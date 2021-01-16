@@ -1251,7 +1251,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1226"/>
         <source>Divots</source>
-        <translation>Divots</translation>
+        <translation>Supuración</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="385"/>
@@ -3590,12 +3590,12 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="269"/>
         <source>Yemen</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Yemén</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="270"/>
         <source>Zambia</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zambia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="271"/>
@@ -3626,7 +3626,7 @@ Extra Device</source>
     <message>
         <location filename="artisanlib/main.py" line="20841"/>
         <source>HH806AUtemperature(): {0} bytes received but 14 needed</source>
-        <translation type="obsolete">HH806AUtemperature(): {0} bytes recibidos pero se necesitan 14</translation>
+        <translation type="obsolete">HH806AUtemperature(): {0} Bytes recibidos pero se necesitan 14</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2211"/>
@@ -3636,12 +3636,12 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/comm.py" line="2238"/>
         <source>HH506RAtemperature(): {0} bytes received but 14 needed</source>
-        <translation type="unfinished">HH506RAtemperature(): {0} bytes recibidos pero se necesitan 14</translation>
+        <translation type="unfinished">HH506RAtemperature(): {0} Bytes recibidos pero se necesitan 14</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2192"/>
         <source>HH506RAGetID: {0} bytes received but 5 needed</source>
-        <translation type="unfinished">HH506RAGetID: {0} recibidos pero se necesitan 5</translation>
+        <translation type="unfinished">HH506RAGetID: {0} Bytes recibidos pero se necesitan 5</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3932"/>
@@ -3656,7 +3656,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/pid_control.py" line="1027"/>
         <source>pid.readoneword(): {0} RX bytes received (7 needed) for unit ID={1}</source>
-        <translation type="unfinished">pid.readoneword(): {0} RX bytesrecibidos pero se necesitan 7 en Unidad ID={1}</translation>
+        <translation type="unfinished">pid.readoneword(): {0} RX Bytes recibidos pero se necesitan 7 en Unidad ID={1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="3532"/>
@@ -3676,27 +3676,27 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="34409"/>
         <source>Value Error:</source>
-        <translation>Exception Valor:</translation>
+        <translation>Error de Valor:</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2501"/>
         <source>Exception:</source>
-        <translation>Error:</translation>
+        <translation>Excepción:</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="628"/>
         <source>IO Error:</source>
-        <translation></translation>
+        <translation>Error de IO</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="5846"/>
         <source>Serial Exception:</source>
-        <translation type="unfinished">Exception Serial:</translation>
+        <translation type="unfinished">Excepción Serial:</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="500"/>
         <source>CRC16 data corruption ERROR. TX does not match RX. Check wiring</source>
-        <translation type="unfinished">CRC16 data corrupcion ERROR. TX no coincide con RX. Comprueba los cables de conexion</translation>
+        <translation type="unfinished">CRC16 ERROR corrupción de data. TX no coincide con RX. Comprueba los cables de conexión</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="503"/>
@@ -3706,77 +3706,77 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/comm.py" line="1678"/>
         <source>Unable to open serial port</source>
-        <translation type="unfinished">Puerta serial no se pudo abrir</translation>
+        <translation type="unfinished">No se pudo abrir el Puerto serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2359"/>
         <source>CENTER303temperature(): {0} bytes received but 8 needed</source>
-        <translation type="unfinished">CENTER303temperature(): {0} bytes recibidos pero se necesitan 8</translation>
+        <translation type="unfinished">CENTER303temperature(): {0} Bytes recibidos pero se necesitan 8</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2525"/>
         <source>CENTER306temperature(): {0} bytes received but 10 needed</source>
-        <translation type="unfinished">CENTER306temperature(): {0} bytes recibidos pero se necesitan 10</translation>
+        <translation type="unfinished">CENTER306temperature(): {0} Bytes recibidos pero se necesitan 10</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2406"/>
         <source>VOLTCRAFTPL125T2temperature(): {0} bytes received but 26 needed</source>
-        <translation type="unfinished">VOLTCRAFTPL125T2temperature(): {0} bytes recibidos pero se necesitan 326</translation>
+        <translation type="unfinished">VOLTCRAFTPL125T2temperature(): {0} Bytes recibidos pero se necesitan 326</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2456"/>
         <source>VOLTCRAFTPL125T4temperature(): {0} bytes received but 26 needed</source>
-        <translation type="unfinished">VOLTCRAFTPL125T4temperature(): {0} bytes recibidos pero se necesitan 326</translation>
+        <translation type="unfinished">VOLTCRAFTPL125T4temperature(): {0} Bytes recibidos pero se necesitan 326</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="654"/>
         <source>DTAcommand(): {0} bytes received but 15 needed</source>
-        <translation type="unfinished">DTAtemperature(): {0} bytes recibidos pero se necesitan 15</translation>
+        <translation type="unfinished">DTAtemperature(): {0} Bytes recibidos pero se necesitan 15</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2614"/>
         <source>CENTER309temperature(): {0} bytes received but 45 needed</source>
-        <translation type="unfinished">CENTER309temperature(): {0} bytes recibidos pero se necesitan 45</translation>
+        <translation type="unfinished">CENTER309temperature(): {0} Bytes recibidos pero se necesitan 45</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="5325"/>
         <source>Arduino could not set channels</source>
-        <translation type="unfinished">Ardunino no pudo cambiar canales</translation>
+        <translation type="unfinished">Arduino no pudo cambiar los canales</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="5336"/>
         <source>Arduino could not set temperature unit</source>
-        <translation type="unfinished">Arduino no pudo cambiar temperatura</translation>
+        <translation type="unfinished">Arduino no pudo cambiar la temperatura</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2292"/>
         <source>CENTER302temperature(): {0} bytes received but 7 needed</source>
-        <translation type="unfinished">CENTER302temperature(): {0} bytes recibidos pero se necesitan 7</translation>
+        <translation type="unfinished">CENTER302temperature(): {0} Bytes recibidos pero se necesitan 7</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1796"/>
         <source>Serial Exception: invalid comm port</source>
-        <translation type="unfinished">Exception Serial: Comm nombre invalido</translation>
+        <translation type="unfinished">Excepción Serial: Puerto comm invalido</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1801"/>
         <source>Serial Exception: timeout</source>
-        <translation type="unfinished">Exception Serial: tiempo de espera</translation>
+        <translation type="unfinished">Excepción Serial: Tiempo agotado</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1946"/>
         <source>Univariate: no profile data available</source>
-        <translation type="unfinished">Univariate: no data de perfil disponible</translation>
+        <translation type="unfinished">Univariate: No hay data de perfil disponible</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="2156"/>
         <source>Polyfit: no profile data available</source>
-        <translation type="unfinished">Polyfit: no data de perfil disponible</translation>
+        <translation type="unfinished">Polyfit: No hay data de perfil disponible</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28357"/>
         <source>HH806AUtemperature(): {0} bytes received but 16 needed</source>
-        <translation type="obsolete">HH806AUtemperature(): {0} bytes recibidos pero se necesitan 14 {806A?} {1 ?} {16 ?}</translation>
+        <translation type="obsolete">HH806AUtemperature(): {0} Bytes recibidos pero se necesitan 14 {806A?} {1 ?} {16 ?}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23371"/>
@@ -3786,32 +3786,32 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="11742"/>
         <source>Error in lnRegression:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error en lnRegression</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31065"/>
         <source>Exception (probably due to an empty profile):</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Excepción (Probablemente debi a un perfil vacio)</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9196"/>
         <source>Exception: PhidgetManager couldn&apos;t be started. Verify that the Phidget driver is correctly installed!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Excepción: PhidgetManager no pudo iniciar. Verificar que el driver Phidget está instalado correctamente</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35001"/>
         <source>Analyze: no background profile data available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Analyze: no hay datos disponibles en el perfil de fondo</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35004"/>
         <source>Analyze: background profile requires CHARGE and DROP events</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Analyze: El perfil de fondo necesita los eventos CARGAR y DESCARGAR</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="490"/>
         <source>F80h Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="719"/>
@@ -3821,37 +3821,37 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/comm.py" line="1441"/>
         <source>Extech755pressure(): conversion error, {0} bytes received</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extech755pressure(): error de conversión, {0} Bytes recibidos</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="1455"/>
         <source>Extech755pressure(): {0} bytes received but 10 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extech755pressure(): {0} Bytes received pero se necesitan 10</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="1803"/>
         <source>MS6514temperature(): {0} bytes received but 18 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MS6514temperature(): {0} Bytes recibidos pero se necesitan 18</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="1851"/>
         <source>DT301temperature(): {0} bytes received but 11 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DT301temperature(): {0} Bytes recibidos pero se necesitan 18</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="1971"/>
         <source>HH806AUtemperature(): {0} bytes received</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HH806AUtemperature(): {0} Bytes recibidos</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2016"/>
         <source>HH806Wtemperature(): Unable to initiate device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HH806Wtemperature(): No se puede iniciar el dispositivo</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="5346"/>
         <source>Arduino could not set filters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Arduino no puede establecer los filtros</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1785"/>
@@ -3861,72 +3861,72 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/curves.py" line="1908"/>
         <source>ln(): no profile data available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ln(): No hay datos de perfil disponibles</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1929"/>
         <source>expvar(): no profile data available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">expvar(): No hay datos de perfil disponibles</translation>
     </message>
     <message>
         <location filename="../artisanlib/modbusport.py" line="561"/>
         <source>Modbus Error:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error en Modbus:</translation>
     </message>
     <message>
         <location filename="../artisanlib/modbusport.py" line="958"/>
         <source>Modbus Communication Resumed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comunicación Resumida en Modbus</translation>
     </message>
     <message>
         <location filename="../artisanlib/modbusport.py" line="968"/>
         <source>Modbus Communication Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error de Comunicación en Modbus</translation>
     </message>
     <message>
         <location filename="../artisanlib/s7port.py" line="695"/>
         <source>S7 Communication Resumed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comunicación Resumida en S7</translation>
     </message>
     <message>
         <location filename="../artisanlib/s7port.py" line="706"/>
         <source>S7 Communication Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error de Comunicación en S7</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12197"/>
         <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error: redrawdesigner() Eventos de Tueste pueden que no funcionen. Restting Designer.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="26879"/>
         <source>Exception: {} not a valid settings file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Excepción: {} No es un archivo valido de configuración</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34919"/>
         <source>Analyze: DROP event required, none found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Evento DESCARGAR necesario no se encuentra</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34915"/>
         <source>Analyze: CHARGE event required, none found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Evento CARGAR necesario no se encuentra</translation>
     </message>
     <message>
         <location filename="../artisanlib/s7port.py" line="387"/>
         <source>readActiveRegisters() S7 Communication Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error de comunicación S7</translation>
     </message>
     <message>
         <location filename="../artisanlib/s7port.py" line="702"/>
         <source>S7 Error: connecting to PLC failed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error de S7: Fallo Conexión a PLC</translation>
     </message>
     <message>
         <location filename="../artisanlib/s7port.py" line="460"/>
         <source>S7 Error connecting to PLC failed:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error de Conexión de S7 a PLC Falló:</translation>
     </message>
 </context>
 <context>
@@ -3954,7 +3954,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="25129"/>
         <source>Bready</source>
-        <translation type="obsolete">Panificado</translation>
+        <translation type="obsolete">Pan</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="25130"/>
@@ -3964,7 +3964,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="25131"/>
         <source>Flat</source>
-        <translation type="obsolete">Llano</translation>
+        <translation type="obsolete">Plano</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="25132"/>
@@ -3992,27 +3992,27 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="621"/>
         <source>Roast Properties</source>
-        <translation type="unfinished">Propiedades del Tostado</translation>
+        <translation type="unfinished">Propiedades de Tueste</translation>
     </message>
     <message>
         <location filename="../artisanlib/logs.py" line="80"/>
         <source>Error Log</source>
-        <translation type="unfinished">Historial de errores</translation>
+        <translation type="unfinished">Historial de Errores</translation>
     </message>
     <message>
         <location filename="../artisanlib/logs.py" line="113"/>
         <source>Message History</source>
-        <translation type="unfinished">Historial de mensajes</translation>
+        <translation type="unfinished">Historial de Mensajes</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="139"/>
         <source>AutoSave Path</source>
-        <translation type="unfinished">Camino Auto-Guardar</translation>
+        <translation type="unfinished">Ruta para Auto Guardar</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="31"/>
         <source>Roast Calculator</source>
-        <translation type="unfinished">Calculadora del Tostado</translation>
+        <translation type="unfinished">Calculadora de Tueste</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="46"/>
@@ -4022,42 +4022,42 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/phases.py" line="28"/>
         <source>Roast Phases</source>
-        <translation type="unfinished">Fases del Tostado</translation>
+        <translation type="unfinished">Fases de Tueste</translation>
     </message>
     <message>
         <location filename="../artisanlib/cup_profile.py" line="39"/>
         <source>Cup Profile</source>
-        <translation type="unfinished">Perfil de la taza</translation>
+        <translation type="unfinished">Perfil en Taza</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="33"/>
         <source>Profile Background</source>
-        <translation type="unfinished">Perfil de fondo</translation>
+        <translation type="unfinished">Perfil de Fondo</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="29"/>
         <source>Statistics</source>
-        <translation type="unfinished">Estadisticas</translation>
+        <translation type="unfinished">Estadísticas</translation>
     </message>
     <message>
         <location filename="../artisanlib/designer.py" line="36"/>
         <source>Designer Config</source>
-        <translation type="unfinished">Config del Diseñador</translation>
+        <translation type="unfinished">Configuración del Diseñador</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="150"/>
         <source>Manual Temperature Logger</source>
-        <translation type="unfinished">Grabadora manual de Temperaturas</translation>
+        <translation type="unfinished">Grabadora Manual de Temperaturas</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="430"/>
         <source>Ports Configuration</source>
-        <translation type="unfinished">Configuracion Puertos</translation>
+        <translation type="unfinished">Configuración de Puertos</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="42"/>
         <source>Device Assignment</source>
-        <translation type="unfinished">Asignacion de dispositivos</translation>
+        <translation type="unfinished">Asignación de Dispositivos</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="35"/>
@@ -4067,7 +4067,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/wheels.py" line="38"/>
         <source>Wheel Graph Editor</source>
-        <translation type="unfinished">Editor de Graficos de Rueda</translation>
+        <translation type="unfinished">Editor Gráfico de la Rueda</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="40"/>
@@ -4092,7 +4092,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/logs.py" line="36"/>
         <source>Serial Log</source>
-        <translation type="unfinished">Historial Puertos Serie</translation>
+        <translation type="unfinished">Historial Puertos Seriales</translation>
     </message>
     <message>
         <location filename="../artisanlib/platform.py" line="32"/>
@@ -4102,7 +4102,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31561"/>
         <source>Keyboard Autosave [a]</source>
-        <translation type="obsolete">Auto-Guardar Teclado [a]</translation>
+        <translation type="obsolete">Auto Guardar Teclado [a]</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30953"/>
@@ -4127,57 +4127,57 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="23376"/>
         <source>Keyboard Shortcuts Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ayuda - Atajos de Teclado</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="1052"/>
         <source>Alarms Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ayuda - Alarmas</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="30"/>
         <source>Autosave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Auto Guardar</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="116"/>
         <source>Autosave Fields Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ayuda - Campos en Auto Guardar</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="144"/>
         <source>AutoSave Save Also Path</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Auto Guardar: Guardar tambien en Ruta</translation>
     </message>
     <message>
         <location filename="../artisanlib/batches.py" line="29"/>
         <source>Batch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Batch</translation>
     </message>
     <message>
         <location filename="../artisanlib/comparator.py" line="681"/>
         <source>Comparator</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comparador</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="50"/>
         <source>Plotter Data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Plotter de Datos</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2878"/>
         <source>Symbolic Formulas Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ayuda - Formulas Simbólicas</translation>
     </message>
     <message>
         <location filename="../artisanlib/designer.py" line="607"/>
         <source>Add Point</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Añadir Punto</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2886"/>
         <source>External Programs Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ayuda - Programas Externos</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2960"/>
