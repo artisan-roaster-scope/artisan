@@ -685,8 +685,8 @@ class FujiPID(object):
             self.aw.qmc.adderror(mssg)
             return False
                 
-    #sets a new sv value (if slient=False, no output nor event recording is done)
-    def setsv(self,value,silent=False):
+    #sets a new sv value (if slient=False, no output nor event recording is done, if move is True the SV slider is moved)
+    def setsv(self,value,silent=False,move=True):
         command = ""
         #Fuji PXG / PXF
         if self.aw.ser.controlETpid[0] in [0,4]:  # Fuji PXG or PXF
@@ -727,6 +727,8 @@ class FujiPID(object):
                     strcommand = "SETSV::" + str("%.1f"%float(value))
                     self.aw.qmc.DeviceEventRecord(strcommand)
                 self.sv = value
+                if move:
+                    self.aw.moveSVslider(value,setValue=False)
             else:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setsv()")
                 return -1
@@ -749,44 +751,59 @@ class FujiPID(object):
                     strcommand = "SETSV::" + str("%.1f"%float(value))
                     self.aw.qmc.DeviceEventRecord(strcommand)
                 self.sv = value
+                if move:
+                    self.aw.moveSVslider(value,setValue=False)
             else:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setPXRsv()")
                 return -1
 
-    #used to set up or down SV by diff degrees from current sv setting
-    def adjustsv(self,diff):
+    #used to set up or down SV by diff degrees from current sv setting; if move is True the SV slider is moved
+    def adjustsv(self,diff,move=True):
         currentsv = self.readcurrentsv()
         if currentsv != -1:
             newsv = int((currentsv + diff)*10.)          #multiply by 10 because we use a decimal point
-            #   if control pid is fuji PXG
-            if self.aw.ser.controlETpid[0] == 0:
+            
+            #   if control pid is fuji PXG or PXF
+            if self.aw.ser.controlETpid[0] in [0,4]:
+                if self.aw.ser.controlETpid[0] == 0:
+                    reg_dict = self.PXG4
+                elif self.aw.ser.controlETpid[0] == 4:
+                    reg_dict = self.PXF
+                # read the current svN (1-7) being used
+                
+                #-- experimental begin
                 # read the current svN (1-7) being used
                 if self.aw.ser.useModbusPort:
-                    reg = self.aw.modbus.address2register(self.aw.fujipid.PXG4["selectsv"][1],3)
+                    reg = self.aw.modbus.address2register(reg_dict["selectsv"][1],3)
                     N = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
                 else:
-                    command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,self.PXG4["selectsv"][1],1)
+                    command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict["selectsv"][1],1)
                     N = self.aw.fujipid.readoneword(command)
                 if N > 0:
-                    self.aw.fujipid.PXG4["selectsv"][0] = N
-                    svkey = "sv" + str(N)
-                    if self.aw.ser.useModbusPort:
-                        reg = self.aw.modbus.address2register(self.PXG4[svkey][1],6)
-                        self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,newsv)
-                    else:
-                        command = self.message2send(self.aw.ser.controlETpid[1],6,self.PXG4[svkey][1],newsv)
-                        r = self.aw.ser.sendFUJIcommand(command,8)
-                    if self.aw.ser.useModbusPort or len(r) == 8:
-                        message = QApplication.translate("Message","SV{0} changed from {1} to {2})",None).format(str(N),str(currentsv),str(newsv/10.))
-                        self.aw.sendmessage(message)
-                        self.PXG4[svkey][0] = newsv/10
-                        #record command as an Event to replay (not binary as it needs to be stored in a text file)
-                        strcommand = "SETSV::" + str("%.1f"%(newsv/10.))
-                        self.aw.qmc.DeviceEventRecord(strcommand)
-                        self.aw.lcd6.display("%.1f"%float(newsv/10.))
-                    else:
-                        msg = QApplication.translate("Message","Unable to set sv{0}",None).format(str(N))
-                        self.aw.sendmessage(msg)
+                    reg_dict["selectsv"][0] = N
+                #-- experimental end
+                
+                svkey = "sv"+ str(reg_dict["selectsv"][0]) #current sv
+
+                if self.aw.ser.useModbusPort:
+                    reg = self.aw.modbus.address2register(reg_dict[svkey][1],6)
+                    self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,newsv)
+                else:
+                    command = self.message2send(self.aw.ser.controlETpid[1],6,reg_dict[svkey][1],newsv)
+                    r = self.aw.ser.sendFUJIcommand(command,8)
+                if self.aw.ser.useModbusPort or len(r) == 8:
+                    message = QApplication.translate("Message","SV{0} changed from {1} to {2})",None).format(str(N),str(currentsv),str(newsv/10.))
+                    self.aw.sendmessage(message)
+                    reg_dict[svkey][0] = newsv/10
+                    #record command as an Event to replay (not binary as it needs to be stored in a text file)
+                    strcommand = "SETSV::" + str("%.1f"%(newsv/10.))
+                    self.aw.qmc.DeviceEventRecord(strcommand)
+                    self.aw.lcd6.display("%.1f"%float(newsv/10.))
+                    if move:
+                        self.aw.moveSVslider(newsv/10.,setValue=False)
+                else:
+                    msg = QApplication.translate("Message","Unable to set sv{0}",None).format(str(N))
+                    self.aw.sendmessage(msg)
             #   or if control pid is fuji PXR
             elif self.aw.ser.controlETpid[0] == 1:
                 if self.aw.ser.useModbusPort:
@@ -803,6 +820,8 @@ class FujiPID(object):
                     strcommand = "SETSV::" + str("%.1f"%(newsv/10.))
                     self.aw.qmc.DeviceEventRecord(strcommand)
                     self.aw.lcd6.display("%.1f"%float(newsv/10.))
+                    if move:
+                        self.aw.moveSVslider(newsv/10.,setValue=False)
                 else:
                     self.aw.sendmessage(QApplication.translate("Message","Unable to set sv", None))
         else:
@@ -1513,7 +1532,7 @@ class PIDcontrol(object):
             if self.aw.ser.ArduinoIsInitialized:
                 sv = max(0,self.aw.float2float(sv,2))
                 if self.sv != sv: # nothing to do (avoid loops via moveslider!)
-                    if move == True and self.aw.pidcontrol.svSlider:
+                    if move == True:
                         self.aw.moveSVslider(sv,setValue=True) # only move the slider
                         self.sv = sv # remember last sv
                     try:

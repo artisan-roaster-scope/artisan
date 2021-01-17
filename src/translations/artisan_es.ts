@@ -1251,7 +1251,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1226"/>
         <source>Divots</source>
-        <translation>Divots</translation>
+        <translation>Supuración</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="385"/>
@@ -3626,7 +3626,7 @@ Extra Device</source>
     <message>
         <location filename="artisanlib/main.py" line="20841"/>
         <source>HH806AUtemperature(): {0} bytes received but 14 needed</source>
-        <translation type="obsolete">HH806AUtemperature(): {0} bytes recibidos pero se necesitan 14</translation>
+        <translation type="obsolete">HH806AUtemperature(): {0} Bytes recibidos pero se necesitan 14</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2211"/>
@@ -3636,12 +3636,12 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/comm.py" line="2238"/>
         <source>HH506RAtemperature(): {0} bytes received but 14 needed</source>
-        <translation type="unfinished">HH506RAtemperature(): {0} bytes recibidos pero se necesitan 14</translation>
+        <translation type="unfinished">HH506RAtemperature(): {0} Bytes recibidos pero se necesitan 14</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2192"/>
         <source>HH506RAGetID: {0} bytes received but 5 needed</source>
-        <translation type="unfinished">HH506RAGetID: {0} recibidos pero se necesitan 5</translation>
+        <translation type="unfinished">HH506RAGetID: {0} Bytes recibidos pero se necesitan 5</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3932"/>
@@ -3681,7 +3681,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2501"/>
         <source>Exception:</source>
-        <translation>Error:</translation>
+        <translation>Excepción:</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="628"/>
@@ -3711,32 +3711,32 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/comm.py" line="2359"/>
         <source>CENTER303temperature(): {0} bytes received but 8 needed</source>
-        <translation type="unfinished">CENTER303temperature(): {0} bytes recibidos pero se necesitan 8</translation>
+        <translation type="unfinished">CENTER303temperature(): {0} Bytes recibidos pero se necesitan 8</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2525"/>
         <source>CENTER306temperature(): {0} bytes received but 10 needed</source>
-        <translation type="unfinished">CENTER306temperature(): {0} bytes recibidos pero se necesitan 10</translation>
+        <translation type="unfinished">CENTER306temperature(): {0} Bytes recibidos pero se necesitan 10</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2406"/>
         <source>VOLTCRAFTPL125T2temperature(): {0} bytes received but 26 needed</source>
-        <translation type="unfinished">VOLTCRAFTPL125T2temperature(): {0} bytes recibidos pero se necesitan 326</translation>
+        <translation type="unfinished">VOLTCRAFTPL125T2temperature(): {0} Bytes recibidos pero se necesitan 326</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2456"/>
         <source>VOLTCRAFTPL125T4temperature(): {0} bytes received but 26 needed</source>
-        <translation type="unfinished">VOLTCRAFTPL125T4temperature(): {0} bytes recibidos pero se necesitan 326</translation>
+        <translation type="unfinished">VOLTCRAFTPL125T4temperature(): {0} Bytes recibidos pero se necesitan 326</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="654"/>
         <source>DTAcommand(): {0} bytes received but 15 needed</source>
-        <translation type="unfinished">DTAtemperature(): {0} bytes recibidos pero se necesitan 15</translation>
+        <translation type="unfinished">DTAtemperature(): {0} Bytes recibidos pero se necesitan 15</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2614"/>
         <source>CENTER309temperature(): {0} bytes received but 45 needed</source>
-        <translation type="unfinished">CENTER309temperature(): {0} bytes recibidos pero se necesitan 45</translation>
+        <translation type="unfinished">CENTER309temperature(): {0} Bytes recibidos pero se necesitan 45</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="5325"/>
@@ -3751,7 +3751,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/comm.py" line="2292"/>
         <source>CENTER302temperature(): {0} bytes received but 7 needed</source>
-        <translation type="unfinished">CENTER302temperature(): {0} bytes recibidos pero se necesitan 7</translation>
+        <translation type="unfinished">CENTER302temperature(): {0} Bytes recibidos pero se necesitan 7</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1796"/>
@@ -3766,7 +3766,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/curves.py" line="1946"/>
         <source>Univariate: no profile data available</source>
-        <translation type="unfinished">Univariable: No hay datos de perfil disponibles</translation>
+        <translation type="unfinished">Univariate: No hay datos de perfil disponibles</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="2156"/>
@@ -3926,7 +3926,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/s7port.py" line="460"/>
         <source>S7 Error connecting to PLC failed:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error de Conexión de S7 a PLC Falló:</translation>
     </message>
 </context>
 <context>
@@ -4152,7 +4152,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/batches.py" line="29"/>
         <source>Batch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Batch</translation>
     </message>
     <message>
         <location filename="../artisanlib/comparator.py" line="681"/>
@@ -4167,7 +4167,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/devices.py" line="2878"/>
         <source>Symbolic Formulas Help</source>
-        <translation type="unfinished">Ayuda - Fórmulas Simbólicas</translation>
+        <translation type="unfinished">Ayuda - Fórmulas Simbólicas</translation
     </message>
     <message>
         <location filename="../artisanlib/designer.py" line="607"/>
