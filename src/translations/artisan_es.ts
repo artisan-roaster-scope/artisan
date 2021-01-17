@@ -5471,7 +5471,7 @@ Extra Device</source>
     <message>
         <location filename="../help/eventsliders_help.py" line="27"/>
         <source>Serial</source>
-        <translation type="obsolete">Registro de Puerto Serial</translation>
+        <translation type="obsolete">Puerto Serial</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="48"/>
@@ -5586,7 +5586,7 @@ Extra Device</source>
     <message>
         <location filename="../help/eventannotations_help.py" line="14"/>
         <source>Prefix Field</source>
-        <translation type="unfinished">Campos de Prefijo</translation>
+        <translation type="unfinished">Campo de Prefijo</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="55"/>
@@ -5921,19 +5921,21 @@ Gas 50% @12% DTR</translation>
     <message>
         <location filename="../help/eventannotations_help.py" line="62"/>
         <source>When combining back ticks with single or double quotes the back ticks should be inside the quotes.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cuando se combinan comillas invertidas con simples o dobles las comillas invertidas van dentro de las otras</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="63"/>
         <source>Background event annotations can be seen during a roast when &amp;#39;Annotations&amp;#39; is checked in the Profile Background window.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Las anotaciones de evento de fondo se puede ver durante el tueste cuando &amp;#39;anotaciones&amp;#39 es correcto en la ventana de Fondo de Perfil</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="64"/>
         <source>Simple scaling of the event value is possible. Use a single math operator (&amp;#39;*&amp;#39;, &amp;#39;/&amp;#39;, &amp;#39;+&amp;#39; or &amp;#39;-&amp;#39;) immediately following the field name &quot;E&quot;. For example: 
 &amp;#39;~E/10&amp;#39; will divide the E value by 10. 
 &amp;#39;~E+5&amp;#39; adds 5 to the the value of E.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El escalamiento simple del valor del evento es posible. Usa un operador matemático sencillo (&amp;#39;*&amp;#39;, &amp;#39;/&amp;#39;, &amp;#39;+&amp;#39; or &amp;#39;-&amp;#39;) inmediatamente seguido del nombre del campo &quot;E&quot;. Por ejemplo: 
+&amp;#39;~E/10&amp;#39; dividira el valor E entre 10. 
+&amp;#39;~E+5&amp;#39; sumará 5 al valor de E.</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="65"/>
@@ -5948,37 +5950,37 @@ Note that if the event value  does not match any value in the Annotation definit
     <message>
         <location filename="../help/eventbuttons_help.py" line="11"/>
         <source>EVENT CUSTOM BUTTONS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BOTONES EVENTOS PERSONALIZADOS</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="15"/>
         <source>Button Label</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Etiqueta Botón</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="15"/>
         <source>Enter \n to create labels with multiple lines. \t is substituted by the event type.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Presiona \n para crear etiquetas e múltiples líneas. \t es sustituído por un tipo de evento</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="16"/>
         <source>Event Description</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Descripción del Evento</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="18"/>
         <source>Event Value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valor del Evento</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="21"/>
         <source>Button Visibility</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Visibilidad del Botón</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="27"/>
         <source>COMMANDS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">COMANDOS</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="35"/>
