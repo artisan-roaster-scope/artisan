@@ -3553,9 +3553,14 @@ class tgraphcanvas(FigureCanvas):
                         ts = tx
 
                     # if more than max cool (from statistics) past DROP and not yet COOLend turn the time LCD red:
-                    if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and len(self.timex) > self.timeindex[6]:
-                        aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["slowcoolingtimer"],aw.lcdpaletteB["slowcoolingtimer"]))
-                        aw.qmc.setTimerLargeLCDcolorSignal.emit(aw.lcdpaletteF["slowcoolingtimer"],aw.lcdpaletteB["slowcoolingtimer"])
+                    if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and ((len(self.timex) == 1+self.timeindex[6]) or (4*60+2 > (tx - aw.qmc.timex[aw.qmc.timeindex[6]]) > 4*60)):
+                        # switch LCD color to "cooling" color (only after 4min cooling we switch to slowcoolingtimer color)
+                        if (tx - aw.qmc.timex[aw.qmc.timeindex[6]]) > 4*60:
+                            timer_color = "slowcoolingtimer"
+                        else:
+                            timer_color = "rstimer"
+                        aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF[timer_color],aw.lcdpaletteB[timer_color]))
+                        aw.qmc.setTimerLargeLCDcolorSignal.emit(aw.lcdpaletteF[timer_color],aw.lcdpaletteB[timer_color])
 
                     self.setLCDtime(ts)
             finally:
