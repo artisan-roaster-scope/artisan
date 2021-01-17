@@ -21678,7 +21678,7 @@ class ApplicationWindow(QMainWindow):
                             elif cs.startswith("adjustSV(") and cs.endswith(")"):
                                 try:
                                     sv_offset = int(eval(cs[len("adjustSV("):-1]))
-                                    if self.qmc.device != 0 and self.qmc.device != 26:
+                                    if self.qmc.device != 26: # not for DTA
                                         self.adjustSVSignal.emit(sv_offset)
                                         self.sendmessage("Artisan Command: {}".format(cs))
                                 except:
