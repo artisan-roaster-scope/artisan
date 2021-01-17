@@ -18869,8 +18869,13 @@ class ApplicationWindow(QMainWindow):
             return 0
 
     def calcAutoDeltaAxis(self):
-        if len(aw.qmc.delta1) > 3 or len(aw.qmc.delta2) > 3:
+        if not(aw.qmc.flagstart) and (len(aw.qmc.delta1) > 3 or len(aw.qmc.delta2) > 3):
             return self.calcAutoDelta(self.qmc.delta1,self.qmc.delta2,self.qmc.timeindex,self.qmc.DeltaETflag,self.qmc.DeltaBTflag)
+        elif self.qmc.flagon:
+            if aw.qmc.mode == "C":
+                return self.qmc.zlimit_C_default - 1
+            else:
+                return self.qmc.zlimit_F_default - 1
         else:
             return 0
 
@@ -26236,15 +26241,17 @@ class ApplicationWindow(QMainWindow):
                     computedProfile["organic_loss"] = self.float2float(weight_loss - moisture_loss)
             din = dout = 0
             # standardize unit of volume and weight to l and g
-            if volumein != 0.0 and volumeout != 0.0:
+            if volumein != 0.0:
                 volumein = self.float2float(aw.convertVolume(volumein,aw.qmc.volume_units.index(aw.qmc.volume[2]),0),4) # in l
+            if volumeout != 0.0:
                 volumeout = self.float2float(aw.convertVolume(volumeout,aw.qmc.volume_units.index(aw.qmc.volume[2]),0),4) # in l
             # store volume in l
             computedProfile["volumein"] = volumein
             computedProfile["volumeout"] = volumeout
             # store weight in kg
-            if weightin != 0.0 and weightout != 0.0:
+            if weightin != 0.0:
                 weightin = self.float2float(aw.convertWeight(weightin,aw.qmc.weight_units.index(aw.qmc.weight[2]),0),1) # in g
+            if weightout != 0.0:
                 weightout = self.float2float(aw.convertWeight(weightout,aw.qmc.weight_units.index(aw.qmc.weight[2]),0),1) # in g
             computedProfile["weightin"] = weightin
             computedProfile["weightout"] = weightout
