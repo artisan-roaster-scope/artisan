@@ -11285,7 +11285,7 @@ class tgraphcanvas(FigureCanvas):
     def calcStatistics(self,TP_index):
         statisticstimes = [0,0,0,0,0]
         try:
-            if self.timeindex[1] and self.phasesbuttonflag:
+            if self.timeindex[1]:
                 #manual dryend available
                 dryEndIndex = self.timeindex[1]
             else:
