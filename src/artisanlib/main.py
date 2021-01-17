@@ -11024,7 +11024,9 @@ class tgraphcanvas(FigureCanvas):
                             aw.eNumberSpinBox.blockSignals(False)
                             if aw.qmc.timeindex[0] > -1:
                                 timez = stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Nevents]]-aw.qmc.timex[aw.qmc.timeindex[0]])
-                                aw.etimeline.setText(timez)
+                            else:
+                                timez = stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Nevents]])
+                            aw.etimeline.setText(timez)
                             aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents])
                             aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents]))
                             aw.lineEvent.setText(self.specialeventsStrings[Nevents])
@@ -23416,7 +23418,9 @@ class ApplicationWindow(QMainWindow):
                 self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
                 if aw.qmc.timeindex[0] > -1:
                     timez = stringfromseconds(self.qmc.timex[self.qmc.specialevents[currentevent-1]]-self.qmc.timex[self.qmc.timeindex[0]])
-                    self.etimeline.setText(timez)
+                else:
+                    timez = stringfromseconds(self.qmc.timex[self.qmc.specialevents[currentevent-1]])
+                self.etimeline.setText(timez)
                 self.valueEdit.setText(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[currentevent-1]))
                 self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
                 #plot little dot lines
@@ -23448,7 +23452,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.specialeventsStrings[lenevents-1] = self.lineEvent.text()
             if aw.qmc.timeindex[0] > -1:
                 newtime = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ stringtoseconds(str(self.etimeline.text())))
-                self.qmc.specialevents[lenevents-1] = newtime
+            else:
+                newtime = self.qmc.time2index(stringtoseconds(str(self.etimeline.text())))
+            self.qmc.specialevents[lenevents-1] = newtime
 
             self.lineEvent.clearFocus()
             self.eNumberSpinBox.clearFocus()
