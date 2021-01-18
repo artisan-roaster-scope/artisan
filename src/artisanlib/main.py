@@ -1426,6 +1426,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundpath = ""
         self.backgroundUUID = None
         self.backgroundmovespeed = 30
+        self.backgroundShowFullflag = False
         self.titleB = ""
         self.roastbatchnrB = 0
         self.roastbatchprefixB = ""
@@ -6663,7 +6664,8 @@ class tgraphcanvas(FigureCanvas):
                                     stemp3B = self.smooth_list(tx,self.fill_gaps(self.temp2BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
                                 else:
                                     stemp3B = self.stemp2BX[n3]
-                            stemp3B = [None]*bcharge_idx + stemp3B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
+                            if not self.backgroundShowFullflag:
+                                stemp3B = [None]*bcharge_idx + stemp3B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
                             self.l_back3, = self.ax.plot(self.extratimexB[n3], stemp3B, markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
                                                         sketch_params=None,path_effects=[],transform=trans,
                                                         linewidth=self.XTbacklinewidth,linestyle=self.XTbacklinestyle,drawstyle=self.XTbackdrawstyle,color=self.backgroundxtcolor,
@@ -6697,7 +6699,8 @@ class tgraphcanvas(FigureCanvas):
                                     stemp4B = self.smooth_list(tx,self.fill_gaps(self.temp2BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
                                 else:
                                     stemp4B = self.stemp2BX[n4]
-                            stemp4B = [None]*bcharge_idx + stemp4B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
+                            if not self.backgroundShowFullflag:
+                                stemp4B = [None]*bcharge_idx + stemp4B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
                             self.l_back4, = self.ax.plot(self.extratimexB[n4], stemp4B, markersize=self.YTbackmarkersize,marker=self.YTbackmarker,
                                                         sketch_params=None,path_effects=[],transform=trans,
                                                         linewidth=self.YTbacklinewidth,linestyle=self.YTbacklinestyle,drawstyle=self.YTbackdrawstyle,color=self.backgroundytcolor,
@@ -6706,9 +6709,11 @@ class tgraphcanvas(FigureCanvas):
 
                     #draw background
                     if aw.qmc.backgroundETcurve:
-#                        temp_etb = self.stemp1B
-                        # only draw background curve from CHARGE to DROP
-                        temp_etb = [None]*bcharge_idx + self.stemp1B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
+                        if self.backgroundShowFullflag:
+                            temp_etb = self.stemp1B
+                        else:
+                            # only draw background curve from CHARGE to DROP
+                            temp_etb = [None]*bcharge_idx + self.stemp1B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
                     else:
                         temp_etb = [None]*len(self.timeB)
                     self.l_back1, = self.ax.plot(self.timeB,temp_etb,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
@@ -6716,9 +6721,11 @@ class tgraphcanvas(FigureCanvas):
                                                 linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
                                                 alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundET", None)))
                     if aw.qmc.backgroundBTcurve:
-#                        temp_btb = self.stemp2B
-                        # only draw background curve from CHARGE to DROP
-                        temp_btb = [None]*bcharge_idx + self.stemp2B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
+                        if self.backgroundShowFullflag:
+                            temp_btb = self.stemp2B
+                        else:
+                            # only draw background curve from CHARGE to DROP
+                            temp_btb = [None]*bcharge_idx + self.stemp2B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
                     else:
                         temp_btb = [None]*len(self.timeB)
                     self.l_back2, = self.ax.plot(self.timeB, temp_btb,markersize=self.BTbackmarkersize,marker=self.BTbackmarker,
@@ -6774,7 +6781,7 @@ class tgraphcanvas(FigureCanvas):
                         for p in range(len(self.backgroundEvents)):
                             if self.eventsGraphflag not in [2,4] or self.backgroundEtypes[p] > 3:
                                 event_idx = self.backgroundEvents[p]
-                                if event_idx < bcharge_idx or event_idx > bdrop_idx:
+                                if not self.backgroundShowFullflag and event_idx < bcharge_idx or event_idx > bdrop_idx:
                                     continue
                                 if self.backgroundEtypes[p] < 4:
                                     st1 = self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p])
@@ -28191,6 +28198,8 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("ETBflag"):
                 aw.qmc.backgroundETcurve = bool(toBool(settings.value("ETBflag",aw.qmc.backgroundETcurve)))
                 aw.qmc.backgroundBTcurve = bool(toBool(settings.value("BTBflag",aw.qmc.backgroundBTcurve)))
+            if settings.contains("backgroundShowFullflag"):
+                aw.qmc.backgroundShowFullflag = bool(toBool(settings.value("backgroundShowFullflag",aw.qmc.backgroundShowFullflag)))
             settings.endGroup()
             if settings.contains("compareAlignEvent"):
                 aw.qmc.compareAlignEvent = toInt(settings.value("compareAlignEvent",aw.qmc.compareAlignEvent))
@@ -29405,6 +29414,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("alignEvent",aw.qmc.alignEvent)
             settings.setValue("ETBflag",aw.qmc.backgroundETcurve)
             settings.setValue("BTBflag",aw.qmc.backgroundBTcurve)
+            settings.setValue("backgroundShowFullflag",aw.qmc.backgroundShowFullflag)
             settings.endGroup()
             settings.setValue("compareAlignEvent",self.qmc.compareAlignEvent)
             settings.setValue("compareEvents",self.qmc.compareEvents)
