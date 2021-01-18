@@ -77,6 +77,16 @@ RequestExecutionLevel admin
   System::Call "shell32::SHChangeNotify(i,i,i,i) (${SHCNE_ASSOCCHANGED}, ${SHCNF_FLUSH}, 0, 0)"
 !macroend
 
+!macro IsRunning 
+  Delete "$TEMP\25b241e1.tmp"
+  nsExec::Exec "cmd /c for /f $\"tokens=1,2$\" %i in ('tasklist') do (if /i %i EQU artisan.exe fsutil file createnew $TEMP\25b241e1.tmp 0)"
+  IfFileExists $TEMP\25b241e1.tmp 0 notRunning
+    ;we have at least one main window active
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Artisan was found to be running. Please close all instances then try the installer again." /SD IDOK
+    Delete "$TEMP\25b241e1.tmp"
+    Quit
+  notRunning:
+!macroEnd
 
 ; HM NIS Edit Wizard helper defines
 !define pyinstallerOutputDir 'dist/artisan'
@@ -139,6 +149,7 @@ ShowInstDetails show
 ShowUnInstDetails show
 
 Function .onInit
+  !insertmacro IsRunning
 
   ${If} ${RunningX64}
     ReadRegStr $R0 ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
@@ -246,6 +257,7 @@ Function un.onUninstSuccess
 FunctionEnd
 
 Function un.onInit
+    !insertmacro IsRunning
 
     IfSilent +3 
         MessageBox MB_ICONQUESTION|MB_YESNO|MB_TOPMOST "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +2 
