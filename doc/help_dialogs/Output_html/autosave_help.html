@@ -1,4 +1,37 @@
-<head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body><b>AUTOSAVE FIELDS</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+<head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body><b>AUTOSAVE DIALOG</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Dialog Field</th>
+        <th>Meaning</th>
+    </tr>
+    <tr>
+        <td>Autosave [a]</td>
+        <td>Turn Autosave ON or OFF.  When sampling, the keyboard &#39;a&#39; will save the profile at that moment.<br>NOTE: Files with the same file name will be silently overwritten.  Use ~currdatetime in the file name prefix to get unique file names.</td>
+    </tr>
+    <tr>
+        <td>Add to recent file list</td>
+        <td>When checked, Autosaved files will be added to the Files&gt;&gt; Open Recent files list.</td>
+    </tr>
+    <tr>
+        <td>File Name Prefix</td>
+        <td>Defines the file name to use for Autosave.  See the Autosave Fields section below.</td>
+    </tr>
+    <tr>
+        <td>Preview:</td>
+        <td>Shows an example of the file name based on the File Name Prefix field.<br>A &#39;While Recording:&#39; example will also be shown if the file name will be different when the scope is sampling.</td>
+    </tr>
+    <tr>
+        <td>Path</td>
+        <td>Where to store the Autosaved files.</td>
+    </tr>
+    <tr>
+        <td>Save Also</td>
+        <td>Allows to save an additional file.  Choose the file type from the pull-down menu.</td>
+    </tr>
+    <tr>
+        <td>Path</td>
+        <td>Where to store the additional files.</td>
+    </tr>
+</table><br/><br/><b>AUTOSAVE FIELDS</b><table width="100%" border="1" padding="1" border-collapse="collapse">
     <tr>
         <th>Prefix Field</th>
         <th>Source</th>
@@ -108,6 +141,11 @@
         <td>~minute</td>
         <td>Roast minute in format mm</td>
         <td>42</td>
+    </tr>
+    <tr>
+        <td>~currtime</td>
+        <td>Current date and time with seconds in format yy-MM-dd_hhmmss.  Not the same as roast time. </td>
+        <td>21-01-18_093609</td>
     </tr>
     <tr>
         <td>~operator</td>
@@ -362,5 +400,9 @@
     <tr>
         <td>&#x27;Recording ~batchcounter&#39; &quot;~batch&quot; ~title ~datetime_long</td>
         <td>When OFF:<br>Prod-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog<br>While Recording:<br>Recording 1380  Burundi KigandaMurambi 2020-04-25_1136.alog</td>
+    </tr>
+    <tr>
+        <td>&#x27;Recording ~batchcounter&#39; &quot;~batch&quot; ~title ~date_long_&#39;~currtime&#39;&quot;~time&quot;</td>
+        <td>Creates a unique filename for multiple saves while sampling by using ~currtime.<br>When OFF:<br>Prod-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog<br>While Recording. <br>Recording 1380  Burundi KigandaMurambi 2020-04-25_113809.alog</td>
     </tr>
 </table></body>

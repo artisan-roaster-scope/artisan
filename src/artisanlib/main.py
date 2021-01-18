@@ -1916,6 +1916,7 @@ class tgraphcanvas(FigureCanvas):
         self.autosaveprefix = ""
         self.autosavepath = ""
         self.autosavealsopath = ""
+        self.autosaveaddtorecentfilesflag = False
 
         self.autosaveimage = False # if true save an image along alog files
         self.autosaveimageformat = "PDF" # one of the supported image file formats PDF, SVG, PNG, JPEG, BMP, CSV, JSON
@@ -23155,6 +23156,8 @@ class ApplicationWindow(QMainWindow):
     #previewmode 0=not preview, 1=preview for while recording, 2=preview for while not recording
     def parseAutosaveprefix(self,fn,previewmode=0):
         try:
+            currtime = QDateTime.currentDateTime().toString("hhmmss")
+
             #it is text only when there are no disallowed characters, so add the date for backward compatibility and return.
             if fn == self.removeDisallowedFilenameChars(str(fn)):
                 fn += '_' + self.qmc.roastdate.toString("yy-MM-dd_hhmm")
@@ -23305,6 +23308,7 @@ class ApplicationWindow(QMainWindow):
                 ("dd", self.qmc.roastdate.toString("dd")),
                 ("hour", self.qmc.roastdate.toString("hh")),
                 ("minute", self.qmc.roastdate.toString("mm")),
+                ("currtime", currtime),
                 ]
     
             _ignorecase = re.IGNORECASE  # @UndefinedVariable
@@ -23350,7 +23354,7 @@ class ApplicationWindow(QMainWindow):
                         pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
                     self.serialize(filename_path,pf)
                     self.sendmessage(QApplication.translate("Message","Profile {0} saved in: {1}", None).format(filename,self.qmc.autosavepath))
-                    self.setCurrentFile(filename_path,False) # we do not add autosaved files any longer to the recent file menu
+                    self.setCurrentFile(filename_path,aw.qmc.autosaveaddtorecentfilesflag)
                     self.qmc.fileCleanSignal.emit()
 
                     if self.qmc.autosavealsopath != "":
@@ -28217,6 +28221,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.compareMainEvents = bool(toBool(settings.value("compareMainEvents",self.qmc.compareMainEvents)))
             if settings.contains("autosaveflag"):
                 self.qmc.autosaveflag = toInt(settings.value("autosaveflag",self.qmc.autosaveflag))
+            if settings.contains("autosaveaddtorecentfilesflag"):
+                self.qmc.autosaveaddtorecentfilesflag = bool(toBool(settings.value("autosaveaddtorecentfilesflag",self.qmc.autosaveaddtorecentfilesflag)))
             if settings.contains("autosavepdf"):
                 self.qmc.autosaveimage = bool(toBool(settings.value("autosavepdf",self.qmc.autosaveimage)))
             if settings.contains("autosaveimageformat"):
@@ -29424,6 +29430,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("compareDeltaBT",self.qmc.compareDeltaBT)
             settings.setValue("compareMainEvents",self.qmc.compareMainEvents)
             settings.setValue("autosaveflag",self.qmc.autosaveflag)
+            settings.setValue("autosaveaddtorecentfilesflag",self.qmc.autosaveaddtorecentfilesflag)
             settings.setValue("autosavepdf",self.qmc.autosaveimage)
             settings.setValue("autosaveimageformat",self.qmc.autosaveimageformat)
             settings.setValue("autosaveprefix",self.qmc.autosaveprefix)

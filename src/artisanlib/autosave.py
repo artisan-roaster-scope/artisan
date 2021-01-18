@@ -51,6 +51,12 @@ class autosaveDlg(ArtisanDialog):
         self.autocheckbox = QCheckBox()
         self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [a]",None))
         self.autocheckbox.setChecked(self.aw.qmc.autosaveflag)
+
+        addtorecentfileslabel = QLabel(QApplication.translate("CheckBox","Add to recent file list", None))
+        self.addtorecentfiles = QCheckBox()
+        self.addtorecentfiles.setToolTip(QApplication.translate("Tooltip", "Add auto saved file names to the recent files list",None))
+        self.addtorecentfiles.setChecked(self.aw.qmc.autosaveaddtorecentfilesflag)
+
         autopdflabel = QLabel(QApplication.translate("CheckBox","Save also", None))
         self.autopdfcheckbox = QCheckBox()
         self.autopdfcheckbox.setToolTip(QApplication.translate("Tooltip", "Save image alongside .alog profiles",None))
@@ -80,12 +86,19 @@ class autosaveDlg(ArtisanDialog):
         self.pathAlsoEdit = QLineEdit(self.aw.qmc.autosavealsopath)
         self.pathAlsoEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store the save also files",None))
         pathAlsoButton.clicked.connect(self.getalsopath)
+        
+        # this intermediate layout is needed to add the 'addtorecentfiles' checkbox into the existing grid layout.
+        autochecklabelplus = QHBoxLayout()
+        autochecklabelplus.addWidget(autochecklabel)
+        autochecklabelplus.addWidget(self.addtorecentfiles)
+        autochecklabelplus.addWidget(addtorecentfileslabel)
+        autochecklabelplus.addStretch()
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(self.dialogbuttons)
         autolayout = QGridLayout()
         autolayout.addWidget(self.autocheckbox,0,0,Qt.AlignRight)
-        autolayout.addWidget(autochecklabel,0,1)
+        autolayout.addLayout(autochecklabelplus,0,1)
         autolayout.addWidget(prefixlabel,1,0)
         autolayout.addWidget(self.prefixEdit,1,1,1,2)
         autolayout.addWidget(prefixpreviewLabel,2,0)
@@ -160,6 +173,7 @@ class autosaveDlg(ArtisanDialog):
             self.aw.sendmessage(message)
         self.aw.qmc.autosaveimage = self.autopdfcheckbox.isChecked()
         self.aw.qmc.autosaveimageformat = self.imageTypesComboBox.currentText()
+        self.aw.qmc.autosaveaddtorecentfilesflag = self.addtorecentfiles.isChecked()
         self.close()
 
     @pyqtSlot()
