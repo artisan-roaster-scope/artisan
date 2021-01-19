@@ -6468,14 +6468,15 @@ class tgraphcanvas(FigureCanvas):
                     except: # set_in_layout not available in mpl<3.x
                         pass
                     self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
-                    self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
-                    self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-                    for i in self.delta_ax.get_yticklines():
-                        i.set_markersize(10)
-                    for i in self.delta_ax.yaxis.get_minorticklines():
-                        i.set_markersize(5)
-                    for label in self.delta_ax.get_yticklabels() :
-                        label.set_fontproperties(prop)
+                    if self.zgrid > 0:
+                        self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
+                        self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                        for i in self.delta_ax.get_yticklines():
+                            i.set_markersize(10)
+                        for i in self.delta_ax.yaxis.get_minorticklines():
+                            i.set_markersize(5)
+                        for label in self.delta_ax.get_yticklabels() :
+                            label.set_fontproperties(prop)
 
                     # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
                     self.delta_ax.fmt_ydata = self.fmt_data
@@ -6522,12 +6523,18 @@ class tgraphcanvas(FigureCanvas):
 #                self.delta_ax.spines['top'].set_visible(False)
                 self.delta_ax.set_frame_on(False) # hide all splines (as the four lines above)
 
-                self.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.ygrid))
-                self.ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-                for i in self.ax.get_yticklines():
-                    i.set_markersize(10)
-                for i in self.ax.yaxis.get_minorticklines():
-                    i.set_markersize(5)
+                if self.ygrid > 0:
+                    self.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.ygrid))
+                    self.ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                    for i in self.ax.get_yticklines():
+                        i.set_markersize(10)
+                    for i in self.ax.yaxis.get_minorticklines():
+                        i.set_markersize(5)
+#                else: # hide all spines from the ax
+#                    self.ax.spines['left'].set_visible(False)
+#                    self.ax.spines['bottom'].set_visible(False)
+#                    self.ax.spines['right'].set_visible(False)
+#                    self.ax.spines['top'].set_visible(False)
 
                 #update X ticks, labels, and colors
                 self.xaxistosm(redraw=False)
@@ -7699,9 +7706,10 @@ class tgraphcanvas(FigureCanvas):
                                 self.drawDeltaET(trans)
                 if recomputeAllDeltas and self.delta_ax is not None and two_ax_mode:
                     aw.autoAdjustAxis(timex=False)
-                    self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
-                    self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
-                    self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                    if self.zgrid > 0:
+                        self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
+                        self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
+                        self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
                 ##### Extra devices-curves
                 self.extratemp1lines,self.extratemp2lines = [],[]
                 for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
@@ -28118,8 +28126,8 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("grid")
             if settings.contains("xgrid"):
                 self.qmc.xgrid = toInt(settings.value("xgrid",self.qmc.xgrid))
-                self.qmc.ygrid = max(10,toInt(settings.value("ygrid",self.qmc.ygrid)))
-                self.qmc.zgrid = max(1,toInt(settings.value("zgrid",self.qmc.zgrid)))
+                self.qmc.ygrid = max(0,toInt(settings.value("ygrid",self.qmc.ygrid)))
+                self.qmc.zgrid = max(0,toInt(settings.value("zgrid",self.qmc.zgrid)))
                 self.qmc.gridthickness = toInt(settings.value("gridthickness",self.qmc.gridthickness))
 #                self.qmc.xrotation = toInt(settings.value("xrotation",self.qmc.xrotation))
                 self.qmc.gridlinestyle = toInt(settings.value("gridlinestyle",self.qmc.gridlinestyle))
