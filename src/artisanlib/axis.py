@@ -140,7 +140,7 @@ class WindowsDlg(ArtisanDialog):
         timegridlabel = QLabel(QApplication.translate("Label", "Step",None))
         self.xaxislencombobox = QComboBox()
         timelocs =   [
-                    #QApplication.translate("ComboBox", "30 seconds",None),
+                      "",
                       QApplication.translate("ComboBox", "1 minute",None),
                       QApplication.translate("ComboBox", "2 minutes",None),
                       QApplication.translate("ComboBox", "3 minutes",None),
@@ -158,7 +158,7 @@ class WindowsDlg(ArtisanDialog):
             self.xaxislencombobox.setMaximumWidth(width)
 #        self.xaxislencombobox.setMaximumWidth(120)
         
-        self.timeconversion = [60,120,180,240,300,600,1800,3600]
+        self.timeconversion = [0,60,120,180,240,300,600,1800,3600]
         try:
             self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(self.aw.qmc.xgrid))
         except Exception:
@@ -447,15 +447,16 @@ class WindowsDlg(ArtisanDialog):
         self.aw.qmc.autodeltaxET = autodeltaxET_org
         self.aw.qmc.autodeltaxBT = autodeltaxBT_org
         # adjust zgrid
-        zlimit_max = int(str(self.zlimitEdit.text()))
-        d = zlimit_max - zlimit_min
-        steps = int(round(d/5))
-        if steps > 50: 
-            steps = int(round(steps/10))*10
-        elif steps > 10:
-            steps = int(round(steps/5))*5
-        auto_grid = max(2,steps)
-        self.zgridSpinBox.setValue(auto_grid)        
+        if self.zgridSpinBox.value() != 0:
+            zlimit_max = int(str(self.zlimitEdit.text()))
+            d = zlimit_max - zlimit_min
+            steps = int(round(d/5))
+            if steps > 50: 
+                steps = int(round(steps/10))*10
+            elif steps > 10:
+                steps = int(round(steps/5))*5
+            auto_grid = max(2,steps)
+            self.zgridSpinBox.setValue(auto_grid)        
     
     def changexrotation(self):
         self.aw.qmc.xrotation = self.xrotationSpinBox.value()
@@ -623,7 +624,7 @@ class WindowsDlg(ArtisanDialog):
         try:
             self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(self.aw.qmc.xgrid_default))
         except Exception:
-            self.xaxislencombobox.setCurrentIndex(0)
+            self.xaxislencombobox.setCurrentIndex(1)
         if self.aw.qmc.mode == "F":
             self.ygridSpinBox.setValue(self.aw.qmc.ygrid_F_default)
             self.ylimitEdit.setText(str(self.aw.qmc.ylimit_F_default))

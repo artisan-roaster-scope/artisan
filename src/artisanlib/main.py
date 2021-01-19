@@ -4894,31 +4894,30 @@ class tgraphcanvas(FigureCanvas):
                 starttime = self.timex[self.timeindex[0]]
             else:
                 starttime = 0
-
+    
         endtime = endofx + starttime
         
         self.ax.set_xlim(startofx,endtime)
-
-        if not self.xgrid:
-            self.xgrid = 60.
-
-        mfactor1 =  round(float(2. + int(starttime)/int(self.xgrid)))
-        mfactor2 =  round(float(2. + int(endofx)/int(self.xgrid)))
-
-        majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid)
-        if self.xgrid == 60:
-            minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 30)
-        else:
-            minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 60)
-
-        majorlocator = ticker.FixedLocator(majorloc)
-        minorlocator = ticker.FixedLocator(minorloc)
-
-        self.ax.xaxis.set_major_locator(majorlocator)
-        self.ax.xaxis.set_minor_locator(minorlocator)
-
-        formatter = ticker.FuncFormatter(self.formtime)
-        self.ax.xaxis.set_major_formatter(formatter)
+        
+        if self.xgrid != 0:
+    
+            mfactor1 =  round(float(2. + int(starttime)/int(self.xgrid)))
+            mfactor2 =  round(float(2. + int(endofx)/int(self.xgrid)))
+    
+            majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid)
+            if self.xgrid == 60:
+                minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 30)
+            else:
+                minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 60)
+    
+            majorlocator = ticker.FixedLocator(majorloc)
+            minorlocator = ticker.FixedLocator(minorloc)
+    
+            self.ax.xaxis.set_major_locator(majorlocator)
+            self.ax.xaxis.set_minor_locator(minorlocator)
+    
+            formatter = ticker.FuncFormatter(self.formtime)
+            self.ax.xaxis.set_major_formatter(formatter)
 
 
         #adjust the length of the minor ticks
@@ -18818,15 +18817,16 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.zlimit = int(dmax) + 1
                 else:
                     aw.qmc.zlimit = aw.qmc.zlimit_min + 1
-                # adjust zgrid
-                d = aw.qmc.zlimit - aw.qmc.zlimit_min
-                steps = int(round(d/5))
-                if steps > 50: 
-                    steps = int(round(steps/10))*10
-                elif steps > 10:
-                    steps = int(round(steps/5))*5
-                auto_grid = max(2,steps)
-                aw.qmc.zgrid = auto_grid
+                # adjust zgrid (only if zgrid not deactivated)
+                if aw.qmc.zgrid != 0:
+                    d = aw.qmc.zlimit - aw.qmc.zlimit_min
+                    steps = int(round(d/5))
+                    if steps > 50: 
+                        steps = int(round(steps/10))*10
+                    elif steps > 10:
+                        steps = int(round(steps/5))*5
+                    auto_grid = max(2,steps)
+                    aw.qmc.zgrid = auto_grid
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -30972,15 +30972,17 @@ class ApplicationWindow(QMainWindow):
                         if self.qmc.autodeltaxBT:
                             self.qmc.delta_ax.set_ylim(self.qmc.zlimit_min,delta_max)                        
                         # adjust zgrid
-                        d = delta_max - self.qmc.zlimit_min
-                        steps = int(round(d/5))
-                        if steps > 50: 
-                            steps = int(round(steps/10))*10
-                        elif steps > 10:
-                            steps = int(round(steps/5))*5
-                        auto_grid = max(2,steps)
-                        self.qmc.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(auto_grid))
-                        self.qmc.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                        if aw.qmc.zgrid != 0:
+                            d = delta_max - self.qmc.zlimit_min
+                            steps = int(round(d/5))
+                            if steps > 50: 
+                                steps = int(round(steps/10))*10
+                            elif steps > 10:
+                                steps = int(round(steps/5))*5
+                            auto_grid = max(2,steps)
+                            aw.qmc.zgrid = auto_grid
+                            self.qmc.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(aw.qmc.zgrid))
+                            self.qmc.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
                         # adjust time limits
                         aw.qmc.ax.set_xlim(min_start_time-15,max_end_time+15) # we adjust the min, max time scale to ensure all data is visible
                         graph_image = "roastlog-graph"
