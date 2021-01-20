@@ -7274,7 +7274,7 @@ class tgraphcanvas(FigureCanvas):
                                 pass
                             elif aw.qmc.showEtypes[self.specialeventstype[i]]:
                                 event_idx = int(self.specialevents[i])
-                                if not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
+                                if not self.flagstart and not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
                                     continue
                             
                                 firstletter = self.etypes[self.specialeventstype[i]][0]
@@ -7588,7 +7588,7 @@ class tgraphcanvas(FigureCanvas):
                             evalues = [self.E1values[:],self.E2values[:],self.E3values[:],self.E4values[:]]
                         for i in range(Nevents):
                             event_idx = int(self.specialevents[i])
-                            if not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
+                            if not self.flagstart and not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
                                 continue
                             if self.specialeventstype[i] == 4 or self.eventsGraphflag in [0,3,4]:
                                 if self.specialeventstype[i] < 4 and (not aw.qmc.renderEventsDescr or len(self.specialeventsStrings[i].strip()) == 0):
@@ -7743,7 +7743,7 @@ class tgraphcanvas(FigureCanvas):
                                 trans = self.delta_ax.transData
                             else:
                                 trans = self.ax.transData
-                            if not self.foregroundShowFullflag:
+                            if not self.flagstart and not self.foregroundShowFullflag:
                                 visible_extratemp1 = [None]*charge_idx + self.extrastemp1[i][charge_idx:drop_idx+1] + [None]*(len(self.extratimex[i])-drop_idx-1)
                             else:
                                 visible_extratemp1 = self.extrastemp1[i]
@@ -7767,7 +7767,7 @@ class tgraphcanvas(FigureCanvas):
                                 trans = self.delta_ax.transData
                             else:
                                 trans = self.ax.transData
-                            if not self.foregroundShowFullflag:
+                            if not self.flagstart and not self.foregroundShowFullflag:
                                 visible_extratemp2 = [None]*charge_idx + self.extrastemp2[i][charge_idx:drop_idx+1] + [None]*(len(self.extratimex[i])-drop_idx-1)
                             else:
                                 visible_extratemp2 = self.extrastemp2[i]
@@ -7782,7 +7782,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
                 ##### ET,BT curves
                 
-                if not self.foregroundShowFullflag:
+                if not self.flagstart and not self.foregroundShowFullflag:
                     visible_et = [None]*charge_idx + self.stemp1[charge_idx:drop_idx+1] + [None]*(len(self.timex)-drop_idx-1)
                     visible_bt = [None]*charge_idx + self.stemp2[charge_idx:drop_idx+1] + [None]*(len(self.timex)-drop_idx-1)
                 else:
@@ -18892,7 +18892,7 @@ class ApplicationWindow(QMainWindow):
                 t_start = aw.qmc.timex[aw.qmc.timeindex[0]] - 60
             elif self.qmc.timeindex[0] == -1:
                 t_start = aw.qmc.timex[0] - 60
-            if self.qmc.timeindex[7] > 0 and self.qmc.foregroundShowFullflag: # COOL set and the curves are drawn beyond DROP
+            if self.qmc.timeindex[7] > 0 and (self.qmc.foregroundShowFullflag or self.flagstart): # COOL set and the curves are drawn beyond DROP
                 t_end = aw.qmc.timex[aw.qmc.timeindex[7]] + 60
             elif self.qmc.timeindex[6] > 0: # DROP set
                 t_end = aw.qmc.timex[aw.qmc.timeindex[6]] + 90
