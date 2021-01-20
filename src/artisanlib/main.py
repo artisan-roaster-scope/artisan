@@ -18892,7 +18892,7 @@ class ApplicationWindow(QMainWindow):
                 t_start = aw.qmc.timex[aw.qmc.timeindex[0]] - 60
             elif self.qmc.timeindex[0] == -1:
                 t_start = aw.qmc.timex[0] - 60
-            if self.qmc.timeindex[7] > 0 and (self.qmc.foregroundShowFullflag or self.flagstart): # COOL set and the curves are drawn beyond DROP
+            if self.qmc.timeindex[7] > 0 and (self.qmc.foregroundShowFullflag or self.qmc.flagstart): # COOL set and the curves are drawn beyond DROP
                 t_end = aw.qmc.timex[aw.qmc.timeindex[7]] + 60
             elif self.qmc.timeindex[6] > 0: # DROP set
                 t_end = aw.qmc.timex[aw.qmc.timeindex[6]] + 90
