@@ -301,6 +301,7 @@ class HUDDlg(ArtisanDialog):
         self.org_graphstyle = self.aw.qmc.graphstyle
         self.org_ETname = self.aw.ETname
         self.org_BTname = self.aw.BTname
+        self.org_foregroundShowFullflag = self.aw.qmc.foregroundShowFullflag
         
         self.showHUDbutton = QCheckBox(QApplication.translate("Label", "HUD Button", None))
         self.showHUDbutton.setChecked(self.aw.qmc.HUDbuttonflag)
@@ -319,10 +320,12 @@ class HUDDlg(ArtisanDialog):
         ETPIDLabel = QLabel(QApplication.translate("Label", "ET p-i-d 1",None))
         #delta ET
         self.DeltaET = QCheckBox()
+        self.DeltaET.setFocusPolicy(Qt.NoFocus)
         self.DeltaET.setChecked(self.aw.qmc.DeltaETflag)
         DeltaETlabel = QLabel(deltaLabelUTF8 + QApplication.translate("Label", "ET",None))
         #delta BT
         self.DeltaBT = QCheckBox()
+        self.DeltaBT.setFocusPolicy(Qt.NoFocus)
         self.DeltaBT.setChecked(self.aw.qmc.DeltaBTflag)
         DeltaBTlabel = QLabel(deltaLabelUTF8 + QApplication.translate("Label", "BT",None))
         filterlabel = QLabel(QApplication.translate("Label", "Smoothing",None))
@@ -380,6 +383,12 @@ class HUDDlg(ArtisanDialog):
             self.DropDuplicatesLimit.setSuffix(" F")
         elif self.aw.qmc.mode == "C":
             self.DropDuplicatesLimit.setSuffix(" C")
+
+        #show full
+        self.ShowFull = QCheckBox(QApplication.translate("CheckBox", "Show Full",None))
+        self.ShowFull.setChecked(self.aw.qmc.foregroundShowFullflag)
+        self.ShowFull.stateChanged.connect(self.changeShowFullFilter)
+        self.ShowFull.setFocusPolicy(Qt.NoFocus)
         
         #dropspikes
         self.DropSpikes = QCheckBox(QApplication.translate("CheckBox", "Drop Spikes",None))
@@ -503,9 +512,11 @@ class HUDDlg(ArtisanDialog):
         rorBoxLayout.addWidget(self.projectCheck)
         rorBoxLayout.addWidget(self.projectionmodeComboBox)
         self.DeltaETlcd = QCheckBox()
+        self.DeltaETlcd.setFocusPolicy(Qt.NoFocus)
         self.DeltaETlcd.setChecked(self.aw.qmc.DeltaETlcdflag)
         DeltaETlcdLabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "ET",None))
         self.DeltaBTlcd = QCheckBox()
+        self.DeltaBTlcd.setFocusPolicy(Qt.NoFocus)
         self.DeltaBTlcd.setChecked(self.aw.qmc.DeltaBTlcdflag)
         self.swapdeltalcds = QCheckBox(QApplication.translate("CheckBox", "Swap",None))
         self.swapdeltalcds.setChecked(self.aw.qmc.swapdeltalcds)
@@ -609,7 +620,14 @@ class HUDDlg(ArtisanDialog):
         postRoastVBox = QVBoxLayout()
         postRoastVBox.addLayout(spikesLayout2)
         postRoastGroupLayout = QGroupBox(QApplication.translate("GroupBox","Curve Filter",None))
-        postRoastGroupLayout.setLayout(postRoastVBox)    
+        postRoastGroupLayout.setLayout(postRoastVBox)
+        
+        # Render xGroup
+        renderVBox = QVBoxLayout()
+        renderVBox.addWidget(self.ShowFull)
+        renderGroupLayout = QGroupBox(QApplication.translate("GroupBox","Display Filter",None))
+        renderGroupLayout.setLayout(renderVBox)    
+        
         #swapETBT flag
         self.rorFilter = QCheckBox(QApplication.translate("CheckBox", "Limits",None))
         self.rorFilter.setChecked(self.aw.qmc.RoRlimitFlag)
@@ -691,9 +709,14 @@ class HUDDlg(ArtisanDialog):
         tab0Layout.addWidget(rorSymbolicFormulaGroupLayout)
         tab0Layout.addStretch()
         #tab1
+        tab1UpperRightLayout = QVBoxLayout()
+        tab1UpperRightLayout.addWidget(postRoastGroupLayout)
+        tab1UpperRightLayout.addWidget(renderGroupLayout)
+        
         tab1UpperLayout = QHBoxLayout()
         tab1UpperLayout.addWidget(inputFilterGroupLayout)
-        tab1UpperLayout.addWidget(postRoastGroupLayout)
+        tab1UpperLayout.addLayout(tab1UpperRightLayout)
+        
         tab1Layout = QVBoxLayout()
         tab1Layout.addLayout(tab1UpperLayout)
         tab1Layout.addWidget(rorFilterGroupLayout)
@@ -2314,6 +2337,11 @@ class HUDDlg(ArtisanDialog):
     def changeDropFilter(self,_=0):
         self.aw.qmc.filterDropOuts = not self.aw.qmc.filterDropOuts
         self.aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
+        
+    @pyqtSlot(int) 
+    def changeShowFullFilter(self,_=0):
+        self.aw.qmc.foregroundShowFullflag = not self.aw.qmc.foregroundShowFullflag
+        self.aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
 
     @pyqtSlot(int) 
     def changeSpikeFilter(self,_=0):
@@ -2414,6 +2442,7 @@ class HUDDlg(ArtisanDialog):
         self.aw.qmc.graphstyle = self.org_graphstyle
         self.aw.ETname = self.org_ETname
         self.aw.BTname = self.org_BTname
+        self.aw.qmc.foregroundShowFullflag = self.org_foregroundShowFullflag
         
         self.aw.setFonts(False)
         self.aw.qmc.resetlinecountcaches()
@@ -2464,6 +2493,7 @@ class HUDDlg(ArtisanDialog):
         self.aw.qmc.minmaxLimits = self.MinMaxLimits.isChecked()
         self.aw.qmc.filterDropOut_tmin = int(self.minLimit.value())
         self.aw.qmc.filterDropOut_tmax = int(self.maxLimit.value())
+        self.aw.qmc.foregroundShowFullflag = self.ShowFull.isChecked()
         mode = self.modeComboBox.currentText()
         if mode == QApplication.translate("ComboBox","metrics", None):
             self.aw.HUDfunction = 0

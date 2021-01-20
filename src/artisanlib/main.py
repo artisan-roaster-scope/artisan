@@ -1538,6 +1538,7 @@ class tgraphcanvas(FigureCanvas):
         self.BTlcd = True
         self.swaplcds = False # if set draw ET curver on top of BT curve and show ET LCD above BT LCD by default
         self.LCDdecimalplaces = 1
+        self.foregroundShowFullflag = True
         self.DeltaETflag = False
         self.DeltaBTflag = True
         self.DeltaETlcdflag = False
@@ -6259,15 +6260,15 @@ class tgraphcanvas(FigureCanvas):
         else:
             return (lst + [-1]*(ln-len(lst)))[:ln]
 
-    def drawET(self):
+    def drawET(self,temp):
         if aw.qmc.ETcurve:
-            self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,
+            self.l_temp1, = self.ax.plot(self.timex,temp,markersize=self.ETmarkersize,marker=self.ETmarker,
                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                 linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
 
-    def drawBT(self):
+    def drawBT(self,temp):
         if aw.qmc.BTcurve:
-            self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,
+            self.l_temp2, = self.ax.plot(self.timex,temp,markersize=self.BTmarkersize,marker=self.BTmarker,
                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                 linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
 
@@ -7216,6 +7217,14 @@ class tgraphcanvas(FigureCanvas):
 #                            print("BT RoR std (new):",numpy.std(self.delta2))
 #                        except Exception as e:
 #                            print(e)
+                
+                # CHARGE-DROP curve index limits
+                charge_idx = 0
+                if self.timeindex[0] > -1:
+                    charge_idx = self.timeindex[0]
+                drop_idx = len(self.timex)-1
+                if self.timeindex[6] > 0:
+                    drop_idx = self.timeindex[6]
 
                 if self.eventsshowflag:
                     Nevents = len(self.specialevents)
@@ -7264,6 +7273,10 @@ class tgraphcanvas(FigureCanvas):
                                 # a special event of type "--"
                                 pass
                             elif aw.qmc.showEtypes[self.specialeventstype[i]]:
+                                event_idx = int(self.specialevents[i])
+                                if not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
+                                    continue
+                            
                                 firstletter = self.etypes[self.specialeventstype[i]][0]
                                 secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
 
@@ -7276,7 +7289,7 @@ class tgraphcanvas(FigureCanvas):
                                             temps = self.temp2
                                         else:
                                             temps = self.stemp2
-                                    elif (aw.qmc.ETcurve and self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]) or (not aw.qmc.BTcurve):
+                                    elif (aw.qmc.ETcurve and self.temp1[event_idx] >= self.temp2[event_idx]) or (not aw.qmc.BTcurve):
                                         col = self.palette["et"]
                                         if aw.qmc.flagon:
                                             temps = self.temp1
@@ -7294,9 +7307,9 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         vert_offset = 2.5
                                     anno = self.ax.annotate(firstletter + secondletter,
-                                                     xy=(self.timex[int(self.specialevents[i])],
-                                                     temps[int(self.specialevents[i])]),
-                                                     xytext=(self.timex[int(self.specialevents[i])],row[firstletter] + vert_offset),
+                                                     xy=(self.timex[event_idx],
+                                                     temps[event_idx]),
+                                                     xytext=(self.timex[event_idx],row[firstletter] + vert_offset),
                                                      alpha=1.,
                                                      va="center", ha="left",
                                                      bbox=dict(boxstyle='square,pad=0.1', fc=self.palette["specialeventbox"], ec='none'),
@@ -7574,6 +7587,9 @@ class tgraphcanvas(FigureCanvas):
                             # we prepare copies of the Evalues
                             evalues = [self.E1values[:],self.E2values[:],self.E3values[:],self.E4values[:]]
                         for i in range(Nevents):
+                            event_idx = int(self.specialevents[i])
+                            if not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
+                                continue
                             if self.specialeventstype[i] == 4 or self.eventsGraphflag in [0,3,4]:
                                 if self.specialeventstype[i] < 4 and (not aw.qmc.renderEventsDescr or len(self.specialeventsStrings[i].strip()) == 0):
                                     etype = self.etypesf(self.specialeventstype[i])
@@ -7695,7 +7711,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.DeltaETflag or self.DeltaBTflag:
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
-                        if len(self.timex) == len(self.delta1) and len(self.timex)  == len(self.delta2):
+                        if len(self.timex) == len(self.delta1) and len(self.timex) == len(self.delta2):
                             trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
                             if aw.qmc.swapdeltalcds:
                                 self.drawDeltaET(trans)
@@ -7705,10 +7721,11 @@ class tgraphcanvas(FigureCanvas):
                                 self.drawDeltaET(trans)
                 if recomputeAllDeltas and self.delta_ax is not None and two_ax_mode:
                     aw.autoAdjustAxis(timex=False)
+                    self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                     if self.zgrid > 0:
-                        self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                         self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
                         self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                    
                 ##### Extra devices-curves
                 self.extratemp1lines,self.extratemp2lines = [],[]
                 for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
@@ -7726,10 +7743,14 @@ class tgraphcanvas(FigureCanvas):
                                 trans = self.delta_ax.transData
                             else:
                                 trans = self.ax.transData
+                            if not self.foregroundShowFullflag:
+                                visible_extratemp1 = [None]*charge_idx + self.extrastemp1[i][charge_idx:drop_idx+1] + [None]*(len(self.extratimex[i])-drop_idx-1)
+                            else:
+                                visible_extratemp1 = self.extrastemp1[i]
                             # first draw the fill if any, but not during recording!
                             if not aw.qmc.flagstart and aw.extraFill1[i] > 0:
-                                self.ax.fill_between(self.extratimex[i], 0, self.extrastemp1[i],transform=trans,color=self.extradevicecolor1[i],alpha=aw.extraFill1[i]/100.,sketch_params=None)
-                            self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],transform=trans,color=self.extradevicecolor1[i],
+                                self.ax.fill_between(self.extratimex[i], 0, visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],alpha=aw.extraFill1[i]/100.,sketch_params=None)
+                            self.extratemp1lines.append(self.ax.plot(self.extratimex[i],visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],
                                 drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
@@ -7746,22 +7767,34 @@ class tgraphcanvas(FigureCanvas):
                                 trans = self.delta_ax.transData
                             else:
                                 trans = self.ax.transData
+                            if not self.foregroundShowFullflag:
+                                visible_extratemp2 = [None]*charge_idx + self.extrastemp2[i][charge_idx:drop_idx+1] + [None]*(len(self.extratimex[i])-drop_idx-1)
+                            else:
+                                visible_extratemp2 = self.extrastemp2[i]
                             # first draw the fill if any
                             if not aw.qmc.flagstart and aw.extraFill2[i] > 0:
-                                self.ax.fill_between(self.extratimex[i], 0, self.extrastemp2[i],transform=trans,color=self.extradevicecolor2[i],alpha=aw.extraFill2[i]/100.,sketch_params=None)
-                            self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],transform=trans,color=self.extradevicecolor2[i],
+                                self.ax.fill_between(self.extratimex[i], 0, visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],alpha=aw.extraFill2[i]/100.,sketch_params=None)
+                            self.extratemp2lines.append(self.ax.plot(self.extratimex[i],visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
                     except Exception as ex:
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
                 ##### ET,BT curves
-                if aw.qmc.swaplcds:
-                    self.drawET()
-                    self.drawBT()
+                
+                if not self.foregroundShowFullflag:
+                    visible_et = [None]*charge_idx + self.stemp1[charge_idx:drop_idx+1] + [None]*(len(self.timex)-drop_idx-1)
+                    visible_bt = [None]*charge_idx + self.stemp2[charge_idx:drop_idx+1] + [None]*(len(self.timex)-drop_idx-1)
                 else:
-                    self.drawBT()
-                    self.drawET()
+                    visible_et = self.stemp1
+                    visible_bt = self.stemp2
+                                
+                if aw.qmc.swaplcds:
+                    self.drawET(visible_et)
+                    self.drawBT(visible_bt)
+                else:
+                    self.drawBT(visible_bt)
+                    self.drawET(visible_et)
 
                 if aw.qmc.ETcurve:
                     self.handles.append(self.l_temp1)
@@ -7864,9 +7897,9 @@ class tgraphcanvas(FigureCanvas):
                         self.labels = [toASCII(l) for l in self.labels]
                     if self.legend is None:
                         if self.legendloc_pos is None:
-                            loc = self.legendloc
+                            loc = self.legendloc # a position selected in the axis dialog
                         else:
-                            loc = self.legendloc_pos
+                            loc = self.legendloc_pos # a user define legend position set by drag-and-drop
                     else:
                         loc = self.legend._loc
                     leg = self.ax.legend(self.handles,self.labels,loc=loc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
@@ -18859,7 +18892,7 @@ class ApplicationWindow(QMainWindow):
                 t_start = aw.qmc.timex[aw.qmc.timeindex[0]] - 60
             elif self.qmc.timeindex[0] == -1:
                 t_start = aw.qmc.timex[0] - 60
-            if self.qmc.timeindex[7] > 0: # COOL set
+            if self.qmc.timeindex[7] > 0 and self.qmc.foregroundShowFullflag: # COOL set and the curves are drawn beyond DROP
                 t_end = aw.qmc.timex[aw.qmc.timeindex[7]] + 60
             elif self.qmc.timeindex[6] > 0: # DROP set
                 t_end = aw.qmc.timex[aw.qmc.timeindex[6]] + 90
@@ -27778,6 +27811,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.minmaxLimits = bool(toBool(settings.value("minmaxLimits",self.qmc.minmaxLimits)))
                 self.qmc.filterDropOut_tmin = toInt(settings.value("minLimit",self.qmc.filterDropOut_tmin))
                 self.qmc.filterDropOut_tmax = toInt(settings.value("maxLimit",self.qmc.filterDropOut_tmax))
+            if settings.contains("foregroundShowFullflag"):
+                self.qmc.foregroundShowFullflag = bool(toBool(settings.value("foregroundShowFullflag",self.qmc.foregroundShowFullflag)))
             settings.beginGroup("RoC")
             self.qmc.DeltaETflag = bool(toBool(settings.value("DeltaET",self.qmc.DeltaETflag)))
             self.qmc.DeltaBTflag = bool(toBool(settings.value("DeltaBT",self.qmc.DeltaBTflag)))
@@ -29190,6 +29225,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("minmaxLimits",self.qmc.minmaxLimits)
             settings.setValue("minLimit",self.qmc.filterDropOut_tmin)
             settings.setValue("maxLimit",self.qmc.filterDropOut_tmax)
+            settings.setValue("foregroundShowFullflag",self.qmc.foregroundShowFullflag)
             settings.beginGroup("RoC")
             settings.setValue("DeltaET",self.qmc.DeltaETflag)
             settings.setValue("DeltaBT",self.qmc.DeltaBTflag)
