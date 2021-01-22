@@ -14589,6 +14589,19 @@ class EventActionThread(QThread):
         # the GUI thread
         aw.eventaction_internal(self.action,self.command,doupdategraphics=False,doupdatebackground=False)
 
+# applies comma2dot as fixup to automatically turn numbers like "1,2" into valid numbers like "1.0" and the empty entry into "0.0"
+class MyQDoubleValidator(QDoubleValidator):
+    def __init__(self, *args, **kwargs):
+        super(MyQDoubleValidator, self).__init__(*args, **kwargs)
+    
+    def fixup(self, input):
+        if input is None or input == "":
+            return "0"
+        else:
+            try:
+                return aw.comma2dot(input)
+            except:
+                return input
 
 ########################################################################################
 #################### MAIN APPLICATION WINDOW ###########################################
@@ -17632,7 +17645,7 @@ class ApplicationWindow(QMainWindow):
 
     # this is important to have . as decimal separator independent of the systems locale
     def createCLocaleDoubleValidator(self,bot,top,dec,w):
-        validator = QDoubleValidator(bot,top,dec,w)
+        validator = MyQDoubleValidator(bot,top,dec,w)
         validator.setLocale(QLocale.c())
         return validator
 
