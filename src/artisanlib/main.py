@@ -682,6 +682,7 @@ class tgraphcanvas(FigureCanvas):
     toggleRecorderSignal = pyqtSignal()
     processAlarmSignal = pyqtSignal(int,bool,int,str)
     alarmsetSignal = pyqtSignal(int)
+    moveBackgroundSignal = pyqtSignal(str,int)
 
     def __init__(self,parent,dpi):
 
@@ -2286,6 +2287,7 @@ class tgraphcanvas(FigureCanvas):
         self.toggleRecorderSignal.connect(self.toggleRecorderTigger)
         self.processAlarmSignal.connect(self.processAlarm)
         self.alarmsetSignal.connect(self.selectAlarmSet)
+        self.moveBackgroundSignal.connect(self.moveBackgroundAndRedraw)
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -3747,6 +3749,7 @@ class tgraphcanvas(FigureCanvas):
             if self.alarmSemaphore.available() < 1:
                 self.alarmSemaphore.release(1)
 
+    @pyqtSlot(int)
     def selectAlarmSet(self,n):
         alarmset = self.getAlarmSet(n)
         if alarmset is not None:
@@ -3769,6 +3772,12 @@ class tgraphcanvas(FigureCanvas):
             finally:
                 if self.alarmSemaphore.available() < 1:
                     self.alarmSemaphore.release(1)
+    
+    @pyqtSlot(str,int)
+    def moveBackgroundAndRedraw(self,direction,step):
+        aw.qmc.movebackground(direction,step)
+        self.backmoveflag = 0 # do not align background automatically during redraw!
+        aw.qmc.redraw(recomputeAllDeltas=(direction=="left" or direction=="right"),sampling=aw.qmc.flagon)
     
     def findAlarmSet(self,label):
         try:
@@ -14594,12 +14603,12 @@ class MyQDoubleValidator(QDoubleValidator):
     def __init__(self, *args, **kwargs):
         super(MyQDoubleValidator, self).__init__(*args, **kwargs)
     
-    def fixup(self, input):
-        if input is None or input == "":
+    def fixup(self, input_value):
+        if input_value is None or input_value == "":
             return "0"
         else:
             try:
-                return aw.comma2dot(input)
+                return aw.comma2dot(input_value)
             except:
                 return input
 
@@ -21757,6 +21766,32 @@ class ApplicationWindow(QMainWindow):
                                         self.sendmessage("Artisan Command: {}".format(cs))
                                 except:
                                     pass
+                            # moveBackground(<direction>,<step>) with <direction> one of up,down,left,right and <step> the length of the move
+                            elif cs.startswith("moveBackground(") and cs.endswith(")"):
+                                try:
+                                    args = cs[len("moveBackground("):-1].split(",")
+                                    if len(args) == 2:
+                                        direction = args[0].lower()
+                                        if len(direction)>3 and (direction[0]=='"' or direction[0]=="'") and (direction[-1]=='"' or direction[-1]=="'"):
+                                            direction = eval(direction)
+                                        step = int(args[1])
+                                        self.qmc.moveBackgroundSignal.emit(direction,step)
+                                        self.sendmessage("Artisan Command: {}".format(cs))
+                                except:
+                                    pass
+                            # pidLookahead(<n>) adds <n> to the current SV. Note that n can be negativex
+                            elif cs.startswith("pidLookahead(") and cs.endswith(")"):
+                                try:
+                                    lookahead = int(eval(cs[len("pidLookahead("):-1]))
+                                    if self.qmc.device == 0 and self.fujipid and self.qmc.Controlbuttonflag: # FUJI PID
+                                        self.fujipid.lookahead = lookahead
+                                        self.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(self.fujipid.lookahead))
+                                    elif (self.pidcontrol and self.qmc.Controlbuttonflag): # MODBUS hardware PID
+                                        self.pidcontrol.svLookahead = lookahead
+                                        aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(self.pidcontrol.svLookahead))
+                                except:
+                                    pass
+                                                    
                 elif action == 21: # RC Command
                     # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
                     ##  pulse(ch,min,max[,sn]) : sets the min/max pulse width in microseconds
@@ -22888,21 +22923,25 @@ class ApplicationWindow(QMainWindow):
                         self.moveKbutton("left")
                     elif aw.qmc.background:
                         aw.qmc.movebackground("left",aw.qmc.backgroundmovespeed)
+                        self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
                         aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
                 elif key == 16777236:               #MOVES CURRENT BUTTON RIGHT
                     if self.keyboardmoveflag:
                         self.moveKbutton("right")
                     elif aw.qmc.background:
                         aw.qmc.movebackground("right",aw.qmc.backgroundmovespeed)
+                        self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
                         aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
                 elif key == 16777235:               #UP
                     if aw.qmc.background:
                         aw.qmc.movebackground("up",aw.qmc.backgroundmovespeed)
-                        aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
+                        self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
+                        aw.qmc.redraw(recomputeAllDeltas=False,sampling=aw.qmc.flagon)
                 elif key == 16777237:               #DOWN
                     if aw.qmc.background:
                         aw.qmc.movebackground("down",aw.qmc.backgroundmovespeed)
-                        aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
+                        self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
+                        aw.qmc.redraw(recomputeAllDeltas=False,sampling=aw.qmc.flagon)
                 elif key == 65:                     #letter A (automatic save)
                     if not app.artisanviewerMode and self.qmc.flagon:
                         self.automaticsave()
