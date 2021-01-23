@@ -46,6 +46,10 @@ CHECK FOR UPDATES
 # cd /Library/Frameworks/Python.framework/Versions/3.8/bin
 # sudo -H ./pip-review --local --interactive
 
+# check package dependencies using pipdeptree
+# sudo -H python3 -m pip install pipdeptree
+# pipdeptree -fl
+
 Note:
 To build Artisan on Mac OS X 10.11 El Capitan and later one needs to 
 1) disable SIP (check its status via "# csrutil status")

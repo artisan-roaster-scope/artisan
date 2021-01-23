@@ -1,15 +1,25 @@
-gevent==20.9.0 # 1.5.0 is not compatible with Python 3.8
+######
+# platform specifics
+#
+distro==1.5.0
+######
+# packages that differ per platform:
+#
+gevent==21.1.2 # 20.9.0 # 1.5.0 is not compatible with Python 3.8
 gevent-websocket==0.10.1
-numpy==1.19.4
-colorspacious==1.1.2
-scipy==1.5.4 # released already
+numpy==1.19.5
+scipy==1.6.0 # 1.5.4 # depends on numpy thus we have to put it after numpy
 matplotlib==3.3.3 # 3.2.2 # MPL 3.3.x is not compatible with pyinstaller up to 4.0
+colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
 PyQt5==5.15.2 #5.14.2 # 5.15.0 seems not to install on Python 3.7.1
-openpyxl==3.0.5
+openpyxl==3.0.6
 pyinstaller==4.1 # 3.6
 #jeepney==0.4
 #cryptography==2.6.1
-keyring==21.5.0 #19.2.0  # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
-SecretStorage==3.3.0 # no need any longer to install this separately # 3.3.0 not on Stretch
+keyring==21.8.0 # 21.5.0  # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
+SecretStorage==3.3.0
 lxml==4.6.2
-distro==1.5.0
+#
+# NOTES:
+# keyring needs the GnomeKeyring package installed for plus to remember the passwords
+# via # sudo apt install gnome-keyring

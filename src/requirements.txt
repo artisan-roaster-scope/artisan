@@ -1,23 +1,22 @@
-setuptools==50.3.2
+setuptools==51.3.3 # 50.3.2
 wheel==0.35.1
 pyserial==3.5 # 3.4
 pymodbus==2.4.0
-unidecode==1.1.1
+python-snap7==1.0 # 0.11
+yoctopuce==1.10.4298
+Phidget22==1.6.20201218
+unidecode==1.1.2
 bottle==0.12.19
 qrcode==6.1
-requests==2.25.0
-yoctopuce==1.10.42060
+requests==2.25.1
 pefile==2019.4.18
 altgraph==0.17
 macholib==1.14
-python-snap7==0.11
-pyusb==1.1.0
+pyusb==1.1.1 # 1.1.0
 persist-queue==0.5.1
 portalocker==2.0.0
-prettytable==0.7.2 # 1.0.1 and 2.0.0 fail to be packed by py2app properly into builds
-Phidget22==1.6.20201120
+prettytable==0.7.2 # 1.0.1 and 2.0.0 fail to be packed by py2app and some pyinstaller versions properly into builds
 natsort==7.1.0
-xlrd==1.2.0
+xlrd==2.0.1 #1.2.0
 requests-file==1.5.1
 websocket-client==0.57.0
-wquantiles==0.5
