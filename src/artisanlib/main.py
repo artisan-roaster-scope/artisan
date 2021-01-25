@@ -23715,7 +23715,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanOpenFilesDialog(self,msg=QApplication.translate("Message","Select",None),ext="*",path=None):
         if path is None:
             path = self.getDefaultPath()
-        res = QFileDialog.getOpenFileNames(self,msg,path,ext)[0]
+        res = QFileDialog.getOpenFileNames(self,msg,path,ext, options=QFileDialog.DontUseNativeDialog)[0]
         for f in res:
             self.setDefaultPath(str(f))
         return res
@@ -23727,7 +23727,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanOpenFileDialog(self,msg=QApplication.translate("Message","Open",None),ext="*",ext_alt=None,path=None):
         if path is None:
             path = self.getDefaultPath()
-        f = str(QFileDialog.getOpenFileName(self,caption=msg,directory=path,filter=ext)[0])
+        f = str(QFileDialog.getOpenFileName(self,caption=msg,directory=path,filter=ext, options=QFileDialog.DontUseNativeDialog)[0])
         if ext_alt is not None and not f.endswith(ext_alt):
             return ""
         else:
@@ -23758,7 +23758,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanSaveFileDialog(self,msg=QApplication.translate("Message","Save",None),ext="*.alog",path=None):
         if path is None:
             path = self.getDefaultPath()
-        f = str(QFileDialog.getSaveFileName(self,msg,path,ext)[0])
+        f = str(QFileDialog.getSaveFileName(self,msg,path,ext, options=QFileDialog.DontUseNativeDialog)[0])
         self.setDefaultPath(f)
         return f
 
@@ -32664,7 +32664,8 @@ class ApplicationWindow(QMainWindow):
         initialPath = QDir.currentPath() + "/ArtisanScreenshot." + fmt
         fileName = QFileDialog.getSaveFileName(self, "Artisan ScreenShot",
                 initialPath,
-                "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt))[0]
+                "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt),
+                options=QFileDialog.DontUseNativeDialog)[0]
         if fileName:
             imag.save(fileName, fmt)
 
@@ -32675,7 +32676,8 @@ class ApplicationWindow(QMainWindow):
         initialPath = QDir.currentPath() + "/DesktopScreenshot." + fmt
         fileName = QFileDialog.getSaveFileName(self, "Desktop ScreenShot",
                 initialPath,
-                "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt))[0]
+                "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt),
+                options=QFileDialog.DontUseNativeDialog)[0]
         if fileName:
             imag.save(fileName, fmt)
 
