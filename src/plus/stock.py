@@ -247,8 +247,8 @@ def renderAmount(amount,default_unit = None,target_unit_idx = 0):
 # Stores
 #   store:  <storeLabel,locationID>
 
-def makeStoreDict(location_hr_id,location_label):
-    return {'location_hr_id': location_hr_id, 'location_label': location_label}
+#def makeStoreDict(location_hr_id,location_label):
+#    return {'location_hr_id': location_hr_id, 'location_label': location_label}
 
 def getStoreLabel(store):
     return store[0]

@@ -2269,7 +2269,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 self.plus_amount_selected = None
                 self.plus_amount_replace_selected = None
-            self.fillBlendData(selected_blend,prev_coffee_label,prev_blend_label)
+            self.fillBlendData(x,prev_coffee_label,prev_blend_label)
             
         self.checkWeightIn()
         self.updatePlusSelectedLine()
@@ -2375,8 +2375,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.plus_default_store = None # we reset the defaultstore
                 # we now set the actual values from the stock
                 self.populatePlusCoffeeBlendCombos()
-                if False: #self.plus_blend_selected_spec is not None and "hr_id" in self.plus_blend_selected_spec:
-                    # try to apply blend replacement
+                if self.plus_blend_selected_spec is not None and "hr_id" in self.plus_blend_selected_spec:
+                    # try to apply blend replacement (blend recipe might have been updated on the server since this recent roast blend entry was established
                     # search for the position of blend/location hr_id combo in self.plus_blends and call blendSelectionChanged with pos+1
                     try:
                         pos_in_blends = next(i for i, b in enumerate(self.plus_blends) if \

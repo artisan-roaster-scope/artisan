@@ -381,7 +381,7 @@ class PortComboBox(QComboBox):
 
     def getSelection(self):
         return self.edited or self.selection
-
+    
     def setSelection(self,i):
         if i >= 0:
             try:
@@ -396,7 +396,6 @@ class PortComboBox(QComboBox):
 #            self.setSelection(self.currentIndex())
         if event.type() == QEvent.MouseButtonPress:
             self.updateMenu()
-            return True
         return super(PortComboBox, self).eventFilter(obj, event)
 
     def updateMenu(self):
@@ -419,7 +418,7 @@ class PortComboBox(QComboBox):
                 self.setCurrentIndex(pos)
             except Exception:
                 pass
-        except Exception:
+        except:
             pass
         self.blockSignals(False)
 

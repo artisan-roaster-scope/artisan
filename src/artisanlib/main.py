@@ -50,6 +50,12 @@ from unidecode import unidecode
 
 import prettytable  # @UnresolvedImport
 
+try:
+    from PyQt6.QtCore import QLibraryInfo  # @UnusedImport
+    pyqtversion = 6
+except Exception as e:
+    pyqtversion = 5
+
 try: # activate support for hiDPI screens on Windows
     if str(platform.system()).startswith("Windows"):
         os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
@@ -67,28 +73,50 @@ except:
 #    import traceback
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
-
-from PyQt5.QtWidgets import (QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport
-                         QInputDialog, QGroupBox, QLineEdit, # @Reimport
-                         QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport
-                         QLCDNumber, QSpinBox, QComboBox, # @Reimport
-                         QSlider, QStackedWidget, # @Reimport
-                         QColorDialog, QFrame, QProgressDialog, # @Reimport
-                         QStyleFactory, QMenu, QLayout) # @Reimport
-from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
-                            QKeySequence,
-                            QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport
-                            QRegularExpressionValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport
-from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
-from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport
-                          qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
-                          QRegularExpression, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport
-from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
-
-try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
-    from PyQt5 import sip # @UnusedImport
-except:
-    pass
+if pyqtversion < 6:
+    from PyQt5.QtWidgets import (QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport
+                             QInputDialog, QGroupBox, QLineEdit, # @Reimport
+                             QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport
+                             QLCDNumber, QSpinBox, QComboBox, # @Reimport
+                             QSlider, QStackedWidget, # @Reimport
+                             QColorDialog, QFrame, QProgressDialog, # @Reimport
+                             QStyleFactory, QMenu, QLayout) # @Reimport
+    from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
+                                QKeySequence,
+                                QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport
+                                QRegularExpressionValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport
+    from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
+    from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport
+                              qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
+                              QRegularExpression, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport
+    from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
+    
+    try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
+        from PyQt5 import sip # @UnusedImport
+    except:
+        pass
+else:
+    from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport
+                             QInputDialog, QGroupBox, QLineEdit, # @Reimport
+                             QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport
+                             QLCDNumber, QSpinBox, QComboBox, # @Reimport
+                             QSlider, QStackedWidget, # @Reimport
+                             QColorDialog, QFrame, QProgressDialog, # @Reimport
+                             QStyleFactory, QMenu, QLayout) # @Reimport
+    from PyQt6.QtGui import (QAction, QImageReader, QWindow,  # @Reimport
+                                QKeySequence,
+                                QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport
+                                QRegularExpressionValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport
+    from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
+    from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport
+                              qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
+                              QRegularExpression, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport
+    from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
+    
+    try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
+        from PyQt6 import sip # @UnusedImport
+    except:
+        pass
 
 from artisanlib.suppress_errors import suppress_stdout_stderr
 
@@ -15825,10 +15853,7 @@ class ApplicationWindow(QMainWindow):
 
         self.messagelabel.setIndent(6)
         # set a few broad style parameters
-        if False: #locale == "es":
-            self.button_font_size_pt = 12
-        else:
-            self.button_font_size_pt = 13
+        self.button_font_size_pt = 13
         if platf == 'Windows':
             self.button_font_size = str(self.button_font_size_pt - 2) + 'pt'
             self.button_font_size_small = str(self.button_font_size_pt - 3) + 'pt'
@@ -18094,7 +18119,38 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.plus_blend_spec_labels = rr["plus_blend_spec_labels"]
             if self.qmc.plus_default_store is not None and self.qmc.plus_default_store != self.qmc.plus_store:
                 self.qmc.plus_default_store = None # we reset the defaultstore
-
+            # update blend spec/label/spec_labels and other attributs from current stock
+            if self.qmc.plus_blend_spec is not None and "hr_id" in self.qmc.plus_blend_spec and self.qmc.plus_store is not None:
+                try:
+                    weight_unit_idx = self.qmc. weight_units.index(rr["weightUnit"])
+                    blends = plus.stock.getBlends(weight_unit_idx,self.qmc.plus_store)
+                    blend = next(b for b in blends if \
+                        plus.stock.getBlendId(b) == self.qmc.plus_blend_spec["hr_id"] and
+                        plus.stock.getBlendStockDict(b)["location_hr_id"] == self.qmc.plus_store)
+                    w = self.convertWeight(self.qmc.weight[0],weight_unit_idx,self.qmc.weight_units.index("Kg")) # w is weightIn converted to kg
+                    bd = plus.stock.getBlendBlendDict(blend,w)
+                    self.qmc.plus_blend_label = bd["label"]
+                    self.qmc.plus_blend_spec = dict(bd) # make a copy of the blend dict
+                    self.qmc.plus_blend_spec_labels = [i["label"] for i in self.qmc.plus_blend_spec["ingredients"]]
+                    self.qmc.beans = "\n".join(plus.stock.blend2beans(blend,weight_unit_idx,self.qmc.weight[0]))
+                    if "moisture" in bd and bd["moisture"] is not None:
+                        self.qmc.moisture_greens = bd["moisture"]
+                    else:
+                        self.qmc.moisture_greens = 0
+                    if "density" in bd and bd["density"] is not None:
+                        self.qmc.density[0] = bd["density"]
+                    else:
+                        self.qmc.density[0] = 0
+                    if "screen_min" in bd and bd["screen_min"] is not None:
+                        self.qmc.beansize_min = bd["screen_min"]
+                    else:
+                        self.qmc.beansize_min = 0
+                    if "screen_max" in bd and bd["screen_max"] is not None:
+                        self.qmc.beansize_max = bd["screen_max"]
+                    else:
+                        self.qmc.beansize_max = 0
+                except:
+                    pass
         aw.sendmessage(QApplication.translate("Message","Recent roast properties '{0}' set".format(aw.recentRoastLabel(rr))))
 
     # returns the list of recentRoasts with the first entry with the given title, weight and weightunit removed
