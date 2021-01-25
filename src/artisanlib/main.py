@@ -51,7 +51,7 @@ from unidecode import unidecode
 import prettytable  # @UnresolvedImport
 
 try:
-    from PyQt6.QtCore import QLibraryInfo  # @UnusedImport
+    from PyQt6.QtCore import QLibraryInfo  # @UnusedImport @UnresolvedImport
     pyqtversion = 6
 except Exception as e:
     pyqtversion = 5
@@ -74,47 +74,47 @@ except:
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
 if pyqtversion < 6:
-    from PyQt5.QtWidgets import (QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport
-                             QInputDialog, QGroupBox, QLineEdit, # @Reimport
-                             QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport
-                             QLCDNumber, QSpinBox, QComboBox, # @Reimport
-                             QSlider, QStackedWidget, # @Reimport
-                             QColorDialog, QFrame, QProgressDialog, # @Reimport
-                             QStyleFactory, QMenu, QLayout) # @Reimport
-    from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
-                                QKeySequence,
-                                QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport
-                                QRegularExpressionValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport
-    from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
-    from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport
-                              qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
-                              QRegularExpression, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport
-    from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
+    from PyQt5.QtWidgets import (QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport @UnusedImport
+                             QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnusedImport
+                             QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnusedImport
+                             QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnusedImport
+                             QSlider, QStackedWidget, # @Reimport @UnusedImport
+                             QColorDialog, QFrame, QProgressDialog, # @Reimport @UnusedImport
+                             QStyleFactory, QMenu, QLayout) # @Reimport @UnusedImport
+    from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport @UnusedImport
+                                QKeySequence, # @UnusedImport
+                                QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport @UnusedImport
+                                QRegularExpressionValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport @UnusedImport
+    from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport @UnusedImport
+    from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport @UnusedImport
+                              qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport @UnusedImport
+                              QRegularExpression, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnusedImport
+    from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @UnusedImport
     
     try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
         from PyQt5 import sip # @UnusedImport
     except:
         pass
 else:
-    from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport
-                             QInputDialog, QGroupBox, QLineEdit, # @Reimport
-                             QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport
-                             QLCDNumber, QSpinBox, QComboBox, # @Reimport
-                             QSlider, QStackedWidget, # @Reimport
-                             QColorDialog, QFrame, QProgressDialog, # @Reimport
-                             QStyleFactory, QMenu, QLayout) # @Reimport
-    from PyQt6.QtGui import (QAction, QImageReader, QWindow,  # @Reimport
-                                QKeySequence,
-                                QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport
-                                QRegularExpressionValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport
-    from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
-    from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport
-                              qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
-                              QRegularExpression, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport
-    from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
+    from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport @UnresolvedImport
+                             QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnresolvedImport
+                             QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport
+                             QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport
+                             QSlider, QStackedWidget, # @Reimport @UnresolvedImport
+                             QColorDialog, QFrame, QProgressDialog, # @Reimport @UnresolvedImport
+                             QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport
+    from PyQt6.QtGui import (QAction, QImageReader, QWindow,  # @Reimport @UnresolvedImport
+                                QKeySequence, # s@UnresolvedImport
+                                QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport @UnresolvedImport
+                                QRegularExpressionValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport @UnresolvedImport
+    from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport @UnresolvedImport
+    from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport @UnresolvedImport
+                              qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport @UnresolvedImport
+                              QRegularExpression, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnresolvedImport
+    from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @UnresolvedImport
     
     try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
-        from PyQt6 import sip # @UnusedImport
+        from PyQt6 import sip # @UnusedImport @UnresolvedImport
     except:
         pass
 
@@ -3783,6 +3783,7 @@ class tgraphcanvas(FigureCanvas):
         if alarmset is not None:
             try:
                 self.alarmSemaphore.acquire(1)
+                #
                 self.alarmsetlabel = alarmset[0]
                 self.alarmflag = alarmset[1][:]
                 self.alarmguard = alarmset[2][:]
@@ -3826,7 +3827,6 @@ class tgraphcanvas(FigureCanvas):
     def processAlarm(self,number,beep,action,string):
         if not self.silent_alarms:
             try:
-                self.alarmSemaphore.acquire(1)
                 if beep:
                     QApplication.beep()
                 if action == 0:
@@ -4009,21 +4009,20 @@ class tgraphcanvas(FigureCanvas):
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
                 self.adderror((QApplication.translate("Error Message","Exception:",None) + " processAlarm() {0}").format(str(ex)),exc_tb.tb_lineno)
-            finally:
-                if self.alarmSemaphore.available() < 1:
-                    self.alarmSemaphore.release(1)
 
 
     def setalarm(self,alarmnumber):
-        self.alarmstate[alarmnumber] = max(0,len(self.timex) - 1) # we have to ensure that alarmstate of triggered alarms is never negativ
-
-        aw.sendmessage(QApplication.translate("Message","Alarm {0} triggered", None).format(alarmnumber + 1))
-        
-        self.processAlarm(
-            alarmnumber+1,
-            len(self.alarmbeep) > alarmnumber and self.alarmbeep[alarmnumber], # beep?
-            self.alarmaction[alarmnumber],
-            self.alarmstrings[alarmnumber])
+        try:
+            self.alarmSemaphore.acquire(1)
+            self.alarmstate[alarmnumber] = max(0,len(self.timex) - 1) # we have to ensure that alarmstate of triggered alarms is never negativ
+            alarm_beep = len(self.alarmbeep) > alarmnumber and self.alarmbeep[alarmnumber] # beep?
+            alarm_action = self.alarmaction[alarmnumber]
+            alarm_string = self.alarmstrings[alarmnumber]
+        finally:
+            if self.alarmSemaphore.available() < 1:
+                self.alarmSemaphore.release(1)  
+        aw.sendmessage(QApplication.translate("Message","Alarm {0} triggered", None).format(alarmnumber + 1))        
+        self.processAlarmSignal.emit(alarmnumber+1,alarm_beep,alarm_action,alarm_string)
 
     # called only after CHARGE
     def playbackdrop(self):
@@ -14402,103 +14401,110 @@ class SampleThread(QThread):
                             pass
 
                     #check for each alarm that was not yet triggered
-                    for i in range(len(aw.qmc.alarmflag)):
-                        #if alarm on, and not triggered, and time is after set time:
-                        # menu: 0:ON, 1:START, 2:CHARGE, 3:TP, 4:DRY, 5:FCs, 6:FCe, 7:SCs, 8:SCe, 9:DROP, 10:COOL
-                        # qmc.alarmtime = -1 (None == START)
-                        # qmc.alarmtime = 0 (CHARGE)
-                        # qmc.alarmtime = 1 (DRY)
-                        # qmc.alarmtime = 2 (FCs)
-                        # qmc.alarmtime = 3 (FCe)
-                        # qmc.alarmtime = 4 (SCs)
-                        # qmc.alarmtime = 5 (SCe)
-                        # qmc.alarmtime = 6 (DROP)
-                        # qmc.alarmtime = 7 (COOL)
-                        # qmc.alarmtime = 8 (TP)
-                        # qmc.alarmtime = 9 (ON)
-                        # qmc.alamrtime = 10 (If Alarm)
-                        # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
-                        # 1) the alarm From is START
-                        # 2) the alarm was not triggered yet
-                        # 3) the alarm From is ON
-                        # 4) the alarm From is CHARGE
-                        # 5) the alarm From is any other event but TP
-                        # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
-                        if aw.qmc.alarmflag[i] \
-                          and aw.qmc.alarmstate[i] == -1 \
-                          and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmstate) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]] != -1)) \
-                          and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmstate) and aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]] == -1)) \
-                          and ((aw.qmc.alarmtime[i] == 9) or (aw.qmc.alarmtime[i] < 0 and local_flagstart) \
-                            or (local_flagstart and aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
-                            or (local_flagstart and aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
-                            or (aw.qmc.alarmtime[i] == 10 and aw.qmc.alarmguard[i] != -1)  \
-                            or (local_flagstart and aw.qmc.alarmtime[i] == 8 and aw.qmc.timeindex[0] > -1 \
-                                and aw.qmc.TPalarmtimeindex)):
-                            #########
-                            # check alarmoffset (time after From event):
-                            if aw.qmc.alarmoffset[i] > 0:
-                                alarm_time = aw.qmc.timeclock.elapsed()/1000.
-                                if aw.qmc.alarmtime[i] < 0: # time after START
-                                    pass # the alarm_time is the clock time
-                                elif local_flagstart and aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
-                                    alarm_time = alarm_time - sample_timex[aw.qmc.timeindex[0]]
-                                elif local_flagstart and aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
-                                    alarm_time = alarm_time - sample_timex[aw.qmc.TPalarmtimeindex]
-                                elif local_flagstart and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
-                                    alarm_time = alarm_time - sample_timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
-                                elif local_flagstart and aw.qmc.alarmtime[i] == 10: # time or temp after the trigger of the alarmguard (if one is set)
-                                    # we know here that the alarmstate of the guard is valid as it has triggered
-                                    alarm_time = alarm_time - sample_timex[aw.qmc.alarmstate[aw.qmc.alarmguard[i]]]
-
-                                if alarm_time >= aw.qmc.alarmoffset[i]:
-                                    aw.qmc.temporaryalarmflag = i
-                            #########
-                            # check alarmtemp:
-                            alarm_temp = None
-                            if aw.qmc.alarmtime[i] == 10: # IF ALARM and only during recording as otherwise no data to refer to is available
-                                # and this is a conditional alarm with alarm_time set to IF ALARM
-                                if_alarm_state = aw.qmc.alarmstate[aw.qmc.alarmguard[i]] # reading when the IF ALARM triggered
-                                if if_alarm_state != -1:
-                                    if if_alarm_state < len(sample_timex):
-                                        alarm_idx = if_alarm_state
-                                    else:
-                                        alarm_idx = -1
-                                # we substract the reading at alarm_idx from the current reading of the channel determined by alarmsource
-                            else:
-                                alarm_idx = None
-                            if aw.qmc.alarmsource[i] == -2 and sample_delta1[-1]:  #check DeltaET (might be None)
-                                alarm_temp = sample_delta1[-1]
-                                if alarm_idx != None:
-                                    alarm_temp -= sample_delta1[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
-                            elif aw.qmc.alarmsource[i] == -1 and sample_delta2[-1]: #check DeltaBT (might be None
-                                alarm_temp = sample_delta2[-1]
-                                if alarm_idx != None:
-                                    alarm_temp -= sample_delta2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
-                            elif aw.qmc.alarmsource[i] == 0:                      #check ET
-                                alarm_temp = sample_temp1[-1]
-                                if alarm_idx != None:
-                                    alarm_temp -= sample_temp1[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
-                            elif aw.qmc.alarmsource[i] == 1:                      #check BT
-                                alarm_temp = sample_temp2[-1]
-                                if alarm_idx != None:
-                                    alarm_temp -= sample_temp2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
-                            elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
-                                if (aw.qmc.alarmsource[i])%2==0:
-                                    alarm_temp = sample_extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
-                                    if alarm_idx != None:
-                                        alarm_temp -= sample_extratemp1[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                    try:
+                        aw.qmc.alarmSemaphore.acquire(1)
+                        for i in range(len(aw.qmc.alarmflag)):
+                            #if alarm on, and not triggered, and time is after set time:
+                            # menu: 0:ON, 1:START, 2:CHARGE, 3:TP, 4:DRY, 5:FCs, 6:FCe, 7:SCs, 8:SCe, 9:DROP, 10:COOL
+                            # qmc.alarmtime = -1 (None == START)
+                            # qmc.alarmtime = 0 (CHARGE)
+                            # qmc.alarmtime = 1 (DRY)
+                            # qmc.alarmtime = 2 (FCs)
+                            # qmc.alarmtime = 3 (FCe)
+                            # qmc.alarmtime = 4 (SCs)
+                            # qmc.alarmtime = 5 (SCe)
+                            # qmc.alarmtime = 6 (DROP)
+                            # qmc.alarmtime = 7 (COOL)
+                            # qmc.alarmtime = 8 (TP)
+                            # qmc.alarmtime = 9 (ON)
+                            # qmc.alamrtime = 10 (If Alarm)
+                            # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
+                            # 1) the alarm From is START
+                            # 2) the alarm was not triggered yet
+                            # 3) the alarm From is ON
+                            # 4) the alarm From is CHARGE
+                            # 5) the alarm From is any other event but TP
+                            # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
+                            if aw.qmc.alarmflag[i] \
+                              and aw.qmc.alarmstate[i] == -1 \
+                              and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmstate) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]] != -1)) \
+                              and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmstate) and aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]] == -1)) \
+                              and ((aw.qmc.alarmtime[i] == 9) or (aw.qmc.alarmtime[i] < 0 and local_flagstart) \
+                                or (local_flagstart and aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
+                                or (local_flagstart and aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
+                                or (aw.qmc.alarmtime[i] == 10 and aw.qmc.alarmguard[i] != -1)  \
+                                or (local_flagstart and aw.qmc.alarmtime[i] == 8 and aw.qmc.timeindex[0] > -1 \
+                                    and aw.qmc.TPalarmtimeindex)):
+                                #########
+                                # check alarmoffset (time after From event):
+                                if aw.qmc.alarmoffset[i] > 0:
+                                    alarm_time = aw.qmc.timeclock.elapsed()/1000.
+                                    if aw.qmc.alarmtime[i] < 0: # time after START
+                                        pass # the alarm_time is the clock time
+                                    elif local_flagstart and aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
+                                        alarm_time = alarm_time - sample_timex[aw.qmc.timeindex[0]]
+                                    elif local_flagstart and aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
+                                        alarm_time = alarm_time - sample_timex[aw.qmc.TPalarmtimeindex]
+                                    elif local_flagstart and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
+                                        alarm_time = alarm_time - sample_timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
+                                    elif local_flagstart and aw.qmc.alarmtime[i] == 10: # time or temp after the trigger of the alarmguard (if one is set)
+                                        # we know here that the alarmstate of the guard is valid as it has triggered
+                                        alarm_time = alarm_time - sample_timex[aw.qmc.alarmstate[aw.qmc.alarmguard[i]]]
+    
+                                    if alarm_time >= aw.qmc.alarmoffset[i]:
+                                        aw.qmc.temporaryalarmflag = i
+                                #########
+                                # check alarmtemp:
+                                alarm_temp = None
+                                if aw.qmc.alarmtime[i] == 10: # IF ALARM and only during recording as otherwise no data to refer to is available
+                                    # and this is a conditional alarm with alarm_time set to IF ALARM
+                                    if_alarm_state = aw.qmc.alarmstate[aw.qmc.alarmguard[i]] # reading when the IF ALARM triggered
+                                    if if_alarm_state != -1:
+                                        if if_alarm_state < len(sample_timex):
+                                            alarm_idx = if_alarm_state
+                                        else:
+                                            alarm_idx = -1
+                                    # we substract the reading at alarm_idx from the current reading of the channel determined by alarmsource
                                 else:
-                                    alarm_temp = sample_extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                    alarm_idx = None
+                                if aw.qmc.alarmsource[i] == -2 and sample_delta1[-1]:  #check DeltaET (might be None)
+                                    alarm_temp = sample_delta1[-1]
                                     if alarm_idx != None:
-                                        alarm_temp -= sample_extratemp2[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
-
-                            alarm_limit = aw.qmc.alarmtemperature[i]
-
-                            if alarm_temp is not None and alarm_temp != -1 and (
-                                    (aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or
-                                    (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit) or
-                                    (alarm_idx != None and alarm_temp == alarm_limit)): # for relative IF_ALARMS we include the equality
-                                aw.qmc.temporaryalarmflag = i
+                                        alarm_temp -= sample_delta1[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                elif aw.qmc.alarmsource[i] == -1 and sample_delta2[-1]: #check DeltaBT (might be None
+                                    alarm_temp = sample_delta2[-1]
+                                    if alarm_idx != None:
+                                        alarm_temp -= sample_delta2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                elif aw.qmc.alarmsource[i] == 0:                      #check ET
+                                    alarm_temp = sample_temp1[-1]
+                                    if alarm_idx != None:
+                                        alarm_temp -= sample_temp1[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                elif aw.qmc.alarmsource[i] == 1:                      #check BT
+                                    alarm_temp = sample_temp2[-1]
+                                    if alarm_idx != None:
+                                        alarm_temp -= sample_temp2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
+                                    if (aw.qmc.alarmsource[i])%2==0:
+                                        alarm_temp = sample_extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                        if alarm_idx != None:
+                                            alarm_temp -= sample_extratemp1[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                    else:
+                                        alarm_temp = sample_extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                        if alarm_idx != None:
+                                            alarm_temp -= sample_extratemp2[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+    
+                                alarm_limit = aw.qmc.alarmtemperature[i]
+    
+                                if alarm_temp is not None and alarm_temp != -1 and (
+                                        (aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or
+                                        (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit) or
+                                        (alarm_idx != None and alarm_temp == alarm_limit)): # for relative IF_ALARMS we include the equality
+                                    aw.qmc.temporaryalarmflag = i
+                    except:
+                        pass
+                    finally:
+                        if aw.qmc.alarmSemaphore.available() < 1:
+                            aw.qmc.alarmSemaphore.release(1)
 
                 #############    if using DEVICE 18 (no device). Manual mode
                 # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
