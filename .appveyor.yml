@@ -18,9 +18,7 @@ environment:
 #  - job_name: rpi
 #    appveyor_build_worker_image: Ubuntu1604
 
-  GITHUB_TOKEN:
-     secure: PlbRv5ROUa2qrP6YTVZhC5xpnCEF5cbQ4YuW3Hm6I3gvVBQPTybAvI0ZgLA1P6AL
-  
+
 matrix:
   allow_failures:
     - job_name: rpi
@@ -32,8 +30,8 @@ init:
 
 branches:
   only:
-    - master     
-        
+    - master
+
 stack:
   python 3.8
 
@@ -125,10 +123,10 @@ for:
     - .ci/install-${ARTISAN_OS}.sh
 
   build_script:
-    - echo "MacOS Build"  
+    - echo "MacOS Build"
     - chmod +x src/*.sh
     - .ci/script-${ARTISAN_OS}.sh
-    
+
 #  artifacts:
 #    - path: 'src/artisan-*.dmg'
 
@@ -150,14 +148,14 @@ for:
     PYTHON: $HOME/venv3.8
 
   install:
-    - echo "Linux Install"  
+    - echo "Linux Install"
     - chmod +x .ci/*.sh
     - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
     - sed -i'' -e "s/__revision__ = '0'/__revision__ = '$GIT_VERSION'/" src/artisanlib/__init__.py
     - .ci/install-${ARTISAN_OS}.sh
 
   build_script:
-    - echo "Linux Build"  
+    - echo "Linux Build"
     - chmod +x src/*.sh
     - .ci/script-${ARTISAN_OS}.sh
 
@@ -185,14 +183,14 @@ for:
     PYTHON: $HOME/venv3.8
 
   install:
-    - echo "RPI Install"  
+    - echo "RPI Install"
     - chmod +x ./.ci/*.sh
     - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
     - sed -i'' -e "s/__revision__ = '0'/__revision__ = '$GIT_VERSION'/" src/artisanlib/__init__.py
     - .ci/install-${ARTISAN_OS}.sh
 
   build_script:
-    - echo "RPI Build"  
+    - echo "RPI Build"
     - chmod +x src/*.sh
     - .ci/script-${ARTISAN_OS}.sh
 
