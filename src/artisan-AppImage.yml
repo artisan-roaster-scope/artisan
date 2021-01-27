@@ -1,0 +1,12 @@
+app: artisan
+
+ingredients:
+  dist: trusty
+  sources:
+    - deb http://archive.ubuntu.com/ubuntu/ trusty main universe
+  script:
+    - oDir=$(pwd)
+    - cd ..
+    - path="file://$(pwd)/$(ls artisan-*.deb)" # Search for the package
+    - cd $oDir # go back to orignal folder
+    - curl -O -C - $path  # use the deb package
