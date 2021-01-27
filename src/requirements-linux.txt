@@ -10,6 +10,7 @@ gevent-websocket==0.10.1
 numpy==1.19.5
 scipy==1.6.0 # 1.5.4 # depends on numpy thus we have to put it after numpy
 matplotlib==3.3.3 # 3.2.2 # MPL 3.3.x is not compatible with pyinstaller up to 4.0
+wquantiles==0.5 # depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
 PyQt5==5.15.2 #5.14.2 # 5.15.0 seems not to install on Python 3.7.1
 openpyxl==3.0.6
