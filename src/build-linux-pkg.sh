@@ -73,4 +73,12 @@ flavor." \
 cd ..
 mv *.rpm ${NAME}.rpm
 mv *.deb ${NAME}.deb
+
+# Create AppImage by using the pkg2appimage tool
+wget -c https://github.com/$(wget -q https://github.com/AppImage/pkg2appimage/releases -O - | grep "pkg2appimage-.*-x86_64.AppImage" | head -n 1 | cut -d '"' -f 2)
+chmod +x ./pkg2appimage-*.AppImage
+./pkg2appimage-*.AppImage artisan-AppImage.yml
+
+mv ./out/*.AppImage ${NAME}.AppImage
+
 ls -lh *.deb *.rpm
