@@ -459,7 +459,7 @@ class modbusport(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            self.master.write_register(int(register),int(value),unit=int(slave))
+            self.master.write_register(int(register),int(round(value)),unit=int(slave))
             time.sleep(.03) # avoid possible hickups on startup
         except Exception as ex:
 #            _logger.debug("writeSingleRegister exception: %s" % str(ex))

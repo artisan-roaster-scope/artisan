@@ -20530,10 +20530,10 @@ class ApplicationWindow(QMainWindow):
                         action = action + 1 # skip the 19: Aillio PRS
             # after adaption: (see eventaction)
                 value = self.calcSliderSendValue(n)
-                if not (action in [6,14,21]): # only for IO, VOUT and RC Commands we keep the floats
+                if not (action in [4, 6,14,15, 21]): # only for MODBUS, IO, VOUT, S7 and RC Commands we keep the floats
                     value = int(round(value))
                 if action in [8,9,16,17,18]: # for Hottop/R1 Heater or Fan, we just forward the value
-                    cmd = value
+                    cmd = int(round(value))
                 else:
                     cmd = self.eventslidercommands[n]
                     cmd = cmd.format(*(tuple([value]*cmd.count("{}"))))

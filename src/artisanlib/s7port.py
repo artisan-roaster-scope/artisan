@@ -427,7 +427,7 @@ class s7port(object):
             if self.isConnected():
                 with suppress_stdout_stderr():
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                    self.set_int(ba, 0, int(value))
+                    self.set_int(ba, 0, int(round(value)))
                     self.waitToEnsureMinTimeBetweenRequests()
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:
