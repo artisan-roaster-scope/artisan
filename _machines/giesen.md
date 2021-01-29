@@ -2,7 +2,7 @@
 layout: single
 permalink: /machines/giesen/
 title: "Giesen"
-excerpt: "WPG1/W1A/W6A/W15A"
+excerpt: "WPG/WPE//W1/W6/W15/W30/W40/W60"
 header:
   overlay_image: /assets/images/giesen.jpg
   image: /assets/images/giesen.jpg
@@ -15,6 +15,7 @@ header:
   - logging of exhaust temperature (ET), bean temperature (BT) and related rate-of-rise curves
   - logging and control of burner level, air flow, air temperature setpoint, drum speed
   - logging of the optional infrared (IR) and environmental temperature sensor
+  - operation of actors (intake, flavouring, discharge, cooling, stirrer) on W30 and larger machines via custom buttons (press CMD-2 to switch to this extended button set; CMD-1 switches back to the standard button set)
 
 {: .notice--primary}
 **Watch out!** The WxA+ setups require an unlock code from Giesen and deliver data in higher resolution with decimals.
