@@ -2,7 +2,6 @@
 layout: single
 permalink: /machines/giesen/
 title: "Giesen"
-excerpt: "WPG/WPE//W1/W6/W15/W30/W40/W60"
 header:
   overlay_image: /assets/images/giesen.jpg
   image: /assets/images/giesen.jpg
