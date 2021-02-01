@@ -4167,7 +4167,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/devices.py" line="2878"/>
         <source>Symbolic Formulas Help</source>
-        <translation type="unfinished">Ayuda - Fórmulas Simbólicas</translation
+        <translation type="unfinished">Ayuda - Fórmulas Simbólicas</translation>
     </message>
     <message>
         <location filename="../artisanlib/designer.py" line="607"/>
