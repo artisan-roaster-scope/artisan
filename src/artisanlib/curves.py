@@ -1804,8 +1804,8 @@ class HUDDlg(ArtisanDialog):
                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                 except: # mpl before v3.0 do not have this set_in_layout() function
                     pass
-            else:
-                self.aw.qmc.plottermessage = QApplication.translate("Error Message","Plotter: incorrect syntax: annotate(text,time,temperature,fontsize)", None)
+#            else:
+#                self.aw.qmc.plottermessage = QApplication.translate("Error Message","Plotter: incorrect syntax: annotate(text,time,temperature,fontsize)", None)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " annotate() syntax: {0}").format(str(e)),exc_tb.tb_lineno)
@@ -1838,7 +1838,7 @@ class HUDDlg(ArtisanDialog):
     def plotequ(self,_=False):
         try:
             self.aw.qmc.plotterstack = [0]*10
-            self.aw.qmc.plottermessage = ""
+#            self.aw.qmc.plottermessage = ""
             self.aw.clearMessageLine()
 
             self.aw.qmc.plotterequationresults = [[],[],[],[],[],[],[],[],[]]
