@@ -1894,7 +1894,7 @@ class HUDDlg(ArtisanDialog):
                     
             self.aw.qmc.fig.canvas.draw()
             self.updatePlotterleftlabels()
-            self.equlabel.setText(self.aw.qmc.plottermessage)
+#            self.equlabel.setText(self.aw.qmc.plottermessage)
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()

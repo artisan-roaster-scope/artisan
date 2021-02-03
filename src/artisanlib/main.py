@@ -33386,11 +33386,12 @@ class ApplicationWindow(QMainWindow):
             if background_profile_path:
             # load background into foreground
                 aw.loadFile(background_profile_path)
-            # if there is a plotter generated background curve bring it to the foreground
+            # if there is a plotter or analyzer generated background curve bring it to the foreground
             elif len(aw.qmc.temp1B) > 2:
                 _timex  = aw.qmc.timeB[:]
                 _temp1 = aw.qmc.temp1B[:]
                 _temp2 = aw.qmc.temp2B[:]
+                _sampling_interval = aw.qmc.profile_sampling_interval
                 # use foreground events if the background has no CHARGE
                 if aw.qmc.timeindexB[0] == -1:
                     _timeindex = aw.qmc.timeindex[:]
@@ -33408,6 +33409,11 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.temp1 = _temp1[:]
                 aw.qmc.temp2 = _temp2[:]
                 aw.qmc.timeindex = _timeindex[:]
+                for x in range(len(aw.qmc.extradevices)):
+                    aw.qmc.extratemp1[x] = [-1]*len(aw.qmc.timex)
+                    aw.qmc.extratemp2[x] = [-1]*len(aw.qmc.timex)
+                    aw.qmc.extratimex[x] = aw.qmc.timex[:]
+                aw.qmc.profile_sampling_interval = _sampling_interval
                 if not foreground_profile_path:
                     aw.qmc.redraw(recomputeAllDeltas=True)
                 aw.qmc.fileDirtySignal.emit()
