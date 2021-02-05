@@ -1509,6 +1509,8 @@ class tgraphcanvas(FigureCanvas):
         # background Deltas
         self.DeltaETBflag = False
         self.DeltaBTBflag = True
+        self.clearBgbeforeprofileload = False
+        self.hideBgafterprofileload = False
 
         # projection variables of change of rate
         self.HUDflag = False
@@ -23852,6 +23854,8 @@ class ApplicationWindow(QMainWindow):
     def loadFile(self,filename,quiet=False):
         f = None
         try:
+            if self.qmc.clearBgbeforeprofileload:
+                self.deleteBackground()
             f = QFile(filename)
             if not f.open(QFile.ReadOnly):
                 raise IOError(f.errorString())
@@ -23883,6 +23887,8 @@ class ApplicationWindow(QMainWindow):
                     self.curFile = None
                 else:
                     self.qmc.fileCleanSignal.emit()
+                if self.qmc.hideBgafterprofileload:
+                    aw.qmc.background = False
                 #Plot everything
                 self.qmc.redraw()
                 self.updatePhasesLCDs()
@@ -27398,8 +27404,6 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extra_event_sampling_delay = toInt(settings.value("ExtraEventSamplingDelay",int(self.qmc.extra_event_sampling_delay)))
             #restore colors
             if settings.contains("Colors"):
-#                self.qmc.palette["canvas"] = 'None'  #revert the canvas element to default if it does not exist in the settings.
-                self.qmc.palette["canvas"] = '#F8F8F8'  #revert the canvas element to default if it does not exist in the settings.
                 for (k, v) in list(toMap(settings.value("Colors")).items()):
                     self.qmc.palette[str(k)] = s2a(toString(v))
                 if "messages" in self.qmc.palette:
@@ -27412,6 +27416,13 @@ class ApplicationWindow(QMainWindow):
                     self.setLabelColor(aw.label4,QColor(self.qmc.palette["deltaet"]))
                 if "deltabt" in self.qmc.palette:
                     self.setLabelColor(aw.label5,QColor(self.qmc.palette["deltabt"]))
+                if "canvas" in self.qmc.palette:
+                    if len(self.qmc.palette["canvas"]) == 0:  #revert the canvas element to default if it is blank in the settings.
+                        self.qmc.palette["canvas"] = '#F8F8F8'
+                else:
+                    self.qmc.palette["canvas"] = '#F8F8F8'  #revert the canvas element to default if it does not exist in the settings.
+                if "canvas_alt" in self.qmc.palette:
+                    self.qmc.palette.pop("canvas_alt")  #remove the canvas_alt element if it somehow snuck into the settings
             if settings.contains("ETBColor"):
                 self.qmc.backgroundmetcolor = s2a(toString(settings.value("ETBColor",self.qmc.backgroundmetcolor)))
             if settings.contains("BTBColor"):
