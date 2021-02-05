@@ -1447,9 +1447,9 @@ class tgraphcanvas(FigureCanvas):
 
         self.pid = pid.PID()
 
-        #background profile
+        #background profile # set to True if background profile is shown
         self.background = False
-        self.backgroundprofile = None
+        self.backgroundprofile = None # if not None, a background profile is loaded
         self.backgroundDetails = True
         self.backgroundeventsflag = True
         self.backgroundpath = ""
@@ -2854,13 +2854,25 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.statisticsmode = (aw.qmc.statisticsmode + 1)%2
                 aw.qmc.writecharacteristics()
                 aw.qmc.fig.canvas.draw_idle()
+                return
 
 #PLUS
-            elif not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == 1 and event.dblclick==True and \
+            if not self.designerflag and not self.wheelflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == 1 and event.dblclick==True and \
                     event.x < event.y and aw.plus_account is not None and aw.qmc.roastUUID is not None:
                 QDesktopServices.openUrl(QUrl(plus.util.roastLink(aw.qmc.roastUUID), QUrl.TolerantMode))
+                return
+            
+            if not self.designerflag and not self.wheelflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == 1 and event.dblclick==False and \
+                    self.backgroundprofile is not None and event.x > event.y:
+                fig = self.ax.get_figure()
+                s = fig.get_size_inches()*fig.dpi
+                if event.x > s[0]*2/3 and event.y > s[1]*2/3:
+                    # toggle background if right top corner above canvas where the subtitle is clicked
+                    self.background = not self.background
+                    self.redraw(recomputeAllDeltas=True)
+                    return
 
-            elif event.button == 1 and event.inaxes and aw.qmc.crossmarker and not self.designerflag and not self.wheelflag and not aw.qmc.flagon:
+            if event.button == 1 and event.inaxes and aw.qmc.crossmarker and not self.designerflag and not self.wheelflag and not aw.qmc.flagon:
                 self.baseX,self.baseY = event.xdata, event.ydata
                 if self.base_horizontalcrossline is None and self.base_verticalcrossline is None:
                     # Mark starting point of click-and-drag with a marker
@@ -6447,7 +6459,7 @@ class tgraphcanvas(FigureCanvas):
                     any(aw.extraDelta2[:len(self.extratimex)]))
 
                 titleB = ""
-                if self.background and not ((aw.qmc.flagstart and not aw.qmc.title_show_always) or self.title is None or self.title.strip() == ""):
+                if self.backgroundprofile != None and not ((aw.qmc.flagstart and not aw.qmc.title_show_always) or self.title is None or self.title.strip() == ""):
                     if self.roastbatchnrB == 0:
                         titleB = self.titleB
                     else:
