@@ -7779,7 +7779,7 @@ class tgraphcanvas(FigureCanvas):
                                 trans = self.delta_ax.transData
                             else:
                                 trans = self.ax.transData
-                            if not self.flagstart and not self.foregroundShowFullflag:
+                            if not self.flagstart and not self.foregroundShowFullflag and len(self.extrastemp1[i]) > 0:
                                 visible_extratemp1 = [None]*charge_idx + self.extrastemp1[i][charge_idx:drop_idx+1] + [None]*(len(self.extratimex[i])-drop_idx-1)
                             else:
                                 visible_extratemp1 = self.extrastemp1[i]
@@ -7803,7 +7803,7 @@ class tgraphcanvas(FigureCanvas):
                                 trans = self.delta_ax.transData
                             else:
                                 trans = self.ax.transData
-                            if not self.flagstart and not self.foregroundShowFullflag:
+                            if not self.flagstart and not self.foregroundShowFullflag and len(self.extrastemp1[i]) > 0:
                                 visible_extratemp2 = [None]*charge_idx + self.extrastemp2[i][charge_idx:drop_idx+1] + [None]*(len(self.extratimex[i])-drop_idx-1)
                             else:
                                 visible_extratemp2 = self.extrastemp2[i]
