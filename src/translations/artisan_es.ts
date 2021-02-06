@@ -5003,32 +5003,32 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="30549"/>
         <source>Organic Loss</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pérdida Orgánica</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30550"/>
         <source>Ambient Humidity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Humedad Ambiental</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30551"/>
         <source>Ambient Pressure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Presión Ambiental</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30552"/>
         <source>Ambient Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temperatura Ambiental</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Roasting Notes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Notas de Tueste</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Cupping Notes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Notas de Cata</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30556"/>
@@ -5043,12 +5043,12 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="30558"/>
         <source>Light Cut</source>
-        <translation type="unfinished">Corte Ligero</translation>
+        <translation type="unfinished">Perfil Ligero</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30559"/>
         <source>Dark Cut</source>
-        <translation type="unfinished">Corte Oscuro</translation>
+        <translation type="unfinished">Perfil Oscuro</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30560"/>
@@ -5083,17 +5083,17 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="30566"/>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modo</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31284"/>
         <source>Roast Ranking</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Clasificación de Tueste</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31394"/>
         <source>Ranking Report</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reporte de Clasificación</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31536"/>
@@ -5103,82 +5103,82 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Roasting Report</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reporte de Tueste</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Date:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fecha:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Beans:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Granos:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Weight:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Peso</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Degree:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Grado:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Volumen:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Roaster:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tostador:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Operator:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Operador:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Organization:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Organización</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Cupping:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Catación:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Color:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Color:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>CHARGE:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CARGAR:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Size:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tamaño:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Density:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Densidad:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Moisture:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Humedad:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Ambient:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ambiente:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
@@ -5188,37 +5188,37 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>DRY:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SECADO:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>FCs:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCi</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>FCe:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCt</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>SCs:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCi</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>SCe:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCt</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>DROP:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DESCARGAR</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>COOL:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ENFRIADO:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
@@ -5233,7 +5233,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Drying:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Secando:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
@@ -5243,22 +5243,22 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Finishing:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fase Final:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Cooling:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Enfriando:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Background:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fondo:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Alarms:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alarmas:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
@@ -5273,7 +5273,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31767"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eventos</translation>
     </message>
 </context>
 <context>
@@ -5281,23 +5281,24 @@ Extra Device</source>
     <message>
         <location filename="../help/alarms_help.py" line="11"/>
         <source>ALARMS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ALARMAS</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="15"/>
         <source>Each alarm is only triggered once.
 Alarms are scanned in order from the top of the table to the bottom.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cada alarma se dispara una sola vez.
+Las alarmas son escaneadas en el orden desde la primera fila de la tabla hasta la última.</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="18"/>
         <source>Field</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Campo</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="158"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Descripción</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="19"/>
@@ -5307,42 +5308,42 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="19"/>
         <source>Alarm number for reference.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Número de alarma para referencia</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="20"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Estado</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="20"/>
         <source>Activate or Deactivate the alarm.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activar o Desactivar la alarma</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="21"/>
         <source>If Alarm</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alarma SI</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="21"/>
         <source>Alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alarma activada sólo si una alarma con un valor asignado fue disparada antes. Usar el 0 para no salvar.</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="22"/>
         <source>But Not</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pero NO</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="22"/>
         <source>Alarm triggered only if the alarm with the given number was not triggered before. Use 0 for no guard.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alarma activada solo si una alarma con un valor asignado no fue activada antes. Usar 0 para no salvar.</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="23"/>
         <source>From</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Desde</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="23"/>
@@ -5352,217 +5353,217 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="24"/>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tiempo</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="24"/>
         <source>If not 00:00, alarm is triggered mm:ss after the event &quot;From&quot; happens.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SI no 00:00, alarma es activada mm:ss luego de que el evento &quot;Desde&quot; ocurra</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="14"/>
         <source>Source</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fuente</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="25"/>
         <source>The observed temperature source.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La fuente de temperatura observada</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="26"/>
         <source>Condition</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Condiciones</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="26"/>
         <source>Alarm is triggered if source rises above or below the specified temperature.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La alarma es activada si la fuente sale de la temperatura definida</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="23"/>
         <source>Temp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temperatura</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="27"/>
         <source>The specified temperature limit.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El límite de la temperatura definida</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="34"/>
         <source>Action</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Acción</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="28"/>
         <source>The action to be triggered if all conditions are fulfilled.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La acción a ser activada si todas las condiciones son cumplidas</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="29"/>
         <source>Commands for alarms with an action, descriptive note for alarms without an action.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Los comandos para alarmas con una acción, notas descriptivas para las alarmas sin una acción</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="32"/>
         <source>ALARM CONFIGURATION OPTIONS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OPCIONES DE CONFIGURACIÓN DE ALARMA</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="27"/>
         <source>Option</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opción</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="31"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Agregar</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="36"/>
         <source>Adds a new alarm to the bottom of the table.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Agrega una nueva alarma al final de la tabla</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="32"/>
         <source>Insert</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Insertar</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="37"/>
         <source>Inserts a new alarm above the selected alarm.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Insertar una nueva alarma arriba de la alarma seleccionada</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="33"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Borrar</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="38"/>
         <source>Deletes the selected alarm.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Borra la alarma seleccionada</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="34"/>
         <source>Copy Table</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Copiar tabla</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="39"/>
         <source>Copy the alarm table in tab separated format to the clipboard.  Option or ALT click to copy a tabular format to the clipboard.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Copia la tabla de alarma en un formato de tabulación en el portapapeles. Presiona Opción o ALT para copiar a un formato tabular al portapapeles</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="40"/>
         <source>All On</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Todo ON</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="40"/>
         <source>Enables all alarms.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Habilitar todas las alarmas.</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="41"/>
         <source>All Off</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Todo OFF</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="41"/>
         <source>Disables all alarms.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Deshabilitar todas las alarmas</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="42"/>
         <source>Load</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cargar</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="42"/>
         <source>Load alarm definition from a file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cargar defición de alarma desde un archivo</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="43"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guardar</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="43"/>
         <source>Save the alarm definitions to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guarda la definición de alarma a un archivo</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="44"/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Limpiar</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="44"/>
         <source>Clears all alarms from the table.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Limpiar todas las alarmas desde la tabla</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="35"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ayuda</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="35"/>
         <source>Opens this window.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Abre esta ventana</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="46"/>
         <source>Load from Profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cargar desde Perfil</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="46"/>
         <source>when ticked will replace the alarm table when loading a profile with the alarms stored in the profile.  If there are no alarms in the profile the alarm table will be cleared.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cuando es marcado, reemplazará la tabla de alarma cuando se cargue un perfil con las alarmas almacenadas en el perfil. Si no hay alarmas en el perfil, la tabla de alarma sera limpiada.</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="47"/>
         <source>Load from Background</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cargar desde Fondo</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="47"/>
         <source>when ticked will replace the alarm table when loading a background profile with the alarms stored in the profile.  If there are no alarms in the profile the alarm table will be cleared.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cuando es marcado, reemplazará la tabla de alarma cuando se cargue un perfil con las alarmas almacenadas en el perfil. Si no hay alarmas en el perfil, la tabla de alarma será limpiada.</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="48"/>
         <source>PopUp TimeOut</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tiempo de Espera Emergente</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="48"/>
         <source>A PopUp will automatically close after this time if the OK button has not been clicked.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Una ventana emergente se cerrará automáticamente luego de este momento si el botón OK no es presionado.</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="51"/>
         <source>Alarm Actions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Acciones de Alarma</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="55"/>
         <source>Enter the Command into the Description field of the Alarm.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ingresa el comando en el campo de descripción de la Alarma</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="34"/>
         <source>Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comando</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="14"/>
         <source>Meaning</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Significado</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="59"/>
@@ -5572,87 +5573,87 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="59"/>
         <source>&lt;text&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;texto&gt;</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="59"/>
         <source>the text to  be displayed in the pop up</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El texto a mostrar en el Pop Up</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="48"/>
         <source>Call Program</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Llamar Programa</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="48"/>
         <source>A program/script path (absolute or relative)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Una ruta de programa/script (absoluta o relativa)</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="47"/>
         <source>start an external program</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Iniciar un programa externo</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="61"/>
         <source>Event Button</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Botón de Evento</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="61"/>
         <source>&lt;button number&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;Número de Botón&gt;</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="61"/>
         <source>triggers the button, the button number comes from the Events Buttons configuration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activa el botón, el número de botón viene desde la configuración de Botones de Eventos</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="62"/>
         <source>Slider &lt;1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Deslizador &lt;1&gt;</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="65"/>
         <source>&lt;value&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;valor&gt;</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="62"/>
         <source>set the slider for special event nr. 1 to the value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prepara el deslizador para el evento especial nro. 1 al valor</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="63"/>
         <source>Slider &lt;2&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Deslizador &lt;2&gt;</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="63"/>
         <source>set the slider for special event nr. 2 to the value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prepara el deslizador para el evento especial nro. 2 al valor</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="64"/>
         <source>Slider &lt;3&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Deslizador &lt;3&gt;</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="64"/>
         <source>set the slider for special event nr. 3 to the value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prepara el deslizador para el evento especial nro. 3 al valor</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="65"/>
         <source>Slider &lt;4&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Deslizador &lt;4&gt;</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="65"/>
         <source>set the slider for special event nr. 4 to the value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prepara el deslizador para el evento especial nro. 4 al valor</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="66"/>
@@ -5662,57 +5663,57 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="66"/>
         <source>trigger START</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activa INICIAR</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="67"/>
         <source>DRY</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SECADO</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="67"/>
         <source>trigger the DRY event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activa el evento SECADO</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="68"/>
         <source>FCs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCi</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="68"/>
         <source>trigger the FCs event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activa el evento FCi</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="69"/>
         <source>Fce</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCf</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="69"/>
         <source>trigger the FCe event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activa el evento FCf</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="70"/>
         <source>SCs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCi</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="70"/>
         <source>trigger the SCs event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activa el evento SCi</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="71"/>
         <source>Sce</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCf</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="71"/>
         <source>trigger the Sce event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activa el evento SCf</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="72"/>
@@ -5722,17 +5723,17 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="72"/>
         <source>trigger the DROP event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activa el evento DESCARGAR</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="73"/>
         <source>COOL END</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FIN ENFRIAMIENTO</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="73"/>
         <source>trigger the COOL END event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activa el evento FIN ENFRIAMIENTO</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="74"/>
@@ -5742,7 +5743,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="74"/>
         <source>trigger OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activar OFF</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="75"/>
@@ -5752,7 +5753,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="75"/>
         <source>trigger the CHARGE event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activar el evento CARGAR</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="76"/>
@@ -5772,12 +5773,12 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="77"/>
         <source>turns PID off and switches to manual mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Apagar el PID y cambiar al modo Manual</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="78"/>
         <source>Set Canvas Color</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configurar el Color del Canvas</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="78"/>
@@ -5787,215 +5788,218 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="78"/>
         <source>sets the canvas to &lt;color&gt;, can be in hex format, e.g. &quot;#ffaa55&quot; or a color name, e.g. &quot;blue&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura el canvas a &lt;color&gt;, puede ser en fórmato hex, ej: &quot;#ffaa55&quot; o por nombre de color, ej: &quot;azul&quot;</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="79"/>
         <source>Reset Canvas Color</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reiniciar el Color del Canvas</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="79"/>
         <source>reset the canvas color to the color specified in Config&gt;&gt;Colors
 canvas color resets automatically at OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reinicar el color del canvas a un color específico en configuración&gt;&gt;Colores
+Automáticamente se reiniciar el color del Canvas a OFF</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="24"/>
         <source>AUTOSAVE FIELDS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CAMPOS DE AUTO GUARDAR</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="14"/>
         <source>Prefix Field</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Campo Prefijo</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="55"/>
         <source>Example</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ejemplo</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="28"/>
         <source>The batch prefix set in Config&gt;Batch&gt;Prefix</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El prefijo del lote se configura en Configuración&gt;Lote&gt;Prefijo</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="29"/>
         <source>The current batch number</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El número de lote actual</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="30"/>
         <source>Same as &quot;~batchprefix~batchnum&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Igual a &quot;~batchprefix~batchnum&quot;</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="31"/>
         <source>The current batch position, or &quot;Roast of the Day&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La posición del lote actual, o &quot;Tueste del Día&quot;</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="32"/>
         <source>Same as Batch field in Roast Properties
 &quot;~batchprefix~batchnum (~batchposition)&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Al igual que Campo de Lote en Propiedades de Tueste
+&quot;~batchprefix~batchnum (~batchposition)&quot;</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="33"/>
         <source>From Roast&gt;Properties&gt;Title</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Título</translation>
     </message>
     <message encoding="UTF-8">
         <location filename="../help/autosave_help.py" line="34"/>
         <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Beans field.
 From Roast&gt;Properties&gt;Beans</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sustituir “nn” con 10, 15, 20, 25 o 30 para mostrar el primer carácter “nn” del campo Granos.
+de Tueste&gt;Propiedades&gt;Granos</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="35"/>
         <source>The entire first line From Roast&gt;Properties&gt;Beans</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La primera linea de Tueste&gt;Propiedades&gt;Granos</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="36"/>
         <source>Roast date in format yy-MM-dd</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fecha de tueste en formato aa-MM-dd</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="37"/>
         <source>Roast date in format yyyy-MM-dd</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fecha de tueste en formato aaaa-MM-dd</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="38"/>
         <source>Roast time in format hhmm</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hora de tueste en formato hhmm</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="39"/>
         <source>Roast date and time in format yy-MM-dd_hhmm</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fecha y hora de Tueste en formato aa-MM-dd_hhmm</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="40"/>
         <source>Roast date and time in format yyyy-MM-dd_hhmm</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fecha y hora de tueste en formato aaaa-MM-dd_hhmm</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="41"/>
         <source>Roast year in format yyyy</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Año de tueste en formato aaaa</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="42"/>
         <source>Roast year in format yy</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Año de tueste en formato yy</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="43"/>
         <source>Roast month in format MMM (localized)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mes de tueste en formato MMM</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="44"/>
         <source>Roast month in format MM</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mes de tueste en formato MM</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="45"/>
         <source>Roast day in format ddd (localized)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Día de tueste en formato ddd (Localizado)</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="46"/>
         <source>Roast day in format dd</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Día de tueste en formato dd</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="47"/>
         <source>Roast hour in format hh</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hora de tueste en formato hh</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="48"/>
         <source>Roast minute in format mm</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Minuto de tueste en formato mm</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="50"/>
         <source>From Roast&gt;Properties&gt;Operator</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Operador</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="51"/>
         <source>From Roast&gt;Properties&gt;Organization</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Desde Tueste&gt;Propiedades&gt;Organización</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="52"/>
         <source>From Roast&gt;Properties&gt;Machine</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Máquina</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="53"/>
         <source>From Roast&gt;Properties&gt;Weight Green</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Peso en Verde</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="54"/>
         <source>From Roast&gt;Properties&gt;Weight Roasted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Peso Tostado</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="55"/>
         <source>From Roast&gt;Properties&gt;Weight</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Peso</translation>
     </message>
     <message encoding="UTF-8">
         <location filename="../help/autosave_help.py" line="56"/>
         <source>Calculated weight loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pérdida de peso calculado en porcentaje (el símbolo “-” no se muestra; puede ser agregado manualmente encima del campo si se desea)</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="57"/>
         <source>From Roast&gt;Properties&gt;Volume Green</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Volumen en Verde</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="58"/>
         <source>From Roast&gt;Properties&gt;Volume Roasted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Volumen Tostado</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="59"/>
         <source>From Roast&gt;Properties&gt;Volume</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Volumen</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="60"/>
         <source>Calculated volume gain in percent</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Volumen ganado calculado en porcentaje</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="61"/>
         <source>From Roast&gt;Properties&gt;Density Green</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Densidad en Verde</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="62"/>
         <source>From Roast&gt;Properties&gt;Density Roasted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Densidad Tostado</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="63"/>
         <source>From Roast&gt;Properties&gt;Density</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Densidad</translation>
     </message>
     <message encoding="UTF-8">
         <location filename="../help/autosave_help.py" line="64"/>
         <source>Calculated density loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pérdidad de densidad calculada en porcentaje (el símbolo “-” no se muestra; puede ser agregad manualmente encima del campo si se desea)</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="65"/>
