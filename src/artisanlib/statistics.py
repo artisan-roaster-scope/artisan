@@ -22,6 +22,7 @@ from PyQt5.QtCore import Qt, pyqtSlot, QSettings
 from PyQt5.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, 
     QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, QLayout,
     QSpinBox)
+from artisanlib.util import deltaLabelUTF8
 
 class StatisticsDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
@@ -30,8 +31,8 @@ class StatisticsDlg(ArtisanDialog):
         self.setModal(True)
         self.timez = QCheckBox(QApplication.translate("CheckBox","Time",None))
         self.bar = QCheckBox(QApplication.translate("CheckBox","Bar",None))
+        self.dt = QCheckBox(deltaLabelUTF8 + self.aw.qmc.mode)
         self.ror = QCheckBox(self.aw.qmc.mode + QApplication.translate("CheckBox","/min",None))
-        self.ts = QCheckBox(QApplication.translate("CheckBox","AUC",None))
         self.area = QCheckBox(QApplication.translate("CheckBox","Characteristics",None))
         self.ShowStatsSummary = QCheckBox(QApplication.translate("CheckBox", "Summary",None))
         self.ShowStatsSummary.setChecked(self.aw.qmc.statssummary)
@@ -46,21 +47,22 @@ class StatisticsDlg(ArtisanDialog):
                 self.area.setChecked(True)
             if self.aw.qmc.statisticsflags[4]:
                 self.ror.setChecked(True)
-            if self.aw.qmc.statisticsflags[5]:
-                self.ts.setChecked(True)
+            if self.aw.qmc.statisticsflags[6]:
+                self.dt.setChecked(True)
         else:
-            self.aw.qmc.statisticsflags = [1,1,0,1,1,0]
+            self.aw.qmc.statisticsflags = [1,1,0,1,1,0,1]
             self.timez.setChecked(True)
             self.bar.setChecked(True)
             self.area.setChecked(True)
             self.ror.setChecked(True)
-            self.ts.setChecked(False)
+            self.dt.setChecked(False)
         self.timez.stateChanged.connect(self.changeStatisticsflag)
         self.bar.stateChanged.connect(self.changeStatisticsflag)
         # flag 2 not used anymore
         self.area.stateChanged.connect(self.changeStatisticsflag)
         self.ror.stateChanged.connect(self.changeStatisticsflag)
-        self.ts.stateChanged.connect(self.changeStatisticsflag)
+        # flag 5 not used anymore
+        self.dt.stateChanged.connect(self.changeStatisticsflag)
         
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.accept)
@@ -68,8 +70,8 @@ class StatisticsDlg(ArtisanDialog):
         flagsLayout = QGridLayout()
         flagsLayout.addWidget(self.timez,0,0)
         flagsLayout.addWidget(self.bar,0,1)
-        flagsLayout.addWidget(self.ror,0,2)
-        flagsLayout.addWidget(self.ts,0,3)
+        flagsLayout.addWidget(self.dt,0,2)
+        flagsLayout.addWidget(self.ror,0,3)
         flagsLayout.addWidget(self.area,0,4)
         flagsLayout.addWidget(self.ShowStatsSummary,0,5)
         
@@ -228,8 +230,8 @@ class StatisticsDlg(ArtisanDialog):
             i = 3
         elif sender == self.ror:
             i = 4
-        elif sender == self.ts:
-            i = 5
+        elif sender == self.dt:
+            i = 6
         else:
             return
         self.aw.qmc.statisticsflags[i] = value
@@ -273,10 +275,11 @@ class StatisticsDlg(ArtisanDialog):
         else:
             self.aw.qmc.statisticsflags[4] = 0
             
-        if self.ts.isChecked(): 
-            self.aw.qmc.statisticsflags[5] = 1
+        if self.dt.isChecked(): 
+            self.aw.qmc.statisticsflags[6] = 1
         else:
-            self.aw.qmc.statisticsflags[5] = 0
+            self.aw.qmc.statisticsflags[6] = 0
+
         self.aw.qmc.redraw(recomputeAllDeltas=False)
         #save window position (only; not size!)
         settings = QSettings()

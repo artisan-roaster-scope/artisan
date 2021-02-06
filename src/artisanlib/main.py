@@ -889,7 +889,8 @@ class tgraphcanvas(FigureCanvas):
 
         #statistics flags selects to display: stat. time, stat. bar, (stat. flavors), stat. area, stat. deg/min, stat. ETBTarea
         # NOTE: stat. flavors not used anymore. The code has been removed.
-        self.statisticsflags = [1,1,0,1,0,0]
+        #       statisticsflags[5] area is not used anymore
+        self.statisticsflags = [1,1,0,1,0,0,1]
         self.statisticsmode = 1 # one of 0: standard computed values, 1: roast properties
 
         # Area Under Curve (AUC)
@@ -11495,13 +11496,13 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.add_patch(rect)
 
                 if aw.qmc.LCDdecimalplaces:
-                    fmtstr = "%.1f"
+                    fmtstr = "{0:.1f}"
                 else:
-                    fmtstr = "%.0f"
+                    fmtstr = "{0:.0f}"
                 if self.statisticstimes[0]:
-                    dryphaseP = fmtstr%(self.statisticstimes[1]*100./self.statisticstimes[0])
-                    midphaseP = fmtstr%(self.statisticstimes[2]*100./self.statisticstimes[0])
-                    finishphaseP = fmtstr%(self.statisticstimes[3]*100./self.statisticstimes[0])
+                    dryphaseP = fmtstr.format(self.statisticstimes[1]*100./self.statisticstimes[0])
+                    midphaseP = fmtstr.format(self.statisticstimes[2]*100./self.statisticstimes[0])
+                    finishphaseP = fmtstr.format(self.statisticstimes[3]*100./self.statisticstimes[0])
                 else:
                     dryphaseP = " --- "
                     midphaseP = " --- "
@@ -11540,26 +11541,20 @@ class tgraphcanvas(FigureCanvas):
 
                 st1 = st2 = st3 = st4 = ""
 
-                if self.statisticsflags[4] or self.statisticsflags[5]:
+                if self.statisticsflags[4] or self.statisticsflags[6]:
                     rates_of_changes = aw.RoR(TP_index,dryEndIndex)
-                    if self.statisticsflags[4]:
-                        st1 = st1 + "%.1f"%rates_of_changes[0] + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None))
-                        st2 = st2 + "%.1f"%rates_of_changes[1] + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None))
-                        st3 = st3 + "%.1f"%rates_of_changes[2] + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None))
-                    if self.statisticsflags[5]:
+                    d = str(aw.qmc.LCDdecimalplaces)
+                    if self.statisticsflags[6]:
+                        fmtstr = "{0:." + d + "f}{1}"
                         if self.statisticsflags[4]:
-                            st1 += "  "
-                            st2 += "  "
-                            st3 += "  "
-                        _,_,ts1b,_ = aw.ts(self.timeindex[0],dryEndIndex,TP_index)
-                        _,_,ts2b,_ = aw.ts(dryEndIndex,self.timeindex[2],TP_index)
-                        _,_,ts3b,_ = aw.ts(self.timeindex[2],self.timeindex[6],TP_index)
-                        st1 += str(ts1b) + "C*min"
-                        st2 += str(ts2b) + "C*min"
-                        st3 += str(ts3b) + "C*min"
+                            fmtstr += "  {2:." + d + "f}{3}"
+                    else:
+                        fmtstr = "{2:." + d + "f}{3}"
 
-                if self.statisticsflags[4] or self.statisticsflags[5]:
-                    #Write flavor estimation
+                    st1 = st1 + fmtstr.format(rates_of_changes[3], aw.qmc.mode, rates_of_changes[0], aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None)))
+                    st2 = st2 + fmtstr.format(rates_of_changes[4], aw.qmc.mode, rates_of_changes[1], aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None)))
+                    st3 = st3 + fmtstr.format(rates_of_changes[5], aw.qmc.mode, rates_of_changes[2], aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None)))
+
                     statsprop = aw.mpl_fontproperties.copy()
                     statsprop.set_size(11)
                     text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontproperties=statsprop)
@@ -27364,7 +27359,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("Statistics"):
                 self.qmc.statisticsflags = [toInt(x) for x in toList(settings.value("Statistics",self.qmc.statisticsflags))]
                 # extend statisticsflag len to the full size (for backward compatibility)
-                for i in range(6 - len(self.qmc.statisticsflags)):
+                for i in range(7 - len(self.qmc.statisticsflags)):
                     self.qmc.statisticsflags.append(0)
             if settings.contains("AnalysisResultsLoc"):
                 self.qmc.analysisresultsloc = [toFloat(x) for x in toList(settings.value("AnalysisResultsLoc",self.qmc.analysisresultsloc))]
@@ -28384,6 +28379,10 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.backgroundBTcurve = bool(toBool(settings.value("BTBflag",aw.qmc.backgroundBTcurve)))
             if settings.contains("backgroundShowFullflag"):
                 aw.qmc.backgroundShowFullflag = bool(toBool(settings.value("backgroundShowFullflag",aw.qmc.backgroundShowFullflag)))
+            if settings.contains("clearBgbeforeprofileload"):
+                aw.qmc.clearBgbeforeprofileload = bool(toBool(settings.value("clearBgbeforeprofileload",aw.qmc.clearBgbeforeprofileload)))
+            if settings.contains("hideBgafterprofileload"):
+                aw.qmc.hideBgafterprofileload = bool(toBool(settings.value("hideBgafterprofileload",aw.qmc.hideBgafterprofileload)))
             settings.endGroup()
             if settings.contains("compareAlignEvent"):
                 aw.qmc.compareAlignEvent = toInt(settings.value("compareAlignEvent",aw.qmc.compareAlignEvent))
@@ -29602,6 +29601,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ETBflag",aw.qmc.backgroundETcurve)
             settings.setValue("BTBflag",aw.qmc.backgroundBTcurve)
             settings.setValue("backgroundShowFullflag",aw.qmc.backgroundShowFullflag)
+            settings.setValue("clearBgbeforeprofileload",aw.qmc.clearBgbeforeprofileload)
+            settings.setValue("hideBgafterprofileload",aw.qmc.hideBgafterprofileload)
             settings.endGroup()
             settings.setValue("compareAlignEvent",self.qmc.compareAlignEvent)
             settings.setValue("compareEvents",self.qmc.compareEvents)
@@ -32511,14 +32512,18 @@ class ApplicationWindow(QMainWindow):
             divisor = self.qmc.timex[dryEndIndex] - self.qmc.timex[TP_index]
             if divisor:
                 rc1 = ((BTdrycross - LP) / divisor)*60.
+                dt1 = BTdrycross - LP
             else:
                 rc1 = 0
+                dt1 = 0
         if self.qmc.timeindex[2]:
             if midphasetime and BTdrycross:
                 rc2 = ((self.qmc.temp2[self.qmc.timeindex[2]] - BTdrycross)/midphasetime)*60.
+                dt2 = self.qmc.temp2[self.qmc.timeindex[2]] - BTdrycross
             if finishphasetime:
                 rc3 = ((self.qmc.temp2[self.qmc.timeindex[6]]- self.qmc.temp2[self.qmc.timeindex[2]])/finishphasetime)*60.
-        return (rc1,rc2,rc3)
+                dt3 = self.qmc.temp2[self.qmc.timeindex[6]]- self.qmc.temp2[self.qmc.timeindex[2]]
+        return (rc1,rc2,rc3,dt1,dt2,dt3)
 
     @pyqtSlot()
     @pyqtSlot(bool)
