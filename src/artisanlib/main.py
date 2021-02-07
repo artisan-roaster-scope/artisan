@@ -4019,7 +4019,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.setCanvasColorSignal.emit(c)
                 elif action == 25:
                     # Reset Canvas Color
-                    aw.resetCanvasColorSignal.emit(c)
+                    aw.resetCanvasColorSignal.emit()
 
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
