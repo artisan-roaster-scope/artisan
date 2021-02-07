@@ -1,9 +1,8 @@
-####Artisan helps coffee roasters record, analyze, and control roast profiles. With the help of a thermocouple data logger, or a proportional–integral–derivative controller (PID controller), this software offers roasting metrics to help make decisions that influence the final coffee flavor.
+#### Artisan helps coffee roasters record, analyze, and control roast profiles. With the help of a thermocouple data logger, or a proportional–integral–derivative controller (PID controller), this software offers roasting metrics to help make decisions that influence the final coffee flavor.
 
-Artisan is free for personal and commercial use, but asks for a donation <https://www.paypal.me/MarkoLuther>.
+Artisan is free for personal and commercial use, but asks for a [donation](https://www.paypal.me/MarkoLuther).
 
-
-##HOME
+## HOME
 
 <https://artisan-scope.org>
 
@@ -11,42 +10,35 @@ The home of its development is on GitHub were all source and binary files are av
 
 <https://github.com/artisan-roaster-scope/artisan>
 
-
-##MAILING LIST
+## MAILING LIST
 
 <https://lists.einfachkaffee.de/postorius/lists/artisan-user.lists.einfachkaffee.de/>
 
-
-##ARTISAN BLOG
+## ARTISAN BLOG
 
 https://artisan-roasterscope.blogspot.de
 
+## FEATURES
 
+Runs on 64bit Windows 8, macOS 10.13 (legacy builds support 10.10), Redhat/Debian Linux (incl. Raspberry Pi) and supports a large number of devices and roasting machines. See <https://artisan-scope.org/devices/index> for supported devices and <https://artisan-scope.org/machines/index> for supported machines.
 
-##FEATURES
+**Artisan offers**
+- Unlimited number of curves.
+- Rate-of-rise (RoR), area-under-the-curve (AUC), development-time-ratio (DTR) calculations.
+- Projection lines and head-up-display (HUD).
+- Roast profile evaluation and statistics.
+- Roast-, production- and ranking reports.
+- Automated reproduction of roasts via alarm programs, replay of events or PID control.
+- Batch counter.
+- Profile designer, cupping editor, spider- and wheel graph.
+- User defined buttons and sliders with programable actions.
+- Many import and export formats.
 
-Runs on 64bit Windows 8, macOS 10.13 (legacy builds support 10.10), Redhat/Debian Linux (incl. Raspberry Pi) and supports a large number of devices and roasting machines. See <https://artisan-scope.org/devices/index> for supported Supported Devices and <https://artisan-scope.org/machines/index> for supported machines.
-
-Artisan offers
-- unlimited number of curves
-- rate-of-rise (RoR), area-under-the-curve (AUC), development-time-ratio (DTR) calculations
-- projection lines and head-up-display (HUD)
-- roast profile evaluation and statistics
-- roast-, production- and ranking reports
-- automated reproduction of roasts via alarm programs, replay of events or PID control
-- batch counter
-- profile designer, cupping editor, spider- and wheel graph
-- user defined buttons and sliders with programable actions
-- many import and export formats
-
-
-##INSTALLATION
+## INSTALLATION
 
 See <https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/Installation.md>
 
-
-
-##LICENCE
+## LICENCE
 
 Artisan is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -61,12 +53,9 @@ Copies of the GNU General Public License has been included with this
 distribution in the file `LICENSE.txt`. An online version is available at
 <http://www.gnu.org/licenses/>.
 
-
-
-##LIBRARIES
+## LIBRARIES
 
 Artisan uses the following libraries in unmodified forms:
-
 - Python 3.x released under the PSF licence http://www.python.org/psf/
   http://www.python.org/
 - QT 5.x under the Qt GNU Lesser General Public License version 2.1 (LGPL)
@@ -89,7 +78,6 @@ Artisan uses the following libraries in unmodified forms:
 - arabic_reshaper.py under GPL by Abd Allah Diab (Mpcabd)
 
 
-
-##VERSION HISTORY
+## VERSION HISTORY
 
 See <https://github.com/artisan-roaster-scope/artisan>
