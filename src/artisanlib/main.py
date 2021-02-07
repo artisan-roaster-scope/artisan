@@ -8772,6 +8772,8 @@ class tgraphcanvas(FigureCanvas):
                                         pass
                         if self.ambientTemp is not None and self.ambientTemp != 0:
                             self.ambientTemp = fromCtoF(self.ambientTemp)  #ambient temperature
+                        if self.greens_temp is not None and self.greens_temp != 0:
+                            self.greens_temp = fromCtoF(self.greens_temp)
 
                         #prevents accidentally deleting a modified profile.
                         self.fileDirtySignal.emit()
@@ -8832,6 +8834,8 @@ class tgraphcanvas(FigureCanvas):
 
                         if self.ambientTemp is not None and self.ambientTemp != 0:
                             self.ambientTemp = fromFtoC(self.ambientTemp)  #ambient temperature
+                        if self.greens_temp is not None and self.greens_temp != 0:
+                            self.greens_temp = fromFtoC(self.greens_temp)
 
                         #prevents accidentally deleting a modified profile.
                         self.fileDirtySignal.emit()
@@ -32504,18 +32508,21 @@ class ApplicationWindow(QMainWindow):
         finishphasetime = self.qmc.statisticstimes[3]
         BTdrycross = None
         rc1 = rc2 = rc3 = 0.
+        dt1 = dt2 = dt3 = 0.
+        divisor = 0
         if dryEndIndex > -1 and dryEndIndex < len(self.qmc.temp2):
             BTdrycross = self.qmc.temp2[dryEndIndex]
-        if BTdrycross and TP_index < 1000 and TP_index > -1 and dryEndIndex and TP_index < len(self.qmc.temp2):
+        if BTdrycross and self.qmc.greens_temp > 0:
+            LP = self.qmc.greens_temp
+            #avoid dividing by zero
+            divisor = self.qmc.timex[dryEndIndex] - self.qmc.timex[self.qmc.timeindex[0]]
+        elif BTdrycross and TP_index < 1000 and TP_index > -1 and dryEndIndex and TP_index < len(self.qmc.temp2):
             LP = self.qmc.temp2[TP_index]
             #avoid dividing by zero
             divisor = self.qmc.timex[dryEndIndex] - self.qmc.timex[TP_index]
-            if divisor:
-                rc1 = ((BTdrycross - LP) / divisor)*60.
-                dt1 = BTdrycross - LP
-            else:
-                rc1 = 0
-                dt1 = 0
+        if divisor:
+            rc1 = ((BTdrycross - LP) / divisor)*60.
+            dt1 = BTdrycross - LP
         if self.qmc.timeindex[2]:
             if midphasetime and BTdrycross:
                 rc2 = ((self.qmc.temp2[self.qmc.timeindex[2]] - BTdrycross)/midphasetime)*60.
