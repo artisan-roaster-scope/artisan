@@ -11793,8 +11793,11 @@ class tgraphcanvas(FigureCanvas):
                     else: # take DRY as specificed in phases
                         pi = aw.findDryEnd(phasesindex=1)
                         begin = aw.time2index(self.timex[pi])
-                    # intial bean temp set to ambient
-                    if aw.qmc.ambientTemp != None and aw.qmc.ambientTemp > 0:
+                    # initial bean temp set to greens_temp or ambient or a fixed temp
+                    if aw.qmc.greens_temp > 0:
+                        time_l = [charge]
+                        temp_l = [aw.qmc.greens_temp]                        
+                    elif aw.qmc.ambientTemp != None and aw.qmc.ambientTemp > 0:
                         time_l = [charge]
                         temp_l = [aw.qmc.ambientTemp]
                     else:
@@ -31015,7 +31018,7 @@ class ApplicationWindow(QMainWindow):
                             charge = max(0,rd["charge_idx"]) # start of visible data
                             drop = rd["drop_idx"] # end of visible data
                             stemp = numpy.concatenate(([None]*charge,stemp[charge:drop],[None]*(len(timex)-drop)))
-                            timeindex = [max(0,v) if i>0 else max(-1,v) for v,i in enumerate(p["timeindex"])]
+                            timeindex = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(p["timeindex"])]
                             if len(timex) > rd["charge_idx"]:
                                 if first_profile:
                                 # align with CHARGE
