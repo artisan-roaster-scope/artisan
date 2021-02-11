@@ -20546,7 +20546,7 @@ class ApplicationWindow(QMainWindow):
                         action = action + 1 # skip the 19: Aillio PRS
             # after adaption: (see eventaction)
                 value = self.calcSliderSendValue(n)
-                if not (action in [4, 6,14,15, 21]): # only for MODBUS, IO, VOUT, S7 and RC Commands we keep the floats
+                if not (action in [6, 14, 15, 21]): # only for IO, VOUT, S7 and RC Commands we keep the floats
                     value = int(round(value))
                 if action in [8,9,16,17,18]: # for Hottop/R1 Heater or Fan, we just forward the value
                     cmd = int(round(value))
@@ -20885,6 +20885,27 @@ class ApplicationWindow(QMainWindow):
                                         followupCmd = 0.08
                                 except Exception:
                                     pass
+                            elif cs.startswith('writeSingle'):
+                                try:
+                                    cmds = eval(cs[len('writeSingle'):])
+                                    if isinstance(cmds,tuple):
+                                        if len(cmds) == 3 and not isinstance(cmds[0],list):
+                                            # cmd has format "writeSingle(s,r,v)"
+                                            aw.modbus.writeSingleRegister(*cmds)
+                                            followupCmd = 0.08
+                                        else:
+                                            # cmd has format "writeSingle([s,r,v],..,[s,r,v])"
+                                            for cmd in cmds:
+                                                if followupCmd:
+                                                    libtime.sleep(followupCmd) # respect the MODBUS timing (a MODBUS command might have preceeded)
+                                                aw.modbus.writeSingleRegister(*cmd)
+                                                followupCmd = 0.08
+                                    else:
+                                        # cmd has format "writeSingle([s,r,v])"
+                                        aw.modbus.writeSingleRegister(*cmds)
+                                        followupCmd = 0.08
+                                except Exception:
+                                    pass
                             elif cs.startswith('write'):
                                 try:
                                     cmds = eval(cs[len('write'):])
@@ -20894,7 +20915,7 @@ class ApplicationWindow(QMainWindow):
                                             aw.modbus.writeRegister(*cmds)
                                             followupCmd = 0.08
                                         else:
-                                        # cmd has format "write([s,r,v],..,[s,r,v])"
+                                            # cmd has format "write([s,r,v],..,[s,r,v])"
                                             for cmd in cmds:
                                                 if followupCmd:
                                                     libtime.sleep(followupCmd) # respect the MODBUS timing (a MODBUS command might have preceeded)
@@ -21285,9 +21306,9 @@ class ApplicationWindow(QMainWindow):
                                 if cs.startswith('out(') and len(cs)>7:
                                     cs_split = cs[4:-1].split(',')
                                     if len(cs_split) == 2:
-                                        aw.ser.phidgetOUTsetPWM(int(cs_split[0]),int(eval(cs_split[1])))
+                                        aw.ser.phidgetOUTsetPWM(int(cs_split[0]),int(round(eval(cs_split[1]))))
                                     elif len(cs_split) == 3:
-                                        aw.ser.phidgetOUTsetPWM(int(cs_split[0]),int(eval(cs_split[1])),cs_split[2])
+                                        aw.ser.phidgetOUTsetPWM(int(cs_split[0]),int(round(eval(cs_split[1])),cs_split[2]))
                                 elif cs.startswith('toggle(') and len(cs)>8:
                                     cs_split = cs[7:-1].split(',')
                                     if len(cs_split) == 1:
@@ -21297,9 +21318,9 @@ class ApplicationWindow(QMainWindow):
                                 elif cs.startswith('outhub(') and len(cs)>10:
                                     cs_split = cs[7:-1].split(',')
                                     if len(cs_split) == 2:
-                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),int(eval(cs_split[1])))
+                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),int(round(eval(cs_split[1]))))
                                     elif len(cs_split) == 3:
-                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),int(eval(cs_split[1])),cs_split[2])
+                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),int(round(eval(cs_split[1])),cs_split[2]))
                                 elif cs.startswith('togglehub(') and len(cs)>11:
                                     cs_split = cs[10:-1].split(',')
                                     if len(cs_split) == 1:

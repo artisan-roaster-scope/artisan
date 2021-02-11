@@ -115,7 +115,7 @@
     </tr>
     <tr>
         <td>&#160;</td>
-        <td>write([slaveId,register,value],..,[slaveId,register,value])</td>
+        <td>write(slaveId,register,value) or write([slaveId,register,value],..,[slaveId,register,value])</td>
         <td>write register: MODBUS function 6 (int) or function 16 (float)</td>
     </tr>
     <tr>
@@ -141,12 +141,17 @@
     <tr>
         <td>&#160;</td>
         <td>writeBCD(s,r,v) or writeBCD([s,r,v],..,[s,r,v])</td>
-        <td>write 16bit BCD encoded value v to regiseter r of slave s </td>
+        <td>write 16bit BCD encoded value v to register r of slave s </td>
     </tr>
     <tr>
         <td>&#160;</td>
-        <td>writeWord(slaveId,register,value)</td>
+        <td>writeWord(slaveId,register,value) or writeWord([slaveId,register,value],..,[slaveId,register,value])</td>
         <td>write 32bit float to two 16bit int registers: MODBUS function 16</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
+        <td>writeSingle(slaveId,register,value) or writeSingle([slaveId,register,value],..,[slaveId,register,value])</td>
+        <td>write 16bit integer to a single 16bit register: MODBUS function 6 (int)</td>
     </tr>
     <tr>
         <td>DTA Command</td>

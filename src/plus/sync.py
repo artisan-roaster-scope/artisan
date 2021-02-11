@@ -533,7 +533,11 @@ def fetchServerUpdate(uuid,file=None):
         config.app_window.updatePlusStatusSignal.emit() # @UndefinedVariable
 
 
-# updates from server are only requested if connected and the uuid is in the sync cache
+# updates from server are only requested if connected (the uuid does not have to be in the sync cache; this allows roasts to be "rediscovered" once the 
+# sync cache got lost). This behavior was changed from requiring an exsisting sync record in commit from 23.1.2020
+# https://github.com/artisan-roaster-scope/artisan/commit/62880a7c10051638b2171406da918f5a98f04631
+# "adds roast profiles automatic to the plus syncing game if not yet part of it but there is already a record on the platform"
+
 # this function might be called from a thread (eg. via QTimer)
 def getUpdate(uuid,file=None):
     config.logger.info("sync:getUpdate(" + str(uuid) + "," + str(file) + ")")

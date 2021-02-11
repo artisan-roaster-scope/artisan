@@ -25,7 +25,7 @@ openpyxl==3.6.0
 #PyQt 5.11.3 is preinstalled
 pyinstaller==4.1
 cffi==1.14.4
-cryptography==3.3.1
+cryptography==3.3.2
 keyring==21.8.0
 SecretStorage==3.3.0
 lxml==4.6.2
