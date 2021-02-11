@@ -29,6 +29,8 @@ Note that MODBUS Command actions can be sequenced by separating them with semico
 
 * `read(slaveId,register)`:  
 reads <register> from slave <slaveID> using function 3 (Read Multiple Holding Registers). The result is bound to the placeholder `_` and thus can be used in later commands.
+* `writeSingle([slaveId,register,value],..,[slaveId,register,value])`:  
+write single register via function 6 (int)
 * `writeWord([slaveId,register,value],..,[slaveId,register,value])`:  
 write register via function 16 (float)
 * `write([slaveId,register,value],..,[slaveId,register,value])`:  
