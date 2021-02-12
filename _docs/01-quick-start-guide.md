@@ -31,9 +31,9 @@ The service features support for
 
 
 
-### Learn what Artisan can do and Your first roast 
+### Learn what Artisan can do and Your First Roast 
 
-1.	Skim the pages of the Quick Start Guide, learn what Artisan RoasterScope can do, and then go back and read the pages of interest in detail. For each roast, an Artisan "profile" will be created and can be saved.  For most of the topics below, you will find a page in this Quick Start Guide, and some are linked.  
+1.	Skim the pages of this Quick Start Guide, learn what Artisan RoasterScope can do, and then go back and read the pages of interest in detail. For each roast, an Artisan "profile" will be created and can be saved.  For most of the topics below, you will find a page in this Quick Start Guide, and some are linked.  
 2.	Config>Temperature - pick ˚F or ˚C.
 3.	Config>[Sampling](https://artisan-scope.org/docs/sampling/) - leave at 3 for now. After you have done 25-30 roasts and know the program better you can reduce it if your devices support that. Under Curves your Delta Span should be at least twice your sampling rate.  Leave Oversampling unselected/unchecked.
 4.	Run Config>Machine, or set up your devices, and make sure the LCDs show your temps.  Some of these configurations will change the sampling rate and that’s ok.  
