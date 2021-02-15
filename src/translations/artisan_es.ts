@@ -6004,184 +6004,186 @@ de Tueste&gt;Propiedades&gt;Granos</translation>
     <message encoding="UTF-8">
         <location filename="../help/autosave_help.py" line="64"/>
         <source>Calculated density loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
-        <translation type="unfinished">Pérdidad de densidad calculada en porcentaje (el símbolo “-” no se muestra; puede ser agregad manualmente encima del campo si se desea)</translation>
+        <translation type="unfinished">Pérdida de densidad calculada en porcentaje (el símbolo “-” no se muestra; puede ser agregado manualmente encima del campo si se desea)</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="65"/>
         <source>From Roast&gt;Properties&gt;Moisture Green</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Humedad en Verde</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="66"/>
         <source>From Roast&gt;Properties&gt;Moisture Roasted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Humedad Tostado</translation>
     </message>
     <message encoding="UTF-8">
         <location filename="../help/autosave_help.py" line="67"/>
         <source>Calculated moisture loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pérdida de humedad calculada en porcentaje (el símbolo “-” no se muestra; puede ser agregado manualmente encima del campo si se desea)</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="68"/>
         <source>From Roast&gt;Properties&gt;Drum Speed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Velocidad de Tambor</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="69"/>
         <source>From Roast&gt;Properties&gt;Color Whole</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Color Grano</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="70"/>
         <source>From Roast&gt;Properties&gt;Color Ground</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Color Molido</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="71"/>
         <source>From Roast&gt;Properties&gt;Color System</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Sistema de Color</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="72"/>
         <source>From Roast&gt;Properties&gt;Screen Min</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Malla Mínima</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="73"/>
         <source>From Roast&gt;Properties&gt;Screen Max</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Malla Máxima</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="74"/>
         <source>From Roast&gt;Properties&gt;(Green) Beans Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Temperatura del Grano (Verde)</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="75"/>
         <source>From Roast&gt;Properties&gt;Ambient Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Temperatura Ambiental</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="76"/>
         <source>From Roast&gt;Properties&gt;Ambient Humidity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Humedad Ambiental</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="77"/>
         <source>From Roast&gt;Properties&gt;Ambient Pressure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">De Tueste&gt;Propiedades&gt;Presión Ambiental</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="78"/>
         <source>Calculated time from FCs to DROP in seconds</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tiempo calculado desde FCi a DESCARGAR en segundos</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="79"/>
         <source>Calculated time from FCs to DROP in min_secs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tiempo calculado desde FCi a DESCARGAR en min_secs</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="80"/>
         <source>From Profile Statistics - DTR (in percent)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Desde Estadísticas de Perfil - DTR (en porcentaje)</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="81"/>
         <source>From the Profile Statistics - AUC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Desde Estadísticas de Perfil - AUC</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="82"/>
         <source>From the Profile Statistics - AUC Base</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Desde Estadísticas de Perfil - AUC Base</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="83"/>
         <source>From the Profile - ET at CHARGE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Desde Perfil - ET al CARGAR</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="84"/>
         <source>From the Profile - BT at CHARGE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Desde Perfil - BT al CARGAR</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="85"/>
         <source>From the Profile - ET at FCs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Desde Perfil - ET al FCi</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="86"/>
         <source>From the Profile -BT at FCs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Desde Perfil - BT al FCi</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="87"/>
         <source>From the Profile - ET at DROP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Desde Perfil - ET al DESCARGAR</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="88"/>
         <source>From the Profile - BT at DROP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Desde Perfil - BT al DESCARGAR</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="89"/>
         <source>From the Profile - DROP time in seconds</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Desde Perfil - DESCARGAR tiempo en segundos</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="90"/>
         <source>From the Profile - DROP time in min_secs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Desde Perfil - DESCARGAR tiempo en min_secs</translation>
     </message>
     <message encoding="UTF-8">
         <location filename="../help/autosave_help.py" line="91"/>
         <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Roasting Notes field.
 From Roast&gt;Properties&gt;Roasting Notes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sustituir “nn” con 10, 15, 20, 25 o 30 para mostrar los primeros caracteres “nn” del campo Notas de Tueste.
+De Tueste&gt;Propiedades&gt;Notas de Tueste</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="92"/>
         <source>The entire first line From Roast&gt;Properties&gt;Roasting Notes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La primera línea desde Tueste&gt;Propiedades&gt;Notas de Tueste</translation>
     </message>
     <message encoding="UTF-8">
         <location filename="../help/autosave_help.py" line="93"/>
         <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Cupping Notes field.
 From Roast&gt;Properties&gt;Cupping Notes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sustituir “nn” con 10, 15, 20, 25 o 30 para mostrar los primeros caracteres “nn” del campo Notas de Catación.
+De Tueste&gt;Propiedades&gt;Notas de Catación</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="94"/>
         <source>The entire first line From Roast&gt;Properties&gt;Cupping Notes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La primera línea Desde Tueste&gt;Propiedades&gt;Notas de Catación</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="37"/>
         <source>EXAMPLES</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">EJEMPLOS</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="105"/>
         <source>Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.  </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Los Datos usados para sustituir los campos del prefijo del archivo Auto Guardar son sacados de las Propiedades de Tueste actuales</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="108"/>
         <source>Autosave Field</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Campo Auto Guardar</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="108"/>
         <source>Example File Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nombre de Archivo Ejemplo</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="109"/>
         <source>~title Roasted on ~date</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">~title Tostado el ~date</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="109"/>
@@ -6224,133 +6226,144 @@ Recording 1380  Burundi KigandaMurambi 2020-04-25_1136.alog</source>
     <message>
         <location filename="../help/eventannotations_help.py" line="11"/>
         <source>EVENT ANNOTATIONS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ANOTACIONES DE EVENTO</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="15"/>
         <source>The value of Event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El valor del Evento</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="18"/>
         <source>ET value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valor ET</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="19"/>
         <source>BT value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valor BT</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="18"/>
         <source>The Description field of the Event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El Campo de Descripción del Evento</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="19"/>
         <source>The Type field of the Event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El Tipo de Campo del Evento</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="20"/>
         <source>The value of the Slider Unit for this Event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El valor de la unidad del Deslizador para este Evento</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="21"/>
         <source>Number of seconds since CHARGE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Número de segundos desde CARGAR</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="22"/>
         <source>Number of seconds after FCs 
 Best used inside double quotes (see notes below) 
 Displays &amp;#39;*&amp;#39; prior to FCs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Número de segundos luego de FCi 
+Mejor usar en doble comillas (ver anotaciones abajo)
+Se muestra &amp;#39;*&amp;#39; antes de FCi</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="23"/>
         <source>Number of seconds before FCs 
 Best used inside single quotes or back ticks (see notes below) 
 Displays &amp;#39;*&amp;#39; after FCs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Número de segundos antes de FCi
+Mejor usar dentro de comillas simples (ver notas debajo)
+Se muestra &amp;#39;*&amp;#39; luego de FCi</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="24"/>
         <source>Development time ratio. Note: DTR=0 before FCs 
 100*(t{Event}-t{FCs})/(t{FCs}-t{CHARGE})</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Proporción de tiempo de desarrollo. Nota: DTR=0 antes FCi 
+100*(t{Event}-t{FCs})/(t{FCs}-t{CHARGE})</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="25"/>
         <source>The degree symbol</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Símbolo de grado</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="26"/>
         <source>Temperature mode (&amp;#39;C&amp;#39; or &amp;#39;F&amp;#39;)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modo de Temperatura (&amp;#39;C&amp;#39; or &amp;#39;F&amp;#39;)</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="27"/>
         <source>Degree symbol with Temperature mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Símbolo de grado con modo de temperatura</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="28"/>
         <source>ET RoR value
 Displays &amp;#39;--&amp;#39; when the RoR value is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valor ET RoR
+Se muestra &amp;#39;--&amp;#39; cuando el valor RoR no está disponible</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="29"/>
         <source>BT RoR value
 Shows &amp;#39;--&amp;#39; when the RoR value Is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valor BT RoR
+Se muestra &amp;#39;--&amp;#39; cuando el valor RoR no está disponible</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="30"/>
         <source>RoR units
-Shorthand for &amp;#39;~deg~mode/min&amp;#39;</source>
-        <translation type="unfinished"></translation>
+abreviado para &amp;#39;~deg~mode/min&amp;#39;</source>
+        <translation type="unfinished">unidades RoR
+</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="31"/>
         <source>ET RoR with units
 Field is hidden when the RoR value is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ror ET con unidades
+Los campos están ocultos cuando el valor RoR no está disponible</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="32"/>
         <source>BT RoR with units
 Field is hidden when the RoR value is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RoR BT con unidades
+Los campos están ocultos cuando el valor RoR no está disponible</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="33"/>
         <source>Quote symbol</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Símbolo de comillas</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="34"/>
         <source>Single quote symbol</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Símbolo de comillas simples</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="41"/>
         <source>Assumptions:  The event value is 50.  In the case of Gas the value 50 corresponds to either 5.0kPh or 50%.  
 For a sensory milestone (see notes above) the value 50 corresponds to the &quot;Hay&quot; aroma. </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Supuestos: El valor del evento es 50. En el caso del Gas, el valor 50 corresponde a 5.0kPh o 50%.
+Para un hito sensorial (ver anotaciones abajo) el valor 50 corresponde al aroma de &quot;Heno&quot;</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="44"/>
         <source>Annotation Field</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Campos de Anotaciones</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="44"/>
         <source>Displays</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mostrar</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="45"/>
@@ -6409,7 +6422,7 @@ Gas 50% @12% DTR</source>
     <message>
         <location filename="../help/eventannotations_help.py" line="50"/>
         <source>Gas ~E% &amp;#39;@~Y2 ~degmode`, ~preFCs sec before FCs`&amp;#39;&quot;@~DTR% DTR&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gas ~E% &amp;#39;@~Y2 ~degmode`, ~preFCs seg. antes de FCi`&amp;#39;&quot;@~DTR% DTR&quot;</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="50"/>
@@ -6421,7 +6434,14 @@ Gas 50% @340 u00b0F, 50 sec before FCs
 
 After FCs:
 Gas 50% @12% DTR</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Más de 90 segundos antes de FCi:
+Gas 50% @340 u00b0F
+
+Menos de 90 segundos antes de FCi:
+Gas 50% @340 u00b0F, 50 seg antes de FCi 
+
+Despues de FCi:
+Gas 50% @12% DTR</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="51"/>
@@ -6436,44 +6456,46 @@ Gas 50% @12% DTR</source>
     <message>
         <location filename="../help/eventannotations_help.py" line="54"/>
         <source>NOTES:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">NOTAS:</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="58"/>
         <source>Event annotations apply only for &amp;#39;Step&amp;#39; and &amp;#39;Step+&amp;#39; Events settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Las anotaciones de evento se aplican solo para &amp;#39;Step&amp;#39; and &amp;#39;Step+&amp;#39; Configuración de eventos</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="59"/>
         <source>Anything between double quotes &quot; will show only after FCs. Example: &quot;~E1 @~DTR%&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Todo entre doble comillas &quot; se mostrará solo luego de FCi. Ejemplo: &quot;~E1 @~DTR%&quot;</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="60"/>
         <source>Anything between single quotes &amp;#39; will show only before FCs. Example: &amp;#39;~E1 @~degmode&amp;#39;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Todo entre comillas simples &amp;#39; se mostrará solo antes de FCi. Ejemplo: &amp;#39;~E1 @~degmode&amp;#39;</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="61"/>
         <source>Anything between back ticks ` will show only within 90 seconds before FCs. Example: `~E1 `FCs~dFCs sec`</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Todo entre comillas invertidas ` se mostrará solo dentro de los 90 segundos antes de FCi. Ejemplo: ``~E1 `FCs~dFCs sec`</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="62"/>
         <source>When combining back ticks with single or double quotes the back ticks should be inside the quotes.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cuando se combinan las comillas invertidas con las doble comillas, las comillas invertidas deben de ir dentro de las dobles.</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="63"/>
         <source>Background event annotations can be seen during a roast when &amp;#39;Annotations&amp;#39; is checked in the Profile Background window.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Las anotaciones de eventos del fondo pueden verse durante el tueste cuando &amp;#39;Anotaciones&amp;#39; sea comprobada en la ventana de fondo de perfil.</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="64"/>
         <source>Simple scaling of the event value is possible. Use a single math operator (&amp;#39;*&amp;#39;, &amp;#39;/&amp;#39;, &amp;#39;+&amp;#39; or &amp;#39;-&amp;#39;) immediately following the field name &quot;E&quot;. For example: 
 &amp;#39;~E/10&amp;#39; will divide the E value by 10. 
 &amp;#39;~E+5&amp;#39; adds 5 to the the value of E.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Se puede hacer una escala simple del valor del evento. Use un operador matemático (&amp;#39;*&amp;#39;, &amp;#39;/&amp;#39;, &amp;#39;+&amp;#39; or &amp;#39;-&amp;#39;) inmediatamente seguido del nombre del campo &quot;E&quot;. Por Ejemplo: 
+&amp;#39;~E/10&amp;#39; dividirá el valor E por 10. 
+&amp;#39;~E+5&amp;#39; le sumará 5 al valor de E.</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="65"/>
