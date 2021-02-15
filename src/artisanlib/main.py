@@ -25631,9 +25631,17 @@ class ApplicationWindow(QMainWindow):
                     settingdev = ''.join([str(self.qmc.extradevices), str([encodeLocal(n) for n in self.qmc.extraname1]), str([encodeLocal(n) for n in self.qmc.extraname2]),
                                         str([encodeLocal(x) for x in self.qmc.extramathexpression1]), str([encodeLocal(x) for x in self.qmc.extramathexpression2]),
                                         ])
-                    profiledev = ''.join([str(profile["extradevices"]), str(profile["extraname1"]), str(profile["extraname2"]),
-                                        str(profile["extramathexpression1"]), str(profile["extramathexpression2"]),
-                                        ])
+                    # fix missing extramathexpression arrays on import
+                    if "extramathexpression1" not in profile:
+                        profile["extramathexpression1"] = [""]*len(profile["extraname1"])
+                    if "extramathexpression2" not in profile:
+                        profile["extramathexpression2"] = [""]*len(profile["extraname2"])
+                    try:
+                        profiledev = ''.join([str(profile["extradevices"]), str(profile["extraname1"]), str(profile["extraname2"]),
+                                            str(profile["extramathexpression1"]), str(profile["extramathexpression2"]),
+                                            ])
+                    except:
+                        profiledev = ''
                     if settingdev != profiledev:
                         string = QApplication.translate("Message","To fully load this profile the extra device configuration needs to be modified.\n\nOverwrite your extra device definitions using the values from the profile?\n\nIt is advisable to save your current settings beforehand via menu Help >> Save Settings.",None)
                         if quiet:
