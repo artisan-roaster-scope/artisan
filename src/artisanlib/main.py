@@ -4014,7 +4014,8 @@ class tgraphcanvas(FigureCanvas):
                     # Playback OFF
                     aw.qmc.backgroundPlaybackEvents = False
                 elif action == 24:
-                    c = string.strip()
+                    # grab only the color definition
+                    c = re.match("#[0-9,a-f,A-F]{6}",string.strip()).group()
                     # Set Canvas Color
                     aw.setCanvasColorSignal.emit(c)
                 elif action == 25:
@@ -20688,6 +20689,8 @@ class ApplicationWindow(QMainWindow):
 
     # relocate event actions, by skippig 3=MultipleEvent and 7=Call Program SliderAction
     def eventactionx(self,a,cmd):
+        # split on an octothorpe '#' that is not inside parentheses '()'
+        cmd = re.split("\#(?![^\(]*\))",cmd)[0].strip()
         try:
             # we added "Multiple Events" at position 20 which has to be mapped to action 3
             self.eventaction((a if (a < 3) else (3 if (a == 20) else ((a + 2) if (a > 5) and (a < 21) else (a + 1)))), cmd)
@@ -20699,6 +20702,8 @@ class ApplicationWindow(QMainWindow):
     #         13= PWM Command; 14= VOUT Command; 15= S7 Command; 16= Aillio R1 Heater; 17= Aillio R1 Fan; 18= Aillio R1 Drum; 19= Aillio R1 Command;
     #         20= Artisan Command; 21= RC Command; 22= WebSocket Command
     def eventaction(self,action,cmd,parallel=True):
+        # split on an octothorpe '#' that is not inside parentheses '()'
+        cmd = re.split("\#(?![^\(]*\))",cmd)[0].strip()
         if action:
             if not parallel:# or action==3: # subactions of multiple event actions, may crash if run in parallel, especially if they update the UI like button shape!
                 self.eventaction_internal(action,cmd,doupdategraphics=True,doupdatebackground=True)
@@ -22318,7 +22323,8 @@ class ApplicationWindow(QMainWindow):
         if eventtype < 4 or eventtype > 4:  ## if eventtype == 4 we have an button event of type " " that does not add an event; if eventtype == 9 ("-") we have an untyped event
             if eventtype == 9: # an untyped event
                 # we just fire the action
-                cmd = self.extraeventsactionstrings[ee]
+                # split on an octothorpe '#' that is not inside parentheses '()'
+                cmd = re.split("\#(?![^\(]*\))",self.extraeventsactionstrings[ee])[0].strip()
                 cmd = cmd.format(*(tuple([cmdvalue]*cmd.count("{}"))))
                 self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # and record the event
@@ -22345,7 +22351,8 @@ class ApplicationWindow(QMainWindow):
                 if self.extraeventsactions[ee] in [8,9,16,17,18]: # for Hottop Heater/Fan/CoolingFan action we take the event value instead of the event string as cmd action
                     self.eventaction(self.extraeventsactions[ee],str(int(new_value)),parallel=parallel)
                 else:
-                    cmd = self.extraeventsactionstrings[ee]
+                    # split on an octothorpe '#' that is not inside parentheses '()'
+                    cmd = re.split("\#(?![^\(]*\))",self.extraeventsactionstrings[ee])[0].strip()
                     cmd = cmd.format(*(tuple([actionvalue]*cmd.count("{}"))))
                     self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # remember the new value as the last value set for this event
@@ -22357,7 +22364,8 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.EventRecord(extraevent = ee,doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
         else:
             # just issue the eventaction (no cmd substitution here)
-            cmd = self.extraeventsactionstrings[ee]
+            # split on an octothorpe '#' that is not inside parentheses '()'
+            cmd = re.split("\#(?![^\(]*\))",self.extraeventsactionstrings[ee])[0].strip()
             cmd = cmd.format(*(tuple([cmdvalue]*cmd.count("{}"))))
             self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
 
