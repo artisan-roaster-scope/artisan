@@ -1938,6 +1938,7 @@ class EventsDlg(ArtisanResizeablDialog):
         if pindex >= 0 and pindex < 10:
             answer = self.localSetbuttonsfrom(pindex)
             if answer:
+                self.nbuttonsSpinBox.setValue(self.aw.buttonlistmaxlen)
                 self.transferpalettecurrentLabelEdit.setText(self.aw.buttonpalette_label)
                 self.updatePalettePopup()
                 self.updateSliderTab()
@@ -2066,10 +2067,10 @@ class EventsDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def setbuttonlistmaxlen(self,_):
-        self.buttonlistmaxlen = self.nbuttonsSpinBox.value()
+        self.aw.buttonlistmaxlen = self.nbuttonsSpinBox.value()
 
     def createEventbuttonTable(self):
-        self.nbuttonsSpinBox.setValue(self.buttonlistmaxlen)
+        self.nbuttonsSpinBox.setValue(self.aw.buttonlistmaxlen)
         nbuttons = len(self.extraeventstypes)
 
         # self.eventbuttontable.clear() # this crashes Ubuntu 16.04
@@ -2330,7 +2331,6 @@ class EventsDlg(ArtisanResizeablDialog):
             #Text Color
             self.aw.extraeventbuttontextcolor[visualIndex] = self.extraeventbuttontextcolor[i]
 
-        self.aw.buttonlistmaxlen = self.buttonlistmaxlen
         #Apply Event Button Changes
         self.aw.settooltip()
         self.aw.realignbuttons()
@@ -2477,6 +2477,9 @@ class EventsDlg(ArtisanResizeablDialog):
             self.extraeventbuttontextcolor.pop(bindex)
 
             self.createEventbuttonTable()
+            # workaround a table redrawbug in PyQt 5.14.2 on macOS
+            if len(self.extraeventstypes) > 1:
+                self.repaint()
 
     @pyqtSlot(bool)
     def addextraeventbuttonSlot(self,_):
@@ -2800,6 +2803,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.qmc.autoDropFlag = self.autoDropFlagstored
         self.aw.qmc.markTPflag = self.markTPFlagstored
         # buttons saved only if ok is pressed, so no restore needed
+        self.aw.buttonlistmaxlen = self.buttonlistmaxlen
         # sliders
         self.aw.eventslidervisibilities = self.eventslidervisibilities
         self.aw.eventslideractions = self.eventslideractions
