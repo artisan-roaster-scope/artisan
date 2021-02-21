@@ -711,6 +711,7 @@ class tgraphcanvas(FigureCanvas):
     processAlarmSignal = pyqtSignal(int,bool,int,str)
     alarmsetSignal = pyqtSignal(int)
     moveBackgroundSignal = pyqtSignal(str,int)
+    eventRecordSignal = pyqtSignal(int)
 
     def __init__(self,parent,dpi):
 
@@ -2319,6 +2320,7 @@ class tgraphcanvas(FigureCanvas):
         self.processAlarmSignal.connect(self.processAlarm)
         self.alarmsetSignal.connect(self.selectAlarmSet)
         self.moveBackgroundSignal.connect(self.moveBackgroundAndRedraw)
+        self.eventRecordSignal.connect(self.EventRecordSlot)
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -10885,6 +10887,10 @@ class tgraphcanvas(FigureCanvas):
     @pyqtSlot(bool)
     def EventRecord_action(self,_=False):
         self.EventRecord()
+
+    @pyqtSlot(int)
+    def EventRecordSlot(self,ee):
+        self.EventRecord(ee)
 
     def EventRecord(self,extraevent=None,takeLock=True,doupdategraphics=True,doupdatebackground=True):
         try:
@@ -22298,7 +22304,7 @@ class ApplicationWindow(QMainWindow):
     #by default actions are processed in a parallel thread, but components of multiple button actions not to avoid crashes
     def recordextraevent(self,ee,parallel=True,updateButtons=True,doupdategraphics=True,doupdatebackground=True):
         eventtype = self.extraeventstypes[ee]
-        if updateButtons: # not if triggered from mutliplebutton actions:
+        if updateButtons: # not if triggered from mutiplebutton actions:
             try:
                 aw.qmc.eventactionsemaphore.acquire(1)
                 # reset color of last pressed button
@@ -22329,7 +22335,9 @@ class ApplicationWindow(QMainWindow):
                 self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # and record the event
                 if self.qmc.flagstart:
-                    self.qmc.EventRecord(extraevent = ee,doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
+#                    self.qmc.EventRecord(extraevent = ee,doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
+                    # we use event handling to enable the doupdategraphics/doupdatebackground also if running in background thread
+                    self.qmc.eventRecordSignal.emit(ee)
             else:
                 if eventtype < 4: # absolute values
                     etype = eventtype
@@ -22361,7 +22369,9 @@ class ApplicationWindow(QMainWindow):
                 # move corresponding slider to new value:
                 self.moveslider(etype,new_value)
                 if self.qmc.flagstart:
-                    self.qmc.EventRecord(extraevent = ee,doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
+#                    self.qmc.EventRecord(extraevent = ee,doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
+                    # we use event handling to enable the doupdategraphics/doupdatebackground also if running in background thread
+                    self.qmc.eventRecordSignal.emit(ee)
         else:
             # just issue the eventaction (no cmd substitution here)
             # split on an octothorpe '#' that is not inside parentheses '()'
