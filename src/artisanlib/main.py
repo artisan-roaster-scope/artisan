@@ -4000,7 +4000,8 @@ class tgraphcanvas(FigureCanvas):
                                 sv = max(0,sv) # we don't send SV < 0
                                 #aw.qmc.temporarysetsv = sv
                                 aw.fujipid.setsv(sv,silent=True)
-                        elif aw.pidcontrol.pidActive:
+                        #elif aw.pidcontrol.pidActive:
+                        else:
                             if sv is not None and sv != aw.pidcontrol.sv:
                                 sv = max(0,sv) # we don't send SV < 0
                                 #aw.qmc.temporarysetsv = sv
