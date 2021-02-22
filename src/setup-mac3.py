@@ -118,12 +118,13 @@ DATA_FILES = [
     ("../translations", [r'translations/artisan_pl.qm']),
     ("../translations", [r'translations/artisan_ru.qm']),
     ("../translations", [r"translations/artisan_sv.qm"]),
-    ("../translations", [r'translations/artisan_zh_CN.qm']),
-    ("../translations", [r'translations/artisan_zh_TW.qm']),
     ("../translations", [r"translations/artisan_no.qm"]),
     ("../translations", [r"translations/artisan_nl.qm"]),
-    ("../translations", [r"translations/artisan_tr.qm"]),
     ("../translations", [r"translations/artisan_th.qm"]),
+    ("../translations", [r"translations/artisan_tr.qm"]),
+    ("../translations", [r"translations/artisan_vi.qm"]),
+    ("../translations", [r'translations/artisan_zh_CN.qm']),
+    ("../translations", [r'translations/artisan_zh_TW.qm']),
     ("../translations", [r"translations/qtbase_el.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ("../translations", [r"translations/qtbase_fa.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ("../translations", [r"translations/qtbase_nl.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
@@ -275,7 +276,7 @@ except:
     subprocess.check_call(r'cp -f /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib',shell = True)
 
 # add localization stubs to make OS X translate the systems menu item and native dialogs
-for lang in ['ar', 'de','el','en','es','fa','fi','fr','he','hu','id','it','ja','ko','nl','no','pl','pt_BR','pt','ru','sv','th','tr','zh_CN','zh_TW']:
+for lang in ['ar', 'de','el','en','es','fa','fi','fr','he','hu','id','it','ja','ko','nl','no','pl','pt_BR','pt','ru','sv','th','tr','vi','zh_CN','zh_TW']:
     loc_dir = r'Artisan.app/Contents/Resources/' + lang + r'.lproj'
     subprocess.check_call(r'mkdir ' + loc_dir,shell = True)
     subprocess.check_call(r'touch ' + loc_dir + r'/Localizable.string',shell = True)

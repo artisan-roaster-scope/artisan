@@ -15627,6 +15627,13 @@ class ApplicationWindow(QMainWindow):
         if locale == "tr":
             self.TurkishLanguage.setChecked(True)
 
+        self.VietnameseLanguage = QAction(UIconst.CONF_MENU_VIETNAMESE,self)
+        self.VietnameseLanguage.setCheckable(True)
+        self.VietnameseLanguage.triggered.connect(self.changelocale_vi)
+        self.languageMenu.addAction(self.VietnameseLanguage)
+        if locale == "vi":
+            self.VietnameseLanguage.setChecked(True)
+
         # simplified Chinese
         self.ChineseChinaLanguage = QAction(UIconst.CONF_MENU_CHINESE_CN,self)
         self.ChineseChinaLanguage.setCheckable(True)
@@ -33748,6 +33755,11 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def changelocale_tr(self,_=False):
         self.changelocale("tr")
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def changelocale_vi(self,_=False):
+        self.changelocale("vi")
 
     @pyqtSlot()
     @pyqtSlot(bool)
