@@ -2269,7 +2269,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 self.plus_amount_selected = None
                 self.plus_amount_replace_selected = None
-            self.fillBlendData(x,prev_coffee_label,prev_blend_label)
+            self.fillBlendData(selected_blend,prev_coffee_label,prev_blend_label)
             
         self.checkWeightIn()
         self.updatePlusSelectedLine()

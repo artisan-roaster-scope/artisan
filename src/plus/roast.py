@@ -144,6 +144,33 @@ def getTemplate(bp):
         config.logger.error("roast: Exception in getTemplate() line %s: %s",exc_tb.tb_lineno,e)
     return d
 
+# remove all data but for what is to be synced with the server
+def trimBlendSpec(blend_spec):
+    print("trimBlendSpec",blend_spec)
+    try:
+        res = {}
+        if "label" in blend_spec:
+            res["label"] = blend_spec["label"]
+        if "ingredients" in blend_spec and blend_spec["ingredients"]:
+            res_ingredients = []
+            for ingredient in blend_spec["ingredients"]:
+                res_ingredient = {}
+                for tag in ["coffee","ratio","ratio_num","ratio_denom"]:
+                    if tag in ingredient:
+                        res_ingredient[tag] = ingredient[tag]
+                if res_ingredient != {}:
+                    res_ingredients.append(res_ingredient)
+            if res_ingredients != []:
+                res["ingredients"] = res_ingredients
+        if res != {}:
+            print("return",res)
+            return res
+        else:
+            print("return None")
+            return None
+    except:
+        return None
+
 def getRoast():
     d = {}
     try:
@@ -180,7 +207,7 @@ def getRoast():
         else:
             d["coffee"] = None # we neeed to explicitly add empty selections otherwise the coffee cannot be deleted from the online record
         if aw.qmc.plus_blend_spec:
-            d["blend"] = aw.qmc.plus_blend_spec
+            d["blend"] = trimBlendSpec(aw.qmc.plus_blend_spec)
         else:
             d["blend"] = None # we neeed to explicitly add empty selections otherwise the coffee cannot be deleted from the online record
         
