@@ -146,7 +146,6 @@ def getTemplate(bp):
 
 # remove all data but for what is to be synced with the server
 def trimBlendSpec(blend_spec):
-    print("trimBlendSpec",blend_spec)
     try:
         res = {}
         if "label" in blend_spec:
@@ -163,10 +162,8 @@ def trimBlendSpec(blend_spec):
             if res_ingredients != []:
                 res["ingredients"] = res_ingredients
         if res != {}:
-            print("return",res)
             return res
         else:
-            print("return None")
             return None
     except:
         return None
