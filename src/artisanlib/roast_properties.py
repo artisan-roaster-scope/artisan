@@ -1655,6 +1655,12 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.updateTemplateLine()
         
+        # set marks if needed
+        self.checkWeightOut()
+        self.checkVolumeOut()
+        self.checkDensityOut()
+        self.checkMoistureOut()
+        
         settings = QSettings()
         if settings.contains("RoastGeometry"):
             self.restoreGeometry(settings.value("RoastGeometry"))
@@ -1860,6 +1866,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.moisture_roasted_edit.setText(self.aw.comma2dot(str(self.moisture_roasted_edit.text())))
         self.modified_moisture_greens_text = self.moisture_greens_edit.text()
         self.calculated_organic_loss()
+        self.checkMoistureOut()
         
     def plus_popups_set_enabled(self,b):
         try:
@@ -3266,12 +3273,44 @@ class editGraphDlg(ArtisanResizeablDialog):
             message = QApplication.translate("Message","No events found", None)
             self.aw.sendmessage(message)
     
+    # mark widget w if b holds otherwise unmark it
+    def markWidget(self,w,b):
+        if b:
+            if sys.platform.startswith("darwin") and darkdetect.isDark() and appFrozen():
+                w.setStyleSheet("""QLineEdit { background-color: #ad0427;  }""")
+            else:
+                w.setStyleSheet("""QLineEdit { color: #CC0F50; }""")
+        else:
+            w.setStyleSheet("")
+        
+    def checkWeightOut(self):
+        wi = float(self.weightinedit.text())
+        wo = float(self.weightoutedit.text())
+        self.markWidget(self.weightoutedit,wi != 0 and wo != 0 and wo > wi)
+    
+    def checkVolumeOut(self):
+        vi = float(self.volumeinedit.text())
+        vo = float(self.volumeoutedit.text())
+        self.markWidget(self.volumeoutedit,vi != 0 and vo != 0 and vo < vi)
+    
+    def checkDensityOut(self):
+        di = float(self.bean_density_in_edit.text())
+        do = float(self.bean_density_out_edit.text())
+        self.markWidget(self.bean_density_out_edit,di != 0 and do != 0 and do > di)
+    
+    def checkMoistureOut(self):
+        mi = float(self.moisture_greens_edit.text())
+        mo = float(self.moisture_roasted_edit.text())
+        self.markWidget(self.moisture_roasted_edit,mi != 0 and mo != 0 and mo > mi)
+    
     @pyqtSlot()
     def weightouteditChanged(self):
         self.weightoutedit.setText(self.aw.comma2dot(self.weightoutedit.text()))
         self.percent()
         self.calculated_density()
         self.density_out_editing_finished() # recalc volume_out
+        # mark weightoutedit if higher than weightinedit
+        self.checkWeightOut()
 
     def checkWeightIn(self):
         enough = True
@@ -3325,6 +3364,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             coffee_idx = self.plus_coffees_combo.currentIndex()
             if coffee_idx > 0:
                 self.coffeeSelectionChanged(coffee_idx)
+        self.checkWeightOut()
         
     def density_percent(self):
         percent = 0.
@@ -3383,6 +3423,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             percentstring =  "%.1f" %(percent) + "%"
             self.volumepercentlabel.setText(percentstring)    #volume percent gain
         self.calculated_density()
+        self.checkVolumeOut()
         
     # calculates density in g/l from weightin/weightout and volumein/volumeout
     def calc_density(self):
@@ -3421,6 +3462,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.bean_density_out_edit.setText("%g" % self.aw.float2float(dout))
         self.density_percent()
         self.calculated_organic_loss()
+        self.checkDensityOut()
             
     def calc_organic_loss(self):
         wloss = 0. # weight (moisture + organic)
