@@ -24,7 +24,9 @@ matrix:
 
 init:
   # Set "build version number" shown in appveyor build status to the commit hash
+  - ps: Write-Host $($env:APPVEYOR_REPO_COMMIT.substring(0,7))
   - ps: Update-AppveyorBuild -Version $($env:APPVEYOR_REPO_COMMIT.substring(0,7))
+  - ps: Write-Host $env:APPVEYOR_BUILD_VERSION
   - ps: if($Env:inhibit_deploy -eq 'true'){Write-Host "**** Deploy Inhibited ****"}
 
 branches:
