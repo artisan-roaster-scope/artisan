@@ -23,10 +23,8 @@ matrix:
     - job_name: rpi
 
 init:
-  # Set "build version number" shown in appveyor build status to the commit hash
-  - ps: Write-Host $($env:APPVEYOR_REPO_COMMIT.substring(0,7))
-  - ps: Update-AppveyorBuild -Version $($env:APPVEYOR_REPO_COMMIT.substring(0,7))
-  - ps: Write-Host $env:APPVEYOR_BUILD_VERSION
+  # Set "build version number" shown in appveyor build status to the commit hash, the build number keeps it unique
+  - ps: Update-AppveyorBuild -Version "$($env:APPVEYOR_REPO_COMMIT.substring(0,7)) ($env:APPVEYOR_BUILD_VERSION)"
   - ps: if($Env:inhibit_deploy -eq 'true'){Write-Host "**** Deploy Inhibited ****"}
 
 branches:
