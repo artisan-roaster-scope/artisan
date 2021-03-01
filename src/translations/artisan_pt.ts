@@ -14026,7 +14026,7 @@ Repeat Operation at the end: {0}</source>
     <message>
         <location filename="../plus/controller.py" line="151"/>
         <source>Keyring error: Ensure that gnome-keyring is installed.</source>
-        <translation>Erro de chaveiro: certifique-se de que o gnome-keyring esteja instalado.</translation>
+        <translation>Erro de Keying: certifique-se de que o gnome-keyring esteja instalado.</translation>
     </message>
     <message>
         <location filename="../plus/controller.py" line="155"/>
@@ -14066,7 +14066,7 @@ Repeat Operation at the end: {0}</source>
     <message>
         <location filename="../plus/login.py" line="65"/>
         <source>Email</source>
-        <translation></translation>
+        <translation>E-mail</translation>
     </message>
     <message>
         <location filename="../plus/login.py" line="75"/>
@@ -14111,12 +14111,12 @@ Repeat Operation at the end: {0}</source>
     <message>
         <location filename="../plus/sync.py" line="452"/>
         <source>Updated data received from artisan.plus</source>
-        <translation>Dados atualizados recebidos de artisan.plus</translation>
+        <translation>Atualizados dados recebidos do artisan.plus</translation>
     </message>
     <message>
         <location filename="../plus/controller.py" line="171"/>
         <source>Authentication failed</source>
-        <translation>A autenticação falhou</translation>
+        <translation>Autenticação falhou</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13612"/>
@@ -14136,7 +14136,7 @@ Repeat Operation at the end: {0}</source>
     <message>
         <location filename="../plus/controller.py" line="195"/>
         <source>Disconnect artisan.plus?</source>
-        <translation>Desconectar artisan.plus?</translation>
+        <translation>Desconectar do artisan.plus?</translation>
     </message>
     <message>
         <location filename="../plus/controller.py" line="197"/>
