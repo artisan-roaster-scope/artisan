@@ -12,7 +12,7 @@ Menu>Config>Themes
 
 ![Theme choices](/assets/images/gsg/Theme choices.png)
 
-Themes are new.  They contain a color set that affects how the display appears.  Artisan comes with several built-in themes that are both attractive and useful as example starting point for user defined themes.  The built-in themes are available at Config>Themes>Artisan.  A user can make adjustments to the colors (Config>Colors) and save a theme by clicking Config>Themes>User>Save Theme. User saved themes can be loaded from Config>Themes>User>Load Theme.  Themes affect only the display on the screen.  They do not affect any of the other Artisan settings.  Note that themes are a subset of the Artisan settings saved and loaded from the Help menu.
+Themes are new.  They contain a color set that affects how the display appears.  Artisan comes with several built-in themes that are both attractive and useful as example starting point for user defined themes.  The built-in themes are available at Config>Themes>Artisan.  A user can make adjustments to the colors (Config>Colors) and the Figure Options (icon on top right that looks like a jagged arrow going up).  You can save a theme by clicking Config>Themes>User>Save Theme. User saved themes can be loaded from Config>Themes>User>Load Theme.  Themes affect only the display on the screen.  They do not affect any of the other Artisan settings.  Note that themes are a subset of the Artisan settings saved and loaded from the Help menu.
 
 Examples of the Focus and Midnight themes:
 
