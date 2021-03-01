@@ -6505,190 +6505,197 @@ This form of annotation must be enclosed in curly brackets &amp;#39;{}&amp;#39;.
 {~E|20Fresh Cut Grass|50Hay|80Baking Bread|100A Point} 
 
 Note that if the event value  does not match any value in the Annotation definition a blank string will be returned.  In the example above an event value of 30 will return a blank string.  The easiest way to ensure these values match is to use Custom Buttons to for the Event.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Otra manera de anotaciones perminte sustituir un valor numérico de evento con una cadena de texto, conocido como valor nominal. Un ejemplo que puede ser util es cuando un evento es usado para guardar un hito sensorial. El valor 20 puede ser usado para el aroma de &amp;#39;Pasto Recién Cortado&amp;#39;, 50 para &amp;#39;Heno&amp;#39;, 80 para &amp;#39;Pan Tostado&amp;#39;, y 100 para representar el &amp;#39;Punto A&amp;#39;.  
+
+Está manera de anotaciones deben de ser encerradas en llaves &amp;#39;{}&amp;#39;. Las entradas son valores numéricos seguido del texto representativo nominal. Las entradas son separadas por una barra vertical &amp;#39;|&amp;#39;. La siguiente cadena de anotaciones complementa este ejemplo.   
+{~E|20Pasto Recién Cortado|50Heno|80Pan Tostado|100Punto A} 
+
+Note que si el valor del evento no se parece a ningún valor en la definición de anotación una cadena de texto vacia será devuelta. En el ejemplo de arriba, un valor de evento de 30 retortanará una cadena de texto vacia. La forma más sencilla para asegurar que estos valores se asimilen es usando los Botones Personalizables para el evento.</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="66"/>
         <source>When annotations overlap to the oint they can not be read, try reducing the value of the &amp;#39;Allowed Annotation Overlap&amp;#39; found on the Annotations configuration page.  The default value for this etting is 100%.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cuando las anotaciones se suporponen al punto de que no se puedan leer, trata de reducir el valor a la &amp;#39;Superposición de Anotación Permitida&amp;#39; Ubicado en la página de Configuración de Anotaciones. El valor por defecto de para esta configuración es del 100%.</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="11"/>
         <source>EVENT CUSTOM BUTTONS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BOTONES PERSONALIZABLES DE EVENTO</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="14"/>
         <source>Column</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Columna</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="15"/>
         <source>Button Label</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Etiqueta de Botón</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="15"/>
         <source>Enter \n to create labels with multiple lines. \t is substituted by the event type.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Presiona \n para crear etiquetas de múltiples líneas. \t es sustituido por el tipo de evento</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="16"/>
         <source>Event Description</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Descripción de Evento</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="16"/>
         <source>Description of the Event to be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Descripción del Evento a ser grabado</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="17"/>
         <source>Event Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tipo de Evento</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="17"/>
         <source>Event type to be recorded or leave blank for no event. u0027u00B1u0027 types add a chosen offset (positive or negative) to the present value of the chosen event.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tipo de evento a ser grabado o déjelo en blanco para no crear ningún evento. Tipos u0027u00B1u0027 agregan una compensación elegida (positiva o negativa) al valor presente del evento elegido.</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="18"/>
         <source>Event Value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valor de Evento</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="18"/>
         <source>Value of event (1-100) to be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valor del Evento (1-100) a ser grabado</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="19"/>
         <source>Perform an action at the time of the event.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Realizar una acción al momento del evento</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="20"/>
         <source>Documentation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Documentación</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="20"/>
         <source>The action Command.  Depends on the action type, &amp;#39;{}&amp;#39; is replaced by the event value and the offset in case of a u00B1 event type.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El Comando de acción. Depende del tipo de acción, &amp;#39;{}&amp;#39; es reemplazada por el valor del evento y la compensación en caso de un tipo de evento u00B1.</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="21"/>
         <source>Button Visibility</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Visibilidad de Botón</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="21"/>
         <source>Hides/shows individual button.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Esconde/Muestra el botón individual</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="24"/>
         <source>EVENT BUTTONS CONFIGURATION OPTIONS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OPCIONES DE CONFIGURACIÓN DE BOTONES DE EVENTOS</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="28"/>
         <source>Max buttons per row</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Botones máximos por fila</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="28"/>
         <source>Sets a maximum number of buttons to display on a single row.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Establece un número máximo de botones a mostrar en una sola columna</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="29"/>
         <source>Button size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tamaño del Botón</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="29"/>
         <source>Sets a size for the buttons.  Choices are tiny, small and large.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Establece un tamaño para los botones. La opciones son: mínimo, pequeño y grande.</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="30"/>
         <source>Color Pattern</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Patrón de Color</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="30"/>
         <source>Applies one of 99 autogenerated color patterns to the buttons.  Set to &quot;0&quot; to manually choose the button colors.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aplica uno de 99 patrones de color autogenerados a los botones. Establece a &quot;0&quot; para elegir manualmente los colores de los botones.</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="31"/>
         <source>Adds a new button to the bottom of the table.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Agrega un nuevo botón al final de la tabla</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="32"/>
         <source>Inserts a new button above the selected button.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Inserta un nuevo botón sobre el botón seleccionado</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="33"/>
         <source>Deletes the selected button.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Elimina el botón seleccionado</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="34"/>
         <source>Copy the button table in tab separated format to the clipboard.  Option or ALT click to copy a tabular format to the clipboard.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Copia la tabla del botón en un formato de separación por tabulación. Presione Option o ALT para copiar el formato tabulado al portapapeles</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="27"/>
         <source>COMMANDS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">COMANDOS</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="42"/>
         <source>Note: &quot;{}&quot; can be used as a placeholder, it will be substituted by the current button value plus the offset for u00B1 event types.  If a placeholder occurs several times in a description/command, all those occurrences are replaced by the value.
 </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nota: &quot;{}&quot; puede ser usado como un marcador, será sustituido por el valor del botón actual, además de la superposición para tipos de evento u00B1. Si un marcador aparece varias veces en una descripción/comando, todas esas ocurrencias son sustituidas por el valor.
+</translation>
     </message>
     <message encoding="UTF-8">
         <location filename="../help/eventsliders_help.py" line="31"/>
         <source>Note: commands can be sequenced, separated by semicolons like in “&lt;cmd1&gt;;&lt;cmd2&gt;;&lt;cmd3&gt;”
 </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nota: los comandos pueden ser secuenciados, separados por punto y coma como en “&lt;cmd1&gt;;&lt;cmd2&gt;;&lt;cmd3&gt;”
+</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="31"/>
         <source>Note: in PHIDGET commands, the optional parameter &lt;sn&gt; has the form &lt;hub_serial&gt;[:&lt;hub_port&gt;] allows to refer to a specific Phidget HUB by given its serial number, and optionally specifying the port number the addressed module is connected to.
 </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nota: en comandos PHIDGET, el parámetro opcional &lt;sn&gt; tiene la forma &lt;hub_serial&gt;[:&lt;hub_port&gt;] permite hacer referencia a un Phidget HUB específico mediante su número de serie, y opcionalmente especifica el número de puerto al que está conectado el módulo direccionado.</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="42"/>
         <source>Note: in YOCTOPUCE commands, the optional parameter &lt;sn&gt; holds either the modules serial number or its name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nota: en comandos YOCTOPUCE, el parámetro opcional &lt;sn&gt; mantiene tanto el número serial de los módulos o su nombre</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="35"/>
         <source>Serial Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comando Serial</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="35"/>
         <source>ASCII serial command or binary a2b_uu(serial command)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comando serial ASCII o binario a2b_uu(serial command)</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="48"/>
         <source>Multiple Event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Evento Múltiple</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="48"/>
         <source>button numbers separated by a comma: 1,2,..</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Botones numéricos separados por una coma: 1,2,..</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="48"/>
