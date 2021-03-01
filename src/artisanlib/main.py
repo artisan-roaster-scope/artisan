@@ -12234,7 +12234,9 @@ class tgraphcanvas(FigureCanvas):
                 t2.append(self.temp2[self.timeindex[i]])    #add temp2
                 timeindexhold[i] =  self.timex[self.timeindex[i]]
 
-        self.reset()                                            #erase screen
+        res = self.reset()  #erase screen
+        if not res:
+            return False
 
         self.timex,self.temp1,self.temp2 = timez[:],t1[:],t2[:]  #copy lists back after reset() with the main points
 
