@@ -457,7 +457,7 @@ class s7port(object):
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:
                 self.commError = True
-                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error connecting to PLC failed:",None))
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed",None))
         except Exception as e:
             if self.aw.qmc.flagon:
                 _, _, exc_tb = sys.exc_info()
