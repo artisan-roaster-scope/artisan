@@ -2,11 +2,13 @@
 layout: single
 permalink: /machines/giesen/
 title: "Giesen"
+excerpt: ""
 header:
   overlay_image: /assets/images/giesen.jpg
   image: /assets/images/giesen.jpg
   teaser: assets/images/giesen.jpg
 ---
+
 * __Producer:__ [GIESEN coffee-roasters](http://www.giesencoffeeroasters.eu){:target="_blank"}, The Netherlands
 * __Machines:__ WPG/WPE/W1/W6/W15/W30/W45/W60 with networked PLC (6/2014 and later)
 * __Connection:__ Siemens S7 network
@@ -16,7 +18,6 @@ header:
   - logging of the optional infrared (IR) and environmental temperature sensor
   - operation of actors (intake, flavouring, discharge, cooling, stirrer) on W30 and larger machines via custom buttons (press CMD-2 to switch to this extended button set; CMD-1 switches back to the standard button set)
 
-{: .notice--primary}
 **Watch out!** The WxA+ setups require an unlock code from Giesen and deliver data in higher resolution with decimals.
 {: .notice--primary}
 
@@ -66,8 +67,6 @@ The computer running Artisan must be on the same IP network as the Giesen roaste
 
  
 This can be done on Windows using the Network Sharing Center by adding a TCP/IPv4 Local Area Connection with those properties. On macOS you set your ethernet port in the Network Control panel to "IPv4: Manually" and fill in the IP and subnet mask accordingly.
-
-{: .notice--primary}
 
 **Watch out!** Artisan doesn't monitor unsafe temperatures, so you should never leave the roaster alone.
 {: .notice--primary}
