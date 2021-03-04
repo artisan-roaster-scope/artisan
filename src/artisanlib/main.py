@@ -13661,20 +13661,21 @@ class VMToolbar(NavigationToolbar):
                 axes = allaxes[0]
 
                 try:
-                    # hack to work around an inconsistency in mpl (1.5.1, 2.0b3) that throws an index error on "steps-post" in figureoptions
-                    steps_post_lines = []
-                    with warnings.catch_warnings():
-                        warnings.simplefilter('ignore')
-                        for line in aw.qmc.ax.lines:
-                            if line.get_drawstyle() == "steps-post":
-                                steps_post_lines.append(line)
-                                line.set_drawstyle("steps")
+#                    # hack to work around an inconsistency in mpl (1.5.1, 2.0b3) that throws an index error on "steps-post" in figureoptions
+#                    steps_post_lines = []
+#                    with warnings.catch_warnings():
+#                        warnings.simplefilter('ignore')
+#                        for line in aw.qmc.ax.lines:
+#                            if line.get_drawstyle() == "steps-post":
+#                                steps_post_lines.append(line)
+#                                line.set_drawstyle("steps")
                     
                     with warnings.catch_warnings():
                         warnings.filterwarnings("ignore") # , category=numpy.VisibleDeprecationWarning)
                         figureoptions.figure_edit(axes)
-                        for line in steps_post_lines:
-                            line.set_drawstyle("steps-post")
+#                        for line in steps_post_lines:
+#                            line.set_drawstyle("steps-post")
+                            
                 except Exception as e:
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
