@@ -34,3 +34,10 @@ toc: false
 
   * By Alan
       - [Using Artisan Designer](https://www.youtube.com/watch?v=_Xw_vNcmhR8)
+
+  * By Jason
+      - [Using PID to control the heat of a coffee roast in Artisan software](https://www.youtube.com/watch?v=5OrrdhCTBPE)
+
+  * By Coffee Roasting at Home
+      - [SR540 (or SR800) Coffee Roaster Thermocouple Installation](https://www.youtube.com/watch?v=NH73BS-zV6o)
+      - [Coffee Roasting with SR540 and Artisan](https://www.youtube.com/watch?v=t1X0weUSZN0)
