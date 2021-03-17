@@ -3717,7 +3717,20 @@ class serialport(object):
                         self.aw.ser.PhidgetDigitalOutLastToggle[str(s)][channel] = None # clears the lastToggle value
             except Exception:
                 pass
-    
+
+    # value: real
+    def phidgetOUTsetPWMfrequency(self,channel,value,serial=None):
+        self.phidgetOUTattach(channel,serial)
+        if serial in self.aw.ser.PhidgetDigitalOut:
+            out = self.aw.ser.PhidgetDigitalOut[serial]
+            # set PWM frequency for all channels of the module
+            try:
+                v = max(100,min(20000,value))
+                if len(out) > channel and out[channel].getAttached():
+                    out[channel].setFrequency(v)
+            except:
+                pass
+
     def phidgetOUTclose(self):
         for m in self.aw.ser.PhidgetDigitalOut:
             out = self.aw.ser.PhidgetDigitalOut[m]

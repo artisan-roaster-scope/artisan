@@ -21307,6 +21307,7 @@ class ApplicationWindow(QMainWindow):
                     # PHIDGET  <sn> : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
                     #
                     ## out(<channel>,<value>[,<sn>])  with <value> in [0-100]
+                    ## frequency(<value>[,<sn>])  with <value> a real number
                     ## toggle(<channel>[,<sn>])
                     ## outhub(<channel>,<value>[,<sn>])
                     ## togglehub(<channel>[,<sn>])
@@ -21331,6 +21332,12 @@ class ApplicationWindow(QMainWindow):
                                         aw.ser.phidgetOUTsetPWM(int(cs_split[0]),int(round(eval(cs_split[1]))))
                                     elif len(cs_split) == 3:
                                         aw.ser.phidgetOUTsetPWM(int(cs_split[0]),int(round(eval(cs_split[1])),cs_split[2]))
+                                elif cs.startswith('frequency(') and len(cs)>14:
+                                    cs_split = cs[10:-1].split(',')
+                                    if len(cs_split) == 2:
+                                        aw.ser.phidgetOUTsetPWMfrequency(int(cs_split[0]),float(eval(cs_split[1])))
+                                    elif len(cs_split) == 3:
+                                        aw.ser.phidgetOUTsetPWMfrequency(int(cs_split[0]),float(eval(cs_split[1]),cs_split[2]))
                                 elif cs.startswith('toggle(') and len(cs)>8:
                                     cs_split = cs[7:-1].split(',')
                                     if len(cs_split) == 1:

@@ -135,7 +135,7 @@ quantifiermin=30, 30, 0, 0
 quantifiersource=5, 4, 0, 2
 
 [RoastProperties]
-roastertype=CTE FZ94 R
+roastertype=CTE FZ94 EVO
 
 [Style]
 ETname=DT
