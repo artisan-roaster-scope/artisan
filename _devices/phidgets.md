@@ -206,7 +206,7 @@ with
 * `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `outhub(0,8,560282)` or `outhub(0,8,560282:2)`. Using a command actions, like in `outhub(0,8)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
 
 
-### 4.4 Module PWM Output
+### 4.4 PWM Output
 
 * [OUT1100](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=714){:target="_blank"}, [REL1100](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=720){:target="_blank"} (4x VINT)
 * [REL1101](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=721){:target="_blank"} (16x VINT)
@@ -214,6 +214,7 @@ with
 Phidget PWM modules can be controlled via `PWM Command ` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`). The following commands are supported:
 
 * `out(ch,v[,<sn>])` : sets PWM in percent [0-100]
+* `frequency(ch,f[,<sn>])` : sets PWM frequency in Hz (PWM frequency is always the same for all channels!)
 * `toggle(ch[,<sn>])` : toggles between last value not 0 and 0
 * `pulse(ch,t[,<sn>])` : turn on for the given time `t`
 
@@ -221,6 +222,7 @@ with
 
 * `ch` : the channel to be addressed (integer)
 * `v` : value (integer)
+* `f` : frequency (real)
 * `t` : time in milliseconds (integer)
 * `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `out(0,8,560282)` or `out(0,8,560282:2)`. Using a command actions, like in `out(0,8)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
 

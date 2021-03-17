@@ -15,7 +15,7 @@ header:
 * __Machine:__ FZ-94 Lab Roaster, Ghibli 15/30/45/60/90, and Ghibli Firewood, Silon ZR7
 * __Connection:__ 
    * FZ-94, Ghibli (USB), Silon (USB): MODBUS RTU via USB-2-RS485 interface; requires the installation of a [serial driver](/modbus_serial/)
-   * Ghibli (touch), Silon ZR7 (touch): MODBUS TCP via network connection
+   * FZ-94 EVO, Ghibli (touch), Silon ZR7 (touch): MODBUS TCP via network connection
 * __Features:__ 
   - logging of environmental temperature (ET), bean temperature (BT), drum temperature (DT)
   - control of set value (SV), fan speed and drum speed on some machines (FZ-94, Ghibli/Silon touch with latest firmware)
