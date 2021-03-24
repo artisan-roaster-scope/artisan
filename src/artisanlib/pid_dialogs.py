@@ -38,7 +38,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushB
 class PID_DlgControl(ArtisanDialog):
     def __init__(self, parent = None, aw = None, activeTab = 0):
         super(PID_DlgControl,self).__init__(parent, aw)
-        self.setModal(True)
+        self.setModal(False)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle(QApplication.translate("Form Caption","PID Control",None))
         
