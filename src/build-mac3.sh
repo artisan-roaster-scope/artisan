@@ -13,7 +13,7 @@ if [ ! -z $APPVEYOR ]; then
     export PYTHONPATH=$PYTHON/lib/python3.8
     export PYTHON_V=3.8
     
-    export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
+    export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt5 # from PyQt v5.15.4 this dir changed form PyQt5/Qt to PyQt5/Qt5
     export QT_SRC_PATH=${QT_PATH}
     export MACOSX_DEPLOYMENT_TARGET=10.15
     export ARTISAN_LEGACY_BUILD=false
@@ -25,7 +25,7 @@ else
     export PYTHONBIN=$PYTHON/bin
     export PYTHONPATH=$PYTHON/lib/python${PYTHON_V}
 
-    export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt5
+    export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt5 # from PyQt v5.15.4 this dir changed form PyQt5/Qt to PyQt5/Qt5
     export QT_SRC_PATH=~/Qt5.15.2/5.15.2/clang_64
     export MACOSX_DEPLOYMENT_TARGET=10.15
     export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
