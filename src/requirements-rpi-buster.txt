@@ -28,7 +28,7 @@ cffi==1.14.4
 cryptography==3.3.2
 keyring==21.8.0
 SecretStorage==3.3.0
-lxml==4.6.2
+lxml==4.6.3
 #
 # NOTES:
 # keyring needs the GnomeKeyring package installed for plus to remember the passwords
