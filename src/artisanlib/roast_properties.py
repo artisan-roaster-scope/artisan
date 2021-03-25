@@ -29,7 +29,7 @@ import plus.stock
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import deltaLabelUTF8,stringfromseconds,stringtoseconds, appFrozen
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
-from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit
+from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit, MyQDoubleSpinBox
 
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent
 from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette
@@ -956,6 +956,16 @@ class editGraphDlg(ArtisanResizeablDialog):
         #organization
         self.organization = QLineEdit(self.aw.qmc.organization)
         self.organization.setCursorPosition(0)
+        #machine capacity
+        self.capacity = MyQDoubleSpinBox()
+        self.capacity.setDecimals(1)
+        self.capacity.setSingleStep(0.5)
+        self.capacity.setRange(0.,500)
+        self.capacity.setAlignment(Qt.AlignRight)
+        self.capacity.setMinimumWidth(30)
+        self.capacity.setValue(3.0)
+        self.capacity.setSuffix("kg")
+        self.capacity.setValue(self.aw.qmc.roastersize)
         #drum speed
         self.drumspeed = QLineEdit(self.aw.qmc.drumspeed)
         self.drumspeed.setAlignment(Qt.AlignCenter)
@@ -1418,6 +1428,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         roasteroperator.addWidget(roastertypelabel)
         roasteroperator.addSpacing(2)
         roasteroperator.addWidget(self.roaster,stretch=3)
+        roasteroperator.addWidget(self.capacity)
         roasteroperator.addSpacing(8)
         roasteroperator.addWidget(drumspeedlabel)
         roasteroperator.addSpacing(2)
@@ -3755,6 +3766,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.ambient_pressure = 0
         #update notes
         self.aw.qmc.roastertype = self.roaster.text()
+        self.aw.qmc.roastersize = self.capacity.value()
         self.aw.qmc.operator = self.operator.text()
         self.aw.qmc.organization = self.organization.text()
         self.aw.qmc.drumspeed = self.drumspeed.text()

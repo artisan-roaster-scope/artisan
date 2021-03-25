@@ -21,6 +21,7 @@ SOURCES = \
     artisanlib/calculator.py \
     artisanlib/colors.py \
     artisanlib/comm.py \
+    artisanlib/command_utility.py \
     artisanlib/comparator.py \
     artisanlib/cropster.py \
     artisanlib/cup_profile.py \
@@ -41,12 +42,13 @@ SOURCES = \
     artisanlib/platform.py \
     artisanlib/ports.py \
     artisanlib/roast_properties.py \
+    artisanlib/rubase.py \
     artisanlib/s7port.py \
     artisanlib/sampling.py \
     artisanlib/statistics.py \
     artisanlib/transposer.py \
     artisanlib/wheels.py \
-    artisanlib/command_utility.py \
+    artisanlib/wsport.py \
     const/UIconst.py \
     help/alarms_help.py \
     help/autosave_help.py \
@@ -56,6 +58,7 @@ SOURCES = \
     help/keyboardshortcuts_help.py \
     help/modbus_help.py \
     help/programs_help.py \
+    help/s7_help.py \
     help/symbolic_help.py \
     help/transposer_help.py \
     plus/controller.py \
@@ -64,7 +67,8 @@ SOURCES = \
     plus/queue.py \
     plus/stock.py \
     plus/sync.py \
-    plus/util.py
+    plus/util.py \
+    uic/SetupDialog.py
     
 TRANSLATIONS = \
 	translations/artisan_de.ts \
