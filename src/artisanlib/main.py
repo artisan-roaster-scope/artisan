@@ -193,6 +193,7 @@ from artisanlib.util import (appFrozen, stringp, uchr, d, encodeLocal, s2a,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toDouble, toBool, toStringList, toMap, removeAll)
 from artisanlib.qtsingleapplication import QtSingleApplication
+from artisanlib.dialogs import ArtisanDialog
 
 from uic import SetupDialog
 
@@ -33074,21 +33075,16 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def preferences(self,_=False):
-        dialog = QDialog(self)
-        # ensure that the dialog is resizable on Windows
-        if str(platform.system()) == 'Windows':
-            windowFlags = dialog.windowFlags()
-            windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
-            dialog.setWindowFlags(windowFlags)
-        # install button translations if needed
-        if aw.locale not in aw.qtbase_locales:
-            ui.buttonBox.button(QDialogButtonBox.Ok).setText(QApplication.translate("Button","OK", None))
-            ui.buttonBox.button(QDialogButtonBox.Cancel).setText(QApplication.translate("Button","Cancel",None))
-
+        dialog = ArtisanDialog(self,self)
+        dialog.setAttribute(Qt.WA_DeleteOnClose, False) # not to have the dialog object deleted on close as we still want to acces its data
         # install dialog content  
         ui = SetupDialog.Ui_SetupDialog()
         ui.setupUi(dialog)
-        # explicitly reset labels to have them tranlated with a controlled context
+        # install button translations if need for the locale
+        if self.locale not in self.qtbase_locales:
+            ui.buttonBox.button(QDialogButtonBox.Ok).setText(QApplication.translate("Button","OK", None))
+            ui.buttonBox.button(QDialogButtonBox.Cancel).setText(QApplication.translate("Button","Cancel",None))
+        # explicitly reset labels to have them transslated with a controlled context
         dialog.setWindowTitle(QApplication.translate("Form Caption", "Setup"))
         ui.roasterSizeDoubleSpinBox.setToolTip(QApplication.translate("Tooltip", "The maximum nominal batch size of the machine in kg"))
         ui.labelOrganization.setText(QApplication.translate("Label", "Organization",None))
@@ -33109,7 +33105,6 @@ class ApplicationWindow(QMainWindow):
             self.qmc.operator_setup = ui.OperatorLineEdit.text()
             self.qmc.roastertype_setup = ui.MachineLineEdit.text()
             self.qmc.roastersize_setup = ui.roasterSizeDoubleSpinBox.value()
-        # deleteLater() will not work here as the dialog is still bound via the parent
         dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
         # the following will immedately release the memory dispite this parent link
         QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
