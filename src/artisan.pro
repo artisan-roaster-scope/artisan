@@ -41,6 +41,7 @@ SOURCES = \
     artisanlib/pid_dialogs.py \
     artisanlib/platform.py \
     artisanlib/ports.py \
+    artisanlib/preferences.py \
     artisanlib/roast_properties.py \
     artisanlib/rubase.py \
     artisanlib/s7port.py \

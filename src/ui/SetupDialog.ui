@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>330</width>
-    <height>149</height>
+    <height>194</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -44,6 +44,28 @@
        </property>
       </widget>
      </item>
+     <item row="2" column="2" colspan="2">
+      <widget class="QLineEdit" name="OperatorLineEdit"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="labelMachine">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string notr="true">Machine</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2" colspan="2">
+      <widget class="QLineEdit" name="OrganizationLineEdit"/>
+     </item>
      <item row="3" column="3">
       <widget class="QDoubleSpinBox" name="roasterSizeDoubleSpinBox">
        <property name="toolTip">
@@ -66,8 +88,8 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="labelMachine">
+     <item row="2" column="0">
+      <widget class="QLabel" name="labelOperator">
        <property name="font">
         <font>
          <weight>75</weight>
@@ -75,7 +97,7 @@
         </font>
        </property>
        <property name="text">
-        <string notr="true">Machine</string>
+        <string notr="true">Operator</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -98,8 +120,8 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="labelOperator">
+     <item row="4" column="0">
+      <widget class="QLabel" name="labelDrumSpeed">
        <property name="font">
         <font>
          <weight>75</weight>
@@ -107,22 +129,23 @@
         </font>
        </property>
        <property name="text">
-        <string notr="true">Operator</string>
+        <string notr="true">Drum Speed</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="1" column="2" colspan="2">
-      <widget class="QLineEdit" name="OrganizationLineEdit"/>
-     </item>
-     <item row="2" column="2" colspan="2">
-      <widget class="QLineEdit" name="OperatorLineEdit"/>
+     <item row="4" column="2" colspan="2">
+      <widget class="QLineEdit" name="DrumSpeedLineEdit">
+       <property name="text">
+        <string notr="true"/>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
-   <item row="1" column="0">
+   <item row="3" column="0">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>

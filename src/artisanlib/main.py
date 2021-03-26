@@ -30,7 +30,7 @@ import time as libtime
 import datetime
 import warnings
 import string as libstring
-import html as htmllibf
+import html as htmllib
 import numpy
 from scipy.signal import savgol_filter
 import subprocess
@@ -75,7 +75,7 @@ except:
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
 if pyqtversion < 6:
-    from PyQt5.QtWidgets import (QDialog, QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport @UnusedImport
+    from PyQt5.QtWidgets import (QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport @UnusedImport
                              QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnusedImport
                              QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnusedImport
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnusedImport
@@ -128,8 +128,12 @@ with suppress_stdout_stderr():
 mpl_version = [int(i) for i in mpl.__version__.split(".")]
 
 if mpl_version[0] > 2 and mpl_version[1] > 2:
-    from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatioF # @UnresolvedImport
+    if mpl_version[1] > 3:
+        from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatio # @UnresolvedImport @UnusedImport
+    else:
+        from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatioF # @UnresolvedImport @UnusedImport
     from matplotlib.backend_bases import _Mode as MPL_Mode  # @UnresolvedImport
+
 
 # on OS X / PyQt5 one needs to
 #   export DYLD_FRAMEWORK_PATH=~/Qt5.5.0/5.5/clang_64/lib/
@@ -193,9 +197,7 @@ from artisanlib.util import (appFrozen, stringp, uchr, d, encodeLocal, s2a,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toDouble, toBool, toStringList, toMap, removeAll)
 from artisanlib.qtsingleapplication import QtSingleApplication
-from artisanlib.dialogs import ArtisanDialog
-
-from uic import SetupDialog
+from artisanlib.preferences import preferencesDialog
 
 
 from Phidget22.Phidget import Phidget as PhidgetDriver
@@ -1533,14 +1535,15 @@ class tgraphcanvas(FigureCanvas):
         self.organization = ""
         self.roastertype = "" 
         self.roastersize = 0
+        self.drumspeed = ""
         # kept in app settings
         self.organization_setup = ""
         self.operator_setup = ""
         self.roastertype_setup = ""
         self.roastersize_setup = 0 
+        self.drumspeed_setup = ""
         #
         self.machinesetup = ""
-        self.drumspeed = ""
         self.roastingnotes = ""
         self.cuppingnotes = ""
         self.roastdate = QDateTime.currentDateTime()
@@ -5274,8 +5277,8 @@ class tgraphcanvas(FigureCanvas):
                     self.operator = self.operator_setup
                     self.roastertype = self.roastertype_setup
                     self.roastersize = self.roastersize_setup
+                    self.drumspeed = self.drumspeeds_setup
                     #
-                    self.drumspeed = ""
                     self.weight = [0,0,self.weight[2]]
                     self.volume = [0,0,self.volume[2]]
                     self.density = [0,self.density[1],1,self.density[3]]
@@ -6332,15 +6335,15 @@ class tgraphcanvas(FigureCanvas):
                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                 linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
 
-    def drawDeltaET(self,trans):
+    def drawDeltaET(self,trans,start,end):
         if self.DeltaETflag:
-            self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
+            self.l_delta1, = self.ax.plot(self.timex[start:end], self.delta1[start:end],transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
             linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "ET", None)))
 
-    def drawDeltaBT(self,trans):
+    def drawDeltaBT(self,trans,start,end):
         if self.DeltaBTflag:
-            self.l_delta2, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
+            self.l_delta2, = self.ax.plot(self.timex[start:end], self.delta2[start:end],transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
             linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "BT", None)))
 
@@ -7774,11 +7777,11 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.timex) == len(self.delta1) and len(self.timex) == len(self.delta2):
                             trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
                             if aw.qmc.swapdeltalcds:
-                                self.drawDeltaET(trans)
-                                self.drawDeltaBT(trans)
+                                self.drawDeltaET(trans,charge_idx,drop_idx)
+                                self.drawDeltaBT(trans,charge_idx,drop_idx)
                             else:
-                                self.drawDeltaBT(trans)
-                                self.drawDeltaET(trans)
+                                self.drawDeltaBT(trans,charge_idx,drop_idx)
+                                self.drawDeltaET(trans,charge_idx,drop_idx)
                 if recomputeAllDeltas and self.delta_ax is not None and two_ax_mode:
                     aw.autoAdjustAxis(timex=False)
                     self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
@@ -13563,11 +13566,14 @@ class VMToolbar(NavigationToolbar):
                 pm = self.recolorIcon(pm,QColor("#424242"))
         if hasattr(pm, 'setDevicePixelRatio'):
             if mpl_version[0] > 2 and mpl_version[1] > 2:
-                _setDevicePixelRatioF(pm, _devicePixelRatioF(self))
+                if mpl_version[1] > 3:
+                    _setDevicePixelRatio(pm, _devicePixelRatioF(self))
+                else:
+                    _setDevicePixelRatioF(pm, _devicePixelRatioF(self))
             else:
                 pm.setDevicePixelRatio(self.canvas._dpi_ratio)
         return QIcon(pm)
-
+        
     def recolorIcon(self, pixmap, color):
         tmp = pixmap.toImage()
         for y in range(tmp.height()):
@@ -22782,6 +22788,7 @@ class ApplicationWindow(QMainWindow):
         self.temperatureMenu.setEnabled(True)
         self.temperatureConfMenu.setEnabled(True)
         self.languageMenu.setEnabled(True)
+        self.setupAction.setEnabled(True)
         self.deviceAction.setEnabled(True)
         self.commportAction.setEnabled(True)
         self.hudAction.setEnabled(True)
@@ -22848,6 +22855,7 @@ class ApplicationWindow(QMainWindow):
         self.switchETBTAction.setEnabled(False)
         # CONFIG menu
         if not compare:
+            self.setupAction.setEnabled(False)
             self.machineMenu.setEnabled(False)
             self.deviceAction.setEnabled(False)
             self.commportAction.setEnabled(False)
@@ -28176,6 +28184,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.roastertype_setup = toString(settings.value("roastertype_setup",self.qmc.roastertype_setup))
             if settings.contains("roastersize_setup"):
                 self.qmc.roastersize_setup = toDouble(settings.value("roastersize_setup",self.qmc.roastersize_setup))
+            if settings.contains("drumspeed_setup"):
+                self.qmc.drumspeed_setup = toString(settings.value("drumspeed_setup",self.qmc.drumspeed_setup))
             settings.beginGroup("RoastProperties")
             # copy setup from pre v1.4.6 RoastProperties organization,operator,roastertype,roastersize
             if self.qmc.organization_setup == "" and settings.contains("organization"):
@@ -28186,11 +28196,14 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.roastertype_setup = toString(settings.value("roastertype",self.qmc.roastertype_setup))
             if self.qmc.roastersize_setup == 0 and settings.contains("roastersize"):
                 self.qmc.roastersize_setup = toDouble(settings.value("roastersize",self.qmc.roastersize_setup))
+            if self.qmc.drumspeed_setup == "" and settings.contains("drumspeed"):
+                self.qmc.drumspeed_setup = toString(settings.value("drumspeed",self.qmc.drumspeed_setup))
             # initialize profile setup values
             self.qmc.organization = self.qmc.organization_setup
             self.qmc.operator = self.qmc.operator_setup
             self.qmc.roastertype = self.qmc.roastertype_setup
             self.qmc.roastersize = self.qmc.roastersize_setup
+            self.qmc.drumspeed = self.qmc.drumspeed_setup
             #
             if settings.contains("machinesetup"):
                 self.qmc.machinesetup = toString(settings.value("machinesetup",self.qmc.machinesetup))
@@ -29540,8 +29553,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("operator_setup",self.qmc.operator_setup)
             settings.setValue("roastertype_setup",self.qmc.roastertype_setup)
             settings.setValue("roastersize_setup",self.qmc.roastersize_setup)
+            settings.setValue("drumspeed_setup",self.qmc.drumspeed_setup)
             settings.beginGroup("RoastProperties")
-            settings.setValue("drumspeed",self.qmc.drumspeed)
             settings.setValue("machinesetup",self.qmc.machinesetup)
 #            settings.setValue("densitySampleVolume",self.qmc.density[2]) # fixed to 1l now
             settings.setValue("beansize",self.qmc.beansize)
@@ -33072,47 +33085,11 @@ class ApplicationWindow(QMainWindow):
                 dialog.show()
 #                dialog.setFixedSize(dialog.size())  # this badly interacts with keeping the window gemetry in qsettings
 
+
     @pyqtSlot()
     @pyqtSlot(bool)
     def preferences(self,_=False):
-        dialog = ArtisanDialog(self,self)
-        dialog.setAttribute(Qt.WA_DeleteOnClose, False) # not to have the dialog object deleted on close as we still want to acces its data
-        # install dialog content  
-        ui = SetupDialog.Ui_SetupDialog()
-        ui.setupUi(dialog)
-        # install button translations if need for the locale
-        if self.locale not in self.qtbase_locales:
-            ui.buttonBox.button(QDialogButtonBox.Ok).setText(QApplication.translate("Button","OK", None))
-            ui.buttonBox.button(QDialogButtonBox.Cancel).setText(QApplication.translate("Button","Cancel",None))
-        # explicitly reset labels to have them transslated with a controlled context
-        dialog.setWindowTitle(QApplication.translate("Form Caption", "Setup"))
-        ui.roasterSizeDoubleSpinBox.setToolTip(QApplication.translate("Tooltip", "The maximum nominal batch size of the machine in kg"))
-        ui.labelOrganization.setText(QApplication.translate("Label", "Organization",None))
-        ui.labelOperator.setText(QApplication.translate("Label", "Operator",None))
-        ui.labelMachine.setText(QApplication.translate("Label", "Machine",None))
-        # fill dialog with data
-        ui.OrganizationLineEdit.setText(self.qmc.organization_setup)
-        ui.OperatorLineEdit.setText(self.qmc.operator_setup)
-        ui.MachineLineEdit.setText(self.qmc.roastertype_setup)
-        ui.roasterSizeDoubleSpinBox.setValue(self.qmc.roastersize_setup)
-        ui.buttonBox.accepted.connect(dialog.accept)
-        ui.buttonBox.rejected.connect(dialog.reject)
-        # fixed hight
-        dialog.setFixedHeight(dialog.sizeHint().height())
-        # show dialog
-        if dialog.exec_():
-            self.qmc.organization_setup = ui.OrganizationLineEdit.text()
-            self.qmc.operator_setup = ui.OperatorLineEdit.text()
-            self.qmc.roastertype_setup = ui.MachineLineEdit.text()
-            self.qmc.roastersize_setup = ui.roasterSizeDoubleSpinBox.value()
-        dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
-        # the following will immedately release the memory dispite this parent link
-        QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
-        try:
-            sip.delete(dialog)
-            #print(sip.isdeleted(dialog))
-        except:
-            pass            
+        preferencesDialog(self,self)
 
     @pyqtSlot()
     @pyqtSlot(bool)
