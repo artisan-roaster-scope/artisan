@@ -5277,7 +5277,7 @@ class tgraphcanvas(FigureCanvas):
                     self.operator = self.operator_setup
                     self.roastertype = self.roastertype_setup
                     self.roastersize = self.roastersize_setup
-                    self.drumspeed = self.drumspeeds_setup
+                    self.drumspeed = self.drumspeed_setup
                     #
                     self.weight = [0,0,self.weight[2]]
                     self.volume = [0,0,self.volume[2]]
