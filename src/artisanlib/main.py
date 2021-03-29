@@ -50,11 +50,12 @@ from unidecode import unidecode
 
 import prettytable  # @UnresolvedImport
 
-try:
-    from PyQt6.QtCore import QLibraryInfo  # @UnusedImport @UnresolvedImport
-    pyqtversion = 6
-except Exception as e:
-    pyqtversion = 5
+#try:
+#    from PyQt6.QtCore import QLibraryInfo  # @UnusedImport @UnresolvedImport
+#    pyqtversion = 6
+#except Exception as e:
+#    pyqtversion = 5
+pyqtversion = 5 # until MPL and all build tools fully support PyQt6 we run on PyQt5
 
 try: # activate support for hiDPI screens on Windows
     if str(platform.system()).startswith("Windows"):
@@ -127,8 +128,12 @@ with suppress_stdout_stderr():
 mpl_version = [int(i) for i in mpl.__version__.split(".")]
 
 if mpl_version[0] > 2 and mpl_version[1] > 2:
-    from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatioF # @UnresolvedImport
+    if mpl_version[1] > 3:
+        from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatio # @UnresolvedImport @UnusedImport
+    else:
+        from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatioF # @UnresolvedImport @UnusedImport
     from matplotlib.backend_bases import _Mode as MPL_Mode  # @UnresolvedImport
+
 
 # on OS X / PyQt5 one needs to
 #   export DYLD_FRAMEWORK_PATH=~/Qt5.5.0/5.5/clang_64/lib/
@@ -192,7 +197,7 @@ from artisanlib.util import (appFrozen, stringp, uchr, d, encodeLocal, s2a,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toDouble, toBool, toStringList, toMap, removeAll)
 from artisanlib.qtsingleapplication import QtSingleApplication
-
+from artisanlib.preferences import preferencesDialog
 
 
 from Phidget22.Phidget import Phidget as PhidgetDriver
@@ -1525,11 +1530,20 @@ class tgraphcanvas(FigureCanvas):
         self.pidpreviouserror = 0  # temporary storage of pid error
 
         #General notes. Accessible through "edit graph properties" of graph menu. WYSIWYG viewer/editor.
-        self.roastertype = ""
-        self.machinesetup = ""
+        # setup of the current profile
         self.operator = ""
         self.organization = ""
+        self.roastertype = "" 
+        self.roastersize = 0
         self.drumspeed = ""
+        # kept in app settings
+        self.organization_setup = ""
+        self.operator_setup = ""
+        self.roastertype_setup = ""
+        self.roastersize_setup = 0 
+        self.drumspeed_setup = ""
+        #
+        self.machinesetup = ""
         self.roastingnotes = ""
         self.cuppingnotes = ""
         self.roastdate = QDateTime.currentDateTime()
@@ -2990,32 +3004,19 @@ class tgraphcanvas(FigureCanvas):
                 self.specialeventstype.append(dlg.type) # default: "--"
                 self.specialeventsStrings.append(dlg.description)
                 self.specialeventsvalue.append(dlg.value)
-
-                try:
-                    dlg.dialogbuttons.accepted.disconnect()
-                    dlg.dialogbuttons.rejected.disconnect()
-                    QApplication.processEvents() # we ensure that events concerning this dialog are processed before deletion
-                    try: # sip not supported on older PyQt versions (RPi!)
-                        sip.delete(dlg)
-                        #print(sip.isdeleted(dlg))
-                    except:
-                        pass
-                except:
-                    pass
                 aw.qmc.fileDirtySignal.emit()
                 self.redraw(recomputeAllDeltas=(action.key[0] in [0,6])) # on moving CHARGE or DROP, we have to recompute the Deltas
-            else:
-                try:
-                    dlg.dialogbuttons.accepted.disconnect()
-                    dlg.dialogbuttons.rejected.disconnect()
-                    QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
-                    try: # sip not supported on older PyQt versions (RPi!)
-                        sip.delete(dlg)
-                        #print(sip.isdeleted(dlg))
-                    except:
-                        pass
+            try:
+                dlg.dialogbuttons.accepted.disconnect()
+                dlg.dialogbuttons.rejected.disconnect()
+                QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
+                try: # sip not supported on older PyQt versions (RPi!)
+                    sip.delete(dlg)
+                    #print(sip.isdeleted(dlg))
                 except:
                     pass
+            except:
+                pass
 
     def updateWebLCDs(self,bt=None,et=None,time=None,alertTitle=None,alertText=None,alertTimeout=None):
         try:
@@ -5271,6 +5272,13 @@ class tgraphcanvas(FigureCanvas):
                     self.plus_location = None
                     self.plus_coffee = None
                     self.plus_blend_spec = None
+                    # copy setup
+                    self.organization = self.organization_setup
+                    self.operator = self.operator_setup
+                    self.roastertype = self.roastertype_setup
+                    self.roastersize = self.roastersize_setup
+                    self.drumspeed = self.drumspeed_setup
+                    #
                     self.weight = [0,0,self.weight[2]]
                     self.volume = [0,0,self.volume[2]]
                     self.density = [0,self.density[1],1,self.density[3]]
@@ -6327,15 +6335,15 @@ class tgraphcanvas(FigureCanvas):
                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                 linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
 
-    def drawDeltaET(self,trans):
+    def drawDeltaET(self,trans,start,end):
         if self.DeltaETflag:
-            self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
+            self.l_delta1, = self.ax.plot(self.timex[start:end], self.delta1[start:end],transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
             linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "ET", None)))
 
-    def drawDeltaBT(self,trans):
+    def drawDeltaBT(self,trans,start,end):
         if self.DeltaBTflag:
-            self.l_delta2, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
+            self.l_delta2, = self.ax.plot(self.timex[start:end], self.delta2[start:end],transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
             linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "BT", None)))
 
@@ -7769,11 +7777,11 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.timex) == len(self.delta1) and len(self.timex) == len(self.delta2):
                             trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
                             if aw.qmc.swapdeltalcds:
-                                self.drawDeltaET(trans)
-                                self.drawDeltaBT(trans)
+                                self.drawDeltaET(trans,charge_idx,drop_idx)
+                                self.drawDeltaBT(trans,charge_idx,drop_idx)
                             else:
-                                self.drawDeltaBT(trans)
-                                self.drawDeltaET(trans)
+                                self.drawDeltaBT(trans,charge_idx,drop_idx)
+                                self.drawDeltaET(trans,charge_idx,drop_idx)
                 if recomputeAllDeltas and self.delta_ax is not None and two_ax_mode:
                     aw.autoAdjustAxis(timex=False)
                     self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
@@ -8760,9 +8768,9 @@ class tgraphcanvas(FigureCanvas):
                             self.temp1[i] = fromCtoF(self.temp1[i])    #ET
                             self.temp2[i] = fromCtoF(self.temp2[i])    #BT
                             if len(self.delta1):
-                                self.delta1[i] = fromCtoF(self.delta1[i])  #Delta ET
+                                self.delta1[i] = RoRfromCtoF(self.delta1[i])  #Delta ET
                             if len(self.delta2):
-                                self.delta2[i] = fromCtoF(self.delta2[i])  #Delta BT
+                                self.delta2[i] = RoRfromCtoF(self.delta2[i])  #Delta BT
                             #extra devices curves
                             nextra = len(aw.qmc.extratemp1)
                             if nextra:
@@ -8821,9 +8829,9 @@ class tgraphcanvas(FigureCanvas):
                             self.temp2[i] = fromFtoC(self.temp2[i])    #BT
                             if self.device != 18 or aw.simulator is not None:
                                 if len(self.delta1):
-                                    self.delta1[i] = fromFtoC(self.delta1[i])  #Delta ET
+                                    self.delta1[i] = RoRfromFtoC(self.delta1[i])  #Delta ET
                                 if len(self.delta2):
-                                    self.delta2[i] = fromFtoC(self.delta2[i])  #Delta BT
+                                    self.delta2[i] = RoRfromFtoC(self.delta2[i])  #Delta BT
                             #extra devices curves
                             nextra = len(aw.qmc.extratemp1)
                             if nextra:
@@ -8959,15 +8967,15 @@ class tgraphcanvas(FigureCanvas):
                 self.backgrounddeltabtcolor = str(dialog.bgdeltabtButton.text())
                 self.backgroundxtcolor = str(dialog.bgextraButton.text())
                 self.backgroundytcolor = str(dialog.bgextra2Button.text())
-                #deleteLater() will not work here as the dialog is still bound via the parent
-                #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
-                # the following will immedately release the memory dispite this parent link
-                QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
-                try: # sip not supported on older PyQt versions (RPi!)
-                    sip.delete(dialog)
-                    #print(sip.isdeleted(dialog))
-                except:
-                    pass
+            #deleteLater() will not work here as the dialog is still bound via the parent
+            #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
+            # the following will immedately release the memory dispite this parent link
+            QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
+            try: # sip not supported on older PyQt versions (RPi!)
+                sip.delete(dialog)
+                #print(sip.isdeleted(dialog))
+            except:
+                pass
 
         #update screen with new colors
         aw.updateCanvasColors()
@@ -13558,11 +13566,14 @@ class VMToolbar(NavigationToolbar):
                 pm = self.recolorIcon(pm,QColor("#424242"))
         if hasattr(pm, 'setDevicePixelRatio'):
             if mpl_version[0] > 2 and mpl_version[1] > 2:
-                _setDevicePixelRatioF(pm, _devicePixelRatioF(self))
+                if mpl_version[1] > 3:
+                    _setDevicePixelRatio(pm, _devicePixelRatioF(self))
+                else:
+                    _setDevicePixelRatioF(pm, _devicePixelRatioF(self))
             else:
                 pm.setDevicePixelRatio(self.canvas._dpi_ratio)
         return QIcon(pm)
-
+        
     def recolorIcon(self, pixmap, color):
         tmp = pixmap.toImage()
         for y in range(tmp.height()):
@@ -14270,46 +14281,41 @@ class SampleThread(QThread):
                                 if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
                                     self.decay_weights = numpy.arange(1,user_filter+1)
                                 aw.qmc.rateofchange2 = self.decay_average(sample_timex,sample_unfiltereddelta2,self.decay_weights)
-                        if aw.qmc.timeindex[6]:
-                            rateofchange1plot = None
-                            rateofchange2plot = None
-                        else:
-                            rateofchange1plot = aw.qmc.rateofchange1
-                            rateofchange2plot = aw.qmc.rateofchange2
+                        rateofchange1plot = aw.qmc.rateofchange1
+                        rateofchange2plot = aw.qmc.rateofchange2
                     else:
                         sample_unfiltereddelta1.append(0.)
                         sample_unfiltereddelta2.append(0.)
                         aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
 
-
-                    # show RoR only 10 readings after CHARGE
-                    if aw.qmc.timeindex[0] == -1 or (aw.qmc.timeindex[0]>-1 and len(sample_timex) < aw.qmc.timeindex[0] + 10):
-                        rateofchange1plot = None
-                        rateofchange2plot = None
                     # limit displayed RoR (only before TP is recognized) # WHY?
-                    elif aw.qmc.RoRlimitFlag: # not aw.qmc.TPalarmtimeindex and aw.qmc.RoRlimitFlag:
-                        if rateofchange1plot is not None and not (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange1plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
+                    if aw.qmc.RoRlimitFlag: # not aw.qmc.TPalarmtimeindex and aw.qmc.RoRlimitFlag:
+                        if not (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange1plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
                             rateofchange1plot = None
-                        if rateofchange2plot is not None and not (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange2plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
+                        if not (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange2plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
                             rateofchange2plot = None
 
                     # append new data to the rateofchange arrays
-                    # only after CHARGE and we have enough readings to fully apply the delta_span and delta_smoothing, we draw the resulting lines
-                    # and only 7 readings after CHARGE
-                    if aw.qmc.timeindex[0] > -1 and length_of_qmc_timex>9+aw.qmc.timeindex[0] and length_of_qmc_timex > int(round(aw.qmc.deltaETfilter/2.)) + max(2,(aw.qmc.deltaETsamples + 1)):
-                        sample_delta1.append(rateofchange1plot)
-                    else:
-                        sample_delta1.append(None)
-                    if aw.qmc.timeindex[0] > -1 and length_of_qmc_timex>9+aw.qmc.timeindex[0] and length_of_qmc_timex > int(round(aw.qmc.deltaBTfilter/2.)) + max(2,(aw.qmc.deltaBTsamples + 1)):
-                        sample_delta2.append(rateofchange2plot)
-                    else:
-                        sample_delta2.append(None)
+                    sample_delta1.append(rateofchange1plot)
+                    sample_delta2.append(rateofchange2plot)
 
                     if local_flagstart:
+                        ror_start = 0
+                        ror_end = length_of_qmc_timex
+                        if aw.qmc.timeindex[6] > 0:
+                            ror_end = aw.qmc.timeindex[6]+1
                         if aw.qmc.DeltaETflag:
-                            aw.qmc.l_delta1.set_data(sample_timex, sample_delta1)
+                            if aw.qmc.timeindex[0] > -1:
+                                ror_start = max(aw.qmc.timeindex[0],int(round(aw.qmc.deltaETfilter/2.)) + max(2,(aw.qmc.deltaETsamples + 1)))
+                                aw.qmc.l_delta1.set_data(sample_timex[ror_start:ror_end], sample_delta1[ror_start:ror_end])
+                            else:
+                                aw.qmc.l_delta1.set_data([], [])
                         if aw.qmc.DeltaBTflag:
-                            aw.qmc.l_delta2.set_data(sample_timex, sample_delta2)
+                            if aw.qmc.timeindex[0] > -1:
+                                ror_start = max(aw.qmc.timeindex[0],int(round(aw.qmc.deltaBTfilter/2.)) + max(2,(aw.qmc.deltaBTsamples + 1)))
+                                aw.qmc.l_delta2.set_data(sample_timex[ror_start:ror_end], sample_delta2[ror_start:ror_end])
+                            else:
+                                aw.qmc.l_delta2.set_data([], [])
                         #readjust xlimit of plot if needed
                         if  not aw.qmc.fixmaxtime and not aw.qmc.locktimex and sample_timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
                             aw.qmc.endofx = int(sample_timex[-1] + 180.)         # increase x limit by 3 minutes
@@ -15379,7 +15385,13 @@ class ApplicationWindow(QMainWindow):
         self.GraphMenu.addAction(self.switchETBTAction)
 
         # CONFIGURATION menu
-        self.machineMenu = QMenu(UIconst.CONF_MENU_MACHINE) # self.ConfMenu.addMenu(UIconst.CONF_MENU_MACHINE)
+        self.setupAction = QAction(UIconst.CONF_MENU_SETUP, self)
+        self.setupAction.setMenuRole(QAction.PreferencesRole)
+        self.setupAction.setShortcut(QKeySequence.Preferences)
+        self.setupAction.triggered.connect(self.preferences)
+        self.ConfMenu.addAction(self.setupAction)
+        
+        self.machineMenu = QMenu(UIconst.CONF_MENU_MACHINE) # self.ConfMenu.addMenu(UIconst.CONF_MENU_MACHINE) done in populateMachineMenu/populateListMenu if not empty
         self.populateMachineMenu()
 
         self.deviceAction = QAction(UIconst.CONF_MENU_DEVICE, self)
@@ -22776,6 +22788,7 @@ class ApplicationWindow(QMainWindow):
         self.temperatureMenu.setEnabled(True)
         self.temperatureConfMenu.setEnabled(True)
         self.languageMenu.setEnabled(True)
+        self.setupAction.setEnabled(True)
         self.deviceAction.setEnabled(True)
         self.commportAction.setEnabled(True)
         self.hudAction.setEnabled(True)
@@ -22842,6 +22855,7 @@ class ApplicationWindow(QMainWindow):
         self.switchETBTAction.setEnabled(False)
         # CONFIG menu
         if not compare:
+            self.setupAction.setEnabled(False)
             self.machineMenu.setEnabled(False)
             self.deviceAction.setEnabled(False)
             self.commportAction.setEnabled(False)
@@ -23465,6 +23479,7 @@ class ApplicationWindow(QMainWindow):
                 ("operator",self.qmc.operator),
                 ("organization",self.qmc.organization),
                 ("machine",self.qmc.roastertype),
+                ("capacity",self.qmc.roastersize),
                 ("drumspeed",self.qmc.drumspeed),
                 ("weightloss",str(cp["weight_loss"]) if "weight_loss" in cp else "0.0"),
                 ("volumegain",str(cp["volume_gain"]) if "volume_gain" in cp else "0.0"),
@@ -25935,6 +25950,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.roastertype = d(profile["roastertype"])
             else:
                 self.qmc.roastertype = ""
+            if "roastersize" in profile:
+                self.qmc.roastersize = profile["roastersize"]
+            else:
+                self.qmc.roastersize = 0
             if "operator" in profile:
                 self.qmc.operator = d(profile["operator"])
             else:
@@ -26601,6 +26620,7 @@ class ApplicationWindow(QMainWindow):
             profile["density"] = [self.qmc.density[0],encodeLocal(self.qmc.density[1]),self.qmc.density[2],encodeLocal(self.qmc.density[3])]
             profile["density_roasted"] = [self.qmc.density_roasted[0],encodeLocal(self.qmc.density_roasted[1]),self.qmc.density_roasted[2],encodeLocal(self.qmc.density_roasted[3])]
             profile["roastertype"] = encodeLocal(self.qmc.roastertype)
+            profile["roastersize"] = self.qmc.roastersize
             profile["machinesetup"] = encodeLocal(self.qmc.machinesetup)
             profile["operator"] = encodeLocal(self.qmc.operator)
             profile["organization"] = encodeLocal(self.qmc.organization)
@@ -28156,12 +28176,35 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("time_grid"):
                 self.qmc.time_grid = bool(toBool(settings.value("time_grid",self.qmc.time_grid)))
             settings.endGroup()
-
+            if settings.contains("organization_setup"):
+                self.qmc.organization_setup = toString(settings.value("organization_setup",self.qmc.organization_setup))
+            if settings.contains("operator_setup"):
+                self.qmc.operator_setup = toString(settings.value("operator_setup",self.qmc.operator_setup))
+            if settings.contains("roastertype_setup"):
+                self.qmc.roastertype_setup = toString(settings.value("roastertype_setup",self.qmc.roastertype_setup))
+            if settings.contains("roastersize_setup"):
+                self.qmc.roastersize_setup = toDouble(settings.value("roastersize_setup",self.qmc.roastersize_setup))
+            if settings.contains("drumspeed_setup"):
+                self.qmc.drumspeed_setup = toString(settings.value("drumspeed_setup",self.qmc.drumspeed_setup))
             settings.beginGroup("RoastProperties")
-            self.qmc.operator = toString(settings.value("operator",self.qmc.operator))
-            if settings.contains("organization"):
-                self.qmc.organization = toString(settings.value("organization",self.qmc.organization))
-            self.qmc.roastertype = toString(settings.value("roastertype",self.qmc.roastertype))
+            # copy setup from pre v1.4.6 RoastProperties organization,operator,roastertype,roastersize
+            if self.qmc.organization_setup == "" and settings.contains("organization"):
+                self.qmc.organization_setup = toString(settings.value("organization",self.qmc.organization_setup))
+            if self.qmc.operator_setup == "" and settings.contains("operator"):
+                self.qmc.operator_setup = toString(settings.value("operator",self.qmc.operator_setup))
+            if self.qmc.roastertype_setup == "" and settings.contains("roastertype"):
+                self.qmc.roastertype_setup = toString(settings.value("roastertype",self.qmc.roastertype_setup))
+            if self.qmc.roastersize_setup == 0 and settings.contains("roastersize"):
+                self.qmc.roastersize_setup = toDouble(settings.value("roastersize",self.qmc.roastersize_setup))
+            if self.qmc.drumspeed_setup == "" and settings.contains("drumspeed"):
+                self.qmc.drumspeed_setup = toString(settings.value("drumspeed",self.qmc.drumspeed_setup))
+            # initialize profile setup values
+            self.qmc.organization = self.qmc.organization_setup
+            self.qmc.operator = self.qmc.operator_setup
+            self.qmc.roastertype = self.qmc.roastertype_setup
+            self.qmc.roastersize = self.qmc.roastersize_setup
+            self.qmc.drumspeed = self.qmc.drumspeed_setup
+            #
             if settings.contains("machinesetup"):
                 self.qmc.machinesetup = toString(settings.value("machinesetup",self.qmc.machinesetup))
             self.qmc.drumspeed = toString(settings.value("drumspeed",self.qmc.drumspeed))
@@ -29506,11 +29549,12 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("temp_grid",self.qmc.temp_grid)
             settings.setValue("time_grid",self.qmc.time_grid)
             settings.endGroup()
+            settings.setValue("organization_setup",self.qmc.organization_setup)
+            settings.setValue("operator_setup",self.qmc.operator_setup)
+            settings.setValue("roastertype_setup",self.qmc.roastertype_setup)
+            settings.setValue("roastersize_setup",self.qmc.roastersize_setup)
+            settings.setValue("drumspeed_setup",self.qmc.drumspeed_setup)
             settings.beginGroup("RoastProperties")
-            settings.setValue("drumspeed",self.qmc.drumspeed)
-            settings.setValue("operator",self.qmc.operator)
-            settings.setValue("organization",self.qmc.organization)
-            settings.setValue("roastertype",self.qmc.roastertype)
             settings.setValue("machinesetup",self.qmc.machinesetup)
 #            settings.setValue("densitySampleVolume",self.qmc.density[2]) # fixed to 1l now
             settings.setValue("beansize",self.qmc.beansize)
@@ -30022,6 +30066,7 @@ class ApplicationWindow(QMainWindow):
     #  . "ground_color"
     #  . "color_system"
     #  . "roastertype"
+    #  . "roastersize"
     #  . "beansize_min"
     #  . "beansize_max"
     #  . "roastingnotes"
@@ -30089,6 +30134,7 @@ class ApplicationWindow(QMainWindow):
         res["ground_color"] = (data["ground_color"] if "ground_color" in data else 0)
         res["color_system"] = (data["color_system"] if "color_system" in data else 0)
         res["roastertype"] = (data["roastertype"] if "roastertype" in data else "")
+        res["roastersize"] = (data["roastersize"] if "roastersize" in data else 0)
         res["beansize_min"] = (data["beansize_min"] if "beansize_min" in data else 0)
         res["beansize_max"] = (data["beansize_max"] if "beansize_max" in data else 0)
         res["roastingnotes"] = (data["roastingnotes"] if "roastingnotes" in data else "")
@@ -30210,6 +30256,8 @@ class ApplicationWindow(QMainWindow):
             res["color_system"] = profile["color_system"]
         if "roastertype" in profile:
             res["roastertype"] = profile["roastertype"]
+        if "roastersize" in profile:
+            res["roastersize"] = profile["roastersize"]
         if "beansize_min" in profile:
             res["beansize_min"] = profile["beansize_min"]
         if "beansize_max" in profile:
@@ -30345,9 +30393,9 @@ class ApplicationWindow(QMainWindow):
                     import csv
                     outfile = open(filename, 'w',newline="")
                     writer= csv.writer(outfile,delimiter='\t')
-                    writer.writerow(["batch","time","profile","beans","in (g)","out (g)","loss (%)","date","dtime",
+                    writer.writerow(["batch","time","profile","beans","in (g)","out (g)","loss (%)","date","time",
                         "in ({})".format(aw.qmc.weight[2].lower()),"out ({})".format(aw.qmc.weight[2].lower()),
-                        "whole color", "ground color", "color system", "machine", "beansize min", "beansize max", "roasting notes", "cupping notes"])
+                        "whole color", "ground color", "color system", "machine", "capacity (kg)", "beansize min", "beansize max", "roasting notes", "cupping notes"])
                     # write data
                     c = 1
                     for p in profiles:
@@ -30370,6 +30418,7 @@ class ApplicationWindow(QMainWindow):
                                 d["ground_color"],
                                 s2a(d["color_system"]),
                                 s2a(d["roastertype"]),
+                                d["roastersize"],
                                 d["beansize_min"],
                                 d["beansize_max"],
                                 s2a(d["roastingnotes"]),
@@ -30641,6 +30690,7 @@ class ApplicationWindow(QMainWindow):
             ["color",               "rank",  "text2int", "false",  "",      QApplication.translate('HTML Report Template','Color',None)                ],
             ["cupping",             "rank",  "text2int", "false",  "",      QApplication.translate('HTML Report Template','Cupping',None)              ],
             ["roastertype",         "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Roaster',None)              ],
+            ["roastersize",         "prof",  "float1",   "true",   "",      QApplication.translate('HTML Report Template','Capacity',None)             ],
             ["operator",            "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Operator',None)             ],
             ["organization",        "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Organization',None)         ],
             ["drumspeed",           "prof",  "text2int", "true" ,  "",      QApplication.translate('HTML Report Template','Drum Speed',None)           ],
@@ -32942,15 +32992,15 @@ class ApplicationWindow(QMainWindow):
             self.color.stopbits = int(str(dialog.color_stopbitsComboBox.currentText()))
             self.color.parity = str(dialog.color_parityComboBox.currentText())
             self.color.timeout = aw.float2float(toFloat(aw.comma2dot(str(dialog.color_timeoutEdit.text()))))
-            # deleteLater() will not work here as the dialog is still bound via the parent
-            dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
-            # the following will immedately release the memory dispite this parent link
-            QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
-            try:
-                sip.delete(dialog)
-                #print(sip.isdeleted(dialog))
-            except:
-                pass
+        # deleteLater() will not work here as the dialog is still bound via the parent
+        dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
+        # the following will immedately release the memory dispite this parent link
+        QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
+        try:
+            sip.delete(dialog)
+            #print(sip.isdeleted(dialog))
+        except:
+            pass
 
     def toggleHottopControl(self):
         if self.HottopControlActive:
@@ -33034,6 +33084,12 @@ class ApplicationWindow(QMainWindow):
                 #modeless style dialog
                 dialog.show()
 #                dialog.setFixedSize(dialog.size())  # this badly interacts with keeping the window gemetry in qsettings
+
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def preferences(self,_=False):
+        preferencesDialog(self,self)
 
     @pyqtSlot()
     @pyqtSlot(bool)

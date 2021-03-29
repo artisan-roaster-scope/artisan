@@ -97,6 +97,11 @@ def getTemplate(bp):
             util.addString2dict(bp,"machinesetup",d,"setup",50)
         except Exception as e:
             config.logger.info("roast: Exception in getTemplate() %s",e)
+            
+        try:
+            util.addNum2dict(bp,"roastersize",d,"machine",0,999,1)
+        except Exception as e:
+            config.logger.info("roast: Exception in getTemplate() %s",e)
         
         try:
             util.addNum2dict(bp,"whole_color",d,"whole_color",0,255,0)
@@ -125,6 +130,9 @@ def getTemplate(bp):
                     "FCs_time",
                     "FCe_time",
                     ("DROP_time","drop_time")])
+                
+                if "fcs_ror" in cp:
+                    util.addRoRTemp2dict(cp,"fcs_ror",d,"FCs_RoR")
                     
                 if "finishphasetime" in cp:
                     util.addTime2dict(cp,"finishphasetime",d,"DEV_time")

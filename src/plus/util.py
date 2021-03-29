@@ -124,7 +124,18 @@ def temp2C(temp):
         return fromFtoC(temp) # @UndefinedVariable
     else:
         return temp
-        
+
+def RoRfromFtoC(Ffloat):
+    if Ffloat in [-1,None]:
+        return Ffloat
+    else:
+        return Ffloat*(5.0/9.0)
+ 
+def RoRtemp2C(temp):
+    if temp is not None and config.app_window.qmc.mode == "F": # @UndefinedVariable
+        return RoRfromFtoC(temp) # @UndefinedVariable
+    else:
+        return temp
 
 ## Prepare Floats for sending
 
@@ -227,6 +238,12 @@ def addAllTemp2dict(dict_source,dict_target,key_source_target_pairs):
         else:
             key_source = key_target = p
         addTemp2dict(dict_source,key_source,dict_target,key_target)
+
+def addRoRTemp2dict(dict_source,key_source,dict_target,key_target):
+    if key_source in dict_source and dict_source[key_source]:
+        temp = limittemp(RoRtemp2C(dict_source[key_source]))
+        if temp is not None:
+            dict_target[key_target] = float2floatMin(temp)
 
 # returns extends dict_target by item with key_target holding the dict_source[key_source] value if key_source in dict_source and not empty
 def add2dict(dict_source,key_source,dict_target,key_target):

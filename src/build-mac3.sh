@@ -13,7 +13,7 @@ if [ ! -z $APPVEYOR ]; then
     export PYTHONPATH=$PYTHON/lib/python3.8
     export PYTHON_V=3.8
     
-    export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
+    export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt5 # from PyQt v5.15.4 this dir changed form PyQt5/Qt to PyQt5/Qt5
     export QT_SRC_PATH=${QT_PATH}
     export MACOSX_DEPLOYMENT_TARGET=10.15
     export ARTISAN_LEGACY_BUILD=false
@@ -25,7 +25,7 @@ else
     export PYTHONBIN=$PYTHON/bin
     export PYTHONPATH=$PYTHON/lib/python${PYTHON_V}
 
-    export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
+    export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt5 # from PyQt v5.15.4 this dir changed form PyQt5/Qt to PyQt5/Qt5
     export QT_SRC_PATH=~/Qt5.15.2/5.15.2/clang_64
     export MACOSX_DEPLOYMENT_TARGET=10.15
     export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
@@ -36,6 +36,26 @@ export PATH=$PYTHON/bin:$PYTHON/lib:$PATH
 export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH
 export DYLD_FRAMEWORK_PATH=$QT_PATH/lib
 
+
+# ui / qrc
+if [ -z $APPVEYOR ]; then
+    echo "************* 0 **************"
+    # ui
+    find ui -iname "*.ui" | while read f
+    do
+        fullfilename=$(basename $f)
+        fn=${fullfilename%.*}
+        pyuic5 -o uic/${fn}.py --from-imports ui/${fn}.ui
+    done
+    
+#    # qrc
+#    find qrc -iname "*.qrc" | while read f
+#    do
+#        fullfilename=$(basename $f)
+#        fn=${fullfilename%.*}
+#        pyrcc5 -o uic/${fn}_rc.py qrc/${fn}.qrc
+#    done
+fi
 
 # translations
 echo "************* 1 **************"

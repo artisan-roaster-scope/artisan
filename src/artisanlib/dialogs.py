@@ -52,7 +52,7 @@ class ArtisanDialog(QDialog):
         self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(False)
         self.dialogbuttons.button(QDialogButtonBox.Cancel).setAutoDefault(False)
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocusPolicy(Qt.StrongFocus) # to add to tab focus switch
-        if self.aw.locale not in self.aw.qtbase_locales:
+        if self.aw is not None and self.aw.locale not in self.aw.qtbase_locales:
             self.dialogbuttons.button(QDialogButtonBox.Ok).setText(QApplication.translate("Button","OK", None))
             self.dialogbuttons.button(QDialogButtonBox.Cancel).setText(QApplication.translate("Button","Cancel",None))
         # add additional CMD-. shortcut to close the dialog
