@@ -197,7 +197,6 @@ from artisanlib.util import (appFrozen, stringp, uchr, d, encodeLocal, s2a,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toDouble, toBool, toStringList, toMap, removeAll)
 from artisanlib.qtsingleapplication import QtSingleApplication
-from artisanlib.preferences import preferencesDialog
 
 
 from Phidget22.Phidget import Phidget as PhidgetDriver
@@ -15385,12 +15384,6 @@ class ApplicationWindow(QMainWindow):
         self.GraphMenu.addAction(self.switchETBTAction)
 
         # CONFIGURATION menu
-        self.setupAction = QAction(UIconst.CONF_MENU_SETUP, self)
-        self.setupAction.setMenuRole(QAction.PreferencesRole)
-        self.setupAction.setShortcut(QKeySequence.Preferences)
-        self.setupAction.triggered.connect(self.preferences)
-        self.ConfMenu.addAction(self.setupAction)
-        
         self.machineMenu = QMenu(UIconst.CONF_MENU_MACHINE) # self.ConfMenu.addMenu(UIconst.CONF_MENU_MACHINE) done in populateMachineMenu/populateListMenu if not empty
         self.populateMachineMenu()
 
@@ -22788,7 +22781,6 @@ class ApplicationWindow(QMainWindow):
         self.temperatureMenu.setEnabled(True)
         self.temperatureConfMenu.setEnabled(True)
         self.languageMenu.setEnabled(True)
-        self.setupAction.setEnabled(True)
         self.deviceAction.setEnabled(True)
         self.commportAction.setEnabled(True)
         self.hudAction.setEnabled(True)
@@ -22855,7 +22847,6 @@ class ApplicationWindow(QMainWindow):
         self.switchETBTAction.setEnabled(False)
         # CONFIG menu
         if not compare:
-            self.setupAction.setEnabled(False)
             self.machineMenu.setEnabled(False)
             self.deviceAction.setEnabled(False)
             self.commportAction.setEnabled(False)
@@ -28207,7 +28198,6 @@ class ApplicationWindow(QMainWindow):
             #
             if settings.contains("machinesetup"):
                 self.qmc.machinesetup = toString(settings.value("machinesetup",self.qmc.machinesetup))
-            self.qmc.drumspeed = toString(settings.value("drumspeed",self.qmc.drumspeed))
 #            self.qmc.density[2] = toDouble(settings.value("densitySampleVolume",self.qmc.density[2])) # fixed to 1l now
             if settings.contains("beansize"):
                 self.qmc.beansize = toDouble(settings.value("beansize",self.qmc.beansize))
@@ -33085,11 +33075,6 @@ class ApplicationWindow(QMainWindow):
                 dialog.show()
 #                dialog.setFixedSize(dialog.size())  # this badly interacts with keeping the window gemetry in qsettings
 
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def preferences(self,_=False):
-        preferencesDialog(self,self)
 
     @pyqtSlot()
     @pyqtSlot(bool)

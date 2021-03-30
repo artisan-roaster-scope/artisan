@@ -94,7 +94,6 @@ ROAST_MENU_SWITCH_ETBT = QApplication.translate("Menu", "Switch ET<->BT", None)
 CONF_MENU = QApplication.translate("Menu", "Config", None)
 if platf != 'Darwin':
     CONF_MENU = "&" + CONF_MENU
-CONF_MENU_SETUP = QApplication.translate("Menu", "Preferences", None)
 CONF_MENU_MACHINE = QApplication.translate("Menu", "Machine", None)
 CONF_MENU_THEMES = QApplication.translate("Menu", "Themes", None)
 CONF_MENU_DEVICE = QApplication.translate("Menu", "Device...", None)

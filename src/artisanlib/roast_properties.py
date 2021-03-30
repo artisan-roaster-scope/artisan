@@ -943,33 +943,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.beansedit = ClickableTextEdit()
         self.beansedit.editingFinished.connect(self.beansEdited)
         
-#        self.beansedit.setMaximumHeight(60)
         if self.aw.qmc.beans is not None:
             self.beansedit.setNewPlainText(self.aw.qmc.beans)
-                    
-        #roaster
-        self.roaster = QLineEdit(self.aw.qmc.roastertype)
-        self.roaster.setCursorPosition(0)
-        #operator
-        self.operator = QLineEdit(self.aw.qmc.operator)
-        self.operator.setCursorPosition(0)
-        #organization
-        self.organization = QLineEdit(self.aw.qmc.organization)
-        self.organization.setCursorPosition(0)
-        #machine capacity
-        self.capacity = MyQDoubleSpinBox()
-        self.capacity.setDecimals(1)
-        self.capacity.setSingleStep(0.5)
-        self.capacity.setRange(0.,500)
-        self.capacity.setAlignment(Qt.AlignRight)
-        self.capacity.setMinimumWidth(30)
-        self.capacity.setValue(3.0)
-        self.capacity.setSuffix("kg")
-        self.capacity.setValue(self.aw.qmc.roastersize)
-        #drum speed
-        self.drumspeed = QLineEdit(self.aw.qmc.drumspeed)
-        self.drumspeed.setAlignment(Qt.AlignCenter)
-        self.drumspeed.setCursorPosition(0)
+
         #weight
         weightlabel = QLabel("<b>" + QApplication.translate("Label", "Weight",None) + "</b>")
         green_label = QLabel("<b>" + QApplication.translate("Label", "Green",None) + "</b>")
@@ -1190,14 +1166,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.scaleWeightAccumulated = ClickableQLabel("")
         self.scaleWeightAccumulated.clicked.connect(self.resetScaleSet)
         # NOTES
-        roastertypelabel = QLabel()
-        roastertypelabel.setText("<b>" + QApplication.translate("Label", "Machine",None) + "</b>")
-        operatorlabel = QLabel()
-        operatorlabel.setText("<b> " + QApplication.translate("Label", "Operator",None) + "</b>")
-        organizationlabel = QLabel()
-        organizationlabel.setText("<b> " + QApplication.translate("Label", "Organization",None) + "</b>")
-        drumspeedlabel = QLabel()
-        drumspeedlabel.setText("<b> " + QApplication.translate("Label", "Drum Speed",None) + "</b>")
         roastinglabel = QLabel("<b>" + QApplication.translate("Label", "Roasting Notes",None) + "</b>")
         self.roastingeditor = QTextEdit()
 #        self.roastingeditor.setMaximumHeight(125)
@@ -1416,24 +1384,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         textLayout.addLayout(titleLine,3,1)
         textLayout.addWidget(beanslabel,4+textLayoutPlusOffset,0)
         textLayout.addWidget(self.beansedit,4+textLayoutPlusOffset,1)
-        textLayout.addWidget(operatorlabel,5+textLayoutPlusOffset,0)
-            
-        roasteroperator = QHBoxLayout()
-        roasteroperator.addWidget(self.operator, stretch=3)
-        roasteroperator.addSpacing(8)
-        roasteroperator.addWidget(organizationlabel)
-        roasteroperator.addSpacing(2)
-        roasteroperator.addWidget(self.organization, stretch=3)
-        roasteroperator.addSpacing(8)
-        roasteroperator.addWidget(roastertypelabel)
-        roasteroperator.addSpacing(2)
-        roasteroperator.addWidget(self.roaster,stretch=3)
-        roasteroperator.addWidget(self.capacity)
-        roasteroperator.addSpacing(8)
-        roasteroperator.addWidget(drumspeedlabel)
-        roasteroperator.addSpacing(2)
-        roasteroperator.addWidget(self.drumspeed,stretch=1)
-        textLayout.addLayout(roasteroperator,5+textLayoutPlusOffset,1)
         
         beanSizeLayout = QHBoxLayout()
         beanSizeLayout.setSpacing(2)
@@ -1640,16 +1590,47 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.TabWidget.setContentsMargins(0,0,0,0)
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab", "General",None))
+        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab", "Roast", None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab", "Notes",None))
+        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab", "Notes", None))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab", "Events",None))
+        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab", "Events", None))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab", "Data",None)) 
+        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab", "Data", None))
+        self.C6Widget = QWidget()
+        self.TabWidget.addTab(self.C6Widget,QApplication.translate("Tab", "Setup", None))
+        # fill Setup tab
+        from uic import SetupWidget 
+        self.setup_ui = SetupWidget.Ui_SetupWidget()
+        self.setup_ui.setupUi(self.C6Widget)
+        # explicitly reset labels to have them translated with a controlled context
+        self.setup_ui.doubleSpinBoxRoasterSize.setToolTip(QApplication.translate("Tooltip", "The maximum nominal batch size of the machine in kg"))
+        self.setup_ui.labelOrganization.setText(QApplication.translate("Label", "Organization",None))
+        self.setup_ui.labelOperator.setText(QApplication.translate("Label", "Operator",None))
+        self.setup_ui.labelMachine.setText(QApplication.translate("Label", "Machine",None))
+        self.setup_ui.labelDrumSpeed.setText(QApplication.translate("Label", "Drum Speed",None))
+        # hack to access the Qt automatic translation of the RestoreDefaults button
+        db = QDialogButtonBox(QDialogButtonBox.RestoreDefaults)
+        defaults_button_text_translated = db.button(QDialogButtonBox.RestoreDefaults).text()
+        self.setup_ui.Defaults.setText(defaults_button_text_translated)
+        self.setup_ui.SetDefaults.setText(QApplication.translate("Button", "Set as Defaults",None))
+        if self.aw.locale not in self.aw.qtbase_locales:
+            self.setup_ui.Defaults.setText(QApplication.translate("Button","Defaults", None))
+        
+        # fill dialog with data
+        self.setup_ui.lineEditOrganization.setText(self.aw.qmc.organization)
+        self.setup_ui.lineEditOperator.setText(self.aw.qmc.operator)
+        self.setup_ui.lineEditMachine.setText(self.aw.qmc.roastertype)
+        self.setup_ui.doubleSpinBoxRoasterSize.setValue(self.aw.qmc.roastersize)
+        self.setup_ui.lineEditDrumSpeed.setText(self.aw.qmc.drumspeed)
+        # connect button signals
+        self.setup_ui.SetDefaults.clicked.connect(self.SetupSetDefaults)
+        self.setup_ui.Defaults.clicked.connect(self.SetupDefaults)
+
+        #
         self.TabWidget.currentChanged.connect(self.tabSwitched)
         #incorporate layouts
         totallayout = QVBoxLayout()
@@ -1689,6 +1670,24 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.dialogbuttons.button(QDialogButtonBox.Ok)
         else:
             self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+    
+    pyqtSlot(bool)
+    def SetupSetDefaults(self,_):
+        # set default machine settings from setup dialog
+        self.aw.qmc.organization_setup = self.setup_ui.lineEditOrganization.text()
+        self.aw.qmc.operator_setup = self.setup_ui.lineEditOperator.text()
+        self.aw.qmc.roastertype_setup = self.setup_ui.lineEditMachine.text()
+        self.aw.qmc.roastersize_setup = self.setup_ui.doubleSpinBoxRoasterSize.value()
+        self.aw.qmc.drumspeed_setup = self.setup_ui.lineEditDrumSpeed.text()
+    
+    pyqtSlot(bool)
+    def SetupDefaults(self,_):
+        # set default machine setup from settings
+        self.setup_ui.lineEditOrganization.setText(self.aw.qmc.organization_setup)
+        self.setup_ui.lineEditOperator.setText(self.aw.qmc.operator_setup)
+        self.setup_ui.lineEditMachine.setText(self.aw.qmc.roastertype_setup)
+        self.setup_ui.doubleSpinBoxRoasterSize.setValue(self.aw.qmc.roastersize_setup)
+        self.setup_ui.lineEditDrumSpeed.setText(self.aw.qmc.drumspeed_setup)
     
     def enableBatchEdit(self):
         if not self.aw.superusermode and not self.batcheditmode:
@@ -3764,12 +3763,13 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.ambient_pressure = float(self.aw.comma2dot(str(self.pressureedit.text())))
         except Exception:
             self.aw.qmc.ambient_pressure = 0
+        #update setup
+        self.aw.qmc.organization = self.setup_ui.lineEditOrganization.text()
+        self.aw.qmc.operator = self.setup_ui.lineEditOperator.text()
+        self.aw.qmc.roastertype = self.setup_ui.lineEditMachine.text()
+        self.aw.qmc.roastersize = self.setup_ui.doubleSpinBoxRoasterSize.value()
+        self.aw.qmc.drumspeed = self.setup_ui.lineEditDrumSpeed.text()
         #update notes
-        self.aw.qmc.roastertype = self.roaster.text()
-        self.aw.qmc.roastersize = self.capacity.value()
-        self.aw.qmc.operator = self.operator.text()
-        self.aw.qmc.organization = self.organization.text()
-        self.aw.qmc.drumspeed = self.drumspeed.text()
         self.aw.qmc.roastingnotes = self.roastingeditor.toPlainText()
         self.aw.qmc.cuppingnotes = self.cuppingeditor.toPlainText()
         if self.aw.superusermode or self.batcheditmode:
