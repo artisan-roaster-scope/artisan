@@ -60,7 +60,7 @@ The main controls look like this:
 Artisan’s standard event buttons are as follows:
 ![Artisan buttons](/assets/images/gsg/standard buttons.png)
 
-In the upper right of your screen, ON start reading the Devices.  START will begin a roast profile recording  the time and temps.  After you hit START, wait at least 15 seconds, you need to drop your beans into the roaster and hit CHARGE (or use Auto CHARGE) to get a ∆BT graph.  Using the trier, when you determine you are at Dry End, hit the Dry End Button, and do the same for First Crack Start, and Drop.  After the roast completes, hit the off button.  Congratulations on your first roast.  At the end of the roast you hit OFF to stop the recording. When you hit RESET, the current profile and background profile are removed and Artisan is reset to be ready for a new roast.  You don’t have to RESET after every roast. 
+In the upper right of your screen, ON startS reading the Devices.  START will begin a roast profile recording  the time and temps.  After you hit START, wait at least 15 seconds, you need to drop your beans into the roaster and hit CHARGE (or use Auto CHARGE) to get a ∆BT graph.  Using the trier, when you determine you are at Dry End, hit the DRY END Button, and do the same for FIRST CRACK START, and DROP.  After the roast completes, hit the off button.  Congratulations on your first roast.  At the end of the roast you hit OFF to stop the recording. When you hit RESET, the current srofile and background profile are removed and Artisan is reset to be ready for a new roast.  You don’t have to RESET after every roast. 
 
 **NOTE:
 *Unplug Your Laptop Before You Roast***
