@@ -29,7 +29,7 @@ import plus.stock
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import deltaLabelUTF8,stringfromseconds,stringtoseconds, appFrozen
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
-from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit, MyQDoubleSpinBox
+from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit
 
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent
 from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette
