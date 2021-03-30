@@ -7,13 +7,13 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 
 ## Setup Hardware for Artisan
 
-### Configure for a supported machine
+### Configure for a Supported Machines
 
 You will find many roaster manufacturers are now supporting Artisan.    See [Artisan Machines](https://artisan-scope.org/machines/).
 
 Under Config>Machine, you will find all the of the Machines with supported set ups.  The list has expanded greatly.  If after running setup you see, "uu" as the reading in the LCDs, something is not right. You should check your probes independent of Artisan first before you try to troubleshoot within Artisan.  So for example, with a Phidget, check the Phidget Control Panel which you will find after installing the Phidget drivers and make sure the Phidgets are updated and showing readings.  
 
-### Configure for supported devices
+### Configure for Supported Devices
 
 You will need to configure the hardware device taking the readings from the roaster if its not a listed roaster above. 
 
@@ -30,6 +30,9 @@ Want to know more?
 
 If you need support for your device, go to the [Community](https://artisan-scope.org/docs/community/) page to see where to get help.  
 
+### Configure for Extra Devices Beyond Two
+
+Artisan supports two primary devices for BT and ET, and you can add additional LCDs and Curves by using Extra Devices on the Cofig>Devices tab.  Each physical device can have two channels, so on that tab you first select your device by its name in the drop down.  You pick a color for the display, apply a label/name for the device, add a formula to be applied to the device reading if any, and select if LCDs or Curves will be displayed. If you check the delta box, that will map the device to the right hand axis scale (the RoR axis) instead of the temperature axis.  
 
 ### Configure Language, Temps and Sampling
 
