@@ -41,7 +41,6 @@ SOURCES = \
     artisanlib/pid_dialogs.py \
     artisanlib/platform.py \
     artisanlib/ports.py \
-    artisanlib/preferences.py \
     artisanlib/roast_properties.py \
     artisanlib/rubase.py \
     artisanlib/s7port.py \
@@ -68,8 +67,7 @@ SOURCES = \
     plus/queue.py \
     plus/stock.py \
     plus/sync.py \
-    plus/util.py \
-    uic/SetupDialog.py
+    plus/util.py
     
 TRANSLATIONS = \
 	translations/artisan_de.ts \
