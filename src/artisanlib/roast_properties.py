@@ -31,6 +31,9 @@ from artisanlib.util import deltaLabelUTF8,stringfromseconds,stringtoseconds, ap
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
 from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit
 
+from uic import EnergyWidget 
+from uic import SetupWidget
+
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent
 from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette
 from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout,
@@ -1600,10 +1603,16 @@ class editGraphDlg(ArtisanResizeablDialog):
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
         self.TabWidget.addTab(C4Widget,QApplication.translate("Tab", "Data", None))
+        #####
+        self.C5Widget = QWidget()
+        self.TabWidget.addTab(self.C5Widget,QApplication.translate("Tab", "Energy", None))
+        # fill Setup tab
+        self.energy_ui = EnergyWidget.Ui_EnergyWidget()
+        self.energy_ui.setupUi(self.C5Widget)
+        #####
         self.C6Widget = QWidget()
         self.TabWidget.addTab(self.C6Widget,QApplication.translate("Tab", "Setup", None))
         # fill Setup tab
-        from uic import SetupWidget 
         self.setup_ui = SetupWidget.Ui_SetupWidget()
         self.setup_ui.setupUi(self.C6Widget)
         # explicitly reset labels to have them translated with a controlled context
