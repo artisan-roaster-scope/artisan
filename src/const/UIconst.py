@@ -17,8 +17,6 @@
 from PyQt5.QtWidgets import QApplication # @Reimport
 
 import platform
-
-import sys
         
 platf = str(platform.system())
 

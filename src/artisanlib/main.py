@@ -2262,6 +2262,28 @@ class tgraphcanvas(FigureCanvas):
         self.statssummary = False
         self.showtimeguide = True
         self.statsmaxchrperline = 30
+        
+        #EnergyUse
+        self.energyresultunit = "BTU"
+        self.loadenergysettingsfromprofile = False
+        self.heatunits = ["BTU", "kJ", "kWh"]        #dave should these be translated?
+        self.fuelnames = ["LPG", "NG", "Elec Coal"]  #dave should these be translated?
+#        self.uses = [QApplication.translate("Dialog","Roast burner",None), QApplication.translate("Dialog","Afterburner",None)]
+        self.burnerratings = [0]*4                   # in ratingunits
+        self.ratingunits = [self.heatunits[0]]*4     # item in list self.heatunits 
+        self.fueltypes = [self.fuelnames[0]]*4       # item in list self.fueltypes
+        self.burner_etypes = [0]*4                   # index of the etype that is the gas/burner setting
+        self.burnerevent_zeropcts = [0]*4            # event value ccrresponding to 0 percent
+        self.burnerevent_hundpcts = [100]*4          # event value ccrresponding to 100 percent
+#        self.burneruses = [0]*4                      # the use for the burner, like roast burner or after burner
+        self.preheatDuration = 0                     # length of preheat in seconds
+        self.preheatenergies = [0]*4                 # rating of the preheat burner
+        self.betweenbatchDuration = 0                # length of bbp in seconds
+        self.betweenbatchenergies = [0]*4            # rating of the between batch burner
+        self.roasts_per_session = 4                  # typical number of roasts in a session
+        self.energy_profile_dict = {}
+        self.energy_settings_dict = {}
+        self.saveEnergytoprofile = True              # flag to allow saving energy settings and data to the active profile
 
         #mouse cross lines measurement
         self.baseX,self.baseY = None, None
@@ -5453,6 +5475,10 @@ class tgraphcanvas(FigureCanvas):
 
                 if aw is not None:
                     aw.updatePlusStatus()
+                
+                # reset the flag to allow saving energy settings and data to profiles
+                self.saveEnergytoprofile = True
+                aw.qmc.energy_profile_dict = {}
 
             except Exception as ex:
 #                import traceback
@@ -11604,6 +11630,285 @@ class tgraphcanvas(FigureCanvas):
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " writestatistics() {0}").format(str(ex)),exc_tb.tb_lineno)
+
+
+    def convertHeat(self,value,fromUnit,toUnit="btu"):
+        if value in [-1,None]:
+            return value
+        conversion = {"kj": {"btu":0.9478,"kj":1.,"kwh":0.0002778},
+                      "kwh":{"btu":3412.1416,"kj":3600.,"kwh":1.},
+                      "btu":{"btu":1.,"kwh":0.0002931,"kj":1.0551}}
+        return value * conversion[fromUnit.lower()][toUnit.lower()]
+
+    def getEnergySettings(self,checkProfile=True):
+        try:
+            self.energy_settings_dict = {}
+            self.energy_settings_dict["burnerratings"] = [0]*4              
+            self.energy_settings_dict["ratingunits"] = [self.heatunits[0]]*4
+            self.energy_settings_dict["fueltypes"] = [self.fuelnames[0]]*4  
+            self.energy_settings_dict["burner_etypes"] = [0]*4              
+            self.energy_settings_dict["burnerevent_zeropcts"] = [0]*4       
+            self.energy_settings_dict["burnerevent_hundpcts"] = [100]*4     
+#            self.energy_settings_dict["burneruses"] = [0]*4                 
+            self.energy_settings_dict["preheatDuration"] = 0                
+            self.energy_settings_dict["preheatenergies"] = [0]*4            
+            self.energy_settings_dict["betweenbatchDuration"] = 0           
+            self.energy_settings_dict["betweenbatchenergies"] = [0]*4       
+            self.energy_settings_dict["roasts_per_session"] = 4             
+            #import from settings or profile
+            if checkProfile and self.loadenergysettingsfromprofile:
+                for i in range(0,4):
+                    if "burnerratings" in self.energy_profile_dict:
+                        self.energy_settings_dict["burnerratings"][i] = self.energy_profile_dict["burnerratings"][i]
+                    if "ratingunits" in self.energy_profile_dict:
+                        self.energy_settings_dict["ratingunits"][i] = self.energy_profile_dict["ratingunits"][i]
+                    if "fueltypes" in self.energy_profile_dict:
+                        self.energy_settings_dict["fueltypes"][i] = self.energy_profile_dict["fueltypes"][i]
+                    if "burner_etypes" in self.energy_profile_dict:
+                        self.energy_settings_dict["burner_etypes"][i] = self.energy_profile_dict["burner_etypes"][i]
+                    if "burnerevent_zeropcts" in self.energy_profile_dict:
+                        self.energy_settings_dict["burnerevent_zeropcts"][i] = self.energy_profile_dict["burnerevent_zeropcts"][i]
+                    if "burnerevent_hundpcts" in self.energy_profile_dict:
+                        self.energy_settings_dict["burnerevent_hundpcts"][i] = self.energy_profile_dict["burnerevent_hundpcts"][i]
+#                    if "burneruses" in self.energy_profile_dict:
+#                        self.energy_settings_dict["burneruses"][i] = self.energy_profile_dict["burneruses"][i]
+                    if "preheatenergies" in self.energy_profile_dict:
+                        self.energy_settings_dict["preheatenergies"][i] = self.energy_profile_dict["preheatenergies"][i]
+                    if "betweenbatchenergies" in self.energy_profile_dict:
+                        self.energy_settings_dict["betweenbatchenergies"][i] = self.energy_profile_dict["betweenbatchenergies"][i]
+                if "preheatDuration" in self.energy_profile_dict:
+                    self.energy_settings_dict["preheatDuration"] = self.energy_profile_dict["preheatDuration"]
+                if "betweenbatchDuration" in self.energy_profile_dict:
+                    self.energy_settings_dict["betweenbatchDuration"] = self.energy_profile_dict["betweenbatchDuration"]
+                if "roasts_per_session" in self.energy_profile_dict:
+                    self.energy_settings_dict["roasts_per_session"] = self.energy_profile_dict["roasts_per_session"]
+            else:
+                for i in range(0,4):
+                    self.energy_settings_dict["burnerratings"][i] = self.burnerratings[i]
+                    self.energy_settings_dict["ratingunits"][i] = self.ratingunits[i]
+                    self.energy_settings_dict["fueltypes"][i] = self.fueltypes[i]
+                    self.energy_settings_dict["burner_etypes"][i] = self.burner_etypes[i]
+                    self.energy_settings_dict["burnerevent_zeropcts"][i] = self.burnerevent_zeropcts[i]
+                    self.energy_settings_dict["burnerevent_hundpcts"][i] = self.burnerevent_hundpcts[i]
+#                    self.energy_settings_dict["burneruses"][i] = self.burneruses[i]
+                    self.energy_settings_dict["preheatenergies"][i] = self.preheatenergies[i]
+                    self.energy_settings_dict["betweenbatchenergies"][i] = self.betweenbatchenergies[i]
+                self.energy_settings_dict["preheatDuration"] = self.preheatDuration
+                self.energy_settings_dict["betweenbatchDuration"] = self.betweenbatchDuration
+                self.energy_settings_dict["roasts_per_session"] = self.roasts_per_session
+#dave
+#        except:
+#            pass
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Error:",None) + " getEnergySettings() {0}").format(str(e)),exc_tb.tb_lineno)
+
+    def calcEnergyuse(self,checkProfile=True):
+        try:
+            energymetrics = {}
+            btu_list = []
+            if len(self.timex) == 0:
+                aw.sendmessage(QApplication.translate("Message","No profile data", None),append=False)
+                return energymetrics, btu_list
+
+            #reference: https://www.eia.gov/environment/emissions/co2_vol_mass.php
+            #           https://carbonpositivelife.com/co2-per-kwh-of-electricity/
+            # entries must match those in self.fueltypes
+            CO2kg_per_BTU = {"LPG":6.307e-05, "NG":5.307e-05, "Elec Coal":0.94}
+
+            # must be a better way
+            eTypes = []
+            for i in range(0,4):
+                eTypes.append(self.etypes[i])
+            eTypes.append(QApplication.translate("Dialog","Continuous",None))
+            
+            # true if bernoulli set for the burner slider
+            bernoulli = [None]*5
+            for i in range(0,5):
+                try:
+                    bernoulli[i] = aw.eventsliderBernoulli[self.burner_etypes[i]]
+                except:
+                    bernoulli[i] = False
+
+            # init the prev_burnertime to drop if it exists or to the end of profile time
+            if self.timeindex[6] > 0:
+                prev_burnertime = [self.timex[self.timeindex[6]]]*4
+            else:
+                prev_burnertime = [self.timex[-1]]*4
+                aw.sendmessage(QApplication.translate("Message","Profile has no DROP event", None),append=False)
+
+            self.getEnergySettings(checkProfile)
+
+            output_list = []
+            for i in range(0,4):
+                # iterate specialevents in reverse from DROP to the first event
+                for j in range(len(self.specialevents) - 1, -1, -1):
+                    if self.specialeventstype[j] == self.energy_settings_dict["burner_etypes"][i]:
+                        # skip if burnerrating is zero
+                        if self.burnerratings[i] == 0:
+                            break
+                        burnertime = self.timex[self.specialevents[j]]
+                        # exclude heat before charge event
+                        if self.timeindex[0] > -1 and burnertime <= self.timex[self.timeindex[0]]:
+                            if prev_burnertime[i] <= self.timex[self.timeindex[0]]:
+                                break
+                            else:
+                                burnertime = self.timex[self.timeindex[0]]
+                        duration = prev_burnertime[i] - burnertime
+
+                        # exclude heat after drop event
+                        if duration < 0:
+                            continue
+                        prev_burnertime[i] = burnertime
+                        # scale the burner setting for 0-100%
+                        val = (self.specialeventsvalue[j] - 1) * 10
+                        emin = toInt(self.energy_settings_dict["burnerevent_zeropcts"][i])  #dave check these, they should already be int's
+                        emax = toInt(self.energy_settings_dict["burnerevent_hundpcts"][i])
+                        scaled = (val - emin) / (emax - emin)  #emax > emin enforced by energy.py
+                        burner_pct = min(1,max(0,scaled)) * 100
+                        # percent factor based on bernoulli setting for burner event slider
+                        if bernoulli[i]:
+                            factor = (burner_pct / 100)
+                        else:
+                            factor = math.sqrt(burner_pct / 100)
+                        
+                        source = chr(ord('A')+i) + "-" + eTypes[self.energy_settings_dict["burner_etypes"][i]]
+                        kind = QApplication.translate("Dialog","Roast Event",None)
+                        sortorder = (2000 * (i + 1)) + j
+                        BTUs = self.energy_settings_dict["burnerratings"][i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],"BTU")
+                        CO2g = BTUs * CO2kg_per_BTU[self.energy_settings_dict["fueltypes"][i]] * 1000
+                        if BTUs > 0:
+                            btu_list.append({"burner_pct":burner_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"Source":source,"Kind":kind,"FuelType":self.energy_settings_dict["fueltypes"][i],"SortOrder":sortorder})
+
+                # end of loop: for j in range(len(self.specialevents) - 1, -1, -1)
+                
+                # calculate Continuous event type
+                if self.energy_settings_dict["burner_etypes"][i] == 4:
+                    if self.timeindex[0] > -1 and self.timeindex[6] > 0:
+                        duration = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
+                    else:
+                        duration = 0
+                        aw.sendmessage(QApplication.translate("Message","Missing CHARGE or DROP event", None),append=False)
+                    burner_pct = toInt(self.energy_settings_dict["burnerevent_hundpcts"][i])  #needed only for the btu_list and outmsg
+                    factor = aw.float2float(toFloat(self.energy_settings_dict["burnerevent_hundpcts"][i]) / 100, 2)
+                    
+                    source = chr(ord('A')+i) + "-" + eTypes[4]  #"Continuous"
+                    kind = QApplication.translate("Dialog","Roast Event",None)
+                    fueltype = self.energy_settings_dict["fueltypes"][i]
+                    sortorder = 2000 - i
+                    BTUs = self.energy_settings_dict["burnerratings"][i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],"BTU")
+                    CO2g = BTUs * CO2kg_per_BTU[fueltype] * 1000
+                    if BTUs > 0:
+                        btu_list.append({"burner_pct":burner_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"Source":source,"Kind":kind,"FuelType":self.energy_settings_dict["fueltypes"][i],"SortOrder":sortorder})
+
+                # calculate preheat
+                if self.energy_settings_dict["preheatenergies"][i] > 0 and self.energy_settings_dict["preheatDuration"] > 0:
+                    if self.energy_settings_dict["preheatenergies"][i] < 1:
+                        # percent burner multiplied by duration
+                        burner_pct = self.energy_settings_dict["preheatenergies"][i] * 1000./10
+                        # percent factor based on bernoulli setting for burner event slider
+                        if bernoulli[i]:
+                            factor = self.energy_settings_dict["preheatenergies"][i]
+                        else:
+                            factor = math.sqrt(self.energy_settings_dict["preheatenergies"][i])
+                        duration = self.energy_settings_dict["preheatDuration"]
+                        BTUs = self.burnerratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],"BTU")
+                        kind = QApplication.translate("Dialog","Preheat %",None)
+                    else:
+                        # measured value
+                        burner_pct = 0
+                        duration = 0
+                        BTUs = self.energy_settings_dict["preheatenergies"][i] * self.convertHeat(1,self.energy_settings_dict["ratingunits"][i],"BTU")
+                        kind = QApplication.translate("Dialog","Preheat Measured",None)
+                    # spread preheat across roasts_per_session
+                    BTUs = BTUs / self.roasts_per_session
+
+                    source = chr(ord('A')+i) + "-" + eTypes[self.burner_etypes[i]]
+                    sortorder = 100 + i
+                    CO2g = BTUs * CO2kg_per_BTU[self.energy_settings_dict["fueltypes"][i]] * 1000
+                    if BTUs > 0:
+                        btu_list.append({"burner_pct":burner_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"Source":source,"Kind":kind,"FuelType":self.energy_settings_dict["fueltypes"][i],"SortOrder":sortorder})
+
+                # calculate betweenbatch 
+                if self.energy_settings_dict["betweenbatchenergies"][i] > 0 and self.energy_settings_dict["betweenbatchDuration"] > 0:
+                    if self.energy_settings_dict["betweenbatchenergies"][i] < 1:
+                        # percent burner multiplied by duration
+                        burner_pct = self.energy_settings_dict["betweenbatchenergies"][i] * 1000./10
+                        # percent factor based on bernoulli setting for burner event slider
+                        if bernoulli[i]:
+                            factor = self.energy_settings_dict["betweenbatchenergies"][i]
+                        else:
+                            factor = math.sqrt(self.energy_settings_dict["betweenbatchenergies"][i])
+                        duration = self.betweenbatchDuration
+                        BTUs = self.energy_settings_dict["burnerratings"][i] * factor * (duration / 3600) * self.convertHeat(1,self.energy_settings_dict["ratingunits"][i],"BTU")
+                        kind = QApplication.translate("Dialog","BBP %",None)
+                    else:
+                        # measured value
+                        burner_pct = 0
+                        duration = 0
+                        BTUs = self.energy_settings_dict["betweenbatchenergies"][i] * self.convertHeat(1,self.energy_settings_dict["ratingunits"][i],"BTU")
+                        kind = QApplication.translate("Dialog","BBP Measured",None)
+
+                    source = chr(ord('A')+i) + "-" + eTypes[self.burner_etypes[i]]
+                    sortorder = 400 + i
+                    CO2g = BTUs * CO2kg_per_BTU[self.energy_settings_dict["fueltypes"][i]] * 1000
+                    if BTUs > 0:
+                        btu_list.append({"burner_pct":burner_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"Source":source,"Kind":kind,"FuelType":self.energy_settings_dict["fueltypes"][i],"SortOrder":sortorder})
+
+            # end of loop: for i in range(0,4)
+
+            btu_list.sort(key=lambda k : k["SortOrder"] )
+
+
+#dave need to clean up for TRANSLATION ISSUES HERE
+            btu_batch = btu_preheat = btu_bbp = btu_roast = 0
+            co2_batch = co2_preheat = co2_bbp = co2_roast= 0
+            for item in btu_list:
+                btu_batch += item['BTUs']
+                btu_preheat += item["BTUs"] if "Preheat" in item["Kind"] else 0
+                btu_bbp += item["BTUs"] if "BBP" in item["Kind"] else 0
+                btu_roast += item["BTUs"] if "Roast" in item["Kind"] else 0
+                co2_batch += item['CO2g']
+                co2_preheat += item["CO2g"] if "Preheat" in item["Kind"] else 0
+                co2_bbp += item["CO2g"] if "BBP" in item["Kind"] else 0
+                co2_roast += item["CO2g"] if "Roast" in item["Kind"] else 0
+            btu_batch = int(btu_batch)
+            btu_preheat = int(btu_preheat)
+            btu_bbp = int(btu_bbp)
+            btu_roast = int(btu_roast)
+            co2_batch = int(co2_batch)
+            co2_preheat = int(co2_preheat)
+            co2_bbp = int(co2_bbp)
+            co2_roast = int(co2_roast)
+
+            # energymetrics
+            energymetrics["BTU_batch"] = btu_batch
+            energymetrics["CO2_batch"] = co2_batch
+            energymetrics["BTU_preheat"] = btu_preheat
+            energymetrics["CO2_preheat"] = co2_preheat
+            energymetrics["BTU_bbp"] = btu_bbp
+            energymetrics["CO2_bbp"] = co2_bbp
+            energymetrics["BTU_roast"] = btu_roast
+            energymetrics["CO2_roast"] = co2_roast
+            #more metrics
+            #dave - for the moment if roasted weight is not enetered we use green weight.  If no green weight then 0
+            #       this could be changed to use a constant weight loss (eg. 18%) when roasted weight is not entered
+            if self.weight[1] != 0.0:  #weightout
+                weightout = aw.float2float(aw.convertWeight(self.weight[1],self.weight_units.index(self.weight[2]),0),1) # in g
+                energymetrics["CO2g_perRoastedkg"] = aw.float2float(energymetrics["CO2_batch"]/(weightout/1000), 1)
+            elif self.weight[0] != 0.0: #weightin assuming 17% weight loss
+                weightin = aw.float2float(aw.convertWeight(self.weight[0],self.weight_units.index(self.weight[2]),0),1) # in g
+                energymetrics["CO2g_perRoastedkg"] = aw.float2float(energymetrics["CO2_batch"]/(0.83 * weightin/1000), 1)
+            else:
+                energymetrics["CO2g_perRoastedkg"] = 0
+            
+        except Exception as ex:
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " calcEnergyuse() {0}").format(str(ex)),exc_tb.tb_lineno)
+        finally:
+            return energymetrics,btu_list
 
     #used in EventRecord()
     def restorebutton_11(self):
@@ -23980,6 +24285,10 @@ class ApplicationWindow(QMainWindow):
 
                 #check colors
                 self.checkColors(self.getcolorPairsToCheck())
+                
+                # do not allow saving energy to profile when first loaded
+                self.qmc.saveEnergytoprofile = False
+        
         except IOError as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
@@ -24078,6 +24387,33 @@ class ApplicationWindow(QMainWindow):
             self.pidcontrol.svBeeps = [bool(x) for x in profile["svBeeps"]]
         if "svDescriptions" in profile:
             self.pidcontrol.svDescriptions = [str(x) for x in profile["svDescriptions"]]
+
+    def loadEnergyFromProfile(self,profile):
+        self.qmc.energy_profile_dict = {}  #be sure to clear before loading a new profile
+        if "burnerratings" in profile:
+            self.qmc.energy_profile_dict["burnerratings"] = [int(x) for x in profile["burnerratings"]]
+        if "ratingunits" in profile:
+            self.qmc.energy_profile_dict["ratingunits"] = [str(x) for x in profile["ratingunits"]]
+        if "fueltypes" in profile:
+            self.qmc.energy_profile_dict["fueltypes"] = [str(x) for x in profile["fueltypes"]]
+        if "burner_etypes" in profile:
+            self.qmc.energy_profile_dict["burner_etypes"] = [int(x) for x in profile["burner_etypes"]]
+        if "burnerevent_zeropcts" in profile:
+            self.qmc.energy_profile_dict["burnerevent_zeropcts"] = [int(x) for x in profile["burnerevent_zeropcts"]]
+        if "burnerevent_hundpcts" in profile:
+            self.qmc.energy_profile_dict["burnerevent_hundpcts"] = [int(x) for x in profile["burnerevent_hundpcts"]]
+#        if "burneruses" in profile:
+#            self.qmc.energy_profile_dict["burneruses"] = [int(x) for x in profile["burneruses"]]
+        if "preheatDuration" in profile:
+            self.qmc.energy_profile_dict["preheatDuration"] = profile["preheatDuration"]
+        if "preheatenergies" in profile:
+            self.qmc.energy_profile_dict["preheatenergies"] = [float(x) for x in profile["preheatenergies"]]
+        if "betweenbatchDuration" in profile:
+            self.qmc.energy_profile_dict["betweenbatchDuration"] = profile["betweenbatchDuration"]
+        if "betweenbatchenergies" in profile:
+            self.qmc.energy_profile_dict["betweenbatchenergies"] = [float(x) for x in profile["betweenbatchenergies"]]
+        if "roasts_per_session" in profile:
+            self.qmc.energy_profile_dict["roasts_per_session"] = profile["roasts_per_session"]
 
     # returns True if data got updated, False otherwise
     def updateSymbolicETBT(self):
@@ -26233,6 +26569,10 @@ class ApplicationWindow(QMainWindow):
             # Ramp/Soak Profiles
             if self.pidcontrol.loadRampSoakFromProfile:
                 self.loadRampSoakFromProfile(filename,profile)
+
+            # Energy
+            self.loadEnergyFromProfile(profile)
+
             if "timeindex" in profile:
                 self.qmc.timeindex = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(profile["timeindex"])]
                 if self.qmc.locktimex:
@@ -26566,6 +26906,19 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["dbt"] = dbt
         except Exception:
             pass
+        ######### Energy Use #########
+        try:
+            if self.qmc.saveEnergytoprofile:
+                energymetrics,_ = self.qmc.calcEnergyuse(True)  #dave - this needs to be examined!!
+                if "BTU_batch" in energymetrics:
+                    computedProfile["BTU_roast"] = self.float2float(energymetrics["BTU_roast"],1)
+                if "BTU_preheat" in energymetrics:
+                    computedProfile["BTU_preheat"] = self.float2float(energymetrics["BTU_preheat"],1)
+                if "BTU_bbp" in energymetrics:
+                    computedProfile["BTU_bbp"] = self.float2float(energymetrics["BTU_bbp"],1)
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
         ######### RETURN #########
         return computedProfile
 
@@ -26757,6 +27110,44 @@ class ApplicationWindow(QMainWindow):
                     profile["legendloc_pos"] = axis_to_data.transform(self.qmc.legend._loc).tolist()
                 except:
                     pass
+
+                    
+            try:
+                if self.qmc.saveEnergytoprofile:
+                    profile["burnerratings"] = self.qmc.burnerratings
+                    profile["ratingunits"] = self.qmc.ratingunits
+                    profile["fueltypes"] = self.qmc.fueltypes
+                    profile["burner_etypes"] = self.qmc.burner_etypes
+                    profile["burnerevent_zeropcts"] = self.qmc.burnerevent_zeropcts
+                    profile["burnerevent_hundpcts"] = self.qmc.burnerevent_hundpcts
+#                    profile["burneruses"] = self.qmc.burneruses
+                    profile["preheatDuration"] = self.qmc.preheatDuration
+                    profile["preheatenergies"] = self.qmc.preheatenergies
+                    profile["betweenbatchDuration"] = self.qmc.betweenbatchDuration
+                    profile["betweenbatchenergies"] = self.qmc.betweenbatchenergies
+                    profile["roasts_per_session"] = self.qmc.roasts_per_session
+
+                    aw.qmc.energy_profile_dict["burnerratings"] = self.qmc.burnerratings
+                    aw.qmc.energy_profile_dict["ratingunits"] = self.qmc.ratingunits
+                    aw.qmc.energy_profile_dict["fueltypes"] = self.qmc.fueltypes
+                    aw.qmc.energy_profile_dict["burner_etypes"] = self.qmc.burner_etypes
+                    aw.qmc.energy_profile_dict["burnerevent_zeropcts"] = self.qmc.burnerevent_zeropcts
+                    aw.qmc.energy_profile_dict["burnerevent_hundpcts"] = self.qmc.burnerevent_hundpcts
+#                    self.energy_profile_dict["burneruses"] = self.qmc.burneruses
+                    aw.qmc.energy_profile_dict["preheatDuration"] = self.qmc.preheatDuration
+                    aw.qmc.energy_profile_dict["preheatenergies"] = self.qmc.preheatenergies
+                    aw.qmc.energy_profile_dict["betweenbatchDuration"] = self.qmc.betweenbatchDuration
+                    aw.qmc.energy_profile_dict["betweenbatchenergies"] = self.qmc.betweenbatchenergies
+                    aw.qmc.energy_profile_dict["roasts_per_session"] = self.qmc.roasts_per_session
+                    aw.qmc.getEnergySettings(True)
+#dave
+#            except:
+#                pass
+#                print("EXCEPTION in getProfile")  #dave
+            except Exception as ex:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " getProfile(): {0}").format(str(ex)),exc_tb.tb_lineno)
+
             return profile
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -28177,6 +28568,36 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.roastersize_setup = toDouble(settings.value("roastersize_setup",self.qmc.roastersize_setup))
             if settings.contains("drumspeed_setup"):
                 self.qmc.drumspeed_setup = toString(settings.value("drumspeed_setup",self.qmc.drumspeed_setup))
+            
+            settings.beginGroup("EnergyUse")
+            if settings.contains("burnerratings"):
+                self.qmc.burnerratings = [toInt(x) for x in toList(settings.value("burnerratings"))]
+            if settings.contains("ratingunits"):
+                self.qmc.ratingunits = list(map(str,list(toStringList(settings.value("ratingunits",self.qmc.ratingunits)))))
+            if settings.contains("burner_etypes"):
+                self.qmc.burner_etypes = [toInt(x) for x in toList(settings.value("burner_etypes"))]
+            if settings.contains("burnerevent_zeropcts"):
+                self.qmc.burnerevent_zeropcts = [toInt(x) for x in toList(settings.value("burnerevent_zeropcts"))]
+            if settings.contains("burnerevent_hundpcts"):
+                self.qmc.burnerevent_hundpcts = [toInt(x) for x in toList(settings.value("burnerevent_hundpcts"))]
+#            if settings.contains("burneruses"):
+#                self.qmc.burneruses = [toInt(x) for x in toList(settings.value("burneruses"))]
+            if settings.contains("preheatDuration"):
+                self.qmc.preheatDuration = toInt(settings.value("preheatDuration",self.qmc.preheatDuration))
+            if settings.contains("preheatenergies"):
+                self.qmc.preheatenergies = [toFloat(x) for x in toList(settings.value("preheatenergies"))]
+            if settings.contains("betweenbatchDuration"):
+                self.qmc.betweenbatchDuration = toInt(settings.value("betweenbatchDuration",self.qmc.betweenbatchDuration))
+            if settings.contains("betweenbatchenergies"):
+                self.qmc.betweenbatchenergies = [toFloat(x) for x in toList(settings.value("betweenbatchenergies"))]
+            if settings.contains("roasts_per_session"):
+                self.qmc.roasts_per_session = toInt(settings.value("roasts_per_session",self.qmc.roasts_per_session))
+            if settings.contains("loadenergysettingsfromprofile"):
+                self.qmc.loadenergysettingsfromprofile = bool(toBool(settings.value("loadenergysettingsfromprofile",self.qmc.loadenergysettingsfromprofile)))
+            if settings.contains("energyresultunit"):
+                self.qmc.energyresultunit = toString(settings.value("energyresultunit",self.qmc.energyresultunit))
+            settings.endGroup()            
+            
             settings.beginGroup("RoastProperties")
             # copy setup from pre v1.4.6 RoastProperties organization,operator,roastertype,roastersize
             if self.qmc.organization_setup == "" and settings.contains("organization"):
@@ -29544,6 +29965,24 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("roastertype_setup",self.qmc.roastertype_setup)
             settings.setValue("roastersize_setup",self.qmc.roastersize_setup)
             settings.setValue("drumspeed_setup",self.qmc.drumspeed_setup)
+            
+            settings.beginGroup("EnergyUse")
+            settings.setValue("burnerratings",self.qmc.burnerratings)
+            settings.setValue("ratingunits",self.qmc.ratingunits)
+            settings.setValue("fueltypes",self.qmc.fueltypes)
+            settings.setValue("burner_etypes",self.qmc.burner_etypes)
+            settings.setValue("burnerevent_zeropcts",self.qmc.burnerevent_zeropcts)
+            settings.setValue("burnerevent_hundpcts",self.qmc.burnerevent_hundpcts)
+#            settings.setValue("burneruses",self.qmc.burneruses)
+            settings.setValue("preheatDuration",self.qmc.preheatDuration)
+            settings.setValue("preheatenergies",self.qmc.preheatenergies)
+            settings.setValue("betweenbatchDuration",self.qmc.betweenbatchDuration)
+            settings.setValue("betweenbatchenergies",self.qmc.betweenbatchenergies)
+            settings.setValue("roasts_per_session",self.qmc.roasts_per_session)
+            settings.setValue("loadenergysettingsfromprofile",self.qmc.loadenergysettingsfromprofile)
+            settings.setValue("energyresultunit",self.qmc.energyresultunit)
+            settings.endGroup()            
+            
             settings.beginGroup("RoastProperties")
             settings.setValue("machinesetup",self.qmc.machinesetup)
 #            settings.setValue("densitySampleVolume",self.qmc.density[2]) # fixed to 1l now
@@ -30664,6 +31103,7 @@ class ApplicationWindow(QMainWindow):
         ranking_data_fields = [
             #fld,                   source,  typ,        test0,    units,   name
             ["id",                  "prod",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Batch',None)                ],
+            ["BTU",                 "comp",  "float1",   "false",  "",      QApplication.translate('HTML Report Template','BTU',None)                  ],            
             ["datetime",            "prod",  "date",     "false",  "",      QApplication.translate('HTML Report Template','Time',None)                 ],
             ["title",               "prod",  "text",     "false",  "60",    QApplication.translate('HTML Report Template','Profile  ',None)            ],
             ["weightin",            "comp",  "float1",   "false",  "weight",QApplication.translate('HTML Report Template','Weight In',None)            ],
