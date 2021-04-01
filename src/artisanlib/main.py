@@ -5260,7 +5260,7 @@ class tgraphcanvas(FigureCanvas):
                 # quantification is blocked if lock_quantification_sampling_ticks is not 0
                 # (eg. after a change of the event value by button or slider actions)
                 aw.block_quantification_sampling_ticks = [0,0,0,0]
-                aw.extraeventsactionslastvalue = [None,None,None,None] # used by +-% event buttons in ON mode when no event was registered yet
+                #aw.extraeventsactionslastvalue = [None,None,None,None] # used by +-% event buttons in ON mode when no event was registered yet
 
                 # if we are in KeepON mode, the reset triggered by ON should resepect the roastpropertiesflag ("Delete Properties on Reset")
                 if self.roastpropertiesflag and (self.flagKeepON or not keepProperties):
