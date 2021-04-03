@@ -17,7 +17,7 @@ Artisan provides one-click configurations for more than 60 roaster brands repres
 
 {: .notice--info}
 **Control!**
-Machine control (incl. heater control) via buttons and sliders allowing for automation is currently supported for machines of [Aillio](/machines/aillio), [Besca](/machines/besca), [Coffed](/machines/coffed), [Coffee Tech](/machines/coffeetech), [Coffeetool](/machines/coffeetool), [Giesen](/machines/giesen), [Hottop](/machines/hottop), [IP Xenakis](/machines/ip), [Kuban](/machines/kuban), [Nordic](/machines/nordic), [Probat](/machines/probat), [San Franciscan](/machines/sf) and [Twino/Ozstar](/machines/twino-ozstar).
+Machine control (incl. heater control) via buttons and sliders allowing for automation is currently supported for machines of [Aillio](/machines/aillio), [Besca](/machines/besca), [Carmomaq](/machines/carmomaq), [Coffed](/machines/coffed), [Coffee Tech](/machines/coffeetech), [Coffeetool](/machines/coffeetool), [Giesen](/machines/giesen), [Hottop](/machines/hottop), [IP Xenakis](/machines/ip), [Kuban](/machines/kuban), [Nordic](/machines/nordic), [Probat](/machines/probat), [San Franciscan](/machines/sf) and [Twino/Ozstar](/machines/twino-ozstar).
 {: .notice--info}
 
 {: .notice--info}
