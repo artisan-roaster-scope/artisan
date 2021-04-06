@@ -1,6 +1,7 @@
 [General]
 Delay=2000
 Oversampling=true
+roastertype_setup=Hottop TC4
 
 [ArduinoPID]
 dutyMax=100
@@ -83,9 +84,6 @@ extraeventslabels=Heater\n+10, Heater\n-10, E, Fan\n+10, Fan\n-10
 extraeventstypes=8, 8, 4, 5, 5
 extraeventsvalues=2, -2, 0, 2, -2
 extraeventsvisibility=1, 1, 0, 1, 1
-
-[RoastProperties]
-roastertype=Hottop TC4
 
 [SerialPort]
 baudrate=115200

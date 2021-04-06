@@ -4,6 +4,7 @@ Delay=5000
 Oversampling=false
 dropDuplicates=true
 dropDuplicatesLimit=0.3
+roastertype_setup=Arc 800
 
 [Device]
 id=115
@@ -32,9 +33,6 @@ extramathexpression1=,
 extramathexpression2=, 
 extraname1=Drum, AT
 extraname2=Inlet, Extra 2
-
-[RoastProperties]
-roastertype=Arc 800
 
 [SerialPort]
 baudrate=9600

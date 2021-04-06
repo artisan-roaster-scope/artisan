@@ -22,7 +22,7 @@ import prettytable
 
 from artisanlib.util import deltaLabelUTF8#, stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanResizeablDialog
-from artisanlib.widgets import (MyQComboBox, MyTableWidgetItemInt, MyTableWidgetItemQCheckBox,
+from artisanlib.widgets import (MyQComboBox, MyTableWidgetItemNumber, MyTableWidgetItemQCheckBox,
                                 MyTableWidgetItemQComboBox, MyTableWidgetItemQLineEdit, MyTableWidgetItemQTime)
 
 from help import alarms_help
@@ -529,7 +529,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         
     def renumberRows(self):
         for i in range(self.alarmtable.rowCount()):
-            self.alarmtable.setItem(i, 0, MyTableWidgetItemInt(str(i+1),i))
+            self.alarmtable.setItem(i, 0, MyTableWidgetItemNumber(str(i+1),i))
 
     @pyqtSlot(bool)
     def deletealarm(self,_):
@@ -906,7 +906,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         #text description
         descriptionedit = QLineEdit(self.aw.qmc.alarmstrings[i])
         descriptionedit.setCursorPosition(0)
-        self.alarmtable.setItem(i, 0, MyTableWidgetItemInt(str(i+1),i))
+        self.alarmtable.setItem(i, 0, MyTableWidgetItemNumber(str(i+1),i))
         self.alarmtable.setCellWidget(i,1,flagComboBox)
         self.alarmtable.setItem(i, 1, MyTableWidgetItemQCheckBox(flagComboBox))
         self.alarmtable.setCellWidget(i,2,guardedit)

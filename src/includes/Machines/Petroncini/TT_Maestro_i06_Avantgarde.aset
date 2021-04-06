@@ -1,6 +1,7 @@
 [General]
 Delay=1000
 Oversampling=false
+roastertype_setup=Petroncini Maestro i06
 
 [Device]
 id=79
@@ -29,9 +30,6 @@ extramathexpression1=,
 extramathexpression2=, 
 extraname1=Burner, Airflow
 extraname2=Gas, DrumSpeed
-
-[RoastProperties]
-roastertype=Petroncini Maestro i06
 
 [S7]
 PID_OFF_action=

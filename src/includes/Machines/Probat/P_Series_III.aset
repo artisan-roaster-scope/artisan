@@ -2,6 +2,7 @@
 Delay=1000
 ExtraEventSamplingDelay=20000
 Oversampling=false
+roastertype_setup=Probat P Series
 
 [DefaultButtons]
 buttonactions=0, 21, 21, 21, 21, 21, 0, 0
@@ -67,9 +68,6 @@ quantifiercoarse=0, 0, 0, 0
 quantifiermax=100, 100, 100, 100
 quantifiermin=0, 0, 0, 0
 quantifiersource=5, 4, 0, 2
-
-[RoastProperties]
-roastertype=Probat P Series
 
 [Sliders]
 ModeTempSliders=C

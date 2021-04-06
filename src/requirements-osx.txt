@@ -15,7 +15,7 @@ gevent==21.1.1 # 20.9.0 # 1.5.0 is not compatible with Python 3.8
 gevent-websocket==0.10.1
 numpy==1.19.5 # 1.16.2 fails on TravisCI; py2app fails with 1.16.5, 1.17.0-2
 scipy==1.6.0 # 1.5.4  # depends on numpy thus we have to put it after numpy	
-matplotlib==3.3.4
+matplotlib==3.4.1
 wquantiles==0.5 # depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
 PyQt5==5.15.4 # 5.15.0 breaks custom event buttons. They only fire after a modal dialog has been opened. Very strange!

@@ -256,12 +256,12 @@ os.chdir('./dist')
 try:
     PYTHONPATH = os.environ["PYTHONPATH"] + r'/'
 except:
-    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/'
+    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/'
 
 try:
     PYTHON_V = os.environ["PYTHON_V"]
 except:
-    PYTHON_V = '3.8'
+    PYTHON_V = '3.9'
     
 # (independent) matplotlib (installed via pip) shared libs are not copied by py2app (both cp are needed!)
 # UPDATE 9/2020: pip install of MPL v3.3.x does not come with a .dylibs directory any longer
@@ -333,10 +333,22 @@ for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/'):
 #except:
 #    pass
 try:
+    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.8/PyQt5/Qt5",shell = True)
     subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.8/PyQt5/Qt",shell = True)
 except:
     pass
-                        
+try:
+    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.9/PyQt5/Qt5",shell = True)
+    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.9/PyQt5/Qt",shell = True)
+except:
+    pass
+
+
+# remove duplicate mpl_data folder
+try:
+    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/mpl_data",shell = True)
+except:
+    pass                    
 
 print('*** Removing unused files ***')
 for root, dirs, files in os.walk('.'):

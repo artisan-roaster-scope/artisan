@@ -6,6 +6,7 @@ ETcurve=false
 ETlcd=false
 ExtraEventSamplingDelay=0
 Oversampling=true
+roastertype_setup=Probatone
 
 [DefaultButtons]
 buttonactions=0, 0, 0, 0, 0, 0, 0, 0
@@ -148,9 +149,6 @@ quantifiersource=0, 0, 0, 2
 [RoC]
 DeltaET=false
 DeltaETlcd=false
-
-[RoastProperties]
-roastertype=Probatone
 
 [Sliders]
 eventslidersflag=1

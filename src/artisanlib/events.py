@@ -2376,6 +2376,22 @@ class EventsDlg(ArtisanResizeablDialog):
                 elif evType == 4:
                     evType = 9 # and map the entry 4 to 9
                 self.extraeventstypes[i] = evType
+
+            labeledit = self.eventbuttontable.cellWidget(i,0)
+            label = labeledit.text()
+            label = label.replace("\\n", chr(10))
+    
+            if i < len(self.extraeventslabels):
+                et = self.extraeventstypes[i]
+                if et > 4 and et < 9:
+                    et = et - 5
+                self.extraeventslabels[i] = label
+                if et < 4:
+                    label = label[:].replace("\\t",self.aw.qmc.etypes[et])
+    
+            #Update Color Buttons
+            self.eventbuttontable.cellWidget(i,7).setText(label)
+            self.eventbuttontable.cellWidget(i,8).setText(label)
     
     @pyqtSlot()
     def setvalueeventbutton(self):

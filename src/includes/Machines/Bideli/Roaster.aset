@@ -1,15 +1,13 @@
 [General]
 Delay=2000
 Oversampling=true
+roastertype_setup=Bideli Roaster
 
 [Device]
 controlETpid=4, 2
 id=0
 readBTpid=4, 1
 showFujiLCDs=false
-
-[RoastProperties]
-roastertype=Bideli Roaster
 
 [SerialPort]
 baudrate=9600

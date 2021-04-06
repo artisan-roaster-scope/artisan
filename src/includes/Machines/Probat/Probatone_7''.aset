@@ -6,6 +6,7 @@ ETcurve=true
 ETlcd=true
 ExtraEventSamplingDelay=0
 Oversampling=true
+roastertype_setup=Probatone
 
 [CurveStyles]
 BTlinestyle=-
@@ -170,9 +171,6 @@ quantifiersource=5, 4, 0, 2
 [RoC]
 DeltaET=false
 DeltaETlcd=false
-
-[RoastProperties]
-roastertype=Probatone
 
 [Sliders]
 ModeTempSliders=C

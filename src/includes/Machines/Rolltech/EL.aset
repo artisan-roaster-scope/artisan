@@ -4,6 +4,7 @@ BTlcd=true
 Delay=3000
 ETcurve=false
 ETlcd=false
+roastertype_setup=Rolltech EL
 
 [Device]
 id=29
@@ -99,6 +100,3 @@ fetch_max_blocks=false
 [RoC]
 DeltaET=false
 DeltaETlcd=false
-
-[RoastProperties]
-roastertype=Rolltech EL

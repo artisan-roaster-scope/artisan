@@ -1,6 +1,7 @@
 [General]
 Delay=1000
 Oversampling=false
+roastertype_setup=CTE Ghibli Touch
 
 [Device]
 id=29
@@ -145,9 +146,6 @@ quantifiercoarse=0, 0, 0, 0
 quantifiermax=70, 70, 100, 100
 quantifiermin=30, 30, 0, 0
 quantifiersource=5, 4, 0, 2
-
-[RoastProperties]
-roastertype=CTE Ghibli Touch
 
 [Sliders]
 ModeTempSliders=C

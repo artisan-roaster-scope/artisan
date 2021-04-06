@@ -1,15 +1,13 @@
 [General]
 Delay=3000
 Oversampling=true
+roastertype_setup=Phoenix Roaster
 
 [Device]
 controlETpid=1, 2
 id=0
 readBTpid=1, 1
 showFujiLCDs=false
-
-[RoastProperties]
-roastertype=Phoenix Roaster
 
 [SerialPort]
 baudrate=9600

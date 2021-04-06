@@ -1,6 +1,7 @@
 [General]
 Delay=1000
 Oversampling=false
+roastertype_setup=CTE FZ94 EVO
 
 [Device]
 id=29
@@ -133,9 +134,6 @@ quantifiercoarse=0, 0, 0, 0
 quantifiermax=70, 70, 100, 100
 quantifiermin=30, 30, 0, 0
 quantifiersource=5, 4, 0, 2
-
-[RoastProperties]
-roastertype=CTE FZ94 EVO
 
 [Style]
 ETname=DT

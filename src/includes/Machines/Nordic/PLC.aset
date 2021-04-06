@@ -1,5 +1,6 @@
 [General]
 Delay=2000
+roastertype_setup=Nordic PLC
 
 [Device]
 id=29
@@ -133,9 +134,6 @@ quantifiercoarse=0, 0, 0, 0
 quantifiermax=100, 100, 100, 100
 quantifiermin=30, 30, 0, 0
 quantifiersource=4, 5, 0, 3
-
-[RoastProperties]
-roastertype=Nordic PLC
 
 [Sliders]
 ModeTempSliders=C

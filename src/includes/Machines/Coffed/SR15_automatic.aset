@@ -1,6 +1,7 @@
 [General]
 Delay=2000
 Oversampling=true
+roastertype_setup=Coffed SR15 automatic
 
 [Device]
 id=29
@@ -92,9 +93,6 @@ type=3
 wordorderLittle=true
 optimizer=true
 fetch_max_blocks=false
-
-[RoastProperties]
-roastertype=Coffed SR15 automatic
 
 [Sliders]
 ModeTempSliders=C

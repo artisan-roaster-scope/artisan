@@ -1,6 +1,7 @@
-[General]
+w[General]
 Delay=1000
 Oversampling=true
+roastertype_setup=Aillio Bullet R1
 
 [Style]
 BTname=IBTS
@@ -36,9 +37,6 @@ extramathexpression1=, , ,
 extramathexpression2=, , , 
 extraname1={3}, BT RoR, Voltage, State
 extraname2={0}, {1}, Exhaust, Fan RPM
-
-[RoastProperties]
-roastertype=Aillio Bullet R1
 
 [events]
 etypes=Fan, Drum, Damper, Heater, --

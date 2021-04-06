@@ -5,6 +5,7 @@ BTlcd=true
 ETlcd=false
 BTcurve=true
 ETcurve=false
+roastertype_setup=US Roaster Corp
 
 [Device]
 id=29
@@ -96,6 +97,3 @@ type=0
 wordorderLittle=true
 optimizer=true
 fetch_max_blocks=false
-
-[RoastProperties]
-roastertype=US Roaster Corp

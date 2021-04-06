@@ -1,6 +1,7 @@
 [General]
 Delay=1000
 Oversampling=false
+roastertype_setup=Lilla
 
 [Device]
 id=79
@@ -25,9 +26,6 @@ extramathexpression1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\0)
 extramathexpression2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\0)
 extraname1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\f\0\x42\0u\0r\0n\0\x65\0r)
 extraname2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\n\0S\0t\0\x61\0\x63\0k)
-
-[RoastProperties]
-roastertype=Lilla
 
 [S7]
 PID_OFF_action=

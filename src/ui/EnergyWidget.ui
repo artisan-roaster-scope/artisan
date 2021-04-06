@@ -6,82 +6,383 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>566</width>
-    <height>420</height>
+    <width>519</width>
+    <height>405</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true">EnergyWidget</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <property name="toolTip">
+   <string notr="true"/>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_6">
+   <property name="spacing">
+    <number>10</number>
+   </property>
+   <property name="leftMargin">
+    <number>2</number>
+   </property>
+   <property name="topMargin">
+    <number>5</number>
+   </property>
+   <property name="rightMargin">
+    <number>5</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
-    <widget class="QLabel" name="label_25">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>5</number>
      </property>
-     <property name="text">
-      <string>No data to display</string>
-     </property>
-    </widget>
+     <item>
+      <widget class="QGroupBox" name="CO2GroupBox">
+       <property name="title">
+        <string>Energy</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>5</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="totalEnergyLabel">
+          <property name="palette">
+           <palette>
+            <active>
+             <colorrole role="WindowText">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>17</red>
+                <green>103</green>
+                <blue>163</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </active>
+            <inactive>
+             <colorrole role="WindowText">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>17</red>
+                <green>103</green>
+                <blue>163</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </inactive>
+            <disabled>
+             <colorrole role="WindowText">
+              <brush brushstyle="SolidPattern">
+               <color alpha="63">
+                <red>0</red>
+                <green>0</green>
+                <blue>0</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </disabled>
+           </palette>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>20</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLabel" name="preheatEnergyLabel">
+            <property name="font">
+             <font>
+              <pointsize>11</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="BBPEnergyLabel">
+            <property name="font">
+             <font>
+              <pointsize>11</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="roastEnergyLabel">
+            <property name="font">
+             <font>
+              <pointsize>11</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="EnergyGroupBox">
+       <property name="title">
+        <string>CO2</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <property name="spacing">
+         <number>5</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="totalCO2Label">
+          <property name="palette">
+           <palette>
+            <active>
+             <colorrole role="WindowText">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>17</red>
+                <green>103</green>
+                <blue>163</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </active>
+            <inactive>
+             <colorrole role="WindowText">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>17</red>
+                <green>103</green>
+                <blue>163</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </inactive>
+            <disabled>
+             <colorrole role="WindowText">
+              <brush brushstyle="SolidPattern">
+               <color alpha="63">
+                <red>0</red>
+                <green>0</green>
+                <blue>0</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </disabled>
+           </palette>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>20</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="CO2perKgCoffeeLabel">
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QTabWidget" name="tabWidget">
-     <property name="currentIndex">
-      <number>2</number>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
      </property>
-     <widget class="QWidget" name="Details">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="toolTip">
+      <string notr="true"/>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="detailsTab">
       <attribute name="title">
-       <string>Details</string>
+       <string notr="true">Details</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
-        <widget class="QTableWidget" name="tableWidget">
+        <widget class="QTableWidget" name="datatable">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string notr="true"/>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="tabKeyNavigation">
+          <bool>false</bool>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <property name="wordWrap">
+          <bool>false</bool>
+         </property>
+         <attribute name="horizontalHeaderCascadingSectionResizes">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>70</number>
+         </attribute>
+         <attribute name="horizontalHeaderDefaultSectionSize">
+          <number>100</number>
+         </attribute>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
          <column>
           <property name="text">
-           <string>Burner</string>
+           <string notr="true">Burner</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>Duration</string>
+           <string notr="true">Duration</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>BTU</string>
+           <string notr="true">BTU</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>CO2 (g)</string>
+           <string notr="true">CO2 (g)</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>Source</string>
+           <string notr="true">Source</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>Kind</string>
+           <string notr="true">Fuel</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>Fuel</string>
+           <string notr="true">Kind</string>
           </property>
          </column>
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <layout class="QHBoxLayout" name="CopyTableLine">
          <item>
-          <widget class="QPushButton" name="pushButton_2">
+          <widget class="QPushButton" name="copyTableButton">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string notr="true"/>
+           </property>
            <property name="text">
-            <string>Copy Table</string>
+            <string notr="true">Copy Table</string>
            </property>
           </widget>
          </item>
@@ -102,245 +403,527 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="burnersTab">
       <attribute name="title">
-       <string>Burners</string>
+       <string notr="true">Burners</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
-        <widget class="QWidget" name="widget" native="true">
+        <widget class="QWidget" name="burnersGrid" native="true">
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="1">
-           <widget class="QLabel" name="label_24">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
+          <property name="leftMargin">
+           <number>5</number>
+          </property>
+          <property name="topMargin">
+           <number>5</number>
+          </property>
+          <property name="rightMargin">
+           <number>5</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
+          </property>
+          <item row="4" column="7">
+           <widget class="QSpinBox" name="hundredpct3">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
-            <property name="text">
-             <string>Label</string>
+            <property name="maximum">
+             <number>100</number>
             </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_5">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Rating</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="6">
-           <widget class="QLabel" name="label_9">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Value 100%</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>D</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="4">
-           <widget class="QLabel" name="label_7">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Fuel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="5">
-           <widget class="QLabel" name="label_8">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Value 0%</string>
+            <property name="value">
+             <number>100</number>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="label_2">
+           <widget class="QLabel" name="bLabel">
             <property name="font">
              <font>
               <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>B</string>
+             <string notr="true">B</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_3">
+          <item row="0" column="4">
+           <widget class="QLabel" name="fueltypesLabel">
             <property name="font">
              <font>
               <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
-            <property name="text">
-             <string>C</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QLabel" name="label_6">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
+            <property name="accessibleDescription">
+             <string notr="true"/>
             </property>
             <property name="text">
-             <string>Unit</string>
+             <string notr="true">Fuel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>A</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="lineEdit_15"/>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="lineEdit_16"/>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="lineEdit_17"/>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="lineEdit_18"/>
-          </item>
-          <item row="1" column="2">
-           <widget class="QLineEdit" name="lineEdit"/>
-          </item>
-          <item row="2" column="2">
-           <widget class="QLineEdit" name="lineEdit_2"/>
-          </item>
-          <item row="3" column="2">
-           <widget class="QLineEdit" name="lineEdit_3"/>
-          </item>
-          <item row="4" column="2">
-           <widget class="QLineEdit" name="lineEdit_4"/>
-          </item>
-          <item row="1" column="3">
-           <widget class="QComboBox" name="comboBox"/>
-          </item>
-          <item row="2" column="3">
-           <widget class="QComboBox" name="comboBox_2"/>
-          </item>
-          <item row="3" column="3">
-           <widget class="QComboBox" name="comboBox_3"/>
-          </item>
-          <item row="4" column="3">
-           <widget class="QComboBox" name="comboBox_4"/>
-          </item>
-          <item row="1" column="4">
-           <widget class="QComboBox" name="comboBox_5"/>
-          </item>
-          <item row="2" column="4">
-           <widget class="QComboBox" name="comboBox_6"/>
-          </item>
-          <item row="3" column="4">
-           <widget class="QComboBox" name="comboBox_7"/>
-          </item>
-          <item row="4" column="4">
-           <widget class="QComboBox" name="comboBox_8"/>
-          </item>
-          <item row="1" column="5">
-           <widget class="QSpinBox" name="spinBox">
+          <item row="2" column="7">
+           <widget class="QSpinBox" name="hundredpct1">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
-           </widget>
-          </item>
-          <item row="2" column="5">
-           <widget class="QSpinBox" name="spinBox_2">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            <property name="maximum">
+             <number>100</number>
             </property>
-           </widget>
-          </item>
-          <item row="3" column="5">
-           <widget class="QSpinBox" name="spinBox_3">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="5">
-           <widget class="QSpinBox" name="spinBox_4">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            <property name="value">
+             <number>100</number>
             </property>
            </widget>
           </item>
           <item row="1" column="6">
-           <widget class="QSpinBox" name="spinBox_5">
+           <widget class="QSpinBox" name="zeropcts0">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="7">
+           <widget class="QSpinBox" name="hundredpct2">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="value">
+             <number>100</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="burnerratingsLabel">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">Rating</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="4">
+           <widget class="QComboBox" name="fueltype3">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="burnerlabelsLabel">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">Label</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="burnerlabel2">
+            <property name="maxLength">
+             <number>12</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="QComboBox" name="ratingunit2">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="7">
+           <widget class="QLabel" name="hundredpctsLabel">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">100%</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
           <item row="2" column="6">
-           <widget class="QSpinBox" name="spinBox_6">
+           <widget class="QSpinBox" name="zeropcts1">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
            </widget>
           </item>
-          <item row="3" column="6">
-           <widget class="QSpinBox" name="spinBox_7">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          <item row="1" column="0">
+           <widget class="QLabel" name="aLabel">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">A</string>
             </property>
            </widget>
           </item>
           <item row="4" column="6">
-           <widget class="QSpinBox" name="spinBox_8">
+           <widget class="QSpinBox" name="zeropcts3">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="burnerlabel1">
+            <property name="maxLength">
+             <number>12</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="burnerlabel0">
+            <property name="maxLength">
+             <number>12</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="4">
+           <widget class="QComboBox" name="fueltype2">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QComboBox" name="ratingunit1">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLineEdit" name="burnerrating2">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLineEdit" name="burnerrating1">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="4">
+           <widget class="QComboBox" name="fueltype1">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="7">
+           <widget class="QSpinBox" name="hundredpct0">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="value">
+             <number>100</number>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2">
+           <widget class="QLineEdit" name="burnerrating3">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="burnerlabel3">
+            <property name="maxLength">
+             <number>12</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="cLabel">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">C</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="6">
+           <widget class="QLabel" name="zeropctsLabel">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">0%</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="6">
+           <widget class="QSpinBox" name="zeropcts2">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLineEdit" name="burnerrating0">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3">
+           <widget class="QComboBox" name="ratingunit3">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QComboBox" name="ratingunit0">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLabel" name="ratingunitsLabel">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">Unit</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4">
+           <widget class="QComboBox" name="fueltype0">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="dLabel">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">D</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="5">
+           <widget class="QLabel" name="eventsLabel">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">Event</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="5">
+           <widget class="QComboBox" name="events0">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="5">
+           <widget class="QComboBox" name="events1">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="5">
+           <widget class="QComboBox" name="events2">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="5">
+           <widget class="QComboBox" name="events3">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
             </property>
            </widget>
           </item>
@@ -348,12 +931,18 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget_4" native="true">
+        <widget class="QWidget" name="burnersButtonsLine" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QPushButton" name="pushButton_4">
+           <widget class="QPushButton" name="burnersSetDefaultsButton">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>Set as Defaults</string>
+             <string notr="true">Set as Defaults</string>
             </property>
            </widget>
           </item>
@@ -371,9 +960,15 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="burnersDefaultsButtons">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>Restore Defaults</string>
+             <string notr="true">Restore Defaults</string>
             </property>
            </widget>
           </item>
@@ -395,40 +990,85 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="protocolTab">
       <attribute name="title">
-       <string>Protocol</string>
+       <string notr="true">Protocol</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
-        <widget class="QWidget" name="widget_2" native="true">
+        <widget class="QWidget" name="roasts_per_sessionLine" native="true">
          <layout class="QGridLayout" name="gridLayout">
+          <property name="leftMargin">
+           <number>5</number>
+          </property>
+          <property name="topMargin">
+           <number>5</number>
+          </property>
+          <property name="rightMargin">
+           <number>5</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
+          </property>
           <item row="5" column="3">
-           <widget class="QLineEdit" name="lineEdit_8"/>
+           <widget class="QLineEdit" name="betweenbatchesenergy0">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
           </item>
           <item row="3" column="4">
-           <widget class="QLineEdit" name="lineEdit_9"/>
+           <widget class="QLineEdit" name="preheatenergies1">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
           </item>
           <item row="0" column="3" colspan="4">
-           <widget class="QLabel" name="label_14">
+           <widget class="QLabel" name="measuredEnergyLabel">
             <property name="font">
              <font>
               <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>Measured Energy or Output %</string>
+             <string notr="true">Measured Energy or Output %</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QLineEdit" name="lineEdit_5"/>
+           <widget class="QLineEdit" name="preheatDuration">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
           </item>
           <item row="1" column="6">
-           <widget class="QLabel" name="label_19">
+           <widget class="QLabel" name="burnerDLabel">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>Burner D</string>
+             <string notr="true">Burner D</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -436,22 +1076,31 @@
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QLabel" name="label_10">
+           <widget class="QLabel" name="preheatingLabel">
             <property name="font">
              <font>
               <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>Pre Heating</string>
+             <string notr="true">Pre-Heating</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
           <item row="2" column="4">
-           <widget class="QLabel" name="label_20">
+           <widget class="QLabel" name="burnerBUnitLabel">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>(kJ)</string>
+             <string notr="true">(kJ)</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -459,9 +1108,12 @@
            </widget>
           </item>
           <item row="1" column="3">
-           <widget class="QLabel" name="label_15">
+           <widget class="QLabel" name="burnerALabel">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>Burner A</string>
+             <string notr="true">Burner A</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -469,12 +1121,19 @@
            </widget>
           </item>
           <item row="3" column="6">
-           <widget class="QLineEdit" name="lineEdit_13"/>
+           <widget class="QLineEdit" name="preheatenergies3">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
           </item>
           <item row="1" column="5">
-           <widget class="QLabel" name="label_18">
+           <widget class="QLabel" name="burnerCLabel">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>Burner C</string>
+             <string notr="true">Burner C</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -482,9 +1141,12 @@
            </widget>
           </item>
           <item row="2" column="5">
-           <widget class="QLabel" name="label_21">
+           <widget class="QLabel" name="burnerCUnitLabel">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>(BTU)</string>
+             <string notr="true">(BTU)</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -492,41 +1154,67 @@
            </widget>
           </item>
           <item row="5" column="4">
-           <widget class="QLineEdit" name="lineEdit_10"/>
+           <widget class="QLineEdit" name="betweenbatchesenergy1">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
           </item>
           <item row="5" column="6">
-           <widget class="QLineEdit" name="lineEdit_14"/>
+           <widget class="QLineEdit" name="betweenbatchesenergy3">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLabel" name="label_12">
+           <widget class="QLabel" name="durationLabel">
             <property name="font">
              <font>
               <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string/>
+            </property>
             <property name="text">
-             <string>Duration</string>
+             <string notr="true">Duration</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
           <item row="5" column="0">
-           <widget class="QLabel" name="label_11">
+           <widget class="QLabel" name="betweenBatchesLabel">
             <property name="font">
              <font>
               <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>Between Batches</string>
+             <string notr="true">Between Batches</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
           <item row="1" column="4">
-           <widget class="QLabel" name="label_16">
+           <widget class="QLabel" name="burnerBLabel">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>Burner B</string>
+             <string notr="true">Burner B</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -534,12 +1222,19 @@
            </widget>
           </item>
           <item row="5" column="1">
-           <widget class="QLineEdit" name="lineEdit_6"/>
+           <widget class="QLineEdit" name="betweenBatchesDuration">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLabel" name="label_13">
+           <widget class="QLabel" name="timeUnitLabel">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>(mm:ss)</string>
+             <string notr="true">(mm:ss)</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -547,9 +1242,12 @@
            </widget>
           </item>
           <item row="2" column="3">
-           <widget class="QLabel" name="label_17">
+           <widget class="QLabel" name="burnerAUnitLabel">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>(BTU)</string>
+             <string notr="true">(BTU)</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -557,12 +1255,19 @@
            </widget>
           </item>
           <item row="5" column="5">
-           <widget class="QLineEdit" name="lineEdit_12"/>
+           <widget class="QLineEdit" name="betweenbatchesenergy2">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
           </item>
           <item row="2" column="6">
-           <widget class="QLabel" name="label_22">
+           <widget class="QLabel" name="burnerDUnitLabel">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>(BTU)</string>
+             <string notr="true">(BTU)</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -570,29 +1275,46 @@
            </widget>
           </item>
           <item row="3" column="3">
-           <widget class="QLineEdit" name="lineEdit_7"/>
+           <widget class="QLineEdit" name="preheatenergies0">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
           </item>
           <item row="3" column="5">
-           <widget class="QLineEdit" name="lineEdit_11"/>
+           <widget class="QLineEdit" name="preheatenergies2">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
           </item>
           <item row="3" column="2">
-           <widget class="QLabel" name="label_26">
+           <widget class="QLabel" name="bar1">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>|</string>
+             <string notr="true">|</string>
             </property>
            </widget>
           </item>
           <item row="5" column="2">
-           <widget class="QLabel" name="label_27">
+           <widget class="QLabel" name="bar2">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>|</string>
+             <string notr="true">|</string>
             </property>
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QLabel" name="label_30">
+           <widget class="QLabel" name="bar0">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>|</string>
+             <string notr="true">|</string>
             </property>
            </widget>
           </item>
@@ -602,19 +1324,48 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QLabel" name="label_23">
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="roasts_per_sessionLabel">
+           <property name="toolTip">
+            <string notr="true"/>
+           </property>
            <property name="text">
-            <string>Typical number of batches per session</string>
+            <string notr="true">Typical number of batches per session</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_9"/>
+          <widget class="QSpinBox" name="roasts_per_session">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="checkBox">
+          <widget class="QCheckBox" name="roasts_per_session_auto_checkBox">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string notr="true"/>
+           </property>
            <property name="text">
-            <string>Auto</string>
+            <string notr="true">Auto</string>
            </property>
           </widget>
          </item>
@@ -634,12 +1385,18 @@
         </layout>
        </item>
        <item>
-        <widget class="QWidget" name="widget_3" native="true">
+        <widget class="QWidget" name="protocolButtonsLine" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <widget class="QPushButton" name="pushButton_5">
+           <widget class="QPushButton" name="protocolSetDefaultsButton">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>Set as Defaults</string>
+             <string notr="true">Set as Defaults</string>
             </property>
            </widget>
           </item>
@@ -657,9 +1414,15 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_6">
+           <widget class="QPushButton" name="protocolDefaultsButton">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>Restore Defaults</string>
+             <string notr="true">Restore Defaults</string>
             </property>
            </widget>
           </item>
@@ -684,7 +1447,30 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="helpButtonLine">
+     <item>
+      <widget class="QLabel" name="resultunitLabel">
+       <property name="accessibleDescription">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string notr="true">Results in</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="resultunitComboBox">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="currentText">
+        <string notr="true"/>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -699,9 +1485,18 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_3">
+      <widget class="QPushButton" name="helpButton">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="accessibleDescription">
+        <string notr="true"/>
+       </property>
        <property name="text">
-        <string>Help</string>
+        <string notr="true">Help</string>
        </property>
       </widget>
      </item>
@@ -709,6 +1504,35 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>datatable</tabstop>
+  <tabstop>burnerlabel0</tabstop>
+  <tabstop>burnerrating0</tabstop>
+  <tabstop>zeropcts0</tabstop>
+  <tabstop>hundredpct0</tabstop>
+  <tabstop>burnerlabel1</tabstop>
+  <tabstop>burnerrating1</tabstop>
+  <tabstop>zeropcts1</tabstop>
+  <tabstop>hundredpct1</tabstop>
+  <tabstop>burnerlabel2</tabstop>
+  <tabstop>burnerrating2</tabstop>
+  <tabstop>zeropcts2</tabstop>
+  <tabstop>hundredpct2</tabstop>
+  <tabstop>burnerlabel3</tabstop>
+  <tabstop>burnerrating3</tabstop>
+  <tabstop>zeropcts3</tabstop>
+  <tabstop>hundredpct3</tabstop>
+  <tabstop>preheatDuration</tabstop>
+  <tabstop>preheatenergies0</tabstop>
+  <tabstop>preheatenergies1</tabstop>
+  <tabstop>preheatenergies2</tabstop>
+  <tabstop>preheatenergies3</tabstop>
+  <tabstop>betweenBatchesDuration</tabstop>
+  <tabstop>betweenbatchesenergy0</tabstop>
+  <tabstop>betweenbatchesenergy1</tabstop>
+  <tabstop>betweenbatchesenergy2</tabstop>
+  <tabstop>betweenbatchesenergy3</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

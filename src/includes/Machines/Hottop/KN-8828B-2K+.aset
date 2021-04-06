@@ -1,6 +1,7 @@
 [General]
 Delay=2000
 Oversampling=true
+roastertype_setup=Hottop 2K+
 
 [ArduinoPID]
 dutyMax=100
@@ -104,9 +105,6 @@ quantifiersource=3, 0, 0, 2
 [RoC]
 DeltaET=false
 DeltaETlcd=false
-
-[RoastProperties]
-roastertype=Hottop 2K+
 
 [SerialPort]
 baudrate=115200

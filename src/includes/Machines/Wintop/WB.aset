@@ -1,15 +1,13 @@
 [General]
 Delay=3000
 Oversampling=true
+roastertype_setup=Wintop WB
 
 [Device]
 controlETpid=4, 2
 id=0
 readBTpid=4, 1
 showFujiLCDs=false
-
-[RoastProperties]
-roastertype=Wintop WB
 
 [SerialPort]
 baudrate=9600
