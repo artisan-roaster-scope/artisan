@@ -38,7 +38,7 @@
       <number>5</number>
      </property>
      <item>
-      <widget class="QGroupBox" name="CO2GroupBox">
+      <widget class="QGroupBox" name="EnergyGroupBox">
        <property name="title">
         <string>Energy</string>
        </property>
@@ -165,7 +165,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="EnergyGroupBox">
+      <widget class="QGroupBox" name="CO2GroupBox">
        <property name="title">
         <string>CO2</string>
        </property>
