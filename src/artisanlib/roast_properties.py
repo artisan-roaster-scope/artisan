@@ -2832,8 +2832,11 @@ class editGraphDlg(ArtisanResizeablDialog):
                 burner_widget = MyTableWidgetItemNumber("{:.1f}%".format(self.btu_list[i]["burner_pct"]),self.btu_list[i]["burner_pct"])
             burner_widget.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             
-            duration_mmss_widget = MyTableWidgetItemNumber(stringfromseconds(self.btu_list[i]["duration"]),self.btu_list[i]["duration"])
-            duration_mmss_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+            if self.btu_list[i]["Kind"] in [QApplication.translate("Dialog","Preheat Measured",None),QApplication.translate("Dialog","BBP Measured",None)]:
+                duration_mmss_widget = MyTableWidgetItemNumber("",0)
+            else:
+                duration_mmss_widget = MyTableWidgetItemNumber(stringfromseconds(self.btu_list[i]["duration"]),self.btu_list[i]["duration"])
+                duration_mmss_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
             
             BTUs = self.aw.qmc.convertHeat(self.btu_list[i]["BTUs"],0,self.aw.qmc.energyresultunit_setup)
             BTUs_widget = MyTableWidgetItemNumber(self.scalefloat(BTUs),BTUs)
@@ -3368,6 +3371,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             res = "{:.3f}".format(n)
         elif n > 999:
             res = "{:.0f}".format(n)
+        elif n > 99:
+            res = "{:.2f}".format(n)
         else:
             res = "{:.1f}".format(n)
         return res
