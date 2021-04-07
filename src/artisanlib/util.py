@@ -181,7 +181,7 @@ def toFloat(x):
         except:
             return 0.
 def toDouble(x):
-    toFloat(x)
+    return toFloat(x)
 def toBool(x):
     if x is None:
         return False
