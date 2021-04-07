@@ -3366,6 +3366,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             res = "0"
         elif n < 1:
             res = "{:.3f}".format(n)
+        elif n > 999:
+            res = "{:.0f}".format(n)
         else:
             res = "{:.1f}".format(n)
         return res

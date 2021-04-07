@@ -11778,7 +11778,7 @@ class tgraphcanvas(FigureCanvas):
                         duration = 0
                         aw.sendmessage(QApplication.translate("Message","Missing CHARGE or DROP event", None),append=False)
                     burner_pct = toInt(self.burnerevent_hundpcts[i])  #needed only for the btu_list and outmsg
-                    factor = aw.float2float(toFloat(self.burnerevent_hundpcts[i]) / 100, 2)
+                    factor = toFloat(self.burnerevent_hundpcts[i]) / 100
                     
                     source = chr(ord('A')+i)
                     kind = QApplication.translate("Dialog","Roast",None)
@@ -11860,14 +11860,14 @@ class tgraphcanvas(FigureCanvas):
                 co2_preheat += item["CO2g"] if "Preheat" in item["Kind"] else 0
                 co2_bbp += item["CO2g"] if "BBP" in item["Kind"] else 0
                 co2_roast += item["CO2g"] if "Roast" in item["Kind"] else 0
-            btu_batch = int(btu_batch)
-            btu_preheat = int(btu_preheat)
-            btu_bbp = int(btu_bbp)
-            btu_roast = int(btu_roast)
-            co2_batch = int(co2_batch)
-            co2_preheat = int(co2_preheat)
-            co2_bbp = int(co2_bbp)
-            co2_roast = int(co2_roast)
+            btu_batch = aw.float2float(btu_batch,3)
+            btu_preheat = aw.float2float(btu_preheat,3)
+            btu_bbp = aw.float2float(btu_bbp,3)
+            btu_roast = aw.float2float(btu_roast,3)
+            co2_batch = aw.float2float(co2_batch,3)
+            co2_preheat = aw.float2float(co2_preheat,3)
+            co2_bbp = aw.float2float(co2_bbp,3)
+            co2_roast = aw.float2float(co2_roast,3)
 
             # energymetrics
             energymetrics["BTU_batch"] = btu_batch

@@ -162,7 +162,7 @@ def toInt(x):
         return 0
     else:
         try:
-            return int(x)
+            return int(round(x))
         except:
             return 0
 def toString(x):
@@ -181,13 +181,7 @@ def toFloat(x):
         except:
             return 0.
 def toDouble(x):
-    if x is None:
-        return 0.
-    else:
-        try:
-            return float(x)
-        except:
-            return 0.
+    toFloat(x)
 def toBool(x):
     if x is None:
         return False
