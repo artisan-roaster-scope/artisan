@@ -195,7 +195,7 @@ import artisanlib.arabic_reshaper
 from artisanlib.util import (appFrozen, stringp, uchr, d, encodeLocal, s2a,
         deltaLabelPrefix, deltaLabelUTF8, deltaLabelBigPrefix, deltaLabelMathPrefix, stringfromseconds, stringtoseconds,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
-        toDouble, toBool, toStringList, toMap, removeAll)
+        toBool, toStringList, toMap, removeAll)
 from artisanlib.qtsingleapplication import QtSingleApplication
 
 
@@ -5298,7 +5298,7 @@ class tgraphcanvas(FigureCanvas):
 
                 self.roastUUID = None # reset UUID
                 aw.qmc.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
-                aw.qmc.roastbatchpos = 1 # initialized to 0, set to increased batchsequence on DROP
+                aw.qmc.roastbatchpos = 1 # initialized to 1, set to increased batchsequence on DROP
                 aw.qmc.roastbatchprefix = aw.qmc.batchprefix
 
                 if self.HUDflag:
@@ -10911,15 +10911,16 @@ class tgraphcanvas(FigureCanvas):
                     self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     def decBatchCounter(self):
-        if aw.qmc.batchcounter > -1 and not bool(aw.simulator):
-            aw.qmc.batchcounter -= 1 # we decrease the batch counter
-            # set the batchcounter of the current profile
-            aw.qmc.roastbatchnr = 0
+        if not bool(aw.simulator):
             if aw.qmc.lastroastepoch + 5400 < aw.qmc.roastepoch:
                 # reset the sequence counter
                 aw.qmc.batchsequence = 1
             elif aw.qmc.batchsequence > 1:
                 aw.qmc.batchsequence -= 1
+        if aw.qmc.batchcounter > -1 and not bool(aw.simulator):
+            aw.qmc.batchcounter -= 1 # we decrease the batch counter
+            # set the batchcounter of the current profile
+            aw.qmc.roastbatchnr = 0
             aw.qmc.roastbatchpos = 0
             # decr. the batchcounter of the loaded app settings
             if aw.settingspath and aw.settingspath != "":
@@ -10936,6 +10937,15 @@ class tgraphcanvas(FigureCanvas):
                     aw.settingspath = ""
 
     def incBatchCounter(self):
+        if not bool(aw.simulator):
+            # update batchsequence by estimating batch sequence (roastbatchpos) from lastroastepoch and roastepoch
+            # if this roasts DROP is more than 1.5h after the last registered DROP, we assume a new session starts
+            if aw.qmc.lastroastepoch + 5400 < aw.qmc.roastepoch:
+                # reset the sequence counter
+                aw.qmc.batchsequence = 1
+            else:
+                aw.qmc.batchsequence += 1
+        # set roastbatchpos
         if aw.qmc.batchcounter > -1 and not bool(aw.simulator):
             aw.qmc.batchcounter += 1 # we increase the batch counter
             # set the batchcounter of the current profile
@@ -10955,18 +10965,10 @@ class tgraphcanvas(FigureCanvas):
                     settings.endGroup()
                 except Exception:
                     aw.settingspath = ""
-            # update batchsequence by estimating batch sequence (roastbatchpos) from lastroastepoch and roastepoch
-            # if this roasts DROP is more than 1.5h after the last registered DROP, we assume a new session starts
-            if aw.qmc.lastroastepoch + 5400 < aw.qmc.roastepoch:
-                # reset the sequence counter
-                aw.qmc.batchsequence = 1
-            else:
-                aw.qmc.batchsequence += 1
-            # set roastbatchpos
+
             aw.qmc.roastbatchpos = aw.qmc.batchsequence
         else: # batch counter system inactive
-            # set the batchcounter of the current profile
-            aw.qmc.batchsequence = 1
+            # set the batchcounter of the current profiles
             aw.qmc.roastbatchnr = 0
             aw.qmc.roastbatchpos = 1
         # update lastroastepoch to time of roastdate
@@ -11727,7 +11729,6 @@ class tgraphcanvas(FigureCanvas):
                 prev_burnertime = [self.timex[-1]]*4
                 aw.sendmessage(QApplication.translate("Message","Profile has no DROP event", None),append=False)
 
-            output_list = []
             for i in range(0,4):
                 # iterate specialevents in reverse from DROP to the first event
                 for j in range(len(self.specialevents) - 1, -1, -1):
@@ -27629,7 +27630,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phidget1045_async = bool(toBool(settings.value("phidget1045_async",self.qmc.phidget1045_async)))
                 self.qmc.phidget1045_changeTrigger = aw.float2float(toFloat(settings.value("phidget1045_changeTrigger",self.qmc.phidget1045_changeTrigger)))
             if settings.contains("phidget1045_emissivity"):
-                self.qmc.phidget1045_emissivity = toDouble(settings.value("phidget1045_emissivity",self.qmc.phidget1045_emissivity))
+                self.qmc.phidget1045_emissivity = toFloat(settings.value("phidget1045_emissivity",self.qmc.phidget1045_emissivity))
             if settings.contains("phidget1045_dataRate"):
                 self.qmc.phidget1045_dataRate = toInt(settings.value("phidget1045_dataRate",self.qmc.phidget1045_dataRate))
             if settings.contains("phidget1200_formula"):
@@ -27669,7 +27670,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.yoctoRemoteFlag = bool(toBool(settings.value("yoctoRemoteFlag",self.qmc.yoctoRemoteFlag)))
                 self.qmc.yoctoServerID = toString(settings.value("yoctoServerID",self.qmc.yoctoServerID))
             if settings.contains("YOCTO_emissivity"):
-                self.qmc.YOCTO_emissivity = toDouble(settings.value("YOCTO_emissivity",self.qmc.YOCTO_emissivity))
+                self.qmc.YOCTO_emissivity = toFloat(settings.value("YOCTO_emissivity",self.qmc.YOCTO_emissivity))
             if settings.contains("YOCTO_async"):
                 self.qmc.YOCTO_async = [bool(toBool(x)) for x in toList(settings.value("YOCTO_async",self.qmc.YOCTO_async))]
             if settings.contains("YOCTO_dataRate"):
@@ -27789,7 +27790,7 @@ class ApplicationWindow(QMainWindow):
                 aw.updateSliderColors()
             if settings.contains("Evaluelinethickness"):
                 self.qmc.Evaluelinethickness = [toInt(x) for x in toList(settings.value("Evaluelinethickness",self.qmc.Evaluelinethickness))]
-                self.qmc.Evaluealpha = [toDouble(x) for x in toList(settings.value("Evaluealpha",self.qmc.Evaluealpha))]
+                self.qmc.Evaluealpha = [toFloat(x) for x in toList(settings.value("Evaluealpha",self.qmc.Evaluealpha))]
             if settings.contains("EvalueMarkerSize"):
                 self.qmc.EvalueMarkerSize = [toInt(x) for x in toList(settings.value("EvalueMarkerSize",self.qmc.EvalueMarkerSize))]
             if settings.contains("specialeventannotations"):
@@ -28302,9 +28303,9 @@ class ApplicationWindow(QMainWindow):
                 aw.sliderSV.blockSignals(False)
 
                 aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider)
-                aw.pidcontrol.pidKp = toDouble(settings.value("pidKp",aw.pidcontrol.pidKp))
-                aw.pidcontrol.pidKi = toDouble(settings.value("pidKi",aw.pidcontrol.pidKi))
-                aw.pidcontrol.pidKd = toDouble(settings.value("pidKd",aw.pidcontrol.pidKd))
+                aw.pidcontrol.pidKp = toFloat(settings.value("pidKp",aw.pidcontrol.pidKp))
+                aw.pidcontrol.pidKi = toFloat(settings.value("pidKi",aw.pidcontrol.pidKi))
+                aw.pidcontrol.pidKd = toFloat(settings.value("pidKd",aw.pidcontrol.pidKd))
                 aw.pidcontrol.pidSource = toInt(settings.value("pidSource",aw.pidcontrol.pidSource))
                 aw.pidcontrol.pidCycle = toInt(settings.value("pidCycle",aw.pidcontrol.pidCycle))
                 if settings.contains("pidPositiveTarget"):
@@ -28343,14 +28344,14 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("PXR")
             for key in list(self.fujipid.PXR.keys()):
                 if type(self.fujipid.PXR[key][0]) == type(float()):
-                    self.fujipid.PXR[key][0] = toDouble(settings.value(key,self.fujipid.PXR[key][0]))
+                    self.fujipid.PXR[key][0] = toFloat(settings.value(key,self.fujipid.PXR[key][0]))
                 elif type(self.fujipid.PXR[key][0]) == type(int()):
                     self.fujipid.PXR[key][0] = toInt(settings.value(key,self.fujipid.PXR[key][0]))
             settings.endGroup()
             settings.beginGroup("PXG4")
             for key in list(self.fujipid.PXG4.keys()):
                 if type(self.fujipid.PXG4[key][0]) == type(float()):
-                    self.fujipid.PXG4[key][0] = toDouble(settings.value(key,self.fujipid.PXG4[key][0]))
+                    self.fujipid.PXG4[key][0] = toFloat(settings.value(key,self.fujipid.PXG4[key][0]))
                 elif type(self.fujipid.PXG4[key][0]) == type(int()):
                     self.fujipid.PXG4[key][0] = toInt(settings.value(key,self.fujipid.PXG4[key][0]))
 
@@ -28365,7 +28366,7 @@ class ApplicationWindow(QMainWindow):
                 settings.beginGroup("deltaDTA")
                 for key in list(self.dtapid.dtamem.keys()):
                     if type(self.dtapid.dtamem[key][0]) == type(float()):
-                        self.dtapid.dtamem[key][0] = toDouble(settings.value(key,self.dtapid.dtamem[key][0]))
+                        self.dtapid.dtamem[key][0] = toFloat(settings.value(key,self.dtapid.dtamem[key][0]))
                     elif type(self.dtapid.dtamem[key][0]) == type(int()):
                         self.dtapid.dtamem[key][0] = toInt(settings.value(key,self.dtapid.dtamem[key][0]))
                 settings.endGroup()
@@ -28376,7 +28377,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("dropDuplicates"):
                 self.qmc.dropDuplicates = bool(toBool(settings.value("dropDuplicates",self.qmc.dropDuplicates)))
             if settings.contains("dropDuplicatesLimit"):
-                self.qmc.dropDuplicatesLimit = toDouble(settings.value("dropDuplicatesLimit",self.qmc.dropDuplicatesLimit))
+                self.qmc.dropDuplicatesLimit = toFloat(settings.value("dropDuplicatesLimit",self.qmc.dropDuplicatesLimit))
             if settings.contains("optimalSmoothing"):
                 self.qmc.optimalSmoothing = bool(toBool(settings.value("optimalSmoothing",self.qmc.optimalSmoothing)))
             if settings.contains("polyfitRoRcalc"):
@@ -28535,7 +28536,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("roastertype_setup"):
                 self.qmc.roastertype_setup = toString(settings.value("roastertype_setup",self.qmc.roastertype_setup))
             if settings.contains("roastersize_setup"):
-                self.qmc.roastersize_setup = toDouble(settings.value("roastersize_setup",self.qmc.roastersize_setup))
+                self.qmc.roastersize_setup = toFloat(settings.value("roastersize_setup",self.qmc.roastersize_setup))
             if settings.contains("drumspeed_setup"):
                 self.qmc.drumspeed_setup = toString(settings.value("drumspeed_setup",self.qmc.drumspeed_setup))
             
@@ -28583,7 +28584,7 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.roastertype_setup == "" and settings.contains("roastertype"):
                 self.qmc.roastertype_setup = toString(settings.value("roastertype",self.qmc.roastertype_setup))
             if self.qmc.roastersize_setup == 0 and settings.contains("roastersize"):
-                self.qmc.roastersize_setup = toDouble(settings.value("roastersize",self.qmc.roastersize_setup))
+                self.qmc.roastersize_setup = toFloat(settings.value("roastersize",self.qmc.roastersize_setup))
             if self.qmc.drumspeed_setup == "" and settings.contains("drumspeed"):
                 self.qmc.drumspeed_setup = toString(settings.value("drumspeed",self.qmc.drumspeed_setup))
             # initialize profile setup values
@@ -28595,9 +28596,9 @@ class ApplicationWindow(QMainWindow):
             #
             if settings.contains("machinesetup"):
                 self.qmc.machinesetup = toString(settings.value("machinesetup",self.qmc.machinesetup))
-#            self.qmc.density[2] = toDouble(settings.value("densitySampleVolume",self.qmc.density[2])) # fixed to 1l now
+#            self.qmc.density[2] = toFloat(settings.value("densitySampleVolume",self.qmc.density[2])) # fixed to 1l now
             if settings.contains("beansize"):
-                self.qmc.beansize = toDouble(settings.value("beansize",self.qmc.beansize))
+                self.qmc.beansize = toFloat(settings.value("beansize",self.qmc.beansize))
             if settings.contains("beansize_min"):
                 self.qmc.beansize_min = toInt(settings.value("beansize_min",self.qmc.beansize_min))
             if settings.contains("beansize_max"):
@@ -28768,7 +28769,7 @@ class ApplicationWindow(QMainWindow):
                     self.extraser[i].timeout = self.extratimeout[i]
             settings.endGroup()
             if settings.contains("ChannelTares"):
-                self.channel_tare_values = [toDouble(x) for x in toList(settings.value("ChannelTares",self.channel_tare_values))]
+                self.channel_tare_values = [toFloat(x) for x in toList(settings.value("ChannelTares",self.channel_tare_values))]
             if settings.contains("BTfunction"):
                 self.qmc.BTfunction = s2a(toString(settings.value("BTfunction",self.qmc.BTfunction)))
             if settings.contains("ETfunction"):
@@ -28800,7 +28801,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.gridthickness = toInt(settings.value("gridthickness",self.qmc.gridthickness))
 #                self.qmc.xrotation = toInt(settings.value("xrotation",self.qmc.xrotation))
                 self.qmc.gridlinestyle = toInt(settings.value("gridlinestyle",self.qmc.gridlinestyle))
-                self.qmc.gridalpha = toDouble(settings.value("gridalpha",self.qmc.gridalpha))
+                self.qmc.gridalpha = toFloat(settings.value("gridalpha",self.qmc.gridalpha))
             settings.endGroup()
             if settings.contains("titleshowalways"):
                 self.qmc.title_show_always = bool(toBool(settings.value("titleshowalways",aw.qmc.title_show_always)))
@@ -28818,8 +28819,8 @@ class ApplicationWindow(QMainWindow):
                 self.eventslidervisibilities = [toInt(x) for x in toList(settings.value("slidervisibilities",self.eventslidervisibilities))]
                 self.eventslideractions = [toInt(x) for x in toList(settings.value("slideractions",self.eventslideractions))]
                 self.eventslidercommands = list(map(str,list(toStringList(settings.value("slidercommands",self.eventslidercommands)))))
-                self.eventslideroffsets = [toDouble(x) for x in toList(settings.value("slideroffsets",self.eventslideroffsets))]
-                self.eventsliderfactors = [toDouble(x) for x in toList(settings.value("sliderfactors",self.eventsliderfactors))]
+                self.eventslideroffsets = [toFloat(x) for x in toList(settings.value("slideroffsets",self.eventslideroffsets))]
+                self.eventsliderfactors = [toFloat(x) for x in toList(settings.value("sliderfactors",self.eventsliderfactors))]
             if settings.contains("slidermin"):
                 self.eventslidermin = [toInt(x) for x in toList(settings.value("slidermin",self.eventslidermin))]
                 self.eventslidermax = [toInt(x) for x in toList(settings.value("slidermax",self.eventslidermax))]

@@ -27,7 +27,7 @@ import plus.util
 import plus.stock
 
 from artisanlib.suppress_errors import suppress_stdout_stderr
-from artisanlib.util import deltaLabelUTF8,stringfromseconds,stringtoseconds, appFrozen, stringfromseconds,stringtoseconds, toInt, toFloat
+from artisanlib.util import deltaLabelUTF8, appFrozen, stringfromseconds,stringtoseconds, toInt, toFloat
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
 from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit, MyTableWidgetItemNumber
 
@@ -3118,8 +3118,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.energy_ui.CO2perKgCoffeeLabel.setText("")
             else:
                 # clear result widgets
-                self.energy_ui.totalEnergyLabel.setText()
-                self.energy_ui.preheatEnergyLabel.setText()
+                self.energy_ui.totalEnergyLabel.setText("")
+                self.energy_ui.preheatEnergyLabel.setText("")
                 self.energy_ui.BBPEnergyLabel.setText("")
                 self.energy_ui.roastEnergyLabel.setText("")
                 self.energy_ui.totalCO2Label.setText("")
@@ -3151,11 +3151,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.energy_ui.burnerDUnitLabel.setText(self.formatBurnerUnitLabel(self.energy_ui.ratingunit3.currentIndex()))
 
     def updateEnableZHpct(self):
-        for ew,zw,hw in [
-            (self.energy_ui.events0,self.energy_ui.zeropcts0,self.energy_ui.hundredpct0),
-            (self.energy_ui.events1,self.energy_ui.zeropcts1,self.energy_ui.hundredpct1),
-            (self.energy_ui.events2,self.energy_ui.zeropcts2,self.energy_ui.hundredpct2),
-            (self.energy_ui.events3,self.energy_ui.zeropcts3,self.energy_ui.hundredpct3),
+        for ew,zw in [
+            (self.energy_ui.events0,self.energy_ui.zeropcts0),
+            (self.energy_ui.events1,self.energy_ui.zeropcts1),
+            (self.energy_ui.events2,self.energy_ui.zeropcts2),
+            (self.energy_ui.events3,self.energy_ui.zeropcts3),
             ]:
             if ew.currentIndex() == 0:
                 zw.setEnabled(False)

@@ -180,8 +180,6 @@ def toFloat(x):
             return float(x)
         except:
             return 0.
-def toDouble(x):
-    return toFloat(x)
 def toBool(x):
     if x is None:
         return False

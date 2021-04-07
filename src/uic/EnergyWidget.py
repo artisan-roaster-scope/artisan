@@ -125,6 +125,7 @@ class Ui_EnergyWidget(object):
         self.detailsTab.setObjectName("detailsTab")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.detailsTab)
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_3.setSpacing(0)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.datatable = QtWidgets.QTableWidget(self.detailsTab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
