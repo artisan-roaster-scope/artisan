@@ -2721,7 +2721,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.measuredEnergyLabel.setText(QApplication.translate("Label","Measured Energy or Output %",None))
             
             # choose the unit to show results
-            self.energy_ui.resultunitComboBox.addItems(self.aw.qmc.heatunits)
+            self.energy_ui.resultunitComboBox.addItems(self.aw.qmc.energyunits)
             
             #
             self.energy_ui.fueltype0.addItems(self.aw.qmc.fuelnames)
@@ -2735,11 +2735,11 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.events2.addItems(etypes)
             self.energy_ui.events3.addItems(etypes)
             #
-            self.energy_ui.ratingunit0.addItems(self.aw.qmc.heatunits)
-            self.energy_ui.ratingunit1.addItems(self.aw.qmc.heatunits)
-            self.energy_ui.ratingunit2.addItems(self.aw.qmc.heatunits)
-            self.energy_ui.ratingunit3.addItems(self.aw.qmc.heatunits)
-            
+            self.energy_ui.ratingunit0.addItems(self.aw.qmc.powerunits)
+            self.energy_ui.ratingunit1.addItems(self.aw.qmc.powerunits)
+            self.energy_ui.ratingunit2.addItems(self.aw.qmc.powerunits)
+            self.energy_ui.ratingunit3.addItems(self.aw.qmc.powerunits)
+
             # input validators
             regextime = QRegularExpression(r"^[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
             self.energy_ui.preheatDuration.setValidator(QRegularExpressionValidator(regextime,self))
@@ -2823,16 +2823,16 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.energy_ui.datatable.setRowCount(0) # clears the table, but keeps the header intact
         self.energy_ui.datatable.setRowCount(ndata)
         
-        self.energy_ui.datatable.horizontalHeaderItem(2).setText(self.aw.qmc.heatunits[self.aw.qmc.energyresultunit_setup])
+        self.energy_ui.datatable.horizontalHeaderItem(2).setText(self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup])
 
         for i in range(ndata):
-            if self.btu_list[i]["Kind"] in [QApplication.translate("Dialog","Preheat Measured",None),QApplication.translate("Dialog","BBP Measured",None)]:
+            if self.btu_list[i]["Kind"] in [0, 2]:  #Preheat Measured, BBP Measured
                 burner_widget = MyTableWidgetItemNumber("",self.btu_list[i]["burner_pct"])
             else:
                 burner_widget = MyTableWidgetItemNumber("{:.1f}%".format(self.btu_list[i]["burner_pct"]),self.btu_list[i]["burner_pct"])
             burner_widget.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             
-            if self.btu_list[i]["Kind"] in [QApplication.translate("Dialog","Preheat Measured",None),QApplication.translate("Dialog","BBP Measured",None)]:
+            if self.btu_list[i]["Kind"] in [0, 2]:  #Preheat Measured, BBP Measured
                 duration_mmss_widget = MyTableWidgetItemNumber("",0)
             else:
                 duration_mmss_widget = MyTableWidgetItemNumber(stringfromseconds(self.btu_list[i]["duration"]),self.btu_list[i]["duration"])
@@ -2843,7 +2843,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             BTUs_widget.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             
             CO2g = self.btu_list[i]["CO2g"]
-            CO2g_widget = MyTableWidgetItemNumber("{:.1f}".format(CO2g),CO2g)
+            CO2g_widget = MyTableWidgetItemNumber(self.scalefloat(CO2g),CO2g)
             CO2g_widget.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                         
             Source_widget = QTableWidgetItem(self.btu_list[i]["Source"])
@@ -2852,7 +2852,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             FuelType_widget = QTableWidgetItem(self.btu_list[i]["FuelType"])
             FuelType_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
             
-            Kind_widget = QTableWidgetItem(self.btu_list[i]["Kind"])
+            Kind_widget = QTableWidgetItem(self.aw.qmc.kind_list[self.btu_list[i]["Kind"]])
             Kind_widget.setTextAlignment(Qt.AlignLeft|Qt.AlignVCenter)
             
             self.energy_ui.datatable.setItem(i,0,burner_widget)
@@ -2873,8 +2873,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             except:
                 pass
 
-        self.energy_ui.datatable.setSortingEnabled(True)
-        self.energy_ui.datatable.sortItems(0)
+        #self.energy_ui.datatable.setSortingEnabled(True)
+        #self.energy_ui.datatable.sortItems(0)
 
     # fills the energy tab widgets with the current energy config data
     def updateEnergyTab(self):
@@ -2955,13 +2955,13 @@ class editGraphDlg(ArtisanResizeablDialog):
     
     def updateBurnerUnits(self, updateMetrics=True):
         self.aw.qmc.ratingunits[0] = self.energy_ui.ratingunit0.currentIndex()
-        self.aw.qmc.ratingunits[1] = self.energy_ui.ratingunit0.currentIndex()
-        self.aw.qmc.ratingunits[2] = self.energy_ui.ratingunit0.currentIndex()
-        self.aw.qmc.ratingunits[3] = self.energy_ui.ratingunit0.currentIndex()
+        self.aw.qmc.ratingunits[1] = self.energy_ui.ratingunit1.currentIndex()
+        self.aw.qmc.ratingunits[2] = self.energy_ui.ratingunit2.currentIndex()
+        self.aw.qmc.ratingunits[3] = self.energy_ui.ratingunit3.currentIndex()
         if updateMetrics:
             self.updateMetricsLabel()
     
-    def updateFuleTypes(self, updateMetrics=True):
+    def updateFuelTypes(self, updateMetrics=True):
         self.aw.qmc.fueltypes[0] = self.energy_ui.fueltype0.currentIndex()
         self.aw.qmc.fueltypes[1] = self.energy_ui.fueltype1.currentIndex()
         self.aw.qmc.fueltypes[2] = self.energy_ui.fueltype2.currentIndex()
@@ -3039,7 +3039,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             # unit
             self.updateBurnerUnits(False)
             # fuel
-            self.updateFuleTypes(False)
+            self.updateFuelTypes(False)
             # event
             self.updateBurnerEvents(False)
             # zeropcts & hundpcts
@@ -3073,18 +3073,18 @@ class editGraphDlg(ArtisanResizeablDialog):
         try:
             metrics,self.btu_list = self.aw.qmc.calcEnergyuse()
             if len(metrics) > 0 and metrics["BTU_batch"] > 0:
-                heat_unit = self.aw.qmc.heatunits[self.aw.qmc.energyresultunit_setup]
+                energy_unit = self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup]
                 total_energy = self.scalefloat(self.aw.qmc.convertHeat(metrics["BTU_batch"],0,self.aw.qmc.energyresultunit_setup))
-                self.energy_ui.totalEnergyLabel.setText("{} {}".format(total_energy,heat_unit))
+                self.energy_ui.totalEnergyLabel.setText("{} {}".format(total_energy,energy_unit))
                 preheat_energy = self.scalefloat(self.aw.qmc.convertHeat(metrics["BTU_preheat"],0,self.aw.qmc.energyresultunit_setup))
-                self.energy_ui.preheatEnergyLabel.setText("{} {} (Preheat)".format(preheat_energy,heat_unit))
+                self.energy_ui.preheatEnergyLabel.setText("{} {} (Preheat)".format(preheat_energy,energy_unit))
                 BBP_energy = self.scalefloat(self.aw.qmc.convertHeat(metrics["BTU_bbp"],0,self.aw.qmc.energyresultunit_setup))
-                self.energy_ui.BBPEnergyLabel.setText("{} {} (BBP)".format(BBP_energy,heat_unit))
+                self.energy_ui.BBPEnergyLabel.setText("{} {} (BBP)".format(BBP_energy,energy_unit))
                 roast_energy = self.scalefloat(self.aw.qmc.convertHeat(metrics["BTU_roast"],0,self.aw.qmc.energyresultunit_setup))
-                self.energy_ui.roastEnergyLabel.setText("{} {} (Roast)".format(roast_energy,heat_unit))
+                self.energy_ui.roastEnergyLabel.setText("{} {} (Roast)".format(roast_energy,energy_unit))
                 #
                 if metrics["CO2_batch"] > 0:
-                    scaled_co2_batch = str(metrics["CO2_batch"])+'g' if metrics["CO2_batch"]<1000 else str(self.aw.float2float(metrics["CO2_batch"]/1000.,1)) +'kg'
+                    scaled_co2_batch = str(self.scalefloat(metrics["CO2_batch"]))+'g' if metrics["CO2_batch"]<1000 else str(self.scalefloat(metrics["CO2_batch"]/1000.)) +'kg'
                     self.energy_ui.totalCO2Label.setText(scaled_co2_batch)
 #                    scaled_co2_preheat = str(metrics["CO2_preheat"])+'g' if metrics["CO2_preheat"]<1000 else str(self.aw.float2float(metrics["CO2_preheat"]/1000.,1)) +'kg'
 #                    scaled_co2_bbp = str(metrics["CO2_bbp"])+'g' if metrics["CO2_bbp"]<1000 else str(self.aw.float2float(metrics["CO2_bbp"]/1000.,1)) +'kg'
@@ -3097,18 +3097,18 @@ class editGraphDlg(ArtisanResizeablDialog):
                         bean_weight = self.aw.convertWeight(self.aw.qmc.weight[1],self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]),1) # to kg
                         co2_bean_kg = metrics["CO2_batch"] / bean_weight
                         if co2_bean_kg < 1000:
-                            scaled_co2_kg = str(self.aw.float2float(co2_bean_kg,1)) + 'g'
+                            scaled_co2_kg = str(self.scalefloat(co2_bean_kg)) + 'g'
                         else:
-                            scaled_co2_kg = str(self.aw.float2float(co2_bean_kg/1000.,1)) + 'kg'
+                            scaled_co2_kg = str(self.aw.scalefloat(co2_bean_kg/1000.)) + 'kg'
                         self.energy_ui.CO2perKgCoffeeLabel.setText("{0} {1}".format(scaled_co2_kg, QApplication.translate("Label","CO2 per kg roasted coffee",None)))
                     # a green weight is available
                     elif self.aw.qmc.weight[0] > 0:
                         bean_weight = self.aw.convertWeight(self.aw.qmc.weight[0],self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]),1) # to kg
                         co2_bean_kg = metrics["CO2_batch"] / bean_weight
                         if co2_bean_kg < 1000:
-                            scaled_co2_kg = str(self.aw.float2float(co2_bean_kg,1)) + 'g'
+                            scaled_co2_kg = str(self.scalefloat(co2_bean_kg)) + 'g'
                         else:
-                            scaled_co2_kg = str(self.aw.float2float(co2_bean_kg/1000.,1)) + 'kg'
+                            scaled_co2_kg = str(self.scalefloat(co2_bean_kg/1000.,1)) + 'kg'
                         self.energy_ui.CO2perKgCoffeeLabel.setText("{0} {1}".format(scaled_co2_kg, QApplication.translate("Label","CO2 per kg green coffee",None)))
                     # no weight is available
                     else:
@@ -3136,7 +3136,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             return "{} {}".format(QApplication.translate("Label","Burner",None),tag)
     
     def formatBurnerUnitLabel(self,unit):
-        return "({})".format(self.aw.qmc.heatunits[unit])
+        return "({})".format(self.aw.qmc.energyunits[unit])
     
     def updateEnergyLabels(self):
         self.energy_ui.burnerALabel.setText(self.formatBurnerLabel("A",self.aw.qmc.burnerlabels[0]))
@@ -3257,7 +3257,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def fueltypes_currentindexchanged(self):
-        self.updateFuleTypes()
+        self.updateFuelTypes()
 
     @pyqtSlot()
     def burner_etypes_currentindexchanged(self):
@@ -3372,9 +3372,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         elif n > 999:
             res = "{:.0f}".format(n)
         elif n > 99:
-            res = "{:.2f}".format(n)
-        else:
             res = "{:.1f}".format(n)
+        else:
+            res = "{:.2f}".format(n)
         return res
 
     def validateText2Seconds(self,s):

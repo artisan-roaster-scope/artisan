@@ -2266,8 +2266,9 @@ class tgraphcanvas(FigureCanvas):
         self.statsmaxchrperline = 30
         
         #EnergyUse
-        self.heatunits = ["BTU", "kJ", "kWh"]
-        self.fuelnames = ["LPG", "NG", QApplication.translate("ComboBox","Elec",None)]  #dave should these be translated?
+        self.energyunits = ["BTU", "kJ", "kCal", "kWh"]
+        self.powerunits = ["BTU/h", "kJ/h", "kCal/hr", "kW"]
+        self.fuelnames = ["LPG", "NG", QApplication.translate("ComboBox","Elec",None)]
         ## setup defaults (stored in app :
         # Burners
         self.burnerlabels_setup = [""]*4                   # burner labels
@@ -2286,6 +2287,13 @@ class tgraphcanvas(FigureCanvas):
         self.roasts_per_session_auto_setup = False         # automatic determine typical number of roasts in a session
         # Others
         self.energyresultunit_setup = 0 # 0: BTU, 1: kJ, 2: kWh (see self.heatunits)
+        self.kind_list = [QApplication.translate("Label","Preheat Measured",None),
+                          QApplication.translate("Label","Preheat %",None),
+                          QApplication.translate("Label","BBP Measured",None),
+                          QApplication.translate("Label","BBP %",None),
+                          QApplication.translate("Label","Continuous",None),
+                          QApplication.translate("Label","Roast Event",None)]
+
         ## working variables (stored in .alog profiles):
         # Burners
         self.burnerlabels = self.burnerlabels_setup                  # burner labels
@@ -11692,9 +11700,10 @@ class tgraphcanvas(FigureCanvas):
     def convertHeat(self,value,fromUnit,toUnit=0):
         if value in [-1,None]:
             return value
-        conversion = {1:{0:0.9478, 1:1., 2:0.0002778},
-                      2:{0:3412.1416, 1:3600., 2:1.},
-                      0:{0:1., 2:0.0002931, 1:1.0551}}
+        conversion = {0:{0:1., 1:1.0551, 2:0.2521644, 3:0.0002931},   #"btu":{"btu","kj","kcal","kwh"}
+                      1:{0:0.9478, 1:1., 2:0.2390057, 3:0.0002778},   #"kj":{"btu","kj","kcal","kwh"}
+                      2:{0:3.965667,1:4.184,2:1.,3:0.0011627},        #"kcal":{"btu","kj","kcal","kwh"}
+                      3:{0:3412.1416, 1:3600., 2:860.050647, 3:1.}}   #"kwh":{"btu","kj","kcal","kwh"}
         return value * conversion[fromUnit][toUnit]
 
     def calcEnergyuse(self):
@@ -11764,7 +11773,7 @@ class tgraphcanvas(FigureCanvas):
                         BTUs = self.burnerratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
                         if BTUs > 0:
                             source = chr(ord('A')+i) + "-" + eTypes[self.burner_etypes[i]]
-                            kind = QApplication.translate("Dialog","Roast Event",None)
+                            kind = 5  #Roast Event 
                             sortorder = (2000 * (i + 1)) + j
                             CO2g = BTUs * CO2kg_per_BTU[self.fueltypes[i]] * 1000
                             btu_list.append({"burner_pct":burner_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"Source":source,"Kind":kind,"FuelType":self.fuelnames[self.fueltypes[i]],"SortOrder":sortorder})
@@ -11782,7 +11791,7 @@ class tgraphcanvas(FigureCanvas):
                     factor = toFloat(self.burnerevent_hundpcts[i]) / 100
                     
                     source = chr(ord('A')+i)
-                    kind = QApplication.translate("Dialog","Roast",None)
+                    kind = 4  #Roast Continuous
                     fueltype = self.fueltypes[i]
                     sortorder = 2000 - i
                     BTUs = self.burnerratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
@@ -11792,7 +11801,7 @@ class tgraphcanvas(FigureCanvas):
 
                 # calculate preheat
                 if self.preheatenergies[i] > 0 and self.preheatDuration > 0:
-                    if self.preheatenergies[i] < 1:
+                    if self.preheatenergies[i] <= 1:
                         # percent burner multiplied by duration
                         burner_pct = self.preheatenergies[i] * 1000./10
                         # percent factor based on bernoulli setting for burner event slider
@@ -11802,13 +11811,13 @@ class tgraphcanvas(FigureCanvas):
                             factor = math.sqrt(self.preheatenergies[i])
                         duration = self.preheatDuration
                         BTUs = self.burnerratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
-                        kind = QApplication.translate("Dialog","Preheat %",None)
+                        kind = 1  #Preheat Percent
                     else:
                         # measured value
                         burner_pct = 0
                         duration = 0
                         BTUs = self.preheatenergies[i] * self.convertHeat(1,self.ratingunits[i],0)
-                        kind = QApplication.translate("Dialog","Preheat Measured",None)
+                        kind = 0  #Preheat Measured
                     # spread preheat across roasts_per_session
                     BTUs = BTUs / self.roasts_per_session
 
@@ -11820,7 +11829,7 @@ class tgraphcanvas(FigureCanvas):
 
                 # calculate betweenbatch 
                 if self.betweenbatchenergies[i] > 0 and self.betweenbatchDuration > 0:
-                    if self.betweenbatchenergies[i] < 1:
+                    if self.betweenbatchenergies[i] <= 1:
                         # percent burner multiplied by duration
                         burner_pct = self.betweenbatchenergies[i] * 1000./10
                         # percent factor based on bernoulli setting for burner event slider
@@ -11830,13 +11839,13 @@ class tgraphcanvas(FigureCanvas):
                             factor = math.sqrt(self.betweenbatchenergies[i])
                         duration = self.betweenbatchDuration
                         BTUs = self.burnerratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
-                        kind = QApplication.translate("Dialog","BBP %",None)
+                        kind = 3  #BBP Percent
                     else:
                         # measured value
                         burner_pct = 0
                         duration = 0
                         BTUs = self.betweenbatchenergies[i] * self.convertHeat(1,self.ratingunits[i],0)
-                        kind = QApplication.translate("Dialog","BBP Measured",None)
+                        kind = 2  #BBP Measured
 
                     source = chr(ord('A')+i)
                     sortorder = 400 + i
@@ -11849,18 +11858,17 @@ class tgraphcanvas(FigureCanvas):
             btu_list.sort(key=lambda k : k["SortOrder"] )
 
 
-#dave need to clean up for TRANSLATION ISSUES HERE
             btu_batch = btu_preheat = btu_bbp = btu_roast = 0
             co2_batch = co2_preheat = co2_bbp = co2_roast= 0
             for item in btu_list:
                 btu_batch += item['BTUs']
-                btu_preheat += item["BTUs"] if "Preheat" in item["Kind"] else 0
-                btu_bbp += item["BTUs"] if "BBP" in item["Kind"] else 0
-                btu_roast += item["BTUs"] if "Roast" in item["Kind"] else 0
+                btu_preheat += item["BTUs"] if item["Kind"] in [0,1] else 0
+                btu_bbp += item["BTUs"] if item["Kind"] in [2,3] else 0
+                btu_roast += item["BTUs"] if item["Kind"] in [4,5] else 0
                 co2_batch += item['CO2g']
-                co2_preheat += item["CO2g"] if "Preheat" in item["Kind"] else 0
-                co2_bbp += item["CO2g"] if "BBP" in item["Kind"] else 0
-                co2_roast += item["CO2g"] if "Roast" in item["Kind"] else 0
+                co2_preheat += item["CO2g"] if item["Kind"] in [0,1] else 0
+                co2_bbp += item["CO2g"] if item["Kind"] in [2,3] else 0
+                co2_roast += item["CO2g"] if item["Kind"] in [4,5] else 0
             btu_batch = aw.float2float(btu_batch,3)
             btu_preheat = aw.float2float(btu_preheat,3)
             btu_bbp = aw.float2float(btu_bbp,3)
@@ -26893,7 +26901,7 @@ class ApplicationWindow(QMainWindow):
             pass
         ######### Energy Use #########
         try:
-            energymetrics,_ = self.qmc.calcEnergyuse()  #dave - this needs to be examined!!
+            energymetrics,_ = self.qmc.calcEnergyuse()
             if "BTU_batch" in energymetrics:
                 computedProfile["BTU_roast"] = self.float2float(energymetrics["BTU_roast"],1)
             if "BTU_preheat" in energymetrics:
@@ -27110,10 +27118,6 @@ class ApplicationWindow(QMainWindow):
                 profile["betweenbatchenergies"] = self.qmc.betweenbatchenergies
                 profile["roasts_per_session"] = self.qmc.roasts_per_session
                 profile["roasts_per_session_auto"] = self.qmc.roasts_per_session_auto
-#dave
-#            except:
-#                pass
-#                print("EXCEPTION in getProfile")  #dave
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " getProfile(): {0}").format(str(ex)),exc_tb.tb_lineno)

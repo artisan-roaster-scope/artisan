@@ -162,7 +162,7 @@ def toInt(x):
         return 0
     else:
         try:
-            return int(round(x))
+            return int(x)
         except:
             return 0
 def toString(x):
