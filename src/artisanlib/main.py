@@ -28579,7 +28579,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("roasts_per_session_auto_setup"):
                 self.qmc.roasts_per_session_auto_setup = bool(toBool(settings.value("roasts_per_session_auto_setup",self.qmc.roasts_per_session_auto_setup)))
             if settings.contains("energyresultunit_setup"):
-                self.qmc.energyresultunit_setup = toInt(settings.value("energyresultunit",self.qmc.energyresultunit_setup))
+                self.qmc.energyresultunit_setup = toString(settings.value("energyresultunit",self.qmc.energyresultunit_setup))
             if settings.contains("energytablecolumnwidths"):
                 self.qmc.energytablecolumnwidths = [toInt(x) for x in toList(settings.value("energytablecolumnwidths",self.qmc.energytablecolumnwidths))]
             settings.endGroup()
