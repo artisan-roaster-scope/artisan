@@ -3193,13 +3193,13 @@ class editGraphDlg(ArtisanResizeablDialog):
             tbl.field_names = fields
             for i in range(nrows):
                 rows = []
-                rows.append(self.energy_ui.datatable.cellWidget(i,0).text())
-                rows.append(self.energy_ui.datatable.cellWidget(i,1).text())
-                rows.append(self.energy_ui.datatable.cellWidget(i,2).text())
-                rows.append(self.energy_ui.datatable.cellWidget(i,3).text())
-                rows.append(self.energy_ui.datatable.cellWidget(i,4).text())
-                rows.append(self.energy_ui.datatable.cellWidget(i,5).text())
-                rows.append(self.energy_ui.datatable.cellWidget(i,6).text())
+                rows.append(self.energy_ui.datatable.item(i,0).text())
+                rows.append(self.energy_ui.datatable.item(i,1).text())
+                rows.append(self.energy_ui.datatable.item(i,2).text())
+                rows.append(self.energy_ui.datatable.item(i,3).text())
+                rows.append(self.energy_ui.datatable.item(i,4).text())
+                rows.append(self.energy_ui.datatable.item(i,5).text())
+                rows.append(self.energy_ui.datatable.item(i,6).text())
                 tbl.add_row(rows)
             clipboard = tbl.get_string()
         else:
@@ -3209,13 +3209,13 @@ class editGraphDlg(ArtisanResizeablDialog):
                     clipboard += '\t'
             clipboard += '\n'
             for r in range(nrows):
-                clipboard += self.energy_ui.datatable.cellWidget(r,0).text() + "\t"
-                clipboard += self.energy_ui.datatable.cellWidget(r,1).text() + "\t"
-                clipboard += self.energy_ui.datatable.cellWidget(r,2).text() + "\t"
-                clipboard += self.energy_ui.datatable.cellWidget(r,3).text() + "\t"
-                clipboard += self.energy_ui.datatable.cellWidget(r,4).text() + "\t"
-                clipboard += self.energy_ui.datatable.cellWidget(r,5).text() + "\t"
-                clipboard += self.energy_ui.datatable.cellWidget(r,6).text() + "\n"
+                clipboard += self.energy_ui.datatable.item(r,0).text() + "\t"
+                clipboard += self.energy_ui.datatable.item(r,1).text() + "\t"
+                clipboard += self.energy_ui.datatable.item(r,2).text() + "\t"
+                clipboard += self.energy_ui.datatable.item(r,3).text() + "\t"
+                clipboard += self.energy_ui.datatable.item(r,4).text() + "\t"
+                clipboard += self.energy_ui.datatable.item(r,5).text() + "\t"
+                clipboard += self.energy_ui.datatable.item(r,6).text() + "\n"
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
         sys_clip.setText(clipboard)
