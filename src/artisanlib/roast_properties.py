@@ -3087,7 +3087,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                         if co2_bean_kg < 1000:
                             scaled_co2_kg = str(self.scalefloat(co2_bean_kg)) + 'g'
                         else:
-                            scaled_co2_kg = str(self.aw.scalefloat(co2_bean_kg/1000.)) + 'kg'
+                            scaled_co2_kg = str(self.scalefloat(co2_bean_kg/1000.)) + 'kg'
                         self.energy_ui.CO2perKgCoffeeLabel.setText("{0} {1}".format(scaled_co2_kg, QApplication.translate("Label","CO2 per kg roasted coffee",None)))
                     # a green weight is available
                     elif self.aw.qmc.weight[0] > 0:
@@ -3096,7 +3096,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                         if co2_bean_kg < 1000:
                             scaled_co2_kg = str(self.scalefloat(co2_bean_kg)) + 'g'
                         else:
-                            scaled_co2_kg = str(self.scalefloat(co2_bean_kg/1000.,1)) + 'kg'
+                            scaled_co2_kg = str(self.scalefloat(co2_bean_kg/1000.)) + 'kg'
                         self.energy_ui.CO2perKgCoffeeLabel.setText("{0} {1}".format(scaled_co2_kg, QApplication.translate("Label","CO2 per kg green coffee",None)))
                     # no weight is available
                     else:
