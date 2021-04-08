@@ -45,7 +45,7 @@
     </tr>
 </table><br/><br/><b>2. Protocol Tab</b><table width="100%" border="1" padding="1" border-collapse="collapse">
     <tr>
-        <td>The Protocol settings allow including Preheating and Between Batch Protocol (BBP) energy consuption.  There are two ways to specify thse values.  The first assumes a constant burner setting for a defined period of time.  An example for Preheating is to set a Duration of 45:00 (45 minutes) at 30% Burner setting.  Percentages may be entered either as a decimal (.30) or a percentage (30%).  When a percentage is entered there a corresponding Duration must be entered.<br><br>The second type of entry is a measured energy value.  This is any value greater than 1.0.  The value can be found by direct measurement using Artisan.  Here are instructions for how to make this measurement.<br><br>An Event must be used to record the burner settings.  Make sure all the values on the Protocol tab are blank or zero.  START a profile recording in Artisan at the beginning of the protocol.  For preheating that would be when the burner(s) are first turned on.  For BBP is will be the start of BBP, usually at the end of the previous roast or the end of preheating.  Record any burner setting changes in the appropriate event.  STOP the recording at the end of the protocol.  Save the recorded protocol for safe keeping.  Review the energy used results.  The units that results are displayed in may need to be changed to match the units set on the Burners tab.  If there are multiple burners used it may be necessary to add up the energy used for each individual burner from the table in the Details tab.  Note that clicking &#39;Copy Table&#39; copies the table in CSV format to the clipboard.  Pasting into a spread sheet makes it easy to manipulate the data.</td>
+        <td>The Protocol settings allow including Preheating and Between Batch Protocol (BBP) energy consumption.  There are two ways to specify these values.  The first assumes a constant burner setting for a defined period of time.  An example for Preheating is to set a Duration of 45:00 (45 minutes) at 30% Burner setting.  Percentages may be entered either as a decimal (.30) or a percentage (30%).  When a percentage is entered there a corresponding Duration must be entered.<br><br>The second type of entry is a measured energy value.  This is any value greater than 1.0.  The value can be found by direct measurement using Artisan.  Here are instructions for how to make this measurement.<br><br>An Event must be used to record the burner settings.  Make sure all the values on the Protocol tab are blank or zero.  START a profile recording in Artisan at the beginning of the protocol.  For preheating that would be when the burner(s) are first turned on.  For BBP is will be the start of BBP, usually at the end of the previous roast or the end of preheating.  Record any burner setting changes in the appropriate event.  STOP the recording at the end of the protocol.  Save the recorded protocol for safe keeping.  Review the energy used results.  The units that results are displayed in may need to be changed to match the units set on the Burners tab.  If there are multiple burners used it may be necessary to add up the energy used for each individual burner from the table in the Details tab.  Note that clicking &#39;Copy Table&#39; copies the table in CSV format to the clipboard.  Pasting into a spread sheet makes it easy to manipulate the data.</td>
     </tr>
 </table><table width="100%" border="1" padding="1" border-collapse="collapse">
     <tr>
@@ -69,12 +69,8 @@
         <td>The value is either the measured energy for the protocol or the burner constant percentage setting for the length of the Duration field.</td>
     </tr>
     <tr>
-        <td>Typical number of batches per session</td>
-        <td>This value is used to allocate the preheating energy equally across the number of batches in the roasting session.</td>
-    </tr>
-    <tr>
-        <td>Auto</td>
-        <td>Requires Artisan plus.  When checked, Artisan will make an estimate of the number of batches per roast session.</td>
+        <td>Between Batches after Pre-Heating</td>
+        <td>If a Between Batches protocol run is done after the Preheating and before the roast, this flag should be ticked</td>
     </tr>
 </table><table width="100%" border="1" padding="1" border-collapse="collapse">
     <tr>
