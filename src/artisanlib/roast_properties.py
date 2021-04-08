@@ -2669,8 +2669,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.org_preheatenergies = self.aw.qmc.preheatenergies.copy()
             self.org_betweenbatchDuration = self.aw.qmc.betweenbatchDuration
             self.org_betweenbatchenergies = self.aw.qmc.betweenbatchenergies.copy()
-            self.org_roasts_per_session = self.aw.qmc.roasts_per_session
-            self.org_roasts_per_session_auto = self.aw.qmc.roasts_per_session_auto
+            self.org_betweenbatch_after_preheat = self.aw.qmc.betweenbatch_after_preheat
                     
             self.energy_ui.helpButton.clicked.connect(self.showenergyhelp)
             
@@ -2704,10 +2703,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             # Protocol tab
             self.energy_ui.protocolSetDefaultsButton.setText(QApplication.translate("Button","Set as Defaults",None))
             self.energy_ui.protocolDefaultsButton.setText(QApplication.translate("Button","Restore Defaults",None))
-            self.energy_ui.roasts_per_sessionLabel.setText(QApplication.translate("Label","Typical number of batches per session",None))
-            self.energy_ui.roasts_per_session_auto_checkBox.setText(QApplication.translate("Label","Auto",None))
             self.energy_ui.preheatingLabel.setText(QApplication.translate("Label","Pre-Heating",None))
             self.energy_ui.betweenBatchesLabel.setText(QApplication.translate("Label","Between Batches",None))
+            self.energy_ui.BBPafterPreHeatcheckBox.setText(QApplication.translate("Label","Between Batches after Pre-Heating",None))
             self.energy_ui.burnerALabel.setText(self.formatBurnerLabel("A"))
             self.energy_ui.burnerBLabel.setText(self.formatBurnerLabel("B"))
             self.energy_ui.burnerCLabel.setText(self.formatBurnerLabel("C"))
@@ -2803,9 +2801,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.betweenbatchesenergy2.editingFinished.connect(self.betweenbatchenergies_editingfinished)
             self.energy_ui.betweenbatchesenergy3.editingFinished.connect(self.betweenbatchenergies_editingfinished)
             
-            self.energy_ui.roasts_per_session.valueChanged.connect(self.roasts_per_session_valuechanged)
-            self.energy_ui.roasts_per_session_auto_checkBox.stateChanged.connect(self.roasts_per_session_auto_statechanged)
-        
+            self.energy_ui.BBPafterPreHeatcheckBox.stateChanged.connect(self.betweenbatch_after_preheat_statechanged)
+            
             self.energy_ui.resultunitComboBox.currentIndexChanged.connect(self.energyresultunitComboBox_indexchanged)
             #
             self.energy_ui.burnersSetDefaultsButton.clicked.connect(self.setEnergyBurnerDefaults)
@@ -2815,6 +2812,8 @@ class editGraphDlg(ArtisanResizeablDialog):
 
             #
             self.tabInitialized[4] = True
+        # we always set the batch position on tab switch as it might have been changed in the first tab of the Roast Properties dialog
+        self.energy_ui.roastbatchposLabel.setText("{} #{}".format(QApplication.translate("Label","Batch", None),self.aw.qmc.roastbatchpos))
 
     def createEnergyDataTable(self):
         self.updateEnergyConfig()
@@ -2852,7 +2851,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             FuelType_widget = QTableWidgetItem(self.btu_list[i]["FuelType"])
             FuelType_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
             
-            Kind_widget = QTableWidgetItem(self.aw.qmc.kind_list[self.btu_list[i]["Kind"]])
+            Kind_widget = MyTableWidgetItemNumber(self.aw.qmc.kind_list[self.btu_list[i]["Kind"]],self.btu_list[i]["SortOrder"])
             Kind_widget.setTextAlignment(Qt.AlignLeft|Qt.AlignVCenter)
             
             self.energy_ui.datatable.setItem(i,0,burner_widget)
@@ -2873,8 +2872,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             except:
                 pass
 
-        #self.energy_ui.datatable.setSortingEnabled(True)
-        #self.energy_ui.datatable.sortItems(0)
+        self.energy_ui.datatable.setSortingEnabled(True)
+        self.energy_ui.datatable.sortItems(6)
 
     # fills the energy tab widgets with the current energy config data
     def updateEnergyTab(self):
@@ -2927,9 +2926,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.energy_ui.betweenbatchesenergy1.setText(self.validatePctText(str(self.aw.qmc.betweenbatchenergies[1])))
         self.energy_ui.betweenbatchesenergy2.setText(self.validatePctText(str(self.aw.qmc.betweenbatchenergies[2])))
         self.energy_ui.betweenbatchesenergy3.setText(self.validatePctText(str(self.aw.qmc.betweenbatchenergies[3])))
-        self.energy_ui.roasts_per_session.setValue(self.aw.qmc.roasts_per_session)
-        self.energy_ui.roasts_per_session_auto_checkBox.setChecked(self.aw.qmc.roasts_per_session_auto)
-        self.energy_ui.roasts_per_session.setEnabled(not self.aw.qmc.roasts_per_session_auto)
+        self.energy_ui.BBPafterPreHeatcheckBox.setChecked(self.aw.qmc.betweenbatch_after_preheat)
         #
         self.updateEnergyLabels()
         self.updateEnergyUnitLabels()
@@ -3017,15 +3014,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         if updateMetrics:
             self.updateMetricsLabel()
     
-    def updateRoastsPerSession(self, updateMetrics=True):
-        self.aw.qmc.roasts_per_session = self.energy_ui.roasts_per_session.value()
-        if updateMetrics:
-            self.updateMetricsLabel()
+    def updateBBBafterPreHeat(self):
+        self.aw.qmc.betweenbatch_after_preheat = self.energy_ui.BBPafterPreHeatcheckBox.isChecked()
         
-    def updateRoastsPerSessionAuto(self):
-        self.aw.qmc.roasts_per_session_auto = self.energy_ui.roasts_per_session_auto_checkBox.isChecked()
-        self.energy_ui.roasts_per_session.setEnabled(not self.aw.qmc.roasts_per_session_auto)
-    
     # fills the energy config data from the current energy tab widget values
     def updateEnergyConfig(self):
         if self.tabInitialized[4]:
@@ -3049,7 +3040,6 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.updateBetweenBatchessDuration(False)
             self.updatePreheatEnergies(False)
             self.updateBetweenBatchesEnergies(False)
-            self.updateRoastsPerSession(False)
             #
             self.updateMetricsLabel()
 
@@ -3066,8 +3056,6 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.preheatenergies = self.org_preheatenergies.copy()
             self.aw.qmc.betweenbatchDuration = self.org_betweenbatchDuration
             self.aw.qmc.betweenbatchenergies = self.org_betweenbatchenergies.copy()
-            self.aw.qmc.roasts_per_session = self.org_roasts_per_session
-            self.aw.qmc.roasts_per_session_auto = self.org_roasts_per_session_auto
 
     def updateMetricsLabel(self):
         try:
@@ -3077,11 +3065,11 @@ class editGraphDlg(ArtisanResizeablDialog):
                 total_energy = self.scalefloat(self.aw.qmc.convertHeat(metrics["BTU_batch"],0,self.aw.qmc.energyresultunit_setup))
                 self.energy_ui.totalEnergyLabel.setText("{} {}".format(total_energy,energy_unit))
                 preheat_energy = self.scalefloat(self.aw.qmc.convertHeat(metrics["BTU_preheat"],0,self.aw.qmc.energyresultunit_setup))
-                self.energy_ui.preheatEnergyLabel.setText("{} {} (Preheat)".format(preheat_energy,energy_unit))
+                self.energy_ui.preheatEnergyLabel.setText("{} {} ({})".format(preheat_energy,energy_unit,QApplication.translate("Label","Preheat",None)))
                 BBP_energy = self.scalefloat(self.aw.qmc.convertHeat(metrics["BTU_bbp"],0,self.aw.qmc.energyresultunit_setup))
-                self.energy_ui.BBPEnergyLabel.setText("{} {} (BBP)".format(BBP_energy,energy_unit))
+                self.energy_ui.BBPEnergyLabel.setText("{} {} ({})".format(BBP_energy,energy_unit,QApplication.translate("Label","BBP",None)))
                 roast_energy = self.scalefloat(self.aw.qmc.convertHeat(metrics["BTU_roast"],0,self.aw.qmc.energyresultunit_setup))
-                self.energy_ui.roastEnergyLabel.setText("{} {} (Roast)".format(roast_energy,energy_unit))
+                self.energy_ui.roastEnergyLabel.setText("{} {} ({})".format(roast_energy,energy_unit,QApplication.translate("Label","Roast",None)))
                 #
                 if metrics["CO2_batch"] > 0:
                     scaled_co2_batch = str(self.scalefloat(metrics["CO2_batch"]))+'g' if metrics["CO2_batch"]<1000 else str(self.scalefloat(metrics["CO2_batch"]/1000.)) +'kg'
@@ -3334,13 +3322,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 w.setText(self.validatePctText(w.text()))
         self.updateBetweenBatchesEnergies()
 
-    @pyqtSlot()
-    def roasts_per_session_valuechanged(self):
-        self.updateRoastsPerSession()
-
     @pyqtSlot(int)
-    def roasts_per_session_auto_statechanged(self,_):
-        self.updateRoastsPerSessionAuto()
+    def betweenbatch_after_preheat_statechanged(self,_):
+        self.updateBBBafterPreHeat()
 
     @pyqtSlot()
     def energyresultunitComboBox_indexchanged(self):

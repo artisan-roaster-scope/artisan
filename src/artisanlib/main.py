@@ -2292,6 +2292,7 @@ class tgraphcanvas(FigureCanvas):
         self.preheatenergies_setup = [0]*4                 # rating of the preheat burner
         self.betweenbatchDuration_setup = 0                # length of bbp in seconds
         self.betweenbatchenergies_setup = [0]*4            # rating of the between batch burner
+        self.betweenbatch_after_preheat_setup = False      # True if after preheat a BBP is done
         self.roasts_per_session_setup = 4                  # typical number of roasts in a session
         self.roasts_per_session_auto_setup = False         # automatic determine typical number of roasts in a session
         # Others
@@ -2317,6 +2318,7 @@ class tgraphcanvas(FigureCanvas):
         # Protocol
         self.betweenbatchDuration = self.betweenbatchDuration_setup  # length of bbp in seconds
         self.betweenbatchenergies = self.betweenbatchenergies_setup  # rating of the between batch burner
+        self.betweenbatch_after_preheat = self.betweenbatch_after_preheat_setup # True if after preheat a BBP is done
         self.roasts_per_session = self.roasts_per_session_setup      # typical number of roasts in a session
         self.roasts_per_session_auto = self.roasts_per_session_auto_setup  # automatic determine typical number of roasts in a session
 
@@ -2422,6 +2424,7 @@ class tgraphcanvas(FigureCanvas):
         self.preheatenergies_setup = self.preheatenergies[:]
         self.betweenbatchDuration_setup = self.betweenbatchDuration
         self.betweenbatchenergies_setup = self.betweenbatchenergies[:]
+        self.betweenbatch_after_preheat_setup = self.betweenbatch_after_preheat
         self.roasts_per_session_setup = self.roasts_per_session
         self.roasts_per_session_auto_setup = self.roasts_per_session_auto
     
@@ -2431,6 +2434,7 @@ class tgraphcanvas(FigureCanvas):
         self.preheatenergies = self.preheatenergies_setup[:]
         self.betweenbatchDuration = self.betweenbatchDuration_setup
         self.betweenbatchenergies = self.betweenbatchenergies_setup[:]
+        self.betweenbatch_after_preheat = self.betweenbatch_after_preheat_setup
         self.roasts_per_session = self.roasts_per_session_setup
         self.roasts_per_session_auto = self.roasts_per_session_auto_setup
 
@@ -24412,6 +24416,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.betweenbatchDuration = profile["betweenbatchDuration"]
         if "betweenbatchenergies" in profile:
             self.qmc.betweenbatchenergies = [float(x) for x in profile["betweenbatchenergies"]]
+        if "betweenbatch_after_preheat" in profile:
+            self.qmc.betweenbatch_after_preheat = profile["betweenbatch_after_preheat"]
         if "roasts_per_session" in profile:
             self.qmc.roasts_per_session = profile["roasts_per_session"]
 
@@ -27123,6 +27129,7 @@ class ApplicationWindow(QMainWindow):
                 profile["preheatenergies"] = self.qmc.preheatenergies
                 profile["betweenbatchDuration"] = self.qmc.betweenbatchDuration
                 profile["betweenbatchenergies"] = self.qmc.betweenbatchenergies
+                profile["betweenbatch_after_preheat"] = self.qmc.betweenbatch_after_preheat
                 profile["roasts_per_session"] = self.qmc.roasts_per_session
                 profile["roasts_per_session_auto"] = self.qmc.roasts_per_session_auto
             except Exception as ex:
@@ -28574,12 +28581,14 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.betweenbatchDuration_setup = toInt(settings.value("betweenbatchDuration_setup",self.qmc.betweenbatchDuration_setup))
             if settings.contains("betweenbatchenergies_setup"):
                 self.qmc.betweenbatchenergies_setup = [toFloat(x) for x in toList(settings.value("betweenbatchenergies_setup"))]
+            if settings.contains("betweenbatch_after_preheat_setup"):
+                self.qmc.betweenbatch_after_preheat_setup = bool(toBool(settings.value("betweenbatch_after_preheat_setup",self.qmc.betweenbatch_after_preheat_setup)))
             if settings.contains("roasts_per_session_setup"):
                 self.qmc.roasts_per_session_setup = toInt(settings.value("roasts_per_session_setup",self.qmc.roasts_per_session_setup))
             if settings.contains("roasts_per_session_auto_setup"):
                 self.qmc.roasts_per_session_auto_setup = bool(toBool(settings.value("roasts_per_session_auto_setup",self.qmc.roasts_per_session_auto_setup)))
             if settings.contains("energyresultunit_setup"):
-                self.qmc.energyresultunit_setup = toString(settings.value("energyresultunit",self.qmc.energyresultunit_setup))
+                self.qmc.energyresultunit_setup = toInt(settings.value("energyresultunit_setup",self.qmc.energyresultunit_setup))
             if settings.contains("energytablecolumnwidths"):
                 self.qmc.energytablecolumnwidths = [toInt(x) for x in toList(settings.value("energytablecolumnwidths",self.qmc.energytablecolumnwidths))]
             settings.endGroup()
@@ -29966,6 +29975,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("preheatenergies_setup",self.qmc.preheatenergies_setup)
             settings.setValue("betweenbatchDuration_setup",self.qmc.betweenbatchDuration_setup)
             settings.setValue("betweenbatchenergies_setup",self.qmc.betweenbatchenergies_setup)
+            settings.setValue("betweenbatch_after_preheat_setup",self.qmc.betweenbatch_after_preheat_setup)
             settings.setValue("roasts_per_session_setup",self.qmc.roasts_per_session_setup)
             settings.setValue("roasts_per_session_auto_setup",self.qmc.roasts_per_session_auto_setup)
             settings.setValue("energyresultunit_setup",self.qmc.energyresultunit_setup)

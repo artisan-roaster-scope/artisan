@@ -157,12 +157,13 @@ def path2url(path):
       'file:', urllib.pathname2url(path))
         
 # remaining artifacts from Qt4/5 compatibility layer:
+# note: those conversion functions are sometimes called with string arguments thus a simple int(round(s)) won't work and a int(round(float(s))) needs to be applied
 def toInt(x):
     if x is None:
         return 0
     else:
         try:
-            return int(x)
+            return int(round(float(x)))
         except:
             return 0
 def toString(x):

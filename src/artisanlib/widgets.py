@@ -96,8 +96,8 @@ class MyTableWidgetItemNumber(QTableWidgetItem):
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     def __lt__(self, other):
-        return self.sortKey < other.sortKey 
-        
+        return self.sortKey < other.sortKey
+  
 class MyTableWidgetItemQCheckBox(QTableWidgetItem):
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey):
