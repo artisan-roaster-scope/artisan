@@ -1141,6 +1141,9 @@ class tgraphcanvas(FigureCanvas):
                        "+HB AT",                    #117
                        "+WebSocket 78",             #118
                        "+WebSocket 910",            #119
+                       "Yocto 0-10V Rx",            #120
+                       "Yocto milliVolt Rx",        #121
+                       "Yocto Serial",              #122
                        ]
 
         # ADD DEVICE:
@@ -1175,7 +1178,10 @@ class tgraphcanvas(FigureCanvas):
             106, # Phidget HUB IO 0
             107, # Phidget HUB IO Digital 0
             108, # Yocto 4-20mA Rx
-            111  # WebSocket
+            111,  # WebSocket
+            120, # Yocto-0-10V-Rx
+            121, # Yocto-milliVolt-Rx
+            122 # Yocto-Serial
         ]
 
         # ADD DEVICE:
@@ -1239,6 +1245,9 @@ class tgraphcanvas(FigureCanvas):
             106, # Phidget HUB IO 0
             107, # Phidget HUB IO Digital 0
             108, # Yocto 4-20mA Rx
+            120, # Yocto-0-10V-Rx
+            121, # Yocto-milliVolt-Rx
+            122, # Yocto-Serial
         ]
 
         #extra devices

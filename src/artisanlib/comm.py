@@ -441,7 +441,7 @@ class serialport(object):
                                    self.BEHMOR_78,            #105
                                    self.PHIDGET_HUB0000_0,    #106
                                    self.PHIDGET_HUB0000_D_0,  #107
-                                   self.YOCTO_generic,        #108
+                                   self.YOCTO_generic,        #108 # Yocto-4-20mA-Rx
                                    self.MODBUS_78,            #109
                                    self.S7_910,               #110
                                    self.WS,     # self.probat_sample,        #111
@@ -452,7 +452,10 @@ class serialport(object):
                                    self.HB_DTIT,              #116
                                    self.HB_AT,                #117
                                    self.WS_78,  # self.probat_sample_inlet_ambient, # 118
-                                   self.WS_910  # self.probat_sample_cooling # 119
+                                   self.WS_910,  # self.probat_sample_cooling # 119
+                                   self.YOCTO_generic,        #120 # Yocto-0-10V-Rx
+                                   self.YOCTO_generic,        #120 # Yocto-milliVolt-Rx
+                                   self.YOCTO_generic        #120 # Yocto-Serial
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -4944,7 +4947,7 @@ class serialport(object):
     #   mode=1 => Yocto-Pt100
     #   mode=2 => Yocto-IR
     #   mode=3 => Yocto-Meteo
-    #   mode=4 => Yocto-4-20mA-Rx
+    #   mode=4 => Yocto-4-20mA-Rx (works also for the Yocto-0-10V-Rx, the Yocto-milliVolt-Rx and the Yocto-Serial)
     # that is not in the list of already connected ones
     def getNextYOCTOsensorOfType(self,mode,connected_yoctos,YOCTOsensor):
         if mode == 4:
@@ -4957,7 +4960,10 @@ class serialport(object):
                 ((mode == 0 and productName == "Yocto-Thermocouple") or (mode == 1 and productName == "Yocto-PT100") or \
                  (mode == 2 and productName == "Yocto-Temperature-IR") or \
                  (mode == 3 and productName.startswith("Yocto-Meteo")) or \
-                 (mode == 4 and productName.startswith("Yocto-4-20mA-Rx"))):
+                 (mode == 4 and productName.startswith("Yocto-4-20mA-Rx")) or \
+                 (mode == 4 and productName.startswith("Yocto-0-10V-Rx")) or \
+                 (mode == 4 and productName.startswith("Yocto-milliVolt-Rx")) or \
+                 (mode == 4 and productName.startswith("Yocto-Serial"))):
                 return YOCTOsensor
             else:
                 if mode == 4:
@@ -5016,6 +5022,7 @@ class serialport(object):
                 self.YOCTOsemaphores[channel].release(1)
     
     # mode = 0 for 2x thermocouple model; mode = 1 for 1x PT100 type probe; mode = 2 for IR sensor; mode = 4 for the Yocto-4-20mA-Rx
+    #   (as well as the Yocto-0-10V-Rx, Yocto-milliVolt-Rx and Yocto-Serial)
     def YOCTOtemperatures(self,mode=0):
         try: 
             if not self.YOCTOsensor:
