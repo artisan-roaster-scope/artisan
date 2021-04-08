@@ -10925,11 +10925,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.batchsequence = 1
             elif aw.qmc.batchsequence > 1:
                 aw.qmc.batchsequence -= 1
+            aw.qmc.roastbatchpos = aw.qmc.batchsequence
         if aw.qmc.batchcounter > -1 and not bool(aw.simulator):
             aw.qmc.batchcounter -= 1 # we decrease the batch counter
             # set the batchcounter of the current profile
             aw.qmc.roastbatchnr = 0
-            aw.qmc.roastbatchpos = 0
             # decr. the batchcounter of the loaded app settings
             if aw.settingspath and aw.settingspath != "":
                 try:
@@ -10953,6 +10953,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.batchsequence = 1
             else:
                 aw.qmc.batchsequence += 1
+            aw.qmc.roastbatchpos = aw.qmc.batchsequence
         # set roastbatchpos
         if aw.qmc.batchcounter > -1 and not bool(aw.simulator):
             aw.qmc.batchcounter += 1 # we increase the batch counter
@@ -10973,12 +10974,9 @@ class tgraphcanvas(FigureCanvas):
                     settings.endGroup()
                 except Exception:
                     aw.settingspath = ""
-
-            aw.qmc.roastbatchpos = aw.qmc.batchsequence
         else: # batch counter system inactive
             # set the batchcounter of the current profiles
             aw.qmc.roastbatchnr = 0
-            aw.qmc.roastbatchpos = 1
         # update lastroastepoch to time of roastdate
         aw.qmc.lastroastepoch = aw.qmc.roastepoch
 
