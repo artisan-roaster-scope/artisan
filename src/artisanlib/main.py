@@ -1896,7 +1896,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.loadaxisfromprofile = False # if set, axis are loaded from profile
         
-        self.energytablecolumnwidths = []
+#        self.energytablecolumnwidths = []
 
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
         self.startofx_default = -30
@@ -2292,7 +2292,10 @@ class tgraphcanvas(FigureCanvas):
         self.preheatenergies_setup = [0]*4                 # rating of the preheat burner
         self.betweenbatchDuration_setup = 0                # length of bbp in seconds
         self.betweenbatchenergies_setup = [0]*4            # rating of the between batch burner
+        self.coolingDuration_setup = 0                     # length of cooling in seconds
+        self.coolingenergies_setup = [0]*4                 # rating of the cooling burner
         self.betweenbatch_after_preheat_setup = False      # True if after preheat a BBP is done
+        self.electricEnergyMix_setup = 0                   # the amount of renewable electric energy in the energy mix in %
         # Others
         self.energyresultunit_setup = 0 # 0: BTU, 1: kJ, 2: kWh (see self.heatunits)
         self.kind_list = [QApplication.translate("Label","Preheat Measured",None),
@@ -2316,7 +2319,10 @@ class tgraphcanvas(FigureCanvas):
         self.preheatenergies = self.preheatenergies_setup            # rating of the preheat burner
         self.betweenbatchDuration = self.betweenbatchDuration_setup  # length of bbp in seconds
         self.betweenbatchenergies = self.betweenbatchenergies_setup  # rating of the between batch burner
+        self.coolingDuration = self.coolingDuration_setup            # length of cooling in seconds
+        self.coolingenergies = self.coolingenergies_setup            # rating of the cooling burner
         self.betweenbatch_after_preheat = self.betweenbatch_after_preheat_setup # True if after preheat a BBP is done
+        self.electricEnergyMix = self.electricEnergyMix_setup        # the amount of renewable electric energy in the energy mix in %
 
         #mouse cross lines measurement
         self.baseX,self.baseY = None, None
@@ -2403,6 +2409,7 @@ class tgraphcanvas(FigureCanvas):
         self.burner_etypes_setup = self.burner_etypes[:]
         self.burnerevent_zeropcts_setup = self.burnerevent_zeropcts[:]
         self.burnerevent_hundpcts_setup = self.burnerevent_hundpcts[:]
+        self.electricEnergyMix_setup = self.electricEnergyMix
   
     # restore burner settings to their defaults
     def restoreEnergyBurnerDefaults(self):
@@ -2413,6 +2420,7 @@ class tgraphcanvas(FigureCanvas):
         self.burner_etypes = self.burner_etypes_setup[:]
         self.burnerevent_zeropcts = self.burnerevent_zeropcts_setup[:]
         self.burnerevent_hundpcts = self.burnerevent_hundpcts_setup[:]
+        self.electricEnergyMix = self.electricEnergyMix_setup
     
     # set current protocol settings as defaults
     def setEnergyProtocolDefaults(self):
@@ -2420,6 +2428,8 @@ class tgraphcanvas(FigureCanvas):
         self.preheatenergies_setup = self.preheatenergies[:]
         self.betweenbatchDuration_setup = self.betweenbatchDuration
         self.betweenbatchenergies_setup = self.betweenbatchenergies[:]
+        self.coolingDuration_setup = self.coolingDuration
+        self.coolingenergies_setup = self.coolingenergies[:]
         self.betweenbatch_after_preheat_setup = self.betweenbatch_after_preheat
     
     # restore protocol settings to their defaults    
@@ -2428,6 +2438,8 @@ class tgraphcanvas(FigureCanvas):
         self.preheatenergies = self.preheatenergies_setup[:]
         self.betweenbatchDuration = self.betweenbatchDuration_setup
         self.betweenbatchenergies = self.betweenbatchenergies_setup[:]
+        self.coolingDuration = self.coolingDuration_setup
+        self.coolingenergies = self.coolingenergies_setup[:]
         self.betweenbatch_after_preheat = self.betweenbatch_after_preheat_setup
 
     @pyqtSlot()
@@ -24425,8 +24437,14 @@ class ApplicationWindow(QMainWindow):
             self.qmc.betweenbatchDuration = profile["betweenbatchDuration"]
         if "betweenbatchenergies" in profile:
             self.qmc.betweenbatchenergies = [float(x) for x in profile["betweenbatchenergies"]]
+        if "coolingDuration" in profile:
+            self.qmc.coolingDuration = profile["coolingDuration"]
+        if "coolingenergies" in profile:
+            self.qmc.coolingenergies = [float(x) for x in profile["coolingenergies"]]
         if "betweenbatch_after_preheat" in profile:
             self.qmc.betweenbatch_after_preheat = profile["betweenbatch_after_preheat"]
+        if "electricEnergyMix" in profile:
+            self.qmc.electricEnergyMix = profile["electricEnergyMix"]
 
     # returns True if data got updated, False otherwise
     def updateSymbolicETBT(self):
@@ -27148,7 +27166,10 @@ class ApplicationWindow(QMainWindow):
                 profile["preheatenergies"] = self.qmc.preheatenergies
                 profile["betweenbatchDuration"] = self.qmc.betweenbatchDuration
                 profile["betweenbatchenergies"] = self.qmc.betweenbatchenergies
+                profile["coolingDuration"] = self.qmc.coolingDuration
+                profile["coolingenergies"] = self.qmc.coolingenergies
                 profile["betweenbatch_after_preheat"] = self.qmc.betweenbatch_after_preheat
+                profile["electricEnergyMix"] = self.qmc.electricEnergyMix
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " getProfile(): {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -28598,12 +28619,18 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.betweenbatchDuration_setup = toInt(settings.value("betweenbatchDuration_setup",self.qmc.betweenbatchDuration_setup))
             if settings.contains("betweenbatchenergies_setup"):
                 self.qmc.betweenbatchenergies_setup = [toFloat(x) for x in toList(settings.value("betweenbatchenergies_setup"))]
+            if settings.contains("coolingDuration_setup"):
+                self.qmc.coolingDuration_setup = toInt(settings.value("coolingDuration_setup",self.qmc.coolingDuration_setup))
+            if settings.contains("coolingenergies_setup"):
+                self.qmc.coolingenergies_setup = [toFloat(x) for x in toList(settings.value("coolingenergies_setup"))]
             if settings.contains("betweenbatch_after_preheat_setup"):
                 self.qmc.betweenbatch_after_preheat_setup = bool(toBool(settings.value("betweenbatch_after_preheat_setup",self.qmc.betweenbatch_after_preheat_setup)))
+            if settings.contains("electricEnergyMix_setup"):
+                self.qmc.electricEnergyMix_setup = toInt(settings.value("electricEnergyMix_setup",self.qmc.electricEnergyMix_setup))
             if settings.contains("energyresultunit_setup"):
                 self.qmc.energyresultunit_setup = toInt(settings.value("energyresultunit_setup",self.qmc.energyresultunit_setup))
-            if settings.contains("energytablecolumnwidths"):
-                self.qmc.energytablecolumnwidths = [toInt(x) for x in toList(settings.value("energytablecolumnwidths",self.qmc.energytablecolumnwidths))]
+#            if settings.contains("energytablecolumnwidths"):
+#                self.qmc.energytablecolumnwidths = [toInt(x) for x in toList(settings.value("energytablecolumnwidths",self.qmc.energytablecolumnwidths))]
             settings.endGroup()
             self.qmc.restoreEnergyBurnerDefaults()
             self.qmc.restoreEnergyProtocolDefaults()          
@@ -29988,9 +30015,12 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("preheatenergies_setup",self.qmc.preheatenergies_setup)
             settings.setValue("betweenbatchDuration_setup",self.qmc.betweenbatchDuration_setup)
             settings.setValue("betweenbatchenergies_setup",self.qmc.betweenbatchenergies_setup)
+            settings.setValue("coolingDuration_setup",self.qmc.coolingDuration_setup)
+            settings.setValue("coolingenergies_setup",self.qmc.coolingenergies_setup)
             settings.setValue("betweenbatch_after_preheat_setup",self.qmc.betweenbatch_after_preheat_setup)
+            settings.setValue("electricEnergyMix_setup",self.qmc.electricEnergyMix_setup)
             settings.setValue("energyresultunit_setup",self.qmc.energyresultunit_setup)
-            settings.setValue("energytablecolumnwidths",self.qmc.energytablecolumnwidths)
+#            settings.setValue("energytablecolumnwidths",self.qmc.energytablecolumnwidths)
             settings.endGroup()            
             
             settings.beginGroup("RoastProperties")

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>519</width>
-    <height>401</height>
+    <width>503</width>
+    <height>392</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -282,7 +282,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="spacing">
-        <number>0</number>
+        <number>-1</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -307,6 +307,12 @@
          <property name="toolTip">
           <string notr="true"/>
          </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAsNeeded</enum>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustIgnored</enum>
+         </property>
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
@@ -329,10 +335,10 @@
           <bool>false</bool>
          </attribute>
          <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>70</number>
+          <number>50</number>
          </attribute>
          <attribute name="horizontalHeaderDefaultSectionSize">
-          <number>100</number>
+          <number>60</number>
          </attribute>
          <attribute name="horizontalHeaderStretchLastSection">
           <bool>true</bool>
@@ -427,11 +433,14 @@
        <string notr="true">Burners</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <property name="leftMargin">
         <number>0</number>
        </property>
        <property name="topMargin">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
         <number>0</number>
@@ -443,16 +452,19 @@
         <widget class="QWidget" name="burnersGrid" native="true">
          <layout class="QGridLayout" name="gridLayout_3">
           <property name="leftMargin">
-           <number>5</number>
+           <number>2</number>
           </property>
           <property name="topMargin">
-           <number>5</number>
+           <number>2</number>
           </property>
           <property name="rightMargin">
-           <number>5</number>
+           <number>2</number>
           </property>
           <property name="bottomMargin">
-           <number>5</number>
+           <number>2</number>
+          </property>
+          <property name="spacing">
+           <number>8</number>
           </property>
           <item row="4" column="7">
            <widget class="QSpinBox" name="hundredpct3">
@@ -460,7 +472,7 @@
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="maximum">
-             <number>100</number>
+             <number>999</number>
             </property>
             <property name="value">
              <number>100</number>
@@ -508,7 +520,7 @@
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="maximum">
-             <number>100</number>
+             <number>999</number>
             </property>
             <property name="value">
              <number>100</number>
@@ -521,7 +533,7 @@
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="maximum">
-             <number>100</number>
+             <number>998</number>
             </property>
            </widget>
           </item>
@@ -531,7 +543,7 @@
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="maximum">
-             <number>100</number>
+             <number>999</number>
             </property>
             <property name="value">
              <number>100</number>
@@ -634,7 +646,7 @@
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="maximum">
-             <number>100</number>
+             <number>998</number>
             </property>
            </widget>
           </item>
@@ -660,7 +672,7 @@
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="maximum">
-             <number>100</number>
+             <number>998</number>
             </property>
            </widget>
           </item>
@@ -737,7 +749,7 @@
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="maximum">
-             <number>100</number>
+             <number>999</number>
             </property>
             <property name="value">
              <number>100</number>
@@ -799,7 +811,7 @@
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="maximum">
-             <number>100</number>
+             <number>998</number>
             </property>
            </widget>
           </item>
@@ -950,8 +962,115 @@
         </widget>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <property name="spacing">
+          <number>5</number>
+         </property>
+         <property name="topMargin">
+          <number>10</number>
+         </property>
+         <property name="bottomMargin">
+          <number>10</number>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer_7">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="EnergyMixLine">
+           <property name="spacing">
+            <number>10</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="electricEnergyMixLabel">
+             <property name="toolTip">
+              <string notr="true"/>
+             </property>
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
+             <property name="text">
+              <string notr="true">Electric Energy Mix:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="electricEnergyMixSpinBox">
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="suffix">
+              <string notr="true">%</string>
+             </property>
+             <property name="prefix">
+              <string notr="true"/>
+             </property>
+             <property name="maximum">
+              <number>100</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QLabel" name="renewableLabel">
+           <property name="text">
+            <string>Renewable</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_8">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
         <widget class="QWidget" name="burnersButtonsLine" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>5</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
+          </property>
           <item>
            <widget class="QPushButton" name="burnersSetDefaultsButton">
             <property name="focusPolicy">
@@ -994,19 +1113,6 @@
          </layout>
         </widget>
        </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="protocolTab">
@@ -1015,6 +1121,18 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -1032,15 +1150,84 @@
           <property name="bottomMargin">
            <number>5</number>
           </property>
-          <item row="5" column="3">
-           <widget class="QLineEdit" name="betweenbatchesenergy0">
+          <property name="spacing">
+           <number>8</number>
+          </property>
+          <item row="5" column="6">
+           <widget class="QLineEdit" name="betweenbatchesenergy3">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
-          <item row="3" column="4">
-           <widget class="QLineEdit" name="preheatenergies1">
+          <item row="6" column="4">
+           <widget class="QLineEdit" name="coolingenergies1">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="5">
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="burnerCLabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string notr="true">Burner C</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="burnerCUnitLabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string notr="true">(BTU)</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLineEdit" name="coolingDuration">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="preheatingLabel">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">Pre-Heating</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="5">
+           <widget class="QLineEdit" name="coolingenergies2">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
@@ -1065,101 +1252,17 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="preheatDuration">
+          <item row="5" column="1">
+           <widget class="QLineEdit" name="betweenBatchesDuration">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
-          <item row="1" column="6">
-           <widget class="QLabel" name="burnerDLabel">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">Burner D</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="preheatingLabel">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">Pre-Heating</string>
-            </property>
+          <item row="5" column="3">
+           <widget class="QLineEdit" name="betweenbatchesenergy0">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="4">
-           <widget class="QLabel" name="burnerBUnitLabel">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">(kJ)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="QLabel" name="burnerALabel">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">Burner A</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="6">
-           <widget class="QLineEdit" name="preheatenergies3">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="5">
-           <widget class="QLabel" name="burnerCLabel">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">Burner C</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="5">
-           <widget class="QLabel" name="burnerCUnitLabel">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">(BTU)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -1170,10 +1273,10 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="6">
-           <widget class="QLineEdit" name="betweenbatchesenergy3">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          <item row="2" column="2" rowspan="5">
+           <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
             </property>
            </widget>
           </item>
@@ -1199,6 +1302,43 @@
             </property>
            </widget>
           </item>
+          <item row="6" column="6">
+           <widget class="QLineEdit" name="coolingenergies3">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="coolingLabel">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>false</kerning>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">Cooling</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="6">
+           <widget class="QLineEdit" name="preheatenergies3">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
           <item row="5" column="0">
            <widget class="QLabel" name="betweenBatchesLabel">
             <property name="font">
@@ -1218,74 +1358,8 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="4">
-           <widget class="QLabel" name="burnerBLabel">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">Burner B</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QLineEdit" name="betweenBatchesDuration">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLabel" name="timeUnitLabel">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">(mm:ss)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="3">
-           <widget class="QLabel" name="burnerAUnitLabel">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">(BTU)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="5">
-           <widget class="QLineEdit" name="betweenbatchesenergy2">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="6">
-           <widget class="QLabel" name="burnerDUnitLabel">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">(BTU)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="3">
-           <widget class="QLineEdit" name="preheatenergies0">
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="preheatDuration">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
@@ -1298,41 +1372,174 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="2">
-           <widget class="QLabel" name="bar1">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">|</string>
+          <item row="3" column="3">
+           <widget class="QLineEdit" name="preheatenergies0">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
-          <item row="5" column="2">
-           <widget class="QLabel" name="bar2">
-            <property name="toolTip">
-             <string notr="true"/>
+          <item row="2" column="4">
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <property name="spacing">
+             <number>0</number>
             </property>
-            <property name="text">
-             <string notr="true">|</string>
+            <item>
+             <widget class="QLabel" name="burnerBLabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string notr="true">Burner B</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="burnerBUnitLabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string notr="true">(kJ)</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="5" column="5">
+           <widget class="QLineEdit" name="betweenbatchesenergy2">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="bar0">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">|</string>
+          <item row="6" column="3">
+           <widget class="QLineEdit" name="coolingenergies0">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
+          </item>
+          <item row="2" column="6">
+           <layout class="QVBoxLayout" name="verticalLayout_10">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="burnerDLabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string notr="true">Burner D</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="burnerDUnitLabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string notr="true">(BTU)</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="2" column="1">
+           <layout class="QVBoxLayout" name="verticalLayout_11">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="timeUnitLabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string notr="true">(mm:ss)</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="4">
+           <widget class="QLineEdit" name="preheatenergies1">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="burnerALabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string notr="true">Burner A</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="burnerAUnitLabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string notr="true">(BTU)</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="topMargin">
+          <number>10</number>
+         </property>
+         <property name="bottomMargin">
+          <number>10</number>
+         </property>
          <item>
           <spacer name="horizontalSpacer_6">
            <property name="orientation">
@@ -1372,8 +1579,33 @@
         </layout>
        </item>
        <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
         <widget class="QWidget" name="protocolButtonsLine" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>5</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
+          </property>
           <item>
            <widget class="QPushButton" name="protocolSetDefaultsButton">
             <property name="focusPolicy">
@@ -1415,19 +1647,6 @@
           </item>
          </layout>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -1509,6 +1728,7 @@
   <tabstop>burnerrating3</tabstop>
   <tabstop>zeropcts3</tabstop>
   <tabstop>hundredpct3</tabstop>
+  <tabstop>electricEnergyMixSpinBox</tabstop>
   <tabstop>preheatDuration</tabstop>
   <tabstop>preheatenergies0</tabstop>
   <tabstop>preheatenergies1</tabstop>
@@ -1519,6 +1739,12 @@
   <tabstop>betweenbatchesenergy1</tabstop>
   <tabstop>betweenbatchesenergy2</tabstop>
   <tabstop>betweenbatchesenergy3</tabstop>
+  <tabstop>coolingDuration</tabstop>
+  <tabstop>coolingenergies0</tabstop>
+  <tabstop>coolingenergies1</tabstop>
+  <tabstop>coolingenergies2</tabstop>
+  <tabstop>coolingenergies3</tabstop>
+  <tabstop>BBPafterPreHeatcheckBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>

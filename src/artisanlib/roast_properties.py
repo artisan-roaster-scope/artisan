@@ -2670,7 +2670,10 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.org_preheatenergies = self.aw.qmc.preheatenergies.copy()
             self.org_betweenbatchDuration = self.aw.qmc.betweenbatchDuration
             self.org_betweenbatchenergies = self.aw.qmc.betweenbatchenergies.copy()
+            self.org_coolingDuration = self.aw.qmc.coolingDuration
+            self.org_coolingenergies = self.aw.qmc.coolingenergies.copy()
             self.org_betweenbatch_after_preheat = self.aw.qmc.betweenbatch_after_preheat
+            self.org_electricEnergyMix = self.aw.qmc.electricEnergyMix
                     
             self.energy_ui.helpButton.clicked.connect(self.showenergyhelp)
             
@@ -2701,11 +2704,14 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.ratingunitsLabel.setText(QApplication.translate("Label","Unit",None))
             self.energy_ui.fueltypesLabel.setText(QApplication.translate("Label","Fuel",None))
             self.energy_ui.eventsLabel.setText(QApplication.translate("Label","Event",None))
+            self.energy_ui.electricEnergyMixLabel.setText(QApplication.translate("Label","Electric Energy Mix:",None))
+            self.energy_ui.renewableLabel.setText(QApplication.translate("Label","Renewable",None))
             # Protocol tab
             self.energy_ui.protocolSetDefaultsButton.setText(QApplication.translate("Button","Set as Defaults",None))
             self.energy_ui.protocolDefaultsButton.setText(QApplication.translate("Button","Restore Defaults",None))
             self.energy_ui.preheatingLabel.setText(QApplication.translate("Label","Pre-Heating",None))
             self.energy_ui.betweenBatchesLabel.setText(QApplication.translate("Label","Between Batches",None))
+            self.energy_ui.coolingLabel.setText(QApplication.translate("Label","Cooling",None))
             self.energy_ui.BBPafterPreHeatcheckBox.setText(QApplication.translate("Label","Between Batches after Pre-Heating",None))
             self.energy_ui.burnerALabel.setText(self.formatBurnerLabel("A"))
             self.energy_ui.burnerBLabel.setText(self.formatBurnerLabel("B"))
@@ -2743,6 +2749,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             regextime = QRegularExpression(r"^[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
             self.energy_ui.preheatDuration.setValidator(QRegularExpressionValidator(regextime,self))
             self.energy_ui.betweenBatchesDuration.setValidator(QRegularExpressionValidator(regextime,self))
+            self.energy_ui.coolingDuration.setValidator(QRegularExpressionValidator(regextime,self))
             
             # initialize
             self.updateEnergyTab()
@@ -2791,6 +2798,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             
             self.energy_ui.preheatDuration.editingFinished.connect(self.preheatDuration_editingfinished)
             self.energy_ui.betweenBatchesDuration.editingFinished.connect(self.betweenBatchesDuration_editingfinished)
+            self.energy_ui.coolingDuration.editingFinished.connect(self.coolingDuration_editingfinished)
             
             self.energy_ui.preheatenergies0.editingFinished.connect(self.preheatenergies_editingfinished)
             self.energy_ui.preheatenergies1.editingFinished.connect(self.preheatenergies_editingfinished)
@@ -2802,7 +2810,14 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.betweenbatchesenergy2.editingFinished.connect(self.betweenbatchenergies_editingfinished)
             self.energy_ui.betweenbatchesenergy3.editingFinished.connect(self.betweenbatchenergies_editingfinished)
             
+            self.energy_ui.coolingenergies0.editingFinished.connect(self.coolingenergies_editingfinished)
+            self.energy_ui.coolingenergies1.editingFinished.connect(self.coolingenergies_editingfinished)
+            self.energy_ui.coolingenergies2.editingFinished.connect(self.coolingenergies_editingfinished)
+            self.energy_ui.coolingenergies3.editingFinished.connect(self.coolingenergies_editingfinished)
+            
             self.energy_ui.BBPafterPreHeatcheckBox.stateChanged.connect(self.betweenbatch_after_preheat_statechanged)
+            
+            self.energy_ui.electricEnergyMixSpinBox.valueChanged.connect(self.electric_energy_mix_valuechanged)
             
             self.energy_ui.resultunitComboBox.currentIndexChanged.connect(self.energyresultunitComboBox_indexchanged)
             #
@@ -2862,16 +2877,21 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.datatable.setItem(i,4,Source_widget)
             self.energy_ui.datatable.setItem(i,5,FuelType_widget)
             self.energy_ui.datatable.setItem(i,6,Kind_widget)
-        self.energy_ui.datatable.resizeColumnsToContents()
-        # remember the columnwidth
-        for i in range(len(self.aw.qmc.energytablecolumnwidths)):
-            try:
-                w = self.aw.qmc.energytablecolumnwidths[i]
-                if i == 6:
-                    w = max(80,w)
-                self.energy_ui.datatable.setColumnWidth(i,w)
-            except:
-                pass
+ 
+        header = self.energy_ui.datatable.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.ResizeToContents)
+#        header.setSectionResizeMode(QHeaderView.Stretch)
+#        self.energy_ui.datatable.resizeColumnsToContents()
+        
+#        # remember the columnwidth
+#        for i in range(len(self.aw.qmc.energytablecolumnwidths)):
+#            try:
+#                w = self.aw.qmc.energytablecolumnwidths[i]
+#                if i == 6:
+#                    w = max(80,w)
+#                self.energy_ui.datatable.setColumnWidth(i,w)
+#            except:
+#                pass
 
         self.energy_ui.datatable.setSortingEnabled(True)
         self.energy_ui.datatable.sortItems(6)
@@ -2919,6 +2939,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         ## Protocol tab
         self.energy_ui.preheatDuration.setText(self.validateSeconds2Text(self.aw.qmc.preheatDuration))
         self.energy_ui.betweenBatchesDuration.setText(self.validateSeconds2Text(self.aw.qmc.betweenbatchDuration))
+        self.energy_ui.coolingDuration.setText(self.validateSeconds2Text(self.aw.qmc.coolingDuration))
         self.energy_ui.preheatenergies0.setText(self.validatePctText(str(self.aw.qmc.preheatenergies[0])))
         self.energy_ui.preheatenergies1.setText(self.validatePctText(str(self.aw.qmc.preheatenergies[1])))
         self.energy_ui.preheatenergies2.setText(self.validatePctText(str(self.aw.qmc.preheatenergies[2])))
@@ -2927,7 +2948,12 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.energy_ui.betweenbatchesenergy1.setText(self.validatePctText(str(self.aw.qmc.betweenbatchenergies[1])))
         self.energy_ui.betweenbatchesenergy2.setText(self.validatePctText(str(self.aw.qmc.betweenbatchenergies[2])))
         self.energy_ui.betweenbatchesenergy3.setText(self.validatePctText(str(self.aw.qmc.betweenbatchenergies[3])))
+        self.energy_ui.coolingenergies0.setText(self.validatePctText(str(self.aw.qmc.coolingenergies[0])))
+        self.energy_ui.coolingenergies1.setText(self.validatePctText(str(self.aw.qmc.coolingenergies[1])))
+        self.energy_ui.coolingenergies2.setText(self.validatePctText(str(self.aw.qmc.coolingenergies[2])))
+        self.energy_ui.coolingenergies3.setText(self.validatePctText(str(self.aw.qmc.coolingenergies[3])))
         self.energy_ui.BBPafterPreHeatcheckBox.setChecked(self.aw.qmc.betweenbatch_after_preheat)
+        self.energy_ui.electricEnergyMixSpinBox.setValue(self.aw.qmc.electricEnergyMix)
         #
         self.updateEnergyLabels()
         self.updateEnergyUnitLabels()
@@ -2998,6 +3024,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.betweenbatchDuration = self.validateText2Seconds(self.energy_ui.betweenBatchesDuration.text())
         if updateMetrics:
             self.updateMetricsLabel()
+        
+    def updateCoolingDuration(self, updateMetrics=True):
+        self.aw.qmc.coolingDuration = self.validateText2Seconds(self.energy_ui.coolingDuration.text())
+        if updateMetrics:
+            self.updateMetricsLabel()
     
     def updatePreheatEnergies(self, updateMetrics=True):
         self.aw.qmc.preheatenergies[0] = self.pctText2Num(self.energy_ui.preheatenergies0.text())
@@ -3015,8 +3046,20 @@ class editGraphDlg(ArtisanResizeablDialog):
         if updateMetrics:
             self.updateMetricsLabel()
     
+    def updateCoolingEnergies(self, updateMetrics=True):
+        self.aw.qmc.coolingenergies[0] = self.pctText2Num(self.energy_ui.coolingenergies0.text())
+        self.aw.qmc.coolingenergies[1] = self.pctText2Num(self.energy_ui.coolingenergies1.text())
+        self.aw.qmc.coolingenergies[2] = self.pctText2Num(self.energy_ui.coolingenergies2.text())
+        self.aw.qmc.coolingenergies[3] = self.pctText2Num(self.energy_ui.coolingenergies3.text())
+        if updateMetrics:
+            self.updateMetricsLabel()
+    
     def updateBBPafterPreHeat(self):
         self.aw.qmc.betweenbatch_after_preheat = self.energy_ui.BBPafterPreHeatcheckBox.isChecked()
+        self.updateMetricsLabel()
+        
+    def updateElectricEnergyMix(self):
+        self.aw.qmc.electricEnergyMix = self.energy_ui.electricEnergyMixSpinBox.value()
         self.updateMetricsLabel()
         
     # fills the energy config data from the current energy tab widget values
@@ -3040,6 +3083,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             ## Protocol tab
             self.updatePreheatDuration(False)
             self.updateBetweenBatchessDuration(False)
+            self.updateCoolingDuration(False)
             self.updatePreheatEnergies(False)
             self.updateBetweenBatchesEnergies(False)
             #
@@ -3058,6 +3102,10 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.preheatenergies = self.org_preheatenergies.copy()
             self.aw.qmc.betweenbatchDuration = self.org_betweenbatchDuration
             self.aw.qmc.betweenbatchenergies = self.org_betweenbatchenergies.copy()
+            self.aw.qmc.coolinghDuration = self.org_coolingDuration
+            self.aw.qmc.coolingenergies = self.org_coolingenergies.copy()
+            self.aw.qmc.betweenbatch_after_preheat = self.org_betweenbatch_after_preheat
+            self.aw.qmc.electricEnergyMix = self.org_electricEnergyMix
 
     def updateMetricsLabel(self):
         try:
@@ -3090,8 +3138,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                         self.energy_ui.CO2perKgCoffeeLabel.setText("{0} {1}".format(scaled_co2_kg, QApplication.translate("Label","CO2 per kg green coffee",None)))
                     # no weight is available
                     else:
-                        #self.energy_ui.CO2perKgCoffeeLabel.setText("")
-                        self.energy_ui.CO2perKgCoffeeLabel.setText("uuu g {}".format(QApplication.translate("Label","CO2 per kg green coffee",None)))
+                        self.energy_ui.CO2perKgCoffeeLabel.setText("")
 
             else:
                 # clear result widgets
@@ -3292,6 +3339,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.updateBetweenBatchessDuration()
 
     @pyqtSlot()
+    def coolingDuration_editingfinished(self):
+        self.updateCoolingDuration()
+
+    @pyqtSlot()
     def preheatenergies_editingfinished(self):
         for w in [self.energy_ui.preheatenergies0,
                     self.energy_ui.preheatenergies1,
@@ -3311,9 +3362,23 @@ class editGraphDlg(ArtisanResizeablDialog):
                 w.setText(self.validatePctText(w.text()))
         self.updateBetweenBatchesEnergies()
 
+    @pyqtSlot()
+    def coolingenergies_editingfinished(self):
+        for w in [self.energy_ui.coolingenergies0,
+                    self.energy_ui.coolingenergies1,
+                    self.energy_ui.coolingenergies2,
+                    self.energy_ui.coolingenergies3]:
+            if w.isModified():
+                w.setText(self.validatePctText(w.text()))
+        self.updateCoolingEnergies()
+
     @pyqtSlot(int)
     def betweenbatch_after_preheat_statechanged(self,_):
         self.updateBBPafterPreHeat()
+    
+    @pyqtSlot()
+    def electric_energy_mix_valuechanged(self):
+        self.updateElectricEnergyMix()
 
     @pyqtSlot()
     def energyresultunitComboBox_indexchanged(self):
