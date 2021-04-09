@@ -2639,6 +2639,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         elif i == 4: # Energy (only initialized on creation)
             self.saveEventTable()
             self.initEnergyTab()
+            self.updateMetricsLabel()
         elif i == 5: # Setup (only initialized on creation)
             self.saveEventTable()
             self.initSetupTab()
@@ -3014,8 +3015,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         if updateMetrics:
             self.updateMetricsLabel()
     
-    def updateBBBafterPreHeat(self):
+    def updateBBPafterPreHeat(self):
         self.aw.qmc.betweenbatch_after_preheat = self.energy_ui.BBPafterPreHeatcheckBox.isChecked()
+        self.updateMetricsLabel()
         
     # fills the energy config data from the current energy tab widget values
     def updateEnergyConfig(self):
@@ -3059,7 +3061,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     def updateMetricsLabel(self):
         try:
-            metrics,self.btu_list = self.aw.qmc.calcEnergyuse()
+            metrics,self.btu_list = self.aw.qmc.calcEnergyuse(self.weightinedit.text())
             if len(metrics) > 0 and metrics["BTU_batch"] > 0:
                 energy_unit = self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup]
                 total_energy = self.scalefloat(self.aw.qmc.convertHeat(metrics["BTU_batch"],0,self.aw.qmc.energyresultunit_setup))
@@ -3077,33 +3079,20 @@ class editGraphDlg(ArtisanResizeablDialog):
 #                    scaled_co2_preheat = str(metrics["CO2_preheat"])+'g' if metrics["CO2_preheat"]<1000 else str(self.aw.float2float(metrics["CO2_preheat"]/1000.,1)) +'kg'
 #                    scaled_co2_bbp = str(metrics["CO2_bbp"])+'g' if metrics["CO2_bbp"]<1000 else str(self.aw.float2float(metrics["CO2_bbp"]/1000.,1)) +'kg'
 #                    scaled_co2_roast = str(metrics["CO2_roast"])+'g' if metrics["CO2_roast"]<1000 else str(self.aw.float2float(metrics["CO2_roast"]/1000.,1)) +'kg'
-                    self.energy_ui.CO2perKgCoffeeLabel.setText("")
+#                    self.energy_ui.CO2perKgCoffeeLabel.setText("")
                     
-                    
-                    # a roasted weight is available
-                    if self.aw.qmc.weight[1] > 0:
-                        bean_weight = self.aw.convertWeight(self.aw.qmc.weight[1],self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]),1) # to kg
-                        co2_bean_kg = metrics["CO2_batch"] / bean_weight
-                        if co2_bean_kg < 1000:
-                            scaled_co2_kg = str(self.scalefloat(co2_bean_kg)) + 'g'
-                        else:
-                            scaled_co2_kg = str(self.scalefloat(co2_bean_kg/1000.)) + 'kg'
-                        self.energy_ui.CO2perKgCoffeeLabel.setText("{0} {1}".format(scaled_co2_kg, QApplication.translate("Label","CO2 per kg roasted coffee",None)))
                     # a green weight is available
-                    elif self.aw.qmc.weight[0] > 0:
-                        bean_weight = self.aw.convertWeight(self.aw.qmc.weight[0],self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]),1) # to kg
-                        co2_bean_kg = metrics["CO2_batch"] / bean_weight
-                        if co2_bean_kg < 1000:
-                            scaled_co2_kg = str(self.scalefloat(co2_bean_kg)) + 'g'
+                    if metrics["CO2_per_green_kg"] > 0:
+                        if metrics["CO2_per_green_kg"] < 1000:
+                            scaled_co2_kg = str(self.scalefloat(metrics["CO2_per_green_kg"])) + 'g'
                         else:
-                            scaled_co2_kg = str(self.scalefloat(co2_bean_kg/1000.)) + 'kg'
+                            scaled_co2_kg = str(self.scalefloat(metrics["CO2_per_green_kg"]/1000.)) + 'kg'
                         self.energy_ui.CO2perKgCoffeeLabel.setText("{0} {1}".format(scaled_co2_kg, QApplication.translate("Label","CO2 per kg green coffee",None)))
                     # no weight is available
                     else:
-                        self.energy_ui.CO2perKgCoffeeLabel.setText("")
-                else:
-                    self.energy_ui.totalCO2Label.setText("")
-                    self.energy_ui.CO2perKgCoffeeLabel.setText("")
+                        #self.energy_ui.CO2perKgCoffeeLabel.setText("")
+                        self.energy_ui.CO2perKgCoffeeLabel.setText("uuu g {}".format(QApplication.translate("Label","CO2 per kg green coffee",None)))
+
             else:
                 # clear result widgets
                 self.energy_ui.totalEnergyLabel.setText("")
@@ -3324,7 +3313,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def betweenbatch_after_preheat_statechanged(self,_):
-        self.updateBBBafterPreHeat()
+        self.updateBBPafterPreHeat()
 
     @pyqtSlot()
     def energyresultunitComboBox_indexchanged(self):

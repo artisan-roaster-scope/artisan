@@ -2293,8 +2293,6 @@ class tgraphcanvas(FigureCanvas):
         self.betweenbatchDuration_setup = 0                # length of bbp in seconds
         self.betweenbatchenergies_setup = [0]*4            # rating of the between batch burner
         self.betweenbatch_after_preheat_setup = False      # True if after preheat a BBP is done
-        self.roasts_per_session_setup = 4                  # typical number of roasts in a session
-        self.roasts_per_session_auto_setup = False         # automatic determine typical number of roasts in a session
         # Others
         self.energyresultunit_setup = 0 # 0: BTU, 1: kJ, 2: kWh (see self.heatunits)
         self.kind_list = [QApplication.translate("Label","Preheat Measured",None),
@@ -2313,14 +2311,12 @@ class tgraphcanvas(FigureCanvas):
         self.burner_etypes = self.burner_etypes_setup                # index of the etype that is the gas/burner setting
         self.burnerevent_zeropcts = self.burnerevent_zeropcts_setup  # event value corresponding to 0 percent
         self.burnerevent_hundpcts = self.burnerevent_hundpcts_setup  # event value corresponding to 100 percent
+        # Protocol
         self.preheatDuration = self.preheatDuration_setup            # length of preheat in seconds
         self.preheatenergies = self.preheatenergies_setup            # rating of the preheat burner
-        # Protocol
         self.betweenbatchDuration = self.betweenbatchDuration_setup  # length of bbp in seconds
         self.betweenbatchenergies = self.betweenbatchenergies_setup  # rating of the between batch burner
         self.betweenbatch_after_preheat = self.betweenbatch_after_preheat_setup # True if after preheat a BBP is done
-        self.roasts_per_session = self.roasts_per_session_setup      # typical number of roasts in a session
-        self.roasts_per_session_auto = self.roasts_per_session_auto_setup  # automatic determine typical number of roasts in a session
 
         #mouse cross lines measurement
         self.baseX,self.baseY = None, None
@@ -2425,8 +2421,6 @@ class tgraphcanvas(FigureCanvas):
         self.betweenbatchDuration_setup = self.betweenbatchDuration
         self.betweenbatchenergies_setup = self.betweenbatchenergies[:]
         self.betweenbatch_after_preheat_setup = self.betweenbatch_after_preheat
-        self.roasts_per_session_setup = self.roasts_per_session
-        self.roasts_per_session_auto_setup = self.roasts_per_session_auto
     
     # restore protocol settings to their defaults    
     def restoreEnergyProtocolDefaults(self):
@@ -2435,8 +2429,6 @@ class tgraphcanvas(FigureCanvas):
         self.betweenbatchDuration = self.betweenbatchDuration_setup
         self.betweenbatchenergies = self.betweenbatchenergies_setup[:]
         self.betweenbatch_after_preheat = self.betweenbatch_after_preheat_setup
-        self.roasts_per_session = self.roasts_per_session_setup
-        self.roasts_per_session_auto = self.roasts_per_session_auto_setup
 
     @pyqtSlot()
     def fileDirty(self):
@@ -11717,13 +11709,29 @@ class tgraphcanvas(FigureCanvas):
                       3:{0:3412.1416, 1:3600., 2:860.050647, 3:1.}}   #"kwh":{"btu","kj","kcal","kwh"}
         return value * conversion[fromUnit][toUnit]
 
-    def calcEnergyuse(self):
+    def calcEnergyuse(self,beanweightstr=""):
         try:
             energymetrics = {}
             btu_list = []
             if len(self.timex) == 0:
                 aw.sendmessage(QApplication.translate("Message","No profile data", None),append=False)
                 return energymetrics, btu_list
+
+            # helping function
+            def formatBurnerLabel(i):
+                if len(self.burnerlabels[i]) > 0:
+                    return  self.burnerlabels[i]
+                else:
+                    return chr(ord('A')+i)
+                    
+            # get the valid green weight
+            if beanweightstr != "":
+                w = toFloat(beanweightstr)
+            else: 
+                w = aw.qmc.weight[0]
+            bean_weight = aw.convertWeight(w,aw.qmc.weight_units.index(aw.qmc.weight[2]),1) # to kg
+                        
+            
 
             #reference: https://www.eia.gov/environment/emissions/co2_vol_mass.php
             #           https://carbonpositivelife.com/co2-per-kwh-of-electricity/
@@ -11748,7 +11756,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 prev_burnertime = [self.timex[-1]]*4
                 aw.sendmessage(QApplication.translate("Message","Profile has no DROP event", None),append=False)
-
+                    
             for i in range(0,4):
                 # iterate specialevents in reverse from DROP to the first event
                 for j in range(len(self.specialevents) - 1, -1, -1):
@@ -11783,13 +11791,12 @@ class tgraphcanvas(FigureCanvas):
                         
                         BTUs = self.burnerratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
                         if BTUs > 0:
-                            source = chr(ord('A')+i) + "-" + eTypes[self.burner_etypes[i]]
+                            source = "{}-{}".format(formatBurnerLabel(i), eTypes[self.burner_etypes[i]])
                             kind = 5  #Roast Event 
                             sortorder = (2000 * (i + 1)) + j
                             CO2g = BTUs * CO2kg_per_BTU[self.fueltypes[i]] * 1000
                             btu_list.append({"burner_pct":burner_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"Source":source,"Kind":kind,"FuelType":self.fuelnames[self.fueltypes[i]],"SortOrder":sortorder})
-
-                # end of loop: for j in range(len(self.specialevents) - 1, -1, -1)
+                ### end of loop: for j in range(len(self.specialevents) - 1, -1, -1)
                 
                 # calculate Continuous event type
                 if self.burner_etypes[i] == 0:
@@ -11801,7 +11808,7 @@ class tgraphcanvas(FigureCanvas):
                     burner_pct = toInt(self.burnerevent_hundpcts[i])  #needed only for the btu_list and outmsg
                     factor = toFloat(self.burnerevent_hundpcts[i]) / 100
                     
-                    source = chr(ord('A')+i)
+                    source = formatBurnerLabel(i)
                     kind = 4  #Roast Continuous
                     fueltype = self.fueltypes[i]
                     sortorder = 2000 - i
@@ -11811,7 +11818,7 @@ class tgraphcanvas(FigureCanvas):
                         btu_list.append({"burner_pct":burner_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"Source":source,"Kind":kind,"FuelType":self.fuelnames[self.fueltypes[i]],"SortOrder":sortorder})
 
                 # calculate preheat
-                if self.preheatenergies[i] > 0 and self.preheatDuration > 0:
+                if self.preheatenergies[i] > 0 and self.preheatDuration > 0 and aw.qmc.roastbatchpos == 1:
                     if self.preheatenergies[i] <= 1:
                         # percent burner multiplied by duration
                         burner_pct = self.preheatenergies[i] * 1000./10
@@ -11829,17 +11836,15 @@ class tgraphcanvas(FigureCanvas):
                         duration = 0
                         BTUs = self.preheatenergies[i] * self.convertHeat(1,self.ratingunits[i],0)
                         kind = 0  #Preheat Measured
-                    # spread preheat across roasts_per_session
-                    BTUs = BTUs / self.roasts_per_session
 
-                    source = chr(ord('A')+i)
+                    source = formatBurnerLabel(i)
                     sortorder = 100 + i
                     CO2g = BTUs * CO2kg_per_BTU[self.fueltypes[i]] * 1000
                     if BTUs > 0:
                         btu_list.append({"burner_pct":burner_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"Source":source,"Kind":kind,"FuelType":self.fuelnames[self.fueltypes[i]],"SortOrder":sortorder})
 
                 # calculate betweenbatch 
-                if self.betweenbatchenergies[i] > 0 and self.betweenbatchDuration > 0:
+                if self.betweenbatchenergies[i] > 0 and self.betweenbatchDuration > 0 and (aw.qmc.roastbatchpos > 1 or aw.qmc.betweenbatch_after_preheat):
                     if self.betweenbatchenergies[i] <= 1:
                         # percent burner multiplied by duration
                         burner_pct = self.betweenbatchenergies[i] * 1000./10
@@ -11858,17 +11863,16 @@ class tgraphcanvas(FigureCanvas):
                         BTUs = self.betweenbatchenergies[i] * self.convertHeat(1,self.ratingunits[i],0)
                         kind = 2  #BBP Measured
 
-                    source = chr(ord('A')+i)
+                    source = formatBurnerLabel(i)
                     sortorder = 400 + i
                     CO2g = BTUs * CO2kg_per_BTU[self.fueltypes[i]] * 1000
                     if BTUs > 0:
                         btu_list.append({"burner_pct":burner_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"Source":source,"Kind":kind,"FuelType":self.fuelnames[self.fueltypes[i]],"SortOrder":sortorder})
-
-            # end of loop: for i in range(0,4)
+            #### end of loop: for i in range(0,4)
 
             btu_list.sort(key=lambda k : k["SortOrder"] )
 
-
+            # smmarize the batch metrics
             btu_batch = btu_preheat = btu_bbp = btu_roast = 0
             co2_batch = co2_preheat = co2_bbp = co2_roast= 0
             for item in btu_list:
@@ -11888,6 +11892,11 @@ class tgraphcanvas(FigureCanvas):
             co2_preheat = aw.float2float(co2_preheat,3)
             co2_bbp = aw.float2float(co2_bbp,3)
             co2_roast = aw.float2float(co2_roast,3)
+            if bean_weight > 0 and co2_batch > 0:
+                co2_per_green_kg = co2_batch / bean_weight
+            else:
+                co2_per_green_kg = 0
+            co2_per_green_kg = aw.float2float(co2_per_green_kg,3)
 
             # energymetrics
             energymetrics["BTU_batch"] = btu_batch
@@ -11898,17 +11907,7 @@ class tgraphcanvas(FigureCanvas):
             energymetrics["CO2_bbp"] = co2_bbp
             energymetrics["BTU_roast"] = btu_roast
             energymetrics["CO2_roast"] = co2_roast
-            #more metrics
-            #dave - for the moment if roasted weight is not enetered we use green weight.  If no green weight then 0
-            #       this could be changed to use a constant weight loss (eg. 18%) when roasted weight is not entered
-            if self.weight[1] != 0.0:  #weightout
-                weightout = aw.float2float(aw.convertWeight(self.weight[1],self.weight_units.index(self.weight[2]),0),1) # in g
-                energymetrics["CO2g_perRoastedkg"] = aw.float2float(energymetrics["CO2_batch"]/(weightout/1000), 1)
-            elif self.weight[0] != 0.0: #weightin assuming 17% weight loss
-                weightin = aw.float2float(aw.convertWeight(self.weight[0],self.weight_units.index(self.weight[2]),0),1) # in g
-                energymetrics["CO2g_perRoastedkg"] = aw.float2float(energymetrics["CO2_batch"]/(0.83 * weightin/1000), 1)
-            else:
-                energymetrics["CO2g_perRoastedkg"] = 0
+            energymetrics["CO2_per_green_kg"] = co2_per_green_kg
             
         except Exception as ex:
             #import traceback
@@ -11917,7 +11916,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " calcEnergyuse() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
             return energymetrics,btu_list
-
+        
     #used in EventRecord()
     def restorebutton_11(self):
         aw.button_11.setDisabled(False)
@@ -23856,6 +23855,16 @@ class ApplicationWindow(QMainWindow):
                 ("hour", self.qmc.roastdate.toString("hh")),
                 ("minute", self.qmc.roastdate.toString("mm")),
                 ("currtime", currtime),
+                #  Energy Use
+                ("btubatch", str(cp["BTU_batch"]) if "BTU_batch" in cp else "0.0"),
+                ("co2batch", str(cp["CO2_batch"]) if "CO2_batch" in cp else "0.0"),
+                ("btupreheat", str(cp["BTU_preheat"]) if "BTU_preheat" in cp else "0.0"),
+                ("co2preheat", str(cp["CO2_preheat"]) if "CO2_preheat" in cp else "0.0"),
+                ("btubbp", str(cp["BTU_bbp"]) if "BTU_bbp" in cp else "0.0"),
+                ("co2bbp", str(cp["CO2_bbp"]) if "CO2_bbp" in cp else "0.0"),
+                ("bturoast", str(cp["BTU_roast"]) if "BTU_roast" in cp else "0.0"),
+                ("co2roast", str(cp["CO2_roast"]) if "CO2_roast" in cp else "0.0"),
+                ("co2pergreenkg", str(cp["CO2_per_green_kg"]) if "CO2_per_green_kg" in cp else "0.0"),
                 ]
     
             _ignorecase = re.IGNORECASE  # @UndefinedVariable
@@ -24418,8 +24427,6 @@ class ApplicationWindow(QMainWindow):
             self.qmc.betweenbatchenergies = [float(x) for x in profile["betweenbatchenergies"]]
         if "betweenbatch_after_preheat" in profile:
             self.qmc.betweenbatch_after_preheat = profile["betweenbatch_after_preheat"]
-        if "roasts_per_session" in profile:
-            self.qmc.roasts_per_session = profile["roasts_per_session"]
 
     # returns True if data got updated, False otherwise
     def updateSymbolicETBT(self):
@@ -26916,11 +26923,23 @@ class ApplicationWindow(QMainWindow):
         try:
             energymetrics,_ = self.qmc.calcEnergyuse()
             if "BTU_batch" in energymetrics:
-                computedProfile["BTU_roast"] = self.float2float(energymetrics["BTU_roast"],1)
+                computedProfile["BTU_batch"] = self.float2float(energymetrics["BTU_batch"],1)
+            if "CO2_batch" in energymetrics:
+                computedProfile["CO2_batch"] = self.float2float(energymetrics["CO2_batch"],1)
             if "BTU_preheat" in energymetrics:
                 computedProfile["BTU_preheat"] = self.float2float(energymetrics["BTU_preheat"],1)
+            if "CO2_preheat" in energymetrics:
+                computedProfile["CO2_preheat"] = self.float2float(energymetrics["CO2_preheat"],1)
             if "BTU_bbp" in energymetrics:
                 computedProfile["BTU_bbp"] = self.float2float(energymetrics["BTU_bbp"],1)
+            if "CO2_bbp" in energymetrics:
+                computedProfile["CO2_bbp"] = self.float2float(energymetrics["CO2_bbp"],1)
+            if "BTU_roast" in energymetrics:
+                computedProfile["BTU_roast"] = self.float2float(energymetrics["BTU_roast"],1)
+            if "CO2_roast" in energymetrics:
+                computedProfile["CO2_roast"] = self.float2float(energymetrics["CO2_roast"],1)
+            if "CO2_per_green_kg" in energymetrics:
+                computedProfile["CO2_per_green_kg"] = self.float2float(energymetrics["CO2_per_green_kg"],1)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -27116,7 +27135,7 @@ class ApplicationWindow(QMainWindow):
                 except:
                     pass
 
-                    
+            # Energy Settings  
             try:
                 profile["burnerlabels"] = self.qmc.burnerlabels
                 profile["burnerratings"] = self.qmc.burnerratings
@@ -27130,8 +27149,6 @@ class ApplicationWindow(QMainWindow):
                 profile["betweenbatchDuration"] = self.qmc.betweenbatchDuration
                 profile["betweenbatchenergies"] = self.qmc.betweenbatchenergies
                 profile["betweenbatch_after_preheat"] = self.qmc.betweenbatch_after_preheat
-                profile["roasts_per_session"] = self.qmc.roasts_per_session
-                profile["roasts_per_session_auto"] = self.qmc.roasts_per_session_auto
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " getProfile(): {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -28583,10 +28600,6 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.betweenbatchenergies_setup = [toFloat(x) for x in toList(settings.value("betweenbatchenergies_setup"))]
             if settings.contains("betweenbatch_after_preheat_setup"):
                 self.qmc.betweenbatch_after_preheat_setup = bool(toBool(settings.value("betweenbatch_after_preheat_setup",self.qmc.betweenbatch_after_preheat_setup)))
-            if settings.contains("roasts_per_session_setup"):
-                self.qmc.roasts_per_session_setup = toInt(settings.value("roasts_per_session_setup",self.qmc.roasts_per_session_setup))
-            if settings.contains("roasts_per_session_auto_setup"):
-                self.qmc.roasts_per_session_auto_setup = bool(toBool(settings.value("roasts_per_session_auto_setup",self.qmc.roasts_per_session_auto_setup)))
             if settings.contains("energyresultunit_setup"):
                 self.qmc.energyresultunit_setup = toInt(settings.value("energyresultunit_setup",self.qmc.energyresultunit_setup))
             if settings.contains("energytablecolumnwidths"):
@@ -29976,8 +29989,6 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("betweenbatchDuration_setup",self.qmc.betweenbatchDuration_setup)
             settings.setValue("betweenbatchenergies_setup",self.qmc.betweenbatchenergies_setup)
             settings.setValue("betweenbatch_after_preheat_setup",self.qmc.betweenbatch_after_preheat_setup)
-            settings.setValue("roasts_per_session_setup",self.qmc.roasts_per_session_setup)
-            settings.setValue("roasts_per_session_auto_setup",self.qmc.roasts_per_session_auto_setup)
             settings.setValue("energyresultunit_setup",self.qmc.energyresultunit_setup)
             settings.setValue("energytablecolumnwidths",self.qmc.energytablecolumnwidths)
             settings.endGroup()            
@@ -31102,7 +31113,6 @@ class ApplicationWindow(QMainWindow):
         ranking_data_fields = [
             #fld,                   source,  typ,        test0,    units,   name
             ["id",                  "prod",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Batch',None)                ],
-            ["BTU",                 "comp",  "float1",   "false",  "",      QApplication.translate('HTML Report Template','BTU',None)                  ],            
             ["datetime",            "prod",  "date",     "false",  "",      QApplication.translate('HTML Report Template','Time',None)                 ],
             ["title",               "prod",  "text",     "false",  "60",    QApplication.translate('HTML Report Template','Profile  ',None)            ],
             ["weightin",            "comp",  "float1",   "false",  "weight",QApplication.translate('HTML Report Template','Weight In',None)            ],
@@ -31200,6 +31210,15 @@ class ApplicationWindow(QMainWindow):
             ["scorching",           "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Scorching',None)            ],
             ["divots",              "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Divots',None)               ],
             ["mode",                "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Mode',None)                 ],
+            ["BTU_batch",           "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_batch',None)            ],
+            ["CO2_batch",           "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_batch',None)            ],
+            ["BTU_preheat",         "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_preheat',None)          ],
+            ["CO2_preheat",         "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_preheat',None)          ],
+            ["BTU_bbp",             "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_bbp ',None)             ],
+            ["CO2_bbp",             "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_bbp ',None)             ],
+            ["BTU_roast",           "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_roast',None)            ],
+            ["CO2_roast",           "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_roast',None)            ],
+            ["CO2_per_green_kg",    "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_per_green_kg',None)     ],
         ]
         return ranking_data_fields, field_index
 
