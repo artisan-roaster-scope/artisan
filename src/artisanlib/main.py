@@ -2275,18 +2275,18 @@ class tgraphcanvas(FigureCanvas):
         self.statsmaxchrperline = 30
         
         #EnergyUse
-        self.energyunits = ["BTU", "kJ", "kCal", "kWh"]
-        self.powerunits = ["BTU/h", "kJ/h", "kCal/hr", "kW"]
-        self.fuelnames = ["LPG", "NG", QApplication.translate("ComboBox","Elec",None)]
+        self.energyunits = ["BTU", "kJ", "kCal", "kWh", "hph"]
+        self.powerunits = ["BTU/h", "kJ/h", "kCal/h", "kW", "hp"]
+        self.sourcenames = ["LPG", "NG", QApplication.translate("ComboBox","Elec",None)]
         ## setup defaults (stored in app :
         # Burners
-        self.burnerlabels_setup = [""]*4                   # burner labels
-        self.burnerratings_setup = [0]*4                   # in ratingunits
-        self.ratingunits_setup = [0]*4                     # index in list self.heatunits
-        self.fueltypes_setup = [0]*4                       # index in list self.fueltypes
-        self.burner_etypes_setup = [0]*4                   # index of the etype that is the gas/burner setting
-        self.burnerevent_zeropcts_setup = [0]*4            # event value corresponding to 0 percent
-        self.burnerevent_hundpcts_setup = [100]*4          # event value corresponding to 100 percent
+        self.loadlabels_setup = [""]*4                   # burner labels
+        self.loadratings_setup = [0]*4                   # in ratingunits
+        self.ratingunits_setup = [0]*4                   # index in list self.powerunits
+        self.sourcetypes_setup = [0]*4                   # index in list self.sourcenames
+        self.load_etypes_setup = [0]*4                   # index of the etype that is the gas/burner setting
+        self.loadevent_zeropcts_setup = [0]*4            # event value corresponding to 0 percent
+        self.loadevent_hundpcts_setup = [100]*4          # event value corresponding to 100 percent
         # Protocol
         self.preheatDuration_setup = 0                     # length of preheat in seconds
         self.preheatenergies_setup = [0]*4                 # rating of the preheat burner
@@ -2297,23 +2297,25 @@ class tgraphcanvas(FigureCanvas):
         self.betweenbatch_after_preheat_setup = False      # True if after preheat a BBP is done
         self.electricEnergyMix_setup = 0                   # the amount of renewable electric energy in the energy mix in %
         # Others
-        self.energyresultunit_setup = 0 # 0: BTU, 1: kJ, 2: kWh (see self.heatunits)
+        self.energyresultunit_setup = 0                    # index in list self.powerunits
         self.kind_list = [QApplication.translate("Label","Preheat Measured",None),
                           QApplication.translate("Label","Preheat %",None),
                           QApplication.translate("Label","BBP Measured",None),
                           QApplication.translate("Label","BBP %",None),
+                          QApplication.translate("Label","Cooling Measured",None),
+                          QApplication.translate("Label","Cooling %",None),
                           QApplication.translate("Label","Continuous",None),
                           QApplication.translate("Label","Roast Event",None)]
 
         ## working variables (stored in .alog profiles):
         # Burners
-        self.burnerlabels = self.burnerlabels_setup                  # burner labels
-        self.burnerratings = self.burnerratings_setup                # in ratingunits
+        self.loadlabels = self.loadlabels_setup                  # burner labels
+        self.loadratings = self.loadratings_setup                # in ratingunits
         self.ratingunits = self.ratingunits_setup                    # index in list self.heatunits 
-        self.fueltypes = self.fueltypes_setup                        # index in list self.fueltypes
-        self.burner_etypes = self.burner_etypes_setup                # index of the etype that is the gas/burner setting
-        self.burnerevent_zeropcts = self.burnerevent_zeropcts_setup  # event value corresponding to 0 percent
-        self.burnerevent_hundpcts = self.burnerevent_hundpcts_setup  # event value corresponding to 100 percent
+        self.sourcetypes = self.sourcetypes_setup                        # index in list self.sourcetypes
+        self.load_etypes = self.load_etypes_setup                # index of the etype that is the gas/burner setting
+        self.loadevent_zeropcts = self.loadevent_zeropcts_setup  # event value corresponding to 0 percent
+        self.loadevent_hundpcts = self.loadevent_hundpcts_setup  # event value corresponding to 100 percent
         # Protocol
         self.preheatDuration = self.preheatDuration_setup            # length of preheat in seconds
         self.preheatenergies = self.preheatenergies_setup            # rating of the preheat burner
@@ -2401,25 +2403,25 @@ class tgraphcanvas(FigureCanvas):
     #####################################################################################
 
     # set current burner settings as defaults
-    def setEnergyBurnerDefaults(self):
-        self.burnerlabels_setup = self.burnerlabels[:]
-        self.burnerratings_setup = self.burnerratings[:]
+    def setEnergyLoadDefaults(self):
+        self.loadlabels_setup = self.loadlabels[:]
+        self.loadratings_setup = self.loadratings[:]
         self.ratingunits_setup = self.ratingunits[:]
-        self.fueltypes_setup = self.fueltypes[:]
-        self.burner_etypes_setup = self.burner_etypes[:]
-        self.burnerevent_zeropcts_setup = self.burnerevent_zeropcts[:]
-        self.burnerevent_hundpcts_setup = self.burnerevent_hundpcts[:]
+        self.sourcetypes_setup = self.sourcetypes[:]
+        self.load_etypes_setup = self.load_etypes[:]
+        self.loadevent_zeropcts_setup = self.loadevent_zeropcts[:]
+        self.loadevent_hundpcts_setup = self.loadevent_hundpcts[:]
         self.electricEnergyMix_setup = self.electricEnergyMix
   
     # restore burner settings to their defaults
-    def restoreEnergyBurnerDefaults(self):
-        self.burnerlabels = self.burnerlabels_setup[:]
-        self.burnerratings = self.burnerratings_setup[:]
+    def restoreEnergyLoadDefaults(self):
+        self.loadlabels = self.loadlabels_setup[:]
+        self.loadratings = self.loadratings_setup[:]
         self.ratingunits = self.ratingunits_setup[:]
-        self.fueltypes = self.fueltypes_setup[:]
-        self.burner_etypes = self.burner_etypes_setup[:]
-        self.burnerevent_zeropcts = self.burnerevent_zeropcts_setup[:]
-        self.burnerevent_hundpcts = self.burnerevent_hundpcts_setup[:]
+        self.sourcetypes = self.sourcetypes_setup[:]
+        self.load_etypes = self.load_etypes_setup[:]
+        self.loadevent_zeropcts = self.loadevent_zeropcts_setup[:]
+        self.loadevent_hundpcts = self.loadevent_hundpcts_setup[:]
         self.electricEnergyMix = self.electricEnergyMix_setup
     
     # set current protocol settings as defaults
@@ -2431,6 +2433,7 @@ class tgraphcanvas(FigureCanvas):
         self.coolingDuration_setup = self.coolingDuration
         self.coolingenergies_setup = self.coolingenergies[:]
         self.betweenbatch_after_preheat_setup = self.betweenbatch_after_preheat
+        print("setEnergyDefaults \n{} {} {}".format(self.preheatenergies_setup, self.betweenbatchenergies_setup, self.coolingenergies_setup)) #dave
     
     # restore protocol settings to their defaults    
     def restoreEnergyProtocolDefaults(self):
@@ -2441,6 +2444,7 @@ class tgraphcanvas(FigureCanvas):
         self.coolingDuration = self.coolingDuration_setup
         self.coolingenergies = self.coolingenergies_setup[:]
         self.betweenbatch_after_preheat = self.betweenbatch_after_preheat_setup
+        print("restoreEnergyDefaults \n{} {} {}".format(self.preheatenergies, self.betweenbatchenergies, self.coolingenergies)) #dave
 
     @pyqtSlot()
     def fileDirty(self):
@@ -5381,7 +5385,7 @@ class tgraphcanvas(FigureCanvas):
                     self.roastersize = self.roastersize_setup
                     self.drumspeed = self.drumspeed_setup
                     # set energy defaults
-                    self.restoreEnergyBurnerDefaults()
+                    self.restoreEnergyLoadDefaults()
                     self.restoreEnergyProtocolDefaults() 
                     #
                     self.weight = [0,0,self.weight[2]]
@@ -11715,14 +11719,16 @@ class tgraphcanvas(FigureCanvas):
     def convertHeat(self,value,fromUnit,toUnit=0):
         if value in [-1,None]:
             return value
-        conversion = {0:{0:1., 1:1.0551, 2:0.2521644, 3:0.0002931},   #"btu":{"btu","kj","kcal","kwh"}
-                      1:{0:0.9478, 1:1., 2:0.2390057, 3:0.0002778},   #"kj":{"btu","kj","kcal","kwh"}
-                      2:{0:3.965667,1:4.184,2:1.,3:0.0011627},        #"kcal":{"btu","kj","kcal","kwh"}
-                      3:{0:3412.1416, 1:3600., 2:860.050647, 3:1.}}   #"kwh":{"btu","kj","kcal","kwh"}
+        conversion = {0:{0:1., 1:1.0551, 2:0.2521644, 3:0.0002931, 4:0.000393015},   #"btu":{"btu","kj","kcal","kwh",hph}
+                      1:{0:0.9478, 1:1., 2:0.2390057, 3:0.0002778, 4:0.000372506},   #"kj":{"btu","kj","kcal","kwh",hph}
+                      2:{0:3.965667,1:4.184,2:1.,3:0.0011627, 4:0.001559609},        #"kcal":{"btu","kj","kcal","kwh",hph}
+                      3:{0:3412.1416, 1:3600., 2:860.050647, 3:1., 4:1.34102209},    #"kwh":{"btu","kj","kcal","kwh",hph}
+                      4:{0:2544.43358, 1:2684.51954, 2:641.18648, 3:0.7457, 4:1.}}   #"hph":{"btu","kj","kcal","kwh",hph}
         return value * conversion[fromUnit][toUnit]
 
     def calcEnergyuse(self,beanweightstr=""):
         try:
+            print("aw.qmc values", aw.qmc.loadratings, aw.qmc.preheatenergies, aw.qmc.betweenbatchenergies)  #dave
             energymetrics = {}
             btu_list = []
             if len(self.timex) == 0:
@@ -11730,9 +11736,9 @@ class tgraphcanvas(FigureCanvas):
                 return energymetrics, btu_list
 
             # helping function
-            def formatBurnerLabel(i):
-                if len(self.burnerlabels[i]) > 0:
-                    return  self.burnerlabels[i]
+            def formatLoadLabel(i):
+                if len(self.loadlabels[i]) > 0:
+                    return  self.loadlabels[i]
                 else:
                     return chr(ord('A')+i)
                     
@@ -11747,7 +11753,7 @@ class tgraphcanvas(FigureCanvas):
 
             #reference: https://www.eia.gov/environment/emissions/co2_vol_mass.php
             #           https://carbonpositivelife.com/co2-per-kwh-of-electricity/
-            # entries must match those in self.fueltypes
+            # entries must match those in self.sourcetypes
             CO2kg_per_BTU = {0:6.307e-05, 1:5.307e-05, 2:0.94}
 
             # must be a better way
@@ -11757,153 +11763,207 @@ class tgraphcanvas(FigureCanvas):
             bernoulli = [None]*5
             for i in range(0,5):
                 try:
-                    if self.burner_etypes[i] != 0:
-                        bernoulli[i] = aw.eventsliderBernoulli[self.burner_etypes[i]-1]
+                    if self.load_etypes[i] != 0:
+                        bernoulli[i] = aw.eventsliderBernoulli[self.load_etypes[i]-1]
                 except:
                     bernoulli[i] = False
 
-            # init the prev_burnertime to drop if it exists or to the end of profile time
+            # init the prev_loadtime to drop if it exists or to the end of profile time
             if self.timeindex[6] > 0:
-                prev_burnertime = [self.timex[self.timeindex[6]]]*4
+                prev_loadtime = [self.timex[self.timeindex[6]]]*4
             else:
-                prev_burnertime = [self.timex[-1]]*4
+                prev_loadtime = [self.timex[-1]]*4
                 aw.sendmessage(QApplication.translate("Message","Profile has no DROP event", None),append=False)
                     
             for i in range(0,4):
                 # iterate specialevents in reverse from DROP to the first event
                 for j in range(len(self.specialevents) - 1, -1, -1):
-                    if self.burner_etypes[i] != 0 and self.specialeventstype[j] == self.burner_etypes[i]-1:
-                        # skip if burnerrating is zero
-                        if self.burnerratings[i] == 0:
+                    if self.load_etypes[i] != 0 and self.specialeventstype[j] == self.load_etypes[i]-1:
+                        # skip if loadrating is zero
+                        if self.loadratings[i] == 0:
                             break
-                        burnertime = self.timex[self.specialevents[j]]
+                        loadtime = self.timex[self.specialevents[j]]
                         # exclude heat before charge event
-                        if self.timeindex[0] > -1 and burnertime <= self.timex[self.timeindex[0]]:
-                            if prev_burnertime[i] <= self.timex[self.timeindex[0]]:
+                        if self.timeindex[0] > -1 and loadtime <= self.timex[self.timeindex[0]]:
+                            if prev_loadtime[i] <= self.timex[self.timeindex[0]]:
                                 break
                             else:
-                                burnertime = self.timex[self.timeindex[0]]
-                        duration = prev_burnertime[i] - burnertime
+                                loadtime = self.timex[self.timeindex[0]]
+                        duration = prev_loadtime[i] - loadtime
 
                         # exclude heat after drop event
                         if duration < 0:
                             continue
-                        prev_burnertime[i] = burnertime
+                        prev_loadtime[i] = loadtime
                         # scale the burner setting for 0-100%
                         val = (self.specialeventsvalue[j] - 1) * 10
-                        emin = toInt(self.burnerevent_zeropcts[i])  #dave check these, they should already be int's
-                        emax = toInt(self.burnerevent_hundpcts[i])
+                        emin = toInt(self.loadevent_zeropcts[i])  #dave check these, they should already be int's
+                        emax = toInt(self.loadevent_hundpcts[i])
                         scaled = (val - emin) / (emax - emin)  #emax > emin enforced by energy.py
-                        burner_pct = min(1,max(0,scaled)) * 100
+                        load_pct = min(1,max(0,scaled)) * 100
                         # percent factor based on bernoulli setting for burner event slider
+                        # if Bernoulli is selected we expect the % value to truly means % power
+                        #   when not selected the % power is greater than the % pressure
                         if bernoulli[i]:
-                            factor = (burner_pct / 100)
+                            factor = (load_pct / 100)
                         else:
-                            factor = math.sqrt(burner_pct / 100)
+                            factor = math.sqrt(load_pct / 100)
                         
-                        BTUs = self.burnerratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
+                        BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
                         if BTUs > 0:
-                            source = "{}-{}".format(formatBurnerLabel(i), eTypes[self.burner_etypes[i]])
-                            kind = 5  #Roast Event 
+                            loadlabel = "{}-{}".format(formatLoadLabel(i), eTypes[self.load_etypes[i]])
+                            kind = 7  #Roast Event 
                             sortorder = (2000 * (i + 1)) + j
-                            CO2g = BTUs * CO2kg_per_BTU[self.fueltypes[i]] * 1000
-                            btu_list.append({"burner_pct":burner_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"Source":source,"Kind":kind,"FuelType":self.fuelnames[self.fueltypes[i]],"SortOrder":sortorder})
+                            CO2g = BTUs * CO2kg_per_BTU[self.sourcetypes[i]] * 1000
+                            if self.sourcetypes[i] in [2]:  #electicity
+                                CO2g = CO2g * (1 - self.electricEnergyMix/100)
+                            btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcenames[self.sourcetypes[i]],"SortOrder":sortorder})
                 ### end of loop: for j in range(len(self.specialevents) - 1, -1, -1)
                 
                 # calculate Continuous event type
-                if self.burner_etypes[i] == 0:
+                if self.load_etypes[i] == 0:
                     if self.timeindex[0] > -1 and self.timeindex[6] > 0:
                         duration = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
                     else:
                         duration = 0
                         aw.sendmessage(QApplication.translate("Message","Missing CHARGE or DROP event", None),append=False)
-                    burner_pct = toInt(self.burnerevent_hundpcts[i])  #needed only for the btu_list and outmsg
-                    factor = toFloat(self.burnerevent_hundpcts[i]) / 100
+                    load_pct = toInt(self.loadevent_hundpcts[i])  #needed only for the btu_list and outmsg
+                    # percent factor based on bernoulli setting for burner event slider
+                    if bernoulli[i] or self.sourcetypes[i] not in [0,1]:   # not a gas load
+                        factor = (load_pct / 100)
+                    else:
+                        factor = math.sqrt(load_pct / 100)
                     
-                    source = formatBurnerLabel(i)
-                    kind = 4  #Roast Continuous
-                    fueltype = self.fueltypes[i]
+                    loadlabel = formatLoadLabel(i)
+                    kind = 6  #Roast Continuous
+                    fueltype = self.sourcetypes[i]
                     sortorder = 2000 - i
-                    BTUs = self.burnerratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
+                    BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
                     CO2g = BTUs * CO2kg_per_BTU[fueltype] * 1000
+                    if self.sourcetypes[i] in [2]:  #electicity
+                        CO2g = CO2g * (1 - self.electricEnergyMix/100)
                     if BTUs > 0:
-                        btu_list.append({"burner_pct":burner_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"Source":source,"Kind":kind,"FuelType":self.fuelnames[self.fueltypes[i]],"SortOrder":sortorder})
+                        btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcenames[self.sourcetypes[i]],"SortOrder":sortorder})
 
                 # calculate preheat
                 if self.preheatenergies[i] > 0 and self.preheatDuration > 0 and aw.qmc.roastbatchpos == 1:
                     if self.preheatenergies[i] <= 1:
-                        # percent burner multiplied by duration
-                        burner_pct = self.preheatenergies[i] * 1000./10
+                        # percent load multiplied by duration
+                        load_pct = self.preheatenergies[i] * 1000./10
                         # percent factor based on bernoulli setting for burner event slider
-                        if bernoulli[i]:
+                        if bernoulli[i] or self.sourcetypes[i] not in [0,1]:   # not a gas load
                             factor = self.preheatenergies[i]
                         else:
                             factor = math.sqrt(self.preheatenergies[i])
                         duration = self.preheatDuration
-                        BTUs = self.burnerratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
+                        BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
                         kind = 1  #Preheat Percent
                     else:
                         # measured value
-                        burner_pct = 0
+                        load_pct = 0
                         duration = 0
                         BTUs = self.preheatenergies[i] * self.convertHeat(1,self.ratingunits[i],0)
                         kind = 0  #Preheat Measured
 
-                    source = formatBurnerLabel(i)
+                    loadlabel = formatLoadLabel(i)
                     sortorder = 100 + i
-                    CO2g = BTUs * CO2kg_per_BTU[self.fueltypes[i]] * 1000
+                    CO2g = BTUs * CO2kg_per_BTU[self.sourcetypes[i]] * 1000
+                    if self.sourcetypes[i] in [2]:  #electicity
+                        CO2g = CO2g * (1 - self.electricEnergyMix/100)
                     if BTUs > 0:
-                        btu_list.append({"burner_pct":burner_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"Source":source,"Kind":kind,"FuelType":self.fuelnames[self.fueltypes[i]],"SortOrder":sortorder})
+                        btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcenames[self.sourcetypes[i]],"SortOrder":sortorder})
 
                 # calculate betweenbatch 
                 if self.betweenbatchenergies[i] > 0 and self.betweenbatchDuration > 0 and (aw.qmc.roastbatchpos > 1 or aw.qmc.betweenbatch_after_preheat):
                     if self.betweenbatchenergies[i] <= 1:
-                        # percent burner multiplied by duration
-                        burner_pct = self.betweenbatchenergies[i] * 1000./10
+                        # percent load multiplied by duration
+                        load_pct = self.betweenbatchenergies[i] * 1000./10
                         # percent factor based on bernoulli setting for burner event slider
-                        if bernoulli[i]:
+                        if bernoulli[i] or self.sourcetypes[i] not in [0,1]:   # not a gas load
                             factor = self.betweenbatchenergies[i]
                         else:
                             factor = math.sqrt(self.betweenbatchenergies[i])
                         duration = self.betweenbatchDuration
-                        BTUs = self.burnerratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
+                        BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
                         kind = 3  #BBP Percent
                     else:
                         # measured value
-                        burner_pct = 0
+                        load_pct = 0
                         duration = 0
                         BTUs = self.betweenbatchenergies[i] * self.convertHeat(1,self.ratingunits[i],0)
                         kind = 2  #BBP Measured
 
-                    source = formatBurnerLabel(i)
+                    loadlabel = formatLoadLabel(i)
                     sortorder = 400 + i
-                    CO2g = BTUs * CO2kg_per_BTU[self.fueltypes[i]] * 1000
+                    CO2g = BTUs * CO2kg_per_BTU[self.sourcetypes[i]] * 1000
+                    if self.sourcetypes[i] in [2]:  #electicity
+                        CO2g = CO2g * (1 - self.electricEnergyMix/100)
                     if BTUs > 0:
-                        btu_list.append({"burner_pct":burner_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"Source":source,"Kind":kind,"FuelType":self.fuelnames[self.fueltypes[i]],"SortOrder":sortorder})
+                        btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcenames[self.sourcetypes[i]],"SortOrder":sortorder})
+
+                # calculate cooling 
+                if self.preheatenergies[i] > 0 and self.preheatDuration > 0 and aw.qmc.roastbatchpos == 1:
+                    if self.coolingenergies[i] <= 1:
+                        # percent load multiplied by duration
+                        load_pct = self.coolingenergies[i] * 1000./10
+                        # percent factor based on bernoulli setting for burner event slider
+                        if bernoulli[i] or self.sourcetypes[i] not in [0,1]:   # not a gas load
+                            factor = self.coolingenergies[i]
+                        else:
+                            factor = math.sqrt(self.coolingenergies[i])
+                        duration = self.coolingDuration
+                        BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
+                        kind = 5  #Cooling Percent
+                    else:
+                        # measured value
+                        load_pct = 0
+                        duration = 0
+                        BTUs = self.coolingenergies[i] * self.convertHeat(1,self.ratingunits[i],0)
+                        kind = 4  #Cooling Measured
+
+                    loadlabel = formatLoadLabel(i)
+                    sortorder = 800 + i
+                    CO2g = BTUs * CO2kg_per_BTU[self.sourcetypes[i]] * 1000
+                    if self.sourcetypes[i] in [2]:  #electicity
+                        CO2g = CO2g * (1 - self.electricEnergyMix/100)
+                    if BTUs > 0:
+                        btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcenames[self.sourcetypes[i]],"SortOrder":sortorder})
             #### end of loop: for i in range(0,4)
 
             btu_list.sort(key=lambda k : k["SortOrder"] )
 
-            # smmarize the batch metrics
-            btu_batch = btu_preheat = btu_bbp = btu_roast = 0
+            #kind 0:Preheat Measured, 1:Preheat Pct, 2:BBP Measured, 3:BBP Pct, 4:Cooling Measured, 5:Cooling Pct, 6:Continuous, 7:Roast Event
+            # summarize the batch metrics
+            btu_batch = btu_preheat = btu_bbp = btu_cooling = btu_roast = 0
             co2_batch = co2_preheat = co2_bbp = co2_roast= 0
+            electricity_batch = lpg_batch = ng_batch = 0
             for item in btu_list:
                 btu_batch += item['BTUs']
                 btu_preheat += item["BTUs"] if item["Kind"] in [0,1] else 0
                 btu_bbp += item["BTUs"] if item["Kind"] in [2,3] else 0
-                btu_roast += item["BTUs"] if item["Kind"] in [4,5] else 0
+                btu_cooling += item["BTUs"] if item["Kind"] in [4,5] else 0
+                btu_roast += item["BTUs"] if item["Kind"] in [6,7] else 0
                 co2_batch += item['CO2g']
                 co2_preheat += item["CO2g"] if item["Kind"] in [0,1] else 0
                 co2_bbp += item["CO2g"] if item["Kind"] in [2,3] else 0
-                co2_roast += item["CO2g"] if item["Kind"] in [4,5] else 0
+                co2_cooling += item["CO2g"] if item["Kind"] in [4,5] else 0
+                co2_roast += item["CO2g"] if item["Kind"] in [6,7] else 0
+                lpg_batch += item['BTUs'] if item["SourceType"] in [0] else 0
+                ng_batch += item['BTUs'] if item["SourceType"] in [1] else 0
+                electricity_batch += item['BTUs'] if item["SourceType"] in [2] else 0
             btu_batch = aw.float2float(btu_batch,3)
             btu_preheat = aw.float2float(btu_preheat,3)
             btu_bbp = aw.float2float(btu_bbp,3)
+            btu_cooling = aw.float2float(btu_cooling,3)
             btu_roast = aw.float2float(btu_roast,3)
             co2_batch = aw.float2float(co2_batch,3)
             co2_preheat = aw.float2float(co2_preheat,3)
             co2_bbp = aw.float2float(co2_bbp,3)
+            co2_cooling = aw.float2float(co2_cooling,3)
             co2_roast = aw.float2float(co2_roast,3)
+            lpg_batch = aw.float2float(lpg_batch,3)
+            ng_batch = aw.float2float(ng_batch,3)
+            electricity_batch = aw.float2float(electricity_batch,3)
             if bean_weight > 0 and co2_batch > 0:
                 co2_per_green_kg = co2_batch / bean_weight
             else:
@@ -11917,9 +11977,16 @@ class tgraphcanvas(FigureCanvas):
             energymetrics["CO2_preheat"] = co2_preheat
             energymetrics["BTU_bbp"] = btu_bbp
             energymetrics["CO2_bbp"] = co2_bbp
+            energymetrics["BTU_cooling"] = btu_cooling
+            energymetrics["CO2_cooling"] = co2_cooling
             energymetrics["BTU_roast"] = btu_roast
             energymetrics["CO2_roast"] = co2_roast
             energymetrics["CO2_per_green_kg"] = co2_per_green_kg
+            energymetrics["LPG_batch"] = lpg_batch
+            energymetrics["NG_batch"] = ng_batch
+            energymetrics["Electricity_batch"] = electricity_batch
+            
+            print("\n",energymetrics)  #dave
             
         except Exception as ex:
             #import traceback
@@ -23874,6 +23941,8 @@ class ApplicationWindow(QMainWindow):
                 ("co2preheat", str(cp["CO2_preheat"]) if "CO2_preheat" in cp else "0.0"),
                 ("btubbp", str(cp["BTU_bbp"]) if "BTU_bbp" in cp else "0.0"),
                 ("co2bbp", str(cp["CO2_bbp"]) if "CO2_bbp" in cp else "0.0"),
+                #("btucooling", str(cp["BTU_cooling"]) if "BTU_cooling" in cp else "0.0"),
+                #("co2cooling", str(cp["CO2_cooling"]) if "CO2_cooling" in cp else "0.0"),
                 ("bturoast", str(cp["BTU_roast"]) if "BTU_roast" in cp else "0.0"),
                 ("co2roast", str(cp["CO2_roast"]) if "CO2_roast" in cp else "0.0"),
                 ("co2pergreenkg", str(cp["CO2_per_green_kg"]) if "CO2_per_green_kg" in cp else "0.0"),
@@ -24415,20 +24484,20 @@ class ApplicationWindow(QMainWindow):
             self.pidcontrol.svDescriptions = [str(x) for x in profile["svDescriptions"]]
 
     def loadEnergyFromProfile(self,profile):
-        if "burnerlabels" in profile:
-            self.qmc.burnerlabels = [str(x) for x in profile["burnerlabels"]]
-        if "burnerratings" in profile:
-            self.qmc.burnerratings = [int(x) for x in profile["burnerratings"]]
+        if "loadlabels" in profile:
+            self.qmc.loadlabels = [str(x) for x in profile["loadlabels"]]
+        if "loadratings" in profile:
+            self.qmc.loadratings = [int(x) for x in profile["loadratings"]]
         if "ratingunits" in profile:
             self.qmc.ratingunits = [int(x) for x in profile["ratingunits"]]
-        if "fueltypes" in profile:
-            self.qmc.fueltypes = [int(x) for x in profile["fueltypes"]]
-        if "burner_etypes" in profile:
-            self.qmc.burner_etypes = [int(x) for x in profile["burner_etypes"]]
-        if "burnerevent_zeropcts" in profile:
-            self.qmc.burnerevent_zeropcts = [int(x) for x in profile["burnerevent_zeropcts"]]
-        if "burnerevent_hundpcts" in profile:
-            self.qmc.burnerevent_hundpcts = [int(x) for x in profile["burnerevent_hundpcts"]]
+        if "sourcetypes" in profile:
+            self.qmc.sourcetypes = [int(x) for x in profile["sourcetypes"]]
+        if "load_etypes" in profile:
+            self.qmc.load_etypes = [int(x) for x in profile["load_etypes"]]
+        if "loadevent_zeropcts" in profile:
+            self.qmc.loadevent_zeropcts = [int(x) for x in profile["loadevent_zeropcts"]]
+        if "loadevent_hundpcts" in profile:
+            self.qmc.loadevent_hundpcts = [int(x) for x in profile["loadevent_hundpcts"]]
         if "preheatDuration" in profile:
             self.qmc.preheatDuration = profile["preheatDuration"]
         if "preheatenergies" in profile:
@@ -26952,12 +27021,23 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["BTU_bbp"] = self.float2float(energymetrics["BTU_bbp"],1)
             if "CO2_bbp" in energymetrics:
                 computedProfile["CO2_bbp"] = self.float2float(energymetrics["CO2_bbp"],1)
+            if "BTU_cooling" in energymetrics:
+                computedProfile["BTU_cooling"] = self.float2float(energymetrics["BTU_cooling"],1)
+            if "CO2_cooling" in energymetrics:
+                computedProfile["CO2_cooling"] = self.float2float(energymetrics["CO2_cooling"],1)
             if "BTU_roast" in energymetrics:
                 computedProfile["BTU_roast"] = self.float2float(energymetrics["BTU_roast"],1)
             if "CO2_roast" in energymetrics:
                 computedProfile["CO2_roast"] = self.float2float(energymetrics["CO2_roast"],1)
             if "CO2_per_green_kg" in energymetrics:
                 computedProfile["CO2_per_green_kg"] = self.float2float(energymetrics["CO2_per_green_kg"],1)
+            if "LPG_batch" in energymetrics:
+                computedProfile["LPG_batch"] = self.float2float(energymetrics["LPG_batch"],1)
+            if "NG_batch" in energymetrics:
+                computedProfile["NG_batch"] = self.float2float(energymetrics["NG_batch"],1)
+            if "Electricity_batch" in energymetrics:
+                computedProfile["Electricity_batch"] = self.float2float(energymetrics["Electricity_batch"],1)
+
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -27155,13 +27235,13 @@ class ApplicationWindow(QMainWindow):
 
             # Energy Settings  
             try:
-                profile["burnerlabels"] = self.qmc.burnerlabels
-                profile["burnerratings"] = self.qmc.burnerratings
+                profile["loadlabels"] = self.qmc.loadlabels
+                profile["loadratings"] = self.qmc.loadratings
                 profile["ratingunits"] = self.qmc.ratingunits
-                profile["fueltypes"] = self.qmc.fueltypes
-                profile["burner_etypes"] = self.qmc.burner_etypes
-                profile["burnerevent_zeropcts"] = self.qmc.burnerevent_zeropcts
-                profile["burnerevent_hundpcts"] = self.qmc.burnerevent_hundpcts
+                profile["sourcetypes"] = self.qmc.sourcetypes
+                profile["load_etypes"] = self.qmc.load_etypes
+                profile["loadevent_zeropcts"] = self.qmc.loadevent_zeropcts
+                profile["loadevent_hundpcts"] = self.qmc.loadevent_hundpcts
                 profile["preheatDuration"] = self.qmc.preheatDuration
                 profile["preheatenergies"] = self.qmc.preheatenergies
                 profile["betweenbatchDuration"] = self.qmc.betweenbatchDuration
@@ -28597,20 +28677,20 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.drumspeed_setup = toString(settings.value("drumspeed_setup",self.qmc.drumspeed_setup))
             
             settings.beginGroup("EnergyUse")
-            if settings.contains("burnerlabels_setup"):
-                self.qmc.burnerlabels_setup = [toString(x) for x in toList(settings.value("burnerlabels_setup"))]
-            if settings.contains("burnerratings_setup"):
-                self.qmc.burnerratings_setup = [toInt(x) for x in toList(settings.value("burnerratings_setup"))]
+            if settings.contains("loadlabels_setup"):
+                self.qmc.loadlabels_setup = [toString(x) for x in toList(settings.value("loadlabels_setup"))]
+            if settings.contains("loadratings_setup"):
+                self.qmc.loadratings_setup = [toInt(x) for x in toList(settings.value("loadratings_setup"))]
             if settings.contains("ratingunits_setup"):
                 self.qmc.ratingunits_setup = [toInt(x) for x in toList(settings.value("ratingunits_setup"))]
-            if settings.contains("fueltypes_setup"):
-                self.qmc.fueltypes_setup = [toInt(x) for x in toList(settings.value("fueltypes_setup"))]
-            if settings.contains("burner_etypes_setup"):
-                self.qmc.burner_etypes_setup = [toInt(x) for x in toList(settings.value("burner_etypes_setup"))]
-            if settings.contains("burnerevent_zeropcts_setup"):
-                self.qmc.burnerevent_zeropcts_setup = [toInt(x) for x in toList(settings.value("burnerevent_zeropcts_setup"))]
-            if settings.contains("burnerevent_hundpcts_setup"):
-                self.qmc.burnerevent_hundpcts_setup = [toInt(x) for x in toList(settings.value("burnerevent_hundpcts_setup"))]
+            if settings.contains("sourcetypes_setup"):
+                self.qmc.sourcetypes_setup = [toInt(x) for x in toList(settings.value("sourcetypes_setup"))]
+            if settings.contains("load_etypes_setup"):
+                self.qmc.load_etypes_setup = [toInt(x) for x in toList(settings.value("load_etypes_setup"))]
+            if settings.contains("loadevent_zeropcts_setup"):
+                self.qmc.loadevent_zeropcts_setup = [toInt(x) for x in toList(settings.value("loadevent_zeropcts_setup"))]
+            if settings.contains("loadevent_hundpcts_setup"):
+                self.qmc.loadevent_hundpcts_setup = [toInt(x) for x in toList(settings.value("loadevent_hundpcts_setup"))]
             if settings.contains("preheatDuration_setup"):
                 self.qmc.preheatDuration_setup = toInt(settings.value("preheatDuration_setup",self.qmc.preheatDuration_setup))
             if settings.contains("preheatenergies_setup"):
@@ -28632,7 +28712,7 @@ class ApplicationWindow(QMainWindow):
 #            if settings.contains("energytablecolumnwidths"):
 #                self.qmc.energytablecolumnwidths = [toInt(x) for x in toList(settings.value("energytablecolumnwidths",self.qmc.energytablecolumnwidths))]
             settings.endGroup()
-            self.qmc.restoreEnergyBurnerDefaults()
+            self.qmc.restoreEnergyLoadDefaults()
             self.qmc.restoreEnergyProtocolDefaults()          
             
             settings.beginGroup("RoastProperties")
@@ -30004,13 +30084,13 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("drumspeed_setup",self.qmc.drumspeed_setup)
             
             settings.beginGroup("EnergyUse")
-            settings.setValue("burnerlabels_setup",self.qmc.burnerlabels_setup)
-            settings.setValue("burnerratings_setup",self.qmc.burnerratings_setup)
+            settings.setValue("loadlabels_setup",self.qmc.loadlabels_setup)
+            settings.setValue("loadratings_setup",self.qmc.loadratings_setup)
             settings.setValue("ratingunits_setup",self.qmc.ratingunits_setup)
-            settings.setValue("fueltypes_setup",self.qmc.fueltypes_setup)
-            settings.setValue("burner_etypes_setup",self.qmc.burner_etypes_setup)
-            settings.setValue("burnerevent_zeropcts_setup",self.qmc.burnerevent_zeropcts_setup)
-            settings.setValue("burnerevent_hundpcts_setup",self.qmc.burnerevent_hundpcts_setup)
+            settings.setValue("sourcetypes_setup",self.qmc.sourcetypes_setup)
+            settings.setValue("load_etypes_setup",self.qmc.load_etypes_setup)
+            settings.setValue("loadevent_zeropcts_setup",self.qmc.loadevent_zeropcts_setup)
+            settings.setValue("loadevent_hundpcts_setup",self.qmc.loadevent_hundpcts_setup)
             settings.setValue("preheatDuration_setup",self.qmc.preheatDuration_setup)
             settings.setValue("preheatenergies_setup",self.qmc.preheatenergies_setup)
             settings.setValue("betweenbatchDuration_setup",self.qmc.betweenbatchDuration_setup)
@@ -31244,11 +31324,16 @@ class ApplicationWindow(QMainWindow):
             ["CO2_batch",           "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_batch',None)            ],
             ["BTU_preheat",         "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_preheat',None)          ],
             ["CO2_preheat",         "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_preheat',None)          ],
-            ["BTU_bbp",             "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_bbp ',None)             ],
-            ["CO2_bbp",             "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_bbp ',None)             ],
+            ["BTU_bbp",             "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_bbp',None)              ],
+            ["CO2_bbp",             "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_bbp',None)              ],
+            ["BTU_cooling",         "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_cooling',None)          ],
+            ["CO2_cooling",         "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_cooling',None)          ],
             ["BTU_roast",           "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_roast',None)            ],
             ["CO2_roast",           "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_roast',None)            ],
             ["CO2_per_green_kg",    "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_per_green_kg',None)     ],
+            ["LPG_batch",           "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','LPG_batch',None)            ],
+            ["NG_batch",            "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','NG_batch',None)             ],
+            ["Electricity_batch",   "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','Electricity_batch',None)    ],
         ]
         return ranking_data_fields, field_index
 

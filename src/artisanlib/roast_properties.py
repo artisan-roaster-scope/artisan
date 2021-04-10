@@ -2659,13 +2659,13 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.btu_list = []
             
             # remember parameters to enable a Cancel action
-            self.org_burnerlabels = self.aw.qmc.burnerlabels.copy()
-            self.org_burnerratings = self.aw.qmc.burnerratings.copy()
+            self.org_loadlabels = self.aw.qmc.loadlabels.copy()
+            self.org_loadratings = self.aw.qmc.loadratings.copy()
             self.org_ratingunits = self.aw.qmc.ratingunits.copy()
-            self.org_fueltypes = self.aw.qmc.fueltypes.copy()
-            self.org_burner_etypes = self.aw.qmc.burner_etypes.copy()
-            self.org_burnerevent_zeropcts = self.aw.qmc.burnerevent_zeropcts.copy()
-            self.org_burnerevent_hundpcts = self.aw.qmc.burnerevent_hundpcts.copy()
+            self.org_sourcetypes = self.aw.qmc.sourcetypes.copy()
+            self.org_load_etypes = self.aw.qmc.load_etypes.copy()
+            self.org_loadevent_zeropcts = self.aw.qmc.loadevent_zeropcts.copy()
+            self.org_loadevent_hundpcts = self.aw.qmc.loadevent_hundpcts.copy()
             self.org_preheatDuration = self.aw.qmc.preheatDuration
             self.org_preheatenergies = self.aw.qmc.preheatenergies.copy()
             self.org_betweenbatchDuration = self.aw.qmc.betweenbatchDuration
@@ -2680,7 +2680,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             ### reset UI text lables and tooltips for propper translation
             self.energy_ui.helpButton.setText(QApplication.translate("Button","Help",None))
             self.energy_ui.tabWidget.setTabText(0,QApplication.translate("Tab","Details",None))
-            self.energy_ui.tabWidget.setTabText(1,QApplication.translate("Tab","Burners",None))
+            self.energy_ui.tabWidget.setTabText(1,QApplication.translate("Tab","Loads",None))
             self.energy_ui.tabWidget.setTabText(2,QApplication.translate("Tab","Protocol",None))
             self.energy_ui.resultunitLabel.setText(QApplication.translate("Label","Results in",None))
             self.energy_ui.EnergyGroupBox.setTitle(QApplication.translate("GroupBox","Energy",None))
@@ -2688,21 +2688,21 @@ class editGraphDlg(ArtisanResizeablDialog):
             # Details tab
             self.energy_ui.copyTableButton.setText(QApplication.translate("Button","Copy Table",None))
             self.energy_ui.copyTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
-            self.energy_ui.datatable.horizontalHeaderItem(0).setText(QApplication.translate("Table","Burner",None))
+            self.energy_ui.datatable.horizontalHeaderItem(0).setText(QApplication.translate("Table","Power",None))
             self.energy_ui.datatable.horizontalHeaderItem(1).setText(QApplication.translate("Table","Duration",None))
             self.energy_ui.datatable.horizontalHeaderItem(2).setText("BTU")
             self.energy_ui.datatable.horizontalHeaderItem(3).setText(QApplication.translate("Table","CO2",None) + " (g)")
-            self.energy_ui.datatable.horizontalHeaderItem(4).setText(QApplication.translate("Table","Source",None))
-            self.energy_ui.datatable.horizontalHeaderItem(5).setText(QApplication.translate("Table","Fuel",None))
+            self.energy_ui.datatable.horizontalHeaderItem(4).setText(QApplication.translate("Table","Load",None))
+            self.energy_ui.datatable.horizontalHeaderItem(5).setText(QApplication.translate("Table","Source",None))
             self.energy_ui.datatable.horizontalHeaderItem(6).setText(QApplication.translate("Table","Kind",None))
             self.energy_ui.datatable.verticalHeader().setSectionResizeMode(2)
-            # Burners tab
-            self.energy_ui.burnersSetDefaultsButton.setText(QApplication.translate("Button","Set as Defaults",None))
-            self.energy_ui.burnersDefaultsButtons.setText(QApplication.translate("Button","Restore Defaults",None))
-            self.energy_ui.burnerlabelsLabel.setText(QApplication.translate("Label","Label",None))
-            self.energy_ui.burnerratingsLabel.setText(QApplication.translate("Label","Rating",None))
+            # Loads tab
+            self.energy_ui.loadsSetDefaultsButton.setText(QApplication.translate("Button","Set as Defaults",None))
+            self.energy_ui.loadsDefaultsButtons.setText(QApplication.translate("Button","Restore Defaults",None))
+            self.energy_ui.loadlabelsLabel.setText(QApplication.translate("Label","Label",None))
+            self.energy_ui.loadratingsLabel.setText(QApplication.translate("Label","Rating",None))
             self.energy_ui.ratingunitsLabel.setText(QApplication.translate("Label","Unit",None))
-            self.energy_ui.fueltypesLabel.setText(QApplication.translate("Label","Fuel",None))
+            self.energy_ui.sourcetypesLabel.setText(QApplication.translate("Label","Source",None))
             self.energy_ui.eventsLabel.setText(QApplication.translate("Label","Event",None))
             self.energy_ui.electricEnergyMixLabel.setText(QApplication.translate("Label","Electric Energy Mix:",None))
             self.energy_ui.renewableLabel.setText(QApplication.translate("Label","Renewable",None))
@@ -2713,15 +2713,15 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.betweenBatchesLabel.setText(QApplication.translate("Label","Between Batches",None))
             self.energy_ui.coolingLabel.setText(QApplication.translate("Label","Cooling",None))
             self.energy_ui.BBPafterPreHeatcheckBox.setText(QApplication.translate("Label","Between Batches after Pre-Heating",None))
-            self.energy_ui.burnerALabel.setText(self.formatBurnerLabel("A"))
-            self.energy_ui.burnerBLabel.setText(self.formatBurnerLabel("B"))
-            self.energy_ui.burnerCLabel.setText(self.formatBurnerLabel("C"))
-            self.energy_ui.burnerDLabel.setText(self.formatBurnerLabel("D"))
+            self.energy_ui.loadALabel.setText(self.formatLoadLabel("A"))
+            self.energy_ui.loadBLabel.setText(self.formatLoadLabel("B"))
+            self.energy_ui.loadCLabel.setText(self.formatLoadLabel("C"))
+            self.energy_ui.loadDLabel.setText(self.formatLoadLabel("D"))
             self.energy_ui.timeUnitLabel.setText(QApplication.translate("Label","(mm:ss)",None))
-            self.energy_ui.burnerAUnitLabel.setText("(BTU)")
-            self.energy_ui.burnerBUnitLabel.setText("(BTU)")
-            self.energy_ui.burnerCUnitLabel.setText("(BTU)")
-            self.energy_ui.burnerDUnitLabel.setText("(BTU)")
+            self.energy_ui.loadAUnitLabel.setText("(BTU)")
+            self.energy_ui.loadBUnitLabel.setText("(BTU)")
+            self.energy_ui.loadCUnitLabel.setText("(BTU)")
+            self.energy_ui.loadDUnitLabel.setText("(BTU)")
             self.energy_ui.durationLabel.setText(QApplication.translate("Label","Duration",None))
             self.energy_ui.measuredEnergyLabel.setText(QApplication.translate("Label","Measured Energy or Output %",None))
             
@@ -2729,10 +2729,10 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.resultunitComboBox.addItems(self.aw.qmc.energyunits)
             
             #
-            self.energy_ui.fueltype0.addItems(self.aw.qmc.fuelnames)
-            self.energy_ui.fueltype1.addItems(self.aw.qmc.fuelnames)
-            self.energy_ui.fueltype2.addItems(self.aw.qmc.fuelnames)
-            self.energy_ui.fueltype3.addItems(self.aw.qmc.fuelnames)
+            self.energy_ui.sourcetype0.addItems(self.aw.qmc.sourcenames)
+            self.energy_ui.sourcetype1.addItems(self.aw.qmc.sourcenames)
+            self.energy_ui.sourcetype2.addItems(self.aw.qmc.sourcenames)
+            self.energy_ui.sourcetype3.addItems(self.aw.qmc.sourcenames)
             #
             etypes = [""] + self.aw.qmc.etypes[:4]
             self.energy_ui.events0.addItems(etypes)
@@ -2759,40 +2759,40 @@ class editGraphDlg(ArtisanResizeablDialog):
             
             self.energy_ui.copyTableButton.clicked.connect(self.copyEnergyDataTabletoClipboard)
         
-            self.energy_ui.burnerlabel0.editingFinished.connect(self.burnerlabels_editingfinished)
-            self.energy_ui.burnerlabel1.editingFinished.connect(self.burnerlabels_editingfinished)
-            self.energy_ui.burnerlabel2.editingFinished.connect(self.burnerlabels_editingfinished)
-            self.energy_ui.burnerlabel3.editingFinished.connect(self.burnerlabels_editingfinished)
+            self.energy_ui.loadlabel0.editingFinished.connect(self.loadlabels_editingfinished)
+            self.energy_ui.loadlabel1.editingFinished.connect(self.loadlabels_editingfinished)
+            self.energy_ui.loadlabel2.editingFinished.connect(self.loadlabels_editingfinished)
+            self.energy_ui.loadlabel3.editingFinished.connect(self.loadlabels_editingfinished)
 
-            self.energy_ui.burnerrating0.editingFinished.connect(self.burnerratings_editingfinished)
-            self.energy_ui.burnerrating1.editingFinished.connect(self.burnerratings_editingfinished)
-            self.energy_ui.burnerrating2.editingFinished.connect(self.burnerratings_editingfinished)
-            self.energy_ui.burnerrating3.editingFinished.connect(self.burnerratings_editingfinished)
+            self.energy_ui.loadrating0.editingFinished.connect(self.loadratings_editingfinished)
+            self.energy_ui.loadrating1.editingFinished.connect(self.loadratings_editingfinished)
+            self.energy_ui.loadrating2.editingFinished.connect(self.loadratings_editingfinished)
+            self.energy_ui.loadrating3.editingFinished.connect(self.loadratings_editingfinished)
 
             self.energy_ui.ratingunit0.currentIndexChanged.connect(self.ratingunits_currentindexchanged)
             self.energy_ui.ratingunit1.currentIndexChanged.connect(self.ratingunits_currentindexchanged)
             self.energy_ui.ratingunit2.currentIndexChanged.connect(self.ratingunits_currentindexchanged)
             self.energy_ui.ratingunit3.currentIndexChanged.connect(self.ratingunits_currentindexchanged)
             
-            self.energy_ui.fueltype0.currentIndexChanged.connect(self.fueltypes_currentindexchanged)
-            self.energy_ui.fueltype1.currentIndexChanged.connect(self.fueltypes_currentindexchanged)
-            self.energy_ui.fueltype2.currentIndexChanged.connect(self.fueltypes_currentindexchanged)
-            self.energy_ui.fueltype3.currentIndexChanged.connect(self.fueltypes_currentindexchanged)
+            self.energy_ui.sourcetype0.currentIndexChanged.connect(self.sourcetypes_currentindexchanged)
+            self.energy_ui.sourcetype1.currentIndexChanged.connect(self.sourcetypes_currentindexchanged)
+            self.energy_ui.sourcetype2.currentIndexChanged.connect(self.sourcetypes_currentindexchanged)
+            self.energy_ui.sourcetype3.currentIndexChanged.connect(self.sourcetypes_currentindexchanged)
 
-            self.energy_ui.events0.currentIndexChanged.connect(self.burner_etypes_currentindexchanged)
-            self.energy_ui.events1.currentIndexChanged.connect(self.burner_etypes_currentindexchanged)
-            self.energy_ui.events2.currentIndexChanged.connect(self.burner_etypes_currentindexchanged)
-            self.energy_ui.events3.currentIndexChanged.connect(self.burner_etypes_currentindexchanged)
+            self.energy_ui.events0.currentIndexChanged.connect(self.load_etypes_currentindexchanged)
+            self.energy_ui.events1.currentIndexChanged.connect(self.load_etypes_currentindexchanged)
+            self.energy_ui.events2.currentIndexChanged.connect(self.load_etypes_currentindexchanged)
+            self.energy_ui.events3.currentIndexChanged.connect(self.load_etypes_currentindexchanged)
             
-            self.energy_ui.zeropcts0.valueChanged.connect(self.burnerevent_zeropcts0_valuechanged)
-            self.energy_ui.zeropcts1.valueChanged.connect(self.burnerevent_zeropcts1_valuechanged)
-            self.energy_ui.zeropcts2.valueChanged.connect(self.burnerevent_zeropcts2_valuechanged)
-            self.energy_ui.zeropcts3.valueChanged.connect(self.burnerevent_zeropcts3_valuechanged)
+            self.energy_ui.zeropcts0.valueChanged.connect(self.loadevent_zeropcts0_valuechanged)
+            self.energy_ui.zeropcts1.valueChanged.connect(self.loadevent_zeropcts1_valuechanged)
+            self.energy_ui.zeropcts2.valueChanged.connect(self.loadevent_zeropcts2_valuechanged)
+            self.energy_ui.zeropcts3.valueChanged.connect(self.loadevent_zeropcts3_valuechanged)
             
-            self.energy_ui.hundredpct0.valueChanged.connect(self.burnerevent_hundpcts0_valuechanged)
-            self.energy_ui.hundredpct1.valueChanged.connect(self.burnerevent_hundpcts1_valuechanged)
-            self.energy_ui.hundredpct2.valueChanged.connect(self.burnerevent_hundpcts2_valuechanged)
-            self.energy_ui.hundredpct3.valueChanged.connect(self.burnerevent_hundpcts3_valuechanged)
+            self.energy_ui.hundredpct0.valueChanged.connect(self.loadevent_hundpcts0_valuechanged)
+            self.energy_ui.hundredpct1.valueChanged.connect(self.loadevent_hundpcts1_valuechanged)
+            self.energy_ui.hundredpct2.valueChanged.connect(self.loadevent_hundpcts2_valuechanged)
+            self.energy_ui.hundredpct3.valueChanged.connect(self.loadevent_hundpcts3_valuechanged)
 
             # Protocol
             
@@ -2821,8 +2821,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             
             self.energy_ui.resultunitComboBox.currentIndexChanged.connect(self.energyresultunitComboBox_indexchanged)
             #
-            self.energy_ui.burnersSetDefaultsButton.clicked.connect(self.setEnergyBurnerDefaults)
-            self.energy_ui.burnersDefaultsButtons.clicked.connect(self.restoreEnergyBurnerDefaults)
+            self.energy_ui.loadsSetDefaultsButton.clicked.connect(self.setEnergyLoadDefaults)
+            self.energy_ui.loadsDefaultsButtons.clicked.connect(self.restoreEnergyLoadDefaults)
             self.energy_ui.protocolSetDefaultsButton.clicked.connect(self.setEnergyProtocolDefaults)
             self.energy_ui.protocolDefaultsButton.clicked.connect(self.restoreEnergyProtocolDefaults)
 
@@ -2842,10 +2842,10 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         for i in range(ndata):
             if self.btu_list[i]["Kind"] in [0, 2]:  #Preheat Measured, BBP Measured
-                burner_widget = MyTableWidgetItemNumber("",self.btu_list[i]["burner_pct"])
+                load_widget = MyTableWidgetItemNumber("",self.btu_list[i]["load_pct"])
             else:
-                burner_widget = MyTableWidgetItemNumber("{:.1f}%".format(self.btu_list[i]["burner_pct"]),self.btu_list[i]["burner_pct"])
-            burner_widget.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                load_widget = MyTableWidgetItemNumber("{:.1f}%".format(self.btu_list[i]["load_pct"]),self.btu_list[i]["load_pct"])
+            load_widget.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             
             if self.btu_list[i]["Kind"] in [0, 2]:  #Preheat Measured, BBP Measured
                 duration_mmss_widget = MyTableWidgetItemNumber("",0)
@@ -2861,21 +2861,21 @@ class editGraphDlg(ArtisanResizeablDialog):
             CO2g_widget = MyTableWidgetItemNumber(self.scalefloat(CO2g),CO2g)
             CO2g_widget.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                         
-            Source_widget = QTableWidgetItem(self.btu_list[i]["Source"])
-            Source_widget.setTextAlignment(Qt.AlignLeft|Qt.AlignVCenter)
+            Load_widget = QTableWidgetItem(self.btu_list[i]["LoadLabel"])
+            Load_widget.setTextAlignment(Qt.AlignLeft|Qt.AlignVCenter)
             
-            FuelType_widget = QTableWidgetItem(self.btu_list[i]["FuelType"])
-            FuelType_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+            SourceType_widget = QTableWidgetItem(self.btu_list[i]["SourceType"])
+            SourceType_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
             
             Kind_widget = MyTableWidgetItemNumber(self.aw.qmc.kind_list[self.btu_list[i]["Kind"]],self.btu_list[i]["SortOrder"])
             Kind_widget.setTextAlignment(Qt.AlignLeft|Qt.AlignVCenter)
             
-            self.energy_ui.datatable.setItem(i,0,burner_widget)
+            self.energy_ui.datatable.setItem(i,0,load_widget)
             self.energy_ui.datatable.setItem(i,1,duration_mmss_widget)
             self.energy_ui.datatable.setItem(i,2,BTUs_widget)
             self.energy_ui.datatable.setItem(i,3,CO2g_widget)
-            self.energy_ui.datatable.setItem(i,4,Source_widget)
-            self.energy_ui.datatable.setItem(i,5,FuelType_widget)
+            self.energy_ui.datatable.setItem(i,4,Load_widget)
+            self.energy_ui.datatable.setItem(i,5,SourceType_widget)
             self.energy_ui.datatable.setItem(i,6,Kind_widget)
  
         header = self.energy_ui.datatable.horizontalHeader()
@@ -2900,42 +2900,42 @@ class editGraphDlg(ArtisanResizeablDialog):
     def updateEnergyTab(self):
         self.energy_ui.resultunitComboBox.setCurrentIndex(self.aw.qmc.energyresultunit_setup)
         ## Details tab
-        ## Burners tab
+        ## Loads tab
         # label
-        self.energy_ui.burnerlabel0.setText(self.aw.qmc.burnerlabels[0])
-        self.energy_ui.burnerlabel1.setText(self.aw.qmc.burnerlabels[1])
-        self.energy_ui.burnerlabel2.setText(self.aw.qmc.burnerlabels[2])
-        self.energy_ui.burnerlabel3.setText(self.aw.qmc.burnerlabels[3])
+        self.energy_ui.loadlabel0.setText(self.aw.qmc.loadlabels[0])
+        self.energy_ui.loadlabel1.setText(self.aw.qmc.loadlabels[1])
+        self.energy_ui.loadlabel2.setText(self.aw.qmc.loadlabels[2])
+        self.energy_ui.loadlabel3.setText(self.aw.qmc.loadlabels[3])
         # rating
-        self.energy_ui.burnerrating0.setText(str(self.aw.qmc.burnerratings[0]) if self.aw.qmc.burnerratings[0] != 0 else "")
-        self.energy_ui.burnerrating1.setText(str(self.aw.qmc.burnerratings[1]) if self.aw.qmc.burnerratings[1] != 0 else "")
-        self.energy_ui.burnerrating2.setText(str(self.aw.qmc.burnerratings[2]) if self.aw.qmc.burnerratings[2] != 0 else "")
-        self.energy_ui.burnerrating3.setText(str(self.aw.qmc.burnerratings[3]) if self.aw.qmc.burnerratings[3] != 0 else "")
+        self.energy_ui.loadrating0.setText(str(self.aw.qmc.loadratings[0]) if self.aw.qmc.loadratings[0] != 0 else "")
+        self.energy_ui.loadrating1.setText(str(self.aw.qmc.loadratings[1]) if self.aw.qmc.loadratings[1] != 0 else "")
+        self.energy_ui.loadrating2.setText(str(self.aw.qmc.loadratings[2]) if self.aw.qmc.loadratings[2] != 0 else "")
+        self.energy_ui.loadrating3.setText(str(self.aw.qmc.loadratings[3]) if self.aw.qmc.loadratings[3] != 0 else "")
         # unit
         self.energy_ui.ratingunit0.setCurrentIndex(self.aw.qmc.ratingunits[0])
         self.energy_ui.ratingunit1.setCurrentIndex(self.aw.qmc.ratingunits[1])
         self.energy_ui.ratingunit2.setCurrentIndex(self.aw.qmc.ratingunits[2])
         self.energy_ui.ratingunit3.setCurrentIndex(self.aw.qmc.ratingunits[3])
-        # fuel
-        self.energy_ui.fueltype0.setCurrentIndex(self.aw.qmc.fueltypes[0])
-        self.energy_ui.fueltype1.setCurrentIndex(self.aw.qmc.fueltypes[1])
-        self.energy_ui.fueltype2.setCurrentIndex(self.aw.qmc.fueltypes[2])
-        self.energy_ui.fueltype3.setCurrentIndex(self.aw.qmc.fueltypes[3])
+        # source
+        self.energy_ui.sourcetype0.setCurrentIndex(self.aw.qmc.sourcetypes[0])
+        self.energy_ui.sourcetype1.setCurrentIndex(self.aw.qmc.sourcetypes[1])
+        self.energy_ui.sourcetype2.setCurrentIndex(self.aw.qmc.sourcetypes[2])
+        self.energy_ui.sourcetype3.setCurrentIndex(self.aw.qmc.sourcetypes[3])
         # event
-        self.energy_ui.events0.setCurrentIndex(self.aw.qmc.burner_etypes[0])
-        self.energy_ui.events1.setCurrentIndex(self.aw.qmc.burner_etypes[1])
-        self.energy_ui.events2.setCurrentIndex(self.aw.qmc.burner_etypes[2])
-        self.energy_ui.events3.setCurrentIndex(self.aw.qmc.burner_etypes[3])
+        self.energy_ui.events0.setCurrentIndex(self.aw.qmc.load_etypes[0])
+        self.energy_ui.events1.setCurrentIndex(self.aw.qmc.load_etypes[1])
+        self.energy_ui.events2.setCurrentIndex(self.aw.qmc.load_etypes[2])
+        self.energy_ui.events3.setCurrentIndex(self.aw.qmc.load_etypes[3])
         # zeropcts
-        self.energy_ui.zeropcts0.setValue(self.aw.qmc.burnerevent_zeropcts[0])
-        self.energy_ui.zeropcts1.setValue(self.aw.qmc.burnerevent_zeropcts[1])
-        self.energy_ui.zeropcts2.setValue(self.aw.qmc.burnerevent_zeropcts[2])
-        self.energy_ui.zeropcts3.setValue(self.aw.qmc.burnerevent_zeropcts[3])
+        self.energy_ui.zeropcts0.setValue(self.aw.qmc.loadevent_zeropcts[0])
+        self.energy_ui.zeropcts1.setValue(self.aw.qmc.loadevent_zeropcts[1])
+        self.energy_ui.zeropcts2.setValue(self.aw.qmc.loadevent_zeropcts[2])
+        self.energy_ui.zeropcts3.setValue(self.aw.qmc.loadevent_zeropcts[3])
         # hundpcts
-        self.energy_ui.hundredpct0.setValue(self.aw.qmc.burnerevent_hundpcts[0])
-        self.energy_ui.hundredpct1.setValue(self.aw.qmc.burnerevent_hundpcts[1])
-        self.energy_ui.hundredpct2.setValue(self.aw.qmc.burnerevent_hundpcts[2])
-        self.energy_ui.hundredpct3.setValue(self.aw.qmc.burnerevent_hundpcts[3])
+        self.energy_ui.hundredpct0.setValue(self.aw.qmc.loadevent_hundpcts[0])
+        self.energy_ui.hundredpct1.setValue(self.aw.qmc.loadevent_hundpcts[1])
+        self.energy_ui.hundredpct2.setValue(self.aw.qmc.loadevent_hundpcts[2])
+        self.energy_ui.hundredpct3.setValue(self.aw.qmc.loadevent_hundpcts[3])
         ## Protocol tab
         self.energy_ui.preheatDuration.setText(self.validateSeconds2Text(self.aw.qmc.preheatDuration))
         self.energy_ui.betweenBatchesDuration.setText(self.validateSeconds2Text(self.aw.qmc.betweenbatchDuration))
@@ -2960,24 +2960,28 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.updateEnableZHpct()
         self.createEnergyDataTable()
     
-    def updateBurnerLabels(self, updateMetrics=True):
-        self.aw.qmc.burnerlabels[0] = self.energy_ui.burnerlabel0.text()
-        self.aw.qmc.burnerlabels[1] = self.energy_ui.burnerlabel1.text()
-        self.aw.qmc.burnerlabels[2] = self.energy_ui.burnerlabel2.text()
-        self.aw.qmc.burnerlabels[3] = self.energy_ui.burnerlabel3.text()
+    def updateLoadLabels(self, updateMetrics=True):
+        self.aw.qmc.loadlabels[0] = self.energy_ui.loadlabel0.text()
+        self.aw.qmc.loadlabels[1] = self.energy_ui.loadlabel1.text()
+        self.aw.qmc.loadlabels[2] = self.energy_ui.loadlabel2.text()
+        self.aw.qmc.loadlabels[3] = self.energy_ui.loadlabel3.text()
         if updateMetrics:
             self.updateMetricsLabel()
         self.updateEnergyLabels()
     
-    def updateBurnerRatings(self, updateMetrics=True):
-        self.aw.qmc.burnerratings[0] = (int(self.energy_ui.burnerrating0.text()) if len(self.energy_ui.burnerrating0.text())>0 else 0)
-        self.aw.qmc.burnerratings[1] = (int(self.energy_ui.burnerrating1.text()) if len(self.energy_ui.burnerrating1.text())>0 else 0)
-        self.aw.qmc.burnerratings[2] = (int(self.energy_ui.burnerrating2.text()) if len(self.energy_ui.burnerrating2.text())>0 else 0)
-        self.aw.qmc.burnerratings[3] = (int(self.energy_ui.burnerrating3.text()) if len(self.energy_ui.burnerrating3.text())>0 else 0)
+    def updateLoadRatings(self, updateMetrics=True):
+        self.aw.qmc.loadratings[0] = (int(self.energy_ui.loadrating0.text()) if len(self.energy_ui.loadrating0.text())>0 else 0)
+        self.aw.qmc.loadratings[1] = (int(self.energy_ui.loadrating1.text()) if len(self.energy_ui.loadrating1.text())>0 else 0)
+        self.aw.qmc.loadratings[2] = (int(self.energy_ui.loadrating2.text()) if len(self.energy_ui.loadrating2.text())>0 else 0)
+        self.aw.qmc.loadratings[3] = (int(self.energy_ui.loadrating3.text()) if len(self.energy_ui.loadrating3.text())>0 else 0)
+#        self.aw.qmc.loadratings[0] = (float(self.energy_ui.loadrating0.text()) if len(self.energy_ui.loadrating0.text())>0 else 0)
+#        self.aw.qmc.loadratings[1] = (float(self.energy_ui.loadrating1.text()) if len(self.energy_ui.loadrating1.text())>0 else 0)
+#        self.aw.qmc.loadratings[2] = (float(self.energy_ui.loadrating2.text()) if len(self.energy_ui.loadrating2.text())>0 else 0)
+#        self.aw.qmc.loadratings[3] = (float(self.energy_ui.loadrating3.text()) if len(self.energy_ui.loadrating3.text())>0 else 0)
         if updateMetrics:
             self.updateMetricsLabel()
     
-    def updateBurnerUnits(self, updateMetrics=True):
+    def updateLoadUnits(self, updateMetrics=True):
         self.aw.qmc.ratingunits[0] = self.energy_ui.ratingunit0.currentIndex()
         self.aw.qmc.ratingunits[1] = self.energy_ui.ratingunit1.currentIndex()
         self.aw.qmc.ratingunits[2] = self.energy_ui.ratingunit2.currentIndex()
@@ -2985,33 +2989,33 @@ class editGraphDlg(ArtisanResizeablDialog):
         if updateMetrics:
             self.updateMetricsLabel()
     
-    def updateFuelTypes(self, updateMetrics=True):
-        self.aw.qmc.fueltypes[0] = self.energy_ui.fueltype0.currentIndex()
-        self.aw.qmc.fueltypes[1] = self.energy_ui.fueltype1.currentIndex()
-        self.aw.qmc.fueltypes[2] = self.energy_ui.fueltype2.currentIndex()
-        self.aw.qmc.fueltypes[3] = self.energy_ui.fueltype3.currentIndex()
+    def updateSourceTypes(self, updateMetrics=True):
+        self.aw.qmc.sourcetypes[0] = self.energy_ui.sourcetype0.currentIndex()
+        self.aw.qmc.sourcetypes[1] = self.energy_ui.sourcetype1.currentIndex()
+        self.aw.qmc.sourcetypes[2] = self.energy_ui.sourcetype2.currentIndex()
+        self.aw.qmc.sourcetypes[3] = self.energy_ui.sourcetype3.currentIndex()
         if updateMetrics:
             self.updateMetricsLabel()
     
-    def updateBurnerEvents(self, updateMetrics=True):
-        self.aw.qmc.burner_etypes[0] = self.energy_ui.events0.currentIndex()
-        self.aw.qmc.burner_etypes[1] = self.energy_ui.events1.currentIndex()
-        self.aw.qmc.burner_etypes[2] = self.energy_ui.events2.currentIndex()
-        self.aw.qmc.burner_etypes[3] = self.energy_ui.events3.currentIndex()
+    def updateLoadEvents(self, updateMetrics=True):
+        self.aw.qmc.load_etypes[0] = self.energy_ui.events0.currentIndex()
+        self.aw.qmc.load_etypes[1] = self.energy_ui.events1.currentIndex()
+        self.aw.qmc.load_etypes[2] = self.energy_ui.events2.currentIndex()
+        self.aw.qmc.load_etypes[3] = self.energy_ui.events3.currentIndex()
         if updateMetrics:
             self.updateMetricsLabel()
     
-    def updateBurnerPcts(self, updateMetrics=True):
+    def updateLoadPcts(self, updateMetrics=True):
         # zeropcts
-        self.aw.qmc.burnerevent_zeropcts[0] = self.energy_ui.zeropcts0.value()
-        self.aw.qmc.burnerevent_zeropcts[1] = self.energy_ui.zeropcts1.value()
-        self.aw.qmc.burnerevent_zeropcts[2] = self.energy_ui.zeropcts2.value()
-        self.aw.qmc.burnerevent_zeropcts[3] = self.energy_ui.zeropcts3.value()
+        self.aw.qmc.loadevent_zeropcts[0] = self.energy_ui.zeropcts0.value()
+        self.aw.qmc.loadevent_zeropcts[1] = self.energy_ui.zeropcts1.value()
+        self.aw.qmc.loadevent_zeropcts[2] = self.energy_ui.zeropcts2.value()
+        self.aw.qmc.loadevent_zeropcts[3] = self.energy_ui.zeropcts3.value()
         # hundpcts
-        self.aw.qmc.burnerevent_hundpcts[0] = self.energy_ui.hundredpct0.value()
-        self.aw.qmc.burnerevent_hundpcts[1] = self.energy_ui.hundredpct1.value()
-        self.aw.qmc.burnerevent_hundpcts[2] = self.energy_ui.hundredpct2.value()
-        self.aw.qmc.burnerevent_hundpcts[3] = self.energy_ui.hundredpct3.value()
+        self.aw.qmc.loadevent_hundpcts[0] = self.energy_ui.hundredpct0.value()
+        self.aw.qmc.loadevent_hundpcts[1] = self.energy_ui.hundredpct1.value()
+        self.aw.qmc.loadevent_hundpcts[2] = self.energy_ui.hundredpct2.value()
+        self.aw.qmc.loadevent_hundpcts[3] = self.energy_ui.hundredpct3.value()
         if updateMetrics:
             self.updateMetricsLabel()
     
@@ -3067,19 +3071,19 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.tabInitialized[4]:
             self.aw.qmc.energyresultunit_setup = self.energy_ui.resultunitComboBox.currentIndex()
             ## Details tab
-            ## Burners tab
+            ## Loads tab
             # label
-            self.updateBurnerLabels(False)
+            self.updateLoadLabels(False)
             # rating
-            self.updateBurnerRatings(False)
+            self.updateLoadRatings(False)
             # unit
-            self.updateBurnerUnits(False)
-            # fuel
-            self.updateFuelTypes(False)
+            self.updateLoadUnits(False)
+            # source
+            self.updateSourceTypes(False)
             # event
-            self.updateBurnerEvents(False)
+            self.updateLoadEvents(False)
             # zeropcts & hundpcts
-            self.updateBurnerPcts(False)
+            self.updateLoadPcts(False)
             ## Protocol tab
             self.updatePreheatDuration(False)
             self.updateBetweenBatchessDuration(False)
@@ -3091,13 +3095,13 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     def restoreAllEnergySettings(self):
         if self.tabInitialized[4]:
-            self.aw.qmc.burnerlabels = self.org_burnerlabels.copy()
-            self.aw.qmc.burnerratings = self.org_burnerratings.copy()
+            self.aw.qmc.loadlabels = self.org_loadlabels.copy()
+            self.aw.qmc.loadratings = self.org_loadratings.copy()
             self.aw.qmc.ratingunits = self.org_ratingunits.copy()
-            self.aw.qmc.fueltypes = self.org_fueltypes.copy()
-            self.aw.qmc.burner_etypes = self.org_burner_etypes.copy()
-            self.aw.qmc.burnerevent_zeropcts = self.org_burnerevent_zeropcts.copy()
-            self.aw.qmc.burnerevent_hundpcts = self.org_burnerevent_hundpcts.copy()
+            self.aw.qmc.sourcetypes = self.org_sourcetypes.copy()
+            self.aw.qmc.load_etypes = self.org_load_etypes.copy()
+            self.aw.qmc.loadevent_zeropcts = self.org_loadevent_zeropcts.copy()
+            self.aw.qmc.loadevent_hundpcts = self.org_loadevent_hundpcts.copy()
             self.aw.qmc.preheatDuration = self.org_preheatDuration
             self.aw.qmc.preheatenergies = self.org_preheatenergies.copy()
             self.aw.qmc.betweenbatchDuration = self.org_betweenbatchDuration
@@ -3121,7 +3125,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 roast_energy = self.scalefloat(self.aw.qmc.convertHeat(metrics["BTU_roast"],0,self.aw.qmc.energyresultunit_setup))
                 self.energy_ui.roastEnergyLabel.setText("{} {} ({})".format(roast_energy,energy_unit,QApplication.translate("Label","Roast",None)))
                 #
-                if metrics["CO2_batch"] > 0:
+                if metrics["CO2_batch"] >= 0:
                     scaled_co2_batch = str(self.scalefloat(metrics["CO2_batch"]))+'g' if metrics["CO2_batch"]<1000 else str(self.scalefloat(metrics["CO2_batch"]/1000.)) +'kg'
                     self.energy_ui.totalCO2Label.setText(scaled_co2_batch)
 #                    scaled_co2_preheat = str(metrics["CO2_preheat"])+'g' if metrics["CO2_preheat"]<1000 else str(self.aw.float2float(metrics["CO2_preheat"]/1000.,1)) +'kg'
@@ -3153,26 +3157,26 @@ class editGraphDlg(ArtisanResizeablDialog):
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updateMetricsLabel() {0}").format(str(e)),exc_tb.tb_lineno)
 
-    def formatBurnerLabel(self,tag,label=""):
+    def formatLoadLabel(self,tag,label=""):
         if len(label) > 0:
             return label
         else:
-            return "{} {}".format(QApplication.translate("Label","Burner",None),tag)
+            return "{} {}".format(QApplication.translate("Label","Load",None),tag)
     
-    def formatBurnerUnitLabel(self,unit):
+    def formatLoadUnitLabel(self,unit):
         return "({})".format(self.aw.qmc.energyunits[unit])
     
     def updateEnergyLabels(self):
-        self.energy_ui.burnerALabel.setText(self.formatBurnerLabel("A",self.aw.qmc.burnerlabels[0]))
-        self.energy_ui.burnerBLabel.setText(self.formatBurnerLabel("B",self.aw.qmc.burnerlabels[1]))
-        self.energy_ui.burnerCLabel.setText(self.formatBurnerLabel("C",self.aw.qmc.burnerlabels[2]))
-        self.energy_ui.burnerDLabel.setText(self.formatBurnerLabel("D",self.aw.qmc.burnerlabels[3]))
+        self.energy_ui.loadALabel.setText(self.formatLoadLabel("A",self.aw.qmc.loadlabels[0]))
+        self.energy_ui.loadBLabel.setText(self.formatLoadLabel("B",self.aw.qmc.loadlabels[1]))
+        self.energy_ui.loadCLabel.setText(self.formatLoadLabel("C",self.aw.qmc.loadlabels[2]))
+        self.energy_ui.loadDLabel.setText(self.formatLoadLabel("D",self.aw.qmc.loadlabels[3]))
         
     def updateEnergyUnitLabels(self):
-        self.energy_ui.burnerAUnitLabel.setText(self.formatBurnerUnitLabel(self.energy_ui.ratingunit0.currentIndex()))
-        self.energy_ui.burnerBUnitLabel.setText(self.formatBurnerUnitLabel(self.energy_ui.ratingunit1.currentIndex()))
-        self.energy_ui.burnerCUnitLabel.setText(self.formatBurnerUnitLabel(self.energy_ui.ratingunit2.currentIndex()))
-        self.energy_ui.burnerDUnitLabel.setText(self.formatBurnerUnitLabel(self.energy_ui.ratingunit3.currentIndex()))
+        self.energy_ui.loadAUnitLabel.setText(self.formatLoadUnitLabel(self.energy_ui.ratingunit0.currentIndex()))
+        self.energy_ui.loadBUnitLabel.setText(self.formatLoadUnitLabel(self.energy_ui.ratingunit1.currentIndex()))
+        self.energy_ui.loadCUnitLabel.setText(self.formatLoadUnitLabel(self.energy_ui.ratingunit2.currentIndex()))
+        self.energy_ui.loadDUnitLabel.setText(self.formatLoadUnitLabel(self.energy_ui.ratingunit3.currentIndex()))
 
     def updateEnableZHpct(self):
         for ew,zw in [
@@ -3190,16 +3194,16 @@ class editGraphDlg(ArtisanResizeablDialog):
     ##
 
     @pyqtSlot(bool)
-    def setEnergyBurnerDefaults(self,_=False):
+    def setEnergyLoadDefaults(self,_=False):
         # ensure that the data from the focused widget gets set
         focusWidget = QApplication.focusWidget()
         if focusWidget:
             focusWidget.clearFocus()
-        self.aw.qmc.setEnergyBurnerDefaults()
+        self.aw.qmc.setEnergyLoadDefaults()
         
     @pyqtSlot(bool)
-    def restoreEnergyBurnerDefaults(self,_=False):
-        self.aw.qmc.restoreEnergyBurnerDefaults()
+    def restoreEnergyLoadDefaults(self,_=False):
+        self.aw.qmc.restoreEnergyLoadDefaults()
         self.updateEnergyTab()
         
     @pyqtSlot(bool)
@@ -3260,67 +3264,67 @@ class editGraphDlg(ArtisanResizeablDialog):
     ##
     
     @pyqtSlot()
-    def burnerlabels_editingfinished(self):
-        for w in [self.energy_ui.burnerlabel0,self.energy_ui.burnerlabel1,self.energy_ui.burnerlabel2,self.energy_ui.burnerlabel3]:
+    def loadlabels_editingfinished(self):
+        for w in [self.energy_ui.loadlabel0,self.energy_ui.loadlabel1,self.energy_ui.loadlabel2,self.energy_ui.loadlabel3]:
             if w.isModified():
                 w.setText(w.text().strip())
-        self.updateBurnerLabels()
+        self.updateLoadLabels()
 
     @pyqtSlot()
-    def burnerratings_editingfinished(self):
-        for w in [self.energy_ui.burnerrating0,self.energy_ui.burnerrating1,self.energy_ui.burnerrating2,self.energy_ui.burnerrating3]:
+    def loadratings_editingfinished(self):
+        for w in [self.energy_ui.loadrating0,self.energy_ui.loadrating1,self.energy_ui.loadrating2,self.energy_ui.loadrating3]:
             if w.isModified():
                 w.setText(self.validateNumText(w.text()))
-        self.updateBurnerRatings()
+        self.updateLoadRatings()
         self.updateEnergyLabels()
 
     @pyqtSlot()
     def ratingunits_currentindexchanged(self):
-        self.updateBurnerUnits()
+        self.updateLoadUnits()
         self.updateEnergyUnitLabels()
 
     @pyqtSlot()
-    def fueltypes_currentindexchanged(self):
-        self.updateFuelTypes()
+    def sourcetypes_currentindexchanged(self):
+        self.updateSourceTypes()
 
     @pyqtSlot()
-    def burner_etypes_currentindexchanged(self):
+    def load_etypes_currentindexchanged(self):
         self.updateEnableZHpct()
-        self.updateBurnerEvents()
+        self.updateLoadEvents()
 
     @pyqtSlot()
-    def burnerevent_zeropcts0_valuechanged(self):
-        self.burnerevent_pcts_valuechanged("zero",self.energy_ui.zeropcts0,self.energy_ui.hundredpct0)
+    def loadevent_zeropcts0_valuechanged(self):
+        self.loadevent_pcts_valuechanged("zero",self.energy_ui.zeropcts0,self.energy_ui.hundredpct0)
 
     @pyqtSlot()
-    def burnerevent_zeropcts1_valuechanged(self):
-        self.burnerevent_pcts_valuechanged("zero",self.energy_ui.zeropcts1,self.energy_ui.hundredpct1)
+    def loadevent_zeropcts1_valuechanged(self):
+        self.loadevent_pcts_valuechanged("zero",self.energy_ui.zeropcts1,self.energy_ui.hundredpct1)
 
     @pyqtSlot()
-    def burnerevent_zeropcts2_valuechanged(self):
-        self.burnerevent_pcts_valuechanged("zero",self.energy_ui.zeropcts2,self.energy_ui.hundredpct2)
+    def loadevent_zeropcts2_valuechanged(self):
+        self.loadevent_pcts_valuechanged("zero",self.energy_ui.zeropcts2,self.energy_ui.hundredpct2)
 
     @pyqtSlot()
-    def burnerevent_zeropcts3_valuechanged(self):
-        self.burnerevent_pcts_valuechanged("zero",self.energy_ui.zeropcts3,self.energy_ui.hundredpct3)
+    def loadevent_zeropcts3_valuechanged(self):
+        self.loadevent_pcts_valuechanged("zero",self.energy_ui.zeropcts3,self.energy_ui.hundredpct3)
 
     @pyqtSlot()
-    def burnerevent_hundpcts0_valuechanged(self):
-        self.burnerevent_pcts_valuechanged("hund",self.energy_ui.zeropcts0,self.energy_ui.hundredpct0)
+    def loadevent_hundpcts0_valuechanged(self):
+        self.loadevent_pcts_valuechanged("hund",self.energy_ui.zeropcts0,self.energy_ui.hundredpct0)
 
     @pyqtSlot()
-    def burnerevent_hundpcts1_valuechanged(self):
-        self.burnerevent_pcts_valuechanged("hund",self.energy_ui.zeropcts1,self.energy_ui.hundredpct1)
+    def loadevent_hundpcts1_valuechanged(self):
+        self.loadevent_pcts_valuechanged("hund",self.energy_ui.zeropcts1,self.energy_ui.hundredpct1)
 
     @pyqtSlot()
-    def burnerevent_hundpcts2_valuechanged(self):
-        self.burnerevent_pcts_valuechanged("hund",self.energy_ui.zeropcts2,self.energy_ui.hundredpct2)
+    def loadevent_hundpcts2_valuechanged(self):
+        self.loadevent_pcts_valuechanged("hund",self.energy_ui.zeropcts2,self.energy_ui.hundredpct2)
 
     @pyqtSlot()
-    def burnerevent_hundpcts3_valuechanged(self):
-        self.burnerevent_pcts_valuechanged("hund",self.energy_ui.zeropcts3,self.energy_ui.hundredpct3)
+    def loadevent_hundpcts3_valuechanged(self):
+        self.loadevent_pcts_valuechanged("hund",self.energy_ui.zeropcts3,self.energy_ui.hundredpct3)
     
-    def burnerevent_pcts_valuechanged(self,field,zeropcts,hundpcts):
+    def loadevent_pcts_valuechanged(self,field,zeropcts,hundpcts):
         if zeropcts.value() >= hundpcts.value():
             self.aw.sendmessage(QApplication.translate("Dialog","The 0% value must be less than the 100% value.",None))
             QApplication.beep()
@@ -3328,7 +3332,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 zeropcts.setValue(hundpcts.value()-1)
             else:
                 hundpcts.setValue(zeropcts.value()+1)
-        self.updateBurnerPcts()
+        self.updateLoadPcts()
     
     @pyqtSlot()
     def preheatDuration_editingfinished(self):
@@ -3433,9 +3437,14 @@ class editGraphDlg(ArtisanResizeablDialog):
         res = ""
         try:
             r = abs(toInt(toFloat((self.aw.comma2dot(str(s))))))
+            #dave r = abs(toFloat(self.aw.comma2dot(str(s))))
             if not r == 0:
                 res = str(r)
-        except Exception:
+        #dave except Exception:
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " validateNumText(): {0}").format(str(e)),exc_tb.tb_lineno)
+            print("EXCEPTION  input s=", s)
             pass
         return res
 

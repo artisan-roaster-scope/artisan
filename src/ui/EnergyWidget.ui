@@ -365,12 +365,12 @@
          </column>
          <column>
           <property name="text">
-           <string notr="true">Source</string>
+           <string notr="true">Load</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string notr="true">Fuel</string>
+           <string notr="true">Source</string>
           </property>
          </column>
          <column>
@@ -428,7 +428,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="burnersTab">
+     <widget class="QWidget" name="loadsTab">
       <attribute name="title">
        <string notr="true">Burners</string>
       </attribute>
@@ -449,7 +449,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QWidget" name="burnersGrid" native="true">
+        <widget class="QWidget" name="loadsGrid" native="true">
          <layout class="QGridLayout" name="gridLayout_3">
           <property name="leftMargin">
            <number>2</number>
@@ -496,7 +496,7 @@
            </widget>
           </item>
           <item row="0" column="4">
-           <widget class="QLabel" name="fueltypesLabel">
+           <widget class="QLabel" name="sourcetypesLabel">
             <property name="font">
              <font>
               <weight>75</weight>
@@ -551,7 +551,7 @@
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QLabel" name="burnerratingsLabel">
+           <widget class="QLabel" name="loadratingsLabel">
             <property name="font">
              <font>
               <weight>75</weight>
@@ -570,7 +570,7 @@
            </widget>
           </item>
           <item row="4" column="4">
-           <widget class="QComboBox" name="fueltype3">
+           <widget class="QComboBox" name="sourcetype3">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
@@ -583,7 +583,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLabel" name="burnerlabelsLabel">
+           <widget class="QLabel" name="loadlabelsLabel">
             <property name="font">
              <font>
               <weight>75</weight>
@@ -602,7 +602,7 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QLineEdit" name="burnerlabel2">
+           <widget class="QLineEdit" name="loadlabel2">
             <property name="maxLength">
              <number>12</number>
             </property>
@@ -677,21 +677,21 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLineEdit" name="burnerlabel1">
+           <widget class="QLineEdit" name="loadlabel1">
             <property name="maxLength">
              <number>12</number>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="burnerlabel0">
+           <widget class="QLineEdit" name="loadlabel0">
             <property name="maxLength">
              <number>12</number>
             </property>
            </widget>
           </item>
           <item row="3" column="4">
-           <widget class="QComboBox" name="fueltype2">
+           <widget class="QComboBox" name="sourcetype2">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
@@ -717,21 +717,21 @@
            </widget>
           </item>
           <item row="3" column="2">
-           <widget class="QLineEdit" name="burnerrating2">
+           <widget class="QLineEdit" name="loadrating2">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
           <item row="2" column="2">
-           <widget class="QLineEdit" name="burnerrating1">
+           <widget class="QLineEdit" name="loadrating1">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
           <item row="2" column="4">
-           <widget class="QComboBox" name="fueltype1">
+           <widget class="QComboBox" name="sourcetype1">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
@@ -757,14 +757,14 @@
            </widget>
           </item>
           <item row="4" column="2">
-           <widget class="QLineEdit" name="burnerrating3">
+           <widget class="QLineEdit" name="loadrating3">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QLineEdit" name="burnerlabel3">
+           <widget class="QLineEdit" name="loadlabel3">
             <property name="maxLength">
              <number>12</number>
             </property>
@@ -816,7 +816,7 @@
            </widget>
           </item>
           <item row="1" column="2">
-           <widget class="QLineEdit" name="burnerrating0">
+           <widget class="QLineEdit" name="loadrating0">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
@@ -868,7 +868,7 @@
            </widget>
           </item>
           <item row="1" column="4">
-           <widget class="QComboBox" name="fueltype0">
+           <widget class="QComboBox" name="sourcetype0">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
@@ -1057,7 +1057,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QWidget" name="burnersButtonsLine" native="true">
+        <widget class="QWidget" name="loadsButtonsLine" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <property name="leftMargin">
            <number>0</number>
@@ -1072,7 +1072,7 @@
            <number>5</number>
           </property>
           <item>
-           <widget class="QPushButton" name="burnersSetDefaultsButton">
+           <widget class="QPushButton" name="loadsSetDefaultsButton">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
@@ -1098,7 +1098,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="burnersDefaultsButtons">
+           <widget class="QPushButton" name="loadsDefaultsButtons">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
@@ -1173,7 +1173,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QLabel" name="burnerCLabel">
+             <widget class="QLabel" name="loadCLabel">
               <property name="toolTip">
                <string notr="true"/>
               </property>
@@ -1186,7 +1186,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="burnerCUnitLabel">
+             <widget class="QLabel" name="loadCUnitLabel">
               <property name="toolTip">
                <string notr="true"/>
               </property>
@@ -1385,7 +1385,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QLabel" name="burnerBLabel">
+             <widget class="QLabel" name="loadBLabel">
               <property name="toolTip">
                <string notr="true"/>
               </property>
@@ -1398,7 +1398,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="burnerBUnitLabel">
+             <widget class="QLabel" name="loadBUnitLabel">
               <property name="toolTip">
                <string notr="true"/>
               </property>
@@ -1432,7 +1432,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QLabel" name="burnerDLabel">
+             <widget class="QLabel" name="loadDLabel">
               <property name="toolTip">
                <string notr="true"/>
               </property>
@@ -1445,7 +1445,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="burnerDUnitLabel">
+             <widget class="QLabel" name="loadDUnitLabel">
               <property name="toolTip">
                <string notr="true"/>
               </property>
@@ -1499,7 +1499,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QLabel" name="burnerALabel">
+             <widget class="QLabel" name="loadALabel">
               <property name="toolTip">
                <string notr="true"/>
               </property>
@@ -1512,7 +1512,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="burnerAUnitLabel">
+             <widget class="QLabel" name="loadAUnitLabel">
               <property name="toolTip">
                <string notr="true"/>
               </property>
@@ -1712,20 +1712,20 @@
  </widget>
  <tabstops>
   <tabstop>datatable</tabstop>
-  <tabstop>burnerlabel0</tabstop>
-  <tabstop>burnerrating0</tabstop>
+  <tabstop>loadlabel0</tabstop>
+  <tabstop>loadrating0</tabstop>
   <tabstop>zeropcts0</tabstop>
   <tabstop>hundredpct0</tabstop>
-  <tabstop>burnerlabel1</tabstop>
-  <tabstop>burnerrating1</tabstop>
+  <tabstop>loadlabel1</tabstop>
+  <tabstop>loadrating1</tabstop>
   <tabstop>zeropcts1</tabstop>
   <tabstop>hundredpct1</tabstop>
-  <tabstop>burnerlabel2</tabstop>
-  <tabstop>burnerrating2</tabstop>
+  <tabstop>loadlabel2</tabstop>
+  <tabstop>loadrating2</tabstop>
   <tabstop>zeropcts2</tabstop>
   <tabstop>hundredpct2</tabstop>
-  <tabstop>burnerlabel3</tabstop>
-  <tabstop>burnerrating3</tabstop>
+  <tabstop>loadlabel3</tabstop>
+  <tabstop>loadrating3</tabstop>
   <tabstop>zeropcts3</tabstop>
   <tabstop>hundredpct3</tabstop>
   <tabstop>electricEnergyMixSpinBox</tabstop>
