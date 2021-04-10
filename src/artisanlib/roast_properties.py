@@ -3437,14 +3437,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         res = ""
         try:
             r = abs(toInt(toFloat((self.aw.comma2dot(str(s))))))
-            #dave r = abs(toFloat(self.aw.comma2dot(str(s))))
             if not r == 0:
                 res = str(r)
-        #dave except Exception:
-        except Exception as e:
-            _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " validateNumText(): {0}").format(str(e)),exc_tb.tb_lineno)
-            print("EXCEPTION  input s=", s)
+        except Exception:
             pass
         return res
 

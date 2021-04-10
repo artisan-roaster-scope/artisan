@@ -2433,7 +2433,6 @@ class tgraphcanvas(FigureCanvas):
         self.coolingDuration_setup = self.coolingDuration
         self.coolingenergies_setup = self.coolingenergies[:]
         self.betweenbatch_after_preheat_setup = self.betweenbatch_after_preheat
-        print("setEnergyDefaults \n{} {} {}".format(self.preheatenergies_setup, self.betweenbatchenergies_setup, self.coolingenergies_setup)) #dave
     
     # restore protocol settings to their defaults    
     def restoreEnergyProtocolDefaults(self):
@@ -2444,7 +2443,6 @@ class tgraphcanvas(FigureCanvas):
         self.coolingDuration = self.coolingDuration_setup
         self.coolingenergies = self.coolingenergies_setup[:]
         self.betweenbatch_after_preheat = self.betweenbatch_after_preheat_setup
-        print("restoreEnergyDefaults \n{} {} {}".format(self.preheatenergies, self.betweenbatchenergies, self.coolingenergies)) #dave
 
     @pyqtSlot()
     def fileDirty(self):
@@ -11728,7 +11726,6 @@ class tgraphcanvas(FigureCanvas):
 
     def calcEnergyuse(self,beanweightstr=""):
         try:
-            print("aw.qmc values", aw.qmc.loadratings, aw.qmc.preheatenergies, aw.qmc.betweenbatchenergies)  #dave
             energymetrics = {}
             btu_list = []
             if len(self.timex) == 0:
@@ -11935,7 +11932,7 @@ class tgraphcanvas(FigureCanvas):
             #kind 0:Preheat Measured, 1:Preheat Pct, 2:BBP Measured, 3:BBP Pct, 4:Cooling Measured, 5:Cooling Pct, 6:Continuous, 7:Roast Event
             # summarize the batch metrics
             btu_batch = btu_preheat = btu_bbp = btu_cooling = btu_roast = 0
-            co2_batch = co2_preheat = co2_bbp = co2_roast= 0
+            co2_batch = co2_preheat = co2_bbp = co2_cooling = co2_roast = 0
             electricity_batch = lpg_batch = ng_batch = 0
             for item in btu_list:
                 btu_batch += item['BTUs']
@@ -11985,8 +11982,6 @@ class tgraphcanvas(FigureCanvas):
             energymetrics["LPG_batch"] = lpg_batch
             energymetrics["NG_batch"] = ng_batch
             energymetrics["Electricity_batch"] = electricity_batch
-            
-            print("\n",energymetrics)  #dave
             
         except Exception as ex:
             #import traceback
