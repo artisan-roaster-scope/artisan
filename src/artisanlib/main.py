@@ -11945,9 +11945,9 @@ class tgraphcanvas(FigureCanvas):
                 co2_bbp += item["CO2g"] if item["Kind"] in [2,3] else 0
                 co2_cooling += item["CO2g"] if item["Kind"] in [4,5] else 0
                 co2_roast += item["CO2g"] if item["Kind"] in [6,7] else 0
-                lpg_batch += item['BTUs'] if item["SourceType"] in [0] else 0
-                ng_batch += item['BTUs'] if item["SourceType"] in [1] else 0
-                electricity_batch += item['BTUs'] if item["SourceType"] in [2] else 0
+                lpg_batch += item['BTUs'] if item["SourceType"] == self.sourcenames[0] else 0
+                ng_batch += item['BTUs'] if item["SourceType"] == self.sourcenames[1] else 0
+                electricity_batch += item['BTUs'] if item["SourceType"] == self.sourcenames[2] else 0
             btu_batch = aw.float2float(btu_batch,3)
             btu_preheat = aw.float2float(btu_preheat,3)
             btu_bbp = aw.float2float(btu_bbp,3)
@@ -27027,11 +27027,11 @@ class ApplicationWindow(QMainWindow):
             if "CO2_per_green_kg" in energymetrics:
                 computedProfile["CO2_per_green_kg"] = self.float2float(energymetrics["CO2_per_green_kg"],1)
             if "LPG_batch" in energymetrics:
-                computedProfile["LPG_batch"] = self.float2float(energymetrics["LPG_batch"],1)
+                computedProfile["BTU_LPG"] = self.float2float(energymetrics["LPG_batch"],1)
             if "NG_batch" in energymetrics:
-                computedProfile["NG_batch"] = self.float2float(energymetrics["NG_batch"],1)
+                computedProfile["BTU_NG"] = self.float2float(energymetrics["NG_batch"],1)
             if "Electricity_batch" in energymetrics:
-                computedProfile["Electricity_batch"] = self.float2float(energymetrics["Electricity_batch"],1)
+                computedProfile["BTU_ELEC"] = self.float2float(energymetrics["Electricity_batch"],1)
 
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
