@@ -23330,6 +23330,7 @@ class ApplicationWindow(QMainWindow):
                     if not aw.qmc.designerflag:
                         if alt_modifier and platf != 'Windows' or ((control_shift_modifier or control_alt_modifier) and platf == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
                             aw.deleteBackground()
+                            self.autoAdjustAxis()
                             aw.qmc.redraw()
                         else:
                             self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext_alt=".alog")
@@ -24621,6 +24622,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     def clearbackgroundRedraw(self):
         self.deleteBackground()
+        self.autoAdjustAxis()
         self.qmc.redraw()
 
     @pyqtSlot(str)
