@@ -2864,7 +2864,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             Load_widget = QTableWidgetItem(self.btu_list[i]["LoadLabel"])
             Load_widget.setTextAlignment(Qt.AlignLeft|Qt.AlignVCenter)
             
-            SourceType_widget = QTableWidgetItem(self.btu_list[i]["SourceType"])
+            SourceType_widget = MyTableWidgetItemNumber(self.aw.qmc.sourcenames[self.btu_list[i]["SourceType"]],self.btu_list[i]["SortOrder"])
             SourceType_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
             
             Kind_widget = MyTableWidgetItemNumber(self.aw.qmc.kind_list[self.btu_list[i]["Kind"]],self.btu_list[i]["SortOrder"])

@@ -11746,8 +11746,6 @@ class tgraphcanvas(FigureCanvas):
                 w = aw.qmc.weight[0]
             bean_weight = aw.convertWeight(w,aw.qmc.weight_units.index(aw.qmc.weight[2]),1) # to kg
                         
-            
-
             #reference: https://www.eia.gov/environment/emissions/co2_vol_mass.php
             #           https://carbonpositivelife.com/co2-per-kwh-of-electricity/
             # entries must match those in self.sourcetypes
@@ -11814,7 +11812,7 @@ class tgraphcanvas(FigureCanvas):
                             CO2g = BTUs * CO2kg_per_BTU[self.sourcetypes[i]] * 1000
                             if self.sourcetypes[i] in [2]:  #electicity
                                 CO2g = CO2g * (1 - self.electricEnergyMix/100)
-                            btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcenames[self.sourcetypes[i]],"SortOrder":sortorder})
+                            btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcetypes[i],"SortOrder":sortorder})
                 ### end of loop: for j in range(len(self.specialevents) - 1, -1, -1)
                 
                 # calculate Continuous event type
@@ -11840,7 +11838,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.sourcetypes[i] in [2]:  #electicity
                         CO2g = CO2g * (1 - self.electricEnergyMix/100)
                     if BTUs > 0:
-                        btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcenames[self.sourcetypes[i]],"SortOrder":sortorder})
+                        btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcetypes[i],"SortOrder":sortorder})
 
                 # calculate preheat
                 if self.preheatenergies[i] > 0 and self.preheatDuration > 0 and aw.qmc.roastbatchpos == 1:
@@ -11868,7 +11866,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.sourcetypes[i] in [2]:  #electicity
                         CO2g = CO2g * (1 - self.electricEnergyMix/100)
                     if BTUs > 0:
-                        btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcenames[self.sourcetypes[i]],"SortOrder":sortorder})
+                        btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcetypes[i],"SortOrder":sortorder})
 
                 # calculate betweenbatch 
                 if self.betweenbatchenergies[i] > 0 and self.betweenbatchDuration > 0 and (aw.qmc.roastbatchpos > 1 or aw.qmc.betweenbatch_after_preheat):
@@ -11896,7 +11894,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.sourcetypes[i] in [2]:  #electicity
                         CO2g = CO2g * (1 - self.electricEnergyMix/100)
                     if BTUs > 0:
-                        btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcenames[self.sourcetypes[i]],"SortOrder":sortorder})
+                        btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcetypes[i],"SortOrder":sortorder})
 
                 # calculate cooling 
                 if self.preheatenergies[i] > 0 and self.preheatDuration > 0 and aw.qmc.roastbatchpos == 1:
@@ -11924,7 +11922,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.sourcetypes[i] in [2]:  #electicity
                         CO2g = CO2g * (1 - self.electricEnergyMix/100)
                     if BTUs > 0:
-                        btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcenames[self.sourcetypes[i]],"SortOrder":sortorder})
+                        btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcetypes[i],"SortOrder":sortorder})
             #### end of loop: for i in range(0,4)
 
             btu_list.sort(key=lambda k : k["SortOrder"] )
@@ -11933,7 +11931,7 @@ class tgraphcanvas(FigureCanvas):
             # summarize the batch metrics
             btu_batch = btu_preheat = btu_bbp = btu_cooling = btu_roast = 0
             co2_batch = co2_preheat = co2_bbp = co2_cooling = co2_roast = 0
-            electricity_batch = lpg_batch = ng_batch = 0
+            btu_elec = btu_lpg = btu_ng = 0
             for item in btu_list:
                 btu_batch += item['BTUs']
                 btu_preheat += item["BTUs"] if item["Kind"] in [0,1] else 0
@@ -11945,9 +11943,9 @@ class tgraphcanvas(FigureCanvas):
                 co2_bbp += item["CO2g"] if item["Kind"] in [2,3] else 0
                 co2_cooling += item["CO2g"] if item["Kind"] in [4,5] else 0
                 co2_roast += item["CO2g"] if item["Kind"] in [6,7] else 0
-                lpg_batch += item['BTUs'] if item["SourceType"] == self.sourcenames[0] else 0
-                ng_batch += item['BTUs'] if item["SourceType"] == self.sourcenames[1] else 0
-                electricity_batch += item['BTUs'] if item["SourceType"] == self.sourcenames[2] else 0
+                btu_lpg += item['BTUs'] if item["SourceType"] in [0] else 0
+                btu_ng += item['BTUs'] if item["SourceType"] in [1] else 0
+                btu_elec += item['BTUs'] if item["SourceType"] in [2] else 0
             btu_batch = aw.float2float(btu_batch,3)
             btu_preheat = aw.float2float(btu_preheat,3)
             btu_bbp = aw.float2float(btu_bbp,3)
@@ -11958,9 +11956,9 @@ class tgraphcanvas(FigureCanvas):
             co2_bbp = aw.float2float(co2_bbp,3)
             co2_cooling = aw.float2float(co2_cooling,3)
             co2_roast = aw.float2float(co2_roast,3)
-            lpg_batch = aw.float2float(lpg_batch,3)
-            ng_batch = aw.float2float(ng_batch,3)
-            electricity_batch = aw.float2float(electricity_batch,3)
+            btu_lpg = aw.float2float(btu_lpg,3)
+            btu_ng = aw.float2float(btu_ng,3)
+            btu_elec = aw.float2float(btu_elec,3)
             if bean_weight > 0 and co2_batch > 0:
                 co2_per_green_kg = co2_batch / bean_weight
             else:
@@ -11979,9 +11977,9 @@ class tgraphcanvas(FigureCanvas):
             energymetrics["BTU_roast"] = btu_roast
             energymetrics["CO2_roast"] = co2_roast
             energymetrics["CO2_per_green_kg"] = co2_per_green_kg
-            energymetrics["LPG_batch"] = lpg_batch
-            energymetrics["NG_batch"] = ng_batch
-            energymetrics["Electricity_batch"] = electricity_batch
+            energymetrics["BTU_LPG"] = btu_lpg
+            energymetrics["BTU_NG"] = btu_ng
+            energymetrics["BTU_ELEC"] = btu_elec
             
         except Exception as ex:
             #import traceback
@@ -27026,12 +27024,12 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["CO2_roast"] = self.float2float(energymetrics["CO2_roast"],1)
             if "CO2_per_green_kg" in energymetrics:
                 computedProfile["CO2_per_green_kg"] = self.float2float(energymetrics["CO2_per_green_kg"],1)
-            if "LPG_batch" in energymetrics:
-                computedProfile["BTU_LPG"] = self.float2float(energymetrics["LPG_batch"],1)
-            if "NG_batch" in energymetrics:
-                computedProfile["BTU_NG"] = self.float2float(energymetrics["NG_batch"],1)
-            if "Electricity_batch" in energymetrics:
-                computedProfile["BTU_ELEC"] = self.float2float(energymetrics["Electricity_batch"],1)
+            if "BTU_LPG" in energymetrics:
+                computedProfile["BTU_LPG"] = self.float2float(energymetrics["BTU_LPG"],1)
+            if "BTU_NG" in energymetrics:
+                computedProfile["BTU_NG"] = self.float2float(energymetrics["BTU_NG"],1)
+            if "BTU_ELEC" in energymetrics:
+                computedProfile["BTU_ELEC"] = self.float2float(energymetrics["BTU_ELEC"],1)
 
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -31326,9 +31324,9 @@ class ApplicationWindow(QMainWindow):
             ["BTU_roast",           "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_roast',None)            ],
             ["CO2_roast",           "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_roast',None)            ],
             ["CO2_per_green_kg",    "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_per_green_kg',None)     ],
-            ["LPG_batch",           "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','LPG_batch',None)            ],
-            ["NG_batch",            "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','NG_batch',None)             ],
-            ["Electricity_batch",   "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','Electricity_batch',None)    ],
+            ["BTU_LPG",             "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_LPG',None)              ],
+            ["BTU_NG",              "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_NG',None)               ],
+            ["BTU_ELEC",            "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_ELEC',None)             ],
         ]
         return ranking_data_fields, field_index
 
