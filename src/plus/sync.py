@@ -290,6 +290,11 @@ def diffCachedSyncRecord(roast_record):
             for key, value in cached_sync_record.items():
                 if key != "roast_id" and key in res and res[key] == value:
                     del res[key]
+            for key in roast.sync_record_zero_supressed_attributes:
+                if key in cached_sync_record and cached_sync_record[key] is not None and cached_sync_record[key] != 0 and key not in res:
+                    # we explicitly set the value of key to 0 dispite it is part of the sync_record_zero_supressed_attributes
+                    # to sync back the local 0 value with the non-zero value currently on the server
+                    res[key] = 0
             return res
     except Exception as e:
         config.logger.error("sync: Exception in diffCachedSyncRecord() %s",e)

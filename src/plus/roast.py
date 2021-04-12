@@ -99,7 +99,8 @@ def getTemplate(bp):
             config.logger.info("roast: Exception in getTemplate() %s",e)
             
         try:
-            util.addNum2dict(bp,"roastersize",d,"machine",0,999,1)
+            if "roastersize" in bp and bp["roastersize"] is not None and bp["roastersize"] != 0:
+                util.addNum2dict(bp,"roastersize",d,"roastersize",0,999,1)
         except Exception as e:
             config.logger.info("roast: Exception in getTemplate() %s",e)
         
@@ -197,11 +198,49 @@ def getRoast():
         else:
             d["amount"] = 0
         
+        # computed values added just for the profile, but not for the profiles template
         try:
             if "computed" in p:
                 cp = p["computed"]
-                util.addTemp2dict(cp,"det",d,"CM_ETD")
-                util.addTemp2dict(cp,"dbt",d,"CM_BTD")
+                if "det" in cp:
+                    util.addTemp2dict(cp,"det",d,"CM_ETD")
+                if "dbt" in cp:
+                    util.addTemp2dict(cp,"dbt",d,"CM_BTD")
+                #### Energy Consumption data only added if not zero
+                util.addAllNum2dict(cp,d,
+                    [
+                        # energy consumption by source type in BTU
+                        "BTU_ELEC",
+                        "BTU_LPG",
+                        "BTU_NG",
+                        # energy consumption by process in BTU
+                        "BTU_roast",
+                        "BTU_preheat",
+                        "BTU_bbp",
+                        "BTU_cooling",
+                        # total energy conumption per batch
+                        "BTU_batch"
+                    ],
+                    None, # no min limit
+                    None, # no max limit
+                    1, # 1 decimal places
+                    dropZero=True) # we do not transfer zero values
+                    
+                util.addAllNum2dict(cp,d,
+                    [
+                        # CO2 production by process in g
+                        "CO2_roast",
+                        "CO2_preheat",
+                        "CO2_bbp",
+                        "CO2_cooling",
+                        # total CO2 production per batch
+                        "CO2_batch"
+                    ],
+                    None, # no min limit
+                    None, # no max limit
+                    3, # 3 decimal places
+                    factor=1/1000, # CO2 data is forwarded in kg (instead of the Artisan internal g)
+                    dropZero=True) # we do not transfer zero values
         except Exception as e:
             config.logger.info("roast: Exception in getRoast() %s",e)
 
@@ -248,16 +287,30 @@ def getRoast():
 ################
 ## Sync Record (roast properties synced bidirectional between the client and the server)
 
-# returns the current plus record and a hash over the plus record
-# if applied, r is assumed to contain the complete roast data as returned by roast.getRoast()
-def getSyncRecord(r = None):
-    try:
-        config.logger.info("roast:getSyncRecord()")
-        m = hashlib.sha256()
-        d = {}
-        if r is None:
-            r = getRoast()
-        attributes = [
+# the following data items are supressed from the roast record if they have 0 values to avoid sending just tags with zeros:
+sync_record_zero_supressed_attributes = [
+            "roastersize",
+            ### Energy data
+            # energy consumption by source type in BTU
+            "BTU_ELEC",
+            "BTU_LPG",
+            "BTU_NG",
+            # energy consumption by process in BTU
+            "BTU_roast",
+            "BTU_preheat",
+            "BTU_bbp",
+            "BTU_cooling",
+            # total energy conumption per batch
+            "BTU_batch",
+            # CO2 production by process in g
+            "CO2_roast",
+            "CO2_preheat",
+            "CO2_bbp",
+            "CO2_cooling",
+            # total CO2 production per batch
+            "CO2_batch"]
+            
+sync_record_non_supressed_attributes = [
             "roast_id",
             "location",
             "coffee",
@@ -277,10 +330,22 @@ def getSyncRecord(r = None):
             "notes",
             "temperature",
             "pressure",
-            "humidity",
-        ]
+            "humidity"]
+
+# all roast record attributes that participate in the syncing process
+sync_record_attributes = sync_record_non_supressed_attributes + sync_record_zero_supressed_attributes
+
+# returns the current plus record and a hash over the plus record
+# if applied, r is assumed to contain the complete roast data as returned by roast.getRoast()
+def getSyncRecord(r = None):
+    try:
+        config.logger.info("roast:getSyncRecord()")
+        m = hashlib.sha256()
+        d = {}
+        if r is None:
+            r = getRoast()
         # we take only the value of attributes to be synced back
-        for a in attributes:
+        for a in sync_record_attributes:
             if a in r:
                 d[a] = r[a]
                 m.update(str(r[a]).encode('utf-8'))

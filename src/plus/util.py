@@ -154,7 +154,7 @@ def float2floatMin(fs,n=1):
 ## Prepare numbers for sending
 # for numbers out of range None is returned
 def limitnum(minn,maxn,n):
-    if n is None or n>maxn or n<minn:
+    if n is None or (maxn is not None and n>maxn) or (minn is not None and n<minn):
         return None
     else:
         return n
@@ -193,21 +193,30 @@ def addString2dict(dict_source,key_source,dict_target,key_target,maxlen):
         txt = limittext(maxlen,decode(dict_source[key_source]))
         if txt is not None:
             dict_target[key_target] = txt
-            
-def addNum2dict(dict_source,key_source,dict_target,key_target,minn,maxn,digits):
+
+# factor is multiplied to the original value before the min/max calculation
+# if min or max is None, the corresponding limit is not enforced, otherwise numbers beyond the given limit are replaced by None
+# if dropZero then a zero value is replaced by None
+def addNum2dict(dict_source,key_source,dict_target,key_target,minn,maxn,digits,factor=1,dropZero=False):
     if key_source in dict_source and dict_source[key_source]:
-        n = limitnum(minn,maxn,dict_source[key_source])
-        if n is not None:
+        n = dict_source[key_source]
+        if n is not None and factor is not None:
+            n = n * factor
+        n = limitnum(minn,maxn,n)
+        if n is not None and (not dropZero or n!=0):
             dict_target[key_target] = float2floatMin(n,digits)
             
 # consumes a list of source-target pairs, or just strings used as both source and target key, to be processed with add2dict
-def addAllNum2dict(dict_source,dict_target,key_source_target_pairs,minn,maxn,digits):
+# factor is multiplied to the original value before the min/max calculation
+# if min or max is None, the corresponding limit is not enforced, otherwise numbers beyond the given limit are replaced by None
+# if dropZero then zero values are replaced by None
+def addAllNum2dict(dict_source,dict_target,key_source_target_pairs,minn,maxn,digits,factor=1,dropZero=False):
     for p in key_source_target_pairs:
         if isinstance(p, tuple):
             (key_source,key_target) = p
         else:
             key_source = key_target = p
-        addNum2dict(dict_source,key_source,dict_target,key_target,minn,maxn,digits)
+        addNum2dict(dict_source,key_source,dict_target,key_target,minn,maxn,digits,factor)
         
 def addTime2dict(dict_source,key_source,dict_target,key_target):
     if key_source in dict_source and dict_source[key_source]:
