@@ -2970,14 +2970,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.updateEnergyLabels()
     
     def updateLoadRatings(self, updateMetrics=True):
-        self.aw.qmc.loadratings[0] = (int(self.energy_ui.loadrating0.text()) if len(self.energy_ui.loadrating0.text())>0 else 0)
-        self.aw.qmc.loadratings[1] = (int(self.energy_ui.loadrating1.text()) if len(self.energy_ui.loadrating1.text())>0 else 0)
-        self.aw.qmc.loadratings[2] = (int(self.energy_ui.loadrating2.text()) if len(self.energy_ui.loadrating2.text())>0 else 0)
-        self.aw.qmc.loadratings[3] = (int(self.energy_ui.loadrating3.text()) if len(self.energy_ui.loadrating3.text())>0 else 0)
-#        self.aw.qmc.loadratings[0] = (float(self.energy_ui.loadrating0.text()) if len(self.energy_ui.loadrating0.text())>0 else 0)
-#        self.aw.qmc.loadratings[1] = (float(self.energy_ui.loadrating1.text()) if len(self.energy_ui.loadrating1.text())>0 else 0)
-#        self.aw.qmc.loadratings[2] = (float(self.energy_ui.loadrating2.text()) if len(self.energy_ui.loadrating2.text())>0 else 0)
-#        self.aw.qmc.loadratings[3] = (float(self.energy_ui.loadrating3.text()) if len(self.energy_ui.loadrating3.text())>0 else 0)
+        self.aw.qmc.loadratings[0] = (self.aw.float2float(self.energy_ui.loadrating0.text()) if len(self.energy_ui.loadrating0.text())>0 else 0)
+        self.aw.qmc.loadratings[1] = (self.aw.float2float(self.energy_ui.loadrating1.text()) if len(self.energy_ui.loadrating1.text())>0 else 0)
+        self.aw.qmc.loadratings[2] = (self.aw.float2float(self.energy_ui.loadrating2.text()) if len(self.energy_ui.loadrating2.text())>0 else 0)
+        self.aw.qmc.loadratings[3] = (self.aw.float2float(self.energy_ui.loadrating3.text()) if len(self.energy_ui.loadrating3.text())>0 else 0)
         if updateMetrics:
             self.updateMetricsLabel()
     
@@ -3436,7 +3432,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def validateNumText(self,s):
         res = ""
         try:
-            r = abs(toInt(toFloat((self.aw.comma2dot(str(s))))))
+            r = abs(self.aw.float2float(toFloat((self.aw.comma2dot(str(s))))))
             if not r == 0:
                 res = str(r)
         except Exception:
@@ -3467,7 +3463,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             if len(s) == 0:
                 res = 0
             elif s == s.strip('%'):
-                res = int(s)
+                res = self.aw.float2float(toFloat(s))
             else:
                 res = self.aw.float2float(toFloat(s.strip('%'))/100,2)
         except:
