@@ -2050,12 +2050,9 @@ class HUDDlg(ArtisanDialog):
             start = 0
         startindex = self.aw.qmc.time2index(starttime + start)
         endindex = min(l,self.aw.qmc.time2index(endtime + start))
-        c1 = [numpy.nan if x == -1 else x for x in self.curves[self.c1ComboBox.currentIndex()] ]
-        c1 = numpy.array(c1,dtype='float64')
-        c2 = [numpy.nan if x == -1 else x for x in self.curves[self.c2ComboBox.currentIndex()] ]
-        c2 = numpy.array(c2,dtype='float64')
-        idx = numpy.isfinite(c1) & numpy.isfinite(c2)
-        z = self.aw.qmc.polyfit(c1[idx], c2[idx], # c1,c2,
+        c1 = self.curves[self.c1ComboBox.currentIndex()]
+        c2 = self.curves[self.c2ComboBox.currentIndex()]
+        z = self.aw.qmc.polyfit(c1,c2,
                self.polyfitdeg.value(),startindex,endindex,self.deltacurves[self.c2ComboBox.currentIndex()])
         res = True
         if z is not None:

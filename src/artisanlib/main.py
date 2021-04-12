@@ -12158,7 +12158,13 @@ class tgraphcanvas(FigureCanvas):
         ya = yarray[startindex:endindex]
         if len(xa) > 0 and len(xa) == len(ya) and not all(x == 0 for x in xa) and not all(x == 0 for x in ya):
             try:
-                z = numpy.polyfit(xa,ya,deg)
+                # polyfit only over proper values (not -1, infinit or NaN)
+                c1 = [numpy.nan if x == -1 else x for x in xa]
+                c1 = numpy.array(c1,dtype='float64')
+                c2 = [numpy.nan if x == -1 else x for x in ya]
+                c2 = numpy.array(c2,dtype='float64')
+                idx = numpy.isfinite(c1) & numpy.isfinite(c2)
+                z = numpy.polyfit(c1[idx],c2[idx],deg)
                 p = numpy.poly1d(z)
                 x = p(xarray[startindex:endindex])
                 pad = max(0,len(self.timex) - startindex - len(x))
