@@ -11841,8 +11841,8 @@ class tgraphcanvas(FigureCanvas):
                         btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcetypes[i],"SortOrder":sortorder})
 
                 # calculate preheat
-                if self.preheatenergies[i] > 0 and self.preheatDuration > 0 and aw.qmc.roastbatchpos == 1:
-                    if self.preheatenergies[i] <= 1:
+                if self.preheatenergies[i] > 0 and aw.qmc.roastbatchpos == 1:
+                    if self.preheatenergies[i] <= 1 and self.preheatDuration > 0:
                         # percent load multiplied by duration
                         load_pct = self.preheatenergies[i] * 1000./10
                         # percent factor based on bernoulli setting for burner event slider
@@ -11869,8 +11869,8 @@ class tgraphcanvas(FigureCanvas):
                         btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcetypes[i],"SortOrder":sortorder})
 
                 # calculate betweenbatch 
-                if self.betweenbatchenergies[i] > 0 and self.betweenbatchDuration > 0 and (aw.qmc.roastbatchpos > 1 or aw.qmc.betweenbatch_after_preheat):
-                    if self.betweenbatchenergies[i] <= 1:
+                if self.betweenbatchenergies[i] > 0 and (aw.qmc.roastbatchpos > 1 or aw.qmc.betweenbatch_after_preheat):
+                    if self.betweenbatchenergies[i] <= 1 and self.betweenbatchDuration > 0:
                         # percent load multiplied by duration
                         load_pct = self.betweenbatchenergies[i] * 1000./10
                         # percent factor based on bernoulli setting for burner event slider
@@ -11897,8 +11897,8 @@ class tgraphcanvas(FigureCanvas):
                         btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcetypes[i],"SortOrder":sortorder})
 
                 # calculate cooling 
-                if self.preheatenergies[i] > 0 and self.preheatDuration > 0 and aw.qmc.roastbatchpos == 1:
-                    if self.coolingenergies[i] <= 1:
+                if self.coolingenergies[i] > 0 and aw.qmc.roastbatchpos == 1:
+                    if self.coolingenergies[i] <= 1 and self.coolingDuration > 0:
                         # percent load multiplied by duration
                         load_pct = self.coolingenergies[i] * 1000./10
                         # percent factor based on bernoulli setting for burner event slider
