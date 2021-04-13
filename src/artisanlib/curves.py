@@ -1013,6 +1013,11 @@ class HUDDlg(ArtisanDialog):
         self.endEdit = QLineEdit()
         self.endEdit.setMaximumWidth(60)
         self.endEdit.setAlignment(Qt.AlignRight)
+        self.polyfitRoR = False
+        self.polyfitRoRflag = QCheckBox(deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis",None))
+        self.polyfitRoRflag.setChecked(self.polyfitRoR)
+        self.polyfitRoRflag.setFocusPolicy(Qt.NoFocus)
+        self.polyfitRoRflag.stateChanged.connect(self.polyfitRoRflagChanged)
         regextime = QRegularExpression(r"^[0-5][0-9]:[0-5][0-9]$")
         self.startEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.startEdit.setText("00:00")
@@ -1028,8 +1033,8 @@ class HUDDlg(ArtisanDialog):
         self.eventAComboBox.setCurrentIndex(0)
         self.eventAComboBox.currentIndexChanged.connect(self.calcEventRC)
         self.eventBComboBox = QComboBox()
-        self.eventBComboBox.addItems([i[0] for i in self.events] + [""])
-        self.eventBComboBox.setCurrentIndex(len(self.events))
+        self.eventBComboBox.addItems([""] + [i[0] for i in self.events])
+        self.eventBComboBox.setCurrentIndex(0)
         self.eventBComboBox.currentIndexChanged.connect(self.calcEventRC)
         tab3Layout = QVBoxLayout()
         interLayout = QHBoxLayout()
@@ -1076,6 +1081,7 @@ class HUDDlg(ArtisanDialog):
         polytimes.addWidget(self.endEdit)
         polytimes.addWidget(endlabel)
         polyCurves = QHBoxLayout()
+        polyCurves.addWidget(self.polyfitRoRflag)
         polyCurves.addWidget(self.c1ComboBox)
         polyCurves.addWidget(self.result)
         polyCurves.addWidget(self.c2ComboBox)
@@ -1384,8 +1390,8 @@ class HUDDlg(ArtisanDialog):
 
         self.updatePlotterleftlabels()  
          
-        self.startEdit.editingFinished.connect(self.polyfitcurveschanged)
-        self.endEdit.editingFinished.connect(self.polyfitcurveschanged)
+        self.startEdit.editingFinished.connect(self.startEditChanged)
+        self.endEdit.editingFinished.connect(self.endEditChanged)
         self.polyfitdeg.valueChanged.connect(self.polyfitcurveschanged)
         self.c1ComboBox.currentIndexChanged.connect(self.polyfitcurveschanged)
         self.c2ComboBox.currentIndexChanged.connect(self.polyfitcurveschanged)
@@ -1986,7 +1992,30 @@ class HUDDlg(ArtisanDialog):
         if not self.polyfitCheck.isChecked() and not self.expvarCheck.isChecked() and not self.lnvarCheck.isChecked() and not self.univarCheck.isChecked() and not self.interpCheck.isChecked():
             self.aw.qmc.resetlines()
             self.aw.qmc.redraw(recomputeAllDeltas=False)
-            
+    
+    @pyqtSlot()
+    def startEditChanged(self):
+        self.eventAComboBox.blockSignals(True)
+        self.eventAComboBox.setDisabled(True)
+        self.eventAComboBox.setCurrentIndex(0)
+        self.eventAComboBox.setDisabled(False)
+        self.eventAComboBox.blockSignals(False)
+        self.polyfitcurveschanged(0)
+
+    @pyqtSlot()
+    def endEditChanged(self):
+        self.eventBComboBox.blockSignals(True)
+        self.eventBComboBox.setDisabled(True)
+        self.eventBComboBox.setCurrentIndex(0)
+        self.eventBComboBox.setDisabled(False)
+        self.eventBComboBox.blockSignals(False)
+        self.polyfitcurveschanged(0)
+
+    @pyqtSlot(int)
+    def polyfitRoRflagChanged(self,_):
+        self.polyfitRoR = self.polyfitRoRflag.isChecked()
+        self.polyfitcurveschanged(0)
+
     @pyqtSlot(int)
     def calcEventRC(self,_):
         if self.aw.qmc.timeindex[0] != -1:
@@ -1995,22 +2024,22 @@ class HUDDlg(ArtisanDialog):
             start = 0
         
         Aevent = int(self.eventAComboBox.currentIndex())
-        if Aevent == 0:
-            a = 0
-        else:
+        if Aevent != 0:
             a = self.events[Aevent-1][1]
+            self.startEdit.blockSignals(True)
+            self.startEdit.setDisabled(True)
+            self.startEdit.setText(stringfromseconds(self.aw.qmc.timex[a] - start))
+            self.startEdit.setDisabled(False)
+            self.startEdit.blockSignals(False)
                         
         Bevent = int(self.eventBComboBox.currentIndex())
-        if Bevent == len(self.events):
-            b = len(self.aw.qmc.timex) - 1
-        else:
-            b = self.events[Bevent][1]
-        self.startEdit.setDisabled(True)
-        self.startEdit.setText(stringfromseconds(self.aw.qmc.timex[a] - start))
-        self.startEdit.setDisabled(False)
-        self.endEdit.setDisabled(True)
-        self.endEdit.setText(stringfromseconds(self.aw.qmc.timex[b] - start))
-        self.endEdit.setDisabled(False)
+        if Bevent != 0:
+            b = self.events[Bevent-1][1]
+            self.endEdit.blockSignals(True)
+            self.endEdit.setDisabled(True)
+            self.endEdit.setText(stringfromseconds(self.aw.qmc.timex[b] - start))
+            self.endEdit.setDisabled(False)
+            self.endEdit.blockSignals(False)
         self.polyfitcurveschanged(0)
 
     def eventlist(self):
@@ -2053,7 +2082,7 @@ class HUDDlg(ArtisanDialog):
         c1 = self.curves[self.c1ComboBox.currentIndex()]
         c2 = self.curves[self.c2ComboBox.currentIndex()]
         z = self.aw.qmc.polyfit(c1,c2,
-               self.polyfitdeg.value(),startindex,endindex,self.deltacurves[self.c2ComboBox.currentIndex()])
+               self.polyfitdeg.value(),startindex,endindex,self.deltacurves[self.c2ComboBox.currentIndex()],onDeltaAxis=self.polyfitRoR)
         res = True
         if z is not None:
             for e in z:

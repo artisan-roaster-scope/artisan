@@ -12153,7 +12153,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " univariateinfo() {0}").format(str(e)),exc_tb.tb_lineno)
             return
 
-    def polyfit(self,xarray,yarray,deg,startindex,endindex,_=False):
+    def polyfit(self,xarray,yarray,deg,startindex,endindex,_=False,onDeltaAxis=False):
         xa = xarray[startindex:endindex]
         ya = yarray[startindex:endindex]
         if len(xa) > 0 and len(xa) == len(ya) and not all(x == 0 for x in xa) and not all(x == 0 for x in ya):
@@ -12169,7 +12169,11 @@ class tgraphcanvas(FigureCanvas):
                 x = p(xarray[startindex:endindex])
                 pad = max(0,len(self.timex) - startindex - len(x))
                 xx = numpy.append(numpy.append([None]*max(0,startindex), x), [None]*pad)
-                self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
+                if onDeltaAxis:
+                    trans = self.delta_ax.transData
+                else:
+                    trans = self.ax.transData
+                self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3,transform=trans)
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
                     self.fig.canvas.draw()
@@ -17772,8 +17776,7 @@ class ApplicationWindow(QMainWindow):
         self.slider1.valueChanged.connect(self.slider1valueChanged)
         self.slider1.actionTriggered.connect(self.slider1actionTriggered)
         self.slider1.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
-
-
+        
         self.slider2 = self.slider()
         self.sliderLCD2 = self.sliderLCD()
         self.sliderLCD2.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[1])
@@ -17950,6 +17953,7 @@ class ApplicationWindow(QMainWindow):
             string += QApplication.translate("Message","The Artisan Team", None)
             QMessageBox.information(aw,QApplication.translate("Message","One time message about ArtisanViewer", None),string)
             settings.setValue("Mode",self.qmc.mode)  #prevent this popup in case a second instance is started before this first one is closed.
+
 
         # we connect the signals
         self.singleShotPhidgetsPulseOFF.connect(self.processSingleShotPhidgetsPulse)
@@ -18759,51 +18763,55 @@ class ApplicationWindow(QMainWindow):
             if reply == QMessageBox.Cancel:
                 return
             elif reply == QMessageBox.Yes:
-                aw.qmc.etypes = aw.qmc.etypesdefault
-                aw.loadSettings(fn=action.data()[0],remember=False,machine=True)
-                aw.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(label))
+                org_etypes = self.qmc.etypes
+                self.qmc.etypes = self.qmc.etypesdefault
+                self.loadSettings(fn=action.data()[0],remember=False,machine=True)
                 if action.data()[1] == "Phidget":
                     if action.text() == "VINT Ambient Modules":
                         elevation,res = QInputDialog.getInt(self,
                             QApplication.translate("Message", "Ambient",None),
-                            QApplication.translate("Message", "Elevation (MASL)",None),value=aw.qmc.elevation)
+                            QApplication.translate("Message", "Elevation (MASL)",None),value=self.qmc.elevation)
                         if res:
                             try:
-                                aw.qmc.elevation = int(elevation)
+                                self.qmc.elevation = int(elevation)
                             except:
                                 pass
                         else:
-                            aw.sendmessage(QApplication.translate("Message","Action canceled",None))
+                            self.sendmessage(QApplication.translate("Message","Action canceled",None))
                     else:
-                        aw.qmc.machinesetup = action.text()
+                        self.qmc.machinesetup = action.text()
                 else:
-                    aw.establish_etypes()
-                    aw.qmc.machinesetup = action.text()
-                    if aw.qmc.device == 29 and aw.modbus.type in [3,4]: # MODBUS TCP or UDP
+                    # keep original information to Cancel
+                    org_device = self.qmc.device
+                    org_machinesetup = self.qmc.machinesetup
+                    org_modbus_host = self.modbus.host
+                    org_s7_host = self.s7.host
+                    org_ws_host = self.ws.host
+                    org_comport = self.ser.comport
+                    org_roastersize_setup = self.qmc.roastersize_setup
+                    org_roastersize = self.qmc.roastersize
+                    #
+                    self.qmc.machinesetup = action.text()
+                    res = False
+                    if self.qmc.device == 29 and self.modbus.type in [3,4]: # MODBUS TCP or UDP
                         host,res = QInputDialog.getText(self,
                             QApplication.translate("Message", "Machine",None),
-                            QApplication.translate("Message", "Network name or IP address",None),text=aw.modbus.host) #"127.0.0.1"
+                            QApplication.translate("Message", "Network name or IP address",None),text=self.modbus.host) #"127.0.0.1"
                         if res:
-                            aw.modbus.host = host
-                        else:
-                            aw.sendmessage(QApplication.translate("Message","Action canceled",None))
-                    elif aw.qmc.device == 79: # S7
+                            self.modbus.host = host
+                    elif self.qmc.device == 79: # S7
                         host,res = QInputDialog.getText(self,
                             QApplication.translate("Message", "Machine",None),
-                            QApplication.translate("Message", "Network name or IP address",None),text=aw.s7.host) #"127.0.0.1"
+                            QApplication.translate("Message", "Network name or IP address",None),text=self.s7.host) #"127.0.0.1"
                         if res:
-                            aw.s7.host = host
-                        else:
-                            aw.sendmessage(QApplication.translate("Message","Action canceled",None))
-                    elif aw.qmc.device == 111: # WebSocket
+                            self.s7.host = host
+                    elif self.qmc.device == 111: # WebSocket
                         host,res = QInputDialog.getText(self,
                             QApplication.translate("Message", "Machine",None),
-                            QApplication.translate("Message", "Network name or IP address",None),text=aw.ws.host) #"127.0.0.1"
+                            QApplication.translate("Message", "Network name or IP address",None),text=self.ws.host) #"127.0.0.1"
                         if res:
-                            aw.ws.host = host
-                        else:
-                            aw.sendmessage(QApplication.translate("Message","Action canceled",None))
-                    elif aw.qmc.device in [0,9,19,53,101,115] or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial
+                            self.ws.host = host
+                    elif self.qmc.device in [0,9,19,53,101,115] or (self.qmc.device == 29 and self.modbus.type in [0,1,2]): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial
                         import serial.tools.list_ports
                         comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
                         if platf == 'Darwin':
@@ -18812,16 +18820,16 @@ class ApplicationWindow(QMainWindow):
                             ports = list(filter (lambda x: 'Bluetooth-Inc' not in x[0],ports))
                         else:
                             ports = list(comports)
-                        if aw.ser.comport not in [p[0] for p in ports]:
-                            ports.append([aw.ser.comport,"",""])
+                        if self.ser.comport not in [p[0] for p in ports]:
+                            ports.append([self.ser.comport,"",""])
                         ports = sorted(ports,key=lambda p: p[0])
                         items = [(p[1] if (p[1] and p[1]!="n/a") else p[0]) for p in ports]
                         current = 0
                         try:
-                            current = [p[0] for p in ports].index(aw.ser.comport)
+                            current = [p[0] for p in ports].index(self.ser.comport)
                         except Exception:
                             pass
-                        if aw.qmc.device == 53: # Hottop 2k+
+                        if self.qmc.device == 53: # Hottop 2k+
                             try:
                                 current = [p[0] for p in ports].index("FT230X Basic UART")
                             except Exception:
@@ -18835,12 +18843,38 @@ class ApplicationWindow(QMainWindow):
                         if res:
                             try:
                                 pos = items.index(port_name)
-                                if aw.qmc.device == 29: # MODBUS serial
-                                    aw.modbus.comport = ports[pos][0]
+                                if self.qmc.device == 29: # MODBUS serial
+                                    self.modbus.comport = ports[pos][0]
                                 else: # Fuji or HOTTOP
-                                    aw.ser.comport = ports[pos][0]
+                                    self.ser.comport = ports[pos][0]
                             except:
                                 pass
+                    if res:
+                        batchsize,res = QInputDialog.getDouble(self, 
+                            QApplication.translate("Message", "Machine",None),
+                            QApplication.translate("Message", "Machine Capacity (kg)",None),
+                            0, # value
+                            0, # min
+                            999, # max
+                            1) # decimals
+                        if res:
+                            self.qmc.roastersize_setup = self.qmc.roastersize = batchsize
+                    if res:
+                        self.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(label))
+                    else:
+                        # reset
+                        self.qmc.etypes= org_etypes
+                        self.qmc.device = org_device
+                        self.qmc.machinesetup = org_machinesetup
+                        self.modbus.host = org_modbus_host
+                        self.s7.host = org_s7_host
+                        self.ws.host = org_ws_host
+                        self.ser.comport = org_comport
+                        self.qmc.roastersize_setup = org_roastersize_setup
+                        self.qmc.roastersize = org_roastersize
+                        #
+                        self.sendmessage(QApplication.translate("Message","Action canceled",None))
+                    self.establish_etypes()
 
 
     def populateThemeMenu(self):
@@ -19141,6 +19175,9 @@ class ApplicationWindow(QMainWindow):
 
     def updateCanvasColors(self):
         canvas_color = aw.qmc.palette["canvas"]
+        if canvas_color is not None and canvas_color != "None" and not QColor.isValidColor(canvas_color):
+            # we re-initalize broken canvas color
+            canvas_color = aw.qmc.palette["canvas"] = '#F8F8F8'
         try:
             if str(canvas_color) == 'None' and sys.platform.startswith("darwin"):
                 if darkdetect.isDark() and appFrozen():
@@ -19166,7 +19203,7 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.delta_ax.yaxis.get_label().set_color(aw.qmc.palette["ylabel"])
                 aw.qmc.ax.xaxis.get_label().set_color(aw.qmc.palette["xlabel"])
                 aw.qmc.ax.yaxis.get_label().set_color(aw.qmc.palette["ylabel"])
-        except:
+        except: 
             pass
 
         title_color = aw.qmc.palette["title"]
@@ -23335,9 +23372,9 @@ class ApplicationWindow(QMainWindow):
                 elif key == 72:                       #H
                     if not aw.qmc.designerflag:
                         if alt_modifier and platf != 'Windows' or ((control_shift_modifier or control_alt_modifier) and platf == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
-                            aw.deleteBackground()
+                            self.deleteBackground()
                             self.autoAdjustAxis()
-                            aw.qmc.redraw()
+                            self.qmc.redraw()
                         else:
                             self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext_alt=".alog")
                             if len(self.filename) != 0:
@@ -23346,9 +23383,10 @@ class ApplicationWindow(QMainWindow):
                                     aw.loadbackground(self.filename)
                                 except:
                                     pass
-                                aw.qmc.background = True
-                                aw.qmc.timealign(redraw=False)
-                                aw.qmc.redraw()
+                                self.qmc.background = True
+                                self.autoAdjustAxis()
+                                self.qmc.timealign(redraw=False)
+                                self.qmc.redraw()
                 elif key == 75:                       #K
                     if not aw.qmc.flagon:
                         if control_alt_modifier:
@@ -24645,6 +24683,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.resetlinecountcaches()
                 self.loadbackground(filename)
                 self.qmc.background = True
+                self.autoAdjustAxis()
                 self.qmc.timealign(redraw=True)
             except:
                 self.deleteBackground() # delete a loaded background if any
@@ -35115,7 +35154,12 @@ class ApplicationWindow(QMainWindow):
             if filename:
                 if extension not in filename:
                     filename += extension
-                aw.qmc.fig.savefig(filename,transparent=(aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"]=='None'),facecolor=str(aw.qmc.palette["canvas"]),edgecolor=None) # transparent=True is need to get the delta curves and legend drawn
+                #mpl.rcParams['pdf.fonttype'] = 3   # 3 or 42
+                #mpl.rc('pdf', fonttype=3)
+                aw.qmc.fig.savefig(filename,transparent=(aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"]=='None'),
+                        #bbox_inches='tight',
+                        #backend='pgf', # slow and fails on # characters in TeX backend
+                        facecolor=str(aw.qmc.palette["canvas"]),edgecolor=None) # transparent=True is need to get the delta curves and legend drawn
                 aw.qmc.updateBackground() # that redraw is needed to avoid the "transparent flicker"
 
                 self.sendmessage(QApplication.translate("Message","{0} saved", None).format(str(filename)))
