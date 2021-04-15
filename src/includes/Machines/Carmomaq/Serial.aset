@@ -1,7 +1,7 @@
 [General]
 Delay=3000
 Oversampling=false
-roastertype_setup=Carmomaq
+roastertype_setup=Carmomaq Serial
 
 [Device]
 id=29
@@ -145,7 +145,7 @@ parity=N
 port=502
 stopbits=1
 timeout=0.4
-type=3
+type=0
 wordorderLittle=true
 
 [Quantifiers]
