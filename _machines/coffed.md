@@ -23,5 +23,5 @@ header:
 
 **Watch out!**
 Check out the step-by-step documentation by Coffed:  
-["How to connect your computer to an automatic Coffed roaster?"](https://coffed.pl/wp-content/uploads/2020/11/Connnect-computer-with-roaster-1.pdf)
-{:target="_blank"}
+["How to connect your computer to an automatic Coffed roaster?"](https://coffed.pl/wp-content/uploads/2020/11/Connnect-computer-with-roaster-1.pdf){:target="_blank"}
+{: .notice--primary}
