@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="de">
+<!DOCTYPE TS><TS version="2.0" language="de" sourcelanguage="">
 <context>
     <name>About</name>
     <message>
@@ -3598,22 +3597,22 @@ anlegen</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="84"/>
-        <source>Curaçao</source>
+        <source>Cura&#xe7;ao</source>
         <translation type="obsolete">Curacao</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="208"/>
-        <source>Réunion</source>
+        <source>R&#xe9;union</source>
         <translation type="obsolete">Réunion</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="212"/>
-        <source>Saint Barthélemy</source>
+        <source>Saint Barth&#xe9;lemy</source>
         <translation type="obsolete">Saint Barthélemy</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="221"/>
-        <source>São Tomé</source>
+        <source>S&#xe3;o Tom&#xe9;</source>
         <translation type="obsolete">São Tomé</translation>
     </message>
     <message>
@@ -8804,56 +8803,56 @@ Inputs with the area set to the empty input are turned off.</source>
         <source>The PID Control dialog can operate a connected PID slave using the given PID registers to set the p-i-d parameters and the set value (SV). S7 commands can be specified to turn the PID slave on and off from that PID Control dialog. See the help page in the Events Dialog for documentation of available S7 write commands.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message encoding="UTF-8">
         <location filename="../help/autosave_help.py" line="34"/>
         <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Beans field.
 From Roast&gt;Properties&gt;Beans</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message encoding="UTF-8">
         <location filename="../help/autosave_help.py" line="56"/>
         <source>Calculated weight loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message encoding="UTF-8">
         <location filename="../help/autosave_help.py" line="64"/>
         <source>Calculated density loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message encoding="UTF-8">
         <location filename="../help/autosave_help.py" line="67"/>
         <source>Calculated moisture loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message encoding="UTF-8">
         <location filename="../help/autosave_help.py" line="91"/>
         <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Roasting Notes field.
 From Roast&gt;Properties&gt;Roasting Notes</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message encoding="UTF-8">
         <location filename="../help/autosave_help.py" line="93"/>
         <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Cupping Notes field.
 From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message encoding="UTF-8">
         <location filename="../help/eventsliders_help.py" line="31"/>
         <source>Note: commands can be sequenced, separated by semicolons like in “&lt;cmd1&gt;;&lt;cmd2&gt;;&lt;cmd3&gt;”
 </source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message encoding="UTF-8">
         <location filename="../help/eventsliders_help.py" line="38"/>
         <source>sets calling button to “pressed” if argument is 1 or True</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message encoding="UTF-8">
         <location filename="../help/eventsliders_help.py" line="133"/>
         <source>If {} substitutions are used, json brackets need to be duplicated to escape them like in send({{ “value”: {}}})</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message encoding="UTF-8">
         <location filename="../help/eventsliders_help.py" line="135"/>
         <source>sets calling button to “pressed” if argument evaluates to 1 or True</source>
         <translation type="unfinished"></translation>

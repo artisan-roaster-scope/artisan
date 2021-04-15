@@ -14581,9 +14581,6 @@ Repeat Operation at the end: {0}</source>
     </message>
 </context>
 <context>
-    <name>QPlatformTheme</name>
-</context>
-<context>
     <name>Radio Button</name>
     <message>
         <location filename="../artisanlib/devices.py" line="87"/>

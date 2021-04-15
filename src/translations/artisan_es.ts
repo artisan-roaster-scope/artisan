@@ -14140,9 +14140,6 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     </message>
 </context>
 <context>
-    <name>QPlatformTheme</name>
-</context>
-<context>
     <name>Radio Button</name>
     <message>
         <location filename="../artisanlib/devices.py" line="88"/>

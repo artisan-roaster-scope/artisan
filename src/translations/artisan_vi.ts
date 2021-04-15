@@ -941,482 +941,482 @@ END</source>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="458"/>
         <source>Load from profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tải từ profile</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="461"/>
         <source>Load from background</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tải từ file nền</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="50"/>
         <source>Autosave [a]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưu tự động [a]</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="55"/>
         <source>Add to recent file list</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thêm vào danh sách file gần đây</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="60"/>
         <source>Save also</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sao lưu giống vậy</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="123"/>
         <source>Expand</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bung rộng ra</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="127"/>
         <source>Lock</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Khóa</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="192"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tự động</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="32"/>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thời gian</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="171"/>
         <source>Temp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nhiệt độ</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="55"/>
         <source>ET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="58"/>
         <source>BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1002"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hiển thị</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="189"/>
         <source>Annotations</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chú thích</translation>
     </message>
     <message>
         <location filename="../artisanlib/comparator.py" line="745"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các sự kiện</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="388"/>
         <source>Show Full</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hiển thị đầy đủ</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="175"/>
         <source>Playback Aid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phát lại Aid</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1176"/>
         <source>Beep</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bíp bíp</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="183"/>
         <source>Playback Events</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phát lại các sự kiện</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="187"/>
         <source>Playback DROP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phát lại xả liệu</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="197"/>
         <source>Clear the background before loading a new profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xóa file nền trước khi tải file profile mới</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="201"/>
         <source>Always hide background when loading a profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Luôn luôn ẩn nền trước khi tải file profile</translation>
     </message>
     <message>
         <location filename="../artisanlib/batches.py" line="36"/>
         <source>Batch Counter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bộ đếm lô hàng</translation>
     </message>
     <message>
         <location filename="../artisanlib/batches.py" line="51"/>
         <source>Never overwrite counter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không ghi đè bộ đếm</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="107"/>
         <source>Background</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">File nền</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="346"/>
         <source>Optimal Smoothing Post Roast</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tối ưu làm mịn bài rang</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="352"/>
         <source>Polyfit computation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tính toán Polyfit</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="366"/>
         <source>Smooth Spikes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gai mịn</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="371"/>
         <source>Interpolate Duplicates</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nội suy các bản sao</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="394"/>
         <source>Drop Spikes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thả gai nhọn</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="632"/>
         <source>Limits</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các hạn mức</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="422"/>
         <source>Projection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phép chiếu</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="61"/>
         <source>Swap</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hoán đổi</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="524"/>
         <source>Decimal Places</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vị trí thập phân</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1235"/>
         <source>Alarm Popups</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cửa sổ báo động</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1295"/>
         <source>Hide Image During Roast</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ẩn hình ảnh trong quá trình rang</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="973"/>
         <source>DRY END</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SẤY KHÔ KẾT THÚC</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="982"/>
         <source>FC START</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FC BẮT ĐẦU</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="991"/>
         <source>FC END</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FC KẾT THÚC</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1000"/>
         <source>SC START</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SC BẮT ĐẦU</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1009"/>
         <source>SC END</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SC KẾT THÚC</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="115"/>
         <source>Output</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xuất ra</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="153"/>
         <source>PID Duty/Power LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID Duty/Power LCDs</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="156"/>
         <source>Modbus Port</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cổng Modbus</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="196"/>
         <source>PID Firmware</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID Firmware</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="186"/>
         <source>Button</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nút nhấn</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="192"/>
         <source>Show on BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hiển thị trên BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="196"/>
         <source>Snap</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chụp lại</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="199"/>
         <source>Descr.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Descr.</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="211"/>
         <source>Mini Editor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cửa sổ chỉnh sửa nhỏ</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="439"/>
         <source>Auto CHARGE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tự động CHARGE</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="444"/>
         <source>Auto DROP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tự động DROP</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="449"/>
         <source>Mark TP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đánh dấu TP</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="453"/>
         <source>Mark MET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đánh dấu MET</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="457"/>
         <source>Show Time Guide</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hiển thị chỉ dẫn thời gian</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="543"/>
         <source>Switch Using Number Keys + Cmd</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chuyển sang Number Keys + Cmd</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="964"/>
         <source>CHARGE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CHARGE</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1018"/>
         <source>DROP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DROP</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1027"/>
         <source>COOL END</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">COOL END</translation>
     </message>
     <message>
         <location filename="../artisanlib/logs.py" line="37"/>
         <source>Serial Log ON/OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nhật ký Serial ON/OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1180"/>
         <source>Heavy FC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FC Nặng</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1183"/>
         <source>Low FC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FC Nhẹ</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1186"/>
         <source>Light Cut</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cắt nhẹ</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1189"/>
         <source>Dark Cut</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cắt đậm</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1192"/>
         <source>Drops</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Drops</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1195"/>
         <source>Oily</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dầu</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1198"/>
         <source>Uneven</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không đều</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1200"/>
         <source>Tipping</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tipping</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1202"/>
         <source>Scorching</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thiêu đốt</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1204"/>
         <source>Divots</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Divots</translation>
     </message>
     <message>
         <location filename="../artisanlib/phases.py" line="88"/>
         <source>Auto Adjusted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Điều chỉnh tự động</translation>
     </message>
     <message>
         <location filename="../artisanlib/phases.py" line="91"/>
         <source>From Background</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Từ file nền</translation>
     </message>
     <message>
         <location filename="../artisanlib/phases.py" line="94"/>
         <source>Watermarks</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hình mờ</translation>
     </message>
     <message>
         <location filename="../artisanlib/phases.py" line="96"/>
         <source>Phases LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LCD các giai đoạn</translation>
     </message>
     <message>
         <location filename="../artisanlib/phases.py" line="98"/>
         <source>Auto DRY</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tự động sấy</translation>
     </message>
     <message>
         <location filename="../artisanlib/phases.py" line="100"/>
         <source>Auto FCs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tự động FC</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="338"/>
         <source>Start PID on CHARGE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Khởi động PID on CHARGE</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2084"/>
         <source>Follow Background</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chạy theo file nền</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="83"/>
         <source>Fct. 3</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fct. 3</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="86"/>
         <source>Fct. 4</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fct. 4</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="254"/>
         <source>Int</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Int</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="257"/>
         <source>Float</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Float</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1410"/>
         <source>START on CHARGE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">START on CHARGE</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1412"/>
         <source>OFF on DROP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OFF on DROP</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="811"/>
         <source>Delete roast properties on RESET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xóa thuộc tình rang khi RESET</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="814"/>
         <source>Open on CHARGE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Open on CHARGE</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="817"/>
         <source>Open on DROP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Open on DROP</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="903"/>
         <source>Show Always</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Luôn hiển thị</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="33"/>
         <source>Bar</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bar</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="35"/>
         <source>/min</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">/min</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="36"/>
         <source>Characteristics</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nét đặc trưng</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="37"/>
         <source>Summary</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tóm lược</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="98"/>
         <source>From Event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Từ sự kiện</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="111"/>
         <source>Guide</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hướng dẫn</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="113"/>
         <source>LCD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LCD</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="116"/>
         <source>Show Area</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Khu vực hiển thị</translation>
     </message>
 </context>
 <context>
@@ -1424,612 +1424,612 @@ END</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2690"/>
         <source>ET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2691"/>
         <source>BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2106"/>
         <source>ON</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ON</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="383"/>
         <source>START</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bắt đấu</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="392"/>
         <source>CHARGE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CHARGE</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="816"/>
         <source>TP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TP</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="965"/>
         <source>DRY END</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DRY END</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="816"/>
         <source>FC START</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FC START</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="816"/>
         <source>FC END</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FC END</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="816"/>
         <source>SC START</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SC START</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="816"/>
         <source>SC END</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SC END</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="389"/>
         <source>DROP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DROP</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="816"/>
         <source>COOL</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">COOL</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="816"/>
         <source>If Alarm</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">If Alarm</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="850"/>
         <source>below</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dưới</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="850"/>
         <source>above</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">trên</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="376"/>
         <source>Pop Up</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pop Up</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="377"/>
         <source>Call Program</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gọi chương trình</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="378"/>
         <source>Event Button</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nút Event</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="382"/>
         <source>Slider</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Slider</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="384"/>
         <source>DRY</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DRY</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="385"/>
         <source>FCs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCs</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="386"/>
         <source>FCe</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCe</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="387"/>
         <source>SCs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCs</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="388"/>
         <source>SCe</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCe</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="390"/>
         <source>COOL END</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">COOL END</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="391"/>
         <source>OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="393"/>
         <source>RampSoak ON</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RampSoak ON</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="394"/>
         <source>RampSoak OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RampSoak OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="395"/>
         <source>PID ON</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID ON</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="396"/>
         <source>PID OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="397"/>
         <source>SV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SV</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="398"/>
         <source>Playback ON</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Playback ON</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="399"/>
         <source>Playback OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Playback OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="400"/>
         <source>Set Canvas Color</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chỉnh màu Canvas</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="401"/>
         <source>Reset Canvas Color</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reset màu Canvas</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="90"/>
         <source>upper right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">góc trên bên phải</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="91"/>
         <source>upper left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">góc trên bên trái</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="92"/>
         <source>lower left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">góc dưới bên trái</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="93"/>
         <source>lower right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">góc dưới bên phải</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="94"/>
         <source>right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">bên phải</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="95"/>
         <source>center left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">chính giữa bên trái</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="96"/>
         <source>center right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">chính giữa bên phải</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="97"/>
         <source>lower center</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">chính giữa bên trên</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="98"/>
         <source>upper center</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">chính giữa bên dưới</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="99"/>
         <source>center</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">chính giữa</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="144"/>
         <source>1 minute</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">1 phút</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="145"/>
         <source>2 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">2 phút</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="146"/>
         <source>3 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">3 phút</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="147"/>
         <source>4 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">4 phút</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="148"/>
         <source>5 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">5 phút</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="149"/>
         <source>10 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">10 phút</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="150"/>
         <source>30 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">30 phút</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="151"/>
         <source>1 hour</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">1 giờ</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="205"/>
         <source>solid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">nét liền</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="206"/>
         <source>dashed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">nét đứt</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="207"/>
         <source>dashed-dot</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">nét đứt và chấm</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="208"/>
         <source>dotted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">chấm</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="209"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">None</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="51"/>
         <source>Event #0</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Event #0</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="53"/>
         <source>Event #{0}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Event #{0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="91"/>
         <source>liter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">lít</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="92"/>
         <source>gallon</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">gallon</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="93"/>
         <source>quart</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">quart</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="94"/>
         <source>pint</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">pint</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="95"/>
         <source>cup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">cup</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="96"/>
         <source>cm^3</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">cm ^3</translation>
     </message>
     <message>
         <location filename="../artisanlib/rubase.py" line="233"/>
         <source>Air</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Khí</translation>
     </message>
     <message>
         <location filename="../artisanlib/rubase.py" line="234"/>
         <source>Drum</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trống rang</translation>
     </message>
     <message>
         <location filename="../artisanlib/rubase.py" line="235"/>
         <source>Damper</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bướm xả khí</translation>
     </message>
     <message>
         <location filename="../artisanlib/rubase.py" line="236"/>
         <source>Burner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lửa</translation>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="112"/>
         <source>linear</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">tuyến tính</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="424"/>
         <source>newton</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">newton</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="2498"/>
         <source>metrics</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">metrics</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="2500"/>
         <source>thermal</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">nhiệt</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="682"/>
         <source>classic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">cổ điển</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="682"/>
         <source>xkcd</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">xkcd</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="690"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Default</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="892"/>
         <source>cubic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">cubic</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="892"/>
         <source>nearest</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">gần nhất</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="965"/>
         <source>120 secs before FCs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">120 giây trước khi FCs</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="965"/>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tùy chỉnh</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="217"/>
         <source>Flag</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cờ</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="218"/>
         <source>Bar</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thanh</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="219"/>
         <source>Step</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bước</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="220"/>
         <source>Step+</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bước +</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="221"/>
         <source>Combo</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Combo</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="479"/>
         <source>tiny</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">bé xíu</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="480"/>
         <source>small</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">nhỏ</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="481"/>
         <source>large</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">to</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>Serial Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lệnh Serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>Modbus Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lệnh Modbus</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>DTA Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lệnh DTA</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>Hottop Heater</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hottop Heater</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>Hottop Fan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hottop Fan</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>Hottop Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lệnh Hottop</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>Fuji Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lệnh Fuji</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>PWM Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lệnh PWM</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>VOUT Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lệnh VOUT</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>IO Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lệnh IO</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>S7 Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lệnh S7</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>Aillio R1 Heater</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aillio R1 Heater</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>Aillio R1 Fan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aillio R1 Fan</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>Aillio R1 Drum</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aillio R1 Drum</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>Artisan Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lệnh Artisan</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>RC Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lệnh RC</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>WebSocket Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lệnh WebSocket</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>p-i-d</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">p-i-d</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>Aillio R1 Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lệnh Aillio R1</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2147"/>
         <source>Multiple Event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Multiple Event</translation>
     </message>
     <message>
         <location filename="../artisanlib/phases.py" line="128"/>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thời Gian</translation>
     </message>
     <message>
         <location filename="../artisanlib/phases.py" line="129"/>
         <source>Percentage</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phần trăm</translation>
     </message>
     <message>
         <location filename="../artisanlib/phases.py" line="130"/>
         <source>Temp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nhiệt độ</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="571"/>
         <source>bytes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">bytes</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="575"/>
         <source>words</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">words</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="955"/>
         <source>optimize</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">tối ưu hóa</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="960"/>
         <source>fetch full blocks</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">fetch full blocks</translation>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="112"/>
         <source>discrete</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">rời rạc</translation>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="112"/>
         <source>quadratic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">bậc hai</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="441"/>
         <source>Flat</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phẳng</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="441"/>
         <source>Perpendicular</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vuông góc</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="441"/>
         <source>Radial</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bán kính</translation>
     </message>
 </context>
 <context>
@@ -2037,47 +2037,47 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="12387"/>
         <source>Add point</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thêm vào điểm</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12391"/>
         <source>Remove point</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lấy ra điểm</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12397"/>
         <source>Load points</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nạp các điểm</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12401"/>
         <source>Save points</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưu các điểm</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12407"/>
         <source>Reset Designer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reset Designer</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12411"/>
         <source>Config...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cấu hình...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13067"/>
         <source>Add to Cupping Notes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thêm vào ghi chú Cupping</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13071"/>
         <source>Add to Roasting Notes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thêm vào ghi chú mẻ rang</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13077"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chỉnh sửa</translation>
     </message>
 </context>
 <context>
@@ -3308,12 +3308,12 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="34432"/>
         <source>profiles</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">profiles</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34422"/>
         <source>other</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">khác</translation>
     </message>
 </context>
 <context>
@@ -3321,197 +3321,197 @@ END</source>
     <message>
         <location filename="../artisanlib/wsport.py" line="325"/>
         <source>Exception:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ngoại Lệ:</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="490"/>
         <source>F80h Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">F80h Lỗi</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="500"/>
         <source>CRC16 data corruption ERROR. TX does not match RX. Check wiring</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CRC16 dữ liệu truyền nhận bi lỗi.TX và RX có khác biệt.Kiểm tra lại dây truyền dữ liệu</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="503"/>
         <source>No RX data received</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không nhận dữ liệu từ RX</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="5859"/>
         <source>Serial Exception:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Có lỗi từ Serial:</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="654"/>
         <source>DTAcommand(): {0} bytes received but 15 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DTAcommand(): {0} bytes đã nhận nhưng cần tới 15</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="719"/>
         <source>callprogram() received:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">callprogram() đã nhận:</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="1441"/>
         <source>Extech755pressure(): conversion error, {0} bytes received</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extech755pressure(): lỗi chuyển đổi,{0} bytes được nhận</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="1455"/>
         <source>Extech755pressure(): {0} bytes received but 10 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extech755pressure():{0} bytes được nhận,nhưng cần tới 10</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="1678"/>
         <source>Unable to open serial port</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể mở port Serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="1803"/>
         <source>MS6514temperature(): {0} bytes received but 18 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MS6514temperature():{0} bytes được nhận,nhưng cần tới 18</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="1851"/>
         <source>DT301temperature(): {0} bytes received but 11 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DT301temperature()::{0} bytes được nhận,nhưng cần tới 11</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="1971"/>
         <source>HH806AUtemperature(): {0} bytes received</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HH806AUtemperature(): {0} bytes được nhận</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2016"/>
         <source>HH806Wtemperature(): Unable to initiate device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HH806Wtemperature(): không khởi động được thiết bị</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2192"/>
         <source>HH506RAGetID: {0} bytes received but 5 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HH506RAGetID: {0} bytes được nhận,nhưng cần tới 5</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2211"/>
         <source>HH506RAtemperature(): Unable to get id from HH506RA device </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HH506RAtemperature(): không thể lấy ID của thiết bị HH506RA</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2238"/>
         <source>HH506RAtemperature(): {0} bytes received but 14 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HH506RAtemperature(): {0} bytes,nhưng cần tới 14</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2292"/>
         <source>CENTER302temperature(): {0} bytes received but 7 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CENTER302temperature(): {0} bytes được nhận,nhưng cần tới 7</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2359"/>
         <source>CENTER303temperature(): {0} bytes received but 8 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CENTER302temperature(): {0} bytes được nhận,nhưng cần tới 8</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2406"/>
         <source>VOLTCRAFTPL125T2temperature(): {0} bytes received but 26 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VOLTCRAFTPL125T2temperature(): {0} bytes được nhận,nhưng cần tới 26</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2456"/>
         <source>VOLTCRAFTPL125T4temperature(): {0} bytes received but 26 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VOLTCRAFTPL125T4temperature(): {0} bytes được nhận,nhưng cần tới 26</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2525"/>
         <source>CENTER306temperature(): {0} bytes received but 10 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CENTER306temperature(): {0} bytes được nhận,nhưng cần tới 10</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2614"/>
         <source>CENTER309temperature(): {0} bytes received but 45 needed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CENTER309temperature(): {0} bytes được nhận,nhưng cần tới 45</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="5338"/>
         <source>Arduino could not set channels</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Arduino không thể cài đặt channels</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="5349"/>
         <source>Arduino could not set temperature unit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Arduino không thể cài đặt đơn vị nhiệt độ</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="5359"/>
         <source>Arduino could not set filters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Arduino không thể cài đặt bộ lọc</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34759"/>
         <source>Value Error:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Giá trị bị lỗi:</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1931"/>
         <source>ln(): no profile data available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ln(): không có profile dữ liệu</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1952"/>
         <source>expvar(): no profile data available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">expvar(): không có profile dữ liệu</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1969"/>
         <source>Univariate: no profile data available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Univariate: không có profile dữ liệu</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="2179"/>
         <source>Polyfit: no profile data available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Polyfit không có profile dữ liệu</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9315"/>
         <source>Exception: PhidgetManager couldn&apos;t be started. Verify that the Phidget driver is correctly installed!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lỗi:PhidgetManager không thể khởi động. Kiểm tra Phidget dirver đã được cài đặt chưa!</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="11864"/>
         <source>Error in lnRegression:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error in lnRegression:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12321"/>
         <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lỗi: redrawdesigner() Các sự kiện rang có thể không theo thứ tự.Hãy khởi động lại Designer.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23628"/>
         <source>Error:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lỗi:</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="628"/>
         <source>IO Error:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IO Lỗi:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27159"/>
         <source>Exception: {} not a valid settings file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lỗi:{} setting file không đúng</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29875"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lỗi</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31396"/>
         <source>Exception (probably due to an empty profile):</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lỗi (có thể profile rỗng):</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35265"/>
@@ -3614,247 +3614,247 @@ END</source>
     <message>
         <location filename="../artisanlib/alarms.py" line="40"/>
         <source>Alarms</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alarms</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="1052"/>
         <source>Alarms Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alarms trợ giúp</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="30"/>
         <source>Autosave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tự động sao lưu</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="129"/>
         <source>Autosave Fields Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tự động sao lưu trợ giúp</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="152"/>
         <source>AutoSave Path</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đường dẩn tự động sao lưu</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="157"/>
         <source>AutoSave Save Also Path</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đường dẩn tự động sao lưu tiếp theo</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="33"/>
         <source>Axes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trục tọa độ</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="33"/>
         <source>Profile Background</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Profile nền</translation>
     </message>
     <message>
         <location filename="../artisanlib/batches.py" line="29"/>
         <source>Batch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lô hàng</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="31"/>
         <source>Roast Calculator</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Máy tính cho mẻ rang</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="35"/>
         <source>Colors</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Màu sắc</translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="150"/>
         <source>Manual Temperature Logger</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưu dữ liệu nhiệt độ bằng tay</translation>
     </message>
     <message>
         <location filename="../artisanlib/comparator.py" line="681"/>
         <source>Comparator</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">So sánh</translation>
     </message>
     <message>
         <location filename="../artisanlib/cup_profile.py" line="39"/>
         <source>Cup Profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cup Profile</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="50"/>
         <source>Plotter Data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dữ liệu đồ thị</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="271"/>
         <source>Curves</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đường cong</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2878"/>
         <source>Symbolic Formulas Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trợ giúp Symbolic Formulas</translation>
     </message>
     <message>
         <location filename="../artisanlib/designer.py" line="36"/>
         <source>Designer Config</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cấu hình Designer</translation>
     </message>
     <message>
         <location filename="../artisanlib/designer.py" line="607"/>
         <source>Add Point</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thêm điểm</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="42"/>
         <source>Device Assignment</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phân công thiết bị</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2886"/>
         <source>External Programs Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chương trình bên ngoài Trợ giúp</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="46"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Events</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2964"/>
         <source>Event Custom Buttons Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Event Custom Buttons Trợ giúp</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2972"/>
         <source>Event Custom Sliders Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Event Custom Sliders trợ giúp</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2980"/>
         <source>Event Annotations Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Event Annotations trợ giúp</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="3003"/>
         <source>Event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Event</translation>
     </message>
     <message>
         <location filename="../artisanlib/logs.py" line="36"/>
         <source>Serial Log</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Serial ghi lại</translation>
     </message>
     <message>
         <location filename="../artisanlib/logs.py" line="80"/>
         <source>Error Log</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error ghi lại</translation>
     </message>
     <message>
         <location filename="../artisanlib/logs.py" line="113"/>
         <source>Message History</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Message Lịch sử</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23633"/>
         <source>Keyboard Shortcuts Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phím tắt trợ giúp</translation>
     </message>
     <message>
         <location filename="../artisanlib/phases.py" line="28"/>
         <source>Roast Phases</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các tiến trình rang</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="43"/>
         <source>PID Control</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID Control</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1143"/>
         <source>Fuji PXR PID Control</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fuji PXR PID Control</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1965"/>
         <source>Fuji PXG PID Control</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fuji PXG PID Control</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1967"/>
         <source>Fuji PXF PID Control</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fuji PXF PID Control</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3944"/>
         <source>Delta DTA PID Control</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Delta DTA PID Control</translation>
     </message>
     <message>
         <location filename="../artisanlib/platform.py" line="32"/>
         <source>Artisan Platform</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Artisan Platform</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="62"/>
         <source>Scan Modbus</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Artisan Platform</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="223"/>
         <source>Scan S7</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scan S7</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="429"/>
         <source>Ports Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cấu hình các cổng</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1749"/>
         <source>MODBUS Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MODBUS trợ giúp</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1755"/>
         <source>S7 Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">S7 trợ giúp</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="58"/>
         <source>Volume Calculator</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tính toán khối lượng</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="432"/>
         <source>Tare Setup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tare Setup</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="621"/>
         <source>Roast Properties</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thông số mẻ rang</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="30"/>
         <source>Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Số liệu thống kê</translation>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="38"/>
         <source>Profile Transposer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hoán đổi Profile</translation>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="544"/>
         <source>Profile Transposer Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hoán đổi Profile trợ giúp</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="38"/>
         <source>Wheel Graph Editor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đồ thị bánh xe</translation>
     </message>
 </context>
 <context>
@@ -3862,342 +3862,342 @@ END</source>
     <message>
         <location filename="../artisanlib/events.py" line="1199"/>
         <source>Management</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sự quản lý</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="338"/>
         <source>Time Axis</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trục thới gian</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="340"/>
         <source>Temperature Axis</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trục nhiệt độ</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1315"/>
         <source>Axis</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trục</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="344"/>
         <source>Legend Location</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vị trí chú thích</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="346"/>
         <source>Grid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưới</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="172"/>
         <source>Rate of Change</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rate of Change</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="174"/>
         <source>Temperature Conversion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chuyền đổi trục nhiệt độ</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="176"/>
         <source>Weight Conversion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chuyển đổi trọng lượng</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="178"/>
         <source>Volume Conversion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chuyển đổi khối lượng</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="180"/>
         <source>Extraction Yield</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Năng suất chiết xuất</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="495"/>
         <source>Timer LCD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Timer LCD</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="504"/>
         <source>ET LCD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ET LCD</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="507"/>
         <source>BT LCD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BT LCD</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="510"/>
         <source>Extra Devices / PID SV LCD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extra Devices / PID SV LCD</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="513"/>
         <source>Ramp/Soak Timer LCD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ramp/Soak Timer LCD</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="516"/>
         <source>Slow Cooling Timer LCD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Slow Cooling Timer LCD</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="559"/>
         <source>Rate of Rise Curves</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rate of Rise Curves</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="561"/>
         <source>Rate of Rise LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rate of Rise LCDs</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="580"/>
         <source>Rate of Rise Symbolic Assignments</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rate of Rise Symbolic Assignments</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="587"/>
         <source>Head Up Display</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Head Up Display</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="617"/>
         <source>Input Filter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Input Filter</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="622"/>
         <source>Curve Filter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Curve Filter</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="628"/>
         <source>Display Filter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lọc Hiển thị</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="665"/>
         <source>Rate of Rise Filter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rate of Rise Filter</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1039"/>
         <source>Interpolate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nội suy</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1045"/>
         <source>Univariate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đơn biến</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1053"/>
         <source>ln()</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ln()</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1068"/>
         <source>Exponent</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Số mũ</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1099"/>
         <source>Polyfit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Polyfit</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1123"/>
         <source>Curve Fit Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Curve Fit tùy chọn</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1136"/>
         <source>Interval of Interest Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Khoản thời gianl của Interest Options</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1150"/>
         <source>Analyze Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các tùy chọn Analyze</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1195"/>
         <source>Appearance</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thể hiện</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1206"/>
         <source>Resolution</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ phân giải</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1263"/>
         <source>WebLCDs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">WebLCDs</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1278"/>
         <source>Rename ET and BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đổi tên ET and BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1317"/>
         <source>Logo Image File</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">File hình ảnh Logo</translation>
     </message>
     <message>
         <location filename="../artisanlib/designer.py" line="285"/>
         <source>Initial Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cài đặt ban đầu</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="70"/>
         <source>Curves</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Curves</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="80"/>
         <source>LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LCDs</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="947"/>
         <source>Network</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mạng</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="978"/>
         <source>Async</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Async</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="980"/>
         <source>IR</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IR</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1174"/>
         <source>PID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1087"/>
         <source>Arduino TC4</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Arduino TC4</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1099"/>
         <source>External Program</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chương trình bên ngoài</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1113"/>
         <source>Symbolic Assignments</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Symbolic Assignments</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="940"/>
         <source>Event Types</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Event Type</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1129"/>
         <source>Default Buttons</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các nút mặc định</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1140"/>
         <source>Sampling</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lấy mẫu</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="47"/>
         <source>p-i-d</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">p-i-d</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="180"/>
         <source>Target</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Target</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="310"/>
         <source>Set Value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gán giá trị</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="327"/>
         <source>Duty</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hiệu suất</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1134"/>
         <source>Registers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Registers</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1389"/>
         <source>Commands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bộ lệnh</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="880"/>
         <source>Input</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Input</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1301"/>
         <source>Machine</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Machine</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1340"/>
         <source>Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Timeout</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1377"/>
         <source>Nodes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nodes</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1407"/>
         <source>Messages</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các thông báo</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1420"/>
         <source>Flags</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Flags</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1479"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Events</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="130"/>
         <source>Stats Summary</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tóm tắt thống kê</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="157"/>
         <source>AUC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AUC</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="159"/>
         <source>Display</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hiển thị</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="138"/>
         <source>Label Properties</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thuộc tính nhãn</translation>
     </message>
 </context>
 <context>
@@ -4205,677 +4205,677 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="30458"/>
         <source>Profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Profile</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30289"/>
         <source>Roast Batches</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các mẻ rang</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30666"/>
         <source>Batch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lô hàng</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31481"/>
         <source>Date</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ngày tháng</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30750"/>
         <source>Beans</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hạt</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31481"/>
         <source>In</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">In</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30466"/>
         <source>Out</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Out</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31481"/>
         <source>Loss</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hao hụt</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30506"/>
         <source>SUM</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tổng</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30447"/>
         <source>Production Report</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Báo cáo sản xuất</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30667"/>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thời gian</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30668"/>
         <source>Profile  </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Profile  </translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30735"/>
         <source>Weight In</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Khối lượng đầu vào</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30694"/>
         <source>CHARGE BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CHARGE BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30701"/>
         <source>FCs Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCs Time</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30703"/>
         <source>FCs BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCs BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30713"/>
         <source>DROP Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DROP Time</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30715"/>
         <source>DROP BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DROP BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30675"/>
         <source>Dry Percent</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dry Percent</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30676"/>
         <source>MAI Percent</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MAI Phần trăm</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30677"/>
         <source>Dev Percent</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dev phần trăm</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30729"/>
         <source>AUC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AUC</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30737"/>
         <source>Weight Loss</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Khối lượng hao hụt</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31481"/>
         <source>Color</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Màu Sắc</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30681"/>
         <source>Cupping</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cupping</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30682"/>
         <source>Roaster</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Người rang</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30684"/>
         <source>Operator</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Người thợ</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30685"/>
         <source>Organization</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cơ quan</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30686"/>
         <source>Drum Speed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tốc độ trống</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30687"/>
         <source>Whole Color</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Màu sắc tổng quát</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30688"/>
         <source>Ground Color</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ground Color</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30689"/>
         <source>Color System</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Màu Sắc hệ thống</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30690"/>
         <source>Screen Min</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Màn hình Min</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30691"/>
         <source>Screen Max</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Màn hình Max</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30692"/>
         <source>Bean Temp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nhiệt độ hạt</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30693"/>
         <source>CHARGE ET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CHARGE ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30695"/>
         <source>TP Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TP Time</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30696"/>
         <source>TP ET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TP ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30697"/>
         <source>TP BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TP BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30698"/>
         <source>DRY Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DRY Time</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30699"/>
         <source>DRY ET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DRY ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30700"/>
         <source>DRY BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DRY BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30702"/>
         <source>FCs ET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCs ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30704"/>
         <source>FCe Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCe Time</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30705"/>
         <source>FCe ET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCe ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30706"/>
         <source>FCe BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCe BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30707"/>
         <source>SCs Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCs Time</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30708"/>
         <source>SCs ET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCs ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30709"/>
         <source>SCs BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCs BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30710"/>
         <source>SCe Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCe Time</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30711"/>
         <source>SCe ET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCE BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30712"/>
         <source>SCE BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCE BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30714"/>
         <source>DROP ET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DROP ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30716"/>
         <source>COOL Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">COOL Time</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30717"/>
         <source>COOL ET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">COOL ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30718"/>
         <source>COOL BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">COOL BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30719"/>
         <source>Total Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tổng thời gian</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30720"/>
         <source>Dry Phase Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dry Phase Time</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30721"/>
         <source>Mid Phase Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mid Phase RoR</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30722"/>
         <source>Finish Phase Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Finish Phase Time</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30723"/>
         <source>Dry Phase RoR</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dry Phase RoR</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30724"/>
         <source>Mid Phase RoR</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mid Phase RoR</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30725"/>
         <source>Finish Phase RoR</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Finish Phase RoR</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30726"/>
         <source>Total RoR</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tổng RoR</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30727"/>
         <source>FCs RoR</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCs RoR</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30728"/>
         <source>MET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MET</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30730"/>
         <source>AUC Begin</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AUC Begin</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30731"/>
         <source>AUC Base</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AUC Base</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30732"/>
         <source>Dry Phase_AUC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dry Phase_AUC</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30733"/>
         <source>Mid Phase AUC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mid Phase AUC</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30734"/>
         <source>Finish Phase AUC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Finish Phase AUC</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30736"/>
         <source>Weight Out</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Khối lượng đầu ra</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30738"/>
         <source>Volume In</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thể tích đầu vào</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30739"/>
         <source>Volume Out</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thể tích đầu ra</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30740"/>
         <source>Volume Gain</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thể tích tăng</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30741"/>
         <source>Green Density</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tỉ trọng hạt xanh</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30742"/>
         <source>Roasted Density</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tỉ trong sau khi rang</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30743"/>
         <source>Moisture Greens</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ ẩm hạt xanh</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30744"/>
         <source>Moisture Roasted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ ẩm sau khi rang</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30745"/>
         <source>Moisture Loss</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ ẩm hao hụt</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30746"/>
         <source>Organic Loss</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Organic hao hụt</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30747"/>
         <source>Ambient Humidity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ ẩm môi trường</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30748"/>
         <source>Ambient Pressure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Áp suất môi trường</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30749"/>
         <source>Ambient Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nhiệt độ môi trường</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Roasting Notes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ghi chú mẻ rang</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Cupping Notes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cupping Notes</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30753"/>
         <source>Heavy FC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Heavy FC</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30754"/>
         <source>Low FC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Low FC</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30755"/>
         <source>Light Cut</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Light Cut</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30756"/>
         <source>Dark Cut</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dark Cut</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30757"/>
         <source>Drops</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Drops</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30758"/>
         <source>Oily</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dầu</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30759"/>
         <source>Uneven</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Uneven</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30760"/>
         <source>Tipping</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tipping</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30761"/>
         <source>Scorching</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cháy sém</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30762"/>
         <source>Divots</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Divots</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30763"/>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31481"/>
         <source>Roast Ranking</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xếp hạng mẻ rang</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31591"/>
         <source>Ranking Report</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Báo cáo xếp hạng</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31733"/>
         <source>AVG</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AVG</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Roasting Report</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mẻ rang Report</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Date:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ngày tháng:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Beans:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hạt:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Weight:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Khối lượng:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Degree:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Degree:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thể tích:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Roaster:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Người rang:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Operator:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Người thợ:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Organization:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cơ quan:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Cupping:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cupping:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Color:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Màu Sắc:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>CHARGE:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CHARGE:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Size:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kich thước:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Density:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tỉ trọng:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Moisture:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ ẩm:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Ambient:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Môi trường xung quanh:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>TP:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TP:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>DRY:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DRY:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>FCs:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCs:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>FCe:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCe:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>SCs:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCs:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>SCe:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCe:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>DROP:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DROP:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>COOL:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">COOL:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>MET:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MET:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>CM:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CM:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Drying:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Drying:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Maillard:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Maillard:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Finishing:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Finishing:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Cooling:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cooling:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Background:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Background:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Alarms:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alarms:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>RoR:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RoR:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>AUC:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AUC:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31964"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Events</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30683"/>
@@ -8272,77 +8272,77 @@ Inputs with the area set to the empty input are turned off.</source>
     <message>
         <location filename="../artisanlib/alarms.py" line="113"/>
         <source>Pop Up Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thời gian tắt Pop Up</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="533"/>
         <source>Label</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nhãn</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="160"/>
         <source>Alarm Sets</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alarm Sets</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="165"/>
         <source>Current Alarm Set</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hiện tại Alarm Set</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="459"/>
         <source>Enter description</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nhập vào chú thich</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2842"/>
         <source>ET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2843"/>
         <source>BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="43"/>
         <source>Preview:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xem trước:</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="70"/>
         <source>File Name Prefix</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tiền tố tên File</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="147"/>
         <source>While recording:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trong khi ghi nhận:</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="302"/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Max</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="294"/>
         <source>Min</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Min</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="41"/>
         <source>100% Event Step</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">100% Event Step</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1072"/>
         <source>RESET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RESET</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="183"/>
         <source>Step</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bu</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="680"/>
@@ -8352,97 +8352,97 @@ Inputs with the area set to the empty input are turned off.</source>
     <message>
         <location filename="../artisanlib/axis.py" line="213"/>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chiều rộng</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="104"/>
         <source>Opaqueness</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ mờ đục</translation>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="1050"/>
         <source>CHARGE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CHARGE</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1465"/>
         <source>DRY</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DRY</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1467"/>
         <source>FCs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCs</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1469"/>
         <source>FCe</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FCe</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1471"/>
         <source>SCs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCs</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1473"/>
         <source>SCe</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SCe</translation>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="1050"/>
         <source>DROP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DROP</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="84"/>
         <source>ALL</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tất Cả</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="103"/>
         <source>Extra 1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extra 1</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="112"/>
         <source>Extra 2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extra 2</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="167"/>
         <source>by time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">theo thời gian</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="168"/>
         <source>by BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">theo BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="169"/>
         <source>by ET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">theo ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="191"/>
         <source>Text Warning</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dòng chữ cảnh báo</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="192"/>
         <source>sec</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">giây</translation>
     </message>
     <message>
         <location filename="../artisanlib/batches.py" line="45"/>
         <source>Prefix</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tiền tố</translation>
     </message>
     <message>
         <location filename="../artisanlib/batches.py" line="48"/>
         <source>Counter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bộ đếm</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="38"/>
@@ -8452,52 +8452,52 @@ Inputs with the area set to the empty input are turned off.</source>
     <message>
         <location filename="../artisanlib/calculator.py" line="41"/>
         <source>Start (00:00)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bắt đầu (00:00)</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="42"/>
         <source>End (00:00)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kết thúc (00:00)</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="61"/>
         <source>Fahrenheit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đô Fahrenheit</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="62"/>
         <source>Celsius</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ Celsius</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="116"/>
         <source>Yield (%)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Năng suất (%)</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="117"/>
         <source>Grounds (g)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đất (g)</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="118"/>
         <source>TDS (%)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TDS (%)</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="119"/>
         <source>Coffee (g)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Coffee (g)</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="227"/>
         <source>Time syntax error. Time not valid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lổi cú pháp thời gian. Time not valid</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="231"/>
         <source>Error: End time smaller than Start time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lỗi: Thời gian bắt đầu nhỏ hơn thời gian kết thúc</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="248"/>
@@ -8507,62 +8507,62 @@ Inputs with the area set to the empty input are turned off.</source>
     <message>
         <location filename="../artisanlib/calculator.py" line="249"/>
         <source>&lt;b&gt;{0}&lt;/b&gt; {1}/sec, &lt;b&gt;{2}&lt;/b&gt; {3}/min</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;{0}&lt;/b&gt; {1}/sec, &lt;b&gt;{2}&lt;/b&gt; {3}/min</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="253"/>
         <source>No profile found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">không tìm thấy profile</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="42"/>
         <source>Profile Colors</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Profile màu sắc</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="44"/>
         <source>Background Profile Colors</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Màu Background Profile</translation>
     </message>
     <message>
         <location filename="../artisanlib/comparator.py" line="596"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Events</translation>
     </message>
     <message>
         <location filename="../artisanlib/comparator.py" line="702"/>
         <source>Align</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Căn chỉnh</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="81"/>
         <source>TP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TP</translation>
     </message>
     <message>
         <location filename="../artisanlib/comparator.py" line="900"/>
         <source>min</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">phút</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13665"/>
         <source>/min</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">/phút</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1141"/>
         <source>ON</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ON</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="871"/>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tiêu đề</translation>
     </message>
     <message>
         <location filename="../artisanlib/cup_profile.py" line="45"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mặc định</translation>
     </message>
     <message>
         <location filename="../artisanlib/cup_profile.py" line="79"/>
@@ -8572,243 +8572,243 @@ Inputs with the area set to the empty input are turned off.</source>
     <message>
         <location filename="../artisanlib/curves.py" line="54"/>
         <source>Data precision</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ chính xác của dữ liệu</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="113"/>
         <source>No plotter data found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không tìm thấy dữ liệu để vẽ.</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="306"/>
         <source>HUD Button</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nút HUD</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="310"/>
         <source>ET Target 1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ET Target 1</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="312"/>
         <source>BT Target 1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BT Target 1</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="314"/>
         <source>ET Target 2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ET Target 2</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="316"/>
         <source>BT Target 2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BT Target 2</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1494"/>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chế độ</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="320"/>
         <source>ET p-i-d 1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ET p-i-d 1</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="331"/>
         <source>Smoothing</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Làm mịn</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="357"/>
         <source>Smooth Curves</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Làm mịn đường cong</translation>
     </message>
     <message>
         <location filename="../artisanlib/phases.py" line="44"/>
         <source>min</source>
         <comment>abbrev of minimum</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">min</translation>
     </message>
     <message>
         <location filename="../artisanlib/phases.py" line="45"/>
         <source>max</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">max</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="19616"/>
         <source>Delta Span</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Delta Span</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="215"/>
         <source>ET Y(x)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ET Y(x)</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="216"/>
         <source>BT Y(x)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BT Y(x)</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="668"/>
         <source>Path Effects</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Path Effects</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="687"/>
         <source>Font</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Font</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="731"/>
         <source>P1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">P1</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="732"/>
         <source>P2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">P2</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="733"/>
         <source>P3</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">P3</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="734"/>
         <source>P4</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">P4</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="735"/>
         <source>P5</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">P5</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="736"/>
         <source>P6</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">P6</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="737"/>
         <source>P7</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">P7</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="738"/>
         <source>P8</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">P8</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="739"/>
         <source>P9</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">P9</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="927"/>
         <source>Offset seconds from CHARGE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dịch chuyển giây khi xảy ra CHARGE</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="932"/>
         <source>Start of Analyze interval of interest</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bắt đầu phân tích khoảng thời gian quan tâm</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="974"/>
         <source>Custom offset seconds from CHARGE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chỉnh sửa dịch chuyển theo giây khi CHARGE</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="951"/>
         <source>Number of samples considered significant</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Số lượng mẫu được coi là đáng kể</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="957"/>
         <source>Delta RoR Actual-to-Fit considered significant</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Delta RoR Actual-to-Fit considered significant</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="964"/>
         <source>Start of Curve Fit window</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bắt đầu cửa sổ Curve Fit</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="990"/>
         <source>deg</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">độ</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="967"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Start</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1009"/>
         <source>End</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">End</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1268"/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Port</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1258"/>
         <source>Not available in ArtisanViewer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không có sẵn trong ArtisanViewer</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="344"/>
         <source>Opacity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ mờ</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2940"/>
         <source>EVENT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">EVENT</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="340"/>
         <source>Marker</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Marker</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13657"/>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thời gian</translation>
     </message>
     <message>
         <location filename="../artisanlib/designer.py" line="211"/>
         <source>Curviness</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ cong</translation>
     </message>
     <message>
         <location filename="../artisanlib/designer.py" line="612"/>
         <source>temp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">nhiệt độ</translation>
     </message>
     <message>
         <location filename="../artisanlib/designer.py" line="617"/>
         <source>time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">thời gian</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="83"/>
         <source>Control</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Điều khiển</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="129"/>
         <source>Control ET</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Điều khiển ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="137"/>
         <source>Read BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đọc BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1063"/>
@@ -8818,57 +8818,57 @@ Inputs with the area set to the empty input are turned off.</source>
     <message>
         <location filename="../artisanlib/devices.py" line="142"/>
         <source>RS485 Unit ID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RS485 Unit ID</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="161"/>
         <source>ET Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kênh ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="164"/>
         <source>BT Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kênh BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="190"/>
         <source>AT Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kênh AT</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="199"/>
         <source>Filter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bộ lọc</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="856"/>
         <source>Async</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Async</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="858"/>
         <source>Change</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thay đổi</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="857"/>
         <source>Rate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tỷ lệ</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="930"/>
         <source>Emissivity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ bức xạ</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="501"/>
         <source>Gain</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tăng thêm</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="669"/>
         <source>Wiring</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đấu dây</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="735"/>
@@ -8878,47 +8878,47 @@ Inputs with the area set to the empty input are turned off.</source>
     <message>
         <location filename="../artisanlib/wheels.py" line="58"/>
         <source>Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tỉ lệ</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1263"/>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Host</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="875"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mật khẩu</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="882"/>
         <source>Remote Only</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Remote Only</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="928"/>
         <source>VirtualHub</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VirtualHub</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1021"/>
         <source>MASL</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MASL</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1022"/>
         <source>Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nhiệt độ</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1023"/>
         <source>Humidity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ ẩm</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1024"/>
         <source>Pressure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Áp suất</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1025"/>
@@ -10285,522 +10285,522 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/main.py" line="15203"/>
         <source>Artisan CSV...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Artisan CSV...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15207"/>
         <source>Artisan JSON...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Artisan JSON...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="61"/>
         <source>Excel...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Excel...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15213"/>
         <source>Probat Pilot...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Probat Pilot...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15217"/>
         <source>RoastLogger...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RoastLogger...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15187"/>
         <source>Fahrenheit...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ F-Fahrenheit...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15191"/>
         <source>Celsius...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Độ C-Celsius...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15223"/>
         <source>PNG...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PNG...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15227"/>
         <source>JPEG...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">JPEG...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15231"/>
         <source>BMP...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BMP...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15235"/>
         <source>SVG...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SVG...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15239"/>
         <source>PDF...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PDF...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15666"/>
         <source>Auto All</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Auto All</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15677"/>
         <source>Fit BT to</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fit BT to</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15681"/>
         <source>Fit BT to Bkgnd</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fit BT to Bkgnd</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15685"/>
         <source>Clear results</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Quét dọn các kết quả</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18463"/>
         <source>Load Theme...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tải Theme...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="40"/>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tập tin</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="43"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tạo mới</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="44"/>
         <source>Open...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mở file...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="45"/>
         <source>Open Recent</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mở file gần đây</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="46"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Import</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="47"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưu</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="48"/>
         <source>Save As...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưu dưới dạng...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="49"/>
         <source>Save a Copy As...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưu bản copy dưới dạng...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="50"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Export</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="51"/>
         <source>Convert To</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chuyển đổi thành</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="52"/>
         <source>Save Graph</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưu dồ thị</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="53"/>
         <source>Full Size...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Full Size...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="54"/>
         <source>Large (1200x?)...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lớn(1200x?)...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="55"/>
         <source>Report</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Báo Cáo</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="80"/>
         <source>Roast</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rang</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="57"/>
         <source>Batches</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lô hàng</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="58"/>
         <source>Ranking</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xếp loại</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="59"/>
         <source>Web...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Web...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="60"/>
         <source>CSV...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CSV...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="62"/>
         <source>Save Statistics...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưu các thống kê...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="63"/>
         <source>Print...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">In...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="72"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chỉnh sừa</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="75"/>
         <source>Cut</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cắt</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="76"/>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sao chép</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="77"/>
         <source>Paste</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dán</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="83"/>
         <source>Properties...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các thông số...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="84"/>
         <source>Background...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">File nền...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="85"/>
         <source>Cup Profile...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cup Profile...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="86"/>
         <source>Convert to Fahrenheit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chuyển sang  Fahrenheit</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="87"/>
         <source>Convert to Celsius</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chuyển sang Celsius</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="88"/>
         <source>Fahrenheit Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chế độ Fahrenheit</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="89"/>
         <source>Celsius Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chế độ Celsius</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="90"/>
         <source>Switch Profiles</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hoán đổi Profiles</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="91"/>
         <source>Switch ET&lt;-&gt;BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hoán đổi  ET&lt;-&gt;BT</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="94"/>
         <source>Config</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cấu hình</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="97"/>
         <source>Machine</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Machine</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="98"/>
         <source>Themes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Themes</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="99"/>
         <source>Device...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thiết bị...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="100"/>
         <source>Port...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cổng...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="101"/>
         <source>Sampling...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lấy mẫu...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="103"/>
         <source>Oversampling</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lấy mẫu quá mức</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="104"/>
         <source>Colors...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Màu sắc...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="105"/>
         <source>Controls</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Điều khiển</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="106"/>
         <source>Readings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bài Đọc</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="107"/>
         <source>Buttons</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các nút nhấn</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="108"/>
         <source>Sliders</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các thanh trượt</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="109"/>
         <source>Phases...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các Pha...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="110"/>
         <source>Events...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các sự kiện...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="111"/>
         <source>Curves...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Những đường cong...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="112"/>
         <source>Statistics...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các thống kê...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="113"/>
         <source>Axes...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các trục...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="114"/>
         <source>Autosave...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tự động sao lưu...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="115"/>
         <source>Batch...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lô hàng...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="116"/>
         <source>Alarms...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các báo động...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="117"/>
         <source>Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nhiệt độ</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="118"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ngôn ngữ</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="149"/>
         <source>Tools</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các công cụ</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="152"/>
         <source>Analyzer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bộ phân tích</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="153"/>
         <source>Designer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thiết kế</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="154"/>
         <source>Simulator</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Giả lập</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="155"/>
         <source>Comparator</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bộ so sánh</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="156"/>
         <source>Wheel Graph</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đồ thị bánh xe</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="157"/>
         <source>Convert Profile Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chuyển đổi nhiệt độ profile</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="158"/>
         <source>Transposer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bộ chuyển đồi</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="159"/>
         <source>Calculator</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Máy tính</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="161"/>
         <source>Main LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Main LCDs</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="162"/>
         <source>Delta LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Delta LCDs</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="163"/>
         <source>PID LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID LCDs</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="164"/>
         <source>Extra LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extra LCDs</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="165"/>
         <source>Phases LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phases LCDs</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="169"/>
         <source>Load Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tải các cấu hình...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="170"/>
         <source>Load Recent Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tải các cấu hình gần đây</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="171"/>
         <source>Save Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưu các cấu hình...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="172"/>
         <source>Save Theme...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưu Theme...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="176"/>
         <source>View</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">View</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="179"/>
         <source>Full Screen</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toan bộ màn hình</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="182"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trợ giúp</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="188"/>
         <source>About Qt</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thông tin về QT</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="189"/>
         <source>Check for Updates</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kiểm tra các bản cập nhật</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="190"/>
         <source>Documentation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các tài liệu</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="192"/>
         <source>Keyboard Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phím tắt</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="193"/>
         <source>Errors</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lổi</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="194"/>
         <source>Messages</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thông báo</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="195"/>
         <source>Serial</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Serial</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="199"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các cấu hình</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="200"/>
         <source>Platform</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Platform</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="201"/>
         <source>Factory Reset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Factory Reset</translation>
     </message>
 </context>
 <context>
@@ -12844,6 +12844,56 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../plus/controller.py" line="151"/>
+        <source>Keyring error: Ensure that gnome-keyring is installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../plus/controller.py" line="155"/>
+        <source>Login aborted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../plus/controller.py" line="160"/>
+        <source>authentified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../plus/controller.py" line="161"/>
+        <source>Connected to artisan.plus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../plus/controller.py" line="214"/>
+        <source>artisan.plus turned off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../plus/controller.py" line="171"/>
+        <source>Authentication failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../plus/controller.py" line="184"/>
+        <source>Couldn&apos;t connect to artisan.plus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../plus/controller.py" line="195"/>
+        <source>Disconnect artisan.plus?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../plus/controller.py" line="197"/>
+        <source>Disconnect?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../plus/controller.py" line="216"/>
+        <source>artisan.plus disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../plus/login.py" line="40"/>
         <source>Register</source>
         <translation type="unfinished"></translation>
@@ -12918,81 +12968,28 @@ Repeat Operation at the end: {0}</source>
         <source>artisan.plus debug logging OFF.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../plus/controller.py" line="151"/>
-        <source>Keyring error: Ensure that gnome-keyring is installed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="155"/>
-        <source>Login aborted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="160"/>
-        <source>authentified</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="161"/>
-        <source>Connected to artisan.plus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="214"/>
-        <source>artisan.plus turned off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="171"/>
-        <source>Authentication failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="184"/>
-        <source>Couldn&apos;t connect to artisan.plus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="195"/>
-        <source>Disconnect artisan.plus?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="197"/>
-        <source>Disconnect?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="216"/>
-        <source>artisan.plus disconnected</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QPlatformTheme</name>
 </context>
 <context>
     <name>Radio Button</name>
     <message>
         <location filename="../artisanlib/devices.py" line="87"/>
         <source>Meter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mét</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="88"/>
         <source>PID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="89"/>
         <source>TC4</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TC4</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="90"/>
         <source>Prog</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prog</translation>
     </message>
 </context>
 <context>
@@ -13056,322 +13053,322 @@ Repeat Operation at the end: {0}</source>
     <message>
         <location filename="../artisanlib/background.py" line="367"/>
         <source>Playback Events set OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Playback Events gán giá trị OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="379"/>
         <source>Playback DROP set OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Playback DROP gán giá trị OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="399"/>
         <source>Playback Aid set OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Playback Aid gán giá trị OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3313"/>
         <source>pid #{0} successfully set to ({1},{2},{3})</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">pid #{0} gán giá trị thành công ({1},{2},{3})</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3321"/>
         <source>pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">pid sự cố câu lệnh. Dữ liệu không đúng tại pid{0} (8,8,8): ({1},{2},{3}) </translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_control.py" line="438"/>
         <source>{0} successfully sent to pid </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">{0} gửi thành công  đến PID</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_control.py" line="447"/>
         <source>setpid(): There was a problem setting {0}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">setpid(): sự cố khi gán giá trị {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="999"/>
         <source>Decimal position successfully set to 1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dấu thập phân đã gán giá trị 1</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1002"/>
         <source>Problem setting decimal position</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sự cố khi gán dấu phẩy thập phân</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1056"/>
         <source>Thermocouple type successfully set</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Loại cảm biến Thermocouple đã được chọn</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1059"/>
         <source>Problem setting thermocouple type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sự cố khi chọn loại cảm biến Thermocouple</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1970"/>
         <source>Ready</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sẵn sàng</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3775"/>
         <source>setting autotune...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">gán autotune...</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3802"/>
         <source>Autotune successfully turned OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Autotune đã gán giá trị OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3805"/>
         <source>Autotune successfully turned ON</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Autotune đã gán giá trị ON</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3730"/>
         <source>wait...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">chờ...</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1556"/>
         <source>PID OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1558"/>
         <source>PID ON</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID ON</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1588"/>
         <source>SV successfully set to {0}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SV{0} gán trị {0} thành công</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1599"/>
         <source>Empty SV box</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SV box rỗng</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1609"/>
         <source>Unable to read SV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không đọc được SV</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3646"/>
         <source>Ramp/Soak operation cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ramp/Soak đã hủy</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3649"/>
         <source>No RX data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không có dữ liệu RX</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3667"/>
         <source>RS ON</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RS ON</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3655"/>
         <source>Need to change pattern mode...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cần phải đổi pattern mode...</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3658"/>
         <source>Pattern has been changed. Wait 5 secs.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pattern đã thay đổi. Chờ trong 5 giây.</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3660"/>
         <source>Pattern could not be changed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pattern không thể thay đổi</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3687"/>
         <source>RampSoak could not be changed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RampSoak không thể thay đổi</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3690"/>
         <source>RS OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RS OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3751"/>
         <source>Reading Ramp/Soak {0} ...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đang đọc Ramp/Soak {0} ...</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3756"/>
         <source>problem reading Ramp/Soak</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sự cố đọc Ramp/Soak</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3759"/>
         <source>Finished reading Ramp/Soak val.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đọc giá tri Ramp/Soak hoàn tất.</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1856"/>
         <source>Finished reading pid values</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đọc giá tri PID hoàn tất</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3930"/>
         <source>Ramp/Soak successfully written</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ramp/Soak đã ghi thành công</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2764"/>
         <source>Time Units successfully set to MM:SS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Time Units đã đổi thành MM:SS</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2767"/>
         <source>Problem setting time units</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sự cố khi gán đơn vị thời gian</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2932"/>
         <source>SV{0} set to {1}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SV{0} gán giá trị{1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2936"/>
         <source>Problem setting SV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sự cố việc gán trị SV</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2938"/>
         <source>Cancelled svN change</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đã hủy sự thay đổi svN</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2956"/>
         <source>PID already using sv{0}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID đang sử dụng sv{0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2959"/>
         <source>setNsv(): bad response</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">setNsv():phản hồi không tốt</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3013"/>
         <source>pid changed to {0}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">pid đã thay đổi thành{0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3016"/>
         <source>setNpid(): bad confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">setNpid():sự xác nhận không tốt</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3020"/>
         <source>Cancelled pid change</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hủy thay đổi pid</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3045"/>
         <source>PID was already using pid {0}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID đã đang sử dụng pid={0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3048"/>
         <source>setNpid(): Unable to set pid {0} </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">setNpid</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3165"/>
         <source>SV{0} successfully set to {1}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SV{0} gán trị {1} thành công</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3173"/>
         <source>setsv(): Unable to set SV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">setsv():không thể gán giá trị SV</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3336"/>
         <source>sending commands for p{0} i{1} d{2}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">đang gươ lệnh cho p{0} i{1} d{2}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3406"/>
         <source>getallpid(): Unable to read pid values</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">getallpid():Không đọc được các giá trị pid</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3434"/>
         <source>PID is using pid = {0}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID đang sử dụng pid={0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3437"/>
         <source>getallpid(): Unable to read current sv</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">getallpid():Không đọc được sv hiện tại</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3507"/>
         <source>PID is using SV = {0}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID đamg sử dụng SV={0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3734"/>
         <source>PID set to OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID gán giá trị OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3736"/>
         <source>PID set to ON</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID gán giá trị ON</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3739"/>
         <source>Unable</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thễ</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3740"/>
         <source>No data received</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không nhận đượcdữ liệu</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3784"/>
         <source>Current pid = {0}. Proceed with autotune command?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Giá trị PID={0}. Tiếp tuc với autune?</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3788"/>
         <source>Autotune cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Autotune bi hủy</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3807"/>
         <source>UNABLE to set Autotune</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể gán giá trị Autotune</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3857"/>
         <source>SV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SV</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3857"/>
         <source>Ramp (MM:SS)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ramp(MM:SS)</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3857"/>
         <source>Soak (MM:SS)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Soak (MM:SS)</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3947"/>
         <source>Work in Progress</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đang thực hiện</translation>
     </message>
 </context>
 <context>
@@ -13379,202 +13376,202 @@ Repeat Operation at the end: {0}</source>
     <message>
         <location filename="../artisanlib/alarms.py" line="222"/>
         <source>Alarm Table</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bản các báo hiệu</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="230"/>
         <source>Alarm Sets</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alarm Sets</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1355"/>
         <source>Config</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cấu hình</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1599"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Events</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1602"/>
         <source>Data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dữ liệu</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="549"/>
         <source>Curves</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Curves</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1197"/>
         <source>Graph</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đồ thị</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="555"/>
         <source>LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LCDs</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1339"/>
         <source>RoR</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RoR</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1344"/>
         <source>Filters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các bộ lọc</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1349"/>
         <source>HUD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HUD</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1354"/>
         <source>Plotter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Plotter</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1359"/>
         <source>Math</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toán</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1364"/>
         <source>Analyze</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Analyze</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1369"/>
         <source>UI</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">UI</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1547"/>
         <source>ET/BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ET/BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1196"/>
         <source>Extra Devices</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extra Devices</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1199"/>
         <source>Symb ET/BT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Symb ET/BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1202"/>
         <source>Phidgets</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phidgets</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1205"/>
         <source>Yoctopuce</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Yoctopuce</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1208"/>
         <source>Ambient</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Môi trường xung quanh</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1361"/>
         <source>Buttons</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Các nút</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1366"/>
         <source>Sliders</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sliders</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1369"/>
         <source>Quantifiers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bộ định lượng</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1372"/>
         <source>Palettes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bảng màu</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1378"/>
         <source>Style</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kiểu</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1380"/>
         <source>Annotations</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chú thích</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2567"/>
         <source>PID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PID</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="500"/>
         <source>Ramp/Soak</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ramp/Soak</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2561"/>
         <source>RS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RS</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2564"/>
         <source>SV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SV</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2570"/>
         <source>Set RS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Set RS</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1550"/>
         <source>Extra</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extra</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3964"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chung</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1553"/>
         <source>Modbus</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modbus</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1556"/>
         <source>S7</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">S7</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1559"/>
         <source>Scale</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tỉ lệ</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1562"/>
         <source>Color</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Màu sắc</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1565"/>
         <source>WebSocket</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">WebSocket</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1596"/>
         <source>Notes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ghi chú</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1593"/>
