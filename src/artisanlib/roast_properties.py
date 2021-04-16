@@ -2664,6 +2664,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.org_ratingunits = self.aw.qmc.ratingunits.copy()
             self.org_sourcetypes = self.aw.qmc.sourcetypes.copy()
             self.org_load_etypes = self.aw.qmc.load_etypes.copy()
+            self.org_presssure_percents = self.aw.qmc.presssure_percents.copy()
             self.org_loadevent_zeropcts = self.aw.qmc.loadevent_zeropcts.copy()
             self.org_loadevent_hundpcts = self.aw.qmc.loadevent_hundpcts.copy()
             self.org_preheatDuration = self.aw.qmc.preheatDuration
@@ -2704,6 +2705,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.ratingunitsLabel.setText(QApplication.translate("Label","Unit",None))
             self.energy_ui.sourcetypesLabel.setText(QApplication.translate("Label","Source",None))
             self.energy_ui.eventsLabel.setText(QApplication.translate("Label","Event",None))
+            self.energy_ui.pressureLabel.setText(QApplication.translate("Label","Pressure %",None))
             self.energy_ui.electricEnergyMixLabel.setText(QApplication.translate("Label","Electric Energy Mix:",None))
             self.energy_ui.renewableLabel.setText(QApplication.translate("Label","Renewable",None))
             # Protocol tab
@@ -2783,6 +2785,11 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.events1.currentIndexChanged.connect(self.load_etypes_currentindexchanged)
             self.energy_ui.events2.currentIndexChanged.connect(self.load_etypes_currentindexchanged)
             self.energy_ui.events3.currentIndexChanged.connect(self.load_etypes_currentindexchanged)
+            
+            self.energy_ui.pressureCheckBox0.stateChanged.connect(self.pressureCheckBox_statechanged)
+            self.energy_ui.pressureCheckBox1.stateChanged.connect(self.pressureCheckBox_statechanged)
+            self.energy_ui.pressureCheckBox2.stateChanged.connect(self.pressureCheckBox_statechanged)
+            self.energy_ui.pressureCheckBox3.stateChanged.connect(self.pressureCheckBox_statechanged)
             
             self.energy_ui.zeropcts0.valueChanged.connect(self.loadevent_zeropcts0_valuechanged)
             self.energy_ui.zeropcts1.valueChanged.connect(self.loadevent_zeropcts1_valuechanged)
@@ -2926,6 +2933,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.energy_ui.events1.setCurrentIndex(self.aw.qmc.load_etypes[1])
         self.energy_ui.events2.setCurrentIndex(self.aw.qmc.load_etypes[2])
         self.energy_ui.events3.setCurrentIndex(self.aw.qmc.load_etypes[3])
+        # pressure percent
+        self.energy_ui.pressureCheckBox0.setChecked(self.aw.qmc.presssure_percents[0])
+        self.energy_ui.pressureCheckBox1.setChecked(self.aw.qmc.presssure_percents[1])
+        self.energy_ui.pressureCheckBox2.setChecked(self.aw.qmc.presssure_percents[2])
+        self.energy_ui.pressureCheckBox3.setChecked(self.aw.qmc.presssure_percents[3])
         # zeropcts
         self.energy_ui.zeropcts0.setValue(self.aw.qmc.loadevent_zeropcts[0])
         self.energy_ui.zeropcts1.setValue(self.aw.qmc.loadevent_zeropcts[1])
@@ -2998,6 +3010,14 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.load_etypes[1] = self.energy_ui.events1.currentIndex()
         self.aw.qmc.load_etypes[2] = self.energy_ui.events2.currentIndex()
         self.aw.qmc.load_etypes[3] = self.energy_ui.events3.currentIndex()
+        if updateMetrics:
+            self.updateMetricsLabel()
+    
+    def updatePressurePercent(self, updateMetrics=True):
+        self.aw.qmc.presssure_percents[0] = self.energy_ui.pressureCheckBox0.isChecked()
+        self.aw.qmc.presssure_percents[1] = self.energy_ui.pressureCheckBox1.isChecked()
+        self.aw.qmc.presssure_percents[2] = self.energy_ui.pressureCheckBox2.isChecked()
+        self.aw.qmc.presssure_percents[3] = self.energy_ui.pressureCheckBox3.isChecked()
         if updateMetrics:
             self.updateMetricsLabel()
     
@@ -3076,6 +3096,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.updateLoadUnits(False)
             # source
             self.updateSourceTypes(False)
+            # pressure percent
+            self.updatePressurePercent(False)
             # event
             self.updateLoadEvents(False)
             # zeropcts & hundpcts
@@ -3096,6 +3118,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.ratingunits = self.org_ratingunits.copy()
             self.aw.qmc.sourcetypes = self.org_sourcetypes.copy()
             self.aw.qmc.load_etypes = self.org_load_etypes.copy()
+            self.aw.qmc.presssure_percents = self.org_presssure_percents.copy()
             self.aw.qmc.loadevent_zeropcts = self.org_loadevent_zeropcts.copy()
             self.aw.qmc.loadevent_hundpcts = self.org_loadevent_hundpcts.copy()
             self.aw.qmc.preheatDuration = self.org_preheatDuration
@@ -3288,6 +3311,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.updateEnableZHpct()
         self.updateLoadEvents()
 
+    @pyqtSlot(int)
+    def pressureCheckBox_statechanged(self,_):
+        self.updatePressurePercent()
+    
     @pyqtSlot()
     def loadevent_zeropcts0_valuechanged(self):
         self.loadevent_pcts_valuechanged("zero",self.energy_ui.zeropcts0,self.energy_ui.hundredpct0)

@@ -5,7 +5,7 @@
 #
 # Copyright (c) 2018, Paul Holleis, Marko Luther
 # All rights reserved.
-# 
+#
 # 
 # ABOUT
 # This module connects to the artisan.plus inventory management service
@@ -224,7 +224,7 @@ def getRoast():
                     None, # no min limit
                     None, # no max limit
                     1, # 1 decimal places
-                    dropZero=True) # we do not transfer zero values
+                )
                     
                 util.addAllNum2dict(cp,d,
                     [
@@ -240,12 +240,14 @@ def getRoast():
                     None, # no max limit
                     3, # 3 decimal places
                     factor=1/1000, # CO2 data is forwarded in kg (instead of the Artisan internal g)
-                    dropZero=True) # we do not transfer zero values
+                )
         except Exception as e:
             config.logger.info("roast: Exception in getRoast() %s",e)
 
         if aw.qmc.plus_store:
             d["location"] = aw.qmc.plus_store
+        else:
+            d["location"] = None
         if aw.qmc.plus_coffee:
             d["coffee"] = aw.qmc.plus_coffee
         else:
@@ -254,6 +256,10 @@ def getRoast():
             d["blend"] = trimBlendSpec(aw.qmc.plus_blend_spec)
         else:
             d["blend"] = None # we neeed to explicitly add empty selections otherwise the coffee cannot be deleted from the online record
+        
+        # ensure that location is None if neither coffee nor blend is set
+        if d["coffee"] is None and d["blend"] is None and d["location"] is not None:
+            d["location"] = None
         
         try:
             util.addTemp2dict(p,"ambientTemp",d,"temperature")
@@ -289,6 +295,15 @@ def getRoast():
 
 # the following data items are supressed from the roast record if they have 0 values to avoid sending just tags with zeros:
 sync_record_zero_supressed_attributes = [
+            "density_roasted",
+            "batch_number",
+            "batch_pos",
+            "whole_color",
+            "ground_color",
+            "moisture",
+            "temperature",
+            "pressure",
+            "humidity",
             "roastersize",
             ### Energy data
             # energy consumption by source type in BTU
@@ -308,32 +323,28 @@ sync_record_zero_supressed_attributes = [
             "CO2_bbp",
             "CO2_cooling",
             # total CO2 production per batch
-            "CO2_batch"]
+            "CO2_batch" 
+]
+            
+sync_record_empty_string_supressed_attributes = [
+            "label",
+            "batch_prefix",
+            "color_system",
+            "machine",
+            "notes",
+]
             
 sync_record_non_supressed_attributes = [
             "roast_id",
             "location",
             "coffee",
             "blend",
-            "label",
             "amount",
-            "end_weight",
-            "density_roasted",
-            "batch_number",
-            "batch_prefix",
-            "batch_pos", 
-            "color_system",
-            "whole_color",
-            "ground_color",
-            "moisture",
-            "machine",
-            "notes",
-            "temperature",
-            "pressure",
-            "humidity"]
+            "end_weight"
+]
 
 # all roast record attributes that participate in the syncing process
-sync_record_attributes = sync_record_non_supressed_attributes + sync_record_zero_supressed_attributes
+sync_record_attributes = sync_record_non_supressed_attributes + sync_record_zero_supressed_attributes + sync_record_empty_string_supressed_attributes
 
 # returns the current plus record and a hash over the plus record
 # if applied, r is assumed to contain the complete roast data as returned by roast.getRoast()

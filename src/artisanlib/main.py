@@ -2285,6 +2285,7 @@ class tgraphcanvas(FigureCanvas):
         self.ratingunits_setup = [0]*4                   # index in list self.powerunits
         self.sourcetypes_setup = [0]*4                   # index in list self.sourcenames
         self.load_etypes_setup = [0]*4                   # index of the etype that is the gas/burner setting
+        self.presssure_percents_setup = [False]*4        # event value in pressure percent
         self.loadevent_zeropcts_setup = [0]*4            # event value corresponding to 0 percent
         self.loadevent_hundpcts_setup = [100]*4          # event value corresponding to 100 percent
         # Protocol
@@ -2311,9 +2312,10 @@ class tgraphcanvas(FigureCanvas):
         # Burners
         self.loadlabels = self.loadlabels_setup                  # burner labels
         self.loadratings = self.loadratings_setup                # in ratingunits
-        self.ratingunits = self.ratingunits_setup                    # index in list self.heatunits 
-        self.sourcetypes = self.sourcetypes_setup                        # index in list self.sourcetypes
+        self.ratingunits = self.ratingunits_setup                # index in list self.heatunits 
+        self.sourcetypes = self.sourcetypes_setup                # index in list self.sourcetypes
         self.load_etypes = self.load_etypes_setup                # index of the etype that is the gas/burner setting
+        self.presssure_percents = self.presssure_percents_setup  # event value in pressure percent
         self.loadevent_zeropcts = self.loadevent_zeropcts_setup  # event value corresponding to 0 percent
         self.loadevent_hundpcts = self.loadevent_hundpcts_setup  # event value corresponding to 100 percent
         # Protocol
@@ -2409,6 +2411,7 @@ class tgraphcanvas(FigureCanvas):
         self.ratingunits_setup = self.ratingunits[:]
         self.sourcetypes_setup = self.sourcetypes[:]
         self.load_etypes_setup = self.load_etypes[:]
+        self.presssure_percents_setup = self.presssure_percents[:]
         self.loadevent_zeropcts_setup = self.loadevent_zeropcts[:]
         self.loadevent_hundpcts_setup = self.loadevent_hundpcts[:]
         self.electricEnergyMix_setup = self.electricEnergyMix
@@ -2420,6 +2423,7 @@ class tgraphcanvas(FigureCanvas):
         self.ratingunits = self.ratingunits_setup[:]
         self.sourcetypes = self.sourcetypes_setup[:]
         self.load_etypes = self.load_etypes_setup[:]
+        self.presssure_percents = self.presssure_percents_setup[:]
         self.loadevent_zeropcts = self.loadevent_zeropcts_setup[:]
         self.loadevent_hundpcts = self.loadevent_hundpcts_setup[:]
         self.electricEnergyMix = self.electricEnergyMix_setup
@@ -4322,22 +4326,28 @@ class tgraphcanvas(FigureCanvas):
                     # 3 Gas or electric power: gas heats BT _faster_ because of hoter air.
                     # Every roaster will have a different constantN (self.projectionconstant).
 
-                    den = self.ctemp1[-1] - self.ctemp2[-1]  #denominator ETn - BTn
-                    if den > 0 and len(aw.qmc.delta2)>0 and aw.qmc.delta2[-1]: # if ETn > BTn
-                        #get x points
-                        xpoints = list(numpy.arange(self.timex[-1],self.endofx + starttime, self.delay/1000.))  #do two minutes after endofx (+ 120 seconds); why? now +starttime
-                        #get y points
-                        ypoints = [self.ctemp2[-1]]                                  # start initializing with last BT
-                        K =  self.projectionconstant*aw.qmc.delta2[-1]/den/60.                 # multiplier
-                        for _ in range(len(xpoints)-1):                                     # create new points from previous points
-                            DeltaT = K*(self.ctemp1[-1]- ypoints[-1])                        # DeltaT = K*(ET - BT)
-                            ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint
-
-                        #plot ET level (straight line) and BT curve
-                        if self.l_ETprojection is not None:
-                            self.l_ETprojection.set_data([self.timex[-1],self.endofx + starttime], [self.ctemp1[-1], self.ctemp1[-1]])
-                        if self.l_BTprojection is not None:
-                            self.l_BTprojection.set_data(xpoints, ypoints)
+                    if len(self.ctemp1) > 0 and len(self.ctemp2) > 0:
+                        den = self.ctemp1[-1] - self.ctemp2[-1]  #denominator ETn - BTn
+                        if den > 0 and len(aw.qmc.delta2)>0 and aw.qmc.delta2[-1]: # if ETn > BTn
+                            #get x points
+                            xpoints = list(numpy.arange(self.timex[-1],self.endofx + starttime, self.delay/1000.))  #do two minutes after endofx (+ 120 seconds); why? now +starttime
+                            #get y points
+                            ypoints = [self.ctemp2[-1]]                                  # start initializing with last BT
+                            K =  self.projectionconstant*aw.qmc.delta2[-1]/den/60.                 # multiplier
+                            for _ in range(len(xpoints)-1):                                     # create new points from previous points
+                                DeltaT = K*(self.ctemp1[-1]- ypoints[-1])                        # DeltaT = K*(ET - BT)
+                                ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint
+    
+                            #plot ET level (straight line) and BT curve
+                            if self.l_ETprojection is not None:
+                                self.l_ETprojection.set_data([self.timex[-1],self.endofx + starttime], [self.ctemp1[-1], self.ctemp1[-1]])
+                            if self.l_BTprojection is not None:
+                                self.l_BTprojection.set_data(xpoints, ypoints)
+                        else:
+                            if self.l_ETprojection:
+                                self.l_ETprojection.set_data([],[])
+                            if self.l_BTprojection:
+                                self.l_BTprojection.set_data([],[])
                     else:
                         if self.l_ETprojection:
                             self.l_ETprojection.set_data([],[])
@@ -24532,6 +24542,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.sourcetypes = [int(x) for x in profile["sourcetypes"]]
         if "load_etypes" in profile:
             self.qmc.load_etypes = [int(x) for x in profile["load_etypes"]]
+        if "presssure_percents" in profile:
+            self.qmc.presssure_percents = [int(x) for x in profile["presssure_percents"]]
         if "loadevent_zeropcts" in profile:
             self.qmc.loadevent_zeropcts = [int(x) for x in profile["loadevent_zeropcts"]]
         if "loadevent_hundpcts" in profile:
@@ -27280,6 +27292,7 @@ class ApplicationWindow(QMainWindow):
                 profile["ratingunits"] = self.qmc.ratingunits
                 profile["sourcetypes"] = self.qmc.sourcetypes
                 profile["load_etypes"] = self.qmc.load_etypes
+                profile["presssure_percents"] = self.qmc.presssure_percents
                 profile["loadevent_zeropcts"] = self.qmc.loadevent_zeropcts
                 profile["loadevent_hundpcts"] = self.qmc.loadevent_hundpcts
                 profile["preheatDuration"] = self.qmc.preheatDuration
@@ -28727,6 +28740,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.sourcetypes_setup = [toInt(x) for x in toList(settings.value("sourcetypes_setup"))]
             if settings.contains("load_etypes_setup"):
                 self.qmc.load_etypes_setup = [toInt(x) for x in toList(settings.value("load_etypes_setup"))]
+            if settings.contains("presssure_percents_setup"):
+                self.qmc.presssure_percents_setup = [bool(toBool(x)) for x in toList(settings.value("presssure_percents_setup"))]
             if settings.contains("loadevent_zeropcts_setup"):
                 self.qmc.loadevent_zeropcts_setup = [toInt(x) for x in toList(settings.value("loadevent_zeropcts_setup"))]
             if settings.contains("loadevent_hundpcts_setup"):
@@ -30129,6 +30144,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ratingunits_setup",self.qmc.ratingunits_setup)
             settings.setValue("sourcetypes_setup",self.qmc.sourcetypes_setup)
             settings.setValue("load_etypes_setup",self.qmc.load_etypes_setup)
+            settings.setValue("presssure_percents_setup",self.qmc.presssure_percents_setup)
             settings.setValue("loadevent_zeropcts_setup",self.qmc.loadevent_zeropcts_setup)
             settings.setValue("loadevent_hundpcts_setup",self.qmc.loadevent_hundpcts_setup)
             settings.setValue("preheatDuration_setup",self.qmc.preheatDuration_setup)

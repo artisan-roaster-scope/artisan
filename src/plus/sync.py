@@ -295,11 +295,19 @@ def diffCachedSyncRecord(roast_record):
                     keys_with_equal_values.append(key)
             # for items where we supress zero values we need to force the propagate of zeros in case on server there is no zero established yet
             for key in roast.sync_record_zero_supressed_attributes:
-                if key in cached_sync_record and cached_sync_record[key] is not None and cached_sync_record[key] != 0 and key not in res \
+                if key in cached_sync_record and cached_sync_record[key] and key not in res \
                         and key not in keys_with_equal_values: # not if data is euqal on both sides and thus the key got deleted from res in the step before
                     # we explicitly set the value of key to 0 dispite it is part of the sync_record_zero_supressed_attributes
                     # to sync back the local 0 value with the non-zero value currently on the server
                     res[key] = 0
+            # for items where we supress zero values we need to force the propagate of zeros in case on server there is no zero established yet
+            for key in roast.sync_record_empty_string_supressed_attributes:
+                if key in cached_sync_record and cached_sync_record[key] and key not in res \
+                        and key not in keys_with_equal_values: # not if data is euqal on both sides and thus the key got deleted from res in the step before
+                    # we explicitly set the value of key to "" dispite it is part of the sync_record_zero_supressed_attributes
+                    # to sync back the local "" value with the non-zero value currently on the server
+                    res[key] = ""
+                    
             return res
     except Exception as e:
         config.logger.error("sync: Exception in diffCachedSyncRecord() %s",e)

@@ -196,21 +196,20 @@ def addString2dict(dict_source,key_source,dict_target,key_target,maxlen):
 
 # factor is multiplied to the original value before the min/max calculation
 # if min or max is None, the corresponding limit is not enforced, otherwise numbers beyond the given limit are replaced by None
-# if dropZero then a zero value is replaced by None
-def addNum2dict(dict_source,key_source,dict_target,key_target,minn,maxn,digits,factor=1,dropZero=False):
+# Note: None and 0 values are just dropped and no entry is added
+def addNum2dict(dict_source,key_source,dict_target,key_target,minn,maxn,digits,factor=1):
     if key_source in dict_source and dict_source[key_source]:
         n = dict_source[key_source]
         if n is not None and factor is not None:
             n = n * factor
-        n = limitnum(minn,maxn,n)
-        if n is not None and (not dropZero or n!=0):
+        n = limitnum(minn,maxn,n) # may return None
+        if n:
             dict_target[key_target] = float2floatMin(n,digits)
             
 # consumes a list of source-target pairs, or just strings used as both source and target key, to be processed with add2dict
 # factor is multiplied to the original value before the min/max calculation
 # if min or max is None, the corresponding limit is not enforced, otherwise numbers beyond the given limit are replaced by None
-# if dropZero then zero values are replaced by None
-def addAllNum2dict(dict_source,dict_target,key_source_target_pairs,minn,maxn,digits,factor=1,dropZero=False):
+def addAllNum2dict(dict_source,dict_target,key_source_target_pairs,minn,maxn,digits,factor=1):
     for p in key_source_target_pairs:
         if isinstance(p, tuple):
             (key_source,key_target) = p
