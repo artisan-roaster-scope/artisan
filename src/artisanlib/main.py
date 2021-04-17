@@ -11764,14 +11764,14 @@ class tgraphcanvas(FigureCanvas):
             # must be a better way
             eTypes = [""] + self.etypes[:][:4]
             
-            # true if bernoulli set for the burner slider
-            bernoulli = [None]*5
-            for i in range(0,5):
-                try:
-                    if self.load_etypes[i] != 0:
-                        bernoulli[i] = aw.eventsliderBernoulli[self.load_etypes[i]-1]
-                except:
-                    bernoulli[i] = False
+#            # true if bernoulli set for the burner slider
+#            bernoulli = [None]*5
+#            for i in range(0,5):
+#                try:
+#                    if self.load_etypes[i] != 0:
+#                        bernoulli[i] = aw.eventsliderBernoulli[self.load_etypes[i]-1]
+#                except:
+#                    bernoulli[i] = False
 
             # init the prev_loadtime to drop if it exists or to the end of profile time
             if self.timeindex[6] > 0:
@@ -11806,13 +11806,11 @@ class tgraphcanvas(FigureCanvas):
                         emax = toInt(self.loadevent_hundpcts[i])
                         scaled = (val - emin) / (emax - emin)  #emax > emin enforced by energy.py
                         load_pct = min(1,max(0,scaled)) * 100
-                        # percent factor based on bernoulli setting for burner event slider
-                        # if Bernoulli is selected we expect the % value to truly means % power
-                        #   when not selected the % power is greater than the % pressure
-                        if bernoulli[i]:
-                            factor = (load_pct / 100)
-                        else:
+                        if self.presssure_percents[i] and self.sourcetypes[i] in [0,1]:   # gas loads only
+                            # convert pressure to heat
                             factor = math.sqrt(load_pct / 100)
+                        else:
+                            factor = (load_pct / 100)
                         
                         BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
                         if BTUs > 0:
@@ -11833,11 +11831,11 @@ class tgraphcanvas(FigureCanvas):
                         duration = 0
                         aw.sendmessage(QApplication.translate("Message","Missing CHARGE or DROP event", None),append=False)
                     load_pct = toInt(self.loadevent_hundpcts[i])  #needed only for the btu_list and outmsg
-                    # percent factor based on bernoulli setting for burner event slider
-                    if bernoulli[i] or self.sourcetypes[i] not in [0,1]:   # not a gas load
-                        factor = (load_pct / 100)
-                    else:
+                    if self.presssure_percents[i] and self.sourcetypes[i] in [0,1]:   # gas loads only
+                        # convert pressure to heat
                         factor = math.sqrt(load_pct / 100)
+                    else:
+                        factor = (load_pct / 100)
                     
                     loadlabel = formatLoadLabel(i)
                     kind = 6  #Roast Continuous
@@ -11855,11 +11853,11 @@ class tgraphcanvas(FigureCanvas):
                     if self.preheatenergies[i] <= 1 and self.preheatDuration > 0:
                         # percent load multiplied by duration
                         load_pct = self.preheatenergies[i] * 1000./10
-                        # percent factor based on bernoulli setting for burner event slider
-                        if bernoulli[i] or self.sourcetypes[i] not in [0,1]:   # not a gas load
-                            factor = self.preheatenergies[i]
+                        if self.presssure_percents[i] and self.sourcetypes[i] in [0,1]:   # gas loads only
+                            # convert pressure to heat
+                            factor = math.sqrt(load_pct / 100)
                         else:
-                            factor = math.sqrt(self.preheatenergies[i])
+                            factor = (load_pct / 100)
                         duration = self.preheatDuration
                         BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
                         kind = 1  #Preheat Percent
@@ -11883,11 +11881,11 @@ class tgraphcanvas(FigureCanvas):
                     if self.betweenbatchenergies[i] <= 1 and self.betweenbatchDuration > 0:
                         # percent load multiplied by duration
                         load_pct = self.betweenbatchenergies[i] * 1000./10
-                        # percent factor based on bernoulli setting for burner event slider
-                        if bernoulli[i] or self.sourcetypes[i] not in [0,1]:   # not a gas load
-                            factor = self.betweenbatchenergies[i]
+                        if self.presssure_percents[i] and self.sourcetypes[i] in [0,1]:   # gas loads only
+                            # convert pressure to heat
+                            factor = math.sqrt(load_pct / 100)
                         else:
-                            factor = math.sqrt(self.betweenbatchenergies[i])
+                            factor = (load_pct / 100)
                         duration = self.betweenbatchDuration
                         BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
                         kind = 3  #BBP Percent
@@ -11911,11 +11909,11 @@ class tgraphcanvas(FigureCanvas):
                     if self.coolingenergies[i] <= 1 and self.coolingDuration > 0:
                         # percent load multiplied by duration
                         load_pct = self.coolingenergies[i] * 1000./10
-                        # percent factor based on bernoulli setting for burner event slider
-                        if bernoulli[i] or self.sourcetypes[i] not in [0,1]:   # not a gas load
-                            factor = self.coolingenergies[i]
+                        if self.presssure_percents[i] and self.sourcetypes[i] in [0,1]:   # gas loads only
+                            # convert pressure to heat
+                            factor = math.sqrt(load_pct / 100)
                         else:
-                            factor = math.sqrt(self.coolingenergies[i])
+                            factor = (load_pct / 100)
                         duration = self.coolingDuration
                         BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
                         kind = 5  #Cooling Percent
