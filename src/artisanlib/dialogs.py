@@ -125,7 +125,12 @@ class HelpDlg(ArtisanDialog):
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
         self.dialogbuttons.accepted.connect(self.close)
 
+        homeLabel = QLabel()
+        homeLabel.setText("{} {}".format(QApplication.translate("Label", "For more details visit", None),
+                 "<a href='https://artisan-scope.org'>artisan-scope.org</a>"))
+        homeLabel.setOpenExternalLinks(True)
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(homeLabel)
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
         hLayout = QVBoxLayout()
