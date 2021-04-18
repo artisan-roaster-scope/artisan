@@ -31154,6 +31154,9 @@ class ApplicationWindow(QMainWindow):
     #  . "AUC": int
     #  . "color": int
     #  . "cup": int
+    #  . "energy": float in kWh
+    #  . "co2": float in g
+    #  . "co2kg": float in g
     def profileRankingData(self,profile):
         res = {}
         # temp_unit
@@ -31219,6 +31222,12 @@ class ApplicationWindow(QMainWindow):
             comp = profile["computed"]
             if "AUC" in comp:
                 res["AUC"] = comp["AUC"]
+            if "BTU_batch" in comp:
+                res["energy"] = self.qmc.convertHeat(comp["BTU_batch"],0,3)
+            if "CO2_batch" in comp:
+                res["co2"] = comp["CO2_batch"]
+            if "CO2_per_green_kg" in comp:
+                res["co2kg"] = comp["CO2_per_green_kg"]
         # color
         if "ground_color" in profile:
             res["color"] = profile["ground_color"]
@@ -31240,6 +31249,9 @@ class ApplicationWindow(QMainWindow):
     #  . "AUC"
     #  . "color"
     #  . "cupping"
+    #  . "energy"
+    #  . "co2"
+    #  . "co2kg"
     def rankingData2string(self,data,units=True):
         res = {}
         res["charge_temp_num"] = (convertTemp(data["charge_temp"],(data["temp_unit"] if units else ""),aw.qmc.mode) if "charge_temp" in data else 0)
@@ -31263,6 +31275,12 @@ class ApplicationWindow(QMainWindow):
         res["DEV_percent"] = ('{0:.1f}'.format(data["DEV_percent"]) + ("%" if units else "") if "DEV_percent" in data else "")
         res["AUC_num"] = (data["AUC"] if "AUC" in data else 0)
         res["AUC"] = (data["AUC"] if "AUC" in data else "")
+        res["energy_num"] = ('{0:.1f}'.format(data["energy"]) if "energy" in data else 0)
+        res["energy"] = ('{0:.1f}'.format(data["energy"]) + ("kWh" if units else "") if "energy" in data else "")
+        res["co2_num"] = ('{0:.1f}'.format(data["co2"]) if "co2" in data else 0)
+        res["co2"] = ('{0:.1f}'.format(data["co2"]) + ("g" if units else "") if "co2" in data else "")
+        res["co2kg_num"] = ('{0:.1f}'.format(data["co2kg"]) if "co2kg" in data else 0)
+        res["co2kg"] = ('{0:.1f}'.format(data["co2kg"]) + ("g" if units else "") if "co2kg" in data else "")
         return res
 
     def rankingdataDef(self):
@@ -31512,6 +31530,9 @@ class ApplicationWindow(QMainWindow):
 <td sorttable_customkey=\"$loss_num\">$weightloss</td>
 <td sorttable_customkey=\"$color_num\">$color</td>
 <td>$cupping</td>
+<td sorttable_customkey=\"$energy_num\">$energy</td>
+<td sorttable_customkey=\"$co2_num\">$co2</td>
+<td sorttable_customkey=\"$co2kg_num\">$co2kg</td>
 </tr>"""
         pd = self.productionData2string(production_data,units=False)
         rd = self.rankingData2string(ranking_data,units=False)
@@ -31564,6 +31585,12 @@ class ApplicationWindow(QMainWindow):
             color_num = str(rd["color_num"]),
             color = rd["color"],
             cupping = rd["cupping"],
+            energy = rd["energy"],
+            energy_num = rd["energy_num"],
+            co2 = rd["co2"],
+            co2_num = rd["co2_num"],
+            co2kg = rd["co2kg"],
+            co2kg_num = rd["co2kg_num"],
         )
 
     def reportFiles(self):
@@ -31627,6 +31654,12 @@ class ApplicationWindow(QMainWindow):
                 colors_count = 0
                 cuppings = 0
                 cuppings_count = 0
+                energies = 0
+                energies_count = 0
+                co2s = 0
+                co2s_count = 0
+                co2kgs = 0
+                co2kgs_count = 0
                 handles = []
                 labels = []
                 timex_list = []
@@ -31656,8 +31689,8 @@ class ApplicationWindow(QMainWindow):
                     try:
                         rd = self.profileRankingData(p)
                     except Exception as e:
-    #                        import traceback
-    #                        traceback.print_exc(file=sys.stdout)
+#                        import traceback
+#                        traceback.print_exc(file=sys.stdout)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
                         continue
@@ -31725,6 +31758,15 @@ class ApplicationWindow(QMainWindow):
                     if rd["cupping"] > 0:
                         cuppings += rd["cupping"]
                         cuppings_count += 1
+                    if "energy" in rd and rd["energy"] > 0:
+                        energies += rd["energy"]
+                        energies_count += 1
+                    if "co2" in rd and rd["co2"] > 0:
+                        co2s += rd["co2"]
+                        co2s_count += 1
+                    if "co2kg" in rd and rd["co2kg"] > 0:
+                        co2kgs += rd["co2kg"]
+                        co2kgs_count += 1
                     if len(profiles) > max_profiles:
                         entries += self.rankingData2htmlentry(pd,rd, cl) + "\n"
                     else:
@@ -32129,6 +32171,9 @@ class ApplicationWindow(QMainWindow):
                     loss_avg = ('{0:.1f}'.format(loss / loss_count) if loss_count > 0 and loss > 0 else ""),
                     colors_avg = ('{0:.1f}'.format(colors / colors_count) if colors > 0 and colors_count > 0 else ""),
                     cup_avg = ('{0:.2f}'.format(cuppings / cuppings_count) if cuppings > 0 and cuppings_count > 0 else ""),
+                    energy_avg = ('{0:.2f}'.format(energies / energies_count) if energies > 0 and energies_count > 0 else ""),
+                    co2_avg = ('{0:.2f}'.format(co2s / co2s_count) if co2s > 0 and co2s_count > 0 else ""),
+                    co2kg_avg = ('{0:.2f}'.format(co2kgs / co2kgs_count) if co2kgs > 0 and co2kgs_count > 0 else ""),
                     graph_image=graph_image,
                     graph_image_pct=graph_image_pct
                 )
@@ -32552,6 +32597,16 @@ class ApplicationWindow(QMainWindow):
                     color = color + " (" + self.qmc.color_systems[self.qmc.color_system_idx] + ")"
             else:
                 color = "--"
+            if "BTU_batch" in cp and cp["BTU_batch"]:
+                energy = "%.1fkWh"%self.qmc.convertHeat(cp["BTU_batch"],0,3)
+            else:
+                energy = "--"
+            if "CO2_batch" in cp and cp["CO2_batch"]:
+                CO2 = "%.1fg"%cp["CO2_batch"]
+                if "CO2_per_green_kg" in cp:
+                    CO2 += " ({}g/kg)".format(self.float2float(cp["CO2_per_green_kg"]))
+            else:
+                CO2 = "--"
             if "det" in cp:
                 cm = "%.1f/%.1f" % (cp["det"],cp["dbt"]) + uchr(176) + aw.qmc.mode
             else:
@@ -32612,6 +32667,10 @@ class ApplicationWindow(QMainWindow):
                 cup=str(aw.float2float(self.cuppingSum(self.qmc.flavors))),
                 color_label=QApplication.translate("HTML Report Template", "Color:", None),
                 color=color,
+                energy_label=QApplication.translate("HTML Report Template", "Energy:", None),
+                energy=energy,
+                CO2_label=QApplication.translate("HTML Report Template", "CO2:", None),
+                CO2=CO2,
                 charge_label=QApplication.translate("HTML Report Template", "CHARGE:", None),
                 charge=charge,
                 size_label=QApplication.translate("HTML Report Template", "Size:", None),
