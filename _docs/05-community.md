@@ -11,6 +11,7 @@ You can get support from the community and the developers by sending your questi
 
 **Subscribe First!**
 You need to be subscribed to this list to send and receive messages. Messages by non-subscribers are discarded automatically as are messages with large attachments (e.g. images).
+{: .notice--info}
 
 
 ## Blog
@@ -21,3 +22,4 @@ There are posts detailing many topics on the [Artisan Blog](http://artisan-roast
 ## Coffee Roasting Forums
 
 [Home Barista](https://www.home-barista.com){:target="_blank"}
+	
