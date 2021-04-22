@@ -34,8 +34,8 @@ toc_sticky: false
 **What is the minimum system required to run the app?**  
 : Artisan supports 64bit macOS, Windows and Linux. For the minimum system versions see under [Platforms](/about/)
 
-**Do I loose my settings on upgrading?**  
-: No, the Artisan settings are stored separately from the app on you computer
+**Do I lose my settings on upgrading?**  
+: No, the Artisan settings are stored separately from the app on your computer.  For safe keeping can always save your settings to a file using `Help > Save Settings`.
 
 **My LCDs show just `uu` or `-1`**
 : This happens if your devices are not configured correctly.  Artisan is not getting valid readings.  Possible solutions include seeing if you have a reading on the device itself.  Make sure you have the right drivers are installed.  Make sure there is no software running blocking the single device access such as the Phidgets Control Panel in Phidget setups.  Double check your device set up. 
@@ -88,7 +88,7 @@ toc_sticky: false
 **How accurate is the first-crack start prediction?**  
 : the prediction of roasting events is based on the current roast time, temperature and rate-of-rise and the [target phase temperature](https://artisan-roasterscope.blogspot.com/2017/02/roast-phases-statistics-and-phases-lcds.html){:target="_blank"} and is made under the assumption of a constant rate-of-rise.
 
-**How Do I record my gas and air changes?**  
+**How do I record my gas and air changes?**  
 : Events can be entered via [custom event buttons, event sliders, the generic event button, the mini event editor, a point-and-click action](https://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target="_blank"}, or automatically via [event quantifiers](https://artisan-roasterscope.blogspot.de/2014/04/event-quantifiers.html){:target="_blank"} monitoring the readings reported by a connected device. You create Buttons or Sliders under `Config > Events, and choose a way to display them.  More advanced displays can be created using [Event Annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html){:target="_blank"}. Event buttons can be ["relative"](https://artisan-roasterscope.blogspot.de/2015/10/increasing-heat.html), [sliders as well as event buttons can trigger actions](https://artisan-roasterscope.blogspot.de/2016/08/fz-94-4-taking-control.html){:target="_blank"} and [events can be replayed automatically](https://artisan-roasterscope.blogspot.com/2017/10/profile-templates.html){:target="_blank"}.
 
 **How do I set the default values for special events when I start my roast?**  
@@ -101,18 +101,17 @@ toc_sticky: false
 
 ## Viewing
 
-**How to display the RoR instead of the temperature at the cursor position next to the time in the top line coordiinate widget?** 
-: Just press the `d` key to toggle between temperature and RoR readings
- show RoR instead of C in under coordinates
+**How to display the RoR instead of the temperature at the cursor position next to the time in the top line coordinate widget?** 
+: Just press the `d` key to toggle between temperature and RoR readings.
 
 **How can I activate cross-lines at the cursor position?**  
-: Just press the key t to toggle cross-lines and move the mouse. While cross-lines are active you can [place a start point and drag while holding the mouse button](https://artisan-roasterscope.blogspot.com/2017/12/artisan-v12.html){:target="_blank"} to measure the deltas between the current position and the start point.
+: Just press the key t (Ctrl+Shift+t on Windows) to toggle cross-lines and move the mouse. While cross-lines are active you can [place a start point and drag while holding the mouse button](https://artisan-roasterscope.blogspot.com/2017/12/artisan-v12.html){:target="_blank"} to measure the deltas between the current position and the start point.
  
 **What does the unit `C*min` for the AUC denote?** 
-: The [area–under–the-curve (AUC)](https://artisan-roasterscope.blogspot.com/2016/11/area-under-curve-auc.html){:target="_blank"} measures the area between a given base temperature (here in C) and the BT curve over a certain period. Thus the unit of AUC is the temperature unit multiplied by the time unit (minutes).
+: The [area–under–the-curve (AUC)](https://artisan-roasterscope.blogspot.com/2016/11/area-under-curve-auc.html){:target="_blank"} measures the area between a given base temperature and the BT curve over a certain period. Thus the unit of AUC is the temperature unit (always in degrees `C`) multiplied by the time unit (minutes).  
 
 **What are those `CM` readings shown in the time axis label about?**  
 : [This is a pair of values indicating how good your profiles ET and BT curves match the ones of the background template.](https://artisan-roasterscope.blogspot.com/2019/05/how-close.html){:target="_blank"} Better matches get lower `CM` values. The measure is named by the initials of the roasting operation, [Casino Mocca](https://casinomocca.com/){:target="_blank"}, that first suggested it.
 
-**Can I change the z-order of curves?** 
-: The drawing order of curves is fixed and follows the one of the LCDs. However, the order of the ET/BT LCDs can be swapped in the Device Assignment dialog (menu `Config > Device`) and the order of the RoR LCDs can be swapped in the Curves dialog (menu `Config > Curves`, first tab). Besides this you can hide curves temporarily by a click to their legend entry (activate the legend in the Axis dialog accessible via menu `Config > Axis`) to see what is behind.
+**Can I change which curve is drawn on top?** 
+: The drawing order of curves is fixed and follows the order of the LCDs. However, the order of the ET/BT LCDs can be swapped in the Device Assignment dialog (menu `Config > Device`) and the order of the RoR LCDs can be swapped in the Curves dialog (menu `Config > Curves`, first tab). Besides this you can hide curves temporarily by a click to their legend entry (activate the legend in the Axis dialog accessible via menu `Config > Axis`) to see what is behind.
