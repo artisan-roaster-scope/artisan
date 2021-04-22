@@ -7947,7 +7947,7 @@ class tgraphcanvas(FigureCanvas):
                                 trans = self.delta_ax.transData
                             else:
                                 trans = self.ax.transData
-                            if not self.flagstart and not self.foregroundShowFullflag and len(self.extrastemp1[i]) > 0:
+                            if not self.flagstart and not self.foregroundShowFullflag and len(self.extrastemp2[i]) > 0:
                                 visible_extratemp2 = [None]*charge_idx + self.extrastemp2[i][charge_idx:drop_idx+1] + [None]*(len(self.extratimex[i])-drop_idx-1)
                             else:
                                 visible_extratemp2 = self.extrastemp2[i]
@@ -9888,11 +9888,9 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message","Scope recording...", None))
             aw.button_2.setEnabled(False)
             aw.button_2.setGraphicsEffect(None)
-#            QApplication.processEvents()
             aw.button_1.setText(QApplication.translate("Button", "OFF",None)) # text means click to turn OFF (it is ON)
             aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop recording", None))
             aw.button_1.setEnabled(True) # ensure that the OFF button is enabled
-#            QApplication.processEvents()
             #disable RESET button:
             aw.button_7.setEnabled(False)
             aw.button_18.setEnabled(True)
