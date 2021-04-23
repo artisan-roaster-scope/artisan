@@ -40,6 +40,9 @@ toc_sticky: false
 **My LCDs show just `uu` or `-1`**
 : This happens if your devices are not configured correctly.  Artisan is not getting valid readings.  Possible solutions include seeing if you have a reading on the device itself.  Make sure you have the right drivers are installed.  Make sure there is no software running blocking the single device access such as the Phidgets Control Panel in Phidget setups.  Double check your device set up. 
 
+**Artisan displays readings in Celsius, but I would like to work in Fahrenheit. Is there a way to switch that on Artisan?** 
+: You can switch the unit used to display temperature readings in menu `Config >> Temperature`
+
 **How many devices does Artisan support?**  
 : Any number. Every device is supposed to provide two data channels. The BT and ET channels are delivered by the main device. You can configure an unlimited number of extra devices, each providing two additional channels. For each extra device you have to choose the device type. Some device types, like MODBUS, S7 or Phidgets require additional configuration in separate tabs. Note that an Artisan device does not have to be connected to a physical device. [Virtual Devices](https://artisan-roasterscope.blogspot.com/2014/04/virtual-devices-and-symbolic-assignments.html){:target="_blank"} compute their data from the data of other channels using a [symbolic formula](https://artisan-roasterscope.blogspot.com/2019/11/symbolic-formulas-basics-new-variables.html){:target="_blank"}. Each channel can show its reading in an extra LCD and be rendered as an extra curve. Channel names and colors can be choosen freely. If you check the delta box of a channel its curve will be map to the right hand axis scale (the Rate-of-rise axis) instead of the temperature axis.
 
