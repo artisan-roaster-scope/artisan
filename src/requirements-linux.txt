@@ -7,18 +7,18 @@ distro==1.5.0
 #
 gevent==21.1.2 # 20.9.0 # 1.5.0 is not compatible with Python 3.8
 gevent-websocket==0.10.1
-numpy==1.19.5
-scipy==1.6.0 # 1.5.4 # depends on numpy thus we have to put it after numpy
+numpy==1.20.2 # 1.19.5
+scipy==1.6.2 # 1.6.0 # depends on numpy thus we have to put it after numpy
 matplotlib==3.3.4 # 3.4.1 requires pyinstaller > 4.2 # MPL 3.3.x is not compatible with pyinstaller up to 4.0
 wquantiles==0.5 # depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
 PyQt5==5.15.3 #5.14.2 # 5.15.0 seems not to install on Python 3.7.1
-openpyxl==3.0.6
-pyinstaller==4.1 # 3.6
+openpyxl==3.0.7 # 3.0.6
+pyinstaller==4.3 # 3.6
 #jeepney==0.4
 #cryptography==2.6.1
-keyring==21.8.0 # 21.5.0  # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
-SecretStorage==3.3.0
+keyring==23.0.1 # 21.8.0 # 21.5.0  # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
+SecretStorage==3.3.1
 lxml==4.6.3
 #
 # NOTES:

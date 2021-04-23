@@ -16,17 +16,17 @@ distro==1.5.0
 #
 gevent==21.1.2
 gevent-websocket==0.10.1
-numpy==1.19.5
-scipy==1.6.0 # depends on numpy thus needs to be put after
+numpy==1.20.2 # 1.19.5
+scipy==1.6.2 # 1.6.0 # depends on numpy thus needs to be put after
 matplotlib==3.3.4 # 3.4.1  requires pyinstaller > 4.2 # 3.1.x requires Python 3.7, stretch comes with Python 3.5.3 only
 wquantiles==0.5 # depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus needs to be put after
-openpyxl==3.6.0
+openpyxl==3.7.0 # 3.6.0
 #PyQt 5.11.3 is preinstalled
-pyinstaller==4.2
+pyinstaller==4.3 #4.2
 cffi==1.14.4
-cryptography==3.3.2
-keyring==21.8.0
+cryptography==3.4.7 #3.3.2
+keyring==23.0.1 #21.8.0
 SecretStorage==3.3.0
 lxml==4.6.3
 #
