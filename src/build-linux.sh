@@ -10,7 +10,7 @@ export PATH=$PATH:$HOME/.local/bin
 if [ ! -z $APPVEYOR ]; then
     # Appveyor environment
     echo "NOTICE: Appveyor build"
-    export PYTHON_PATH=/home/appveyor/venv3.8/lib/python3.8/site-packages
+    export PYTHON_PATH=/home/appveyor/venv3.9/lib/python3.9/site-packages
     export QT_PATH=$PYTHON_PATH/PyQt5/Qt
 elif [ -d /usr/lib/python3/dist-packages/PyQt5 ]; then
     # ARM builds
