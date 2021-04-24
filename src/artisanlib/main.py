@@ -24545,7 +24545,7 @@ class ApplicationWindow(QMainWindow):
         if "loadlabels" in profile:
             self.qmc.loadlabels = [str(x) for x in profile["loadlabels"]]
         if "loadratings" in profile:
-            self.qmc.loadratings = [int(x) for x in profile["loadratings"]]
+            self.qmc.loadratings = [float(x) for x in profile["loadratings"]]
         if "ratingunits" in profile:
             self.qmc.ratingunits = [int(x) for x in profile["ratingunits"]]
         if "sourcetypes" in profile:
@@ -28743,7 +28743,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("loadlabels_setup"):
                 self.qmc.loadlabels_setup = [toString(x) for x in toList(settings.value("loadlabels_setup"))]
             if settings.contains("loadratings_setup"):
-                self.qmc.loadratings_setup = [toInt(x) for x in toList(settings.value("loadratings_setup"))]
+                self.qmc.loadratings_setup = [toFloat(x) for x in toList(settings.value("loadratings_setup"))]
             if settings.contains("ratingunits_setup"):
                 self.qmc.ratingunits_setup = [toInt(x) for x in toList(settings.value("ratingunits_setup"))]
             if settings.contains("sourcetypes_setup"):
