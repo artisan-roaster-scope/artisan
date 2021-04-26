@@ -51,7 +51,7 @@ from unidecode import unidecode
 ## MONKEY PATCH BEGIN: importlib.metadata fix for macOS builds with py2app that fails to set proper metadata for prettytable >0.7.2 and thus fail
 ## on import with importlib.metadata.PackageNotFoundError: prettytable on __version__ = importlib_metadata.version(__name__)
 try:
-    import importlib.metadata as importlib_metadata
+    import importlib.metadata as importlib_metadata # @UnresolvedImport
     def md_version(pkg_name):
         if pkg_name == "prettytable":
             return '2.1.0'
