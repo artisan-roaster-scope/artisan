@@ -2990,10 +2990,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.updateEnergyLabels()
     
     def updateLoadRatings(self, updateMetrics=True):
-        self.aw.qmc.loadratings[0] = (self.aw.float2float(self.energy_ui.loadrating0.text()) if len(self.energy_ui.loadrating0.text())>0 else 0)
-        self.aw.qmc.loadratings[1] = (self.aw.float2float(self.energy_ui.loadrating1.text()) if len(self.energy_ui.loadrating1.text())>0 else 0)
-        self.aw.qmc.loadratings[2] = (self.aw.float2float(self.energy_ui.loadrating2.text()) if len(self.energy_ui.loadrating2.text())>0 else 0)
-        self.aw.qmc.loadratings[3] = (self.aw.float2float(self.energy_ui.loadrating3.text()) if len(self.energy_ui.loadrating3.text())>0 else 0)
+        self.aw.qmc.loadratings[0] = toFloat(self.scalefloat(self.energy_ui.loadrating0.text())) if len(self.energy_ui.loadrating0.text())>0 else 0
+        self.aw.qmc.loadratings[1] = toFloat(self.scalefloat(self.energy_ui.loadrating1.text())) if len(self.energy_ui.loadrating1.text())>0 else 0
+        self.aw.qmc.loadratings[2] = toFloat(self.scalefloat(self.energy_ui.loadrating2.text())) if len(self.energy_ui.loadrating2.text())>0 else 0
+        self.aw.qmc.loadratings[3] = toFloat(self.scalefloat(self.energy_ui.loadrating3.text())) if len(self.energy_ui.loadrating3.text())>0 else 0
         if updateMetrics:
             self.updateMetricsLabel()
     
@@ -3437,7 +3437,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     ######
 
     def scalefloat(self,num):
-        n = toFloat(num)
+        n = toFloat(self.aw.comma2dot(str(num)))
         if n == 0:
             res = "0"
         elif n < 1:
@@ -3467,8 +3467,9 @@ class editGraphDlg(ArtisanResizeablDialog):
     def validateNumText(self,s):
         res = ""
         try:
-            r = abs(self.aw.float2float(toFloat((self.aw.comma2dot(str(s))))))
-            if not r == 0:
+            r = self.scalefloat(toFloat(self.aw.comma2dot(str(s))))
+            #print("r, type(r)",r, type(r))  #dave
+            if not r == '0':
                 res = str(r)
         except Exception:
             pass
@@ -3498,7 +3499,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             if len(s) == 0:
                 res = 0
             elif s == s.strip('%'):
-                res = self.aw.float2float(toFloat(s))
+                res = toFloat(self.scalefloat(s))
             else:
                 res = self.aw.float2float(toFloat(s.strip('%'))/100,2)
         except:
@@ -4729,36 +4730,55 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.sendmessage(QApplication.translate("Message","Roast properties updated but profile not saved to disk", None))
         self.close()
     
+    def getMeasuredvalues(self,title,updatefields,fields,loadEnergy):
+        loadLabels = ['']*4
+        loadUnits = ['']*4
+        loadValues = ['0']*4
+        for i in range(0,4): 
+            loadLabels[i] = self.formatLoadLabel(chr(ord('A')+i),self.aw.qmc.loadlabels[i])
+            if self.aw.qmc.load_etypes[i] > 0:
+                loadValues[i] = self.scalefloat(loadEnergy[i])
+                loadUnits[i] = self.aw.qmc.energyunits[self.aw.qmc.ratingunits[i]]
+            else:
+                loadValues[i] = '--'
+                loadUnits[i] = ''
+        if self.openEnergyMeasuringDialog(title,loadLabels,loadValues,loadUnits):
+            # set values
+            for i, field in enumerate(fields): 
+                if self.aw.qmc.load_etypes[i] > 0 and loadEnergy[i] > -1:
+                    field.setText(self.validatePctText(str(loadEnergy[i])))
+                    updatefields()
+        
     @pyqtSlot(bool)
     def preHeatToolButton_triggered(self,_):
         title = QApplication.translate("Label","Pre-Heating",None)
-        loadLabels = ["Burner"]*4
-        loadValues = ["12"]*4
-        loadUnits = ["BTU"]*4
-        if self.openEnergyMeasuringDialog(title,loadLabels,loadValues,loadUnits):
-            # set values
-            print("set values")
-    
+        loadEnergy,_ = self.aw.qmc.measureFromprofile()
+        fields = [self.energy_ui.preheatenergies0,
+                self.energy_ui.preheatenergies1,
+                self.energy_ui.preheatenergies2,
+                self.energy_ui.preheatenergies3]
+        self.getMeasuredvalues(title, self.updatePreheatEnergies, fields, loadEnergy)
+
     @pyqtSlot(bool)
     def betweenBatchesToolButton_triggered(self,_):
         title = QApplication.translate("Label","Between Batches",None)
-        loadLabels = ["Burner"]*4
-        loadValues = ["12"]*4
-        loadUnits = ["BTU"]*4
-        if self.openEnergyMeasuringDialog(title,loadLabels,loadValues,loadUnits):
-            # set values
-            print("set values")
-    
+        loadEnergy,_ = self.aw.qmc.measureFromprofile()
+        fields = [self.energy_ui.betweenbatchesenergy0,
+                self.energy_ui.betweenbatchesenergy1,
+                self.energy_ui.betweenbatchesenergy2,
+                self.energy_ui.betweenbatchesenergy3]
+        self.getMeasuredvalues(title, self.updateBetweenBatchesEnergies, fields, loadEnergy)
+
     @pyqtSlot(bool)
     def coolingToolButton_triggered(self,_):
         title = QApplication.translate("Label","Cooling",None)
-        loadLabels = ["Burner"]*4
-        loadValues = ["12"]*4
-        loadUnits = ["BTU"]*4
-        if self.openEnergyMeasuringDialog(title,loadLabels,loadValues,loadUnits):
-            # set values
-            print("set values")
-    
+        _,loadEnergy = self.aw.qmc.measureFromprofile()
+        fields = [self.energy_ui.coolingenergies0,
+                self.energy_ui.coolingenergies1,
+                self.energy_ui.coolingenergies2,
+                self.energy_ui.coolingenergies3]
+        self.getMeasuredvalues(title, self.updateCoolingEnergies, fields, loadEnergy)
+
     def openEnergyMeasuringDialog(self,title,loadLabels,loadValues,loadUnits):
         dialog = EnergyMeasuringDialog(self)
         layout  = dialog.layout()

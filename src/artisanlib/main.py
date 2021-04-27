@@ -11739,11 +11739,11 @@ class tgraphcanvas(FigureCanvas):
     def convertHeat(self,value,fromUnit,toUnit=0):
         if value in [-1,None]:
             return value
-        conversion = {0:{0:1., 1:1.0551, 2:0.2521644, 3:0.0002931, 4:0.000393015},   #"btu":{"btu","kj","kcal","kwh",hph}
-                      1:{0:0.9478, 1:1., 2:0.2390057, 3:0.0002778, 4:0.000372506},   #"kj":{"btu","kj","kcal","kwh",hph}
-                      2:{0:3.965667,1:4.184,2:1.,3:0.0011627, 4:0.001559609},        #"kcal":{"btu","kj","kcal","kwh",hph}
-                      3:{0:3412.1416, 1:3600., 2:860.050647, 3:1., 4:1.34102209},    #"kwh":{"btu","kj","kcal","kwh",hph}
-                      4:{0:2544.43358, 1:2684.51954, 2:641.18648, 3:0.7457, 4:1.}}   #"hph":{"btu","kj","kcal","kwh",hph}
+        conversion = {0:{0:1., 1:1.0551, 2:0.2521644, 3:0.0002931, 4:0.000393015},   #"btu":{"btu","kj","kcal","kwh","hph"}
+                      1:{0:0.9478, 1:1., 2:0.2390057, 3:0.0002778, 4:0.000372506},   #"kj":{"btu","kj","kcal","kwh","hph"}
+                      2:{0:3.965667,1:4.184,2:1.,3:0.0011627, 4:0.001559609},        #"kcal":{"btu","kj","kcal","kwh","hph"}
+                      3:{0:3412.1416, 1:3600., 2:860.050647, 3:1., 4:1.34102209},    #"kwh":{"btu","kj","kcal","kwh","hph"}
+                      4:{0:2544.43358, 1:2684.51954, 2:641.18648, 3:0.7457, 4:1.}}   #"hph":{"btu","kj","kcal","kwh","hph"}
         return value * conversion[fromUnit][toUnit]
 
     def calcEnergyuse(self,beanweightstr=""):
@@ -11823,7 +11823,8 @@ class tgraphcanvas(FigureCanvas):
                             factor = math.sqrt(load_pct / 100)
                         else:
                             factor = (load_pct / 100)
-                        
+
+#                        print("i, self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)",i,self.loadratings[i],factor,(duration / 3600),self.convertHeat(1,self.ratingunits[i],0))  #dave
                         BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
                         if BTUs > 0:
                             loadlabel = "{}-{}".format(formatLoadLabel(i), eTypes[self.load_etypes[i]])
@@ -12009,6 +12010,98 @@ class tgraphcanvas(FigureCanvas):
         finally:
             return energymetrics,btu_list
         
+    def measureFromprofile(self):
+        try:
+            if len(self.timex) == 0:
+                aw.sendmessage(QApplication.translate("Message","No profile data", None),append=False)
+                return [-1]*4, [-1]*4
+
+            def getEnergy(i,j,duration): 
+                try:
+                    # scale the burner setting for 0-100%
+                    val = (self.specialeventsvalue[j] - 1) * 10
+                    emin = toInt(self.loadevent_zeropcts[i])  #dave check these, they should already be int's
+                    emax = toInt(self.loadevent_hundpcts[i])
+                    scaled = (val - emin) / (emax - emin)  #emax > emin enforced by energy.py
+                    load_pct = min(1,max(0,scaled)) * 100
+                    if self.presssure_percents[i] and self.sourcetypes[i] in [0,1]:   # gas loads only
+                        # convert pressure to heat
+                        factor = math.sqrt(load_pct / 100)
+                    else:
+                        factor = (load_pct / 100)
+                    energy = self.loadratings[i] * factor * (duration / 3600) #* self.convertHeat(1,self.ratingunits[i],0)
+                except Exception as ex:
+                    #import traceback
+                    #traceback.print_exc(file=sys.stdout)
+                    _, _, exc_tb = sys.exc_info()
+                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),exc_tb.tb_lineno)
+                finally:
+#                    print("{} {} Duration {}, energy {},  Val {}, LoadPct {}".format(i,j,duration, energy, val, load_pct))  #dave
+                    return energy
+
+            # if there is a DROP event use that for coolstart
+            if self.timeindex[6] > 0:
+                coolstart = self.timex[self.timeindex[6]]
+            # else if there is a CHARGE event use that for coolstart
+            elif self.timeindex[0] > -1:
+                coolstart = self.timex[self.timeindex[0]]
+            # else use the start of time for coolstart
+            else:
+                coolstart = self.timex[0]
+
+            # if there is a CHARGE event use that for heatend
+            if self.timeindex[0] > -1:
+                heatend = self.timex[self.timeindex[0]]
+            # else use the end of time for heatend
+            else: 
+                heatend = self.timex[-1]
+            
+            prev_loadtime = [self.timex[-1]]*4
+            coolEnergy = [0]*4
+            heatEnergy = [0]*4
+
+            for i in range(0,4):
+                # iterate specialevents in reverse from end of profile to start
+                if self.load_etypes[i] == 0:
+                    heatEnergy[i] = -1
+                    coolEnergy[i] = -1
+                elif self.loadratings[i] > 0:
+                    for j in range(len(self.specialevents) - 1, -1, -1):
+                        if self.specialeventstype[j] == self.load_etypes[i]-1:
+                            loadtime = self.timex[self.specialevents[j]]
+                            
+                            if loadtime >= coolstart and loadtime < prev_loadtime[i]:
+                                duration = prev_loadtime[i] - loadtime
+                                coolEnergy[i] += getEnergy(i,j,duration)
+#                                print("Call from Cool 1", i, j, coolEnergy[i], duration)  #dave
+                            elif loadtime < coolstart and prev_loadtime[i] >= coolstart:
+                                duration = prev_loadtime[i] - coolstart
+                                coolEnergy[i] += getEnergy(i,j,duration)
+#                                print("Call from Cool 2", i, j, coolEnergy[i], duration)  #dave
+                                
+                            if loadtime < heatend and prev_loadtime[i] >= heatend:
+                                duration = heatend - loadtime
+                                heatEnergy[i] += getEnergy(i,j,duration)
+#                                print("Call from Heat 1", i, j, coolEnergy[i], duration)  #dave
+                            elif loadtime < heatend and prev_loadtime[i] < heatend:  
+                                duration = prev_loadtime[i] - loadtime
+                                heatEnergy[i] += getEnergy(i,j,duration)
+#                                print("Call from Heat 1", i, j, coolEnergy[i], duration)  #dave
+                                
+                            prev_loadtime[i] = loadtime
+
+                    ### end of loop: for j in range(len(self.specialevents) - 1, -1, -1)
+            #### end of loop: for i in range(0,4)
+            
+        except Exception as ex:
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),exc_tb.tb_lineno)
+        finally:
+#            print("heatEnergy {}  coolEnergy {}".format(heatEnergy,coolEnergy))  #dave
+            return heatEnergy, coolEnergy
+
     #used in EventRecord()
     def restorebutton_11(self):
         aw.button_11.setDisabled(False)
@@ -34549,7 +34642,7 @@ class ApplicationWindow(QMainWindow):
     # takes the weight of the green and roasted coffee as floats and
     # returns the weight loss in percentage as float
     def volume_increase(self,green, roasted):
-        if float(roasted) == 0.0 or float(green) > float(roasted):
+        if float(green) == 0.0 or float(green) > float(roasted):
             return 0.
         else:
             return 100. * ((float(roasted) - float(green)) / float(green))
