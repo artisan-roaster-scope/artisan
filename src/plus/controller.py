@@ -85,12 +85,12 @@ def toggle(app_window):
     config.logger.info("controller:toggle()")
     config.app_window = app_window
     modifiers = QApplication.keyboardModifiers()
-    if modifiers == Qt.AltModifier:
-        # ALT-click (OPTION on macOS) sends the log file by email
-        util.sendLog()
-    elif modifiers == (Qt.AltModifier | Qt.ControlModifier):
+    if modifiers == (Qt.AltModifier | Qt.ControlModifier):
         # ALT+CTR-CLICK (OPTION+COMMAND on macOS) toggles the plus debug logging 
         util.debugLogToggle()
+    elif modifiers == Qt.AltModifier:
+        # ALT-click (OPTION on macOS) sends the log file by email
+        util.sendLog()
     else:
         if config.app_window.plus_account is None: # @UndefinedVariable
             connect()

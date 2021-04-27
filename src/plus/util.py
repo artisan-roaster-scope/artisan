@@ -282,18 +282,29 @@ def roastLink(plus_roast):
 
 
 ## Logging
-
+            
 def debugLogON():
     config.logger.info("util:debugLogON()")
     config.logger.setLevel(logging.DEBUG)
     config.handler.setLevel(logging.DEBUG)
     config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus debug logging ON.",None)) # @UndefinedVariable 
+    try:
+        aw = config.app_window
+        aw.qmc.deviceLogDEBUG()
+    except Exception as e:
+        print(e)
+        pass
 
 def debugLogOFF():
     config.logger.info("util:debugLogOFF()")
     config.logger.setLevel(logging.INFO)
     config.handler.setLevel(logging.INFO)
     config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus debug logging OFF.",None)) # @UndefinedVariable 
+    try:
+        aw = config.app_window
+        aw.qmc.deviceLogINFO()
+    except Exception:
+        pass
 
 def debugLogToggle():
     if config.logger.isEnabledFor(logging.DEBUG):
@@ -314,20 +325,40 @@ def sendLog():
     message["Subject"] = "artisan.plus client log"
     message["X-Unsent"] = "1"
     #message["X-Uniform-Type-Identifier"] = "com.apple.mail-draft"
-    message.attach(MIMEText("Please find attached the artisan.plus log file written by Artisan!\nPlease forward this email to {}\n--\n".format(message["To"]), "plain"))
-    with open(config.log_file_path, "rb") as attachment:
-        # Add file as application/octet-stream
-        # Email client can usually download this automatically as attachment
-        part = MIMEBase("application", "octet-stream")
-        part.set_payload(attachment.read())
-    # Encode file in ASCII characters to send by email
-    encoders.encode_base64(part)
-    # Add header as key/value pair to attachment part
-    part.add_header(
-        "Content-Disposition",
-        "attachment; filename= {}{}".format(config.log_file,".log"))
-    # Add attachment to message and convert message to string
-    message.attach(part)    
+    message.attach(MIMEText("Please find attached the log files written by Artisan!\nPlease forward this email to {}\n--\n".format(message["To"]), "plain"))
+    try:
+        with open(config.log_file_path, "rb") as attachment:
+            # Add file as application/octet-stream
+            # Email client can usually download this automatically as attachment
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment.read())
+        # Encode file in ASCII characters to send by email
+        encoders.encode_base64(part)
+        # Add header as key/value pair to attachment part
+        part.add_header(
+            "Content-Disposition",
+            "attachment; filename= {}{}".format(config.log_file,".log"))
+        # Add attachment to message and convert message to string
+        message.attach(part)
+    except Exceptioin:
+        pass
+    try:
+        aw = config.app_window
+        with open(aw.qmc.device_log_file, "rb") as attachment:
+            # Add file as application/octet-stream
+            # Email client can usually download this automatically as attachment
+            part2 = MIMEBase("application", "octet-stream")
+            part2.set_payload(attachment.read())
+        # Encode file in ASCII characters to send by email
+        encoders.encode_base64(part2)
+        # Add header as key/value pair to attachment part
+        part2.add_header(
+            "Content-Disposition",
+            "attachment; filename= {}{}".format(aw.qmc.device_log_file_name,".log"))
+        # Add attachment to message and convert message to string
+        message.attach(part2)
+    except Exception:
+        pass
     # Save message to file tmp file
     tmpfile = QDir(QDir.tempPath()).filePath("plus-log.eml")
     try:

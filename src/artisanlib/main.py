@@ -215,6 +215,8 @@ from artisanlib.qtsingleapplication import QtSingleApplication
 
 from Phidget22.Phidget import Phidget as PhidgetDriver
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
+from Phidget22.Devices.Log import Log as PhidgetLog
+from Phidget22.LogLevel import LogLevel as PhidgetLogLevel
 
 try:
     # spanning a second multiprocessing instance (Hottop server) on macOS falils to import the YAPI interface
@@ -929,6 +931,10 @@ class tgraphcanvas(FigureCanvas):
 
         #DEVICES
         self.device = 18                                    # default device selected to None (18). Calls appropiate function
+        
+        self.device_logging = False # turn on/off device logging
+        self.device_log_file_name = "artisan_device"
+        self.device_log_file = plus.util.getDirectory(self.device_log_file_name,".log")
 
         # Phidget variables
 
@@ -9423,6 +9429,14 @@ class tgraphcanvas(FigureCanvas):
                     self.phidgetServiceDiscoveryStarted = False
                 except:
                     pass
+    
+    def deviceLogDEBUG(self):
+        PhidgetLog.setLevel(PhidgetLogLevel.PHIDGET_LOG_VERBOSE)
+        print("debug")
+    
+    def deviceLLogINFO(self):
+        PhidgetLog.setLevel(PhidgetLogLevel.PHIDGET_LOG_INFO)
+        print("info")
 
     def startPhidgetManager(self):
         # this is needed to surpress the message on the ignored Exception
@@ -9430,6 +9444,11 @@ class tgraphcanvas(FigureCanvas):
         #                            # Phidget driver (artisanlib/surpress_error.py fails to surpress this)
         _stderr = sys.stderr
         sys.stderr = object
+        try:
+            PhidgetLog.enable(PhidgetLogLevel.PHIDGET_LOG_DEBUG, self.device_log_file)
+            PhidgetLog.enableRotating()
+        except:
+            pass
         try:
             if self.phidgetRemoteFlag:
                 try:
@@ -9455,6 +9474,10 @@ class tgraphcanvas(FigureCanvas):
             self.phidgetManager.close()
             self.phidgetManager = None
         self.removePhidgetServer()
+        try:
+            PhidgetLog.disable()
+        except:
+            pass
 
     def restartPhidgetManager(self):
         self.stopPhidgetManager()
@@ -12011,7 +12034,9 @@ class tgraphcanvas(FigureCanvas):
             return energymetrics,btu_list
         
     def measureFromprofile(self):
-        try:
+        coolEnergy = [0]*4
+        heatEnergy = [0]*4
+        try:    
             if len(self.timex) == 0:
                 aw.sendmessage(QApplication.translate("Message","No profile data", None),append=False)
                 return [-1]*4, [-1]*4
@@ -12057,8 +12082,6 @@ class tgraphcanvas(FigureCanvas):
                 heatend = self.timex[-1]
             
             prev_loadtime = [self.timex[-1]]*4
-            coolEnergy = [0]*4
-            heatEnergy = [0]*4
 
             for i in range(0,4):
                 # iterate specialevents in reverse from end of profile to start
@@ -12098,9 +12121,7 @@ class tgraphcanvas(FigureCanvas):
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-#            print("heatEnergy {}  coolEnergy {}".format(heatEnergy,coolEnergy))  #dave
-            return heatEnergy, coolEnergy
+        return heatEnergy, coolEnergy
 
     #used in EventRecord()
     def restorebutton_11(self):
@@ -27900,6 +27921,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.celsiusMode()
             #restore device
             settings.beginGroup("Device")
+            if settings.contains("device_logging"):
+                self.qmc.device_logging = bool(toBool(settings.value("device_logging",self.qmc.device_logging)))
             if settings.contains("id"):
                 self.qmc.device = toInt(settings.value("id",self.qmc.device))
             # Phidget configurations
@@ -29746,6 +29769,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #save device
             settings.beginGroup("Device")
+            settings.setValue("device_logging",self.qmc.device_logging)
             settings.setValue("id",self.qmc.device)
             settings.setValue("phidget1048_types",self.qmc.phidget1048_types)
             settings.setValue("phidget1048_async",self.qmc.phidget1048_async)

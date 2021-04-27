@@ -80,6 +80,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.lcds = QGroupBox(QApplication.translate("GroupBox","LCDs",None))
         self.lcds.setLayout(self.lcdHBox)
         
+        self.deviceLoggingFlag = QCheckBox(QApplication.translate("Label", "Logging", None))
+        self.deviceLoggingFlag.setChecked(self.aw.qmc.device_logging)
+        
         self.controlButtonFlag = QCheckBox(QApplication.translate("Label", "Control", None))
         self.controlButtonFlag.setChecked(self.aw.qmc.Controlbuttonflag)
         self.controlButtonFlag.stateChanged.connect(self.showControlbuttonToggle)
@@ -1144,6 +1147,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         grid.addWidget(programGroupBox,5,1)
         grid.setSpacing(3)
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(self.deviceLoggingFlag)
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
         buttonLayout.setSpacing(10)
@@ -1896,6 +1900,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             settings.setValue("DeviceAssignmentGeometry",self.saveGeometry()) 
             self.aw.DeviceAssignmentDlg_activeTab = self.TabWidget.currentIndex()
         
+            self.aw.qmc.device_logging = self.deviceLoggingFlag.isChecked()
+            
             #save any extra devices here
             self.savedevicetable(redraw=False)
             self.aw.qmc.devicetablecolumnwidths = [self.devicetable.columnWidth(c) for c in range(self.devicetable.columnCount())]
