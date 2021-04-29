@@ -2702,7 +2702,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.datatable.horizontalHeaderItem(6).setText(QApplication.translate("Table","Kind",None))
             self.energy_ui.datatable.verticalHeader().setSectionResizeMode(2)
             # Loads tab
-            self.energy_ui.loadsSetDefaultsButton.setText(QApplication.translate("Button","Set as Defaults",None))
+            self.energy_ui.loadsSetDefaultsButton.setText(QApplication.translate("Button","Save Defaults",None))
             self.energy_ui.loadsDefaultsButtons.setText(QApplication.translate("Button","Restore Defaults",None))
             self.energy_ui.loadlabelsLabel.setText(QApplication.translate("Label","Label",None))
             self.energy_ui.loadratingsLabel.setText(QApplication.translate("Label","Rating",None))
@@ -2713,7 +2713,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.electricEnergyMixLabel.setText(QApplication.translate("Label","Electric Energy Mix:",None))
             self.energy_ui.renewableLabel.setText(QApplication.translate("Label","Renewable",None))
             # Protocol tab
-            self.energy_ui.protocolSetDefaultsButton.setText(QApplication.translate("Button","Set as Defaults",None))
+            self.energy_ui.protocolSetDefaultsButton.setText(QApplication.translate("Button","Save Defaults",None))
             self.energy_ui.protocolDefaultsButton.setText(QApplication.translate("Button","Restore Defaults",None))
             self.energy_ui.preheatingLabel.setText(QApplication.translate("Label","Pre-Heating",None))
             self.energy_ui.betweenBatchesLabel.setText(QApplication.translate("Label","Between Batches",None))
@@ -3531,7 +3531,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             db = QDialogButtonBox(QDialogButtonBox.RestoreDefaults)
             defaults_button_text_translated = db.button(QDialogButtonBox.RestoreDefaults).text()
             self.setup_ui.Defaults.setText(defaults_button_text_translated)
-            self.setup_ui.SetDefaults.setText(QApplication.translate("Button", "Set as Defaults",None))
+            self.setup_ui.SetDefaults.setText(QApplication.translate("Button", "Save Defaults",None))
             if self.aw.locale not in self.aw.qtbase_locales:
                 self.setup_ui.Defaults.setText(QApplication.translate("Button","Defaults", None))
             

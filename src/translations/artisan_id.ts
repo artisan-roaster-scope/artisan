@@ -320,7 +320,7 @@ END</source>
         <translation type="unfinished">Simpan Gambar</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2684"/>
+        <location filename="../artisanlib/roast_properties.py" line="2686"/>
         <source>Help</source>
         <translation type="unfinished">Bantuan</translation>
     </message>
@@ -335,7 +335,7 @@ END</source>
         <translation type="unfinished">Tentukan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3529"/>
+        <location filename="../artisanlib/roast_properties.py" line="3536"/>
         <source>Defaults</source>
         <translation type="unfinished">Setting standar</translation>
     </message>
@@ -345,32 +345,32 @@ END</source>
         <translation type="unfinished">satuan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1238"/>
+        <location filename="../artisanlib/roast_properties.py" line="1239"/>
         <source>in</source>
         <translation type="unfinished">masuk</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1248"/>
+        <location filename="../artisanlib/roast_properties.py" line="1249"/>
         <source>out</source>
         <translation type="unfinished">keluar</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="838"/>
+        <location filename="../artisanlib/roast_properties.py" line="839"/>
         <source>Cluster</source>
         <translation type="unfinished">Gugus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="843"/>
+        <location filename="../artisanlib/roast_properties.py" line="844"/>
         <source>Clear</source>
         <translation type="unfinished">Bersihkan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="848"/>
+        <location filename="../artisanlib/roast_properties.py" line="849"/>
         <source>Create Alarms</source>
         <translation type="unfinished">Membuat Alarm</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="853"/>
+        <location filename="../artisanlib/roast_properties.py" line="854"/>
         <source>Order</source>
         <translation type="unfinished">Urutan</translation>
     </message>
@@ -385,17 +385,17 @@ END</source>
         <translation type="unfinished">Hapus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1048"/>
+        <location filename="../artisanlib/roast_properties.py" line="1049"/>
         <source>calc</source>
         <translation type="unfinished">Hitung</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1264"/>
+        <location filename="../artisanlib/roast_properties.py" line="1265"/>
         <source>scan</source>
         <translation type="unfinished">Pindai</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1275"/>
+        <location filename="../artisanlib/roast_properties.py" line="1276"/>
         <source>update</source>
         <translation type="unfinished">Perbaharui</translation>
     </message>
@@ -960,7 +960,7 @@ END</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2692"/>
+        <location filename="../artisanlib/roast_properties.py" line="2694"/>
         <source>Copy Table</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1041,65 +1041,65 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3527"/>
-        <source>Set as Defaults</source>
+        <location filename="../artisanlib/roast_properties.py" line="2717"/>
+        <source>Restore Defaults</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2715"/>
-        <source>Restore Defaults</source>
+        <location filename="../artisanlib/roast_properties.py" line="3534"/>
+        <source>Save Defaults</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CheckBox</name>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1194"/>
+        <location filename="../artisanlib/roast_properties.py" line="1195"/>
         <source>Heavy FC</source>
         <translation>FC Berat</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1197"/>
+        <location filename="../artisanlib/roast_properties.py" line="1198"/>
         <source>Low FC</source>
         <translation>FC Rendah</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1200"/>
+        <location filename="../artisanlib/roast_properties.py" line="1201"/>
         <source>Light Cut</source>
         <translation>Potong tipis</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1203"/>
+        <location filename="../artisanlib/roast_properties.py" line="1204"/>
         <source>Dark Cut</source>
         <translation>Potong Hitam</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1206"/>
+        <location filename="../artisanlib/roast_properties.py" line="1207"/>
         <source>Drops</source>
         <translation>Drop</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1209"/>
+        <location filename="../artisanlib/roast_properties.py" line="1210"/>
         <source>Oily</source>
         <translation>Berminyak</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1212"/>
+        <location filename="../artisanlib/roast_properties.py" line="1213"/>
         <source>Uneven</source>
         <translation>Tidak merata</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1214"/>
+        <location filename="../artisanlib/roast_properties.py" line="1215"/>
         <source>Tipping</source>
         <translation>Pecah</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1216"/>
+        <location filename="../artisanlib/roast_properties.py" line="1217"/>
         <source>Scorching</source>
         <translation>Gosong</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1218"/>
+        <location filename="../artisanlib/roast_properties.py" line="1219"/>
         <source>Divots</source>
         <translation>Divot</translation>
     </message>
@@ -1149,17 +1149,17 @@ Extra Device</source>
         <translation type="unfinished">Jendela Alarm</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="825"/>
+        <location filename="../artisanlib/roast_properties.py" line="826"/>
         <source>Delete roast properties on RESET</source>
         <translation type="unfinished">Hapus properti sangrai saat RESET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="828"/>
+        <location filename="../artisanlib/roast_properties.py" line="829"/>
         <source>Open on CHARGE</source>
         <translation type="unfinished">Buka saat CHARGE</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="917"/>
+        <location filename="../artisanlib/roast_properties.py" line="918"/>
         <source>Show Always</source>
         <translation type="unfinished">Tampilkan Selalu</translation>
     </message>
@@ -1514,7 +1514,7 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="831"/>
+        <location filename="../artisanlib/roast_properties.py" line="832"/>
         <source>Open on DROP</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1657,12 +1657,12 @@ Extra Device</source>
         <translation type="obsolete">DeltaBT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3590"/>
+        <location filename="../artisanlib/roast_properties.py" line="3597"/>
         <source>ET</source>
         <translation type="unfinished">ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3591"/>
+        <location filename="../artisanlib/roast_properties.py" line="3598"/>
         <source>BT</source>
         <translation type="unfinished">BT</translation>
     </message>
@@ -3862,7 +3862,7 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4487"/>
+        <location filename="../artisanlib/roast_properties.py" line="4486"/>
         <source>Unable to move CHARGE to a value that does not exist</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4173,12 +4173,12 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3546"/>
+        <location filename="../artisanlib/roast_properties.py" line="3553"/>
         <source>Energy Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4823"/>
+        <location filename="../artisanlib/roast_properties.py" line="4839"/>
         <source>Set Measure from Profile</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4536,12 +4536,12 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2689"/>
+        <location filename="../artisanlib/roast_properties.py" line="2691"/>
         <source>Energy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2690"/>
+        <location filename="../artisanlib/roast_properties.py" line="2692"/>
         <source>CO2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8786,12 +8786,12 @@ Inputs with the area set to the empty input are turned off.</source>
 <context>
     <name>Label</name>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3742"/>
+        <location filename="../artisanlib/roast_properties.py" line="3749"/>
         <source>ET</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3743"/>
+        <location filename="../artisanlib/roast_properties.py" line="3750"/>
         <source>BT</source>
         <translation></translation>
     </message>
@@ -8816,7 +8816,7 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation>FC MULAI</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="749"/>
+        <location filename="../artisanlib/roast_properties.py" line="750"/>
         <source>FC END</source>
         <translation>FC AKHIR</translation>
     </message>
@@ -8826,7 +8826,7 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation>SC MULAI</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="779"/>
+        <location filename="../artisanlib/roast_properties.py" line="780"/>
         <source>SC END</source>
         <translation>SC AKHIR</translation>
     </message>
@@ -8836,7 +8836,7 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation>KELUARKAN</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="810"/>
+        <location filename="../artisanlib/roast_properties.py" line="811"/>
         <source>COOL</source>
         <translation>PENDINGINAN</translation>
     </message>
@@ -9126,12 +9126,12 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="unfinished">Unit Bobot</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="964"/>
+        <location filename="../artisanlib/roast_properties.py" line="965"/>
         <source>Weight</source>
         <translation type="unfinished">Bobot</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="996"/>
+        <location filename="../artisanlib/roast_properties.py" line="997"/>
         <source>Volume</source>
         <translation type="unfinished">Volume</translation>
     </message>
@@ -9151,22 +9151,22 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="unfinished">Presisi data</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="885"/>
+        <location filename="../artisanlib/roast_properties.py" line="886"/>
         <source>Title</source>
         <translation>Judul</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="921"/>
+        <location filename="../artisanlib/roast_properties.py" line="922"/>
         <source>Date</source>
         <translation type="unfinished">Tanggal</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2847"/>
+        <location filename="../artisanlib/roast_properties.py" line="2854"/>
         <source>Batch</source>
         <translation type="unfinished">Batch</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1101"/>
+        <location filename="../artisanlib/roast_properties.py" line="1102"/>
         <source>Beans</source>
         <translation type="unfinished">Biji</translation>
     </message>
@@ -9181,7 +9181,7 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="obsolete">keluar</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1023"/>
+        <location filename="../artisanlib/roast_properties.py" line="1024"/>
         <source>Density</source>
         <translation type="unfinished">Densitas</translation>
     </message>
@@ -9201,7 +9201,7 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="obsolete">Warna bubuk</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1121"/>
+        <location filename="../artisanlib/roast_properties.py" line="1122"/>
         <source>Roasted</source>
         <translation type="unfinished">matang</translation>
     </message>
@@ -9216,7 +9216,7 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="unfinished">Lebar</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1082"/>
+        <location filename="../artisanlib/roast_properties.py" line="1083"/>
         <source>Color</source>
         <translation type="unfinished">Warna</translation>
     </message>
@@ -9226,7 +9226,7 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="unfinished">Pola warna</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2709"/>
+        <location filename="../artisanlib/roast_properties.py" line="2711"/>
         <source>Event</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9236,7 +9236,7 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="unfinished">Tindakan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2708"/>
+        <location filename="../artisanlib/roast_properties.py" line="2710"/>
         <source>Source</source>
         <translation type="unfinished">Sumber</translation>
     </message>
@@ -9661,7 +9661,7 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3521"/>
+        <location filename="../artisanlib/roast_properties.py" line="3528"/>
         <source>Machine</source>
         <translation type="unfinished">Mesin</translation>
     </message>
@@ -9716,7 +9716,7 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2729"/>
+        <location filename="../artisanlib/roast_properties.py" line="2731"/>
         <source>Duration</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10311,7 +10311,7 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2707"/>
+        <location filename="../artisanlib/roast_properties.py" line="2709"/>
         <source>Unit</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10483,97 +10483,97 @@ LCDs All</source>
         <translation type="unfinished">g</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="965"/>
+        <location filename="../artisanlib/roast_properties.py" line="966"/>
         <source>Green</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1009"/>
+        <location filename="../artisanlib/roast_properties.py" line="1010"/>
         <source> %</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1066"/>
+        <location filename="../artisanlib/roast_properties.py" line="1067"/>
         <source>Screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1080"/>
+        <location filename="../artisanlib/roast_properties.py" line="1081"/>
         <source>18/64u2033</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1083"/>
+        <location filename="../artisanlib/roast_properties.py" line="1084"/>
         <source>Whole</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1089"/>
+        <location filename="../artisanlib/roast_properties.py" line="1090"/>
         <source>Ground</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1112"/>
+        <location filename="../artisanlib/roast_properties.py" line="1113"/>
         <source>Moisture</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1142"/>
+        <location filename="../artisanlib/roast_properties.py" line="1143"/>
         <source>%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1140"/>
+        <location filename="../artisanlib/roast_properties.py" line="1141"/>
         <source>Ambient Conditions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3520"/>
+        <location filename="../artisanlib/roast_properties.py" line="3527"/>
         <source>Operator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3522"/>
+        <location filename="../artisanlib/roast_properties.py" line="3529"/>
         <source>Drum Speed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1183"/>
+        <location filename="../artisanlib/roast_properties.py" line="1184"/>
         <source>Roasting Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1188"/>
+        <location filename="../artisanlib/roast_properties.py" line="1189"/>
         <source>Cupping Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1274"/>
+        <location filename="../artisanlib/roast_properties.py" line="1275"/>
         <source>Ambient Source</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1353"/>
+        <location filename="../artisanlib/roast_properties.py" line="1354"/>
         <source>Stock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1354"/>
+        <location filename="../artisanlib/roast_properties.py" line="1355"/>
         <source>Store</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1355"/>
+        <location filename="../artisanlib/roast_properties.py" line="1356"/>
         <source>Blend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1824"/>
+        <location filename="../artisanlib/roast_properties.py" line="1825"/>
         <source>Template</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4402"/>
+        <location filename="../artisanlib/roast_properties.py" line="4409"/>
         <source>organic material</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10633,7 +10633,7 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3519"/>
+        <location filename="../artisanlib/roast_properties.py" line="3526"/>
         <source>Organization</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10728,7 +10728,7 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2705"/>
+        <location filename="../artisanlib/roast_properties.py" line="2707"/>
         <source>Label</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10760,32 +10760,32 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2688"/>
+        <location filename="../artisanlib/roast_properties.py" line="2690"/>
         <source>Results in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2706"/>
+        <location filename="../artisanlib/roast_properties.py" line="2708"/>
         <source>Rating</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4754"/>
+        <location filename="../artisanlib/roast_properties.py" line="4770"/>
         <source>Pre-Heating</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4764"/>
+        <location filename="../artisanlib/roast_properties.py" line="4780"/>
         <source>Between Batches</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2724"/>
+        <location filename="../artisanlib/roast_properties.py" line="2726"/>
         <source>(mm:ss)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2730"/>
+        <location filename="../artisanlib/roast_properties.py" line="2732"/>
         <source>Measured Energy or Output %</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10795,12 +10795,12 @@ LCDs All</source>
         <translation type="obsolete">Pembakar</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3153"/>
+        <location filename="../artisanlib/roast_properties.py" line="3160"/>
         <source>Roast</source>
         <translation type="unfinished">Roast</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3169"/>
+        <location filename="../artisanlib/roast_properties.py" line="3176"/>
         <source>CO2 per kg green coffee</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10835,32 +10835,32 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2719"/>
+        <location filename="../artisanlib/roast_properties.py" line="2721"/>
         <source>Between Batches after Pre-Heating</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3149"/>
+        <location filename="../artisanlib/roast_properties.py" line="3156"/>
         <source>Preheat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3151"/>
+        <location filename="../artisanlib/roast_properties.py" line="3158"/>
         <source>BBP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2711"/>
+        <location filename="../artisanlib/roast_properties.py" line="2713"/>
         <source>Electric Energy Mix:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4774"/>
+        <location filename="../artisanlib/roast_properties.py" line="4790"/>
         <source>Cooling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2712"/>
+        <location filename="../artisanlib/roast_properties.py" line="2714"/>
         <source>Renewable</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10875,12 +10875,12 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3191"/>
+        <location filename="../artisanlib/roast_properties.py" line="3198"/>
         <source>Load</source>
         <translation type="unfinished">Muat</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2710"/>
+        <location filename="../artisanlib/roast_properties.py" line="2712"/>
         <source>Pressure %</source>
         <translation type="unfinished"></translation>
     </message>
@@ -12830,7 +12830,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4002"/>
+        <location filename="../artisanlib/roast_properties.py" line="4009"/>
         <source>Data table copied to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
@@ -12855,7 +12855,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4042"/>
+        <location filename="../artisanlib/roast_properties.py" line="4049"/>
         <source>Event table copied to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13387,37 +13387,37 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4110"/>
+        <location filename="../artisanlib/roast_properties.py" line="4117"/>
         <source>Alarms from events #{0} created</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4186"/>
+        <location filename="../artisanlib/roast_properties.py" line="4193"/>
         <source>No events found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4139"/>
+        <location filename="../artisanlib/roast_properties.py" line="4146"/>
         <source>Event #{0} added</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4142"/>
+        <location filename="../artisanlib/roast_properties.py" line="4149"/>
         <source>No profile found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4174"/>
+        <location filename="../artisanlib/roast_properties.py" line="4181"/>
         <source> Events #{0} deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4180"/>
+        <location filename="../artisanlib/roast_properties.py" line="4187"/>
         <source> Event #{0} deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4730"/>
+        <location filename="../artisanlib/roast_properties.py" line="4746"/>
         <source>Roast properties updated but profile not saved to disk</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13622,7 +13622,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3360"/>
+        <location filename="../artisanlib/roast_properties.py" line="3367"/>
         <source>The 0% value must be less than the 100% value.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13889,7 +13889,7 @@ Repeat Operation at the end: {0}</source>
 <context>
     <name>Scope Title</name>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2433"/>
+        <location filename="../artisanlib/roast_properties.py" line="2434"/>
         <source>Roaster Scope</source>
         <translation>Mari ngopi</translation>
     </message>
@@ -14258,17 +14258,17 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished">Umum</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1610"/>
+        <location filename="../artisanlib/roast_properties.py" line="1611"/>
         <source>Notes</source>
         <translation type="unfinished">Catatan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1613"/>
+        <location filename="../artisanlib/roast_properties.py" line="1614"/>
         <source>Events</source>
         <translation type="unfinished">Kejadian</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1616"/>
+        <location filename="../artisanlib/roast_properties.py" line="1617"/>
         <source>Data</source>
         <translation type="unfinished">Data</translation>
     </message>
@@ -14438,32 +14438,32 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1607"/>
+        <location filename="../artisanlib/roast_properties.py" line="1608"/>
         <source>Roast</source>
         <translation type="unfinished">Roast</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1620"/>
+        <location filename="../artisanlib/roast_properties.py" line="1621"/>
         <source>Setup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1618"/>
+        <location filename="../artisanlib/roast_properties.py" line="1619"/>
         <source>Energy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2685"/>
+        <location filename="../artisanlib/roast_properties.py" line="2687"/>
         <source>Details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2687"/>
+        <location filename="../artisanlib/roast_properties.py" line="2689"/>
         <source>Protocol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2686"/>
+        <location filename="../artisanlib/roast_properties.py" line="2688"/>
         <source>Loads</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14471,37 +14471,37 @@ Repeat Operation at the end: {0}</source>
 <context>
     <name>Table</name>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3822"/>
+        <location filename="../artisanlib/roast_properties.py" line="3829"/>
         <source>DRY END</source>
         <translation type="unfinished">AKHIR PENGERINGAN</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3825"/>
+        <location filename="../artisanlib/roast_properties.py" line="3832"/>
         <source>FC START</source>
         <translation type="unfinished">FC MULAI</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3828"/>
+        <location filename="../artisanlib/roast_properties.py" line="3835"/>
         <source>FC END</source>
         <translation type="unfinished">FC AKHIR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3831"/>
+        <location filename="../artisanlib/roast_properties.py" line="3838"/>
         <source>SC START</source>
         <translation type="unfinished">SC MULAI</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3834"/>
+        <location filename="../artisanlib/roast_properties.py" line="3841"/>
         <source>SC END</source>
         <translation type="unfinished">SC AKHIR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3837"/>
+        <location filename="../artisanlib/roast_properties.py" line="3844"/>
         <source>DROP</source>
         <translation type="unfinished">KELUARKAN</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3840"/>
+        <location filename="../artisanlib/roast_properties.py" line="3847"/>
         <source>COOL</source>
         <translation type="unfinished">PENDINGINAN</translation>
     </message>
@@ -14516,22 +14516,22 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished">Waktu</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3819"/>
+        <location filename="../artisanlib/roast_properties.py" line="3826"/>
         <source>CHARGE</source>
         <translation type="unfinished">MENGISI</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3885"/>
+        <location filename="../artisanlib/roast_properties.py" line="3892"/>
         <source>Description</source>
         <translation type="unfinished">Keterangan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3885"/>
+        <location filename="../artisanlib/roast_properties.py" line="3892"/>
         <source>Type</source>
         <translation type="unfinished">Tipe</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3885"/>
+        <location filename="../artisanlib/roast_properties.py" line="3892"/>
         <source>Value</source>
         <translation type="unfinished">Nilai</translation>
     </message>
@@ -14651,7 +14651,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished">Dari</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2699"/>
+        <location filename="../artisanlib/roast_properties.py" line="2701"/>
         <source>Source</source>
         <translation type="unfinished">Sumber</translation>
     </message>
@@ -14681,7 +14681,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3885"/>
+        <location filename="../artisanlib/roast_properties.py" line="3892"/>
         <source>ET</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14691,7 +14691,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3809"/>
+        <location filename="../artisanlib/roast_properties.py" line="3816"/>
         <source>#{0} {1}{2}</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14886,27 +14886,27 @@ Repeat Operation at the end: {0}</source>
         <translation type="obsolete">Pembakar</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2695"/>
+        <location filename="../artisanlib/roast_properties.py" line="2697"/>
         <source>Duration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2700"/>
+        <location filename="../artisanlib/roast_properties.py" line="2702"/>
         <source>Kind</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2697"/>
+        <location filename="../artisanlib/roast_properties.py" line="2699"/>
         <source>CO2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2694"/>
+        <location filename="../artisanlib/roast_properties.py" line="2696"/>
         <source>Power</source>
         <translation type="unfinished">Daya</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2698"/>
+        <location filename="../artisanlib/roast_properties.py" line="2700"/>
         <source>Load</source>
         <translation type="unfinished">Muat</translation>
     </message>
@@ -15406,7 +15406,7 @@ Currently in ALL FINISHING MODE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2693"/>
+        <location filename="../artisanlib/roast_properties.py" line="2695"/>
         <source>Copy table to clipboard, OPTION or ALT click for tabular text</source>
         <translation type="unfinished"></translation>
     </message>
@@ -15778,7 +15778,7 @@ has to be reduced by 4 times.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3518"/>
+        <location filename="../artisanlib/roast_properties.py" line="3525"/>
         <source>The maximum nominal batch size of the machine in kg</source>
         <translation type="unfinished"></translation>
     </message>
