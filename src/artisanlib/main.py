@@ -6425,7 +6425,7 @@ class tgraphcanvas(FigureCanvas):
         if bnr != 0 and title != "":
             title = "{}{} {}".format(bprefix,str(bnr),title)
             
-        if aw.qmc.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
+        if self.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
             title = toASCII(title)
         
         fontprop_xlarge = aw.mpl_fontproperties.copy()
@@ -9432,11 +9432,9 @@ class tgraphcanvas(FigureCanvas):
     
     def deviceLogDEBUG(self):
         PhidgetLog.setLevel(PhidgetLogLevel.PHIDGET_LOG_VERBOSE)
-        print("debug")
     
     def deviceLLogINFO(self):
         PhidgetLog.setLevel(PhidgetLogLevel.PHIDGET_LOG_INFO)
-        print("info")
 
     def startPhidgetManager(self):
         # this is needed to surpress the message on the ignored Exception
@@ -19306,45 +19304,44 @@ class ApplicationWindow(QMainWindow):
         aw.lcd7.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
         aw.updateExtraLCDvisibility()
 
-
     def updateCanvasColors(self):
-        canvas_color = aw.qmc.palette["canvas"]
+        canvas_color = self.qmc.palette["canvas"]
         if canvas_color is not None and canvas_color != "None" and not QColor.isValidColor(canvas_color):
             # we re-initalize broken canvas color
-            canvas_color = aw.qmc.palette["canvas"] = '#F8F8F8'
+            canvas_color = self.qmc.palette["canvas"] = '#F8F8F8'
         try:
             if str(canvas_color) == 'None' and sys.platform.startswith("darwin"):
                 if darkdetect.isDark() and appFrozen():
                     # in dark mode on macOS, the transparent canvas of the classic Artisan theme leeds to unreadable text, thus we switch to standard gray
-                    canvas_color = "#333333" # for light: "#F8F8F8"
-                    aw.qmc.palette["title"] = "#e6e6e6"
-                    aw.qmc.palette["xlabel"] = "#cccccc"
-                    aw.qmc.palette["ylabel"] = "#cccccc"
+                    canvas_color = self.qmc.palette["canvas"] = "#333333" # for light: "#F8F8F8"
+                    self.qmc.palette["title"] = "#e6e6e6"
+                    self.qmc.palette["xlabel"] = "#cccccc"
+                    self.qmc.palette["ylabel"] = "#cccccc"
                 else:
-                    if aw.qmc.palette["title"] == "#e6e6e6":
-                        aw.qmc.palette["title"] = "#000000"
-                    if aw.qmc.palette["xlabel"] == "#cccccc":
-                        aw.qmc.palette["xlabel"] = "#000000"
-                    if aw.qmc.palette["ylabel"] == "#cccccc":
-                        aw.qmc.palette["ylabel"] = "#000000"
-                for label in aw.qmc.ax.xaxis.get_ticklabels():
-                    label.set_color(aw.qmc.palette["xlabel"])
-                for label in aw.qmc.ax.yaxis.get_ticklabels():
-                    label.set_color(aw.qmc.palette["ylabel"])
-                if aw.qmc.delta_ax:
-                    for label in aw.qmc.delta_ax.yaxis.get_ticklabels():
-                        label.set_color(aw.qmc.palette["ylabel"])
-                    aw.qmc.delta_ax.yaxis.get_label().set_color(aw.qmc.palette["ylabel"])
-                aw.qmc.ax.xaxis.get_label().set_color(aw.qmc.palette["xlabel"])
-                aw.qmc.ax.yaxis.get_label().set_color(aw.qmc.palette["ylabel"])
+                    if self.qmc.palette["title"] == "#e6e6e6":
+                        self.qmc.palette["title"] = "#000000"
+                    if self.qmc.palette["xlabel"] == "#cccccc":
+                        self.qmc.palette["xlabel"] = "#000000"
+                    if self.qmc.palette["ylabel"] == "#cccccc":
+                        self.qmc.palette["ylabel"] = "#000000"
+                for label in self.qmc.ax.xaxis.get_ticklabels():
+                    label.set_color(self.qmc.palette["xlabel"])
+                for label in self.qmc.ax.yaxis.get_ticklabels():
+                    label.set_color(self.qmc.palette["ylabel"])
+                if self.qmc.delta_ax:
+                    for label in self.qmc.delta_ax.yaxis.get_ticklabels():
+                        label.set_color(self.qmc.palette["ylabel"])
+                    self.qmc.delta_ax.yaxis.get_label().set_color(self.qmc.palette["ylabel"])
+                self.qmc.ax.xaxis.get_label().set_color(self.qmc.palette["xlabel"])
+                self.qmc.ax.yaxis.get_label().set_color(self.qmc.palette["ylabel"])
         except: 
             pass
 
-        title_color = aw.qmc.palette["title"]
+        title_color = self.qmc.palette["title"]
 
         current_background_color = None
         try:
-            s = aw.styleSheet()[12+len("background-color:"):]
+            s = self.styleSheet()[12+len("background-color:"):]
             current_background_color = s[:s.index(";")]
         except:
             pass
@@ -19355,38 +19352,39 @@ class ApplicationWindow(QMainWindow):
             else:
                 whitep = False
         else:
-            whitep = aw.colorDifference("white",canvas_color) > aw.colorDifference("black",canvas_color)
+            whitep = self.colorDifference("white",canvas_color) > self.colorDifference("black",canvas_color)
 
-        aw.qmc.fig.patch.set_facecolor(str(canvas_color))
-        aw.setStyleSheet("QMainWindow{background-color:" + str(canvas_color) + ";"
+        self.qmc.fig.patch.set_facecolor(str(canvas_color))
+        self.setStyleSheet("QMainWindow{background-color:" + str(canvas_color) + ";"
                                    + "border: 0px solid black;"
                                    + "}" )
 
-        if current_background_color is None or current_background_color != str(canvas_color) or (whitep and aw.qmc.palette["messages"] != 'white'): # canvas color did not change, we do not need to redo the navigation bar
+        if current_background_color is None or current_background_color != str(canvas_color) or (whitep and self.qmc.palette["messages"] != 'white'): # canvas color did not change, we do not need to redo the navigation bar
             # update navigationbar
-            aw.level1layout.removeWidget(aw.ntb) # remove current bar
+            self.level1layout.removeWidget(self.ntb) # remove current bar
             
             if mpl_version[0] > 2 and mpl_version[1] > 2:
-                if aw.ntb.mode == MPL_Mode.PAN:
-                    aw.ntb.pan() # PAN is active, we deactivate it before changing the ToolBar
-                if aw.ntb.mode == MPL_Mode.ZOOM:
-                    aw.ntb.zoom() # ZOOM is active, we deactivate it before changing the ToolBar
+                if self.ntb.mode == MPL_Mode.PAN:
+                    self.ntb.pan() # PAN is active, we deactivate it before changing the ToolBar
+                if self.ntb.mode == MPL_Mode.ZOOM:
+                    self.ntb.zoom() # ZOOM is active, we deactivate it before changing the ToolBar
             else:
-                if aw.ntb._active == 'PAN':
-                    aw.ntb.pan() # PAN is active, we deactivate it before changing the ToolBar
-                if aw.ntb._active == 'ZOOM':
-                    aw.ntb.zoom() # ZOOM is active, we deactivate it before changing the ToolBar
-            aw.removeToolBar(aw.ntb)
-#            aw.ntb.hide() # seems not to be necessary anymore with the removeToolBar() above
-            aw.ntb.destroy()
-            aw.ntb = VMToolbar(aw.qmc, aw.main_widget, whitep)
+                if self.ntb._active == 'PAN':
+                    self.ntb.pan() # PAN is active, we deactivate it before changing the ToolBar
+                if self.ntb._active == 'ZOOM':
+                    self.ntb.zoom() # ZOOM is active, we deactivate it before changing the ToolBar
+            self.removeToolBar(self.ntb)
+#            self.ntb.hide() # seems not to be necessary anymore with the removeToolBar() above
+            self.ntb.destroy()
+            self.ntb = VMToolbar(self.qmc, self.main_widget, whitep)
 
         if whitep:
-            aw.qmc.palette["messages"] = 'white'
+            self.qmc.palette["messages"] = 'white'
         else:
-            aw.qmc.palette["messages"] = 'black'
-        aw.sendmessage("")
-        aw.ntb.setMinimumHeight(50)
+            self.qmc.palette["messages"] = 'black'
+        self.sendmessage("")
+        self.ntb.setMinimumHeight(50)
+
         aw.sliderFrame.setStyleSheet("QGroupBox {background-color:" + str(canvas_color) + ";"
                                     + "color: " + str(title_color) + ";"
                                     + "border: 0px solid gray;"
@@ -19401,27 +19399,27 @@ class ApplicationWindow(QMainWindow):
                                     + "subcontrol-position: top center;" #/* position at the top center */
                                     + "color: " + aw.qmc.palette["messages"] + ";"
                                     + "}")
-
+        
         # ensure x/y coordinates are readable
-        aw.ntb.locLabel.setStyleSheet("QWidget {background-color:" + str(canvas_color) + ";"
+        self.ntb.locLabel.setStyleSheet("QWidget {background-color:" + str(canvas_color) + ";"
                                     + "color: " + str(title_color) + ";"
                                     + "}" )
         # make QToolBar background transparent
-        aw.ntb.setStyleSheet("QToolBar {background-color:" + str(canvas_color) + ";"
+        self.ntb.setStyleSheet("QToolBar {background-color:" + str(canvas_color) + ";"
                                     + "border: 5px solid " + str(canvas_color) + ";"
                                     + "color: " + str(title_color) + ";"
                                     + "}" )
 
-        self.qmc.setProfileTitle(aw.qmc.title,updatebackground=True)
+        self.qmc.setProfileTitle(self.qmc.title,updatebackground=True)
 
-        aw.level1layout.insertWidget(0,aw.ntb)
+        self.level1layout.insertWidget(0,self.ntb)
 
         if str(canvas_color) == 'None':
-            aw.qmc.fig.canvas.setStyleSheet("background-color:transparent;")
-            aw.ntb.setStyleSheet("QToolBar {background-color:transparent;}")
+            self.qmc.fig.canvas.setStyleSheet("background-color:transparent;")
+            self.ntb.setStyleSheet("QToolBar {background-color:transparent;}")
 
-        aw.updateSliderColors()
-        aw.updatePhasesLCDsColors()
+        self.updateSliderColors()
+        self.updatePhasesLCDsColors()
 
         colorPairsToCheck = self.getcolorPairsToCheck()
         self.checkColors(colorPairsToCheck)
@@ -29370,9 +29368,6 @@ class ApplicationWindow(QMainWindow):
 #--------------------------------
         try:
 
-            if "canvas" in aw.qmc.palette:
-                aw.updateCanvasColors()
-
             aw.setFonts() # this one triggers a redraw by default to establish the correct fonts
             # only after this the correct aspect ratio of the qmc canvas is set
 
@@ -29428,6 +29423,10 @@ class ApplicationWindow(QMainWindow):
                     plus.controller.start(aw)
                 except:
                     pass
+            
+            # this one has done here, if it is done on start of the section the slider title colors are not set correctly on Linux and macOS
+            if "canvas" in aw.qmc.palette:
+                aw.updateCanvasColors()
 
         except Exception:
             res = False
@@ -36745,8 +36744,6 @@ def main():
 
     app.setActivationWindow(aw,activateOnMessage=False) # set the activation window for the QtSingleApplication
 
-
-#    aw.setStyleSheet("QMainWindow {background: 'white';}")
 
     # only here deactivating the app napping seems to have an effect
     if sys.platform.startswith("darwin"):
