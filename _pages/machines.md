@@ -13,7 +13,7 @@ sidebar:
   nav: "machines"
 ---
 
-Artisan provides one-click configurations for more than 60 roaster brands representing over 130 different hardware configurations. 
+Artisan provides one-click configurations for more than 60 roaster brands representing over 130 different hardware configurations. Companies marked as "Artisan Supporter" have supported the project financially within the past 2 years.
 
 {: .notice--info}
 **Control!**
