@@ -216,10 +216,11 @@ class s7port(object):
             return False
         
     def disconnect(self):
-        try:
-            self.plc.plc_stop()
-        except:
-            pass
+# don't stop the PLC as we want to keep it running beyond the Artisan disconnect!!
+#        try:
+#            self.plc.plc_stop()
+#        except:
+#            pass
         try:
             self.plc.disconnect()
         except:

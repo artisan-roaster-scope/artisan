@@ -15226,6 +15226,7 @@ class ApplicationWindow(QMainWindow):
     loadBackgroundSignal = pyqtSignal(str)
     clearBackgroundSignal = pyqtSignal()
     adjustSVSignal = pyqtSignal(int)
+    updateSerialLogSignal = pyqtSignal()
 
     def __init__(self, parent = None):
 
@@ -18100,6 +18101,7 @@ class ApplicationWindow(QMainWindow):
         self.loadBackgroundSignal.connect(self.loadbackgroundRedraw)
         self.clearBackgroundSignal.connect(self.clearbackgroundRedraw)
         self.adjustSVSignal.connect(self.adjustPIDsv)
+        self.updateSerialLogSignal.connect(self.updateSerialLog)
 
         if sys.platform.startswith("darwin"):
             # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
@@ -21214,6 +21216,11 @@ class ApplicationWindow(QMainWindow):
     def setLabelColor(self,label,color):
         label.setStyleSheet("QLabel { color: %s; }" % color.name())
 
+    @pyqtSlot()
+    def updateSerialLog(self):
+        if self.serial_dlg is not None:
+            self.serial_dlg.update()
+    
     #adds to serial log
     def addserial(self,serialstring):
         if aw.seriallogflag:
@@ -21225,6 +21232,9 @@ class ApplicationWindow(QMainWindow):
                 if len(self.seriallog) > 999:
                     self.seriallog = self.seriallog[1:]
                 self.seriallog.append(timez + " " + serialstring)
+                # if logging is not on, we have to update the serial log here:
+                if not self.qmc.flagon and self.serial_dlg is not None:
+                    self.updateSerialLogSignal.emit() # as addserial might be called from another (samplinig) thread we need to ensure that this is processed this within the GUI thread via a signal
             except Exception:
                 pass
             finally:
@@ -23149,6 +23159,24 @@ class ApplicationWindow(QMainWindow):
         self.slider4.setVisible(True)
         self.sliderSV.setVisible(True)
         self.setSliderFocusPolicy(Qt.StrongFocus)
+        # on "coarse" sliders we set the single step to 10, otherwise (default) to 1:
+        if self.eventslidercoarse[0]:
+            self.slider1.setSingleStep(10)
+        else:
+            self.slider1.setSingleStep(1)
+        if self.eventslidercoarse[1]:
+            self.slider2.setSingleStep(10)
+        else:
+            self.slider2.setSingleStep(1)
+        if self.eventslidercoarse[2]:
+            self.slider3.setSingleStep(10)
+        else:
+            self.slider3.setSingleStep(1)
+        if self.eventslidercoarse[3]:
+            self.slider4.setSingleStep(10)
+        else:
+            self.slider4.setSingleStep(1)
+        #
         aw.slidersAction.setChecked(True)
         if changeDefault:
             if aw.qmc.flagstart:
@@ -23502,17 +23530,18 @@ class ApplicationWindow(QMainWindow):
                     self.setbuttonsfrom(numberkeys.index(key))
 
                 elif key == 72:                       #H
-                    if not aw.qmc.designerflag:
+                    if not self.qmc.designerflag:
                         if alt_modifier and platf != 'Windows' or ((control_shift_modifier or control_alt_modifier) and platf == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
                             self.deleteBackground()
-                            self.autoAdjustAxis()
+                            if not self.qmc.flagon:
+                                self.autoAdjustAxis()
                             self.qmc.redraw()
                         else:
-                            self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext_alt=".alog")
+                            self.filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext_alt=".alog")
                             if len(self.filename) != 0:
                                 try:
-                                    aw.qmc.resetlinecountcaches()
-                                    aw.loadbackground(self.filename)
+                                    self.qmc.resetlinecountcaches()
+                                    self.loadbackground(self.filename)
                                 except:
                                     pass
                                 self.qmc.background = True
