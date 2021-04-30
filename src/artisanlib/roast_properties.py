@@ -3874,8 +3874,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.datatable.setItem(i,j,extra_qtw2)
                     j = j + 1
 
-    def createEventTable(self):
-        if not self.tabInitialized[2]:
+    def createEventTable(self, force=False):
+        if force or not self.tabInitialized[2]:
             try:
                 #### lock shared resources #####
                 self.aw.qmc.samplingsemaphore.acquire(1)
@@ -4075,7 +4075,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         nevents = len(self.aw.qmc.specialevents)
         if nevents:
             self.aw.clusterEvents()
-            self.createEventTable()
+            self.createEventTable(force=True)
             self.aw.qmc.redraw(recomputeAllDeltas=False)
             self.aw.qmc.fileDirty()
             
@@ -4093,7 +4093,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         finally:
             if self.aw.qmc.samplingsemaphore.available() < 1:
                 self.aw.qmc.samplingsemaphore.release(1)
-        self.createEventTable()
+        self.createEventTable(force=True)
         self.aw.qmc.redraw(recomputeAllDeltas=False)
         self.aw.qmc.fileDirty()
     
@@ -4130,7 +4130,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         nevents = len(self.aw.qmc.specialevents)
         if nevents:
             self.aw.orderEvents()
-            self.createEventTable()
+            self.createEventTable(force=True)
             self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(bool)
@@ -4141,7 +4141,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.specialeventstype.append(0)
             self.aw.qmc.specialeventsStrings.append(str(len(self.aw.qmc.specialevents)))
             self.aw.qmc.specialeventsvalue.append(0)
-            self.createEventTable()
+            self.createEventTable(force=True)
             self.aw.qmc.redraw(recomputeAllDeltas=False)
             message = QApplication.translate("Message","Event #{0} added", None).format(str(len(self.aw.qmc.specialevents))) 
             self.aw.sendmessage(message)
@@ -4186,7 +4186,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.aw.qmc.specialeventsvalue.pop()
                 message = QApplication.translate("Message"," Event #{0} deleted", None).format(str(len(self.aw.qmc.specialevents)+1))
             self.aw.qmc.fileDirty()
-            self.createEventTable()
+            self.createEventTable(force=True)
             self.aw.qmc.redraw(recomputeAllDeltas=False)
             self.aw.sendmessage(message)
         else:
