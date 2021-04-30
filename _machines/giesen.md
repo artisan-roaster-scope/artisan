@@ -15,8 +15,11 @@ header:
 * __Features:__
   - logging of exhaust temperature (ET), bean temperature (BT) and related rate-of-rise curves
   - logging and control of burner level, air flow, air temperature setpoint, drum speed
-  - logging of the optional infrared (IR) and environmental temperature sensor
+  - logging of the optional infrared (IR) and/or environmental temperature sensor (Env)
   - operation of actors (intake, flavouring, discharge, cooling, stirrer) on W30 and larger machines via custom buttons (press CMD-2 to switch to this extended button set; CMD-1 switches back to the standard button set)
+
+**Watch out!** The WxA coarse setup is for older machines, which allow burner changes only in 10% steps.
+{: .notice--primary}
 
 **Watch out!** The WxA+ setups require an unlock code from Giesen and deliver data in higher resolution with decimals.
 {: .notice--primary}
