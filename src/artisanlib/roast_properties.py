@@ -2998,7 +2998,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.loadlabels[2] = self.energy_ui.loadlabel2.text()
         self.aw.qmc.loadlabels[3] = self.energy_ui.loadlabel3.text()
         if updateMetrics:
-            self.c()
+            self.updateMetricsLabel()
         self.updateEnergyLabels()
     
     def updateLoadRatings(self, updateMetrics=True):
