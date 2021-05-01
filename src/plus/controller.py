@@ -23,6 +23,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from artisanlib import __version__
+from artisanlib import __revision__
+from artisanlib import __build__
+
 #import keyring.backends.file
 #import keyring.backends.Gnome
 #import keyring.backends.Google
@@ -35,8 +39,10 @@ import platform
 if platform.system().startswith("Windows") or platform.system() == 'Darwin':
     import keyring.backends.fail # @UnusedImport
     try:
+        import keyring.backends.macOS # @UnusedImport @UnresolvedImport
         keyring.set_keyring(keyring.backends.macOS.Keyring())
     except:
+        import keyring.backends.OS_X # @UnusedImport @UnresolvedImport
         keyring.set_keyring(keyring.backends.OS_X.Keyring())
     import keyring.backends.SecretService # @UnusedImport
     import keyring.backends.Windows # @UnusedImport
@@ -100,7 +106,7 @@ def toggle(app_window):
             if config.connected:
                 if is_synced():
                     # a CTR-click (COMMAND on macOS) logs out and discards the credentials
-                    disconnect(interactive=True,remove_credentials=(modifiers == Qt.ControlModifier))
+                    disconnect(interactive=True,remove_credentials=(modifiers == Qt.ControlModifier),keepON=False)
                 else:
                     # we (manually) turn syncing for the current roast on
                     if app_window.qmc.checkSaved(allow_discard=False):
@@ -108,6 +114,7 @@ def toggle(app_window):
             else:
                 connect(True) # we try to re-connect and disconnect on failure
 
+# if clear_on_failure is set, credentials are removed if connect fails
 def connect(clear_on_failure=False,interactive=True):
     if not is_connected():
         config.logger.info("controller:connect(%s,%s)",clear_on_failure,interactive)
@@ -162,6 +169,7 @@ def connect(clear_on_failure=False,interactive=True):
                     config.connected = success
                     config.app_window.sendmessage(config.app_window.plus_account + " " + QApplication.translate("Plus","authentified",None)) # @UndefinedVariable
                     config.app_window.sendmessage(QApplication.translate("Plus","Connected to artisan.plus",None))  # @UndefinedVariable
+                    config.logger.info("Artisan v%s (%s, %s) connected",str(__version__),str(__revision__),str(__build__))
                     try:
                         queue.start() # start the outbox queue
                     except:
@@ -204,7 +212,8 @@ def disconnect_confirmed():
     else:
         return False
 
-def disconnect(remove_credentials = True, stop_queue = True, interactive = False):
+# if keepON is set (the default), the credentials are not removed at all and just the connected flag is toggled to keep plus in ON (dark-grey) state
+def disconnect(remove_credentials = True, stop_queue = True, interactive = False, keepON=True):
     config.logger.info("controller:disconnect(%s,%s)",remove_credentials,stop_queue)
     if is_connected() and (not interactive or disconnect_confirmed()):
         try:
@@ -212,7 +221,8 @@ def disconnect(remove_credentials = True, stop_queue = True, interactive = False
             # disconnect
             config.connected = False
             # remove credentials
-            connection.clearCredentials(remove_from_keychain=remove_credentials)
+            if not keepON:
+                connection.clearCredentials(remove_from_keychain=remove_credentials)
             if remove_credentials:
                 config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus turned off",None)) # @UndefinedVariable
             else:

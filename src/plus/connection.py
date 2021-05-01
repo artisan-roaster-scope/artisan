@@ -40,9 +40,9 @@ import platform
 if platform.system().startswith("Windows") or platform.system() == 'Darwin':
     import keyring.backends.fail # @UnusedImport
     try:
-        import keyring.backends.macOS # @UnusedImport
+        import keyring.backends.macOS # @UnusedImport @UnresolvedImport
     except:
-        import keyring.backends.OS_X # @UnusedImport
+        import keyring.backends.OS_X # @UnusedImport @UnresolvedImport
     import keyring.backends.SecretService # @UnusedImport
     import keyring.backends.Windows # @UnusedImport
 import keyring # @Reimport # imported last to make py2app work

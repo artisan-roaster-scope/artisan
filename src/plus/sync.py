@@ -265,10 +265,12 @@ def clearSyncRecordHash():
 def syncRecordUpdated(roast_record = None):
     global cached_sync_record_hash
     try:
-        config.logger.debug("sync:syncRecordUpdated()")
+        config.logger.debug("sync:syncRecordUpdated(%s)",roast_record)
         sync_record_semaphore.acquire(1)
         _,current_sync_record_hash = roast.getSyncRecord(roast_record)
-        return cached_sync_record_hash != current_sync_record_hash
+        res = cached_sync_record_hash != current_sync_record_hash
+        config.logger.debug("sync:syncRecordUpdated() => %s",res)
+        return res
     except Exception as e:
         config.logger.error("sync: Exception in syncRecordUpdated() %s",e)
         return False
@@ -300,14 +302,13 @@ def diffCachedSyncRecord(roast_record):
                     # we explicitly set the value of key to 0 dispite it is part of the sync_record_zero_supressed_attributes
                     # to sync back the local 0 value with the non-zero value currently on the server
                     res[key] = 0
-            # for items where we supress zero values we need to force the propagate of zeros in case on server there is no zero established yet
+            # for items where we supress empty string values we need to force the propagate of empty strings in case on server there is no zero established yet
             for key in roast.sync_record_empty_string_supressed_attributes:
                 if key in cached_sync_record and cached_sync_record[key] and key not in res \
                         and key not in keys_with_equal_values: # not if data is euqal on both sides and thus the key got deleted from res in the step before
-                    # we explicitly set the value of key to "" dispite it is part of the sync_record_zero_supressed_attributes
+                    # we explicitly set the value of key to "" dispite it is part of the sync_record_empty_string_supressed_attributes
                     # to sync back the local "" value with the non-zero value currently on the server
                     res[key] = ""
-                    
             return res
     except Exception as e:
         config.logger.error("sync: Exception in diffCachedSyncRecord() %s",e)
@@ -355,6 +356,7 @@ def getApplidedServerUpdatesModifiedAt():
 # the values of "syncable" properties in data are applied to the apps variables directly 
 # if the contained UUID
 def applyServerUpdates(data):
+    global cached_sync_record
     dirty = False
     title_changed = False
     try:
@@ -448,18 +450,36 @@ def applyServerUpdates(data):
             dirty = True  
         if "moisture" in data and data["moisture"] != aw.qmc.density_roasted[0]:
             aw.qmc.moisture_roasted = data["moisture"]
-            dirty = True  
-#        if "volume_in" in data and data["volume_in"] is not None:
-#            v = aw.convertVolume(data["volume_in"],aw.qmc.volume_units.index("l"),aw.qmc.volume_units.index(aw.qmc.volume[2]))
-#            if w != aw.qmc.volume[0]:
-#                aw.qmc.volume[0] = v
-#                dirty = True
-#        if "volume_out" in data and data["volume_out"] is not None:
-#            v = aw.convertVolume(data["volume_out"],aw.qmc.volume_units.index("l"),aw.qmc.volume_units.index(aw.qmc.volume[2]))
-#            if w != aw.qmc.volume[1]:
-#                aw.qmc.volume[1] = v
-#                dirty = True
-        setSyncRecordHash()
+            dirty = True
+        if "temperature" in data and data["temperature"] != aw.qmc.ambientTemp:
+            aw.qmc.ambientTemp = data["temperature"]
+            dirty = True
+        if "pressure" in data and data["pressure"] != aw.qmc.ambient_pressure:
+            aw.qmc.ambient_pressure = data["pressure"]
+            dirty = True
+        if "humidity" in data and data["humidity"] != aw.qmc.ambient_humidity:
+            aw.qmc.ambient_humidity = data["humidity"]
+            dirty = True
+        if "roastersize" in data and data["roastersize"] != aw.qmc.roastersize:
+            aw.qmc.roastersize = data["roastersize"]
+            dirty = True
+        setSyncRecordHash() # here the sync record is taken form the profiles data after application of the recieved server updates
+        # not that this sync record does not contain null values not transferred for attributes from the server side
+        # to fix this, we will update that sync record with all attributes not in the server data set to null values
+        # this forces those non-null values from the profile to be transmitted to the server on next sync
+        updated_record = {}
+        for key, value in cached_sync_record.items():
+            if not (key in data):
+                # we explicitly add the implicit null value (0 or "") for that key
+                if key in roast.sync_record_zero_supressed_attributes and value != 0:
+                    updated_record[key] = 0
+                elif key in roast.sync_record_empty_string_supressed_attributes and value != "":
+                    updated_record[key] = ""
+            else:
+                updated_record[key] = value
+        cached_sync_record,cached_sync_record_hash = roast.getSyncRecord(updated_record)
+        setSyncRecordHash(cached_sync_record,cached_sync_record_hash)
+        
     except Exception as e:
         config.logger.error("sync: Exception in applyServerUpdates() %s",e)
     finally: 

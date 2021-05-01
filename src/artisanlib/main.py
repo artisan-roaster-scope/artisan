@@ -23514,8 +23514,8 @@ class ApplicationWindow(QMainWindow):
                 modifiers = event.modifiers()
                 #Note: Windows only - PyQt will sometimes, but not always, interpret a shortcut key as a menu key.  For that 
                 #    reason only CTRL and CTRL+SHIFT modifier should be used with shortcut keys f,e,r,c,t,v, and h.
-                control_modifier = modifiers == Qt.ControlModifier # command/apple key on macOS
-                alt_modifier = modifiers == Qt.AltModifier # OPTINO on macOS, ALT on Windows
+                control_modifier = modifiers == Qt.ControlModifier # command/apple key on macOS, CONTROL on Windows
+                alt_modifier = modifiers == Qt.AltModifier # OPTION on macOS, ALT on Windows
                 control_alt_modifier = modifiers == (Qt.ControlModifier | Qt.AltModifier)
                 control_shift_modifier = modifiers == (Qt.ControlModifier | Qt.ShiftModifier)
                 #meta_modifier = modifiers == Qt.MetaModifier # Control on macOS, Meta on Windows

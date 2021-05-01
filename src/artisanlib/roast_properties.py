@@ -25,6 +25,7 @@ import prettytable
 import plus.config  # @UnusedImport
 import plus.util
 import plus.stock
+import plus.controller
 
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import deltaLabelUTF8, appFrozen, stringfromseconds,stringtoseconds, toInt, toFloat
@@ -1651,8 +1652,12 @@ class editGraphDlg(ArtisanResizeablDialog):
 #PLUS
         try:
             if self.aw.plus_account is not None:
-                plus.stock.update()
-                QTimer.singleShot(1500,lambda : self.populatePlusCoffeeBlendCombos())
+                if plus.controller.is_connected():
+                    plus.stock.update()
+                else: # we are in ON mode, but not connected, we connect which triggers a stock update if successful
+                    plus.controller.connect(interactive=False)
+                if plus.controller.is_connected():
+                    QTimer.singleShot(1500,lambda : self.populatePlusCoffeeBlendCombos())
         except:
             pass
         if platform.system() == 'Windows':
