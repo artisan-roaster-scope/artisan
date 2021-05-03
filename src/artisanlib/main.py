@@ -5819,8 +5819,11 @@ class tgraphcanvas(FigureCanvas):
         else:
             xytext = (x+e,y + yup)
         temp_anno = self.ax.annotate(fmtstr%(temp), xy=(x,y),xytext=xytext,
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),
-                            fontsize=fontsize,alpha=a,fontproperties=fontprop_small)
+                            color=self.palette["text"],
+                            arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),
+                            fontsize=fontsize,
+                            alpha=a,
+                            fontproperties=fontprop_small)
         try:
             temp_anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
             temp_anno.draggable(use_blit=True)
@@ -6372,7 +6375,11 @@ class tgraphcanvas(FigureCanvas):
         fontprop_medium = aw.mpl_fontproperties.copy()
         fontprop_medium.set_size("medium")
         self.xlabel_text = xlabel
-        self.xlabel_artist = self.ax.set_xlabel(xlabel,color = self.palette["xlabel"],fontproperties=fontprop_medium)
+        self.xlabel_artist = self.ax.set_xlabel(xlabel,color = self.palette["xlabel"],
+#            fontproperties=fontprop_medium
+            fontsize="medium",
+            fontfamily=fontprop_medium.get_family()
+            )
         try:
             self.xlabel_width = self.xlabel_artist.get_window_extent(renderer=self.fig.canvas.get_renderer()).width
         except:
@@ -6392,15 +6399,19 @@ class tgraphcanvas(FigureCanvas):
             pass
 
         self.background_title_width = 0
-        fontprop_small = aw.mpl_fontproperties.copy()
-        fontprop_small.set_size("xx-small")
+#        fontprop_small = aw.mpl_fontproperties.copy()
+#        fontprop_small.set_size("xx-small")
         backgroundtitle = backgroundtitle.strip()
         if backgroundtitle != "":
             if aw.qmc.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
                 backgroundtitle = toASCII(backgroundtitle)
             backgroundtitle = "\n" + aw.qmc.abbrevString(backgroundtitle,30)
         st_artist = self.fig.suptitle(backgroundtitle,
-                horizontalalignment="right",verticalalignment="top",fontproperties=fontprop_small,x=suptitleX,y=1,color=self.palette["title"])
+                horizontalalignment="right",verticalalignment="top",
+#                fontproperties=fontprop_small,  # title not rendered in PDF in MPL3.4.x
+                fontsize="xx-small",
+                x=suptitleX,y=1,
+                color=self.palette["title"])
         try:
             st_artist.set_in_layout(False)  # remove title from tight_layout calculation
         except:  # set_in_layout not available in mpl<3.x
@@ -6428,12 +6439,14 @@ class tgraphcanvas(FigureCanvas):
         if self.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
             title = toASCII(title)
         
-        fontprop_xlarge = aw.mpl_fontproperties.copy()
-        fontprop_xlarge.set_size("xx-large")
+#        fontprop_xlarge = aw.mpl_fontproperties.copy()
+#        fontprop_xlarge.set_size("xx-large")
         
         self.title_text = aw.arabicReshape(title.strip())
         self.title_artist = self.ax.set_title(self.title_text, color=self.palette["title"], loc='left',
-                    fontproperties=fontprop_xlarge,horizontalalignment="left",verticalalignment="top",x=0)
+#                    fontproperties=fontprop_xlarge, # title not rendered in PDF in MPL3.4.x
+                    fontsize="xx-large",
+                    horizontalalignment="left",verticalalignment="top",x=0)
         try: # this one seems not to work for titles, subtitles and axis!?
             self.title_artist.set_in_layout(False) # remove title from tight_layout calculation
         except: # set_in_layout not available in mpl<3.x
@@ -6556,12 +6569,14 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.set_ylim(self.ylimit_min, self.ylimit)
                 self.ax.set_autoscale_on(False)
 
+                prop = aw.mpl_fontproperties.copy()
+                prop.set_size("small")
                 fontprop_small = aw.mpl_fontproperties.copy()
                 fontprop_small.set_size("xx-small")
-                fontprop_medium = aw.mpl_fontproperties.copy()
-                fontprop_medium.set_size("medium")
-                fontprop_large = aw.mpl_fontproperties.copy()
-                fontprop_large.set_size("large")
+#                fontprop_medium = aw.mpl_fontproperties.copy()
+#                fontprop_medium.set_size("medium")
+#                fontprop_large = aw.mpl_fontproperties.copy()
+#                fontprop_large.set_size("large")
 
                 grid_axis = None
                 if self.temp_grid and self.time_grid:
@@ -6571,7 +6586,7 @@ class tgraphcanvas(FigureCanvas):
                 elif self.time_grid:
                     grid_axis = 'x'
                 if grid_axis is not None:
-                    self.ax.grid(True,axis=grid_axis,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha,sketch_params=0,path_effects=[])
+                    self.ax.grid(True,axis=grid_axis,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth=self.gridthickness,alpha=self.gridalpha,sketch_params=0,path_effects=[])
 
                 if aw.qmc.flagstart and not aw.qmc.title_show_always:
                     self.setProfileTitle("")
@@ -6595,7 +6610,11 @@ class tgraphcanvas(FigureCanvas):
                     y_label = self.ax.set_ylabel("")
                     self.set_xlabel("")
                 else:
-                    y_label = self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,fontproperties=fontprop_large)
+                    y_label = self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,
+#                        fontproperties=fontprop_large, # fails to render in PDF on MPL 3.4.x
+                            fontsize="large",
+                        fontfamily=prop.get_family()
+                        )
                     self.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min","abbrev. of minutes")))
 
                 try:
@@ -6637,8 +6656,6 @@ class tgraphcanvas(FigureCanvas):
                     top=False,          # ticks along the top edge are off
                     direction=tick_dir,
                     labelbottom=True)   # labels along the bottom edge are on
-                prop = aw.mpl_fontproperties.copy()
-                prop.set_size("small")
 
                 # format temperature as int, not float in the cursor position coordinate indicator
                 self.ax.fmt_ydata = self.fmt_data
@@ -6662,7 +6679,11 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.flagstart:
                         y_label = self.delta_ax.set_ylabel("")
                     else:
-                        y_label = self.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)),color = self.palette["ylabel"],fontproperties=fontprop_large)
+                        y_label = self.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)),color = self.palette["ylabel"],
+#                            fontproperties=fontprop_large, # fails to render in PDF on MPL 3.4.x
+                            fontsize="large",
+                            fontfamily=prop.get_family()                            
+                            )
                     try:
                         y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
                     except: # set_in_layout not available in mpl<3.x
@@ -6675,8 +6696,11 @@ class tgraphcanvas(FigureCanvas):
                             i.set_markersize(10)
                         for i in self.delta_ax.yaxis.get_minorticklines():
                             i.set_markersize(5)
+# labels not rendered in PDF exports on MPL 3.4 if fontproperties are set:
+#                        for label in self.delta_ax.get_yticklabels() :
+#                            label.set_fontproperties(prop)
                         for label in self.delta_ax.get_yticklabels() :
-                            label.set_fontproperties(prop)
+                            label.set_fontsize("small")
 
                     # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
                     self.delta_ax.fmt_ydata = self.fmt_data
@@ -6740,9 +6764,13 @@ class tgraphcanvas(FigureCanvas):
                 self.xaxistosm(redraw=False)
 
                 for label in self.ax.get_xticklabels() :
-                    label.set_fontproperties(prop)
+# labels not rendered in PDF exports on MPL 3.4 if fontproperties are set:
+#                    label.set_fontproperties(prop)
+                    label.set_fontsize("small")
                 for label in self.ax.get_yticklabels() :
-                    label.set_fontproperties(prop)
+# labels not rendered in PDF exports on MPL 3.4 if fontproperties are set:
+#                    label.set_fontproperties(prop)
+                    label.set_fontsize("small")
 
                 rcParams['path.sketch'] = (0,0,0)
                 trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
@@ -7007,8 +7035,11 @@ class tgraphcanvas(FigureCanvas):
                                 anno = self.ax.annotate(st1, xy=(self.timeB[event_idx], temp),path_effects=[],
                                                     xytext=(self.timeB[event_idx], temp+height),
                                                     va="center", ha="center",
-                                                    fontsize="x-small",fontproperties=aw.mpl_fontproperties,color=self.palette["bgeventtext"],
-                                                    arrowprops=dict(arrowstyle='wedge',color=self.palette["bgeventmarker"],
+                                                    fontsize="x-small",
+#                                                    fontproperties=aw.mpl_fontproperties, # no PDF output with fontproperties on MPL3.4.x
+                                                    color=self.palette["bgeventtext"],
+                                                    arrowprops=dict(arrowstyle='wedge',
+                                                                    color=self.palette["bgeventmarker"],
                                                                     alpha=self.backgroundalpha),#relpos=(0,0)),
                                                     alpha=min(self.backgroundalpha + 0.1, 1.0))
                                 try:
@@ -7049,23 +7080,24 @@ class tgraphcanvas(FigureCanvas):
                                                         alpha=min(self.backgroundalpha + 0.1, 1.0),
                                                         color=self.palette["text"],
                                                         va="bottom", ha="left",
-                                                        fontproperties=eventannotationprop,
+                                                        fontsize="x-small",
+#                                                        fontproperties=eventannotationprop, # no PDF output with fontproperties on MPL3.4.x
                                                         path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
                                                         )
                                             try:
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                             except: # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
-                                        try:
-                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        except: # mpl before v3.0 do not have this set_in_layout() function
-                                            pass
-                                        try:
-                                            overlap = self.checkOverlap(anno, i, E1b_annotation)
-                                            if overlap:
-                                                anno.remove()
-                                        except:
-                                            pass
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                                            try:
+                                                overlap = self.checkOverlap(anno, i, E1b_annotation)
+                                                if overlap:
+                                                    anno.remove()
+                                            except:
+                                                pass
                                     except Exception as ex:
 #                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
@@ -7093,16 +7125,16 @@ class tgraphcanvas(FigureCanvas):
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                             except: # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
-                                        try:
-                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        except: # mpl before v3.0 do not have this set_in_layout() function
-                                            pass
-                                        try:
-                                            overlap = self.checkOverlap(anno, i, E2b_annotation)
-                                            if overlap:
-                                                anno.remove()
-                                        except:
-                                            pass
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                                            try:
+                                                overlap = self.checkOverlap(anno, i, E2b_annotation)
+                                                if overlap:
+                                                    anno.remove()
+                                            except:
+                                                pass
                                     except Exception as ex:
 #                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
@@ -7130,16 +7162,16 @@ class tgraphcanvas(FigureCanvas):
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                             except: # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
-                                        try:
-                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        except: # mpl before v3.0 do not have this set_in_layout() function
-                                            pass
-                                        try:
-                                            overlap = self.checkOverlap(anno, i, E3b_annotation)
-                                            if overlap:
-                                                anno.remove()
-                                        except:
-                                            pass
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                                            try:
+                                                overlap = self.checkOverlap(anno, i, E3b_annotation)
+                                                if overlap:
+                                                    anno.remove()
+                                            except:
+                                                pass
                                     except Exception as ex:
 #                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
@@ -7167,16 +7199,16 @@ class tgraphcanvas(FigureCanvas):
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                             except: # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
-                                        try:
-                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        except: # mpl before v3.0 do not have this set_in_layout() function
-                                            pass
-                                        try:
-                                            overlap = self.checkOverlap(anno, i, E4b_annotation)
-                                            if overlap:
-                                                anno.remove()
-                                        except:
-                                            pass
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                                            try:
+                                                overlap = self.checkOverlap(anno, i, E4b_annotation)
+                                                if overlap:
+                                                    anno.remove()
+                                            except:
+                                                pass
                                     except Exception as ex:
 #                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
@@ -8624,24 +8656,26 @@ class tgraphcanvas(FigureCanvas):
                     statstr += '\n' + QApplication.translate("AddlInfo", "AUC", None) + ': ' + str(cp["AUC"]) + 'C*min [' + str(cp["AUCbase"]) + aw.qmc.mode + "]"
 
                 if aw.qmc.roastingnotes is not None and len(aw.qmc.roastingnotes)>0:
-                    statstr += skipline
                     roasting_notes_lines = textwrap.wrap(aw.qmc.roastingnotes, width=aw.qmc.statsmaxchrperline)
-                    statstr += roasting_notes_lines[0]
-                    if len(roasting_notes_lines)>1:
+                    if len(roasting_notes_lines)>0:
                         statstr += skipline
-                        statstr += "  " + roasting_notes_lines[1]
-                        if len(roasting_notes_lines)>2:
-                            statstr += ".."
+                        statstr += roasting_notes_lines[0]
+                        if len(roasting_notes_lines)>1:
+                            statstr += skipline
+                            statstr += "  " + roasting_notes_lines[1]
+                            if len(roasting_notes_lines)>2:
+                                statstr += ".."
 
                 if aw.qmc.cuppingnotes is not None and len(aw.qmc.cuppingnotes)>0:
-                    statstr += skipline
                     cupping_notes_lines = textwrap.wrap(aw.qmc.cuppingnotes, width=aw.qmc.statsmaxchrperline)
-                    statstr += cupping_notes_lines[0]
-                    if len(cupping_notes_lines)>1:
+                    if len(cupping_notes_lines)>0:
                         statstr += skipline
-                        statstr += "  " + cupping_notes_lines[1]
-                        if len(cupping_notes_lines)>2:
-                            statstr += ".."
+                        statstr += cupping_notes_lines[0]
+                        if len(cupping_notes_lines)>1:
+                            statstr += skipline
+                            statstr += "  " + cupping_notes_lines[1]
+                            if len(cupping_notes_lines)>2:
+                                statstr += ".."
 
                 # Trim the long lines
                 trimmedstatstr = ""
@@ -8656,7 +8690,8 @@ class tgraphcanvas(FigureCanvas):
 
                 #defaults appropriate for default font
                 prop = aw.mpl_fontproperties.copy()
-                prop.set_size("small")
+                prop_size = "small"
+                prop.set_size(prop_size)
                 fc = aw.qmc.palette["statsanalysisbkgnd"]  #fill color
                 tc = aw.labelBorW(fc)                   #text color
                 a = aw.qmc.alpha["statsanalysisbkgnd"]     #alpha
@@ -8666,7 +8701,8 @@ class tgraphcanvas(FigureCanvas):
 
                 #adjust for other fonts
                 if aw.qmc.graphfont == 1:   #Humor
-                    prop.set_size("x-small")
+                    prop_size = "x-small"
+                    prop.set_size(prop_size)
                 if aw.qmc.graphfont == 2:   #Comic
                     ls = 1.2
 
@@ -8718,7 +8754,10 @@ class tgraphcanvas(FigureCanvas):
                 self.stats_summary_rect = patches.Rectangle((pos_x-margin,pos_y - (stats_textbox_height + 2*margin)),stats_textbox_width+2*margin,stats_textbox_height+3*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=fc,fill=True,alpha=a,zorder=10)
                 self.ax.add_patch(self.stats_summary_rect)
 
-                text = self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=tc,zorder=11,path_effects=[])
+                text = self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',linespacing=ls,
+                    fontsize=prop_size,
+#                    fontproperties=prop, # fails to render in PDF on MPL 3.4.x
+                    color=tc,zorder=11,path_effects=[])
                 text.set_in_layout(False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -11684,26 +11723,39 @@ class tgraphcanvas(FigureCanvas):
                     LP = self.temp2[TP_index]
 
                 if self.statisticsflags[0]:
-                    statsprop = aw.mpl_fontproperties.copy()
-                    statsprop.set_size(11)
-                    text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]/2.,statisticsupper,st1 + "  "+ dryphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+# fails be rendered in PDF exports on MPL v3.4.x
+#                    statsprop = aw.mpl_fontproperties.copy()
+#                    statsprop.set_size(11)
+                    text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]/2.,statisticsupper,st1 + "  "+ dryphaseP+"%",color=self.palette["text"],ha="center",
+#                        fontproperties=statsprop
+                        fontsize="medium"
+                        )
                     try:
                         text.set_in_layout(False)
                     except:
                         pass
                     if self.timeindex[2]: # only if FCs exists
-                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticsupper,st2+ "  " + midphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticsupper,st2+ "  " + midphaseP+"%",color=self.palette["text"],ha="center",
+#                            fontproperties=statsprop
+                            fontsize="medium"
+                            )
                         try:
                             text.set_in_layout(False)
                         except:
                             pass
-                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticsupper,st3 + "  " + finishphaseP+ "%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticsupper,st3 + "  " + finishphaseP+ "%",color=self.palette["text"],ha="center",
+#                            fontproperties=statsprop
+                            fontsize="medium"
+                            )
                         try:
                             text.set_in_layout(False)
                         except:
                             pass
                     if self.timeindex[7]: # only if COOL exists
-                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]+self.statisticstimes[4]/2.,statisticsupper,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]+self.statisticstimes[4]/2.,statisticsupper,st4,color=self.palette["text"],ha="center",
+#                            fontproperties=statsprop
+                            fontsize="medium"
+                            )
                         try:
                             text.set_in_layout(False)
                         except:
@@ -11725,26 +11777,40 @@ class tgraphcanvas(FigureCanvas):
                     st2 = st2 + fmtstr.format(rates_of_changes[4], aw.qmc.mode, rates_of_changes[1], aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None)))
                     st3 = st3 + fmtstr.format(rates_of_changes[5], aw.qmc.mode, rates_of_changes[2], aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None)))
 
-                    statsprop = aw.mpl_fontproperties.copy()
-                    statsprop.set_size(11)
-                    text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontproperties=statsprop)
+# fails be rendered in PDF exports on MPL v3.4.x
+#                    statsprop = aw.mpl_fontproperties.copy()
+#                    statsprop.set_size(11)
+                    
+                    text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]/2.,statisticslower,st1,
+                        color=self.palette["text"],
+                        ha="center",
+                        fontsize="medium")
                     try:
                         text.set_in_layout(False)
                     except:
                         pass
                     if self.timeindex[2]: # only if FCs exists
-                        text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticslower,st2,color=self.palette["text"],ha="center",
+                            #fontproperties=statsprop # fails be rendered in PDF exports on MPL v3.4.x
+                            fontsize="medium"
+                            )
                         try:
                             text.set_in_layout(False)
                         except:
                             pass
-                        text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticslower,st3,color=self.palette["text"],ha="center",
+                            #fontproperties=statsprop # fails be rendered in PDF exports on MPL v3.4.x
+                            fontsize="medium"
+                            )
                         try:
                             text.set_in_layout(False)
                         except:
                             pass
                     if self.timeindex[7]: # only if COOL exists
-                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]+max(self.statisticstimes[4]/2.,self.statisticstimes[4]/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]+max(self.statisticstimes[4]/2.,self.statisticstimes[4]/3.),statisticslower,st4,color=self.palette["text"],ha="center",
+                            #fontproperties=statsprop # fails be rendered in PDF exports on MPL v3.4.x
+                            fontsize="medium"
+                            )
                         try:
                             text.set_in_layout(False)
                         except:
@@ -35370,10 +35436,13 @@ class ApplicationWindow(QMainWindow):
                     filename += extension
                 #mpl.rcParams['pdf.fonttype'] = 3   # 3 or 42
                 #mpl.rc('pdf', fonttype=3)
-                aw.qmc.fig.savefig(filename,transparent=(aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"]=='None'),
+                aw.qmc.fig.savefig(filename,
+                        transparent=(aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"]=='None'),
                         #bbox_inches='tight',
                         #backend='pgf', # slow and fails on # characters in TeX backend
-                        facecolor=str(aw.qmc.palette["canvas"]),edgecolor=None) # transparent=True is need to get the delta curves and legend drawn
+                        facecolor=str(aw.qmc.palette["canvas"]),
+                        edgecolor=None
+                        ) # transparent=True is need to get the delta curves and legend drawn
                 aw.qmc.updateBackground() # that redraw is needed to avoid the "transparent flicker"
 
                 self.sendmessage(QApplication.translate("Message","{0} saved", None).format(str(filename)))
