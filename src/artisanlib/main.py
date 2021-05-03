@@ -2315,7 +2315,7 @@ class tgraphcanvas(FigureCanvas):
         self.betweenbatchenergies_setup = [0]*4            # rating of the between batch burner
         self.coolingDuration_setup = 0                     # length of cooling in seconds
         self.coolingenergies_setup = [0]*4                 # rating of the cooling burner
-        self.betweenbatch_after_preheat_setup = False      # True if after preheat a BBP is done
+        self.betweenbatch_after_preheat_setup = True       # True adds BBP to pre-heating (and cooling) for the first batch.  
         self.electricEnergyMix_setup = 0                   # the amount of renewable electric energy in the energy mix in %
         # Others
         self.energyresultunit_setup = 0                    # index in list self.powerunits
@@ -11967,7 +11967,7 @@ class tgraphcanvas(FigureCanvas):
                         btu_list.append({"load_pct":load_pct,"duration":duration,"BTUs":BTUs,"CO2g":CO2g,"LoadLabel":loadlabel,"Kind":kind,"SourceType":self.sourcetypes[i],"SortOrder":sortorder})
 
                 # calculate betweenbatch 
-                if self.betweenbatchenergies[i] > 0 and (aw.qmc.roastbatchpos > 1 or aw.qmc.betweenbatch_after_preheat):
+                if self.betweenbatchenergies[i] > 0 and (aw.qmc.roastbatchpos > 1 or aw.qmc.betweenbatch_after_preheat or aw.qmc.roastbatchpos==0):
                     if self.betweenbatchenergies[i] <= 1 and self.betweenbatchDuration > 0:
                         # percent load multiplied by duration
                         load_pct = self.betweenbatchenergies[i] * 1000./10
