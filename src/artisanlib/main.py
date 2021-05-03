@@ -11791,21 +11791,12 @@ class tgraphcanvas(FigureCanvas):
                         
             #reference: https://www.eia.gov/environment/emissions/co2_vol_mass.php
             #           https://carbonpositivelife.com/co2-per-kwh-of-electricity/
-            # entries must match those in self.sourcetypes
-            CO2kg_per_BTU = {0:6.307e-05, 1:5.307e-05, 2:0.94}
+            #           https://www.eia.gov/tools/faqs/faq.php?id=74&t=11
+            # entries must match those in self.sourcenames
+            CO2kg_per_BTU = {0:6.307e-05, 1:5.307e-05, 2:2.938e-04}  # "LPG", "NG", "Elec"
 
-            # must be a better way
             eTypes = [""] + self.etypes[:][:4]
             
-#            # true if bernoulli set for the burner slider
-#            bernoulli = [None]*5
-#            for i in range(0,5):
-#                try:
-#                    if self.load_etypes[i] != 0:
-#                        bernoulli[i] = aw.eventsliderBernoulli[self.load_etypes[i]-1]
-#                except:
-#                    bernoulli[i] = False
-
             # init the prev_loadtime to drop if it exists or to the end of profile time
             if self.timeindex[6] > 0:
                 prev_loadtime = [self.timex[self.timeindex[6]]]*4
@@ -11835,7 +11826,7 @@ class tgraphcanvas(FigureCanvas):
                         prev_loadtime[i] = loadtime
                         # scale the burner setting for 0-100%
                         val = (self.specialeventsvalue[j] - 1) * 10
-                        emin = toInt(self.loadevent_zeropcts[i])  #dave check these, they should already be int's
+                        emin = toInt(self.loadevent_zeropcts[i])
                         emax = toInt(self.loadevent_hundpcts[i])
                         scaled = (val - emin) / (emax - emin)  #emax > emin enforced by energy.py
                         load_pct = min(1,max(0,scaled)) * 100
@@ -11845,7 +11836,6 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             factor = (load_pct / 100)
 
-#                        print("i, self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)",i,self.loadratings[i],factor,(duration / 3600),self.convertHeat(1,self.ratingunits[i],0))  #dave
                         BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
                         if BTUs > 0:
                             loadlabel = "{}-{}".format(formatLoadLabel(i), eTypes[self.load_etypes[i]])
@@ -11969,7 +11959,6 @@ class tgraphcanvas(FigureCanvas):
 
             btu_list.sort(key=lambda k : k["SortOrder"] )
 
-            #kind 0:Preheat Measured, 1:Preheat Pct, 2:BBP Measured, 3:BBP Pct, 4:Cooling Measured, 5:Cooling Pct, 6:Continuous, 7:Roast Event
             # summarize the batch metrics
             btu_batch = btu_preheat = btu_bbp = btu_cooling = btu_roast = 0
             co2_batch = co2_preheat = co2_bbp = co2_cooling = co2_roast = 0
@@ -12043,7 +12032,7 @@ class tgraphcanvas(FigureCanvas):
                 try:
                     # scale the burner setting for 0-100%
                     val = (self.specialeventsvalue[j] - 1) * 10
-                    emin = toInt(self.loadevent_zeropcts[i])  #dave check these, they should already be int's
+                    emin = toInt(self.loadevent_zeropcts[i])
                     emax = toInt(self.loadevent_hundpcts[i])
                     scaled = (val - emin) / (emax - emin)  #emax > emin enforced by energy.py
                     load_pct = min(1,max(0,scaled)) * 100
@@ -12059,7 +12048,6 @@ class tgraphcanvas(FigureCanvas):
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),exc_tb.tb_lineno)
                 finally:
-#                    print("{} {} Duration {}, energy {},  Val {}, LoadPct {}".format(i,j,duration, energy, val, load_pct))  #dave
                     return energy
 
             # if there is a DROP event use that for coolstart
@@ -12094,20 +12082,16 @@ class tgraphcanvas(FigureCanvas):
                             if loadtime >= coolstart and loadtime < prev_loadtime[i]:
                                 duration = prev_loadtime[i] - loadtime
                                 coolEnergy[i] += getEnergy(i,j,duration)
-#                                print("Call from Cool 1", i, j, coolEnergy[i], duration)  #dave
                             elif loadtime < coolstart and prev_loadtime[i] >= coolstart:
                                 duration = prev_loadtime[i] - coolstart
                                 coolEnergy[i] += getEnergy(i,j,duration)
-#                                print("Call from Cool 2", i, j, coolEnergy[i], duration)  #dave
                                 
                             if loadtime < heatend and prev_loadtime[i] >= heatend:
                                 duration = heatend - loadtime
                                 heatEnergy[i] += getEnergy(i,j,duration)
-#                                print("Call from Heat 1", i, j, coolEnergy[i], duration)  #dave
                             elif loadtime < heatend and prev_loadtime[i] < heatend:  
                                 duration = prev_loadtime[i] - loadtime
                                 heatEnergy[i] += getEnergy(i,j,duration)
-#                                print("Call from Heat 1", i, j, coolEnergy[i], duration)  #dave
                                 
                             prev_loadtime[i] = loadtime
 

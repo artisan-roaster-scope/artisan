@@ -8,7 +8,7 @@
     </tr>
 </table><br/><br/><b>2. Loads Tab</b><table width="100%" border="1" padding="1" border-collapse="collapse">
     <tr>
-        <td>Begin by making entries on the Loads tab.  <br><br>Power ratings for up to four energy loads may be entered.  Loads will be the main burners or heaters, motors and blowers, and the afterburner if one is used.  Enter one load per line.  Motors and blowers that run continuously may be aggregated and entered as one load.<br><br>Loads are assumed to run continuously. Variable loads, such as the main burner setting, can be recorded in Artisan using one of the four special events.  The settings can be captured from a button, slider or in some cases read directly from the roaster.  The load setup allows linking a load to one of these events.  The energy calculator will then determine the setting percentage and the duration of the setting to calculate the energy consumed.<br><br>Burner entries require knowing the power rating of the burner.  Roasting machine manufacturer&#39;s typically provide this information.  ##### If this information is not available for a specific machine ... #####</td>
+        <td>Begin by making entries on the Loads tab  to define the sources of energy used by this roast. It might be a good idea to save those settings as defaults to be used to calculate the energy consumption of future roasts<br><br>Power ratings for up to four energy loads may be entered.  Loads will be the main burners or heaters, motors and blowers, and the afterburner if one is used.  Enter one load per line.  Motors and blowers that run continuously may be aggregated and entered as one load.<br><br>Loads are assumed to run continuously. Variable loads, such as the main burner setting, can be recorded in Artisan using one of the four special events.  The settings can be captured from a button, slider or in some cases read directly from the roaster.  The load setup allows linking a load to one of these events.  The energy calculator will then determine the setting percentage and the duration of the setting to calculate the energy consumed.<br><br>Burner entries require knowing the power rating of the burner.  Roasting machine manufacturer&#39;s typically provide this information.  ##### If this information is not available for a specific machine ... #####</td>
     </tr>
 </table><table width="100%" border="1" padding="1" border-collapse="collapse">
     <tr>
@@ -45,14 +45,14 @@
     </tr>
     <tr>
         <td>Value 100%</td>
-        <td>When an Event is selected this value can be set to match the 100% load setting to the event setting.  This is useful when the 100% load setting is recorded as a different number in the Event.  For instance, maybe the burner event is recorded as 10x the kPa reading on the gas manometer.  An event value of 30 is recoded to signify 3 kPa.  If the 100% burner setting corresponds to 7 kPa then the &#39;Value 100%&#39; should be set to 60, which is 7 * 10  = 70.  </td>
+        <td>When an Event is selected this value can be set to match the 100% load setting to the event setting.  This is useful when the 100% load setting is recorded as a different number in the Event.  For instance, maybe the burner event is recorded as 10x the kPa reading on the gas manometer.  An event value of 35 is recoded to signify 3.5 kPa, which is 50% pressure.  If the 100% burner setting corresponds to 7 kPa then the &#39;Value 100%&#39; should be set to 70, which is 7 * 10  = 70.  Thus 3.5 kPa will be seen by he energy calculator as 50%.  For pressure readings be sure to tick the Pressure box.  Heat energy readings are normally 0%-100% and do not require any adjustment to this  setting.</td>
     </tr>
     <tr>
         <td>Electric Energy Mix</td>
         <td>This setting allows to set a mix of renewable energy that sources the electric loads.  0% assumes all the energy comes from burning dirty coal and maximizes the CO2 in the calculations.  100% assumes the energy comes only from renewable sources with no CO2 produced.</td>
     </tr>
     <tr>
-        <td>Save as Defaults</td>
+        <td>Save Defaults</td>
         <td>Stores the current settings as defaults to be recalled later.  The default values will be stored when saving settings (Help&gt;Save Settings) to a file.  </td>
     </tr>
     <tr>
@@ -74,7 +74,7 @@
     </tr>
     <tr>
         <td>Between Batches</td>
-        <td>This row sets the values for between batches protocol for the roasting session.  Percentage or measured values may be entered for each burner.  When a percentage is used the Duration field must be set.<br><br>Between Batches energy is applied to each batch of the roasting session, except the first batch.  Tick the &#39;Between Batches after Pre-Heating&#39; box to apply Between Batches energies to the first batch of the session.</td>
+        <td>This row sets the values for between batches protocol for the roasting session.  Percentage or measured values may be entered for each burner.  When a percentage is used the Duration field must be set.<br><br>Between Batches energy is applied to each batch of the roasting session, except the first batch.  Tick the &#39;Between Batches after Pre-Heating&#39; box to apply Between Batches energies to the first batch of the session too.</td>
     </tr>
     <tr>
         <td>Cooling</td>
@@ -97,7 +97,7 @@
         <td>This box should be ticked when a Between Batches protocol run is done after the Preheating and before the roast.</td>
     </tr>
     <tr>
-        <td>Save as Defaults</td>
+        <td>Save Defaults</td>
         <td>Stores the current settings as defaults to be recalled later.  The default values will be stored when saving settings (Help&gt;Save Settings) to a file.  </td>
     </tr>
     <tr>

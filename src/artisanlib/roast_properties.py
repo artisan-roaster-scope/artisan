@@ -3480,7 +3480,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         res = ""
         try:
             r = self.scalefloat(toFloat(self.aw.comma2dot(str(s))))
-            #print("r, type(r)",r, type(r))  #dave
             if not r == '0':
                 res = str(r)
         except Exception:
