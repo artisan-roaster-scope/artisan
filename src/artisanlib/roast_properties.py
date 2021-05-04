@@ -4581,9 +4581,15 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.plus_store_label = self.plus_store_selected_label
             self.aw.qmc.plus_coffee = self.plus_coffee_selected
             self.aw.qmc.plus_coffee_label = self.plus_coffee_selected_label
-            self.aw.qmc.plus_blend_label = self.plus_blend_selected_label
-            self.aw.qmc.plus_blend_spec = self.plus_blend_selected_spec
-            self.aw.qmc.plus_blend_spec_labels = self.plus_blend_selected_spec_labels
+            if self.aw.qmc.plus_coffee is None:
+                self.aw.qmc.plus_coffee_label = None
+                self.aw.qmc.plus_blend_label = self.plus_blend_selected_label
+                self.aw.qmc.plus_blend_spec = self.plus_blend_selected_spec
+                self.aw.qmc.plus_blend_spec_labels = self.plus_blend_selected_spec_labels
+            else:
+                self.aw.qmc.plus_blend_label = None
+                self.aw.qmc.plus_blend_spec =  None
+                self.aw.qmc.plus_blend_spec_labels = None
         
         # Update beans
         self.aw.qmc.beans = self.beansedit.toPlainText()

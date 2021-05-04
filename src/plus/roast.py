@@ -252,7 +252,7 @@ def getRoast():
             d["coffee"] = aw.qmc.plus_coffee
         else:
             d["coffee"] = None # we neeed to explicitly add empty selections otherwise the coffee cannot be deleted from the online record
-        if aw.qmc.plus_blend_spec:
+        if aw.qmc.plus_blend_spec and aw.qmc.plus_coffee is None:
             d["blend"] = trimBlendSpec(aw.qmc.plus_blend_spec)
         else:
             d["blend"] = None # we neeed to explicitly add empty selections otherwise the coffee cannot be deleted from the online record

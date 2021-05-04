@@ -405,6 +405,10 @@ def applyServerUpdates(data):
             if "label" in data["coffee"] and data["coffee"]["label"] != aw.qmc.plus_coffee_label:
                 aw.qmc.plus_coffee_label = data["coffee"]["label"]
                 dirty = True
+            if aw.qmc.plus_coffee is not None:
+                aw.qmc.plus_blend_label = None
+                aw.qmc.plus_blend_spec = None
+                aw.qmc.plus_blend_spec_labels = None
         if "blend" in data and data["blend"] is not None and "label" in data["blend"] and "ingredients" in data["blend"] \
                and data["blend"]["ingredients"]:
             try:
@@ -421,12 +425,20 @@ def applyServerUpdates(data):
                 blend_spec = {
                     "label": data["blend"]["label"],
                     "ingredients": ingredients}
-                blend_spec_labels = [i["coffee"]["label"] for i in ingredients]
+                blend_spec_labels = [i["coffee"]["label"] for i in data["blend"]["ingredients"]]
                 aw.qmc.plus_blend_spec = blend_spec
                 aw.qmc.plus_blend_spec_labels = blend_spec_labels
                 dirty = True
-            except:
+            except Exception:
                 pass
+            if aw.qmc.plus_blend_spec is not None:
+                aw.qmc.plus_coffee = None
+                aw.qmc.plus_coffee_label = None
+        
+        # ensure that location is None if neither coffee nor blend is set
+        if aw.qmc.plus_coffee is None and aw.qmc.plus_blend_spec is None and aw.qmc.plus_store is not None:
+            aw.qmc.plus_store = None
+        
         if "color_system" in data and data["color_system"] != aw.qmc.color_systems[aw.qmc.color_system_idx]:
             try:
                 aw.qmc.color_system_idx = aw.qmc.color_systems.index(data["color_system"])
