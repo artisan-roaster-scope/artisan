@@ -1,7 +1,7 @@
 ---
 layout: single
 permalink: /machines/ipxenakis/
-title: "IP Xenakis"
+title: "IP-CC"
 excerpt: "iRm Series"
 header:
   overlay_image: /assets/images/ip2.jpg
@@ -9,7 +9,7 @@ header:
   teaser: assets/images/ip1.jpg
 ---
 
-* __Producer:__ [IP Xenakis Coffee Roasting Machines](https://www.ip-cc.com/){:target="_blank"}, Greece
+* __Producer:__ [IP-CC Coffee Roasting Machines](https://www.ip-cc.com/){:target="_blank"}, Greece
 * __Machines:__ iRm Series with networked Omron PLC
 * __Connection:__ MODBUS TCP via the network
 * __Features:__

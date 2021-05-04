@@ -74,8 +74,8 @@ machines:
         url: /machines/hottop/
       - title: "IMF"
         url: /machines/imf/
-      - title: "IP Xenakis"
-        url: /machines/ipxenakis/
+      - title: "IP-CC"
+        url: /machines/ip-cc/
       - title: "Kaldi"
         url: /machines/kaldi/
       - title: "KapoK"
