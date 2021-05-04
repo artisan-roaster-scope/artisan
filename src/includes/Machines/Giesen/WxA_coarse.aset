@@ -108,7 +108,7 @@ extraeventsvisibility=0, 0, 0, 1, 0, 1, 1
 [Quantifiers]
 clusterEventsFlag=false
 quantifieractive=1, 1, 1, 1
-quantifiercoarse=0, 0, 0, 0
+quantifiercoarse=0, 0, 0, 1
 quantifiermax=120, 60, 250, 100
 quantifiermin=70, 35, 0, 0
 quantifiersource=7, 4, 5, 6

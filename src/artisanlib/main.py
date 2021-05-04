@@ -3500,6 +3500,8 @@ class tgraphcanvas(FigureCanvas):
                         if self.flagstart:
                             value = aw.float2float((el[1] + 10.0) / 10.0)
                             self.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=value,eventdescription="Q"+self.eventsvalues(value),doupdategraphics=False)
+                        if self.flagon and aw.eventquantifieraction(el[0]):
+                            aw.fireslideractionSignal.emit(el[0])
                     except:
                         pass
                 self.quantifiedEvent = []
@@ -15277,6 +15279,7 @@ class ApplicationWindow(QMainWindow):
     clearBackgroundSignal = pyqtSignal()
     adjustSVSignal = pyqtSignal(int)
     updateSerialLogSignal = pyqtSignal()
+    fireslideractionSignal = pyqtSignal(int)
 
     def __init__(self, parent = None):
 
@@ -15575,6 +15578,7 @@ class ApplicationWindow(QMainWindow):
         self.eventquantifiermin = [0,0,0,0]
         self.eventquantifiermax = [100,100,100,100]
         self.eventquantifiercoarse = [0,0,0,0]
+        self.eventquantifieraction = [0,0,0,0]
         self.clusterEventsFlag = False
         self.eventquantifierlinspaces = [self.computeLinespace(0),self.computeLinespace(1),self.computeLinespace(2),self.computeLinespace(3)]
         self.eventquantifiersteps = 10
@@ -17620,7 +17624,8 @@ class ApplicationWindow(QMainWindow):
                 self.eventslidertemp[:],
                 self.eventsliderunits[:],
                 self.eventsliderBernoulli[:],
-                self.buttonpalette_label
+                self.buttonpalette_label,
+                self.eventquantifieraction[:]
                 ])
         self.buttonpalettemaxlen = [14]*10  #keeps max number of buttons per row per palette
         self.buttonpalette_shortcuts = True # if True palettes can be changed via the number keys
@@ -18152,6 +18157,7 @@ class ApplicationWindow(QMainWindow):
         self.clearBackgroundSignal.connect(self.clearbackgroundRedraw)
         self.adjustSVSignal.connect(self.adjustPIDsv)
         self.updateSerialLogSignal.connect(self.updateSerialLog)
+        self.fireslideractionSignal.connect(self.fireslideraction)
 
         if sys.platform.startswith("darwin"):
             # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
@@ -21160,6 +21166,7 @@ class ApplicationWindow(QMainWindow):
         return False
 
     # n=0 : slider1; n=1 : slider2; n=2 : slider3; n=3 : slider4
+    @pyqtSlot(int)
     def fireslideraction(self,n):
         action = self.eventslideractions[n]
         if action:
@@ -29251,6 +29258,8 @@ class ApplicationWindow(QMainWindow):
                     self.eventquantifiercoarse = [toInt(x) for x in toList(settings.value("quantifiercoarse",self.eventquantifiercoarse))]
                     if settings.contains("clusterEventsFlag"):
                         self.clusterEventsFlag = bool(toBool(settings.value("clusterEventsFlag",aw.clusterEventsFlag)))
+                if settings.contains("eventquantifieraction"):
+                    self.eventquantifieraction = [toInt(x) for x in toList(settings.value("eventquantifieraction",self.eventquantifieraction))]
             settings.endGroup()
             settings.beginGroup("Batch")
             if settings.contains("batchcounter"):
@@ -30607,6 +30616,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("quantifiermin",self.eventquantifiermin)
             settings.setValue("quantifiermax",self.eventquantifiermax)
             settings.setValue("quantifiercoarse",self.eventquantifiercoarse)
+            settings.setValue("eventquantifieraction",self.eventquantifieraction)
             settings.setValue("clusterEventsFlag",self.clusterEventsFlag)
             settings.endGroup()
             settings.setValue("titleshowalways",self.qmc.title_show_always)
@@ -35880,7 +35890,9 @@ class ApplicationWindow(QMainWindow):
         # added slider Bernoulli
         copy.append(self.eventsliderBernoulli[:])
         # palette label
-        copy.append(self.buttonpalette_label)
+        copy.append(self.buttonpalette_label),
+        # quantifier actions
+        copy.append(self.eventquantifieraction[:])
 
         self.buttonpalette[pindex] = copy[:]
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
@@ -35970,6 +35982,11 @@ class ApplicationWindow(QMainWindow):
                 self.buttonpalette_label = copy[25]
             else:
                 self.buttonpalette_label = self.aw.buttonpalette_default_label
+            # quantifier actions
+            if len(copy)>26 and len(copy[26]) == 4:
+                self.eventquantifieraction = copy[26][:]
+            else:
+                self.eventquantifieraction = [0,0,0,0]
 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()
