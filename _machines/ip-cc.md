@@ -1,6 +1,6 @@
 ---
 layout: single
-permalink: /machines/ipxenakis/
+permalink: /machines/ip-cc/
 title: "IP-CC"
 excerpt: "iRm Series"
 header:
