@@ -3500,7 +3500,7 @@ class tgraphcanvas(FigureCanvas):
                         if self.flagstart:
                             value = aw.float2float((el[1] + 10.0) / 10.0)
                             self.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=value,eventdescription="Q"+self.eventsvalues(value),doupdategraphics=False)
-                        if self.flagon and aw.eventquantifieraction(el[0]):
+                        if self.flagon and aw.eventquantifieraction[el[0]]:
                             aw.fireslideractionSignal.emit(el[0])
                     except:
                         pass
@@ -19960,32 +19960,32 @@ class ApplicationWindow(QMainWindow):
         else:
             timex = aw.qmc.on_timex
         if aw.eventquantifiersource[i] == 0:
-            if aw.qmc.flagstart:
+            if aw.qmc.flagstart or not aw.qmc.flagon:
                 temp = aw.qmc.temp1
             else:
                 temp = aw.qmc.on_temp1
         elif aw.eventquantifiersource[i] == 1:
-            if aw.qmc.flagstart:
+            if aw.qmc.flagstart or not aw.qmc.flagon:
                 temp = aw.qmc.temp2
             else:
                 temp = aw.qmc.on_temp2
         else:
             x = (aw.eventquantifiersource[i]-2)
-            if aw.qmc.flagstart:
+            if aw.qmc.flagstart or not aw.qmc.flagon:
                 timex = aw.qmc.extratimex[x // 2]
             else:
                 timex = aw.qmc.on_extratimex[x // 2]
             if x % 2 == 0:
                 # even
                 if len(aw.qmc.extratemp1) > (x/2):
-                    if aw.qmc.flagstart:
+                    if aw.qmc.flagstart or not aw.qmc.flagon:
                         temp = aw.qmc.extratemp1[x // 2]
                     else:
                         temp = aw.qmc.on_extratemp1[x // 2]
             else:
                 # odd
                 if len(aw.qmc.extratemp2) > (x/2):
-                    if aw.qmc.flagstart:
+                    if aw.qmc.flagstart or not aw.qmc.flagon:
                         temp = aw.qmc.extratemp2[x // 2]
                     else:
                         temp = aw.qmc.on_extratemp2[x // 2]
