@@ -26,9 +26,9 @@ If you need support please check the [documentation](#documentation) or ask the 
 <a name="Community"></a>
 ## Community
 
-- [Artisan Discussion Forum](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"}
+- [Artisan Discussion Forum](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} (preferred)
 - [Artisan Mailing List](https://lists.einfachkaffee.de/postorius/lists/artisan-user.lists.einfachkaffee.de/){:target="_blank"} (subscription required)
-- Public Forums or Facebook Groups
+- Public Forums or Facebook Groups (not monitored by the team)
    - [Home-Barista.com](https://www.home-barista.com/roasting/){:target="_blank"}
    - [Homeroasters.org](https://homeroasters.org/){:target="_blank"}
    - [Kaffee Netz](https://www.kaffee-netz.de/forums/){:target="_blank"} (in German)
@@ -57,7 +57,11 @@ If you need support please check the [documentation](#documentation) or ask the 
 : Please report software bugs on the [Artisan issue tracker](https://github.com/artisan-roaster-scope/artisan/issues){:target="_blank"}
 
 <a name="FAQ-General-4"></a>
-**4) How to get our machines supported?**  
+**4) How can I suggest a feature?**  
+: We are looking forward to your ideas! Please send us your feature requests using the [Artisan issue tracker](https://github.com/artisan-roaster-scope/artisan/issues){:target="_blank"}
+
+<a name="FAQ-General-5"></a>
+**5) How to get our machines supported?**  
 : [Contact the Artisan team](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"} and find out how to become a supporter
 
 <br>
