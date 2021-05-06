@@ -14,7 +14,7 @@ environment:
   - job_name: macos
     appveyor_build_worker_image: macos
   - job_name: linux
-    appveyor_build_worker_image: Ubuntu1604
+    appveyor_build_worker_image: Ubuntu2004
 #  - job_name: rpi
 #    appveyor_build_worker_image: Ubuntu1604
 
