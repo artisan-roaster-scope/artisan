@@ -4,9 +4,9 @@ permalink: /devices/phidget-sets/
 title: "Phidget SETS"
 excerpt: "Selected Sets of Phidgets"
 header:
-  overlay_image: /assets/images/phidgets-logo-sets.jpg
-  image: /assets/images/phidgets-logo-sets.jpg
-  teaser: assets/images/phidgets-logo-sets.jpg
+  overlay_image: /assets/images/phidgets-logo-sets-plain.jpg
+  image: /assets/images/phidgets-logo-sets-plain.jpg
+  teaser: assets/images/phidgets-logo-sets-plain.jpg
 toc: false
 ---
 

@@ -4,9 +4,9 @@ permalink: /devices/phidgets/
 title: "Phidgets"
 excerpt: "Various modules"
 header:
-  overlay_image: /assets/images/phidgets-logo.jpg
-  image: /assets/images/phidgets-logo.jpg
-  teaser: assets/images/phidgets-logo.jpg
+  overlay_image: /assets/images/phidgets-logo-plain.jpg
+  image: /assets/images/phidgets-logo-plain.jpg
+  teaser: assets/images/phidgets-logo-plain.jpg
 toc: true
 toc_label: "On this page"
 toc_icon: "cog"

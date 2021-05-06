@@ -4,9 +4,9 @@ permalink: /devices/yoctopuce/
 title: "Yoctopuce"
 excerpt: "PT100/Thermocouple/IR/Meteo/.."
 header:
-  overlay_image: /assets/images/yoctopuce-logo.png
-  image: /assets/images/yoctopuce-logo.png
-  teaser: assets/images/yoctopuce-logo.png
+  overlay_image: /assets/images/yoctopuce-logo-plain.png
+  image: /assets/images/yoctopuce-logo-plain.png
+  teaser: assets/images/yoctopuce-logo-plain.png
 ---
 
 Artisan supports by now many Yoctopuce devices. Most prominently the Yocto Thermocouple and the Yocto PT100. Both connect directly via USB and do not need the installation of any additional driver. 
