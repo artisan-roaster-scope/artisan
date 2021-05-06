@@ -29,10 +29,10 @@ If you need support please check the [documentation](#documentation) or ask the 
 - [Artisan Discussion Forum](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"}
 - [Artisan Mailing List](https://lists.einfachkaffee.de/postorius/lists/artisan-user.lists.einfachkaffee.de/){:target="_blank"} (subscription required)
 - Public Forums or Facebook Groups
-  . [Home-Barista.com](https://www.home-barista.com/roasting/){:target="_blank"}
-  . [Homeroasters.org](https://homeroasters.org/){:target="_blank"}
-  . [Kaffee Netz](https://www.kaffee-netz.de/forums/){:target="_blank"} in German
-  . ...
+   - [Home-Barista.com](https://www.home-barista.com/roasting/){:target="_blank"}
+   - [Homeroasters.org](https://homeroasters.org/){:target="_blank"}
+   - [Kaffee Netz](https://www.kaffee-netz.de/forums/){:target="_blank"} in German
+   - ...
 
 <br>
 
