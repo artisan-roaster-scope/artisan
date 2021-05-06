@@ -36,3 +36,19 @@
   font-weight: 500;
   box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
 }
+
+.help__toggle {
+  margin-left: 1rem;
+  margin-right: 1rem;
+  border: 0;
+  outline: none;
+  color: $muted-text-color;
+  background-color: transparent;
+  cursor: pointer;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+
+  &:hover {
+    color: $text-color;
+  }
+}
