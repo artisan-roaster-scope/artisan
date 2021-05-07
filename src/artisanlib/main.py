@@ -15575,6 +15575,7 @@ class ApplicationWindow(QMainWindow):
         #event quantifiers
         self.eventquantifieractive = [0,0,0,0]
         self.eventquantifiersource = [0,0,0,0]
+        self.eventquantifierSV = [0,0,0,0]
         self.eventquantifiermin = [0,0,0,0]
         self.eventquantifiermax = [100,100,100,100]
         self.eventquantifiercoarse = [0,0,0,0]
@@ -17625,7 +17626,8 @@ class ApplicationWindow(QMainWindow):
                 self.eventsliderunits[:],
                 self.eventsliderBernoulli[:],
                 self.buttonpalette_label,
-                self.eventquantifieraction[:]
+                self.eventquantifieraction[:],
+                self.eventquantifierSV[:]
                 ])
         self.buttonpalettemaxlen = [14]*10  #keeps max number of buttons per row per palette
         self.buttonpalette_shortcuts = True # if True palettes can be changed via the number keys
@@ -21212,7 +21214,11 @@ class ApplicationWindow(QMainWindow):
         return value
         
     def recordsliderevent(self,n):
-        aw.block_quantification_sampling_ticks[n] = aw.sampling_ticks_to_block_quantifiction
+        if aw.eventquantifierSV[n]:
+            # if source of event quantifier is a SV, we do not block further quantification for a period (only for PV values that lag behind)
+            aw.block_quantification_sampling_ticks[n] = 0
+        else:
+            aw.block_quantification_sampling_ticks[n] = aw.sampling_ticks_to_block_quantifiction
         self.extraeventsactionslastvalue[n] = self.eventslidervalues[n]
         if self.qmc.flagstart:
             value = aw.float2float((self.eventslidervalues[n] + 10.0) / 10.0)
@@ -29260,6 +29266,8 @@ class ApplicationWindow(QMainWindow):
                         self.clusterEventsFlag = bool(toBool(settings.value("clusterEventsFlag",aw.clusterEventsFlag)))
                 if settings.contains("eventquantifieraction"):
                     self.eventquantifieraction = [toInt(x) for x in toList(settings.value("eventquantifieraction",self.eventquantifieraction))]
+                if settings.contains("eventquantifierSV"):
+                    self.eventquantifierSV = [toInt(x) for x in toList(settings.value("eventquantifierSV",self.eventquantifierSV))]
             settings.endGroup()
             settings.beginGroup("Batch")
             if settings.contains("batchcounter"):
@@ -30613,6 +30621,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("Quantifiers")
             settings.setValue("quantifieractive",self.eventquantifieractive)
             settings.setValue("quantifiersource",self.eventquantifiersource)
+            settings.setValue("eventquantifierSV",self.eventquantifierSV)
             settings.setValue("quantifiermin",self.eventquantifiermin)
             settings.setValue("quantifiermax",self.eventquantifiermax)
             settings.setValue("quantifiercoarse",self.eventquantifiercoarse)
@@ -35893,6 +35902,8 @@ class ApplicationWindow(QMainWindow):
         copy.append(self.buttonpalette_label),
         # quantifier actions
         copy.append(self.eventquantifieraction[:])
+        # quantifier SVs
+        copy.append(self.eventquantifierSV[:])
 
         self.buttonpalette[pindex] = copy[:]
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
@@ -35987,6 +35998,11 @@ class ApplicationWindow(QMainWindow):
                 self.eventquantifieraction = copy[26][:]
             else:
                 self.eventquantifieraction = [0,0,0,0]
+            # quantifier SV
+            if len(copy)>27 and len(copy[27]) == 4:
+                self.eventquantifierSV = copy[27][:]
+            else:
+                self.eventquantifierSV = [0,0,0,0]
 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()

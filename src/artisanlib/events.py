@@ -576,6 +576,10 @@ class EventsDlg(ArtisanResizeablDialog):
         slidercoarsetitlelabel.setFont(titlefont)
         quantifieractiontitlelabel = QLabel(QApplication.translate("Label","Action", None))
         quantifieractiontitlelabel.setFont(titlefont)
+        quantifieractiontitlelabel.setToolTip(QApplication.translate("Tooltip","Triggered quantifier fires slider action",None))
+        quantifierSVtitlelabel = QLabel(QApplication.translate("Label","SV", None))
+        quantifierSVtitlelabel.setFont(titlefont)
+        quantifierSVtitlelabel.setToolTip(QApplication.translate("Tooltip","No processing delay if source delivers the set value (SV) instead of the process value (PV)",None))
         slidertemptitlelabel = QLabel(QApplication.translate("Label","Temp", None))
         slidertemptitlelabel.setFont(titlefont)
         sliderunittitlelabel = QLabel(QApplication.translate("Label","Unit", None))
@@ -831,6 +835,18 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E4quantifieraction = QCheckBox()
         self.E4quantifieraction.setFocusPolicy(Qt.NoFocus)
         self.E4quantifieraction.setChecked(bool(self.aw.eventquantifieraction[3]))
+        self.E1quantifierSV = QCheckBox()
+        self.E1quantifierSV.setFocusPolicy(Qt.NoFocus)
+        self.E1quantifierSV.setChecked(bool(self.aw.eventquantifierSV[0]))
+        self.E2quantifierSV = QCheckBox()
+        self.E2quantifierSV.setFocusPolicy(Qt.NoFocus)
+        self.E2quantifierSV.setChecked(bool(self.aw.eventquantifierSV[1]))
+        self.E3quantifierSV = QCheckBox()
+        self.E3quantifierSV.setFocusPolicy(Qt.NoFocus)
+        self.E3quantifierSV.setChecked(bool(self.aw.eventquantifierSV[2]))
+        self.E4quantifierSV = QCheckBox()
+        self.E4quantifierSV.setFocusPolicy(Qt.NoFocus)
+        self.E4quantifierSV.setChecked(bool(self.aw.eventquantifierSV[3]))
         
         self.curvenames = []
         self.curvenames.append(QApplication.translate("ComboBox","ET",None))
@@ -1325,10 +1341,11 @@ class EventsDlg(ArtisanResizeablDialog):
         tab6Layout = QGridLayout()
         tab6Layout.addWidget(qeventtitlelabel,0,0,Qt.AlignCenter)
         tab6Layout.addWidget(sourcetitlelabel,0,1,Qt.AlignCenter)
-        tab6Layout.addWidget(mintitlelabel,0,2,Qt.AlignCenter)
-        tab6Layout.addWidget(maxtitlelabel,0,3,Qt.AlignCenter)
-        tab6Layout.addWidget(coarsetitlelabel,0,4,Qt.AlignCenter)
-        tab6Layout.addWidget(quantifieractiontitlelabel,0,5,Qt.AlignCenter)
+        tab6Layout.addWidget(quantifierSVtitlelabel,0,2,Qt.AlignCenter)
+        tab6Layout.addWidget(mintitlelabel,0,3,Qt.AlignCenter)
+        tab6Layout.addWidget(maxtitlelabel,0,4,Qt.AlignCenter)
+        tab6Layout.addWidget(coarsetitlelabel,0,5,Qt.AlignCenter)
+        tab6Layout.addWidget(quantifieractiontitlelabel,0,6,Qt.AlignCenter)
         tab6Layout.addWidget(self.E1active,1,0)
         tab6Layout.addWidget(self.E2active,2,0)
         tab6Layout.addWidget(self.E3active,3,0)
@@ -1337,22 +1354,26 @@ class EventsDlg(ArtisanResizeablDialog):
         tab6Layout.addWidget(self.E2SourceComboBox,2,1)
         tab6Layout.addWidget(self.E3SourceComboBox,3,1)
         tab6Layout.addWidget(self.E4SourceComboBox,4,1)
-        tab6Layout.addWidget(self.E1min,1,2)
-        tab6Layout.addWidget(self.E2min,2,2)
-        tab6Layout.addWidget(self.E3min,3,2)
-        tab6Layout.addWidget(self.E4min,4,2)
-        tab6Layout.addWidget(self.E1max,1,3)
-        tab6Layout.addWidget(self.E2max,2,3)
-        tab6Layout.addWidget(self.E3max,3,3)
-        tab6Layout.addWidget(self.E4max,4,3)
-        tab6Layout.addWidget(self.E1coarse,1,4,Qt.AlignCenter)
-        tab6Layout.addWidget(self.E2coarse,2,4,Qt.AlignCenter)
-        tab6Layout.addWidget(self.E3coarse,3,4,Qt.AlignCenter)
-        tab6Layout.addWidget(self.E4coarse,4,4,Qt.AlignCenter)
-        tab6Layout.addWidget(self.E1quantifieraction,1,5,Qt.AlignCenter)
-        tab6Layout.addWidget(self.E2quantifieraction,2,5,Qt.AlignCenter)
-        tab6Layout.addWidget(self.E3quantifieraction,3,5,Qt.AlignCenter)
-        tab6Layout.addWidget(self.E4quantifieraction,4,5,Qt.AlignCenter)
+        tab6Layout.addWidget(self.E1quantifierSV,1,2,Qt.AlignCenter)
+        tab6Layout.addWidget(self.E2quantifierSV,2,2,Qt.AlignCenter)
+        tab6Layout.addWidget(self.E3quantifierSV,3,2,Qt.AlignCenter)
+        tab6Layout.addWidget(self.E4quantifierSV,4,2,Qt.AlignCenter)
+        tab6Layout.addWidget(self.E1min,1,3)
+        tab6Layout.addWidget(self.E2min,2,3)
+        tab6Layout.addWidget(self.E3min,3,3)
+        tab6Layout.addWidget(self.E4min,4,3)
+        tab6Layout.addWidget(self.E1max,1,4)
+        tab6Layout.addWidget(self.E2max,2,4)
+        tab6Layout.addWidget(self.E3max,3,4)
+        tab6Layout.addWidget(self.E4max,4,4)
+        tab6Layout.addWidget(self.E1coarse,1,5,Qt.AlignCenter)
+        tab6Layout.addWidget(self.E2coarse,2,5,Qt.AlignCenter)
+        tab6Layout.addWidget(self.E3coarse,3,5,Qt.AlignCenter)
+        tab6Layout.addWidget(self.E4coarse,4,5,Qt.AlignCenter)
+        tab6Layout.addWidget(self.E1quantifieraction,1,6,Qt.AlignCenter)
+        tab6Layout.addWidget(self.E2quantifieraction,2,6,Qt.AlignCenter)
+        tab6Layout.addWidget(self.E3quantifieraction,3,6,Qt.AlignCenter)
+        tab6Layout.addWidget(self.E4quantifieraction,4,6,Qt.AlignCenter)
         QuantifierApplyHBox = QHBoxLayout()
         QuantifierApplyHBox.addStretch()
         QuantifierApplyHBox.addWidget(self.clusterEventsFlag)
@@ -1570,6 +1591,10 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E2quantifieraction.setChecked(bool(self.aw.eventquantifieraction[1]))
         self.E3quantifieraction.setChecked(bool(self.aw.eventquantifieraction[2]))
         self.E4quantifieraction.setChecked(bool(self.aw.eventquantifieraction[3]))
+        self.E1quantifierSV.setChecked(bool(self.aw.eventquantifierSV[0]))
+        self.E2quantifierSV.setChecked(bool(self.aw.eventquantifierSV[1]))
+        self.E3quantifierSV.setChecked(bool(self.aw.eventquantifierSV[2]))
+        self.E4quantifierSV.setChecked(bool(self.aw.eventquantifierSV[3]))
         if self.aw.eventquantifiersource[0] < len(self.curvenames):
             self.E1SourceComboBox.setCurrentIndex(self.aw.eventquantifiersource[0])
         if self.aw.eventquantifiersource[1] < len(self.curvenames):
@@ -1856,6 +1881,8 @@ class EventsDlg(ArtisanResizeablDialog):
             copy.append(self.transferpalettecurrentLabelEdit.text())
             # added quantifier actions
             copy.append(self.aw.eventquantifieraction[:])
+            # added quantifier SV
+            copy.append(self.aw.eventquantifierSV[:])
             
             self.aw.buttonpalette[pindex] = copy
             self.aw.buttonpalettemaxlen[pindex] = self.aw.buttonlistmaxlen
@@ -1955,6 +1982,10 @@ class EventsDlg(ArtisanResizeablDialog):
                 self.aw.eventquantifieraction = copy[26][:]
             else:
                 self.aw.eventquantifieraction = [0,0,0,0]
+            if len(copy)>27 and len(copy[27]) == 4:
+                self.aw.eventquantifierSV = copy[27][:]
+            else:
+                self.aw.eventquantifierSV = [0,0,0,0]
             
             self.aw.buttonlistmaxlen = self.aw.buttonpalettemaxlen[pindex]
             
@@ -2745,6 +2776,10 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.eventquantifieraction[1] = int(self.E2quantifieraction.isChecked())
         self.aw.eventquantifieraction[2] = int(self.E3quantifieraction.isChecked())
         self.aw.eventquantifieraction[3] = int(self.E4quantifieraction.isChecked())
+        self.aw.eventquantifierSV[0] = int(self.E1quantifierSV.isChecked())
+        self.aw.eventquantifierSV[1] = int(self.E2quantifierSV.isChecked())
+        self.aw.eventquantifierSV[2] = int(self.E3quantifierSV.isChecked())
+        self.aw.eventquantifierSV[3] = int(self.E4quantifierSV.isChecked())
         self.aw.eventquantifiersource[0] = int(self.E1SourceComboBox.currentIndex())
         self.aw.eventquantifiersource[1] = int(self.E2SourceComboBox.currentIndex())
         self.aw.eventquantifiersource[2] = int(self.E3SourceComboBox.currentIndex())
@@ -2823,6 +2858,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.eventquantifiermax = self.aw.eventquantifiermax[:]
         self.eventquantifiercoarse = self.aw.eventquantifiercoarse[:]
         self.eventquantifieraction = self.aw.eventquantifieraction[:]
+        self.eventquantifierSV = self.aw.eventquantifierSV[:]
         # palettes
         self.buttonpalette = self.aw.buttonpalette[:]
         self.buttonpalettemaxlen = self.aw.buttonpalettemaxlen
