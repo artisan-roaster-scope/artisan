@@ -4351,7 +4351,7 @@ anlegen</translation>
         <translation>Energie Hilfe</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4849"/>
+        <location filename="../artisanlib/roast_properties.py" line="4854"/>
         <source>Set Measure from Profile</source>
         <translation>Wert aus Profile übernehmen</translation>
     </message>
@@ -9764,7 +9764,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation>Maillard</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4800"/>
+        <location filename="../artisanlib/roast_properties.py" line="4801"/>
         <source>Cooling</source>
         <translation>Kühlung</translation>
     </message>
@@ -11230,12 +11230,12 @@ LCDs Ale</translation>
         <translation type="obsolete">Typische Anzahl an Chargen pro Rösttag</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4780"/>
+        <location filename="../artisanlib/roast_properties.py" line="4781"/>
         <source>Pre-Heating</source>
         <translation>Vorheizen</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4790"/>
+        <location filename="../artisanlib/roast_properties.py" line="4791"/>
         <source>Between Batches</source>
         <translation>Zwischen den Chargen</translation>
     </message>

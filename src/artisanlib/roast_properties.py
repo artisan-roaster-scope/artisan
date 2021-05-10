@@ -4760,6 +4760,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         loadLabels = ['']*4
         loadUnits = ['']*4
         loadValues = ['0']*4
+        loadDurations = ['']*4
         for i in range(0,4): 
             loadLabels[i] = self.formatLoadLabel(chr(ord('A')+i),self.aw.qmc.loadlabels[i])
             if self.aw.qmc.load_etypes[i] > 0:
@@ -4768,7 +4769,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 loadValues[i] = '--'
                 loadUnits[i] = ''
-        if self.openEnergyMeasuringDialog(title,loadLabels,loadValues,loadUnits):
+        if self.openEnergyMeasuringDialog(title,loadLabels,loadValues,loadUnits,loadDurations):
             # set values
             for i, field in enumerate(fields): 
                 if self.aw.qmc.load_etypes[i] > 0 and loadEnergy[i] > -1:
@@ -4805,7 +4806,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.energy_ui.coolingenergies3]
         self.getMeasuredvalues(title, self.updateCoolingEnergies, fields, loadEnergy)
 
-    def openEnergyMeasuringDialog(self,title,loadLabels,loadValues,loadUnits):
+    def openEnergyMeasuringDialog(self,title,loadLabels,loadValues,loadUnits,loadDurations):
         dialog = EnergyMeasuringDialog(self)
         layout  = dialog.layout()
         # set data
@@ -4822,6 +4823,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         dialog.ui.loadBunit.setText(loadUnits[1])
         dialog.ui.loadCunit.setText(loadUnits[2])
         dialog.ui.loadDunit.setText(loadUnits[3])
+        dialog.ui.loadAduration.setText(loadDurations[0])
+        dialog.ui.loadBduration.setText(loadDurations[1])
+        dialog.ui.loadCduration.setText(loadDurations[2])
+        dialog.ui.loadDduration.setText(loadDurations[3])
         # fixed hight
         layout.setSpacing(5)
         dialog.setFixedHeight(dialog.sizeHint().height())

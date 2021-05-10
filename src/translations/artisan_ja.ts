@@ -4334,7 +4334,7 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4849"/>
+        <location filename="../artisanlib/roast_properties.py" line="4854"/>
         <source>Set Measure from Profile</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9637,7 +9637,7 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="unfinished">秒</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4800"/>
+        <location filename="../artisanlib/roast_properties.py" line="4801"/>
         <source>Cooling</source>
         <translation type="unfinished">Cooling</translation>
     </message>
@@ -11196,12 +11196,12 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4780"/>
+        <location filename="../artisanlib/roast_properties.py" line="4781"/>
         <source>Pre-Heating</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4790"/>
+        <location filename="../artisanlib/roast_properties.py" line="4791"/>
         <source>Between Batches</source>
         <translation type="unfinished"></translation>
     </message>
