@@ -4766,9 +4766,11 @@ class editGraphDlg(ArtisanResizeablDialog):
                 loadValues[i] = self.scalefloat(loadEnergy[i])
                 loadUnits[i] = self.aw.qmc.energyunits[self.aw.qmc.ratingunits[i]]
             else:
-                loadValues[i] = '--'
-                loadUnits[i] = ''
+                loadValues[i] = '-'
+                loadUnits[i] = '-'
         protocolDuration = self.validateSeconds2Text(duration)
+        if protocolDuration == "":
+            protocolDuration = "- : -"
         if self.openEnergyMeasuringDialog(title,loadLabels,loadValues,loadUnits,protocolDuration):
             # set values
             for i, field in enumerate(fields): 
