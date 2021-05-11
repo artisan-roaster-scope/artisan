@@ -12100,10 +12100,12 @@ class tgraphcanvas(FigureCanvas):
     def measureFromprofile(self):
         coolEnergy = [0]*4
         heatEnergy = [0]*4
+        heatDuration = 0
+        coolDuration = 0
         try:    
             if len(self.timex) == 0:
                 aw.sendmessage(QApplication.translate("Message","No profile data", None),append=False)
-                return [-1]*4, [-1]*4
+                return [-1]*4, [-1]*4, 0, 0
 
             def getEnergy(i,j,duration): 
                 try:
