@@ -12058,14 +12058,22 @@ class tgraphcanvas(FigureCanvas):
             btu_lpg = aw.float2float(btu_lpg,3)
             btu_ng = aw.float2float(btu_ng,3)
             btu_elec = aw.float2float(btu_elec,3)
-            if bean_weight > 0 and co2_batch > 0:
+            if bean_weight > 0:
                 co2_per_green_kg = co2_batch / bean_weight
+                btu_batch_per_green_kg = btu_batch / bean_weight
+                btu_roast_per_green_kg = btu_roast / bean_weight
             else:
                 co2_per_green_kg = 0
+                btu_batch_per_green_kg = 0
+                btu_roast_per_green_kg = 0
             co2_per_green_kg = aw.float2float(co2_per_green_kg,3)
+            btu_batch_per_green_kg = aw.float2float(btu_batch_per_green_kg,3)
+            btu_roast_per_green_kg = aw.float2float(btu_roast_per_green_kg,3)
+
 
             # energymetrics
             energymetrics["BTU_batch"] = btu_batch
+            energymetrics["BTU_batch_per_green_kg"] = btu_batch_per_green_kg
             energymetrics["CO2_batch"] = co2_batch
             energymetrics["BTU_preheat"] = btu_preheat
             energymetrics["CO2_preheat"] = co2_preheat
@@ -12074,6 +12082,7 @@ class tgraphcanvas(FigureCanvas):
             energymetrics["BTU_cooling"] = btu_cooling
             energymetrics["CO2_cooling"] = co2_cooling
             energymetrics["BTU_roast"] = btu_roast
+            energymetrics["BTU_roast_per_green_kg"] = btu_roast_per_green_kg
             energymetrics["CO2_roast"] = co2_roast
             energymetrics["CO2_per_green_kg"] = co2_per_green_kg
             energymetrics["BTU_LPG"] = btu_lpg
@@ -12166,12 +12175,15 @@ class tgraphcanvas(FigureCanvas):
                     ### end of loop: for j in range(len(self.specialevents) - 1, -1, -1)
             #### end of loop: for i in range(0,4)
             
+            heatDuration = self.timex[self.timeindex[0]]
+            coolDuration = self.timex[-1] - self.timex[self.timeindex[6]]
+            
         except Exception as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),exc_tb.tb_lineno)
-        return heatEnergy, coolEnergy
+        return heatEnergy, coolEnergy, heatDuration, coolDuration
 
     #used in EventRecord()
     def restorebutton_11(self):
@@ -24208,6 +24220,8 @@ class ApplicationWindow(QMainWindow):
                 ("bturoast", str(cp["BTU_roast"]) if "BTU_roast" in cp else "0.0"),
                 ("co2roast", str(cp["CO2_roast"]) if "CO2_roast" in cp else "0.0"),
                 ("co2pergreenkg", str(cp["CO2_per_green_kg"]) if "CO2_per_green_kg" in cp else "0.0"),
+                ("btubatchpergreenkg", str(cp["BTU_batch_per_green_kg"]) if "BTU_batch_per_green_kg" in cp else "0.0"),
+                ("bturoastpergreenkg", str(cp["BTU_roast_per_green_kg"]) if "BTU_roast_per_green_kg" in cp else "0.0"),
                 ]
     
             _ignorecase = re.IGNORECASE  # @UndefinedVariable
@@ -27277,6 +27291,8 @@ class ApplicationWindow(QMainWindow):
             energymetrics,_ = self.qmc.calcEnergyuse()
             if "BTU_batch" in energymetrics:
                 computedProfile["BTU_batch"] = self.float2float(energymetrics["BTU_batch"],1)
+            if "BTU_batch_per_green_kg" in energymetrics:
+                computedProfile["BTU_batch_per_green_kg"] = self.float2float(energymetrics["BTU_batch_per_green_kg"],1)
             if "CO2_batch" in energymetrics:
                 computedProfile["CO2_batch"] = self.float2float(energymetrics["CO2_batch"],1)
             if "BTU_preheat" in energymetrics:
@@ -27293,6 +27309,8 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["CO2_cooling"] = self.float2float(energymetrics["CO2_cooling"],1)
             if "BTU_roast" in energymetrics:
                 computedProfile["BTU_roast"] = self.float2float(energymetrics["BTU_roast"],1)
+            if "BTU_roast_per_green_kg" in energymetrics:
+                computedProfile["BTU_roast_per_green_kg"] = self.float2float(energymetrics["BTU_roast_per_green_kg"],1)
             if "CO2_roast" in energymetrics:
                 computedProfile["CO2_roast"] = self.float2float(energymetrics["CO2_roast"],1)
             if "CO2_per_green_kg" in energymetrics:
@@ -31619,6 +31637,7 @@ class ApplicationWindow(QMainWindow):
             ["divots",              "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Divots',None)               ],
             ["mode",                "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Mode',None)                 ],
             ["BTU_batch",           "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_batch',None)            ],
+            ["BTU_batch_per_green_kg","comp","float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_batch_per_green_kg',None)],
             ["CO2_batch",           "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_batch',None)            ],
             ["BTU_preheat",         "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_preheat',None)          ],
             ["CO2_preheat",         "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_preheat',None)          ],
@@ -31627,6 +31646,7 @@ class ApplicationWindow(QMainWindow):
             ["BTU_cooling",         "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_cooling',None)          ],
             ["CO2_cooling",         "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_cooling',None)          ],
             ["BTU_roast",           "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_roast',None)            ],
+            ["BTU_roast_per_green_kg","comp","float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_roast_per_green_kg',None)],
             ["CO2_roast",           "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_roast',None)            ],
             ["CO2_per_green_kg",    "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2_per_green_kg',None)     ],
             ["BTU_LPG",             "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU_LPG',None)              ],

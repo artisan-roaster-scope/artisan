@@ -3060,7 +3060,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if updateMetrics:
             self.updateMetricsLabel()
         
-    def updateBetweenBatchessDuration(self, updateMetrics=True):
+    def updateBetweenBatchesDuration(self, updateMetrics=True):
         self.aw.qmc.betweenbatchDuration = self.validateText2Seconds(self.energy_ui.betweenBatchesDuration.text())
         if updateMetrics:
             self.updateMetricsLabel()
@@ -3124,7 +3124,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.updateLoadPcts(False)
             ## Protocol tab
             self.updatePreheatDuration(False)
-            self.updateBetweenBatchessDuration(False)
+            self.updateBetweenBatchesDuration(False)
             self.updateCoolingDuration(False)
             self.updatePreheatEnergies(False)
             self.updateBetweenBatchesEnergies(False)
@@ -3383,7 +3383,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def betweenBatchesDuration_editingfinished(self):
-        self.updateBetweenBatchessDuration()
+        self.updateBetweenBatchesDuration()
 
     @pyqtSlot()
     def coolingDuration_editingfinished(self):
@@ -4756,11 +4756,10 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.sendmessage(QApplication.translate("Message","Roast properties updated but profile not saved to disk", None))
         self.close()
     
-    def getMeasuredvalues(self,title,updatefields,fields,loadEnergy):
+    def getMeasuredvalues(self,title,func_updatefields,fields,loadEnergy,func_updateduration, durationfield, duration):
         loadLabels = ['']*4
         loadUnits = ['']*4
         loadValues = ['0']*4
-        loadDurations = ['']*4
         for i in range(0,4): 
             loadLabels[i] = self.formatLoadLabel(chr(ord('A')+i),self.aw.qmc.loadlabels[i])
             if self.aw.qmc.load_etypes[i] > 0:
@@ -4769,44 +4768,47 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 loadValues[i] = '--'
                 loadUnits[i] = ''
-        if self.openEnergyMeasuringDialog(title,loadLabels,loadValues,loadUnits,loadDurations):
+        protocolDuration = self.validateSeconds2Text(duration)
+        if self.openEnergyMeasuringDialog(title,loadLabels,loadValues,loadUnits,protocolDuration):
             # set values
             for i, field in enumerate(fields): 
                 if self.aw.qmc.load_etypes[i] > 0 and loadEnergy[i] > -1:
                     field.setText(self.validatePctText(str(loadEnergy[i])))
-                    updatefields()
-        
+                    func_updatefields()
+            durationfield.setText(protocolDuration) 
+            func_updateduration()
+
     @pyqtSlot(bool)
     def preHeatToolButton_triggered(self,_):
         title = QApplication.translate("Label","Pre-Heating",None)
-        loadEnergy,_ = self.aw.qmc.measureFromprofile()
+        loadEnergy,_,duration,_ = self.aw.qmc.measureFromprofile()
         fields = [self.energy_ui.preheatenergies0,
                 self.energy_ui.preheatenergies1,
                 self.energy_ui.preheatenergies2,
                 self.energy_ui.preheatenergies3]
-        self.getMeasuredvalues(title, self.updatePreheatEnergies, fields, loadEnergy)
+        self.getMeasuredvalues(title, self.updatePreheatEnergies, fields, loadEnergy, self.updatePreheatDuration, self.energy_ui.preheatDuration, duration)
 
     @pyqtSlot(bool)
     def betweenBatchesToolButton_triggered(self,_):
         title = QApplication.translate("Label","Between Batches",None)
-        loadEnergy,_ = self.aw.qmc.measureFromprofile()
+        loadEnergy,_,duration,_ = self.aw.qmc.measureFromprofile()
         fields = [self.energy_ui.betweenbatchesenergy0,
                 self.energy_ui.betweenbatchesenergy1,
                 self.energy_ui.betweenbatchesenergy2,
                 self.energy_ui.betweenbatchesenergy3]
-        self.getMeasuredvalues(title, self.updateBetweenBatchesEnergies, fields, loadEnergy)
+        self.getMeasuredvalues(title, self.updateBetweenBatchesEnergies, fields, loadEnergy, self.updateBetweenBatchesDuration, self.energy_ui.betweenBatchesDuration, duration)
 
     @pyqtSlot(bool)
     def coolingToolButton_triggered(self,_):
         title = QApplication.translate("Label","Cooling",None)
-        _,loadEnergy = self.aw.qmc.measureFromprofile()
+        _,loadEnergy,_,duration = self.aw.qmc.measureFromprofile()
         fields = [self.energy_ui.coolingenergies0,
                 self.energy_ui.coolingenergies1,
                 self.energy_ui.coolingenergies2,
                 self.energy_ui.coolingenergies3]
-        self.getMeasuredvalues(title, self.updateCoolingEnergies, fields, loadEnergy)
+        self.getMeasuredvalues(title, self.updateCoolingEnergies, fields, loadEnergy, self.updateCoolingDuration, self.energy_ui.coolingDuration, duration)
 
-    def openEnergyMeasuringDialog(self,title,loadLabels,loadValues,loadUnits,loadDurations):
+    def openEnergyMeasuringDialog(self,title,loadLabels,loadValues,loadUnits,protocolDuration):
         dialog = EnergyMeasuringDialog(self)
         layout  = dialog.layout()
         # set data
@@ -4823,10 +4825,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         dialog.ui.loadBunit.setText(loadUnits[1])
         dialog.ui.loadCunit.setText(loadUnits[2])
         dialog.ui.loadDunit.setText(loadUnits[3])
-        dialog.ui.loadAduration.setText(loadDurations[0])
-        dialog.ui.loadBduration.setText(loadDurations[1])
-        dialog.ui.loadCduration.setText(loadDurations[2])
-        dialog.ui.loadDduration.setText(loadDurations[3])
+        dialog.ui.duration.setText(protocolDuration)
         # fixed hight
         layout.setSpacing(5)
         dialog.setFixedHeight(dialog.sizeHint().height())
