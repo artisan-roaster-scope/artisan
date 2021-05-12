@@ -20,6 +20,10 @@ header:
   - logging of environmental temperature (ET), bean temperature (BT), drum temperature (DT)
   - control of set value (SV), fan speed and drum speed on some machines (FZ-94, Ghibli/Silon touch with latest firmware)
 
+### Netwok Setup
+
+For machines talking MODBUS TCP via network connection: the computer running Artisan must be on the same IP network as the roasting machine. By default the roasting machines use the IP address 192.168.1.27. Configure your computer to use a manual network setup with a static IP address in the range of the roasting machine 192.168.1.x, but with x different from that of the roaster (e.g. 192.168.1.51). Choose 255.255.255.0 as subnet mask.
+
 ### Notes
 
 - some Ghibli series machines do not feature an environmental temperature sensor and report the drum temperature on the Artisan ET channel.
