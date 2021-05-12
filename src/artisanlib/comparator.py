@@ -26,8 +26,8 @@ from matplotlib import rcParams
 if sys.platform.startswith("darwin"):
     # import module to detect if OS X dark mode is active or not
     import darkdetect # @UnresolvedImport
-    
-from artisanlib.util import deltaLabelUTF8, d, stringfromseconds, appFrozen, fromFtoC, fromCtoF
+
+from artisanlib.util import deltaLabelUTF8, d, stringfromseconds, appFrozen, fromFtoC, fromCtoF, fill_gaps
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
@@ -114,9 +114,9 @@ class RoastProfile():
         if "timex" in profile:
             self.timex = profile["timex"]
         if "temp1" in profile:
-            self.temp1 = self.aw.qmc.fill_gaps(profile["temp1"])
+            self.temp1 = fill_gaps(profile["temp1"])
         if "temp2" in profile:
-            self.temp2 = self.aw.qmc.fill_gaps(profile["temp2"])
+            self.temp2 = fill_gaps(profile["temp2"])
         if "timeindex" in profile:
             for i,ti in enumerate(profile["timeindex"]):
                 if i < len(self.timeindex):

@@ -206,7 +206,7 @@ except:
 import unicodedata # @UnresolvedImport
 
 import artisanlib.arabic_reshaper
-from artisanlib.util import (appFrozen, stringp, uchr, d, encodeLocal, s2a,
+from artisanlib.util import (appFrozen, stringp, uchr, d, encodeLocal, s2a, fill_gaps, 
         deltaLabelPrefix, deltaLabelUTF8, deltaLabelBigPrefix, deltaLabelMathPrefix, stringfromseconds, stringtoseconds,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toBool, toStringList, toMap, removeAll)
@@ -642,6 +642,7 @@ from artisanlib.phidgets import PhidgetManager
 from artisanlib.sliderStyle import *
 from artisanlib.cropster import extractProfileCropsterXLS
 from artisanlib.giesen import extractProfileGiesenCSV
+from artisanlib.petroncini import extractProfilePetronciniCSV
 from artisanlib.ikawa import extractProfileIkawaCSV
 from artisanlib.rubase import extractProfileRubaseCSV
 from artisanlib.roastpath import extractProfileRoastPathHTML
@@ -6277,50 +6278,6 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " recomputeDeltas() {0}").format(str(e)),exc_tb.tb_lineno)
             return [0]*len(timex),[0]*len(timex)
 
-    # fills in intermediate interpolated values replacing -1 values based on surrounding values
-    # [1, 2, 3, -1, -1, -1, 10, 11] => [1, 2, 3, 4.75, 6.5, 8.25, 11]
-    # [1,2,3,-1,-1,-1,-1] => [1,2,3,-1,-1,-1,-1] # no final value to interpolate too, so trailing -1 are kept!
-    # [-1,-1,2] => [2, 2.0, 2] # a prefix of -1 will be replaced by the first value in l that is not -1
-    # INVARIANT: the resulting list has always the same lenght as l
-    def fill_gaps(self,l):
-        res = []
-        last_val = -1
-        skip = -1
-        for i,e in enumerate(l):
-            if i >= skip:
-                if e == -1 and last_val == -1:
-                    # a prefix of -1 will be replaced by the first value in l that is not -1
-                    s = -1
-                    for e in l:
-                        if e != -1:
-                            s = e
-                            break
-                    res.append(s)
-                    last_val = s
-                elif e == -1 and last_val != -1:
-                    next_val = None
-                    next_idx = None # first index of an element beyond i of a value different to -1
-                    for j in range(i+1,len(l)):
-                        if l[j] != -1:
-                            next_val = l[j]
-                            next_idx = j
-                            break
-                    if next_val is None:
-                        # no further valid values, we append the tail
-                        res.extend(l[i:])
-                        return res
-                    else:
-                        # compute intermediate values
-                        step = (next_val - last_val) / (j-i+1.)
-                        for _ in range(j-i):
-                            last_val = last_val + step
-                            res.append(last_val)
-                        skip = next_idx
-                else:
-                    res.append(e)
-                    last_val = e
-        return res
-
     def bisection(self,array,value):
         #Algorithm presumes 'array' is monotonic increasing.  This is not guaranteed for profiles so there
         #may be results that are not strictly correct.
@@ -6857,8 +6814,8 @@ class tgraphcanvas(FigureCanvas):
                             tb_lin = numpy.linspace(tb[0],tb[-1],len(tb))
                         else:
                             tb_lin = None
-                        self.stemp1B = self.smooth_list(tb,self.fill_gaps(t1),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
-                        self.stemp2B = self.smooth_list(tb,self.fill_gaps(t2),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
+                        self.stemp1B = self.smooth_list(tb,fill_gaps(t1),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
+                        self.stemp2B = self.smooth_list(tb,fill_gaps(t2),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
 
                     self.l_background_annotations = []
                     #check to see if there is both a profile loaded and a background loaded
@@ -6890,7 +6847,7 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     trans = self.ax.transData
                                 if smooth:
-                                    stemp3B = self.smooth_list(tx,self.fill_gaps(self.temp1BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                    stemp3B = self.smooth_list(tx,fill_gaps(self.temp1BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
                                 else:
                                     stemp3B = self.stemp1BX[n3]
                             else:
@@ -6899,7 +6856,7 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     trans = self.ax.transData
                                 if smooth:
-                                    stemp3B = self.smooth_list(tx,self.fill_gaps(self.temp2BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                    stemp3B = self.smooth_list(tx,fill_gaps(self.temp2BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
                                 else:
                                     stemp3B = self.stemp2BX[n3]
                             if not self.backgroundShowFullflag:
@@ -6925,7 +6882,7 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     trans = self.ax.transData
                                 if smooth:
-                                    stemp4B = self.smooth_list(tx,self.fill_gaps(self.temp1BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                    stemp4B = self.smooth_list(tx,fill_gaps(self.temp1BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
                                 else:
                                     stemp4B = self.stemp1BX[n4]
                             else:
@@ -6934,7 +6891,7 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     trans = self.ax.transData
                                 if smooth:
-                                    stemp4B = self.smooth_list(tx,self.fill_gaps(self.temp2BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                    stemp4B = self.smooth_list(tx,fill_gaps(self.temp2BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
                                 else:
                                     stemp4B = self.stemp2BX[n4]
                             if not self.backgroundShowFullflag:
@@ -6982,8 +6939,8 @@ class tgraphcanvas(FigureCanvas):
                         if recomputeAllDeltas or (self.DeltaETBflag and self.delta1B == []) or (self.DeltaBTBflag and self.delta2B == []):
                             # we populate temporary smoothed ET/BT data arrays
                             cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-                            st1 = self.smooth_list(self.timeB,self.fill_gaps(self.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
-                            st2 = self.smooth_list(self.timeB,self.fill_gaps(self.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
+                            st1 = self.smooth_list(self.timeB,fill_gaps(self.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
+                            st2 = self.smooth_list(self.timeB,fill_gaps(self.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
                             # we start RoR computation 10 readings after CHARGE to avoid this initial peak
                             if aw.qmc.timeindexB[0]>-1:
                                 RoRstart = min(aw.qmc.timeindexB[0]+10, len(self.timeB)-1)
@@ -7408,8 +7365,8 @@ class tgraphcanvas(FigureCanvas):
                     timex_lin = numpy.linspace(self.timex[0],self.timex[-1],len(self.timex))
                 else:
                     timex_lin = None
-                temp1_nogaps = self.fill_gaps(self.resizeList(self.temp1,len(self.timex)))
-                temp2_nogaps = self.fill_gaps(self.resizeList(self.temp2,len(self.timex)))
+                temp1_nogaps = fill_gaps(self.resizeList(self.temp1,len(self.timex)))
+                temp2_nogaps = fill_gaps(self.resizeList(self.temp2,len(self.timex)))
 
                 if smooth or len(self.stemp1) != len(self.timex):
                     if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon: # we don't smooth, but remove the dropouts
@@ -7418,7 +7375,7 @@ class tgraphcanvas(FigureCanvas):
                         self.stemp1 = self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
                 if smooth or len(self.stemp2) != len(self.timex):
                     if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon:  # we don't smooth, but remove the dropouts
-                        self.stemp2 = self.fill_gaps(self.temp2)
+                        self.stemp2 = fill_gaps(self.temp2)
                     else:
                         self.stemp2 = self.smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
 
@@ -7970,9 +7927,9 @@ class tgraphcanvas(FigureCanvas):
                     try:
                         if aw.extraCurveVisibility1[i]:
                             if (not aw.qmc.flagon or aw.qmc.smooth_curves_on_recording) and (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
-                                self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
+                                self.extrastemp1[i] = self.smooth_list(self.extratimex[i],fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
                             else: # we don't smooth, but remove the dropouts
-                                self.extrastemp1[i] = self.fill_gaps(self.extratemp1[i])
+                                self.extrastemp1[i] = fill_gaps(self.extratemp1[i])
                             if aw.extraDelta1[i]:
                                 trans = self.delta_ax.transData
                             else:
@@ -7994,9 +7951,9 @@ class tgraphcanvas(FigureCanvas):
                     try:
                         if aw.extraCurveVisibility2[i]:
                             if (not aw.qmc.flagon or aw.qmc.smooth_curves_on_recording) and (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
-                                self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
+                                self.extrastemp2[i] = self.smooth_list(self.extratimex[i],fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
                             else:
-                                self.extrastemp2[i] = self.fill_gaps(self.extratemp2[i])
+                                self.extrastemp2[i] = fill_gaps(self.extratemp2[i])
                             if aw.extraDelta2[i]:
                                 trans = self.delta_ax.transData
                             else:
@@ -15714,6 +15671,10 @@ class ApplicationWindow(QMainWindow):
         importRubaseAction = QAction("Rubase CSV...",self)
         importRubaseAction.triggered.connect(self.importRubase)
         self.importMenu.addAction(importRubaseAction)
+
+        importPetronciniAction = QAction("Petroncini CSV...",self)
+        importPetronciniAction.triggered.connect(self.importPetroncini)
+        self.importMenu.addAction(importPetronciniAction)
 
         importPilotAction = QAction("Probat Pilot...",self)
         importPilotAction.triggered.connect(self.importPilot)
@@ -24992,8 +24953,8 @@ class ApplicationWindow(QMainWindow):
                 else:
                     tb_lin = None
                 decay_smoothing_p = not aw.qmc.optimalSmoothing
-                b1 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
-                b2 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
+                b1 = self.qmc.smooth_list(tb,fill_gaps(t1),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
+                b2 = self.qmc.smooth_list(tb,fill_gaps(t2),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
 
                 self.qmc.extraname1B,self.qmc.extraname2B = names1x,names2x
                 b1x = []
@@ -25011,14 +24972,14 @@ class ApplicationWindow(QMainWindow):
                         else:
                             tx_lin = None
                         if (aw.qmc.xtcurveidx > 0 and n3 == i and aw.qmc.xtcurveidx % 2) or (aw.qmc.ytcurveidx > 0 and n4 == i and aw.qmc.ytcurveidx % 2):
-                            b1x.append(self.qmc.smooth_list(tx,self.qmc.fill_gaps(t1x[i]),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin))
-                            b2x.append(self.qmc.fill_gaps(t2x[i]))
+                            b1x.append(self.qmc.smooth_list(tx,fill_gaps(t1x[i]),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin))
+                            b2x.append(fill_gaps(t2x[i]))
                         else:
-                            b1x.append(self.qmc.fill_gaps(t1x[i]))
-                            b2x.append(self.qmc.smooth_list(tx,self.qmc.fill_gaps(t2x[i]),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin))
+                            b1x.append(fill_gaps(t1x[i]))
+                            b2x.append(self.qmc.smooth_list(tx,fill_gaps(t2x[i]),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin))
                     else:
-                        b1x.append(self.qmc.fill_gaps(t1x[i]))
-                        b2x.append(self.qmc.fill_gaps(t2x[i]))
+                        b1x.append(fill_gaps(t1x[i]))
+                        b2x.append(fill_gaps(t2x[i]))
                 # NOTE: parallel assignment after time intensive smoothing is necessary to avoid redraw failure!
                 self.qmc.stemp1B,self.qmc.stemp2B,self.qmc.stemp1BX,self.qmc.stemp2BX = b1,b2,b1x,b2x
                 self.qmc.backgroundEvents = profile["specialevents"]
@@ -32036,7 +31997,7 @@ class ApplicationWindow(QMainWindow):
 
                             temp = [convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
                             timex = rd["timex"]
-                            stemp = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=self.qmc.curvefilter,decay_smoothing=not aw.qmc.optimalSmoothing)
+                            stemp = self.qmc.smooth_list(timex,fill_gaps(temp),window_len=self.qmc.curvefilter,decay_smoothing=not aw.qmc.optimalSmoothing)
                             charge = max(0,rd["charge_idx"]) # start of visible data
                             drop = rd["drop_idx"] # end of visible data
                             stemp = numpy.concatenate(([None]*charge,stemp[charge:drop],[None]*(len(timex)-drop)))
@@ -32075,7 +32036,7 @@ class ApplicationWindow(QMainWindow):
                             if self.qmc.DeltaBTflag and self.qmc.delta_ax:
                                 tx = numpy.array(timex)
                                 cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-                                t1 = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=cf,decay_smoothing=not aw.qmc.optimalSmoothing)
+                                t1 = self.qmc.smooth_list(timex,fill_gaps(temp),window_len=cf,decay_smoothing=not aw.qmc.optimalSmoothing)
                                 if len(t1)>10 and len(tx) > 10:
                                     # we start RoR computation 10 readings after CHARGE to avoid this initial peak
                                     RoR_start = min(rd["charge_idx"]+10,len(tx)-1)
@@ -35268,6 +35229,11 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def importGiesen(self,_=False):
         self.importExternal(extractProfileGiesenCSV,QApplication.translate("Message","Import Giesen CSV", None),"*.csv")
+        
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importPetroncini(self,_=False):
+        self.importExternal(extractProfilePetronciniCSV,QApplication.translate("Message","Import Petroncini CSV", None),"*.csv")
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -36568,8 +36534,8 @@ class ApplicationWindow(QMainWindow):
                 timex_lin = numpy.linspace(aw.qmc.timex[0],aw.qmc.timex[-1],len(aw.qmc.timex))
             else:
                 timex_lin = None
-            temp1_nogaps = aw.qmc.fill_gaps(aw.qmc.resizeList(aw.qmc.temp1,len(aw.qmc.timex)))
-            temp2_nogaps = aw.qmc.fill_gaps(aw.qmc.resizeList(aw.qmc.temp2,len(aw.qmc.timex)))
+            temp1_nogaps = fill_gaps(aw.qmc.resizeList(aw.qmc.temp1,len(aw.qmc.timex)))
+            temp2_nogaps = fill_gaps(aw.qmc.resizeList(aw.qmc.temp2,len(aw.qmc.timex)))
 
             if smooth or len(aw.qmc.stemp1) != len(aw.qmc.timex):
                 if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon: # we don't smooth, but remove the dropouts
@@ -36578,15 +36544,15 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.stemp1 = aw.qmc.smooth_list(aw.qmc.timex,temp1_nogaps,window_len=aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
             if smooth or len(aw.qmc.stemp2) != len(aw.qmc.timex):
                 if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon:  # we don't smooth, but remove the dropouts
-                    aw.qmc.stemp2 = aw.qmc.fill_gaps(aw.qmc.temp2)
+                    aw.qmc.stemp2 = fill_gaps(aw.qmc.temp2)
                 else:
                     aw.qmc.stemp2 = aw.qmc.smooth_list(aw.qmc.timex,temp2_nogaps,window_len=aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
 
             #populate background delta ET (aw.qmc.delta1B) and delta BT (aw.qmc.delta2B)
             # we populate temporary smoothed ET/BT data arrays
             cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-            st1 = aw.qmc.smooth_list(aw.qmc.timeB,aw.qmc.fill_gaps(aw.qmc.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
-            st2 = aw.qmc.smooth_list(aw.qmc.timeB,aw.qmc.fill_gaps(aw.qmc.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
+            st1 = aw.qmc.smooth_list(aw.qmc.timeB,fill_gaps(aw.qmc.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
+            st2 = aw.qmc.smooth_list(aw.qmc.timeB,fill_gaps(aw.qmc.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
             # we start RoR computation 10 readings after CHARGE to avoid this initial peak
             if aw.qmc.timeindexB[0]>-1:
                 RoRstart = min(aw.qmc.timeindexB[0]+10, len(aw.qmc.timeB)-1)
