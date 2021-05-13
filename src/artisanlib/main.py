@@ -28571,6 +28571,8 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.type = toInt(settings.value("type",self.modbus.type))
                 self.modbus.host = toString(settings.value("host",self.modbus.host))
                 self.modbus.port = toInt(settings.value("port",self.modbus.port))
+            if settings.contains("reset_socket"):
+                self.modbus.reset_socket = bool(toBool(settings.value("reset_socket",self.modbus.reset_socket)))
             settings.endGroup()
             #restore scale port
             settings.beginGroup("Scale")
@@ -30176,6 +30178,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("type",self.modbus.type)
             settings.setValue("host",self.modbus.host)
             settings.setValue("port",self.modbus.port)
+            settings.setValue("reset_socket",self.modbus.reset_socket)
             settings.endGroup()
             #save scale port
             settings.beginGroup("Scale")
@@ -33797,6 +33800,7 @@ class ApplicationWindow(QMainWindow):
             self.modbus.wordorderLittle = bool(dialog.modbus_littleEndianWords.isChecked())
             self.modbus.optimizer = bool(dialog.modbus_optimize.isChecked())
             self.modbus.fetch_max_blocks = bool(dialog.modbus_full_block.isChecked())
+            self.modbus.reset_socket = bool(dialog.modbus_reset.isChecked())
             self.modbus.type = int(dialog.modbus_type.currentIndex())
             self.modbus.host = str(dialog.modbus_hostEdit.text())
             try:

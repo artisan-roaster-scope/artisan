@@ -136,6 +136,9 @@ class modbusport(object):
         # this dict is re-computed on each connect() by a call to updateActiveRegisters()
         # NOTE: for registers of type float and BCD (32bit = 2x16bit) also the succeeding registers are registered
         self.fetch_max_blocks = False # if set, the optimizer fetches only one sequence per area from the minimum to the maximum register ignoring gaps
+        
+        self.reset_socket = False # reset socket connection on error (True by default in pymodbus>v2.5.2, False by default in pymodbus v2.3)
+        
         self.activeRegisters = {}        
         # the readings cache that is filled by requesting sequences of values in blocks
         self.readingsCache = {}
@@ -208,6 +211,7 @@ class modbusport(object):
                         stopbits=self.stopbits,
                         retry_on_empty=True,
                         retry_on_invalid=True,
+                        reset_socket=self.reset_socket,
                         timeout=self.timeout)
                 elif self.type == 2: # Serial Binary
                     from pymodbus.client.sync import ModbusSerialClient # @Reimport
@@ -220,6 +224,7 @@ class modbusport(object):
                         stopbits=self.stopbits,
                         retry_on_empty=True,
                         retry_on_invalid=True,
+                        reset_socket=self.reset_socket,
                         timeout=self.timeout)  
                 elif self.type == 3: # TCP
                     from pymodbus.client.sync import ModbusTcpClient
@@ -229,6 +234,7 @@ class modbusport(object):
                                 port=self.port,
                                 retry_on_empty=True,
                                 retry_on_invalid=True,
+                                reset_socket=self.reset_socket,
                                 retries=1,
                                 timeout=0.5, #self.timeout
                                 )
@@ -246,6 +252,7 @@ class modbusport(object):
                             port=self.port,
                             retry_on_empty=True,
                             retry_on_invalid=True,
+                            reset_socket=self.reset_socket,
                             retries=3,
                             timeout=0.4, #self.timeout
                             )
@@ -264,6 +271,7 @@ class modbusport(object):
                         parity=self.parity,
                         stopbits=self.stopbits,
                         retry_on_empty=False,
+                        reset_socket=self.reset_socket,
                         strict=False, # settings this to False disables the inter char timeout restriction
                         timeout=self.timeout)
 #                    self.master.inter_char_timeout = 0.05

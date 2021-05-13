@@ -717,6 +717,11 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_full_block.setChecked(self.aw.modbus.fetch_max_blocks)
         self.modbus_full_block.setFocusPolicy(Qt.NoFocus)
         self.modbus_full_block.setEnabled(bool(self.aw.modbus.optimizer))
+        
+        self.modbus_reset = QCheckBox(QApplication.translate("ComboBox","reset",None))
+        self.modbus_reset.setChecked(self.aw.modbus.reset_socket)
+        self.modbus_reset.setFocusPolicy(Qt.NoFocus)
+        self.modbus_reset.setToolTip(QApplication.translate("Tooltip","Reset socket connection on error", None))
 
         ##########################    TAB 4 WIDGETS   SCALE
         scale_devicelabel = QLabel(QApplication.translate("Label", "Device", None))
@@ -904,6 +909,8 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_setup.addWidget(self.modbus_optimize)
         modbus_setup.addSpacing(5)
         modbus_setup.addWidget(self.modbus_full_block)
+        modbus_setup.addSpacing(5)
+        modbus_setup.addWidget(self.modbus_reset)
         modbus_setup.addSpacing(7)
         modbus_setup.addStretch()
         modbus_setup.addWidget(modbus_typelabel)

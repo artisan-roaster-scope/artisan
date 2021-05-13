@@ -1,7 +1,7 @@
 setuptools==56.0.0 #51.3.3 # 50.3.2
 wheel==0.35.1
 pyserial==3.5 # 3.4
-pymodbus==2.5.1
+pymodbus==2.5.2
 python-snap7==1.0 # 0.11
 yoctopuce==1.10.44175
 Phidget22==1.6.20210315
