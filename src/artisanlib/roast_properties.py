@@ -3173,11 +3173,11 @@ class editGraphDlg(ArtisanResizeablDialog):
 #                    self.energy_ui.CO2perKgCoffeeLabel.setText("")
                     
                     # a green weight is available
-                    if metrics["CO2_per_green_kg"] > 0:
-                        if metrics["CO2_per_green_kg"] < 1000:
-                            scaled_co2_kg = str(self.scalefloat(metrics["CO2_per_green_kg"])) + 'g'
+                    if metrics["CO2_batch_per_green_kg"] > 0:
+                        if metrics["CO2_batch_per_green_kg"] < 1000:
+                            scaled_co2_kg = str(self.scalefloat(metrics["CO2_batch_per_green_kg"])) + 'g'
                         else:
-                            scaled_co2_kg = str(self.scalefloat(metrics["CO2_per_green_kg"]/1000.)) + 'kg'
+                            scaled_co2_kg = str(self.scalefloat(metrics["CO2_batch_per_green_kg"]/1000.)) + 'kg'
                         self.energy_ui.CO2perKgCoffeeLabel.setText("{0} {1}".format(scaled_co2_kg, QApplication.translate("Label","CO2 per kg green coffee",None)))
                     # no weight is available
                     else:
@@ -3449,14 +3449,14 @@ class editGraphDlg(ArtisanResizeablDialog):
     ######
 
     def scalefloat(self,num):
-        n = toFloat(self.aw.comma2dot(str(num)))
+        n = toFloat(num)
         if n == 0:
             res = "0"
-        elif n < 1:
+        elif abs(n) < 1:
             res = "{:.3f}".format(n)
-        elif n >= 1000:
+        elif abs(n) >= 1000:
             res = "{:.0f}".format(n)
-        elif n >= 100:
+        elif abs(n) >= 100:
             res = "{:.1f}".format(n)
         else:
             res = "{:.2f}".format(n)
