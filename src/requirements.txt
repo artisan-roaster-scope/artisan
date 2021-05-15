@@ -14,8 +14,7 @@ altgraph==0.17
 macholib==1.14
 pyusb==1.1.1 # 1.1.0
 persist-queue==0.6.0 #0.5.1
-portalocker==2.3.0 #2.0.0
-prettytable==2.1.0 # 0.7.2 # 1.0.1 and 2.0.0 fail to be packed by py2app and some pyinstaller versions properly into builds
+portalocker==2.3.0 #2.0.0pyinstaller versions properly into builds
 natsort==7.1.1 # 7.1.0
 xlrd==2.0.1 #1.2.0
 requests-file==1.5.1

@@ -1572,6 +1572,8 @@ class tgraphcanvas(FigureCanvas):
         self.roastersize_setup = 0 
         self.drumspeed_setup = ""
         #
+        self.machinesetup_energy_ratings = None # read from predefined machine setups and used if available to set energy defaults
+        #
         self.machinesetup = ""
         self.roastingnotes = ""
         self.cuppingnotes = ""
@@ -18948,8 +18950,18 @@ class ApplicationWindow(QMainWindow):
             if reply == QMessageBox.Cancel:
                 return
             elif reply == QMessageBox.Yes:
-                org_etypes = self.qmc.etypes
                 self.qmc.etypes = self.qmc.etypesdefault
+                # keep original information to Cancel
+                org_etypes = self.qmc.etypes
+                org_device = self.qmc.device
+                org_machinesetup = self.qmc.machinesetup
+                org_modbus_host = self.modbus.host
+                org_s7_host = self.s7.host
+                org_ws_host = self.ws.host
+                org_comport = self.ser.comport
+                org_roastersize_setup = self.qmc.roastersize_setup
+                org_roastersize = self.qmc.roastersize
+                #
                 self.loadSettings(fn=action.data()[0],remember=False,machine=True)
                 if action.data()[1] == "Phidget":
                     if action.text() == "VINT Ambient Modules":
@@ -18966,16 +18978,6 @@ class ApplicationWindow(QMainWindow):
                     else:
                         self.qmc.machinesetup = action.text()
                 else:
-                    # keep original information to Cancel
-                    org_device = self.qmc.device
-                    org_machinesetup = self.qmc.machinesetup
-                    org_modbus_host = self.modbus.host
-                    org_s7_host = self.s7.host
-                    org_ws_host = self.ws.host
-                    org_comport = self.ser.comport
-                    org_roastersize_setup = self.qmc.roastersize_setup
-                    org_roastersize = self.qmc.roastersize
-                    #
                     self.qmc.machinesetup = action.text()
                     res = False
                     if self.qmc.device == 29 and self.modbus.type in [3,4]: # MODBUS TCP or UDP
@@ -19045,6 +19047,28 @@ class ApplicationWindow(QMainWindow):
                         if res:
                             self.qmc.roastersize_setup = self.qmc.roastersize = batchsize
                     if res:
+                        # now check if the machine setup contains energy default ratings
+                        if self.qmc.machinesetup_energy_ratings is not None:
+                            if self.qmc.roastersize_setup > 0 and self.qmc.roastersize_setup in self.qmc.machinesetup_energy_ratings:
+                                ratings = self.qmc.machinesetup_energy_ratings[self.qmc.roastersize_setup]
+                                if "loadlabels" in ratings and len(ratings["loadlabels"]) == 4:
+                                    self.qmc.loadlabels_setup = ratings["loadlabels"]
+                                if "loadratings" in ratings and len(ratings["loadratings"]) == 4:
+                                    self.qmc.loadratings_setup = ratings["loadratings"]
+                                if "ratingunits" in ratings and len(ratings["ratingunits"]) == 4:
+                                    self.qmc.ratingunits_setup = ratings["ratingunits"]
+                                if "sourcetypes" in ratings and len(ratings["sourcetypes"]) == 4:
+                                    self.qmc.sourcetypes_setup = ratings["sourcetypes"]
+                                if "load_etypes" in ratings and len(ratings["load_etypes"]) == 4:
+                                    self.qmc.load_etypes_setup = ratings["load_etypes"]
+                                if "presssure_percents" in ratings and len(ratings["presssure_percents"]) == 4:
+                                    self.qmc.presssure_percents_setup = ratings["presssure_percents"]
+                                if "loadevent_zeropcts" in ratings and len(ratings["loadevent_zeropcts"]) == 4:
+                                    self.qmc.loadevent_zeropcts_setup = ratings["loadevent_zeropcts"]
+                                if "loadevent_hundpcts" in ratings and len(ratings["loadevent_hundpcts"]) == 4:
+                                    self.qmc.loadevent_hundpcts_setup = ratings["loadevent_hundpcts"]
+                                self.qmc.restoreEnergyLoadDefaults()
+                            self.sendmessage(QApplication.translate("Message","Energy loads configured for {0} {1}kg",None).format(label,self.qmc.roastersize_setup))
                         self.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(label))
                     else:
                         # reset
@@ -28994,7 +29018,14 @@ class ApplicationWindow(QMainWindow):
 #                self.qmc.energytablecolumnwidths = [toInt(x) for x in toList(settings.value("energytablecolumnwidths",self.qmc.energytablecolumnwidths))]
             settings.endGroup()
             self.qmc.restoreEnergyLoadDefaults()
-            self.qmc.restoreEnergyProtocolDefaults()          
+            self.qmc.restoreEnergyProtocolDefaults() 
+            
+            settings.beginGroup("EnergyDefaults")
+            if settings.contains("ratings"):
+                self.qmc.machinesetup_energy_ratings = settings.value("ratings",self.qmc.machinesetup_energy_ratings)
+            else:
+                self.qmc.machinesetup_energy_ratings = None
+            settings.endGroup()
             
             settings.beginGroup("RoastProperties")
             # copy setup from pre v1.4.6 RoastProperties organization,operator,roastertype,roastersize
@@ -30390,7 +30421,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("electricEnergyMix_setup",self.qmc.electricEnergyMix_setup)
             settings.setValue("energyresultunit_setup",self.qmc.energyresultunit_setup)
 #            settings.setValue("energytablecolumnwidths",self.qmc.energytablecolumnwidths)
-            settings.endGroup()            
+            settings.endGroup()        
             
             settings.beginGroup("RoastProperties")
             settings.setValue("machinesetup",self.qmc.machinesetup)
