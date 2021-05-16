@@ -651,7 +651,7 @@ from artisanlib.aillio import extractProfileRoastWorld,extractProfileRoasTime
 from artisanlib.simulator import Simulator
 from artisanlib.transposer import profileTransformatorDlg
 from artisanlib.comparator import roastCompareDlg
-from artisanlib.dialogs import ArtisanMessageBox, HelpDlg, ArtisanInputDialog
+from artisanlib.dialogs import ArtisanMessageBox, HelpDlg, ArtisanInputDialog, ArtisanComboBoxDialog
 from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs)
 from artisanlib.logs import (serialLogDlg, errorDlg, messageDlg)
 from artisanlib.events import EventsDlg, customEventDlg
@@ -1557,6 +1557,13 @@ class tgraphcanvas(FigureCanvas):
         self.BT2target = 250
         self.hudETpid = [5,240,60]    # HUD pid: p = 20, i = 60, d = 13
         self.pidpreviouserror = 0  # temporary storage of pid error
+        
+        self.heating_types = [
+            "",
+            QApplication.translate("ComboBox", "Propane Gas (LPG)",None),
+            QApplication.translate("ComboBox", "Natural Gas (NG)",None),
+            QApplication.translate("ComboBox", "Electric",None)
+        ]
 
         #General notes. Accessible through "edit graph properties" of graph menu. WYSIWYG viewer/editor.
         # setup of the current profile
@@ -1564,12 +1571,14 @@ class tgraphcanvas(FigureCanvas):
         self.organization = ""
         self.roastertype = "" 
         self.roastersize = 0
+        self.roasterheating = 0
         self.drumspeed = ""
         # kept in app settings
         self.organization_setup = ""
         self.operator_setup = ""
         self.roastertype_setup = ""
         self.roastersize_setup = 0 
+        self.roasterheating_setup = 0
         self.drumspeed_setup = ""
         #
         self.machinesetup_energy_ratings = None # read from predefined machine setups and used if available to set energy defaults
@@ -5416,6 +5425,7 @@ class tgraphcanvas(FigureCanvas):
                     self.operator = self.operator_setup
                     self.roastertype = self.roastertype_setup
                     self.roastersize = self.roastersize_setup
+                    self.roasterheating = self.roasterheating_setup
                     self.drumspeed = self.drumspeed_setup
                     # set energy defaults
                     self.restoreEnergyLoadDefaults()
@@ -18961,6 +18971,8 @@ class ApplicationWindow(QMainWindow):
                 org_comport = self.ser.comport
                 org_roastersize_setup = self.qmc.roastersize_setup
                 org_roastersize = self.qmc.roastersize
+                org_roasterheating_setup = self.qmc.roasterheating_setup
+                org_roasterheating = self.qmc.roasterheating
                 #
                 self.loadSettings(fn=action.data()[0],remember=False,machine=True)
                 if action.data()[1] == "Phidget":
@@ -19047,30 +19059,42 @@ class ApplicationWindow(QMainWindow):
                         if res:
                             self.qmc.roastersize_setup = self.qmc.roastersize = batchsize
                     if res:
-                        # now check if the machine setup contains energy default ratings
-                        if self.qmc.machinesetup_energy_ratings is not None:
-                            if self.qmc.roastersize_setup > 0 and self.qmc.roastersize_setup in self.qmc.machinesetup_energy_ratings:
-                                ratings = self.qmc.machinesetup_energy_ratings[self.qmc.roastersize_setup]
-                                if "loadlabels" in ratings and len(ratings["loadlabels"]) == 4:
-                                    self.qmc.loadlabels_setup = ratings["loadlabels"]
-                                if "loadratings" in ratings and len(ratings["loadratings"]) == 4:
-                                    self.qmc.loadratings_setup = ratings["loadratings"]
-                                if "ratingunits" in ratings and len(ratings["ratingunits"]) == 4:
-                                    self.qmc.ratingunits_setup = ratings["ratingunits"]
-                                if "sourcetypes" in ratings and len(ratings["sourcetypes"]) == 4:
-                                    self.qmc.sourcetypes_setup = ratings["sourcetypes"]
-                                if "load_etypes" in ratings and len(ratings["load_etypes"]) == 4:
-                                    self.qmc.load_etypes_setup = ratings["load_etypes"]
-                                if "presssure_percents" in ratings and len(ratings["presssure_percents"]) == 4:
-                                    self.qmc.presssure_percents_setup = ratings["presssure_percents"]
-                                if "loadevent_zeropcts" in ratings and len(ratings["loadevent_zeropcts"]) == 4:
-                                    self.qmc.loadevent_zeropcts_setup = ratings["loadevent_zeropcts"]
-                                if "loadevent_hundpcts" in ratings and len(ratings["loadevent_hundpcts"]) == 4:
-                                    self.qmc.loadevent_hundpcts_setup = ratings["loadevent_hundpcts"]
-                                self.qmc.restoreEnergyLoadDefaults()
-                            self.sendmessage(QApplication.translate("Message","Energy loads configured for {0} {1}kg",None).format(label,self.qmc.roastersize_setup))
-                        self.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(label))
-                    else:
+                        # size set, ask for heating
+                        dlg = ArtisanComboBoxDialog(self,aw,QApplication.translate("Message", 
+                            "Machine",None),QApplication.translate("Label", "Heating",None),self.qmc.heating_types,0)
+                        if dlg.exec_():
+                            res = dlg.idx
+                            if res is not None:
+                                self.qmc.roasterheating_setup = self.qmc.roasterheating = res
+                                # now check if the machine setup contains energy default ratings for the given batch size and energy rating
+                                if self.qmc.machinesetup_energy_ratings is not None:
+                                    if self.qmc.roastersize_setup > 0 and self.qmc.roasterheating_setup > 0 and \
+                                        self.qmc.roasterheating_setup in self.qmc.machinesetup_energy_ratings:
+                                        heating_ratings = self.qmc.machinesetup_energy_ratings[self.qmc.roasterheating_setup]
+                                        if self.qmc.roastersize_setup in heating_ratings:
+                                            ratings = heating_ratings[self.qmc.roastersize_setup]
+                                            if "loadlabels" in ratings and len(ratings["loadlabels"]) == 4:
+                                                self.qmc.loadlabels_setup = ratings["loadlabels"]
+                                            if "loadratings" in ratings and len(ratings["loadratings"]) == 4:
+                                                self.qmc.loadratings_setup = ratings["loadratings"]
+                                            if "ratingunits" in ratings and len(ratings["ratingunits"]) == 4:
+                                                self.qmc.ratingunits_setup = ratings["ratingunits"]
+                                            if "sourcetypes" in ratings and len(ratings["sourcetypes"]) == 4:
+                                                self.qmc.sourcetypes_setup = ratings["sourcetypes"]
+                                            if "load_etypes" in ratings and len(ratings["load_etypes"]) == 4:
+                                                self.qmc.load_etypes_setup = ratings["load_etypes"]
+                                            if "presssure_percents" in ratings and len(ratings["presssure_percents"]) == 4:
+                                                self.qmc.presssure_percents_setup = ratings["presssure_percents"]
+                                            if "loadevent_zeropcts" in ratings and len(ratings["loadevent_zeropcts"]) == 4:
+                                                self.qmc.loadevent_zeropcts_setup = ratings["loadevent_zeropcts"]
+                                            if "loadevent_hundpcts" in ratings and len(ratings["loadevent_hundpcts"]) == 4:
+                                                self.qmc.loadevent_hundpcts_setup = ratings["loadevent_hundpcts"]
+                                            self.qmc.restoreEnergyLoadDefaults()
+                                            self.sendmessage(QApplication.translate("Message","Energy loads configured for {0} {1}kg",None).format(label,self.qmc.roastersize_setup))
+                                self.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(label))
+                        else:
+                            res = None
+                    if res is None:
                         # reset
                         self.qmc.etypes= org_etypes
                         self.qmc.device = org_device
@@ -19081,6 +19105,8 @@ class ApplicationWindow(QMainWindow):
                         self.ser.comport = org_comport
                         self.qmc.roastersize_setup = org_roastersize_setup
                         self.qmc.roastersize = org_roastersize
+                        self.qmc.roasterheating_setup = org_roasterheating_setup
+                        self.qmc.roasterheating = org_roasterheating
                         #
                         self.sendmessage(QApplication.translate("Message","Action canceled",None))
                     self.establish_etypes()
@@ -26669,6 +26695,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.roastersize = profile["roastersize"]
             else:
                 self.qmc.roastersize = 0
+            if "roasterheating" in profile:
+                self.qmc.roasterheating = profile["roasterheating"]
+            else:
+                self.qmc.roastersize = 0
             if "operator" in profile:
                 self.qmc.operator = d(profile["operator"])
             else:
@@ -27385,6 +27415,7 @@ class ApplicationWindow(QMainWindow):
             profile["density_roasted"] = [self.qmc.density_roasted[0],encodeLocal(self.qmc.density_roasted[1]),self.qmc.density_roasted[2],encodeLocal(self.qmc.density_roasted[3])]
             profile["roastertype"] = encodeLocal(self.qmc.roastertype)
             profile["roastersize"] = self.qmc.roastersize
+            profile["roasterheating"] = self.qmc.roasterheating
             profile["machinesetup"] = encodeLocal(self.qmc.machinesetup)
             profile["operator"] = encodeLocal(self.qmc.operator)
             profile["organization"] = encodeLocal(self.qmc.organization)
@@ -28976,6 +29007,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.roastertype_setup = toString(settings.value("roastertype_setup",self.qmc.roastertype_setup))
             if settings.contains("roastersize_setup"):
                 self.qmc.roastersize_setup = toFloat(settings.value("roastersize_setup",self.qmc.roastersize_setup))
+            if settings.contains("roasterheating_setup"):
+                self.qmc.roasterheating_setup = toInt(settings.value("roasterheating_setup",self.qmc.roasterheating_setup))
             if settings.contains("drumspeed_setup"):
                 self.qmc.drumspeed_setup = toString(settings.value("drumspeed_setup",self.qmc.drumspeed_setup))
             
@@ -29044,6 +29077,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.operator = self.qmc.operator_setup
             self.qmc.roastertype = self.qmc.roastertype_setup
             self.qmc.roastersize = self.qmc.roastersize_setup
+            self.qmc.roasterheating = self.qmc.roasterheating_setup
             self.qmc.drumspeed = self.qmc.drumspeed_setup
             #
             if settings.contains("machinesetup"):
@@ -30400,6 +30434,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("operator_setup",self.qmc.operator_setup)
             settings.setValue("roastertype_setup",self.qmc.roastertype_setup)
             settings.setValue("roastersize_setup",self.qmc.roastersize_setup)
+            settings.setValue("roasterheating_setup",self.qmc.roasterheating_setup)
             settings.setValue("drumspeed_setup",self.qmc.drumspeed_setup)
             
             settings.beginGroup("EnergyUse")

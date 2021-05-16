@@ -1672,6 +1672,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.operator_setup = self.setup_ui.lineEditOperator.text()
         self.aw.qmc.roastertype_setup = self.setup_ui.lineEditMachine.text()
         self.aw.qmc.roastersize_setup = self.setup_ui.doubleSpinBoxRoasterSize.value()
+        self.aw.qmc.roasterheating_setup = self.setup_ui.comboBoxHeating.currentIndex()
         self.aw.qmc.drumspeed_setup = self.setup_ui.lineEditDrumSpeed.text()
     
     pyqtSlot(bool)
@@ -1681,6 +1682,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.setup_ui.lineEditOperator.setText(self.aw.qmc.operator_setup)
         self.setup_ui.lineEditMachine.setText(self.aw.qmc.roastertype_setup)
         self.setup_ui.doubleSpinBoxRoasterSize.setValue(self.aw.qmc.roastersize_setup)
+        self.setup_ui.comboBoxHeating.setCurrentIndex(self.aw.qmc.roasterheating_setup)
         self.setup_ui.lineEditDrumSpeed.setText(self.aw.qmc.drumspeed_setup)
     
     def enableBatchEdit(self):
@@ -3529,8 +3531,12 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.setup_ui.doubleSpinBoxRoasterSize.setToolTip(QApplication.translate("Tooltip", "The maximum nominal batch size of the machine in kg",None))
             self.setup_ui.labelOrganization.setText(QApplication.translate("Label", "Organization",None))
             self.setup_ui.labelOperator.setText(QApplication.translate("Label", "Operator",None))
-            self.setup_ui.labelMachine.setText(QApplication.translate("Label", "Machine",None))
+            self.setup_ui.groupBoxMachine.setTitle(QApplication.translate("Label", "Machine",None))
+            self.setup_ui.labelMachine.setText(QApplication.translate("Label", "Model",None))
+            self.setup_ui.labelHeating.setText(QApplication.translate("Label", "Heating",None))
             self.setup_ui.labelDrumSpeed.setText(QApplication.translate("Label", "Drum Speed",None))
+            # popuplate comboBox
+            self.setup_ui.comboBoxHeating.addItems(self.aw.qmc.heating_types)
             # hack to access the Qt automatic translation of the RestoreDefaults button
             db = QDialogButtonBox(QDialogButtonBox.RestoreDefaults)
             defaults_button_text_translated = db.button(QDialogButtonBox.RestoreDefaults).text()
@@ -3544,6 +3550,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.setup_ui.lineEditOperator.setText(self.aw.qmc.operator)
             self.setup_ui.lineEditMachine.setText(self.aw.qmc.roastertype)
             self.setup_ui.doubleSpinBoxRoasterSize.setValue(self.aw.qmc.roastersize)
+            self.setup_ui.comboBoxHeating.setCurrentIndex(self.aw.qmc.roasterheating)
             self.setup_ui.lineEditDrumSpeed.setText(self.aw.qmc.drumspeed)
             # connect button signals
             self.setup_ui.SetDefaults.clicked.connect(self.SetupSetDefaults)
@@ -4698,6 +4705,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.operator = self.setup_ui.lineEditOperator.text()
             self.aw.qmc.roastertype = self.setup_ui.lineEditMachine.text()
             self.aw.qmc.roastersize = self.setup_ui.doubleSpinBoxRoasterSize.value()
+            self.aw.qmc.roasterheating = self.setup_ui.comboBoxHeating.currentIndex()
             self.aw.qmc.drumspeed = self.setup_ui.lineEditDrumSpeed.text()
         #update notes
         self.aw.qmc.roastingnotes = self.roastingeditor.toPlainText()

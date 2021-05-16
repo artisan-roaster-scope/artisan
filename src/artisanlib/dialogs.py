@@ -23,6 +23,8 @@ from PyQt5.QtWidgets import (QApplication, QAction, QDialog, QMessageBox, QDialo
             QHBoxLayout, QVBoxLayout, QLabel, QLineEdit)
 from PyQt5.QtGui import QKeySequence
 
+from artisanlib.widgets import MyQComboBox
+
 class ArtisanDialog(QDialog):
     def __init__(self, parent=None, aw = None):
         super(ArtisanDialog,self).__init__(parent)
@@ -181,3 +183,31 @@ class ArtisanInputDialog(ArtisanDialog):
         urls = event.mimeData().urls()
         if urls and len(urls)>0:
             self.inputLine.setText(urls[0].toString())
+
+class ArtisanComboBoxDialog(ArtisanDialog):
+    def __init__(self, parent = None, aw = None, title="",label="",choices=[],default=-1):
+        super(ArtisanComboBoxDialog,self).__init__(parent, aw)
+        
+        self.idx = None
+        
+        self.setWindowTitle(title) 
+        self.setModal(True)
+        label = QLabel(label)
+        self.comboBox = MyQComboBox()
+        self.comboBox.addItems(choices)
+        self.comboBox.setCurrentIndex(default)
+        layout = QVBoxLayout()
+        layout.addWidget(label)
+        layout.addWidget(self.comboBox)
+        layout.addWidget(self.dialogbuttons)
+        self.setLayout(layout)
+        self.setFixedHeight(self.sizeHint().height())
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.rejected.connect(self.reject)
+        self.dialogbuttons.accepted.connect(self.accept)
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+    
+    @pyqtSlot()
+    def accept(self):
+        self.idx = self.comboBox.currentIndex()
+        QDialog.accept(self)

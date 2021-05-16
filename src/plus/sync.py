@@ -475,6 +475,9 @@ def applyServerUpdates(data):
         if "roastersize" in data and data["roastersize"] != aw.qmc.roastersize:
             aw.qmc.roastersize = data["roastersize"]
             dirty = True
+        if "roasterheating" in data and data["roasterheating"] != aw.qmc.roasterheating:
+            aw.qmc.roasterheating = data["roasterheating"]
+            dirty = True
         setSyncRecordHash() # here the sync record is taken form the profiles data after application of the recieved server updates
         # not that this sync record does not contain null values not transferred for attributes from the server side
         # to fix this, we will update that sync record with all attributes not in the server data set to null values

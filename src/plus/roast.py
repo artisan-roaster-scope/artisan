@@ -103,6 +103,11 @@ def getTemplate(bp):
                 util.addNum2dict(bp,"roastersize",d,"roastersize",0,999,1)
         except Exception as e:
             config.logger.info("roast: Exception in getTemplate() %s",e)
+        try:
+            if "roasterheating" in bp and bp["roasterheating"] is not None and bp["roasterheating"] != 0:
+                util.addNum2dict(bp,"roasterheating",d,"roasterheating",0,999,0)
+        except Exception as e:
+            config.logger.info("roast: Exception in getTemplate() %s",e)
         
         try:
             util.addNum2dict(bp,"whole_color",d,"whole_color",0,255,0)
@@ -305,6 +310,7 @@ sync_record_zero_supressed_attributes = [
             "pressure",
             "humidity",
             "roastersize",
+            "roasterheating",
             ### Energy data
             # energy consumption by source type in BTU
             "BTU_ELEC",
