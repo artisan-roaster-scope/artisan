@@ -12,7 +12,7 @@ author_profile: true
 ---
 # How to Subscribe to Artisan Discussions
 
-Artisan has established a Discussions page on Github where users can ask questions and the community can participate in answering.  This is the preferred method for getting help.  Unlike a traditional mailing list you can choose how you want to see and follow posts.
+Artisan has established a [Discussions page](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} on [GitHub](https://github.com/){:target="_blank"} where users can ask questions and the community can participate in answering.  This is the preferred method for getting help.  Unlike a traditional mailing list you can choose how you want to see and follow posts.
 
 ### Pull method
 
@@ -24,7 +24,7 @@ Receive notifications when new posts are made to the Discussions page.  You must
 
 ## Subscribe to Notifications
 
-To manage your notificatinon settings you must have a Github account and be signed in.  Go to the Artisan Discussions page.  Click on the "Watch" button.  Then click "Custom".
+To manage your notificatinon settings you must have a Github account and be signed in.  Go to the [Artisan Discussions page](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"}.  Click on the "Watch" button.  Then click "Custom".
 
 ![sub_disc_1](/assets/images/sub_disc_1.png)
 
