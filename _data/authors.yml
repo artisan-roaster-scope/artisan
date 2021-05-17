@@ -20,6 +20,10 @@ Michael Herbert:
     - label: "carefreebuzzbuzz.com"
       icon: "fas fa-fw fa-link"
       url: "https://carefreebuzzbuzz.com"
+    - label: "Instagram"
+      icon: "fab fa-fw fa-instagram"
+      url: "https://instagram.com/carefreebuzzbuzz/"
+
 
 Dave Baxter:
   name     : "Dave Baxter"
