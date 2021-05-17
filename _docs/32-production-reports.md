@@ -4,11 +4,13 @@ permalink: /docs/production-reports/
 excerpt: ""
 last_modified_at: 2018-05-15T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Production Reports
 
-Menu>File>Report>Batches
+Menu: `File` >> `Report` >> `Batches`
 
 These can be saved in web,csv or excel format.
 

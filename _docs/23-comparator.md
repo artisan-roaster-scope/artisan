@@ -4,11 +4,13 @@ permalink: /docs/comparator/
 excerpt: ""
 last_modified_at: 2020-04-29T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Roast Comparator
 
-*Menu>Tools>Comparator*
+Menu: `Tools` >> `Comparator`
 
 The Comparator allows the roaster to compare profiles dynamically while Ranking Reports is static.  The [Ranking Reports](https://artisan-scope.org/docs/ranking-reports/) function has sortable tables with the key data points of the selected roasts, and a chart of all selected profiles. With the Comparator you can add and remove curves in real time, realign based on a different roasting event such as charge or dry end. The Comparator is most useful to compare curves from roasting similar of identical beans from one crop or mulitple crops. It is not great for comparing a natural Ethiopia to a washed Colombia!
 

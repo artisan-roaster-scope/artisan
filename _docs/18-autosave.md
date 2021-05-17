@@ -4,11 +4,13 @@ permalink: /docs/autosave/
 excerpt: ""
 last_modified_at: 2020-10-05T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Autosave
 
-Menu>Config>Autosave
+Menu: `Config` >> `Autosave`
 
 Pick and prefix and directory and choose to include a PDF or not.  You might want to consider a directory structure based upon coffee origin, roasting date or something else.  Many people save their profiles to a cloud drive so they can access them from multiple machines.
 

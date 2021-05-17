@@ -6,10 +6,9 @@ header:
   image: /assets/images/teaser-small.jpg
 title: "About"
 toc: true
+toc_sticky: true
 toc_label: "On this page"
 toc_icon: "cog"
-featurerequest:
-  - excerpt: '[Request a Feature](https://github.com/artisan-roaster-scope/artisan/issues){: .btn .btn--success .btn--large}{:target="_blank"}'
 gallery_main:
   - url: https://artisan.plus/
     image_path: /assets/images/artisan-plus.jpg
@@ -65,7 +64,6 @@ gallery:
     alt: "Has Garanti"
     title: "Has Garanti"
 
-
 ---
 
 
@@ -107,19 +105,20 @@ There are also experimental builds for the Raspberry Pi platform.
 - [user defined buttons and sliders](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target="_blank"} with programable actions
 - many import and export formats like Aillio Roastime, Cropster XLS, Giesen CSV, IKAWA CSV, Probat Pilot, RoastLogger, RoastLog, RoastPath,..
 
-{% include feature_row id="featurerequest" type="center" %}
+[Request a Feature](https://github.com/artisan-roaster-scope/artisan/issues){: .btn .btn--success .btn--large}{:target="_blank"}
 
+  
 ## Cast
 
 __Rafael Cobo__ –– brain behind the project
 
-__Marko Luther__ –– current maintainer
+__Marko Luther__ –– maintainer
 
-__Dave Baxter__ –– design wizard
+__Dave Baxter__ –– design wizard & genious
 
 __Rui Paulo__ –– Aillio master & CI
 
-__Michael Herbert__ –– documentation & testing
+__Michael Herbert__ –– documentation & fundraising
 
 __Brett Pound__ –– support
 
@@ -163,5 +162,5 @@ Artisan builds on a large number of excellent open-source software.
 
 ## License
 
-Artisan is developed and distributed under the [GPLv3.0 License](http://www.gnu.org/copyleft/gpl.html)
+Artisan is developed and distributed under the [GPLv3.0 License](http://www.gnu.org/copyleft/gpl.html). All its documentation (in part available on this site) under the [GFDLv1.3 License](https://www.gnu.org/licenses/fdl-1.3.en.html).
 

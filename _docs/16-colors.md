@@ -4,11 +4,13 @@ permalink: /docs/colors/
 excerpt: ""
 last_modified_at: 2019-11-20T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Colors and Color Themes
 
-Menu>Config>Colors
+Menu: `Config` >> `Colors`
 
 Almost every color used in Artisan can now be configured.  All these colors are saved in themes.  If your foreground and background colors are too similar you will get a message to check them out.  
 

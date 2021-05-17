@@ -6,7 +6,9 @@ header:
   image: /assets/images/teaser-small.jpg
 title: "HELP"
 toc: true
-toc_sticky: false
+toc_sticky: true
+author: Marko Luther
+author_profile: true
 
 ---
 If you need support please check the [documentation](#documentation) or ask the [community](#Community) for help. We also composed a list of [reoccuring questions with answers (FAQ)](#FAQ) below. In case your problem is more specific and you might need to consult a specialist. Why not [book a video session with Marko](https://shop.artisan.plus/en/consulting/video-conference){:target="_blank"}?
@@ -17,6 +19,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 * [Artisan app](https://github.com/artisan-roaster-scope/artisan){:target="_blank"}
    - Tooltips (hover over elements)
    - Help pages (click the help buttons in dialogs like devices, ports, events, alarms, ..)
+   - Keyboard shortcuts page (menu `Help` >> `Keyboard Shortcuts`)
 * [Quick-Start Guide](/docs/quick-start-guide/)
 * [Artisan Blog](https://artisan-roasterscope.blogspot.com/){:target="_blank"}
    - use the search field to find topics
@@ -26,8 +29,8 @@ If you need support please check the [documentation](#documentation) or ask the 
 <a name="Community"></a>
 ## Community
 
-- [Artisan Discussion Forum](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} (preferred)
-- [Artisan Mailing List](https://lists.einfachkaffee.de/postorius/lists/artisan-user.lists.einfachkaffee.de/){:target="_blank"} (subscription required)
+- [Artisan Discussion Forum](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} (technical discussions and support; [Github registration required](/discussions))
+- [Artisan Mailing List](https://lists.einfachkaffee.de/postorius/lists/artisan-user.lists.einfachkaffee.de/){:target="_blank"} (announcements (new versions, documents, seminars,...); subscription required)
 - Public Forums or Facebook Groups (not monitored by the team)
    - [Home-Barista.com](https://www.home-barista.com/roasting/){:target="_blank"}
    - [Homeroasters.org](https://homeroasters.org/){:target="_blank"}
@@ -78,7 +81,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 
 <a name="FAQ-Setup-2"></a>
 **2) Do I lose my settings on upgrading?**  
-: No, the Artisan settings are stored separately from the app on your computer.  For safe keeping can always save your settings to a file using `Help > Save Settings`.
+: No, the Artisan settings are stored separately from the app on your computer.  For safe keeping can always save your settings to a file using `Help` >> `Save Settings`.
 
 <a name="FAQ-Setup-3"></a>
 **3) My LCDs show just `uu` or `-1`**
@@ -86,11 +89,11 @@ If you need support please check the [documentation](#documentation) or ask the 
 
 <a name="FAQ-Setup-4"></a>
 **4) Artisan displays readings in Celsius, but I would like to work in Fahrenheit. Is there a way to switch that on Artisan?** 
-: You can switch the unit used to display temperature readings in menu `Config >> Temperature`
+: You can switch the unit used to display temperature readings in menu `Config` >> `Temperature`
 
 <a name="FAQ-Setup-5"></a>
 **5) The annotations on the Artisan graph are too small too read? How can I enlarge them?**
-: You can adjust the DPI size (and font) used by the graph in the UI tab of the Curves dialog (menu `Config >> Curves`)s
+: You can adjust the DPI size (and font) used by the graph in the UI tab of the Curves dialog (menu `Config` >> `Curves`)
 
 <a name="FAQ-Setup-6"></a>
 **6) How many devices does Artisan support?**  
@@ -98,7 +101,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 
 <a name="FAQ-Setup-7"></a>
 **7) Can I swap ET and BT without changing the wires?**  
-: Under menu `Config > Curves`, tab `Filter`, check the box `ET<->BT`
+: Under menu `Config` >> `Curves`, tab `Filter`, check the box `ET<->BT`
 
 <a name="FAQ-Setup-8"></a>
 **8) My Artisan does not have an ON button?**  
@@ -106,7 +109,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 
 <a name="FAQ-Setup-9"></a>
 **9) There is a delta between the Artisan readings and those displayed on my machine. How to fix this?**  
-: Maybe Artisan is set to display readings in Fahrenheit while your machine displays them in Centigrade (check menu `Config >> Temperature`). The differences can also result from a misconfiguration (wrong device temperature unit set in the MODBUS tab or wrong thermocouple type specified in the Phidget tab). Often it is just caused by the differences in the exact time the readings were taken or in the post processing on the readings (filtering, smoothing, rounding, averaging, ..). The reading displayed on the machine could be taken from a probe in another location than the one forwarding the signal to Artisan. Note that even the two probes fitted in dual-probes often report slightly different values due to differences in the positioning inside the shared shield. You can add a [symbolic formula](https://artisan-roasterscope.blogspot.com/2019/11/symbolic-formulas-basics-new-variables.html){:target="_blank"} to compensate for this effect. Thus often a simple offset will only work on one end of the temperature range. In that case your symbolic formula need to encode a linear or even quadratic mapping.
+: Maybe Artisan is set to display readings in Fahrenheit while your machine displays them in Centigrade (check menu `Config` >> `Temperature`). The differences can also result from a misconfiguration (wrong device temperature unit set in the MODBUS tab or wrong thermocouple type specified in the Phidget tab). Often it is just caused by the differences in the exact time the readings were taken or in the post processing on the readings (filtering, smoothing, rounding, averaging, ..). The reading displayed on the machine could be taken from a probe in another location than the one forwarding the signal to Artisan. Note that even the two probes fitted in dual-probes often report slightly different values due to differences in the positioning inside the shared shield. You can add a [symbolic formula](https://artisan-roasterscope.blogspot.com/2019/11/symbolic-formulas-basics-new-variables.html){:target="_blank"} to compensate for this effect. Thus often a simple offset will only work on one end of the temperature range. In that case your symbolic formula need to encode a linear or even quadratic mapping.
 
 
 
@@ -127,7 +130,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 
 <a name="FAQ-Recording-3"></a>
 **3) I roast the same coffees at the same batch size regularly. Can I define templates for those roast properties?** 
-: Yes. The roast properties can be saved as [Recent Roast Property](https://artisan-roasterscope.blogspot.com/2017/06/recent-roast-properties.html){:target="_blank"} by pressing the + button. Such roast properties can be recalled via the roast properties title popup or by selecting the corresponding item under the menu `File >> New`. Holding the option key while selecting an entry sets the properties without actually starting a new profile recoding.
+: Yes. The roast properties can be saved as [Recent Roast Property](https://artisan-roasterscope.blogspot.com/2017/06/recent-roast-properties.html){:target="_blank"} by pressing the + button. Such roast properties can be recalled via the roast properties title popup or by selecting the corresponding item under the menu `File` >> `New`. Holding the option key while selecting an entry sets the properties without actually starting a new profile recoding.
 
 <a name="FAQ-Recording-4"></a>
 **4) How to automatically repeat a roast profile?**
@@ -139,11 +142,11 @@ If you need support please check the [documentation](#documentation) or ask the 
 
 <a name="FAQ-Recording-6"></a>
 **6) How do I name, organize and save my profiles?**  
-: Under menu `Roast > Roast Properties`, you can choose a name for your profile in the title field.  You can count your roasts using the [Batch Counter](https://artisan-roasterscope.blogspot.com/2015/07/batch-counter.html){:target="_blank"}, and you can use [Autosave](https://artisan-roasterscope.blogspot.com/2017/10/automatic-save.html){:target="_blank"} to automatically save both the Artisan file and rendered version in a format such as a PDF or jpg.  Many people Autosave to a cloud drive so they can access them anywhere.  The Autosave feature gives you [many options for the data included in the filename](https://artisan-roasterscope.blogspot.com/2020/05/autosave-file-naming.html){:target="_blank"}. 
+: Under menu `Roast` >> `Roast Properties`, you can choose a name for your profile in the title field.  You can count your roasts using the [Batch Counter](https://artisan-roasterscope.blogspot.com/2015/07/batch-counter.html){:target="_blank"}, and you can use [Autosave](https://artisan-roasterscope.blogspot.com/2017/10/automatic-save.html){:target="_blank"} to automatically save both the Artisan file and rendered version in a format such as a PDF or jpg.  Many people Autosave to a cloud drive so they can access them anywhere.  The Autosave feature gives you [many options for the data included in the filename](https://artisan-roasterscope.blogspot.com/2020/05/autosave-file-naming.html){:target="_blank"}. 
 
 <a name="FAQ-Recording-7"></a>
 **7) I can not see the rate-of-rise curve during roasting?**  
-: In the upper right of your screen, ON starts reading the Devices. START will begin a roast profile recording the time and temps. After you hit START, wait at least 15 seconds (5 samples x 3sec default rate), you need to drop your beans into the roaster and hit CHARGE (or use Auto CHARGE) to get a ∆BT graph. Using the trier, when you determine you are at Dry End, hit the DRY END button, and do the same for FIRST CRACK START, and DROP. After the roast completes, hit the off button. Congratulations on your first roast. At the end of the roast you hit OFF to stop the recording. When you hit RESET, the current profile and background profile are removed and Artisan is reset to be ready for a new roast. You don’t have to RESET after every roast.
+: In the upper right of your screen, `ON` starts reading the Devices. `START` will begin a roast profile recording the time and temps. After you hit `START`, wait at least 15 seconds (5 samples x 3sec default rate), you need to drop your beans into the roaster and hit `CHARGE` (or use `Auto CHARGE`) to get a ∆BT graph. Using the trier, when you determine you are at Dry End, hit the `DRY END` button, and do the same for `FC START`, and `DROP`. After the roast completes, hit the off button. Congratulations on your first roast. At the end of the roast you hit `OFF` to stop the recording. When you hit `RESET`, the current profile and background profile are removed and Artisan is reset to be ready for a new roast. You don’t have to `RESET` after every roast.
 
 <a name="FAQ-Recording-8"></a>
 **8) How can I get the rate-of-rise in F/30sec?** 
@@ -159,11 +162,11 @@ If you need support please check the [documentation](#documentation) or ask the 
 
 <a name="FAQ-Recording-11"></a>
 **11) How do I record my gas and air changes?**  
-: Events can be entered via [custom event buttons, event sliders, the generic event button, the mini event editor, a point-and-click action](https://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target="_blank"}, or automatically via [event quantifiers](https://artisan-roasterscope.blogspot.de/2014/04/event-quantifiers.html){:target="_blank"} monitoring the readings reported by a connected device. You create Buttons or Sliders under `Config > Events, and choose a way to display them.  More advanced displays can be created using [Event Annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html){:target="_blank"}. Event buttons can be ["relative"](https://artisan-roasterscope.blogspot.de/2015/10/increasing-heat.html), [sliders as well as event buttons can trigger actions](https://artisan-roasterscope.blogspot.de/2016/08/fz-94-4-taking-control.html){:target="_blank"} and [events can be replayed automatically](https://artisan-roasterscope.blogspot.com/2017/10/profile-templates.html){:target="_blank"}.
+: Events can be entered via [custom event buttons, event sliders, the generic event button, the mini event editor, a point-and-click action](https://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target="_blank"}, or automatically via [event quantifiers](https://artisan-roasterscope.blogspot.de/2014/04/event-quantifiers.html){:target="_blank"} monitoring the readings reported by a connected device. You create Buttons or Sliders under `Config` >> `Events, and choose a way to display them.  More advanced displays can be created using [Event Annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html){:target="_blank"}. Event buttons can be ["relative"](https://artisan-roasterscope.blogspot.de/2015/10/increasing-heat.html), [sliders as well as event buttons can trigger actions](https://artisan-roasterscope.blogspot.de/2016/08/fz-94-4-taking-control.html){:target="_blank"} and [events can be replayed automatically](https://artisan-roasterscope.blogspot.com/2017/10/profile-templates.html){:target="_blank"}.
 
 <a name="FAQ-Recording-12"></a>
 **12) How do I set the default values for special events when I start my roast?**  
-: For event types with visible event slider corresponding event marks at the current slider position are set at CHARGE automatically. For other event types you can instruct any of the default buttons (like ON, CHARGE, ..) under [`Config > Events`](/docs/events/) on the first tab, to trigger custom event buttons by selecting the `Multiple Event` button action and enter the custom event button numbers to be triggered in the following text field, separated by a comma.
+: For event types with visible event slider corresponding event marks at the current slider position are set at CHARGE automatically. For other event types you can instruct any of the default buttons (like ON, CHARGE, ..) under [`Config` >> `Events`](/docs/events/) on the first tab, to trigger custom event buttons by selecting the `Multiple Event` button action and enter the custom event button numbers to be triggered in the following text field, separated by a comma.
 
 
 
@@ -193,4 +196,4 @@ If you need support please check the [documentation](#documentation) or ask the 
 
 <a name="FAQ-Viewing-5	"></a>
 **5) Can I change which curve is drawn on top?** 
-: The drawing order of curves is fixed and follows the order of the LCDs. However, the order of the ET/BT LCDs can be swapped in the Device Assignment dialog (menu `Config > Device`) and the order of the RoR LCDs can be swapped in the Curves dialog (menu `Config > Curves`, first tab). Besides this you can hide curves temporarily by a click to their legend entry (activate the legend in the Axis dialog accessible via menu `Config > Axis`) to see what is behind.
+: The drawing order of curves is fixed and follows the order of the LCDs. However, the order of the ET/BT LCDs can be swapped in the Device Assignment dialog (menu `Config` >> `Device`) and the order of the RoR LCDs can be swapped in the Curves dialog (menu `Config` >> `Curves`, first tab). Besides this you can hide curves temporarily by a click to their legend entry (activate the legend in the Axis dialog accessible via menu `Config` >> `Axis`) to see what is behind.

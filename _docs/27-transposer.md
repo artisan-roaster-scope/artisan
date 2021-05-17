@@ -4,15 +4,17 @@ permalink: /docs/transposer/
 excerpt: ""
 last_modified_at: 2020-04-29T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Profile Transposer
 
-*Menu>Tools>Transposer*
+Menu: `Tools` >> `Transposer`
 
 Comparing profiles recorded on different machines is a challenge as the heat and air dynamics differ on roasting machines.  There are some points in a roast that can be identified based on physical changes, like the yellow point (DRY) and the start of first-crack (FCs) that can be compared and used to construct a mapping from profiles recorded on one machine to those on another machine. The profile transposer is a tool that supports the construction and application of such mappings along the temperature axis, but also along the time axis e.g. extend or compress a profile.
 
-Menu> Tools > Transposer allows you to transpose the current loaded profile (source) along the x-axis (time) and y-axis (temperature) to create a new bean temperature profile and apply it if you wish.  In both cases, the mapping between the source and the resulting target profile is constructed from a set of value pairs. Each such pair holds a source value taken from the currently loaded profile and its intended target value as entered in the profile transposer dialog. Value pairs are taken from the key points in the roast, which are CHARGE, DRY END (yellow point), FC START (first-crack start), SC START (second-crack start) and DROP.
+Menu `Tools` >> `Transposer` allows you to transpose the current loaded profile (source) along the x-axis (time) and y-axis (temperature) to create a new bean temperature profile and apply it if you wish.  In both cases, the mapping between the source and the resulting target profile is constructed from a set of value pairs. Each such pair holds a source value taken from the currently loaded profile and its intended target value as entered in the profile transposer dialog. Value pairs are taken from the key points in the roast, which are CHARGE, DRY END (yellow point), FC START (first-crack start), SC START (second-crack start) and DROP.
 
 **Profile Transposer Dialog**
 
@@ -32,11 +34,11 @@ A click on a target row header on any of the tables clears all its target values
 "Cancel" reverts also to the original profile closes the dialog box.
 “OK" creates a new profile by applying the mapping to the loaded profile and closed the dialog box.
 
-**Original Roast** – Below you see an original roast.  Note that you may wish to turn off events (Config>Events>Markers – deselect your option).    Transposer will not tell you how to change your gas air, but it will tell you a proposed new charge temperature if you change any of the BT temps.  
+**Original Roast** – Below you see an original roast.  Note that you may wish to turn off events (menu `Config` >> `Events`, `Markers` – deselect your option).    Transposer will not tell you how to change your gas air, but it will tell you a proposed new charge temperature if you change any of the BT temps.  
 
 ![Transposer Original](/assets/images/gsg/Transposer original.jpg)
 
-**Background Roasts** – After you have used Transposer, you can go to Roast>Switch Profiles, select Save the profile, and it will load into as a background roast.  Remember to turn Events back on before you start roasting.  
+**Background Roasts** – After you have used Transposer, you can go to `Roast` >> `Switch Profiles`, select Save the profile, and it will load into as a background roast.  Remember to turn Events back on before you start roasting.  
 
 **Changing the Phases**  - let’s say you want to change the times or percentages of your phases, enter the new ones in the target boxes.  You will get new targets to hit, but Transposer will not tell you how to get there with air and gas changes.  This is important to note, and you probably want to screenshot and print the dialog box results so you can plan how you will the new time targets.  
 

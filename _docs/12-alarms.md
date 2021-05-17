@@ -3,12 +3,13 @@ title: "Alarms"
 permalink: /docs/alarms/
 excerpt: ""
 last_modified_at: 2019-01-03T15:59:00-04:00
-
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Alarms - Purpose
 
-Menu>Config>Alarms
+Menu: `Config` >> `Alarms`
 
 Alarms are for intermediate and advanced users.  Beginners should be aware they exist and as you gain experience with Artisan come back here and learn more about how powerful they can be as, you can even control the roaster with Alarms.
 
@@ -27,7 +28,7 @@ If you want to load Alarms from a profile (.alog file) check Load from Profile, 
 
 ### Create Alarms from a Profile
 
-If you have a previous roast loaded that contains some (custom) events, you open its event table (menu Roast >> Properties; 3rd tab Events) you can turn the list of events listed there into alarms by clicking "Create Alarms".
+If you have a previous roast loaded that contains some (custom) events, you open its event table (menu `Roast` >> `Properties`; 3rd tab `Events`) you can turn the list of events listed there into alarms by clicking "Create Alarms".
 
 The "Create Alarms" action takes all SELECTED events listed in the table.  If NO events are  selected it takes all of them and turns each of them into an alarm rule. Make sure you check what is selected on on your screen.  Note that you can use the standard modifier keys on your operating system to achieve multi-selections (e.g. the command/apple key on macOS) and further note that other tables within Artisan behave in a similar way.
 
@@ -87,7 +88,7 @@ Some things to remember
 
 ### Always On
 
-For those automating their roasting, Artisan can turn back on automatically after terminating a recording. This is especially useful if one uses Alarms to control sessions with a sequence of roasts. So you might have configured an alarm that triggers the OFF action automatically at the end of the first roast, but there is no way to have Artisan turned ON again via Alarms as alarms are not processed while not sampling.  In Artisan v1.4 you can tick the Keep ON flag in the "Sampling Interval" dialog (menu Config >> Sampling Interval) to have Artisan turn itself on automatically after it received an OFF signal while recording. If there is unsaved data Artisan will still ask you to save that before doing a reset and running the ON action.
+For those automating their roasting, Artisan can turn back on automatically after terminating a recording. This is especially useful if one uses Alarms to control sessions with a sequence of roasts. So you might have configured an alarm that triggers the OFF action automatically at the end of the first roast, but there is no way to have Artisan turned ON again via Alarms as alarms are not processed while not sampling.  In Artisan v1.4 you can tick the Keep ON flag in the "Sampling Interval" dialog (menu `Config` >> `Sampling Interval`) to have Artisan turn itself on automatically after it received an OFF signal while recording. If there is unsaved data Artisan will still ask you to save that before doing a reset and running the ON action.
 
 ### Other Videos and Resources
 

@@ -4,11 +4,13 @@ permalink: /docs/phases/
 excerpt: ""
 last_modified_at: 2018-05-15T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Phases
 
-Menu>Config>Phases
+Menu: `Config` >> `Phases`
 
 Often roasters identify distinct roast phases.
 
@@ -18,7 +20,7 @@ Often roasters identify distinct roast phases.
 
 Artisan marks the drying phase in green, the Maillard phase in yellow and the finishing phase in brown.  By checking Watermark, you can choose to have Artisan automatically mark phases with a watermark on the graph with time and temp.  Checking the Watermarks and Phases LCD is essential.  The Phases are shown at the end of the roast on your graph depending on your choices under [Statistics](https://artisan-scope.org/docs/statistics/).
 
-In the Phases Dialog (menu Config >> Phases) you can set the temperature limits of each phase.  At the same time it is now possible in the Roast Phases dialog to define the display mode (Time, Percentage or Temperature - explained below) to be used on entering any of the three phases.
+In the Phases Dialog (menu `Config` >> `Phases`) you can set the temperature limits of each phase.  At the same time it is now possible in the Roast Phases dialog to define the display mode (Time, Percentage or Temperature - explained below) to be used on entering any of the three phases.
 
 ![phases dialog](/assets/images/gsg/phases new dialog 14.png)
 

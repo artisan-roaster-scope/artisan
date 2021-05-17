@@ -1,0 +1,28 @@
+Marko Luther:
+  name     : "Marko Luther"
+  avatar   : "/assets/images/MarkoLuther.jpg"
+  bio      : "maintainer"
+  location : "Germany"
+  links:
+    - label: "artisan.plus"
+      icon: "fas fa-fw fa-link"
+      url: "https://artisan.plus"
+    - label: "Facebook"
+      icon: "fab fa-fw fa-facebook-square"
+      url: "https://www.facebook.com/marko.luther/"
+
+Michael Herbert:
+  name     : "Michael Herbert"
+  avatar   : "/assets/images/MichaelHerbert.jpeg"
+  bio      : "documentation"
+  location : "CO, USA"
+  links:
+    - label: "carefreebuzzbuzz.com"
+      icon: "fas fa-fw fa-link"
+      url: "https://carefreebuzzbuzz.com"
+
+Dave Baxter:
+  name     : "Dave Baxter"
+  avatar   : "/assets/images/DaveBaxter.png"
+  bio      : "genious"
+  location : "SF, USA"

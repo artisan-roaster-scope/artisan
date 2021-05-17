@@ -4,11 +4,13 @@ permalink: /docs/axes/
 excerpt: ""
 last_modified_at: 2018-05-15T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Axes
 
-Menu>Config>Axes
+Menu: `Config` >> `Axes`
 
 ![cofig axes](/assets/images/gsg/axes dialog.png)
 

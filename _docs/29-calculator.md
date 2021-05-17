@@ -4,11 +4,13 @@ permalink: /docs/calculator/
 excerpt: ""
 last_modified_at: 2018-05-15T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Calculator
 
-*Menu>Tools>Calculator*
+Menu: `Tools` >> `Calculator`
 
 You will find a few useful calculators.  Enter the variables you know, and click in the box of the variable you wish to know and the calculator will populate that value.  
 

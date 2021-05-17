@@ -4,22 +4,24 @@ permalink: /docs/events/
 excerpt: ""
 last_modified_at: 2020-04-30T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Events
 
-Menu>Config>Events
+Menu: `Config` >> `Events`
 
 Creating Events allows you to record data to be shown on your roast graph with either Buttons or Sliders.  You can have multiple labeled sets of Events and manage them in the tab labelled Pallettes in the Events dialog box. Only Button defintions from the Buttons tab are saved in these pallettes.  Events allow recording of data into your roast profile and when used with Alarms allow for automation of the roasting process.  
 
 Artisan’s standard buttons are as follows:
 ![Artisan buttons](/assets/images/gsg/standard buttons.png)
 
-The buttons above contain key time points in your roast and after using the trier in the roaster, you would push the button when the event occurs. The buttons table can down be downloaded using the Copy Table button. Pushing these buttons during a roast will add data to your roast log.  You can find the data under Roast>Properties>Data tab.  The Data and Events tabs can be downloaded using the Copy Table button on those dialogs.  You can change the button sizes - tiny, small and large.  
+The buttons above contain key time points in your roast and after using the trier in the roaster, you would push the button when the event occurs. The buttons table can down be downloaded using the Copy Table button. Pushing these buttons during a roast will add data to your roast log.  You can find the data under `Roast` >> `Properties`, `Data` tab.  The Data and Events tabs can be downloaded using the Copy Table button on those dialogs.  You can change the button sizes - tiny, small and large.  
 
 ![button sizes](/assets/images/gsg/buttton sizes.png)
 
-Sliders can be used to create Events as well.   The sliders appear on the left side and can be used to input a variable value between 0 and 999. Make sure you check Decimal Places under Curves>UI if you use them.  Your events will be rendered on your graphs (if you have the Events checked on the Sliders tab) with the first letter of the name of the event and two decimal places.  So Gas at a value of 35 would be G35.  Or if you don’t check decimal places G3.  
+Sliders can be used to create Events as well.   The sliders appear on the left side and can be used to input a variable value between 0 and 999. Make sure you check Decimal Places under `Curves` >> `UI` if you use them.  Your events will be rendered on your graphs (if you have the Events checked on the Sliders tab) with the first letter of the name of the event and two decimal places.  So Gas at a value of 35 would be G35.  Or if you don’t check decimal places G3.  
 
 You can define up to four custom Events such as Gas and Airflow. Red buttons are Gas readings on propane and the Blue are Fan settings in the example below.
 ![buttons example](/assets/images/gsg/buttons example.png)
@@ -30,18 +32,18 @@ And here is what a slider looks like. NOTE if you have sliders checked on the co
 ![sliders example](/assets/images/gsg/slider example.png)
 
 
-In order to set up custom events, you need to create Event types, under Config>Events:
+In order to set up custom events, you need to create Event types, under `Config` >> `Events`:
 ![config events](/assets/images/gsg/events config dialog 14.png)
 
-You can label up to 4 event types. You can edit how they work with the tabs Buttons and Sliders.  When you click a button or move a slider Artisan records an event on a scale of 0-999.  You can display these events on your roasting graph.  You may need to set your temperature axis to a low of 0° in order to see these the best.  Config>Axes.  If you check Mini Editor you will be able to add or edit existing events during the roast.  The Mini-Editor will appear below your Buttons.  
+You can label up to 4 event types. You can edit how they work with the tabs Buttons and Sliders.  When you click a button or move a slider Artisan records an event on a scale of 0-999.  You can display these events on your roasting graph.  You may need to set your temperature axis to a low of 0° in order to see these the best.  `Config` >> `Axes`.  If you check Mini Editor you will be able to add or edit existing events during the roast.  The Mini-Editor will appear below your Buttons.  
 
 ![events editor](/assets/images/gsg/events editor.png)
 
 You have the option to render event values or descriptions instead of values.  A value would be for example a gas setting that your have set with a slider so if your event button is Gas and the value is 32 it would render G32.  In that that, case don't check the description box.  If you check the description box, it will describe the event.  For example A3(S0) would mean Alarm event 3, slider 0.  
 
-Use the event button type "--" that creates an event adding labels to the graph rendering its button description.  For those using sliders the rendering will continue to be the first letter of the Event name and two digits of the value IF you check Decimal Places under Config>Curves>UI.  If you don’t it will render only one digit.  
+Use the event button type "--" that creates an event adding labels to the graph rendering its button description.  For those using sliders the rendering will continue to be the first letter of the Event name and two digits of the value IF you check Decimal Places under `Config` >> `Curves`, `UI` tab.  If you don’t it will render only one digit.  
 
-During a roast it is now possible to have Artisan draw a line at the current point in time, which helps to compare the current roast state with that of the template (RoR, background event markers,..). You can activate this feature in the Events dialog (menu Config >> Events) by ticking the flag Show Time Guide.  This helps you see Events you have in your Background roast profile.
+During a roast it is now possible to have Artisan draw a line at the current point in time, which helps to compare the current roast state with that of the template (RoR, background event markers,..). You can activate this feature in the Events dialog (menu `Config` >> `Events`) by ticking the flag Show Time Guide.  This helps you see Events you have in your Background roast profile.
 
 ![time guide](/assets/images/gsg/time guide.gif)
 
@@ -94,7 +96,7 @@ The above screenshot shows the Button Label and Description, Type, Value, Action
 
 
 
-Step and Step+ will have new Annotation options allowing the user to customize the labels that appear on the stair steps.  The user will be able to describe events in plain english with the strings. If your stair steps are too close together there is a setting in the dialog box, Allowed Annotation Overlap, which allows you to not render some the events.  There is also a new setting under Config>Axes called 100% Event Step which adjusts where the stair steps show up on your graph.  Please read the [Artisan Blog post](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html) for more details.
+Step and Step+ will have new Annotation options allowing the user to customize the labels that appear on the stair steps.  The user will be able to describe events in plain english with the strings. If your stair steps are too close together there is a setting in the dialog box, Allowed Annotation Overlap, which allows you to not render some the events.  There is also a new setting under `Config` >> `Axes` called 100% Event Step which adjusts where the stair steps show up on your graph.  Please read the [Artisan Blog post](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html) for more details.
 
 Event Annotations is the last tab in the Events dialog box and offers advanced [display features](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html):
 

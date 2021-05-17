@@ -4,11 +4,13 @@ permalink: /docs/analyzer/
 excerpt: ""
 last_modified_at: 2020-02-14T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Profile Analyzer
 
-*Menu>Tools>Analyzer*
+Menu: `Tools` >> `Analyzer`
 
 
 Roasters often want to analyze their roasts to measure consistency, look for aspects of the profile that can be improved, and to create metrics to score the roast against a set quality measures.  Artisan has many ways to provide information on a roast, including the Statistics Summary, Plotter and Math tabs, AUC (area under the curve), and many others.
@@ -19,7 +21,7 @@ The Analyzer is a combination of several tools to help a roaster Analyze segment
 
 Let's look at an example before going into more detail. The BT curve below is fit to an x² curve.  To simplify things the ET curve is not shown, the background curves are shown in red and have been widened to be more visible.  	 
 
-Note: Use *Config > Colors* to change a curve's color and click the little graph icon on the navigation toolbar to change the width of a curve.
+Note: Use menu `Config` >> `Colors` to change a curve's color and click the little graph icon on the navigation toolbar to change the width of a curve.
  
 ![Analyze1](/assets/images/gsg/Analyze1.png)
 
@@ -29,9 +31,9 @@ Notice that this profile has an existing background curve that will be replaced 
 
 **Note: The first time the Analyzer is run the result boxes will probably be on top of each other and the graph.  Simply drag them to another position, Artisan will remember where you placed them.**
  
-There are several things to notice when the Analyzer finishes.  Two boxes display the results, as explained later.  A grey mask highlights the region over which the curve fit was performed. There is an inner masked area that indicates the interval of interest over which all the metrics calculations are performed. The start time of each region can be set on the *Config > Curves > Analyze* tab.  The end of both regions is always the DROP time.
+There are several things to notice when the Analyzer finishes.  Two boxes display the results, as explained later.  A grey mask highlights the region over which the curve fit was performed. There is an inner masked area that indicates the interval of interest over which all the metrics calculations are performed. The start time of each region can be set on the `Config` >> `Curves`, `Analyze` tab.  The end of both regions is always the DROP time.
 
-Note: Depending upon the color theme in use, especially for darker themes, the analysis mask areas may be easier to see by unchecking *Config > Phases > Watermarks*.
+Note: Depending upon the color theme in use, especially for darker themes, the analysis mask areas may be easier to see by unchecking `Config` >> `Phases`, `Watermarks`.
 
 The upper box in the screen shot shows a table of curve fit results.  Remember that this example fits the BT to an x² curve.  That means the curve fit RoR will be a straight line.  The MSE BT value is a measure of how closely the profile compares to the linear (straight line) RoR.  A perfect match between the profile BT and the curve fit BT would show a MSE of zero.  Larger numbers indicate a less precise match.  A description of each column is at the end of this page.  
 
@@ -43,7 +45,7 @@ What's a good result using x²:  Under .10 on MSE BT is a very good roast and be
 
 **Segments**
 
-Let's look at another example to see how the analyzer combines segments to make analysis easier.  Segments start and end when the profile RoR crosses the curve fit RoR. Sometimes they are short in duration or small in amplitude.  The Analyzer will automatically combine such segments with the one to the left (earlier) based upon the Analyze Options on the *Config > Curves> Analyze* tab. 
+Let's look at another example to see how the analyzer combines segments to make analysis easier.  Segments start and end when the profile RoR crosses the curve fit RoR. Sometimes they are short in duration or small in amplitude.  The Analyzer will automatically combine such segments with the one to the left (earlier) based upon the Analyze Options on the `Config` >> `Curves`, `Analyze` tab. 
 
 In the example below, which was fit to an x² curve, the BT RoR goes above and below the curve fit RoR several times. 
 
@@ -59,14 +61,14 @@ To see all of the segments set both Analyze Options to zero.  The table below sh
 
 **Auto All**
 
-The Auto All option on the *Tools>Analyze* menu will fit three different curves to the profile BT.  It fits x², x³, and ln() curves.  The x² fit will be displayed in the graph after Auto All has completed.  The curve fit results for all three fit types will be shown in the Curve Fit Analysis box.  The results are sorted in ascending order of MSE BT.  The Segment Analysis box will show results for the x² fit. 
+The Auto All option on the `Tools` >> `Analyze` menu will fit three different curves to the profile BT.  It fits x², x³, and ln() curves.  The x² fit will be displayed in the graph after Auto All has completed.  The curve fit results for all three fit types will be shown in the Curve Fit Analysis box.  The results are sorted in ascending order of MSE BT.  The Segment Analysis box will show results for the x² fit. 
 
 
 **Fit to any chosen background**
 
-The Analyzer can compare the profile BT to any background curve.  Be sure the desired background BT is displayed in the graph and choose "Fit BT to Bkgnd" from the Tools > Analyze menu.
+The Analyzer can compare the profile BT to any background curve.  Be sure the desired background BT is displayed in the graph and choose "Fit BT to Bkgnd" from the `Tools` >> `Analyze` menu.
 
-After you are done with Analyzer you can clear the results by using Tools>Analyze>Clear Results.  You will see the fit curve and not your original background curve.  If you like, you can Switch Profiles under the Roast menu, and save the fit curve to use later as an "ideal" background.   If you want to get the original background curve to show again either reload the profile that includes the background, or directly load a background from Roast>Background>Load.  
+After you are done with Analyzer you can clear the results by using `Tools` >> `Analyze` >> `Clear Results`.  You will see the fit curve and not your original background curve.  If you like, you can Switch Profiles under the Roast menu, and save the fit curve to use later as an "ideal" background.   If you want to get the original background curve to show again either reload the profile that includes the background, or directly load a background from `Roast` >> `Background` >> `Load`.  
 
 
 **Description of the Fields**
@@ -94,7 +96,7 @@ Swing : The difference between the previous segment's Max Delta and this segment
 
 ABC/secs : The Area Between the Curves divided by the number of seconds in the segment.  The Analyzer calculates the area between the BT RoR and the curve fit RoR for each segment and divides that area by segment number of seconds.  This value is indicative of the severity of a rise or crash. The closer to zero the better.
 
-**Optional settings (*Config>Curves>Analyze* tab)**
+**Optional settings (`Config` >> `Curves`, `Analyze` tab)**
  
 **_Curve Fit and Interval of Interest Options_**
 

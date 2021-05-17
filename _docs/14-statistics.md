@@ -4,10 +4,12 @@ permalink: /docs/statistics/
 excerpt: ""
 last_modified_at: 2019-11-20T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 ### Statistics
 
-Menu>Config>Statistics
+Menu: `Config` >> `Statistics`
 
 The statistics of a roast appear post roast on the right side of the screen.  Post roast, the placement and formatting of the statistic summary has been improved to make things more readable.  You can now save the Statistics box to a file so that you can print it for a coffee bag.  The format is PDF on a Mac and .png on Windows.  You can also change the background color and opacity under the Colors settings.  What goes in the box is determined by what you put in Roast Properties dialog as well as batch prefix/number, roast number of the day, ambient data (temp/humidity/pressure),machine name and drum speed. 
 
@@ -19,7 +21,7 @@ These selections allow you to see the three roast phases in the classic Artisan 
 
 ![phases example](/assets/images/gsg/Three Phases.png)
 
-These Phases depend on your settings in Configuration>Phases.  The Characteristics, at the bottom of your graph post roast, show basic information on the roast, like date, time, beans, batch-size, roast-loss, on the x-axis label if you have entered some of this information in Roast>Properties.  Time after First Crack is now shown as a Characteristic at the bottom of the chart.  You have to enter Charge and Drop in order to get statistics which can be either manually via an event button or automatically.   
+These Phases depend on your settings in `Configuration` >> `Phases`.  The Characteristics, at the bottom of your graph post roast, show basic information on the roast, like date, time, beans, batch-size, roast-loss, on the x-axis label if you have entered some of this information in `Roast` >> `Properties`.  Time after First Crack is now shown as a Characteristic at the bottom of the chart.  You have to enter Charge and Drop in order to get statistics which can be either manually via an event button or automatically.   
 
 The Roast Summary shows roast information on the right, post roast: core information on the roast (batch number, title, date, ambient data, machine), information on the green beans (name in two lines, screen size, density, moisture and batch size), and information on the roasted beans (density, moisture, color, AUC, roasting & cupping notes). The transparency and line length can be configured and the content of the statistic summary box can now be exported for printing.  
 
@@ -36,4 +38,4 @@ AUC is “the idea that the area under the temperature curve could be an indicat
 
 Initial users have suggested that using Dry End as a reference point is good because this allows comparison of AUC across different setups to account for the variations of temperatures (and probe placements). The yellow point can easily be observed independent of equipment and the amount of energy "blown" into the beans before DRY might not be too important for the end result.
 
-You can now see your Area Under Curve.  AUC will also be recomputed for ranking reports based on actual AUC settings under Config>Statistics.  This will make AUC very useful in ranking reports.  Generally, AUC is a useful tool to compare roasts of the same bean.  More details can be found [here](https://artisan-roasterscope.blogspot.com/2016/11/area-under-curve-auc.html), and on [Frans Goddijn’s excellent blog](http://kostverlorenvaart.blogspot.com/2016/11/the-area-under-curve.html) and on this [Home Barista thread](https://www.home-barista.com/home-roasting/charting-auc-in-artisan-t46404.html).
+You can now see your Area Under Curve.  AUC will also be recomputed for ranking reports based on actual AUC settings under `Config` >> `Statistics`.  This will make AUC very useful in ranking reports.  Generally, AUC is a useful tool to compare roasts of the same bean.  More details can be found [here](https://artisan-roasterscope.blogspot.com/2016/11/area-under-curve-auc.html), and on [Frans Goddijn’s excellent blog](http://kostverlorenvaart.blogspot.com/2016/11/the-area-under-curve.html) and on this [Home Barista thread](https://www.home-barista.com/home-roasting/charting-auc-in-artisan-t46404.html).

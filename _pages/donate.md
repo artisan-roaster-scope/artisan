@@ -6,6 +6,8 @@ header:
   image: /assets/images/teaser-small.jpg
 title: "Donate"
 toc: false
+author: Marko Luther
+author_profile: true
 
 ---
 

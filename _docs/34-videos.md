@@ -4,6 +4,8 @@ permalink: /docs/videos/
 excerpt: "Tutorial videos provided by the Community"
 last_modified_at: 2018-05-15T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
   * By [Rick Groszkiewicz](https://www.youtube.com/channel/UCrLDJbbG8c6fO1KXjbDTllw)

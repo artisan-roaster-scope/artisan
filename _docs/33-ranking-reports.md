@@ -4,13 +4,15 @@ permalink: /docs/ranking-reports/
 excerpt: ""
 last_modified_at: 2019-11-23T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Ranking Reports
 
-Menu>File>Report>Ranking
+Menu: `File` >> `Report` >> `Ranking`
 
-For comparing your roasts, a great feature is Report>Ranking>.  Ranking reports include extensive roast characteristic data, such as phase times and percentages, and first crack start rate of rise.  
+For comparing your roasts, a great feature is `Report` >> `Ranking`.  Ranking reports include extensive roast characteristic data, such as phase times and percentages, and first crack start rate of rise.  
 
 You can save these reports in a web page format, a CSV or an Excel format.  Use your computers normal method for selecting multiple files at once when the dialog box pops open to load a profile.  One use of this data is to automate making roast cards with the data you want to see.  We keep roast cards with our roasted beans to see what we are drinking.  
 

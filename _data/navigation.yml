@@ -179,8 +179,6 @@ docs:
         url: /docs/setup/
       - title: "Upgrading"
         url: /docs/upgrading/
-      - title: "Community"
-        url: /docs/community/
   - title: Roasting
     children:
       - title: "Properties"

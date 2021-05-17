@@ -4,11 +4,13 @@ permalink: /docs/curves/
 excerpt: ""
 last_modified_at: 2019-11-20T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Curves
 
-Menu>Config>Curves
+Menu: `Config`>> `Curves`
 
 ![config curves](/assets/images/gsg/config curves menu.png)
 
@@ -17,7 +19,7 @@ These are critical settings within Artisan and for most the first two tabs will 
 First you decide which ROR curves and LCD’s you want to display.
 ![curves ror](/assets/images/gsg/curves ror.png)
 
-The order of Delta LCDs can now be swapped too (the BT/ET LCDs can be swapped in the device config menu).The order curves are shown now respects the order of LCDs (from top to bottom). Thus if the DeltaET LCD is shown above the DeltaBT LCD, also the DeltaET curve is drawn above the DeltaBT curve (menu Config >> Curves, 1st tab RoR).    
+The order of Delta LCDs can now be swapped too (the BT/ET LCDs can be swapped in the device config menu).The order curves are shown now respects the order of LCDs (from top to bottom). Thus if the DeltaET LCD is shown above the DeltaBT LCD, also the DeltaET curve is drawn above the DeltaBT curve (menu `Config` >> `Curves`, 1st tab `RoR`).    
 
 Secondly you move to the filters tab to determine how you want the curves to display.  If you want the curves to be the same during and after the roast your settings will be different than if you want additional post roast filtering/smoothing. **These are critical settings so take your time here.  As you adjust the settings, consider if the results allow you to understand and interpret your results so that you can improve taste in the cup.  For some, to much variation in the curves becomes hard to interpret so they turn up the smoothing.**
 
@@ -30,11 +32,11 @@ Secondly you move to the filters tab to determine how you want the curves to dis
 
 **Limits** will allow you to set temp limits on how high or low your curve can go.  This will keep your curves within reasonable ranges.  This setting limits the readings accepted by Artisan to the specified range. Selecting the standard range of expected temperatures during a roast often already eliminates most of the spikes, because meters experiencing electric noise often return very high or very low readings.
 
-**Swapping BT and ET without switching wires** is easy.  If you want to change the readings from the ET and BT probe to swap them, you do that on the filters tab of Curves dialog, by checking the box ET<->BT.
+**Swapping BT and ET without switching wires** is easy.  If you want to change the readings from the ET and BT probe to swap them, you do that on the filters tab of Curves dialog, by checking the box `ET<->BT`.
 
 
 
-IMPORTANT NOTE:  These two filters above are applied directly on the incoming data source before the data is recorded under Roast>Properties>Data tab. Therefore data eliminated by the min-max limit and the drop spikes filter is lost forever. This is in contrast to the other filters that in the remaining sections that work on the internal raw data and their effect is used to improve the visualization.
+IMPORTANT NOTE:  These two filters above are applied directly on the incoming data source before the data is recorded under `Roast` >> `Properties`, `Data` tab. Therefore data eliminated by the min-max limit and the drop spikes filter is lost forever. This is in contrast to the other filters that in the remaining sections that work on the internal raw data and their effect is used to improve the visualization.
 
 *Filtering During the Roast – ROR*
 

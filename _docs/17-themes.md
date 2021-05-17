@@ -4,11 +4,13 @@ permalink: /docs/themes/
 excerpt: ""
 last_modified_at: 2018-05-15T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Color Themes
 
-Menu>Config>Themes
+Menu: `Config` >> `Themes`
 
 ![Theme choices](/assets/images/gsg/Theme choices.png)
 

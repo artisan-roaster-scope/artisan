@@ -4,11 +4,13 @@ permalink: /docs/sampling/
 excerpt: ""
 last_modified_at: 2018-05-15T15:59:00-04:00
 toc: false
+author: Michael Herbert
+author_profile: true
 ---
 
 ### Sampling and Oversampling
 
-Menu>Confg> Sampling Interval
+Menu: `Confg` >> `Sampling Interval`
 
 ![probes meter app](/assets/images/gsg/probes meter app.png)
 
