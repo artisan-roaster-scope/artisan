@@ -6,47 +6,17 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   inkscape:version="1.0beta2 (2b71d25, 2019-12-03)"
-   sodipodi:docname="artisan-logo.svg"
-   width="16.000149mm"
-   height="16.000149mm"
-   viewBox="0 0 16.000149 16.000149"
+   width="11.641666mm"
+   height="11.641666mm"
+   viewBox="0 0 11.641667 11.641667"
    version="1.1"
    id="svg2718">
-  <sodipodi:namedview
-     fit-margin-bottom="0"
-     fit-margin-right="0"
-     fit-margin-left="0"
-     fit-margin-top="0"
-     inkscape:current-layer="svg2718"
-     inkscape:window-maximized="0"
-     inkscape:window-y="378"
-     inkscape:window-x="164"
-     inkscape:cy="114.27969"
-     inkscape:cx="9.6633579"
-     inkscape:zoom="1.3574153"
-     showgrid="false"
-     id="namedview3966"
-     inkscape:window-height="480"
-     inkscape:window-width="1232"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0"
-     guidetolerance="10"
-     gridtolerance="10"
-     objecttolerance="10"
-     borderopacity="1"
-     inkscape:document-rotation="0"
-     bordercolor="#666666"
-     pagecolor="#ffffff" />
   <defs
      id="defs2712">
     <clipPath
        clipPathUnits="userSpaceOnUse"
        id="clipPath4256">
       <path
-         inkscape:connector-curvature="0"
          d="M 0,0 H 1020.472 V 1020.472 H 0 Z"
          id="path4254" />
     </clipPath>
@@ -68,7 +38,6 @@
        clipPathUnits="userSpaceOnUse"
        id="clipPath4282">
       <path
-         inkscape:connector-curvature="0"
          d="M 269.2913,745.5118 H 751.7262 V 243.7795 H 269.2913 Z"
          id="path4280" />
     </clipPath>
@@ -76,7 +45,6 @@
        clipPathUnits="userSpaceOnUse"
        id="clipPath4288">
       <path
-         inkscape:connector-curvature="0"
          d="M 269.2913,243.7795 H 751.7262 V 745.5118 H 269.2913 Z"
          id="path4286" />
     </clipPath>
@@ -95,7 +63,7 @@
   </metadata>
   <g
      id="layer1"
-     transform="matrix(0.26458332,0,0,0.26458332,18.201126,7.000434)">
+     transform="matrix(0.19251015,0,0,0.19251015,13.243093,5.0934979)">
     <g
        id="g4246"
        transform="matrix(0.06108384,0,0,-0.06108384,-69.70792,34.808757)">
@@ -119,7 +87,6 @@
                id="image4264" />
           </g>
           <path
-             inkscape:connector-curvature="0"
              d="m 344.2126,921.2598 h 332.0472 c 135.3098,0 245,-109.6902 245,-245 V 344.2126 c 0,-135.3098 -109.6902,-245 -245,-245 H 344.2126 c -135.3098,0 -245,109.6902 -245,245 v 332.0472 c 0,135.3098 109.6902,245 245,245 z"
              style="fill:#2599c7;fill-opacity:1;fill-rule:nonzero;stroke:none"
              id="path4266" />
@@ -127,7 +94,6 @@
              id="g4268"
              transform="matrix(1,0,0,-1,0,1020.472)">
             <path
-               inkscape:connector-curvature="0"
                d="m 344.2126,99.2126 h 332.0472 c 135.3098,0 245,109.6902 245,245 v 332.0472 c 0,135.3098 -109.6902,245 -245,245 H 344.2126 c -135.3098,0 -245,-109.6902 -245,-245 V 344.2126 c 0,-135.3098 109.6902,-245 245,-245 z"
                style="fill:none;stroke:#2599c7;stroke-width:80;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
                id="path4270" />
@@ -136,7 +102,6 @@
              id="g4272"
              transform="matrix(1,0,0,-1,0,1020.472)">
             <path
-               inkscape:connector-curvature="0"
                d="m 339.5276,59.52757 h 341.4173 c 154.6397,0 280,125.36023 280,280.00003 v 341.4173 c 0,154.6397 -125.3603,280 -280,280 H 339.5276 c -154.6398,0 -280.00003,-125.3603 -280.00003,-280 V 339.5276 c 0,-154.6398 125.36023,-280.00003 280.00003,-280.00003 z"
                style="fill:none;stroke:#2599c7;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
                id="path4274" />
@@ -152,7 +117,6 @@
              id="g4284"
              clip-path="url(#clipPath4288)">
             <path
-               inkscape:connector-curvature="0"
                d="m 510.342,744.0545 c -95.6572,1.2737 -187.1655,-62.7937 -220.2605,-152.2757 -34.2336,-86.3752 -9.8803,-191.5267 58.6448,-254.3204 46.7383,-44.7892 112.3108,-68.0812 176.6869,-64.762 23.5236,-0.0772 50.289,-2.4894 67.6953,16.9624 29.9303,27.4409 17.8694,82.6893 -20.7254,95.2133 -23.3692,6.6383 -48.0891,2.0262 -71.3811,3.9174 -57.4483,2.856 -107.3514,52.7591 -110.2074,110.2074 -5.7313,57.3519 35.6423,114.6458 92.2608,126.1857 55.9239,14.0871 119.0264,-18.101 138.922,-72.5968 12.7363,-31.7249 6.5611,-66.248 7.9891,-99.4974 0.3088,-51.4854 -0.521,-103.8779 0.4632,-154.7651 1.7174,-40.5438 51.7749,-66.9234 86.1435,-45.4454 23.9095,12.2925 31.5127,40.0228 29.4093,64.9744 -0.1544,70.2618 0.3087,140.5815 -0.2316,210.8433 -7.526,66.4795 -41.7596,130.103 -96.4098,169.4504 -39.9456,29.6215 -89.3276,46.0629 -138.9991,45.9085 z"
                style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
                id="path4290" />
