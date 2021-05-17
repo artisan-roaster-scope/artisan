@@ -15,7 +15,7 @@ Michael Herbert:
   name     : "Michael Herbert"
   avatar   : "/assets/images/MichaelHerbert.jpeg"
   bio      : "documentation"
-  location : "CO, USA"
+  location : "AZ, USA"
   links:
     - label: "carefreebuzzbuzz.com"
       icon: "fas fa-fw fa-link"
