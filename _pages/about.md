@@ -116,11 +116,13 @@ __Marko Luther__ –– maintainer
 
 __Dave Baxter__ –– design wizard & genious
 
-__Rui Paulo__ –– Aillio master & CI
-
 __Michael Herbert__ –– documentation & fundraising
 
+__Rui Paulo__ –– Aillio master & CI
+
 __Brett Pound__ –– support
+
+__Frans Goddijn__ –– support
 
 __Dario Ernst__ –– [mailing list](https://lists.einfachkaffee.de/postorius/lists/artisan-user.lists.einfachkaffee.de/){:target="_blank"} hosting
 
