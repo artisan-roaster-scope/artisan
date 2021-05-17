@@ -25,7 +25,7 @@ url                      : "https://artisan-scope.org" # the base hostname & pro
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : "artisan-roaster-scope/artisan" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : "/assets/images/500x300.png" # path of fallback teaser image, e.g. "/assets/images/500x300.png"
-logo                     : "/assets/images/artisan-logo.svg" # path of logo image to 
+logo                     : "/assets/images/artisan-logo.png" # path of logo image to 
 masthead_title           : "artisan" #"artisan.plus" # overrides the website title displayed in the masthead, use " " for no title
 #breadcrumbs            : false # true, false (default)
 words_per_minute         : 200
