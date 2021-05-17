@@ -49,7 +49,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 
 <a name="FAQ-General-1"></a>
 **1) Where do I find support?**  
-: Check the [Quick-Start Guide](/docs/quick-start-guide/) and ask the [community](/docs/community/) for help
+: Check the [Quick-Start Guide](/docs/quick-start-guide/) or start a [discussion](https://artisan-scope.org/discussions/) for help.
 
 <a name="FAQ-General-2"></a>
 **2) How can I support the project?**  
