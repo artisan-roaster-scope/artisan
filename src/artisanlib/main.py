@@ -32859,15 +32859,15 @@ class ApplicationWindow(QMainWindow):
                 volume = self.volume_weight2html(self.qmc.volume[0],self.qmc.volume[1],self.qmc.volume[2],cp["volume_gain"])
             else:
                 volume = "--"
-            if self.qmc.volume[0] != 0.0 and self.qmc.volume[1] != 0.0 and self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0:
-                degree = str(self.roast_degree(cp["weight_loss"]))
-                if "set_density" in cp:
-                    if "green_density" in cp and "roasted_density" in cp:
-                        density = "%.1fg/l (%s)<br>%.1fg/l (%s)"%(cp["green_density"],QApplication.translate("Label","greens"),cp["roasted_density"],QApplication.translate("Label","roasted"))
-                elif "green_density" in cp and "roasted_density" in cp:
-                    density = "%.1fg/l (%s)<br>%.1fg/l (%s)"%(cp["green_density"],QApplication.translate("Label","greens"),cp["roasted_density"],QApplication.translate("Label","roasted"))
-            else:
-                degree = "--"
+#            if self.qmc.volume[0] != 0.0 and self.qmc.volume[1] != 0.0 and self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0:
+#                degree = str(self.roast_degree(cp["weight_loss"]))
+#                if "set_density" in cp:
+#                    if "green_density" in cp and "roasted_density" in cp:
+#                        density = "%.1fg/l (%s)<br>%.1fg/l (%s)"%(cp["green_density"],QApplication.translate("Label","greens"),cp["roasted_density"],QApplication.translate("Label","roasted"))
+#                elif "green_density" in cp and "roasted_density" in cp:
+#                    density = "%.1fg/l (%s)<br>%.1fg/l (%s)"%(cp["green_density"],QApplication.translate("Label","greens"),cp["roasted_density"],QApplication.translate("Label","roasted"))
+#            else:
+#                degree = "--"
 
             moisture = ""
             if "moisture_greens" in cp:
@@ -32963,8 +32963,8 @@ class ApplicationWindow(QMainWindow):
                 beans=beans_html,
                 weight_label=QApplication.translate("HTML Report Template", "Weight:", None),
                 weight=weight,
-                degree_label=QApplication.translate("HTML Report Template", "Degree:", None),
-                degree=degree,
+#                degree_label=QApplication.translate("HTML Report Template", "Degree:", None),
+#                degree=degree,
                 volume_label=QApplication.translate("HTML Report Template", "Volume:", None),
                 volume=volume,
                 roaster_label=QApplication.translate("HTML Report Template", "Roaster:", None),
@@ -34853,23 +34853,23 @@ class ApplicationWindow(QMainWindow):
         else:
             return 100. * ((float(roasted) - float(green)) / float(green))
 
-    # from RoastMagazine (corrected by substracting 1% based on experience)
-    # http://www.roastmagazine.com/resources/Roasting101_Articles/Roast_SeptOct05_LightRoasting.pdf
-    def roast_degree(self,percent):
-        if percent < 13.5:
-            return ""
-        elif percent < 14.5:
-            return QApplication.translate("Label", "City",None)
-        elif percent < 15.5:
-            return QApplication.translate("Label", "City+",None)
-        elif percent < 16.5:
-            return QApplication.translate("Label", "Full City",None)
-        elif percent < 17.5:
-            return QApplication.translate("Label", "Full City+",None)
-        elif percent < 18.5:
-            return QApplication.translate("Label", "Light French",None)
-        else:
-            return QApplication.translate("Label", "French",None)
+#    # from RoastMagazine (corrected by substracting 1% based on experience)
+#    # http://www.roastmagazine.com/resources/Roasting101_Articles/Roast_SeptOct05_LightRoasting.pdf
+#    def roast_degree(self,percent):
+#        if percent < 13.5:
+#            return ""
+#        elif percent < 14.5:
+#            return QApplication.translate("Label", "City",None)
+#        elif percent < 15.5:
+#            return QApplication.translate("Label", "City+",None)
+#        elif percent < 16.5:
+#            return QApplication.translate("Label", "Full City",None)
+#        elif percent < 17.5:
+#            return QApplication.translate("Label", "Full City+",None)
+#        elif percent < 18.5:
+#            return QApplication.translate("Label", "Light French",None)
+#        else:
+#            return QApplication.translate("Label", "French",None)
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -35415,27 +35415,28 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importHH506RA() {0}").format(str(ex)),exc_tb.tb_lineno)
 
-    #checks or creates directory structure
-    def dirstruct(self):
-        currentdir = QDir().current()     #selects the current dir
-        if not currentdir.exists(QApplication.translate("Directory","profiles", None)):
-            currentdir.mkdir(QApplication.translate("Directory","profiles",None))
-        #check/create 'other' directory inside profiles/
-        otherpath = QApplication.translate("Directory","profiles", None) + "/" + QApplication.translate("Directory","other", None)
-        if not currentdir.exists(otherpath):
-            currentdir.mkdir(otherpath)
-        #find current year,month
-        date =  QDate.currentDate()
-        #check / create year dir
-        yearpath = QApplication.translate("Directory","profiles", None) + "/" + str(date.year())
-        if not currentdir.exists(yearpath):
-            currentdir.mkdir(yearpath)
-        #check /create month dir to store profiles
-        monthpath = QApplication.translate("Directory","profiles", None) + "/" + str(date.year()) + "/" + str(date.month())
-        if not currentdir.exists(monthpath):
-            currentdir.mkdir(monthpath)
-        if len(self.profilepath) == 0:
-            self.profilepath = monthpath
+# not used any longer
+#    #checks or creates directory structure
+#    def dirstruct(self):
+#        currentdir = QDir().current()     #selects the current dir
+#        if not currentdir.exists(QApplication.translate("Directory","profiles", None)):
+#            currentdir.mkdir(QApplication.translate("Directory","profiles",None))
+#        #check/create 'other' directory inside profiles/
+#        otherpath = QApplication.translate("Directory","profiles", None) + "/" + QApplication.translate("Directory","other", None)
+#        if not currentdir.exists(otherpath):
+#            currentdir.mkdir(otherpath)
+#        #find current year,month
+#        date =  QDate.currentDate()
+#        #check / create year dir
+#        yearpath = QApplication.translate("Directory","profiles", None) + "/" + str(date.year())
+#        if not currentdir.exists(yearpath):
+#            currentdir.mkdir(yearpath)
+#        #check /create month dir to store profiles
+#        monthpath = QApplication.translate("Directory","profiles", None) + "/" + str(date.year()) + "/" + str(date.month())
+#        if not currentdir.exists(monthpath):
+#            currentdir.mkdir(monthpath)
+#        if len(self.profilepath) == 0:
+#            self.profilepath = monthpath
 
     @pyqtSlot()
     @pyqtSlot(bool)
