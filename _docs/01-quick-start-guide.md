@@ -14,7 +14,7 @@ author_profile: true
 If you read through the topics on the left you will have a very good idea of how Artisan works.  This Quick-Start-Guide is not intended to answer all technical questions.
 {: .notice--primary}
 
-Artisan Quick-Start Guide is maintained by *Michael Herbert of [CarefreeBuzzBuzz](https://www.carefreebuzzbuzz.com/){:target="_blank"}*. If you have suggestions for improving the content of the Quick-Start-Guide or technical questions, please use the [Artisan discussion forum](https://github.com/artisan-roaster-scope/artisan/discussions) (GitHub registration required).  When clicking links in this Quick-Start-Guide, we suggest you open links in a new window.  You can also find a great deal of information at the [Artisan Blog](https://artisan-roasterscope.blogspot.com/).
+Artisan Quick-Start Guide is maintained by *Michael Herbert of [CarefreeBuzzBuzz](https://www.carefreebuzzbuzz.com/)*. If you have suggestions for improving the content of the Quick-Start-Guide or technical questions, please use the [Artisan discussion forum](https://github.com/artisan-roaster-scope/artisan/discussions) (GitHub registration required).  When clicking links in this Quick-Start-Guide, we suggest you open links in a new window.  You can also find a great deal of information at the [Artisan Blog](https://artisan-roasterscope.blogspot.com/).
 
 
 
