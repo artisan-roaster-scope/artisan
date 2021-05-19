@@ -16,7 +16,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 <a name="Documentation"></a>
 ## Documentation
 
-* [Artisan app](https://github.com/artisan-roaster-scope/artisan){:target="_blank"}
+* [Artisan app](https://github.com/artisan-roaster-scope/artisan/releases/latest){:target="_blank"}
    - Tooltips (hover over elements)
    - Help pages (click the help buttons in dialogs like devices, ports, events, alarms, ..)
    - Keyboard shortcuts page (menu `Help` >> `Keyboard Shortcuts`)
