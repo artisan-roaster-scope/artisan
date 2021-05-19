@@ -10,9 +10,14 @@ toc_sticky: true
 author: Dave Baxter
 author_profile: true
 ---
-# How to Subscribe to Artisan Discussions
+# Register for Github
 
-Artisan has established a [Discussions page](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} on [GitHub](https://github.com/){:target="_blank"} where users can ask questions and the community can participate in answering.  This is the preferred method for getting help.  Unlike a traditional mailing list you can choose how you want to see and follow posts.
+If you do not already have a Githib account you will need ro [register](https://github.com/join){:target="_blank"} before you can post in the Discussions forum.  Registration is free.
+# How to Subscribe to Artisan Discussions.  
+
+Artisan has established a [Discussions page](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} on [GitHub](https://github.com/){:target="_blank"} where users can ask questions and the community can participate in answering.  This is the preferred method for getting help.  Unlike a traditional mailing list you can choose how you want to see and follow posts.  
+
+By default, when you post to a Discussion you will receive notifications when someone else posts to that Discussion.  Use one of the methods described below if you wish to be notified whenever any Discussion topic is created or updated.
 
 ### Pull method
 

@@ -29,7 +29,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 <a name="Community"></a>
 ## Community
 
-- [Artisan Discussion Forum](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} (technical discussions and support; [GitHub registration required](/discussions))
+- [Artisan Discussion Forum](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} (technical discussions and support; [GitHub registration](https://github.com/join){:target="_blank"} required to post; Learn how to [Subscribe](/discussions) to Discussions.)
 - [Artisan Mailing List](https://lists.einfachkaffee.de/postorius/lists/artisan-user.lists.einfachkaffee.de/){:target="_blank"} (announcements (new versions, documents, seminars,...); subscription required)
 - Public Forums or Facebook Groups (not monitored by the team)
    - [Home-Barista.com](https://www.home-barista.com/roasting/){:target="_blank"}
@@ -49,7 +49,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 
 <a name="FAQ-General-1"></a>
 **1) Where do I find support?**  
-: Check the [Quick-Start Guide](/docs/quick-start-guide/) or start a [discussion](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} ([GitHub registration required](/discussions)) for help.
+: Check the [Quick-Start Guide](/docs/quick-start-guide/) or start a [discussion](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} for help ([GitHub registration](https://github.com/join){:target="_blank"} required to post; Learn how to [Subscribe](/discussions) to Discussions.)
 
 <a name="FAQ-General-2"></a>
 **2) How can I support the project?**  

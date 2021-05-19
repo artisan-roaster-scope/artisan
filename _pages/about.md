@@ -114,7 +114,7 @@ __Rafael Cobo__ –– brain behind the project
 
 __Marko Luther__ –– maintainer
 
-__Dave Baxter__ –– design wizard & genious
+__Dave Baxter__ –– design wizard & genius
 
 __Michael Herbert__ –– documentation & fundraising
 
