@@ -6,10 +6,8 @@ excerpt: "SF1/SF6/SF10/SF25/SF75"
 header:
   overlay_image: /assets/images/sf2.jpg
   image: /assets/images/sf.jpg
-  teaser: assets/images/sf-supporter.jpg
+  teaser: assets/images/sf-supporter-grey.jpg
 ---
-
-<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
 
 * __Producer:__ [The San Franciscan Roaster Company](http://www.sanfranroaster.com){:target="_blank"}, USA
 * __Machines:__ all roasters with a Watlow PM6 (requires the _EIA 485 Modbus RTU_ option)

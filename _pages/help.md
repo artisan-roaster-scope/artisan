@@ -168,6 +168,10 @@ If you need support please check the [documentation](#documentation) or ask the 
 **12) How do I set the default values for special events when I start my roast?**  
 : For event types with visible event slider corresponding event marks at the current slider position are set at CHARGE automatically. For other event types you can instruct any of the default buttons (like ON, CHARGE, ..) under [`Config` >> `Events`](/docs/events/) on the first tab, to trigger custom event buttons by selecting the `Multiple Event` button action and enter the custom event button numbers to be triggered in the following text field, separated by a comma.
 
+<a name="FAQ-Recording-13"></a>
+**13) Can the buttons for First Crack, 2nd Crack, etc be programmed to a hot key or function key?**  
+: No. However, there is a keyboard mode. Just press your RETURN key and then select the key to be activated via the left/right cursor keys (note that the next events key is automatically pre-selected) and finally press the SPACE bar to fire the selected key.
+  
 
 
 

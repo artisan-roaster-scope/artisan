@@ -15,10 +15,10 @@ gallery_main:
     alt: "artisan.plus"
     title: "artisan+"
 gallery:
-  - url: http://www.sanfranroaster.com/
-    image_path: /assets/images/sf-logo.png
-    alt: "San Franciscan Roaster"
-    title: "San Franciscan Roaster"
+  - url: https://www.phidgets.com/
+    image_path: /assets/images/phidgets-logo.jpg
+    alt: "Phidgets"
+    title: "Phidgets"
   - url: https://www.hottopusa.com/
     image_path: /assets/images/hottop-logo.png
     alt: "Hottop"
@@ -27,42 +27,30 @@ gallery:
     image_path: /assets/images/yoctopuce-logo.png
     alt: "Yoctopuce"
     title: "Yoctopuce"
-  - url: https://londiniumespresso.com/
-    image_path: /assets/images/londinium-logo.png
-    alt: "Londinium"
-    title: "Londinium"
-  - url: http://www.probat-shoproaster.com/
-    image_path: /assets/images/probat-logo.jpg
-    alt: "Probat"
-    title: "Probat"
-  - url: http://coffed.pl/
-    image_path: /assets/images/coffed-logo.png
-    alt: "Coffed"
-    title: "Coffed"
   - url: http://www.buckeyecoffee.com/
     image_path: /assets/images/bc-logo.jpg
     alt: "Buckeye Coffee"
     title: "Buckeye Coffee"
-  - url: https://www.phidgets.com/
-    image_path: /assets/images/phidgets-logo.jpg
-    alt: "Phidgets"
-    title: "Phidgets"
-  - url: https://www.coffee-tech.com/
-    image_path: /assets/images/cte-logo.jpg
-    alt: "COFFEE-TECH ENGINEERING"
-    title: "COFFEE-TECH ENGINEERING"
-  - url: https://www.diedrichroasters.com/
-    image_path: /assets/images/diedrich-logo.png
-    alt: "Diedrich Roasters"
-    title: "Diedrich Roasters"
-  - url: http://www.kaldi.co.kr
-    image_path: /assets/images/kaldi-logo.jpg
-    alt: "KALDI Coffee Roaster"
-    title: "KALDI Coffee Roaster"
   - url: http://www.hasgaranti.com.tr
     image_path: /assets/images/hasgaranti-logo.jpg
     alt: "Has Garanti"
     title: "Has Garanti"
+  - url: https://www.bescaroasters.com/
+    image_path: /assets/images/besca-logo.jpg
+    alt: "Besca Roasters"
+    title: "Besca Roasters"
+  - url: https://www.ip-cc.com/
+    image_path: /assets/images/IP-CC-logo.jpg
+    alt: "IP-CC"
+    title: "IP-CC"
+  - url: https://www.toper.com/
+    image_path: /assets/images/toper-logo.jpg
+    alt: "Toper"
+    title: "Toper"
+  - url: http://www.kaldi.co.kr
+    image_path: /assets/images/kaldi-logo.jpg
+    alt: "KALDI Coffee Roaster"
+    title: "KALDI Coffee Roaster"
 
 ---
 
