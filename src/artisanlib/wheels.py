@@ -50,9 +50,9 @@ class WheelDlg(ArtisanDialog):
         self.subdialogbuttons.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.resetlabelparents)
         
         self.labelwheelx = 0   #index of wheel being edited on labeltable
-        self.hierarchyButton = QPushButton(QApplication.translate("Button","Reverse Hierarchy",None))
-        self.hierarchyButton.setToolTip(QApplication.translate("Tooltip","Sets graph hierarchy child->parent instead of parent->child",None))
-        self.hierarchyButton.clicked.connect(self.aw.qmc.setWheelHierarchy)
+#        self.hierarchyButton = QPushButton(QApplication.translate("Button","Reverse Hierarchy",None))
+#        self.hierarchyButton.setToolTip(QApplication.translate("Tooltip","Sets graph hierarchy child->parent instead of parent->child",None))
+#        self.hierarchyButton.clicked.connect(self.aw.qmc.setWheelHierarchy)
         self.labeltable.setVisible(False)
         self.subdialogbuttons.setVisible(False)
         aspectlabel = QLabel(QApplication.translate("Label","Ratio",None))
@@ -158,7 +158,7 @@ class WheelDlg(ArtisanDialog):
         controlLayout.addWidget(addButton)
         controlLayout.addWidget(rotateLeftButton)
         controlLayout.addWidget(rotateRightButton)
-        controlLayout.addWidget(self.hierarchyButton)
+#        controlLayout.addWidget(self.hierarchyButton)
         mainlayout = QVBoxLayout()
         mainlayout.addWidget(self.datatable)
         mainlayout.addWidget(self.labelGroupLayout)

@@ -13860,37 +13860,37 @@ class tgraphcanvas(FigureCanvas):
                         for a in range(i+1,nsegments):
                             self.segmentlengths[x][a] = (100-parentanglecount)/(nsegments-(i+1))
 
-    #adjusts size of all segements of the graph based on child parent relation
-    #expects all segments to have a parent except in the first wheel
-    @pyqtSlot(bool)
-    def setWheelHierarchy(self,_):
-        #check for not stablished relashionships (will cause graph plotting problems) and give warning
-        for x in range(1,len(self.wheellabelparent)):
-            for i in range(len(self.wheellabelparent[x])):
-                if self.wheellabelparent[x][i] == 0:
-                    QMessageBox.information(aw,"Wheel Hierarchy Problem",
-                    "Please assign a parent to wheel #%i element#%i: \n\n%s"%(x+1,i+1,self.wheelnames[x][i]))
-                    return
-
-        #adjust top wheel and make all segments equal
-        for i in range(len(self.segmentlengths[-1])):
-            self.segmentlengths[-1][i] = 100./len(self.segmentlengths[-1])
-
-        #adjust lower wheels based on previous wheels
-        for p in range(len(self.wheellabelparent)-1,0,-1):
-            nsegments = len(self.wheellabelparent[p])
-            nparentsegments = len(self.wheellabelparent[p-1])
-            angles = [0]*nparentsegments
-            for x in range(nparentsegments):
-                for i in range(nsegments):
-                    if self.wheellabelparent[p][i]-1 == x:
-                        angles[x] += self.segmentlengths[p][i]
-
-            #adjust angle length of parents proportionaly
-            for i in range(nparentsegments):
-                self.segmentlengths[p-1][i] = angles[i]
-
-        self.drawWheel()
+#    #adjusts size of all segements of the graph based on child parent relation
+#    #expects all segments to have a parent except in the first wheel
+#    @pyqtSlot(bool)
+#    def setWheelHierarchy(self,_):
+#        #check for not stablished relashionships (will cause graph plotting problems) and give warning
+#        for x in range(1,len(self.wheellabelparent)):
+#            for i in range(len(self.wheellabelparent[x])):
+#                if self.wheellabelparent[x][i] == 0:
+#                    QMessageBox.information(aw,"Wheel Hierarchy Problem",
+#                    "Please assign a parent to wheel #%i element#%i: \n\n%s"%(x+1,i+1,self.wheelnames[x][i]))
+#                    return
+#
+#        #adjust top wheel and make all segments equal
+#        for i in range(len(self.segmentlengths[-1])):
+#            self.segmentlengths[-1][i] = 100./len(self.segmentlengths[-1])
+#
+#        #adjust lower wheels based on previous wheels
+#        for p in range(len(self.wheellabelparent)-1,0,-1):
+#            nsegments = len(self.wheellabelparent[p])
+#            nparentsegments = len(self.wheellabelparent[p-1])
+#            angles = [0]*nparentsegments
+#            for x in range(nparentsegments):
+#                for i in range(nsegments):
+#                    if self.wheellabelparent[p][i]-1 == x:
+#                        angles[x] += self.segmentlengths[p][i]
+#
+#            #adjust angle length of parents proportionaly
+#            for i in range(nparentsegments):
+#                self.segmentlengths[p-1][i] = angles[i]
+#
+#        self.drawWheel()
 
 #############################     MOUSE CROSS     #############################
 
@@ -21950,6 +21950,8 @@ class ApplicationWindow(QMainWindow):
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         followupCmd = 0 # contains the required sleep time
                         for c in cmds:
+                            if aw.modbus.lastReadResult is None:
+                                aw.modbus.lastReadResult = 0
                             cs = c.strip().replace("_",str(aw.modbus.lastReadResult)) # the last read value can be accessed via the "_" symbol
                             if followupCmd:
                                 try:
@@ -22168,6 +22170,8 @@ class ApplicationWindow(QMainWindow):
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
+                            if aw.s7.lastReadResult is None:
+                                aw.s7.lastReadResult = 0
                             cs = c.strip().replace("_",str(aw.s7.lastReadResult)) # the last read value can be accessed via the "_" symbol
                             if cs.startswith("setDBint(") and len(cs) > 14:
                                 try:
@@ -35494,6 +35498,7 @@ class ApplicationWindow(QMainWindow):
         self.saveVectorGraph(extension="*.pdf")
 
     #resizes and saves graph to a new width w
+    # transformationmode 0: fast transformation without smoothing, 1: slow using bilinear filtering (smoothing)
     def resizeImg(self,w,transformationmode,filetype="PNG",fname=""):
         try:
             fileext = ".png"
@@ -35506,6 +35511,9 @@ class ApplicationWindow(QMainWindow):
             else:
                 filename = fname
             if filename:
+#                x,y = aw.qmc.fig.get_size_inches()*aw.qmc.fig.dpi # size in pixels
+#                print("x,y",x,y)  
+                  
                 self.image = aw.qmc.grab()
                 if w != 0:
                     self.image = self.image.scaledToWidth(w,transformationmode)
@@ -35523,10 +35531,25 @@ class ApplicationWindow(QMainWindow):
                     painter.end()
                     del painter
                 self.image.save(filename,filetype)
+                
+#                # Insta: 1080 x 608px
+#                fig_dpi = aw.qmc.fig.dpi / aw.devicePixelRatio()
+#                aw.qmc.fig.set_size_inches(1080/fig_dpi, 608/fig_dpi) #(15,8.445) #(10.8, 6.08)
+#                aw.qmc.fig.savefig(filename,
+#                        dpi=fig_dpi, #72, #100,
+#                        backend="agg",
+#                        transparent=(aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"]=='None'),
+#                        #bbox_inches='tight',
+#                        #backend='pgf', # slow and fails on # characters in TeX backend
+#                        facecolor=str(aw.qmc.palette["canvas"]),
+#                        edgecolor=None
+#                ) # transparent=True is need to get the delta curves and legend drawn
 
                 x = self.image.width()
                 y = self.image.height()
                 self.sendmessage(QApplication.translate("Message","{0}  size({1},{2}) saved", None).format(str(filename),str(x),str(y)))
+                
+                
 
         except IOError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " resize() {0}").format(str(ex)))
@@ -35546,7 +35569,7 @@ class ApplicationWindow(QMainWindow):
                     filename += extension
                 #mpl.rcParams['pdf.fonttype'] = 3   # 3 or 42
                 #mpl.rc('pdf', fonttype=3)
-                aw.qmc.fig.savefig(filename,
+                    aw.qmc.fig.savefig(filename,
                         transparent=(aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"]=='None'),
                         #bbox_inches='tight',
                         #backend='pgf', # slow and fails on # characters in TeX backend
