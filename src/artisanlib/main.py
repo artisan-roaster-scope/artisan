@@ -18974,7 +18974,7 @@ class ApplicationWindow(QMainWindow):
                 org_roasterheating_setup = self.qmc.roasterheating_setup
                 org_roasterheating = self.qmc.roasterheating
                 #
-                self.loadSettings(fn=action.data()[0],remember=False,machine=True)
+                self.loadSettings(fn=action.data()[0],remember=False,machine=True,reload=False)
                 if action.data()[1] == "Phidget":
                     if action.text() == "VINT Ambient Modules":
                         elevation,res = QInputDialog.getInt(self,
@@ -34120,7 +34120,7 @@ class ApplicationWindow(QMainWindow):
     def loadSettings_triggered(self,_=False):
         self.loadSettings()
 
-    def loadSettings(self,fn=None,remember=True,reset=True,machine=False,theme=False):
+    def loadSettings(self,fn=None,remember=True,reset=True,machine=False,theme=False,reload=True):
         try:
             if fn:
                 filename = fn
@@ -34129,12 +34129,15 @@ class ApplicationWindow(QMainWindow):
             if filename:
                 try:
                     aw.stopActivities()
+                    saveCurfile = aw.curFile
                     res = aw.settingsLoad(filename,machine=machine,theme=theme)
                     if res and reset:
                         flag_temp = aw.qmc.roastpropertiesflag
                         aw.qmc.roastpropertiesflag = 1 # ensure that all roast properties are reset!
                         aw.qmc.reset(soundOn=False,fireResetAction=False)
                         aw.qmc.roastpropertiesflag = flag_temp
+                        if reload and saveCurfile is not None:
+                            aw.loadFile(saveCurfile)
                     if res and remember:
                         # update recentSettings menu
                         settings = QSettings()
