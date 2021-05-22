@@ -3567,7 +3567,7 @@ Extra Device</source>
         <translation>Wyjątek:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35792"/>
+        <location filename="../artisanlib/main.py" line="35793"/>
         <source>Value Error:</source>
         <translation>Wartość błędu:</translation>
     </message>
@@ -3742,12 +3742,12 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36398"/>
+        <location filename="../artisanlib/main.py" line="36399"/>
         <source>Analyze: no background profile data available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36401"/>
+        <location filename="../artisanlib/main.py" line="36402"/>
         <source>Analyze: background profile requires CHARGE and DROP events</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3832,12 +3832,12 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36316"/>
+        <location filename="../artisanlib/main.py" line="36317"/>
         <source>Analyze: DROP event required, none found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36312"/>
+        <location filename="../artisanlib/main.py" line="36313"/>
         <source>Analyze: CHARGE event required, none found</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4759,7 +4759,7 @@ Extra Device</source>
         <translation type="unfinished">Czas</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31378"/>
+        <location filename="../artisanlib/main.py" line="31606"/>
         <source>Profile</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4841,11 +4841,6 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="32960"/>
         <source>Organization:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="31606"/>
-        <source>Profile  </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8921,7 +8916,7 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="unfinished">Zdarzenie #&lt;b&gt;{0} &lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36469"/>
+        <location filename="../artisanlib/main.py" line="36470"/>
         <source>RoR</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9621,27 +9616,27 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35619"/>
+        <location filename="../artisanlib/main.py" line="35620"/>
         <source> at {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35631"/>
+        <location filename="../artisanlib/main.py" line="35632"/>
         <source>{0} after FCs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35638"/>
+        <location filename="../artisanlib/main.py" line="35639"/>
         <source>{0} after FCe</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35671"/>
+        <location filename="../artisanlib/main.py" line="35672"/>
         <source>ET - BT = {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35719"/>
+        <location filename="../artisanlib/main.py" line="35720"/>
         <source>ET - BT = {0}{1}</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9886,17 +9881,17 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36479"/>
+        <location filename="../artisanlib/main.py" line="36480"/>
         <source>ln()</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36477"/>
+        <location filename="../artisanlib/main.py" line="36478"/>
         <source>x</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36473"/>
+        <location filename="../artisanlib/main.py" line="36474"/>
         <source>Bkgnd</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9956,22 +9951,22 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36419"/>
+        <location filename="../artisanlib/main.py" line="36420"/>
         <source>Bkgd</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36468"/>
+        <location filename="../artisanlib/main.py" line="36469"/>
         <source>MSE BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36469"/>
+        <location filename="../artisanlib/main.py" line="36470"/>
         <source>@FCs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36470"/>
+        <location filename="../artisanlib/main.py" line="36471"/>
         <source>Max+/Max- RoR</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9996,12 +9991,12 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation type="unfinished">Wyrównaj</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35608"/>
+        <location filename="../artisanlib/main.py" line="35609"/>
         <source>{0} to reach ET {1}{2}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35621"/>
+        <location filename="../artisanlib/main.py" line="35622"/>
         <source>{0} to reach BT {1}{2}</source>
         <translation type="unfinished"></translation>
     </message>
@@ -12131,7 +12126,7 @@ Brak profilu [CHARGE] lub [DROP]</translation>
         <translation type="unfinished">{0} zapisano. Rozpoczęto nowe palenie</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36859"/>
+        <location filename="../artisanlib/main.py" line="36860"/>
         <source>Invalid artisan format</source>
         <translation>Niewłaściwy format Artisana</translation>
     </message>
@@ -12298,27 +12293,27 @@ Kontynuować?</translation>
         <translation type="obsolete">Zapisz wykres w formacie PNG</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35549"/>
+        <location filename="../artisanlib/main.py" line="35550"/>
         <source>{0}  size({1},{2}) saved</source>
         <translation type="unfinished">Zapisano {0}  rozmiar({1},{2})</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35560"/>
+        <location filename="../artisanlib/main.py" line="35561"/>
         <source>Save Graph as PDF</source>
         <translation>Zapisz wykres w formacie PDF</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35562"/>
+        <location filename="../artisanlib/main.py" line="35563"/>
         <source>Save Graph as SVG</source>
         <translation>Zapisz wykres w formacie SVG</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35580"/>
+        <location filename="../artisanlib/main.py" line="35581"/>
         <source>{0} saved</source>
         <translation type="unfinished">Zapisano {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35781"/>
+        <location filename="../artisanlib/main.py" line="35782"/>
         <source>Invalid Wheel graph format</source>
         <translation>Niewłaściwy format wykresu kołowego</translation>
     </message>
@@ -12433,32 +12428,32 @@ Kontynuować?</translation>
         <translation type="obsolete">Funkcje symboliczne</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36152"/>
+        <location filename="../artisanlib/main.py" line="36153"/>
         <source>Save Palettes</source>
         <translation>Zapisz palety</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36156"/>
+        <location filename="../artisanlib/main.py" line="36157"/>
         <source>Palettes saved</source>
         <translation>Palety zostały zapisane</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36231"/>
+        <location filename="../artisanlib/main.py" line="36232"/>
         <source>Invalid palettes file format</source>
         <translation>Niewłaściwy format plików palet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36234"/>
+        <location filename="../artisanlib/main.py" line="36235"/>
         <source>Palettes loaded</source>
         <translation>Palety zostały załadowane</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36246"/>
+        <location filename="../artisanlib/main.py" line="36247"/>
         <source>Load Palettes</source>
         <translation>Załaduj palety</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36272"/>
+        <location filename="../artisanlib/main.py" line="36273"/>
         <source>Alarms loaded</source>
         <translation>Alarmy załadowano</translation>
     </message>
@@ -12723,7 +12718,7 @@ Kontynuować?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36723"/>
+        <location filename="../artisanlib/main.py" line="36724"/>
         <source>Assignment problem</source>
         <translation type="unfinished"></translation>
     </message>
@@ -12953,7 +12948,7 @@ Kontynuować?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35778"/>
+        <location filename="../artisanlib/main.py" line="35779"/>
         <source>Wheel {0} loaded</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13203,7 +13198,7 @@ Kontynuować?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36328"/>
+        <location filename="../artisanlib/main.py" line="36329"/>
         <source>Fitting curves...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13268,7 +13263,7 @@ Kontynuować?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36573"/>
+        <location filename="../artisanlib/main.py" line="36574"/>
         <source>Analysis earlier than Curve fit</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13283,7 +13278,7 @@ Kontynuować?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36572"/>
+        <location filename="../artisanlib/main.py" line="36573"/>
         <source>Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.
 Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
         <translation type="unfinished"></translation>
@@ -13891,12 +13886,12 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36828"/>
+        <location filename="../artisanlib/main.py" line="36829"/>
         <source>Simulator stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36857"/>
+        <location filename="../artisanlib/main.py" line="36858"/>
         <source>Simulator started @{}x</source>
         <translation type="unfinished"></translation>
     </message>
@@ -15696,32 +15691,32 @@ Pungency</source>
         <translation>Aktualizacje zdarzenia</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35950"/>
+        <location filename="../artisanlib/main.py" line="35951"/>
         <source>&lt;b&gt;Label&lt;/b&gt;= </source>
         <translation>&lt;b&gt;Etykieta&lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35951"/>
+        <location filename="../artisanlib/main.py" line="35952"/>
         <source>&lt;b&gt;Description &lt;/b&gt;= </source>
         <translation>&lt;b&gt;Opis &lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35952"/>
+        <location filename="../artisanlib/main.py" line="35953"/>
         <source>&lt;b&gt;Type &lt;/b&gt;= </source>
         <translation>&lt;b&gt;Typ &lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35954"/>
+        <location filename="../artisanlib/main.py" line="35955"/>
         <source>&lt;b&gt;Value &lt;/b&gt;= </source>
         <translation>&lt;b&gt;Wartość &lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35956"/>
+        <location filename="../artisanlib/main.py" line="35957"/>
         <source>&lt;b&gt;Documentation &lt;/b&gt;= </source>
         <translation>&lt;b&gt;Dokumentacja &lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35957"/>
+        <location filename="../artisanlib/main.py" line="35958"/>
         <source>&lt;b&gt;Button# &lt;/b&gt;= </source>
         <translation>&lt;b&gt;Przycisk# &lt;/b&gt;= </translation>
     </message>

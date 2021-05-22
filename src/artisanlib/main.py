@@ -31603,7 +31603,7 @@ class ApplicationWindow(QMainWindow):
             #fld,                   source,  typ,        test0,    units,   name
             ["id",                  "prod",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Batch',None)                ],
             ["datetime",            "prod",  "date",     "false",  "",      QApplication.translate('HTML Report Template','Time',None)                 ],
-            ["title",               "prod",  "text",     "false",  "60",    QApplication.translate('HTML Report Template','Profile  ',None)            ],
+            ["title",               "prod",  "text",     "false",  "60",    QApplication.translate('HTML Report Template','Profile',None)              ],
             ["weightin",            "comp",  "float1",   "false",  "weight",QApplication.translate('HTML Report Template','Weight In',None)            ],
             ["CHARGE_BT",           "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','CHARGE BT',None)            ],
             ["FCs_time",            "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','FCs Time',None)             ],
