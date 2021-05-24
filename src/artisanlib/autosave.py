@@ -73,6 +73,7 @@ class autosaveDlg(ArtisanDialog):
         self.dialogbuttons.accepted.connect(self.autoChanged)
         self.dialogbuttons.rejected.connect(self.close)
         self.helpButton = self.dialogbuttons.addButton(QDialogButtonBox.Help)
+        self.setButtonTranslations(self.helpButton,"Help",QApplication.translate("Button","Help", None))
         self.dialogbuttons.button(QDialogButtonBox.Help).clicked.connect(self.showautosavehelp)
         
         pathButton = QPushButton(QApplication.translate("Button","Path", None))

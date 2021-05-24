@@ -89,7 +89,9 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.dialogbuttons.accepted.connect(self.closealarms)
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
         
-        helpButton = QPushButton(QApplication.translate("Button","Help",None))
+        helpDialogButton = QDialogButtonBox()
+        helpButton = helpDialogButton.addButton(QDialogButtonBox.Help)
+        self.setButtonTranslations(helpButton,"Help",QApplication.translate("Button","Help", None))
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
         helpButton.setFocusPolicy(Qt.NoFocus)
         helpButton.setMinimumWidth(80)

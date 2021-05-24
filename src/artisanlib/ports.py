@@ -817,8 +817,7 @@ class comportDlg(ArtisanResizeablDialog):
         
         helpButton = self.dialogbuttons.addButton(QDialogButtonBox.Help)
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
-        if self.aw.locale not in self.aw.qtbase_locales:
-            helpButton.setText(QApplication.translate("Button","Help", None))
+        self.setButtonTranslations(helpButton,"Help",QApplication.translate("Button","Help", None))
         helpButton.clicked.connect(self.showModbusbuttonhelp)
         helpButton.setFocusPolicy(Qt.NoFocus)
         

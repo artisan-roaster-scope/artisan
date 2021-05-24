@@ -160,8 +160,10 @@ class EventsDlg(ArtisanResizeablDialog):
         self.overlapEdit.setAlignment(Qt.AlignRight)
         self.overlapEdit.setValue(self.aw.qmc.overlappct)
         self.overlapEdit.setSuffix(" %")
-
-        helpButton = QPushButton(QApplication.translate("Button","Help", None))
+        
+        helpcurveDialogButton = QDialogButtonBox()
+        helpButton = helpcurveDialogButton.addButton(QDialogButtonBox.Help)
+        self.setButtonTranslations(helpButton,"Help",QApplication.translate("Button","Help", None))
         helpButton.setFocusPolicy(Qt.NoFocus)
 
         helpButton.clicked.connect(self.showEventannotationhelp)
@@ -510,8 +512,7 @@ class EventsDlg(ArtisanResizeablDialog):
         helpButton = helpDialogButton.addButton(QDialogButtonBox.Help)
         helpButton.setFocusPolicy(Qt.NoFocus)
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
-        if self.aw.locale not in self.aw.qtbase_locales:
-            helpButton.setText(QApplication.translate("Button","Help", None))
+        self.setButtonTranslations(helpButton,"Help",QApplication.translate("Button","Help", None))
         helpButton.clicked.connect(self.showEventbuttonhelp)
         #color patterns
         #flag that prevents changing colors too fast
@@ -785,8 +786,7 @@ class EventsDlg(ArtisanResizeablDialog):
         helpsliderDialogButton = QDialogButtonBox()
         helpsliderbutton = helpsliderDialogButton.addButton(QDialogButtonBox.Help)
         helpsliderbutton.setFocusPolicy(Qt.NoFocus)
-        if self.aw.locale not in self.aw.qtbase_locales:
-            helpsliderbutton.setText(QApplication.translate("Button","Help", None))
+        self.setButtonTranslations(helpsliderbutton,"Help",QApplication.translate("Button","Help", None))
         helpsliderbutton.clicked.connect(self.showSliderHelp)
         ## tab4
         qeventtitlelabel = QLabel(QApplication.translate("Label","Event", None))
@@ -902,7 +902,9 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E4max.setAlignment(Qt.AlignRight)
         self.E4max.setRange(-99999,99999)
         self.E4max.setValue(self.aw.eventquantifiermax[3])
-        applyquantifierbutton =  QPushButton(QApplication.translate("Button","Apply",None))
+        applyDialogButton = QDialogButtonBox()
+        applyquantifierbutton = applyDialogButton.addButton(QDialogButtonBox.Apply)
+        self.setButtonTranslations(applyquantifierbutton,"Apply",QApplication.translate("Button","Apply", None))
         applyquantifierbutton.setFocusPolicy(Qt.NoFocus)
         applyquantifierbutton.clicked.connect(self.applyQuantifiers)
         self.clusterEventsFlag = QCheckBox(QApplication.translate("Label","Cluster", None))

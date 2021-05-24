@@ -52,6 +52,7 @@ SOURCES = \
     const/UIconst.py \
     help/alarms_help.py \
     help/autosave_help.py \
+    help/energy_help.py \
     help/eventannotations_help.py \
     help/eventbuttons_help.py \
     help/eventsliders_help.py \
@@ -70,28 +71,32 @@ SOURCES = \
     plus/util.py
     
 TRANSLATIONS = \
+	translations/artisan_ar.ts \
+	translations/artisan_da.ts \
 	translations/artisan_de.ts \
-	translations/artisan_es.ts \
-	translations/artisan_fr.ts \
-	translations/artisan_it.ts \
-	translations/artisan_sv.ts \
-	translations/artisan_zh_CN.ts \
-	translations/artisan_zh_TW.ts \
 	translations/artisan_el.ts \
-	translations/artisan_no.ts \
-	translations/artisan_nl.ts \
+	translations/artisan_es.ts \
+	translations/artisan_fa.ts \
+	translations/artisan_fi.ts \
+	translations/artisan_fr.ts \
+	translations/artisan_gd.ts \
+	translations/artisan_he.ts \
+	translations/artisan_hu.ts \
+	translations/artisan_id.ts \
+	translations/artisan_it.ts \
+	translations/artisan_ja.ts \
 	translations/artisan_ko.ts \
+	translations/artisan_lv.ts \
+	translations/artisan_nl.ts \
+	translations/artisan_no.ts \
 	translations/artisan_pt.ts \
 	translations/artisan_pt_BR.ts \
-	translations/artisan_ru.ts \
-	translations/artisan_ar.ts \
-	translations/artisan_fi.ts \
-	translations/artisan_tr.ts \
-	translations/artisan_ja.ts \
-	translations/artisan_hu.ts \
-	translations/artisan_he.ts \
 	translations/artisan_pl.ts \
-	translations/artisan_id.ts \
+	translations/artisan_ru.ts \
+	translations/artisan_sk.ts \
+	translations/artisan_sv.ts \
 	translations/artisan_th.ts \
-	translations/artisan_fa.ts \
-	translations/artisan_vi.ts
+	translations/artisan_tr.ts \
+	translations/artisan_vi.ts \
+	translations/artisan_zh_CN.ts \
+	translations/artisan_zh_TW.ts

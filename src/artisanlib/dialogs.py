@@ -54,9 +54,10 @@ class ArtisanDialog(QDialog):
         self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(False)
         self.dialogbuttons.button(QDialogButtonBox.Cancel).setAutoDefault(False)
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocusPolicy(Qt.StrongFocus) # to add to tab focus switch
-        if self.aw is not None and self.aw.locale not in self.aw.qtbase_locales:
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setText(QApplication.translate("Button","OK", None))
-            self.dialogbuttons.button(QDialogButtonBox.Cancel).setText(QApplication.translate("Button","Cancel",None))
+        for btn,txt,trans in [
+            (self.dialogbuttons.button(QDialogButtonBox.Ok),"OK", QApplication.translate("Button","OK", None)),
+            (self.dialogbuttons.button(QDialogButtonBox.Cancel),"Cancel",QApplication.translate("Button","Cancel", None))]:
+            self.setButtonTranslations(btn,txt,trans)
         # add additional CMD-. shortcut to close the dialog
         self.dialogbuttons.button(QDialogButtonBox.Cancel).setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog (ESC on Mac OS X)
@@ -66,7 +67,15 @@ class ArtisanDialog(QDialog):
         except:
             pass
         self.dialogbuttons.button(QDialogButtonBox.Cancel).addActions([cancelAction])
-
+    
+    def setButtonTranslations(self,btn,txt,trans):
+        current_trans = btn.text()
+        if txt == current_trans:
+            # if standard qtbase tanslations fail, revert to artisan translations
+            current_trans = trans
+        if txt != current_trans:
+            btn.setText(current_trans)
+                        
     def closeEvent(self,_):
         self.dialogbuttons.rejected.emit()
 

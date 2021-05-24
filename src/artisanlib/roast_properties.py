@@ -2690,7 +2690,11 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.org_electricEnergyMix = self.aw.qmc.electricEnergyMix
             
             ### reset UI text lables and tooltips for propper translation
-            self.energy_ui.helpButton.setText(QApplication.translate("Button","Help",None))
+            # hack to access the Qt automatic translation of the RestoreDefaults button
+            db_help = QDialogButtonBox(QDialogButtonBox.Help)
+            help_text_translated = db_help.button(QDialogButtonBox.Help).text()
+            self.energy_ui.helpButton.setText(help_text_translated)
+            self.setButtonTranslations(self.energy_ui.helpButton,"Help",QApplication.translate("Button","Help", None))
             self.energy_ui.tabWidget.setTabText(0,QApplication.translate("Tab","Details",None))
             self.energy_ui.tabWidget.setTabText(1,QApplication.translate("Tab","Loads",None))
             self.energy_ui.tabWidget.setTabText(2,QApplication.translate("Tab","Protocol",None))
@@ -2710,7 +2714,11 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.datatable.verticalHeader().setSectionResizeMode(2)
             # Loads tab
             self.energy_ui.loadsSetDefaultsButton.setText(QApplication.translate("Button","Save Defaults",None))
-            self.energy_ui.loadsDefaultsButtons.setText(QApplication.translate("Button","Restore Defaults",None))
+            # hack to access the Qt automatic translation of the RestoreDefaults button
+            db = QDialogButtonBox(QDialogButtonBox.RestoreDefaults)
+            defaults_button_text_translated = db.button(QDialogButtonBox.RestoreDefaults).text()
+            self.energy_ui.loadsDefaultsButtons.setText(defaults_button_text_translated)
+            self.setButtonTranslations(self.energy_ui.loadsDefaultsButtons,"Restore Defaults",QApplication.translate("Button","Restore Defaults", None))
             self.energy_ui.loadlabelsLabel.setText(QApplication.translate("Label","Label",None))
             self.energy_ui.loadratingsLabel.setText(QApplication.translate("Label","Rating",None))
             self.energy_ui.ratingunitsLabel.setText(QApplication.translate("Label","Unit",None))
@@ -2722,6 +2730,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             # Protocol tab
             self.energy_ui.protocolSetDefaultsButton.setText(QApplication.translate("Button","Save Defaults",None))
             self.energy_ui.protocolDefaultsButton.setText(QApplication.translate("Button","Restore Defaults",None))
+            self.energy_ui.protocolDefaultsButton.setText(defaults_button_text_translated)
+            self.setButtonTranslations(self.energy_ui.protocolDefaultsButton,"Restore Defaults",QApplication.translate("Button","Restore Defaults", None))
             self.energy_ui.preheatingLabel.setText(QApplication.translate("Label","Pre-Heating",None))
             self.energy_ui.betweenBatchesLabel.setText(QApplication.translate("Label","Between Batches",None))
             self.energy_ui.coolingLabel.setText(QApplication.translate("Label","Cooling",None))
@@ -3537,13 +3547,12 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.setup_ui.labelDrumSpeed.setText(QApplication.translate("Label", "Drum Speed",None))
             # popuplate comboBox
             self.setup_ui.comboBoxHeating.addItems(self.aw.qmc.heating_types)
+            self.setup_ui.SetDefaults.setText(QApplication.translate("Button", "Save Defaults",None))
             # hack to access the Qt automatic translation of the RestoreDefaults button
             db = QDialogButtonBox(QDialogButtonBox.RestoreDefaults)
             defaults_button_text_translated = db.button(QDialogButtonBox.RestoreDefaults).text()
             self.setup_ui.Defaults.setText(defaults_button_text_translated)
-            self.setup_ui.SetDefaults.setText(QApplication.translate("Button", "Save Defaults",None))
-            if self.aw.locale not in self.aw.qtbase_locales:
-                self.setup_ui.Defaults.setText(QApplication.translate("Button","Defaults", None))
+            self.setButtonTranslations(self.setup_ui.Defaults,"Restore Defaults",QApplication.translate("Button","Restore Defaults", None))
             
             # fill dialog with data
             self.setup_ui.lineEditOrganization.setText(self.aw.qmc.organization)

@@ -43,9 +43,9 @@ class WheelDlg(ArtisanDialog):
         self.labeltable = QTableWidget()
 
         self.subdialogbuttons = QDialogButtonBox(QDialogButtonBox.Close | QDialogButtonBox.RestoreDefaults, Qt.Horizontal)
-        if self.aw.locale not in self.aw.qtbase_locales:
-            self.subdialogbuttons.button(QDialogButtonBox.RestoreDefaults).setText(QApplication.translate("Button","Reset Parents", None))
-            self.subdialogbuttons.button(QDialogButtonBox.Close).setText(QApplication.translate("Button","Close",None))
+        self.setButtonTranslations(self.subdialogbuttons.button(QDialogButtonBox.RestoreDefaults),"Restore Defaults",QApplication.translate("Button","Restore Defaults", None))
+        self.setButtonTranslations(self.subdialogbuttons.button(QDialogButtonBox.Close),"Close",QApplication.translate("Button","Close", None))
+        
         self.subdialogbuttons.rejected.connect(self.closelabels)
         self.subdialogbuttons.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.resetlabelparents)
         

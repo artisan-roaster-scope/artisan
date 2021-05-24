@@ -44,9 +44,9 @@ class Login(QDialog):
         
         self.dialogbuttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel,Qt.Horizontal)
         aw = config.app_window
-        if aw.locale not in aw.qtbase_locales:
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setText(QApplication.translate("Button","OK", None))
-            self.dialogbuttons.button(QDialogButtonBox.Cancel).setText(QApplication.translate("Button","Cancel",None))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.Ok),"OK",QApplication.translate("Button","OK", None))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.Cancel),"Cancel",QApplication.translate("Button","Cancel", None))
+        
         self.dialogbuttons.accepted.connect(self.setCredentials)
         self.dialogbuttons.rejected.connect(self.reject)
         self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(False)

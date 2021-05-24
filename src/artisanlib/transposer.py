@@ -103,6 +103,10 @@ class profileTransformatorDlg(ArtisanDialog):
         self.dialogbuttons.button(QDialogButtonBox.Reset).clicked.connect(self.restore)
         self.dialogbuttons.button(QDialogButtonBox.Help).clicked.connect(self.openHelp)
         
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.Apply),"Apply",QApplication.translate("Button","Apply", None))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.Reset),"Reset",QApplication.translate("Button","Reset", None))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.Help),"Help",QApplication.translate("Button","Help", None))
+        
         #buttons
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addWidget(self.dialogbuttons)

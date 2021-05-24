@@ -821,8 +821,7 @@ class HUDDlg(ArtisanDialog):
         helpcurveDialogButton = QDialogButtonBox()
         helpcurveButton = helpcurveDialogButton.addButton(QDialogButtonBox.Help)
         helpcurveButton.setFocusPolicy(Qt.NoFocus)
-        if self.aw.locale not in self.aw.qtbase_locales:
-            helpcurveButton.setText(QApplication.translate("Button","Help", None))
+        self.setButtonTranslations(helpcurveButton,"Help",QApplication.translate("Button","Help", None))
         helpcurveButton.clicked.connect(self.showSymbolicHelp)
         curve1Layout = QGridLayout()
         curve1Layout.setSpacing(5)

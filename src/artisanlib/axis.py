@@ -231,8 +231,7 @@ class WindowsDlg(ArtisanDialog):
         
         resetButton = self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
         resetButton.clicked.connect(self.reset)
-        if self.aw.locale not in self.aw.qtbase_locales:
-            resetButton.setText(QApplication.translate("Button","Defaults", None))
+        self.setButtonTranslations(resetButton,"Restore Defaults",QApplication.translate("Button","Restore Defaults", None))
             
         self.loadAxisFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load from profile",None))
         self.loadAxisFromProfile.setChecked(self.aw.qmc.loadaxisfromprofile)

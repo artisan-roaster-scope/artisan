@@ -229,8 +229,9 @@ class designerconfigDlg(ArtisanDialog):
         self.dialogbuttons.addButton(QDialogButtonBox.Close)
         self.dialogbuttons.addButton(QDialogButtonBox.Apply)
         self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
-        if self.aw.locale not in self.aw.qtbase_locales:
-            self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults).setText(QApplication.translate("Button","Reset", None))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.Close),"Close",QApplication.translate("Button","Close", None))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.Apply),"Apply",QApplication.translate("Button","Apply", None))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults),"Restore Defaults",QApplication.translate("Button","Restore Defaults", None))
         
         self.dialogbuttons.rejected.connect(self.accept)
         self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.reset)

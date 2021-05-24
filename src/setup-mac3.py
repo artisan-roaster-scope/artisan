@@ -124,14 +124,18 @@ DATA_FILES = [
     ("../translations", [r"translations/artisan_tr.qm"]),
     ("../translations", [r"translations/artisan_vi.qm"]),
     ("../translations", [r'translations/artisan_zh_CN.qm']),
-    ("../translations", [r'translations/artisan_zh_TW.qm']),
+    ("../translations", [r'translations/artisan_zh_TW.qm']),    
+    ("../translations", [r"translations/qtbase_da.qm"]), # from Qt 6.1
     ("../translations", [r"translations/qtbase_el.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ("../translations", [r"translations/qtbase_fa.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
+    ("../translations", [r"translations/qtbase_gd.qm"]), # from Qt 6.1
+    ("../translations", [r"translations/qtbase_lv.qm"]), # from Qt 6.1
     ("../translations", [r"translations/qtbase_nl.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ("../translations", [r"translations/qtbase_pt.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
-    ("../translations", [r"translations/qtbase_pt_BR.qm"]), # just a copy of qtbase_pt
+    ("../translations", [r"translations/qtbase_sk.qm"]), # from Qt 6.1
+    ("../translations", [r"translations/qtbase_pt_BR.qm"]), # from Qt 6.1
     ("../translations", [r"translations/qtbase_sv.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
-    ("../translations", [r"translations/qtbase_zh_CN.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
+    ("../translations", [r"translations/qtbase_zh_CN.qm"]), # from Qt 6.1
     ("../Resources", [r"qt.conf"]),
     ("../Resources", [r"artisanProfile.icns"]),
     ("../Resources", [r"artisanAlarms.icns"]),

@@ -88,6 +88,7 @@ except:
 #    import traceback
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
+
 if pyqtversion < 6:
     from PyQt5.QtWidgets import (QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport @UnusedImport
                              QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnusedImport
@@ -536,6 +537,7 @@ else:
     locale = ""
 supported_languages = [
     "ar",
+    "da",
     "de",
     "el",
     "en",
@@ -543,21 +545,25 @@ supported_languages = [
     "fa",
     "fi",
     "fr",
+    "gd",
     "he",
     "hu",
     "id",
     "it",
     "ja",
     "ko",
+    "lv",
     "nl",
     "no",
     "pt",
     "pt_BR",
     "pl",
     "ru",
+    "sk",
     "sv",
     "th",
     "tr",
+    "vi",
     "zh",
     "zh_CN",
     "zh_TW",
@@ -15316,7 +15322,8 @@ class ApplicationWindow(QMainWindow):
         # for other locales standard OK/Cancel buttons created in dialogs via QDialogButtonBoxes should be
         # renamed via setText to link them to artisan translations (which hopefully provides those translations)
 
-        self.qtbase_locales = ["ar","de","en","es","fi","fr","he","hu","it","ja","ko","pl","ru","artisan_zh_TW"] + ["fa","pt","sv","zh_CN"]
+        self.qtbase_additional_locales = ["cs","da","el","fa","gd","lv","nl","pt_BR","pt","sk","sv","zh_CN"] # additionally added to /translations
+        self.qtbase_locales = ["ar","de","en","es","fi","fr","he","hu","it","ja","ko","pl","ru","tr","zh_TW"] # from Qt distribution
 
         try:
             if locale is None or locale == "None":
@@ -16069,19 +16076,19 @@ class ApplicationWindow(QMainWindow):
         if locale == "ar":
             self.ArabicLanguage.setChecked(True)
 
+        self.DanishLanguage = QAction(UIconst.CONF_MENU_DANISH,self)
+        self.DanishLanguage.setCheckable(True)
+        self.DanishLanguage.triggered.connect(self.changelocale_da)
+        self.languageMenu.addAction(self.DanishLanguage)
+        if locale == "da":
+            self.DanishLanguage.setChecked(True)
+
         self.GermanLanguage = QAction(UIconst.CONF_MENU_GERMAN,self)
         self.GermanLanguage.setCheckable(True)
         self.GermanLanguage.triggered.connect(self.changelocale_de)
         self.languageMenu.addAction(self.GermanLanguage)
         if locale == "de":
             self.GermanLanguage.setChecked(True)
-
-        self.GreekLanguage = QAction(UIconst.CONF_MENU_GREEK,self)
-        self.GreekLanguage.setCheckable(True)
-        self.GreekLanguage.triggered.connect(self.changelocale_el)
-        self.languageMenu.addAction(self.GreekLanguage)
-        if locale == "el":
-            self.GreekLanguage.setChecked(True)
 
         self.EnglishLanguage = QAction(UIconst.CONF_MENU_ENGLISH,self)
         self.EnglishLanguage.setCheckable(True)
@@ -16104,19 +16111,26 @@ class ApplicationWindow(QMainWindow):
         if locale == "fa":
             self.FarsiLanguage.setChecked(True)
 
-        self.FinishLanguage = QAction(UIconst.CONF_MENU_FINISH,self)
-        self.FinishLanguage.setCheckable(True)
-        self.FinishLanguage.triggered.connect(self.changelocale_fi)
-        self.languageMenu.addAction(self.FinishLanguage)
-        if locale == "fi":
-            self.FinishLanguage.setChecked(True)
-
         self.FrenchLanguage = QAction(UIconst.CONF_MENU_FRENCH,self)
         self.FrenchLanguage.setCheckable(True)
         self.FrenchLanguage.triggered.connect(self.changelocale_fr)
         self.languageMenu.addAction(self.FrenchLanguage)
         if locale == "fr":
             self.FrenchLanguage.setChecked(True)
+        
+        self.GaelicLanguage = QAction(UIconst.CONF_MENU_SCOTTISH_GAELIC,self)
+        self.GaelicLanguage.setCheckable(True)
+        self.GaelicLanguage.triggered.connect(self.changelocale_gd)
+        self.languageMenu.addAction(self.GaelicLanguage)
+        if locale == "gd":
+            self.GaelicLanguage.setChecked(True)
+
+        self.GreekLanguage = QAction(UIconst.CONF_MENU_GREEK,self)
+        self.GreekLanguage.setCheckable(True)
+        self.GreekLanguage.triggered.connect(self.changelocale_el)
+        self.languageMenu.addAction(self.GreekLanguage)
+        if locale == "el":
+            self.GreekLanguage.setChecked(True)
 
         self.HebrewLanguage = QAction(UIconst.CONF_MENU_HEBREW,self)
         self.HebrewLanguage.setCheckable(True)
@@ -16124,13 +16138,6 @@ class ApplicationWindow(QMainWindow):
         self.languageMenu.addAction(self.HebrewLanguage)
         if locale == "he":
             self.HebrewLanguage.setChecked(True)
-
-        self.HungarianLanguage = QAction(UIconst.CONF_MENU_HUNGARIAN,self)
-        self.HungarianLanguage.setCheckable(True)
-        self.HungarianLanguage.triggered.connect(self.changelocale_hu)
-        self.languageMenu.addAction(self.HungarianLanguage)
-        if locale == "hu":
-            self.HungarianLanguage.setChecked(True)
 
         self.IndonesianLanguage = QAction(UIconst.CONF_MENU_INDONESIAN,self)
         self.IndonesianLanguage.setCheckable(True)
@@ -16160,6 +16167,20 @@ class ApplicationWindow(QMainWindow):
         if locale == "ko":
             self.KoreanLanguage.setChecked(True)
 
+        self.LatvianLanguage = QAction(UIconst.CONF_MENU_LATVIAN,self)
+        self.LatvianLanguage.setCheckable(True)
+        self.LatvianLanguage.triggered.connect(self.changelocale_lv)
+        self.languageMenu.addAction(self.LatvianLanguage)
+        if locale == "lv":
+            self.LatvianLanguage.setChecked(True)
+
+        self.HungarianLanguage = QAction(UIconst.CONF_MENU_HUNGARIAN,self)
+        self.HungarianLanguage.setCheckable(True)
+        self.HungarianLanguage.triggered.connect(self.changelocale_hu)
+        self.languageMenu.addAction(self.HungarianLanguage)
+        if locale == "hu":
+            self.HungarianLanguage.setChecked(True)
+
         self.DutchLanguage = QAction(UIconst.CONF_MENU_DUTCH,self)
         self.DutchLanguage.setCheckable(True)
         self.DutchLanguage.triggered.connect(self.changelocale_nl)
@@ -16173,6 +16194,13 @@ class ApplicationWindow(QMainWindow):
         self.languageMenu.addAction(self.NorwegianLanguage)
         if locale == "no":
             self.NorwegianLanguage.setChecked(True)
+
+        self.PolishLanguage = QAction(UIconst.CONF_MENU_POLISH,self)
+        self.PolishLanguage.setCheckable(True)
+        self.PolishLanguage.triggered.connect(self.changelocale_pl)
+        self.languageMenu.addAction(self.PolishLanguage)
+        if locale == "pl":
+            self.PolishLanguage.setChecked(True)
 
         self.PortugueseLanguage = QAction(UIconst.CONF_MENU_PORTUGUESE,self)
         self.PortugueseLanguage.setCheckable(True)
@@ -16188,19 +16216,26 @@ class ApplicationWindow(QMainWindow):
         if locale == "pt_BR":
             self.PortugueseBrasilLanguage.setChecked(True)
 
-        self.PolishLanguage = QAction(UIconst.CONF_MENU_POLISH,self)
-        self.PolishLanguage.setCheckable(True)
-        self.PolishLanguage.triggered.connect(self.changelocale_pl)
-        self.languageMenu.addAction(self.PolishLanguage)
-        if locale == "pl":
-            self.PolishLanguage.setChecked(True)
-
         self.RussianLanguage = QAction(UIconst.CONF_MENU_RUSSIAN,self)
         self.RussianLanguage.setCheckable(True)
         self.RussianLanguage.triggered.connect(self.changelocale_ru)
         self.languageMenu.addAction(self.RussianLanguage)
         if locale == "ru":
             self.RussianLanguage.setChecked(True)
+
+        self.SlovakLanguage = QAction(UIconst.CONF_MENU_SLOVAK,self)
+        self.SlovakLanguage.setCheckable(True)
+        self.SlovakLanguage.triggered.connect(self.changelocale_sk)
+        self.languageMenu.addAction(self.SlovakLanguage)
+        if locale == "sk":
+            self.SlovakLanguage.setChecked(True)
+
+        self.FinishLanguage = QAction(UIconst.CONF_MENU_FINISH,self)
+        self.FinishLanguage.setCheckable(True)
+        self.FinishLanguage.triggered.connect(self.changelocale_fi)
+        self.languageMenu.addAction(self.FinishLanguage)
+        if locale == "fi":
+            self.FinishLanguage.setChecked(True)
 
         self.SwedishLanguage = QAction(UIconst.CONF_MENU_SWEDISH,self)
         self.SwedishLanguage.setCheckable(True)
@@ -34704,6 +34739,11 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
+    def changelocale_da(self,_=False):
+        self.changelocale("da")
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
     def changelocale_de(self,_=False):
         self.changelocale("de")
 
@@ -34739,6 +34779,11 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
+    def changelocale_gd(self,_=False):
+        self.changelocale("gd")
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
     def changelocale_he(self,_=False):
         self.changelocale("he")
 
@@ -34769,6 +34814,11 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
+    def changelocale_lv(self,_=False):
+        self.changelocale("lv")
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
     def changelocale_nl(self,_=False):
         self.changelocale("nl")
 
@@ -34796,6 +34846,11 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def changelocale_ru(self,_=False):
         self.changelocale("ru")
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def changelocale_sk(self,_=False):
+        self.changelocale("sk")
 
     @pyqtSlot()
     @pyqtSlot(bool)

@@ -109,8 +109,7 @@ class phasesGraphDlg(ArtisanDialog):
         self.dialogbuttons.rejected.connect(self.cancel)
         setDefaultButton = self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
         setDefaultButton.clicked.connect(self.setdefault)
-        if self.aw.locale not in self.aw.qtbase_locales:
-            setDefaultButton.setText(QApplication.translate("Button","Default Temperatures", None))
+        self.setButtonTranslations(setDefaultButton,"Restore Defaults",QApplication.translate("Button","Restore Defaults", None))
         
         phaseLayout = QGridLayout()
         phaseLayout.addWidget(minf,0,1,Qt.AlignHCenter|Qt.AlignBottom)
