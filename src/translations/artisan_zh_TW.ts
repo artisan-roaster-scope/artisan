@@ -113,12 +113,12 @@
     <message>
         <location filename="../artisanlib/main.py" line="8629"/>
         <source>Whole Color</source>
-        <translation>咖啡豆顏色</translation>
+        <translation>整豆色值</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8631"/>
         <source>Ground Color</source>
-        <translation>咖啡粉顏色</translation>
+        <translation>咖啡粉色值</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6200"/>
@@ -1797,7 +1797,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/transposer.py" line="116"/>
         <source>linear</source>
-        <translation>線狀</translation>
+        <translation>線性</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="424"/>
@@ -2292,7 +2292,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/ports.py" line="571"/>
         <source>bytes</source>
-        <translation></translation>
+        <translation>字節</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="575"/>
@@ -2317,7 +2317,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/ports.py" line="961"/>
         <source>optimize</source>
-        <translation>優化</translation>
+        <translation>最優化</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="966"/>
@@ -2327,12 +2327,12 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="2318"/>
         <source>Elec</source>
-        <translation>電的</translation>
+        <translation>電</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="1569"/>
         <source>Propane Gas (LPG)</source>
-        <translation>丙烷氣（LPG</translation>
+        <translation>丙烷（LPG</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="1570"/>
@@ -2342,7 +2342,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="1571"/>
         <source>Electric</source>
-        <translation>電的</translation>
+        <translation>電力</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="721"/>
@@ -5134,12 +5134,12 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31660"/>
         <source>Whole Color</source>
-        <translation>咖啡豆顏色</translation>
+        <translation>整豆色值</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31661"/>
         <source>Ground Color</source>
-        <translation>咖啡粉顏色</translation>
+        <translation>咖啡粉色值</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31662"/>
@@ -5149,17 +5149,17 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31663"/>
         <source>Screen Min</source>
-        <translation>篩網最小</translation>
+        <translation>豆目最小</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31664"/>
         <source>Screen Max</source>
-        <translation>篩網最大</translation>
+        <translation>豆目最大</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31665"/>
         <source>Bean Temp</source>
-        <translation>咖啡豆溫度</translation>
+        <translation>豆溫</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31666"/>
@@ -5274,7 +5274,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31693"/>
         <source>Dry Phase Time</source>
-        <translation>轉黃階段時間</translation>
+        <translation>脫水階段時間</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31694"/>
@@ -5289,7 +5289,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31696"/>
         <source>Dry Phase RoR</source>
-        <translation>轉黃階段RoR</translation>
+        <translation>脫水階段RoR</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31697"/>
@@ -5369,22 +5369,22 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31716"/>
         <source>Moisture Greens</source>
-        <translation>生豆含水量</translation>
+        <translation>生豆含水率</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31717"/>
         <source>Moisture Roasted</source>
-        <translation>熟豆含水量</translation>
+        <translation>熟豆含水率</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31718"/>
         <source>Moisture Loss</source>
-        <translation>水份損失</translation>
+        <translation>水份流失</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31719"/>
         <source>Organic Loss</source>
-        <translation>有機物損失</translation>
+        <translation>有機物流失</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31720"/>
@@ -5414,12 +5414,12 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31728"/>
         <source>Light Cut</source>
-        <translation>豆中線有銀皮</translation>
+        <translation>淺中線</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31729"/>
         <source>Dark Cut</source>
-        <translation>豆中線沒有銀皮</translation>
+        <translation>深中線</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31730"/>
@@ -5429,7 +5429,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31731"/>
         <source>Oily</source>
-        <translation>豆表有油</translation>
+        <translation>油膩</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31732"/>
@@ -5439,17 +5439,17 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31733"/>
         <source>Tipping</source>
-        <translation>不規則</translation>
+        <translation>點灼傷</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31734"/>
         <source>Scorching</source>
-        <translation>焦燒</translation>
+        <translation>灼傷</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31735"/>
         <source>Divots</source>
-        <translation>夾帶銀皮</translation>
+        <translation>破裂</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31736"/>
@@ -5469,17 +5469,17 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31685"/>
         <source>SCe BT</source>
-        <translation>二爆結束BT</translation>
+        <translation>二爆結束 BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31705"/>
         <source>Dry Phase AUC</source>
-        <translation>轉黃階段AUC</translation>
+        <translation>脫水階段 AUC</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32995"/>
         <source>Energy:</source>
-        <translation>活力:</translation>
+        <translation>火力:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32995"/>
@@ -5489,17 +5489,17 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31737"/>
         <source>BTU Batch</source>
-        <translation>BTU 批次</translation>
+        <translation>BTU 批量</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31738"/>
         <source>BTU Batch per green kg</source>
-        <translation type="unfinished"></translation>
+        <translation>BTU批量每公斤生豆</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31739"/>
         <source>CO2 Batch</source>
-        <translation>CO2 批次</translation>
+        <translation>CO2 批量</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31740"/>
@@ -5539,7 +5539,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31747"/>
         <source>BTU Roast per green kg</source>
-        <translation type="unfinished"></translation>
+        <translation>BTU烘焙每公斤生豆</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31748"/>
@@ -5549,7 +5549,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31749"/>
         <source>CO2 Batch per green kg</source>
-        <translation type="unfinished"></translation>
+        <translation>CO2批量每公斤生豆</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31750"/>
@@ -5564,17 +5564,17 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31752"/>
         <source>BTU ELEC</source>
-        <translation>BTU 電的</translation>
+        <translation>BTU 電力</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31753"/>
         <source>Efficiency Batch</source>
-        <translation type="unfinished"></translation>
+        <translation>有效批量</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31754"/>
         <source>Efficiency Roast</source>
-        <translation type="unfinished"></translation>
+        <translation>有效烘焙</translation>
     </message>
 </context>
 <context>
@@ -6308,12 +6308,12 @@ When Keyboard Shortcuts are OFF adds a custom event</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="28"/>
         <source>Load background profile</source>
-        <translation type="unfinished"></translation>
+        <translation>載入背景曲線</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="29"/>
         <source>Remove background profile</source>
-        <translation type="unfinished"></translation>
+        <translation>移除背景曲線</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="30"/>
@@ -6394,7 +6394,7 @@ When Keyboard Shortcuts are OFF adds a custom event</source>
     <message>
         <location filename="../help/symbolic_help.py" line="16"/>
         <source>Absolute time (seconds) from begin of recording of the background profile</source>
-        <translation type="unfinished"></translation>
+        <translation>從背景曲線記錄開端起的絕對時間(秒)</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="17"/>
@@ -6409,17 +6409,17 @@ When Keyboard Shortcuts are OFF adds a custom event</source>
     <message>
         <location filename="../help/symbolic_help.py" line="27"/>
         <source>ExtraBackground #1-A</source>
-        <translation type="unfinished"></translation>
+        <translation>額外背景 #1-A</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="28"/>
         <source>ExtraBackground #1-B</source>
-        <translation type="unfinished"></translation>
+        <translation>額外背景 #1-B</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="29"/>
         <source>ExtraBackground #2-A</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">額外背景 #1-A {2-?}</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="31"/>
@@ -6479,12 +6479,12 @@ When Keyboard Shortcuts are OFF adds a custom event</source>
     <message>
         <location filename="../help/symbolic_help.py" line="44"/>
         <source>Background ET rate of rise</source>
-        <translation type="unfinished"></translation>
+        <translation>背景ET升溫速率</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="45"/>
         <source>Background BT rate of rise</source>
-        <translation type="unfinished"></translation>
+        <translation>背景BT升溫速率</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="48"/>
@@ -6520,7 +6520,7 @@ For example, while &quot;Y2&quot; returns the current bean temperature (BT), &qu
     <message>
         <location filename="../help/symbolic_help.py" line="60"/>
         <source>ExtraBackground #1-B delayed 6 indexes</source>
-        <translation type="unfinished"></translation>
+        <translation>額外背景 #1-B 延遲6個指標</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="61"/>
@@ -6595,7 +6595,7 @@ For example, while &quot;Y2&quot; returns the current bean temperature (BT), &qu
     <message>
         <location filename="../help/symbolic_help.py" line="99"/>
         <source>AUC target value (could be from the background profile, if set)</source>
-        <translation type="unfinished"></translation>
+        <translation>AUC目標值(如設置，可源自背景曲線)</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="100"/>
@@ -6626,7 +6626,7 @@ For example, while &quot;Y2&quot; returns the current bean temperature (BT), &qu
         <location filename="../help/symbolic_help.py" line="112"/>
         <source>
 If there is no background profile the DRY or FCs bean temperature used for the prediction is taken from the Config&gt;Phases setup.</source>
-        <translation type="unfinished"></translation>
+        <translation>如果無背景曲線，用於預測轉黃或一爆開始的豆溫將源自 配置&gt;階段設置</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="112"/>
@@ -6754,12 +6754,13 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
         <location filename="../help/alarms_help.py" line="15"/>
         <source>Each alarm is only triggered once.
 Alarms are scanned in order from the top of the table to the bottom.</source>
-        <translation type="unfinished"></translation>
+        <translation>每個警報僅觸發一次
+警報從上至下按順序發生</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="19"/>
         <source>Alarm number for reference.</source>
-        <translation type="unfinished"></translation>
+        <translation>供參考警報編號</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="20"/>
@@ -6769,7 +6770,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="23"/>
         <source>Alarm only triggered after the given event.</source>
-        <translation type="unfinished"></translation>
+        <translation>警報僅在指定事件後觸發</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="24"/>
@@ -6804,7 +6805,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="32"/>
         <source>ALARM CONFIGURATION OPTIONS</source>
-        <translation type="unfinished"></translation>
+        <translation>警報配置選項</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="27"/>
@@ -6819,7 +6820,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="36"/>
         <source>Adds a new alarm to the bottom of the table.</source>
-        <translation type="unfinished"></translation>
+        <translation>新增警報至表格底部</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="32"/>
@@ -6924,7 +6925,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="47"/>
         <source>Load from Background</source>
-        <translation type="unfinished"></translation>
+        <translation>從背景載入</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="47"/>
@@ -6944,7 +6945,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="51"/>
         <source>Alarm Actions</source>
-        <translation type="unfinished"></translation>
+        <translation>警報動作</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="55"/>
@@ -7288,7 +7289,7 @@ Recording 1380  Burundi KigandaMurambi 2020-04-25_1136.alog</source>
     <message>
         <location filename="../help/eventbuttons_help.py" line="31"/>
         <source>Adds a new button to the bottom of the table.</source>
-        <translation type="unfinished"></translation>
+        <translation>新增新按鈕至表格底部</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="32"/>
@@ -8235,67 +8236,67 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
         <location filename="../help/autosave_help.py" line="62"/>
         <source>From Roast&gt;Properties&gt;Density Roasted</source>
-        <translation type="unfinished"></translation>
+        <translation>來自 烘焙&gt;屬性&gt;熟豆密度</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="66"/>
         <source>From Roast&gt;Properties&gt;Moisture Roasted</source>
-        <translation type="unfinished"></translation>
+        <translation>來自 烘焙&gt;屬性&gt;熟豆水含量</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="69"/>
         <source>From Roast&gt;Properties&gt;Color Whole</source>
-        <translation type="unfinished"></translation>
+        <translation>來自 烘焙&gt;屬性&gt;整豆色值</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="70"/>
         <source>From Roast&gt;Properties&gt;Color Ground</source>
-        <translation type="unfinished"></translation>
+        <translation>來自 烘焙&gt;屬性&gt;咖啡粉值</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="71"/>
         <source>From Roast&gt;Properties&gt;Color System</source>
-        <translation type="unfinished"></translation>
+        <translation>來自 烘焙&gt;屬性&gt;色值系統</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="72"/>
         <source>From Roast&gt;Properties&gt;Screen Min</source>
-        <translation type="unfinished"></translation>
+        <translation>來自 烘焙&gt;屬性&gt;豆目 最小</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="73"/>
         <source>From Roast&gt;Properties&gt;Screen Max</source>
-        <translation type="unfinished"></translation>
+        <translation>來自 烘焙&gt;屬性&gt;豆目 最大</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="74"/>
         <source>From Roast&gt;Properties&gt;(Green) Beans Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation>來自 烘焙&gt;屬性&gt;生豆溫度</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="75"/>
         <source>From Roast&gt;Properties&gt;Ambient Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation>來自 烘焙&gt;屬性&gt;環境溫度</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="76"/>
         <source>From Roast&gt;Properties&gt;Ambient Humidity</source>
-        <translation type="unfinished"></translation>
+        <translation>來自 烘焙&gt;屬性&gt;環境濕度</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="77"/>
         <source>From Roast&gt;Properties&gt;Ambient Pressure</source>
-        <translation type="unfinished"></translation>
+        <translation>來自 烘焙&gt;屬性&gt;環境氣壓</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="80"/>
         <source>From Profile Statistics - DTR (in percent)</source>
-        <translation type="unfinished"></translation>
+        <translation>來自曲線統計 - DTR(百分比)</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="81"/>
         <source>From the Profile Statistics - AUC</source>
-        <translation type="unfinished"></translation>
+        <translation>來自曲線統計 - AUC</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="82"/>
@@ -8731,7 +8732,7 @@ Field is hidden when the RoR value is not available.</source>
     <message>
         <location filename="../help/eventsliders_help.py" line="104"/>
         <source>adjustSV(&lt;int&gt;)</source>
-        <translation type="unfinished"></translation>
+        <translation>調整SV(&lt;int&gt;)</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="104"/>
@@ -10088,7 +10089,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
     <message>
         <location filename="../artisanlib/events.py" line="800"/>
         <source>Coarse</source>
-        <translation>粗</translation>
+        <translation>取整</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="306"/>
@@ -10163,7 +10164,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
     <message>
         <location filename="../artisanlib/devices.py" line="515"/>
         <source>Gain</source>
-        <translation>增長</translation>
+        <translation>增加</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="871"/>
@@ -10483,7 +10484,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
     <message>
         <location filename="../artisanlib/ports.py" line="1050"/>
         <source>Area</source>
-        <translation></translation>
+        <translation>區域</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1509"/>
@@ -10757,7 +10758,7 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1085"/>
         <source>Whole</source>
-        <translation>咖啡豆</translation>
+        <translation>整豆</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1091"/>
@@ -10792,7 +10793,7 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4429"/>
         <source>organic material</source>
-        <translation>有機材料</translation>
+        <translation>有機物質</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8587"/>
@@ -10812,7 +10813,7 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/curves.py" line="926"/>
         <source>Offset seconds from CHARGE</source>
-        <translation>從投豆時計算偏移時間</translation>
+        <translation>從投豆起計算補償時間</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="478"/>
@@ -10832,7 +10833,7 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/curves.py" line="973"/>
         <source>Custom offset seconds from CHARGE</source>
-        <translation>從投豆時計算自定義偏移時間</translation>
+        <translation>自定義投豆後的時間補償秒數</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="963"/>
@@ -11267,7 +11268,7 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1068"/>
         <source>Screen</source>
-        <translation>篩查</translation>
+        <translation>豆目</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1082"/>
@@ -14599,7 +14600,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/devices.py" line="1767"/>
         <source>Clicking YES will overwrite the existing ET and BT values in this profile with the symbolic values defined here.  Click CANCEL to abort.</source>
-        <translation type="unfinished"></translation>
+        <translation>點擊YES將重寫本曲線中定義了的符號值中已有的ET和BT值。點擊CANCEL以終止。</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1779"/>
@@ -15845,7 +15846,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2712"/>
         <source>Source</source>
-        <translation>來源</translation>
+        <translation>熱源</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="953"/>
@@ -16234,7 +16235,7 @@ Concentration</source>
     <message>
         <location filename="../artisanlib/main.py" line="837"/>
         <source>Roast Color</source>
-        <translation>烘焙顏色</translation>
+        <translation>烘焙色值</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="838"/>
@@ -16282,7 +16283,8 @@ Complexity</source>
         <location filename="../artisanlib/main.py" line="784"/>
         <source>Roast
 Color</source>
-        <translation>烘焙顏色</translation>
+        <translation>烘焙
+色值</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="785"/>
@@ -16500,7 +16502,7 @@ nearest: y value of the nearest point</source>
     <message>
         <location filename="../artisanlib/wheels.py" line="92"/>
         <source>Apply color pattern to whole graph</source>
-        <translation>應用輪圖顏色圖案</translation>
+        <translation>將顏色模式運用至全圖</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="98"/>

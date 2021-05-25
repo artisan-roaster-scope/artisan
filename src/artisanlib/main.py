@@ -23124,7 +23124,7 @@ class ApplicationWindow(QMainWindow):
         else:
             string = QApplication.translate("Message","Do you want to reset all settings?<br> Artisan has to be restarted!", None)
         reply = QMessageBox.warning(aw,QApplication.translate("Message","Factory Reset", None),string,
-                            QMessageBox.Cancel | QMessageBox.Reset)
+                            QMessageBox.Cancel | QMessageBox.Reset, QMessageBox.Cancel)
         if reply == QMessageBox.Reset :
             #raise flag. Next time app will open, the settings (bad settings) will not be loaded.
             self.resetqsettings = 1
@@ -33737,7 +33737,8 @@ class ApplicationWindow(QMainWindow):
                     ", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst",
                     ", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeye Coffee), Moshe Spinell",
                     ", Morris Beume (Morris.Coffee), Michael Herbert, Bill (San Franciscan Roaster), Chistopher Feran",
-                    ", Coffed, Bono Gargolov, Rodrigo Ramos (King Caf" + uchr(233) + "s), Nico Bigler, Saeed Abdinasab, Lewis Li, Fotis Lefas (Coffee Lovers, Editors & Trainers)<br>"
+                    ", Coffed, Bono Gargolov, Rodrigo Ramos (King Caf" + uchr(233) + "s), Nico Bigler, Saeed Abdinasab, Lewis Li", 
+                    ", Fotis Lefas (Coffee Lovers, Editors & Trainers), Leo Huang (Rainforest Coffee Institute)<br>"
                     ]
         contributors = "".join(contribs)
         box = QMessageBox(self)
