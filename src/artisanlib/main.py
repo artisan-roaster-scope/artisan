@@ -35662,6 +35662,9 @@ class ApplicationWindow(QMainWindow):
                 else:
                     res_x = int(x*fig_dpi)
                     res_y = int(y*fig_dpi)
+                if len(aw.logofilename) > 0 or self.qmc.logoimg is not None:
+                    self.qmc.redraw()
+                    self.qmc.placelogoimage()
                 self.qmc.fig.savefig(filename,
                         dpi=fig_dpi,
                         backend="agg",
