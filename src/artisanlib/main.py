@@ -35623,8 +35623,8 @@ class ApplicationWindow(QMainWindow):
                 
                 
 
-        except IOError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " resize() {0}").format(str(ex)))
+#        except IOError as ex:
+#            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " resize() {0}").format(str(ex)))
 
     #resizes and saves graph to a new width w and h preserving maximal image quality independent of screen resolution
     def resizeImgToSize(self,w,h,filetype="PNG",fname=""):
