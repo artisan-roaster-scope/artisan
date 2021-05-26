@@ -97,6 +97,11 @@ def getTemplate(bp):
             util.addString2dict(bp,"machinesetup",d,"setup",50)
         except Exception as e:
             config.logger.info("roast: Exception in getTemplate() %s",e)
+        
+        try:
+            util.addString2dict(bp,"locale",d,"locale",7)
+        except Exception as e:
+            config.logger.info("roast: Exception in getTemplate() %s",e)
             
         try:
             if "roastersize" in bp and bp["roastersize"] is not None and bp["roastersize"] != 0:
@@ -338,6 +343,7 @@ sync_record_empty_string_supressed_attributes = [
             "color_system",
             "machine",
             "notes",
+            "locale",
 ]
             
 sync_record_non_supressed_attributes = [

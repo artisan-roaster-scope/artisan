@@ -15839,13 +15839,26 @@ class ApplicationWindow(QMainWindow):
 
         self.saveGraphMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_SAVEGRAPH)
 
+
+        PDFAction = QAction("PDF...",self)
+        PDFAction.triggered.connect(self.saveVectorGraph_PDF)
+        self.saveGraphMenu.addAction(PDFAction)
+
+        SVGAction = QAction("SVG...",self)
+        SVGAction.triggered.connect(self.saveVectorGraph_SVG)
+        self.saveGraphMenu.addAction(SVGAction)
+        
         fullsizeAction = QAction(UIconst.FILE_MENU_SAVEGRAPH_FULL_SIZE,self)
         fullsizeAction.triggered.connect(self.resizeImg_0_1)
         self.saveGraphMenu.addAction(fullsizeAction)
 
-        largeSizeAction = QAction(UIconst.FILE_MENU_SAVEGRAPH_Large,self)
-        largeSizeAction.triggered.connect(self.resizeImg_1200_1)
-        self.saveGraphMenu.addAction(largeSizeAction)
+        JPEGAction = QAction("JPEG...",self)
+        JPEGAction.triggered.connect(self.resizeImg_0_1_JPEG)
+        self.saveGraphMenu.addAction(JPEGAction)
+
+        BMPAction = QAction("BMP...",self)
+        BMPAction.triggered.connect(self.resizeImg_0_1_BMP)
+        self.saveGraphMenu.addAction(BMPAction)
 
         HomeBaristaAction = QAction("Home-Barista.com (1200x?)...",self)
         HomeBaristaAction.triggered.connect(self.resizeImg_1200_1)
@@ -15866,22 +15879,14 @@ class ApplicationWindow(QMainWindow):
         CoffeeGeekAction = QAction("CoffeeGeek.com (500x?)...",self)
         CoffeeGeekAction.triggered.connect(self.resizeImg_500_1)
         self.saveGraphMenu.addAction(CoffeeGeekAction)
-
-        JPEGAction = QAction("JPEG...",self)
-        JPEGAction.triggered.connect(self.resizeImg_0_1_JPEG)
-        self.saveGraphMenu.addAction(JPEGAction)
-
-        BMPAction = QAction("BMP...",self)
-        BMPAction.triggered.connect(self.resizeImg_0_1_BMP)
-        self.saveGraphMenu.addAction(BMPAction)
-
-        SVGAction = QAction("SVG...",self)
-        SVGAction.triggered.connect(self.saveVectorGraph_SVG)
-        self.saveGraphMenu.addAction(SVGAction)
-
-        PDFAction = QAction("PDF...",self)
-        PDFAction.triggered.connect(self.saveVectorGraph_PDF)
-        self.saveGraphMenu.addAction(PDFAction)
+        
+        facebookSizeAction = QAction("Facebook (1200x628)...",self)
+        facebookSizeAction.triggered.connect(self.resizeImgSize_1200_628)
+        self.saveGraphMenu.addAction(facebookSizeAction)
+        
+        instagramSizeAction = QAction("Instagram (1080x608)...",self)
+        instagramSizeAction.triggered.connect(self.resizeImgSize_1080_608)
+        self.saveGraphMenu.addAction(instagramSizeAction)
 
 
         self.reportMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_REPORT)
@@ -24360,7 +24365,8 @@ class ApplicationWindow(QMainWindow):
                         elif self.qmc.autosaveimageformat == "JSON":
                             self.exportJSON(other_filename_path + ".json")
                         else:
-                            self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=other_filename_path)
+#                            self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=other_filename_path)
+                            self.resizeImgToSize(0,0,self.qmc.autosaveimageformat,fname=other_filename_path)
                     #restore dirs
                     QDir.setCurrent(oldDir)
                     # file might be autosaved but not uploaded to plus yet (no DROP registered). This needs to be indicated by a red plus icon
@@ -27430,6 +27436,7 @@ class ApplicationWindow(QMainWindow):
             profile["flavorstartangle"] = self.qmc.flavorstartangle
             profile["flavoraspect"] = self.qmc.flavoraspect
             profile["title"] = encodeLocal(self.qmc.title)
+            profile["locale"] = locale 
 
 #PLUS
             if self.qmc.plus_store is not None:
@@ -27703,6 +27710,7 @@ class ApplicationWindow(QMainWindow):
                             self.exportJSON(filename_also + ".json")
                         else:
                             self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=filename_also)
+                            self.resizeImgToSize(0,0,self.qmc.autosaveimageformat,fname=filename_also)
                     return True
                 else:
                     self.sendmessage(QApplication.translate("Message","Cancelled", None))
@@ -35504,47 +35512,68 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def resizeImg_0_1(self,_=False):
-        self.resizeImg(0,1)
+#        self.resizeImg(0,1)
+        self.resizeImgToSize(0,0,"PNG")
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def resizeImg_0_1_JPEG(self,_=False):
-        self.resizeImg(0,1,"JPEG")
+#        self.resizeImg(0,1,"JPEG")
+        self.resizeImgToSize(0,0,"JPEG")
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def resizeImg_0_1_BMP(self,_=False):
-        self.resizeImg(0,1,"BMP")
+#        self.resizeImg(0,1,"BMP")
+        self.resizeImgToSize(0,0,"BMP")
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def resizeImg_1200_1(self,_=False):
-        self.resizeImg(1200,1)
-
+#        self.resizeImg(1200,1)
+        self.resizeImgToSize(1200,0)
+    
     @pyqtSlot()
     @pyqtSlot(bool)
     def resizeImg_800_1(self,_=False):
-        self.resizeImg(800,1)
+#        self.resizeImg(800,1)
+        self.resizeImgToSize(800,0)
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def resizeImg_700_1(self,_=False):
-        self.resizeImg(700,1)
+#        self.resizeImg(700,1)
+        self.resizeImgToSize(700,0)
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def resizeImg_620_1(self,_=False):
-        self.resizeImg(620,1)
+#        self.resizeImg(620,1)
+        self.resizeImgToSize(620,0)
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def resizeImg_600_1(self,_=False):
-        self.resizeImg(600,1)
+#        self.resizeImg(600,1)
+        self.resizeImgToSize(600,0)
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def resizeImg_500_1(self,_=False):
-        self.resizeImg(500,1)
+#        self.resizeImg(500,1)
+        self.resizeImgToSize(500,0)
+    
+    # Facebook
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def resizeImgSize_1200_628(self,_=False):
+        self.resizeImgToSize(1200,628,"JPEG")
+
+    # Instagram
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def resizeImgSize_1080_608(self,_=False):
+        self.resizeImgToSize(1080,608,"JPEG")
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -35556,9 +35585,49 @@ class ApplicationWindow(QMainWindow):
     def saveVectorGraph_PDF(self,_=False):
         self.saveVectorGraph(extension="*.pdf")
 
-    #resizes and saves graph to a new width w
+    #resizes and saves graph to a new width w (quality depends on screen resolution)
     # transformationmode 0: fast transformation without smoothing, 1: slow using bilinear filtering (smoothing)
-    def resizeImg(self,w,transformationmode,filetype="PNG",fname=""):
+#    def resizeImg(self,w,transformationmode,filetype="PNG",fname=""):
+#        try:
+#            fileext = ".png"
+#            if filetype == "JPEG":
+#                fileext = ".jpg"
+#            elif filetype == "BMP":
+#                fileext = ".bmp"
+#            if fname == "" or fname is None:
+#                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as", None) + filetype,ext="*"+fileext)
+#            else:
+#                filename = fname
+#            if filename:
+#                self.image = aw.qmc.grab()
+#                if w != 0:
+#                    self.image = self.image.scaledToWidth(w,transformationmode)
+#
+#                if not filename.endswith(fileext):
+#                    filename += fileext
+#
+#                if filetype in ["JPEG","BMP","PNG"]:
+#                    # transparences are not supported by those file types and are rendered in black by default.
+#                    white_img = QPixmap(self.image.size())
+#                    white_img.fill() # fills by default with Qt.white
+#                    painter = QPainter(white_img)
+#                    painter.drawPixmap(0,0,self.image.width(),self.image.height(),self.image)
+#                    self.image = white_img
+#                    painter.end()
+#                    del painter
+#                self.image.save(filename,filetype)
+#
+#                x = self.image.width()
+#                y = self.image.height()
+#                self.sendmessage(QApplication.translate("Message","{0}  size({1},{2}) saved", None).format(str(filename),str(x),str(y)))
+                
+                
+
+        except IOError as ex:
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " resize() {0}").format(str(ex)))
+
+    #resizes and saves graph to a new width w and h preserving maximal image quality independent of screen resolution
+    def resizeImgToSize(self,w,h,filetype="PNG",fname=""):
         try:
             fileext = ".png"
             if filetype == "JPEG":
@@ -35566,49 +35635,50 @@ class ApplicationWindow(QMainWindow):
             elif filetype == "BMP":
                 fileext = ".bmp"
             if fname == "" or fname is None:
-                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as", None) + filetype,ext="*"+fileext)
+                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as", None) + " " + filetype,ext="*"+fileext)
             else:
                 filename = fname
             if filename:
-#                x,y = aw.qmc.fig.get_size_inches()*aw.qmc.fig.dpi # size in pixels
-#                print("x,y",x,y)  
-                  
-                self.image = aw.qmc.grab()
-                if w != 0:
-                    self.image = self.image.scaledToWidth(w,transformationmode)
-
                 if not filename.endswith(fileext):
                     filename += fileext
 
-                if filetype in ["JPEG","BMP","PNG"]:
-                    # transparences are not supported by those file types and are rendered in black by default.
-                    white_img = QPixmap(self.image.size())
-                    white_img.fill() # fills by default with Qt.white
-                    painter = QPainter(white_img)
-                    painter.drawPixmap(0,0,self.image.width(),self.image.height(),self.image)
-                    self.image = white_img
-                    painter.end()
-                    del painter
-                self.image.save(filename,filetype)
+                x,y = aw.qmc.fig.get_size_inches()
                 
-#                # Insta: 1080 x 608px
-#                fig_dpi = aw.qmc.fig.dpi / aw.devicePixelRatio()
-#                aw.qmc.fig.set_size_inches(1080/fig_dpi, 608/fig_dpi) #(15,8.445) #(10.8, 6.08)
-#                aw.qmc.fig.savefig(filename,
-#                        dpi=fig_dpi, #72, #100,
-#                        backend="agg",
-#                        transparent=(aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"]=='None'),
-#                        #bbox_inches='tight',
-#                        #backend='pgf', # slow and fails on # characters in TeX backend
-#                        facecolor=str(aw.qmc.palette["canvas"]),
-#                        edgecolor=None
-#                ) # transparent=True is need to get the delta curves and legend drawn
+                adjust_fig_size = False
+                if w == 0 and h == 0:
+                    # high-res, keep aspect ratio as is
+                    fig_dpi = 300
+                elif w != 0:
+                    # compute fig_dpi to achieve the requested width
+                    fig_dpi = w / x
+                if w != 0 and h != 0:
+                    # fig_dpi is already computed to achieve the requested width
+                    # now adjust the height
+                    adjust_fig_size = True
+                if adjust_fig_size:
+                    self.qmc.fig.set_size_inches(w/fig_dpi, h/fig_dpi)
+                    res_x = int(w)
+                    res_y = int(h)
+                else:
+                    res_x = int(x*fig_dpi)
+                    res_y = int(y*fig_dpi)
+                self.qmc.fig.savefig(filename,
+                        dpi=fig_dpi,
+                        backend="agg",
+                        transparent=(aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"]=='None'),
+                        #bbox_inches='tight',
+                        #backend='pgf', # slow and fails on # characters in TeX backend
+                        facecolor=str(aw.qmc.palette["canvas"]),
+                        edgecolor=None
+                ) # transparent=True is need to get the delta curves and legend drawn
 
-                x = self.image.width()
-                y = self.image.height()
-                self.sendmessage(QApplication.translate("Message","{0}  size({1},{2}) saved", None).format(str(filename),str(x),str(y)))
-                
-                
+                if adjust_fig_size:
+                    # reset figure size
+                    self.qmc.fig.set_size_inches(x,y)
+                    # and redraw
+                    self.qmc.lazyredraw_on_resize_timer.start(2)
+            
+                self.sendmessage(QApplication.translate("Message","{0}  size({1},{2}) saved", None).format(str(filename),str(res_x),str(res_y)))
 
         except IOError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " resize() {0}").format(str(ex)))
