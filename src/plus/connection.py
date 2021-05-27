@@ -233,6 +233,13 @@ def authentify():
 def getHeaders(authorized=True,decompress=True):
     os,os_version = config.app_window.get_os() # @UndefinedVariable
     headers = {'user-agent': 'Artisan/' + __version__ + " (" + os + "; " + os_version + ")"}
+    try:
+        locale = config.app_window.get_locale()
+        if locale is not None and locale != "":
+            locale = locale.lower().replace("_","-")
+            headers['Accept-Language'] = locale
+    except:
+        pass
     if authorized:
         token = getToken()
         if token is not None:

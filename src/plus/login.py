@@ -23,13 +23,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5.QtWidgets import QApplication,QDialog,QCheckBox,QGroupBox,QHBoxLayout,QVBoxLayout,QLabel,QLineEdit,QDialogButtonBox,QAction
+from PyQt5.QtWidgets import QApplication,QCheckBox,QGroupBox,QHBoxLayout,QVBoxLayout,QLabel,QLineEdit,QDialogButtonBox,QAction
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtCore import (Qt,pyqtSlot)
 
 from plus import config
 
-class Login(QDialog):
+from artisanlib.dialogs import ArtisanDialog
+
+class Login(ArtisanDialog):
     def __init__(self, parent=None,email=None,saved_password=None,remember_credentials=True):
         super(Login, self).__init__(parent)
         
@@ -43,7 +45,6 @@ class Login(QDialog):
         self.linkResetPassword.setOpenExternalLinks(True)
         
         self.dialogbuttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel,Qt.Horizontal)
-        aw = config.app_window
         self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.Ok),"OK",QApplication.translate("Button","OK", None))
         self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.Cancel),"Cancel",QApplication.translate("Button","Cancel", None))
         

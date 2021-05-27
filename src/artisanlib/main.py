@@ -5925,7 +5925,7 @@ class tgraphcanvas(FigureCanvas):
                     TP_index = self.backgroundtime2index(TP_time) + timeindex[0]
 
                     TP_time = TP_time - t0
-                    st1 = aw.arabicReshape("TP {0}",stringfromseconds(TP_time_loaded,False))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}", None),stringfromseconds(TP_time_loaded,False))
                     anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1)
                 #Add Dry End markers
                 if timeindex[1]:
@@ -14206,9 +14206,9 @@ class VMToolbar(NavigationToolbar):
     def subscription(self):
         remaining_days = max(0,(aw.plus_paidUntil.date() - datetime.datetime.now().date()).days)
         if remaining_days == 1:
-            days = QApplication.translate("Plus","1 day",None)
+            days = QApplication.translate("Plus","1 day left",None)
         else:
-            days = str(remaining_days) + ' ' + QApplication.translate("Plus","days",None)
+            days = QApplication.translate("Plus","{} days left",None).format(remaining_days)
         pu = aw.plus_paidUntil.date()
         message = QApplication.translate("Plus","Paid until",None) + ' ' + QDate(pu.year,pu.month,pu.day).toString(Qt.SystemLocaleShortDate)
         if remaining_days <31:
@@ -14216,10 +14216,10 @@ class VMToolbar(NavigationToolbar):
                 style = "background-color:#cc0f50;color:white;"
             else:
                 style = ""
-            message += '<blockquote><b><span style="' + style + '">&nbsp; ' + days + ' left &nbsp;</span></b></blockquote>'
+            message += '<blockquote><b><span style="' + style + '">&nbsp; ' + days + ' &nbsp;</span></b></blockquote>'
         else:
             message += '<br><br>'
-        message += 'Please visit our <a href="' + plus.config.shop_base_url + '">shop</a> to extend your subscription'
+        message += QApplication.translate("Plus","Please visit our {0}shop{1} to extend your subscription").format('<a href="' + plus.config.shop_base_url + '">','</a>')
         #
         # if less then 31 days:
         # n days left <= rot if <=3
@@ -29944,6 +29944,9 @@ class ApplicationWindow(QMainWindow):
                         return "",""
         except:
             return "",""
+    
+    def get_locale(self):
+        return locale
 
     def closeEventSettings(self, filename=None):
         #save window geometry and position. See QSettings documentation.
@@ -36549,7 +36552,7 @@ class ApplicationWindow(QMainWindow):
             # background
             if exp == 4:
                 res = self.analysisGetResults(exp=4, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
-                self.cfr["equ_background"] = QApplication.translate("Label","Bkgd",None)
+                self.cfr["equ_background"] = QApplication.translate("Label","Bkgnd",None)
                 self.cfr["dbt_background"] = res["mse_BT"]
                 self.cfr["dbdbt_background"] = res["mse_deltaBT"]
                 self.cfr["r2_deltabt_background"] = res["r2_deltaBT"]
