@@ -694,8 +694,8 @@ class HUDDlg(ArtisanDialog):
                                       "Source Han Sans CN",
                                       "Source Han Sans TW",
                                       "Source Han Sans HK",
-                                      "Source Han Sans JP",
                                       "Source Han Sans KR",
+                                      "Source Han Sans JP",
                                       "Dijkstra"])
         self.GraphFont.setCurrentIndex(self.aw.qmc.graphfont)
         self.GraphFont.currentIndexChanged.connect(self.changeGraphFont)

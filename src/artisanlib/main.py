@@ -20572,27 +20572,27 @@ class ApplicationWindow(QMainWindow):
         elif self.qmc.graphfont == 4: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Simplified Chinese
             rcParams['font.size'] = 12.0
-            rcParams['font.family'] = ['SourceHanSansCN-Regular']
+            rcParams['font.family'] = ['source han sans cn']
             aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansCN-Regular.otf")
         elif self.qmc.graphfont == 5: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Traditional Chinese, Taiwan
             rcParams['font.size'] = 12.0
-            rcParams['font.family'] = ['SourceHanSansTW-Regular']
+            rcParams['font.family'] = ['source han sans tw']
             aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansTW-Regular.otf")
         elif self.qmc.graphfont == 6: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Traditional Chinese, Hong Kong
             rcParams['font.size'] = 12.0
-            rcParams['font.family'] = ['SourceHanSansHK-Regular']
+            rcParams['font.family'] = ['source han sans hk']
             aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansHK-Regular.otf")
         elif self.qmc.graphfont == 7: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Korean
             rcParams['font.size'] = 12.0
-            rcParams['font.family'] = ['SourceHanSansKR-Regular']
+            rcParams['font.family'] = ['source han sans kr']
             aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansKR-Regular.otf")
         elif self.qmc.graphfont == 8: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Japanese
             rcParams['font.size'] = 12.0
-            rcParams['font.family'] = ['SourceHanSansJP-Regular']
+            rcParams['font.family'] = ['source han sans jp']
             aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansJP-Regular.otf")
         elif self.qmc.graphfont == 9: 
             # font Dijkstra selected
@@ -20617,6 +20617,7 @@ class ApplicationWindow(QMainWindow):
 
     def set_mpl_fontproperties(self,fontpath):
         if os.path.exists(fontpath):
+            mpl.font_manager.fontManager.addfont(fontpath)
             self.mpl_fontproperties = mpl.font_manager.FontProperties(fname=fontpath)
 
     # trims arabic strings to be rendered correctly with unicode fonts if arabic locale is active
