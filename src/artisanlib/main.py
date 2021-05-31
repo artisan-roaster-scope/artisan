@@ -3825,7 +3825,16 @@ class tgraphcanvas(FigureCanvas):
                 btime = self.timeB[self.timeindexB[0]]
             elif self.timeindexB[0] != -1: # if no foreground profile, align 0:00 to the CHARGE event of the background profile
                 ptime = 0
-                btime = self.timeB[self.timeindexB[0]]
+                if self.flagstart:
+                    if len(self.timeB)>0:
+                        btime = self.timeB[0]
+                    else:
+                        btime = 0
+                else:
+                    if len(self.timeB)>self.timeindexB[0]:
+                        btime = self.timeB[self.timeindexB[0]]
+                    else:
+                        btime = 0
             if ptime is not None and btime is not None:
                 difference = ptime - btime
                 if difference > 0:
@@ -9924,6 +9933,7 @@ class tgraphcanvas(FigureCanvas):
 
             self.timeclock.start()   #set time to the current computer time, otherwise the recorded timestamps append to the time on START after ON which might be long!
             self.flagstart = True
+            self.timealign(redraw=True)
             # start Monitor if not yet running
             if not self.flagon:
                 self.OnMonitor()
@@ -35683,7 +35693,10 @@ class ApplicationWindow(QMainWindow):
                     # reset figure size
                     self.qmc.fig.set_size_inches(x,y)
                     # and redraw
-                    self.qmc.lazyredraw_on_resize_timer.start(2)
+                    if self.qmc.wheelflag:
+                        self.qmc.drawWheel()
+                    else:
+                        self.qmc.lazyredraw_on_resize_timer.start(2)
             
                 self.sendmessage(QApplication.translate("Message","{0}  size({1},{2}) saved", None).format(str(filename),str(res_x),str(res_y)))
 
