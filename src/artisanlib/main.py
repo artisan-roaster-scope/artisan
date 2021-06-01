@@ -31718,7 +31718,7 @@ class ApplicationWindow(QMainWindow):
             ["dry_phase_ror",       "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','Dry Phase RoR',None)        ],
             ["mid_phase_ror",       "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','Mid Phase RoR',None)        ],
             ["finish_phase_ror",    "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','Finish Phase RoR',None)     ],
-            ["dsd['computed']['finish_phase_ror'] * (dsd['computed']['finishphasetime'] / 60)", "eval", "temp", "false", "temp", QApplication.translate('HTML Report Template','Finish Phase Rise',None)],
+            ["dsd['computed']['finish_phase_ror'] * (dsd['computed']['finishphasetime'] / 60)", "eval", "float1", "false", "temp", QApplication.translate('HTML Report Template','Finish Phase Rise',None)],
             ["total_ror",           "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','Total RoR',None)            ],
             ["fcs_ror",             "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','FCs RoR',None)              ],
             ["MET",                 "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','MET',None)                  ],
