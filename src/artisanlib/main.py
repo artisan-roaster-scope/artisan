@@ -274,6 +274,7 @@ class Artisan(QtSingleApplication):
 
     # takes a QUrl and interprets it as follows
     # artisan://roast/<UUID> : loads profile from path associated with the given roast <UUID>
+    # artisan://profile?<url>
     # file://<path>
     def open_url(self, url):
         if not aw.qmc.flagon and not aw.qmc.designerflag and not aw.qmc.wheelflag and aw.qmc.flavorchart_plot is None: # only if not yet monitoring
@@ -286,6 +287,13 @@ class Artisan(QtSingleApplication):
                     if profile_path:
                         aw.sendmessage(QApplication.translate("Message","URL open profile: {0}",None).format(profile_path))
                         self.open_url(QUrl.fromLocalFile(profile_path))
+            elif url.scheme() == "artisan" and url.authority() == 'profile' and url.hasQuery():
+                try:
+                    QTimer.singleShot(20,lambda: aw.importExternalURL(aw.artisanURLextractor,url=QUrl(url.query())))
+                except:
+#                    import traceback
+#                    traceback.print_exc(file=sys.stdout)
+                    pass                
             elif url.scheme() == "file":
                 if not url.hasQuery() or  url.query() != "background":
                     QTimer.singleShot(20,lambda: self.activateWindow())
@@ -15672,6 +15680,10 @@ class ApplicationWindow(QMainWindow):
         self.updateRecentFileActions()
 
         self.importMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_IMPORT)
+        
+        urlImportAction = QAction("Artisan URL...",self)
+        urlImportAction.triggered.connect(self.urlImport)
+        self.importMenu.addAction(urlImportAction)
 
         fileImportCSVAction = QAction("Artisan CSV...",self)
         fileImportCSVAction.triggered.connect(self.fileImportCSV)
@@ -28017,6 +28029,24 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " fileImport(): {0}").format(str(ex)),exc_tb.tb_lineno)
 
+    def artisanURLextractor(self,url,_):
+        import requests
+        from requests_file import FileAdapter  # @UnresolvedImport
+        s = requests.Session()
+        s.mount('file://', FileAdapter())
+        resp = s.get(url.toString(), timeout=(4, 15), headers={"Accept-Encoding" : "gzip"})
+        return ast.literal_eval(resp.text)
+    
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def urlImport(self,_=False):
+        try:
+            self.importExternalURL(self.artisanURLextractor,QApplication.translate("Message","Import Artisan URL", None))
+        except:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            pass
+    
     @pyqtSlot()
     @pyqtSlot(bool)
     def fileImportCSV(self,_=False):
@@ -35326,9 +35356,11 @@ class ApplicationWindow(QMainWindow):
 #            traceback.print_exc(file=sys.stdout)
             pass
     
-    def importExternalURL(self,extractor,message):
+    # url a QUrl
+    def importExternalURL(self,extractor,message="",url=None):
         try:
-            url = self.ArtisanOpenURLDialog(msg=message)
+            if url is None:
+                url = self.ArtisanOpenURLDialog(msg=message)
             if url is None:
                 return
             pass
