@@ -14420,7 +14420,10 @@ class SampleThread(QThread):
     # to linear time based on tx and the current sampling interval
     def decay_average(self,tx,temp,decay_weights):
         if len(tx) != len(temp):
-            return temp
+            if len(temp)>0:
+                return temp[-1]
+            else:
+                return -1
         else:
             l = min(len(decay_weights),len(temp))
             d = aw.qmc.delay / 1000.
