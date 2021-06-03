@@ -1,6 +1,6 @@
 [General]
-Delay=1000
-Oversampling=true
+Delay=2000
+Oversampling=false
 
 [Device]
 id=79

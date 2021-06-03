@@ -1,7 +1,9 @@
 [General]
-Delay=1000
+Delay=2000
 Oversampling=false
 roastertype_setup=Giesen WxA IR
+dropDuplicates=true
+dropDuplicatesLimit=0.2
 
 [ArduinoPID]
 dutyMax=100
@@ -104,7 +106,7 @@ slot=0
 start=38, 36, 48, 52, 18, 10, 14, 16, 90, 0
 type=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 optimizer=true
-fetch_max_blocks=true
+fetch_max_blocks=false
 
 [Sliders]
 ModeTempSliders=C

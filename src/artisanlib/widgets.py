@@ -19,7 +19,7 @@
 from artisanlib.util import stringtoseconds
 
 from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot)
-from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QTableWidgetItem, QSizePolicy, QLCDNumber)
+from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox)
 from PyQt5.QtGui import QFontMetrics
 
 class MyQComboBox(QComboBox):
@@ -179,6 +179,20 @@ class ClickableQLabel(QLabel):
         elif event.button() == Qt.RightButton:
             self.right_clicked.emit()
 
+class ClickableQGroupBox(QGroupBox):
+    clicked = pyqtSignal()
+    left_clicked = pyqtSignal()
+    right_clicked = pyqtSignal()
+    
+    def __init__(self, *args, **kwargs):
+        super(ClickableQGroupBox, self).__init__(*args, **kwargs)
+
+    def mousePressEvent(self, event):
+        self.clicked.emit()
+        if event.button() == Qt.LeftButton:
+            self.left_clicked.emit()
+        elif event.button() == Qt.RightButton:
+            self.right_clicked.emit()
 
 class MyQLCDNumber(QLCDNumber):
     clicked = pyqtSignal()
