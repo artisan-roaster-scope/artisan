@@ -16,7 +16,8 @@ Menu: `Config`>> `Curves`
 
 These are critical settings within Artisan and for most the first two tabs will be where your focus lies.  After you understand Curves, there are advanced roast analysis tools using the Analyze feature which is explained in an Artisan Blog article - [Analyzer](https://artisan-roasterscope.blogspot.com/2019/11/analyzer.html)
 
-First you decide which ROR curves and LCD’s you want to display.
+First you decide which ROR curves and LCD’s you want to display.  **NOTE you wont see your ROR curves without pushing the CHARGE button during the roast.** 
+
 ![curves ror](/assets/images/gsg/curves ror.png)
 
 The order of Delta LCDs can now be swapped too (the BT/ET LCDs can be swapped in the device config menu).The order curves are shown now respects the order of LCDs (from top to bottom). Thus if the DeltaET LCD is shown above the DeltaBT LCD, also the DeltaET curve is drawn above the DeltaBT curve (menu `Config` >> `Curves`, 1st tab `RoR`).    
