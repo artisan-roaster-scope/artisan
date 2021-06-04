@@ -104,7 +104,7 @@ if pyqtversion < 6:
     from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport @UnusedImport
     from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport @UnusedImport
                               qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport @UnusedImport
-                              QRegularExpression, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnusedImport
+                              QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnusedImport
     from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @UnusedImport
     
     try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
@@ -274,7 +274,7 @@ class Artisan(QtSingleApplication):
 
     # takes a QUrl and interprets it as follows
     # artisan://roast/<UUID> : loads profile from path associated with the given roast <UUID>
-    # artisan://profile?<url>
+    # artisan://profile?url=<url>
     # file://<path>
     def open_url(self, url):
         if not aw.qmc.flagon and not aw.qmc.designerflag and not aw.qmc.wheelflag and aw.qmc.flavorchart_plot is None: # only if not yet monitoring
@@ -289,8 +289,11 @@ class Artisan(QtSingleApplication):
                         self.open_url(QUrl.fromLocalFile(profile_path))
             elif url.scheme() == "artisan" and url.authority() == 'profile' and url.hasQuery():
                 try:
-                    QTimer.singleShot(20,lambda: aw.importExternalURL(aw.artisanURLextractor,url=QUrl(url.query())))
-                except:
+                    query = QUrlQuery(url.query())
+                    print(query)
+                    if query.hasQueryItem("url"):
+                        QTimer.singleShot(5,lambda: aw.importExternalURL(aw.artisanURLextractor,url=QUrl(query.queryItemValue("url"))))
+                except Exception:
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     pass                
