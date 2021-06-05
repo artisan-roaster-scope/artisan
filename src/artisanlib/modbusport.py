@@ -209,8 +209,8 @@ class modbusport(object):
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        retry_on_empty=True,
-                        retry_on_invalid=True,
+                        retry_on_empty=False,
+                        retry_on_invalid=False,
                         reset_socket=self.reset_socket,
                         timeout=self.timeout)
                 elif self.type == 2: # Serial Binary
@@ -222,8 +222,8 @@ class modbusport(object):
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        retry_on_empty=True,
-                        retry_on_invalid=True,
+                        retry_on_empty=False,
+                        retry_on_invalid=False,
                         reset_socket=self.reset_socket,
                         timeout=self.timeout)  
                 elif self.type == 3: # TCP
@@ -232,8 +232,8 @@ class modbusport(object):
                         self.master = ModbusTcpClient(
                                 host=self.host, 
                                 port=self.port,
-                                retry_on_empty=True,
-                                retry_on_invalid=True,
+                                retry_on_empty=False,   # only supported for serial clients in v2.5.2
+                                retry_on_invalid=False, # only supported for serial clients in v2.5.2
                                 reset_socket=self.reset_socket,
                                 retries=1,
                                 timeout=0.5, #self.timeout
@@ -250,8 +250,8 @@ class modbusport(object):
                         self.master = ModbusUdpClient(
                             host=self.host, 
                             port=self.port,
-                            retry_on_empty=True,
-                            retry_on_invalid=True,
+                            retry_on_empty=False,   # only supported for serial clients in v2.5.2
+                            retry_on_invalid=False, # only supported for serial clients in v2.5.2
                             reset_socket=self.reset_socket,
                             retries=3,
                             timeout=0.4, #self.timeout
@@ -270,7 +270,8 @@ class modbusport(object):
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        retry_on_empty=False,
+                        retry_on_empty=False,  # by default False for faster speed
+                        retry_on_invalid=False, # by default False
                         reset_socket=self.reset_socket,
                         strict=False, # settings this to False disables the inter char timeout restriction
                         timeout=self.timeout)
@@ -492,8 +493,8 @@ class modbusport(object):
             self.master.mask_write_register(int(register),int(and_mask),int(or_mask),unit=int(slave))
             time.sleep(.03)
         except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:

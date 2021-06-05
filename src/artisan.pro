@@ -12,6 +12,10 @@
 #
 # This file is part of Artisan.
 
+# not sure if the following is strictly needed
+#CODECFORSRC = UTF-8
+#CODECFORTR = UTF-8
+
 SOURCES = \
     artisanlib/alarms.py \
     artisanlib/autosave.py \

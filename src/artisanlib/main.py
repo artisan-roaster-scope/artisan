@@ -8654,7 +8654,7 @@ class tgraphcanvas(FigureCanvas):
                     if "BTU_batch_per_green_kg" in cp and cp["BTU_batch_per_green_kg"]:
                         statstr += " ({}kWh/kg)".format(str(aw.float2float(aw.qmc.convertHeat(cp["BTU_batch_per_green_kg"],0,3),2)))
                 if "CO2_batch" in cp and cp["CO2_batch"]:
-                    statstr += "\n{}: {}g".format(QApplication.translate("AddlInfo", "CO²", None),str(aw.float2float(cp["CO2_batch"],0)))
+                    statstr += "\n{}: {}g".format(QApplication.translate("AddlInfo", "CO2", None).replace("CO2","CO²"),str(aw.float2float(cp["CO2_batch"],0)))
                     if "CO2_batch_per_green_kg" in cp and cp["CO2_batch_per_green_kg"]:
                         statstr += " ({}g/kg)".format(str(aw.float2float(cp["CO2_batch_per_green_kg"],0)))
                 if cp["AUC"]:
@@ -10065,6 +10065,15 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.clearMeasurements(andLCDs=False)
                 elif self.timex != []: # there is a profile loaded, we have to reset
                     aw.qmc.reset(True,False)
+                try:
+                    settings = QSettings()
+                    starts = 0
+                    if settings.contains("starts"):
+                        starts = settings.value("starts")
+                    settings.setValue("starts",starts+1)
+                    settings.sync()
+                except Exception:
+                    pass
                 self.OnRecorder()
         #turn STOP
         else:
@@ -18240,7 +18249,36 @@ class ApplicationWindow(QMainWindow):
 
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatusSlot)
+        
+        QTimer.singleShot(10,self.donate)
 
+    def donate(self):
+        try:
+            everytime = 6*30*24*60*60 # 6 month in seconds
+            everystarts = 50
+            starts = None
+            lastdonationpopup = None
+            settings = QSettings()
+            if settings.contains("starts"):
+                starts = settings.value("starts")
+            if settings.contains("lastdonationpopup"):
+                lastdonationpopup = settings.value("lastdonationpopup")
+            now = int(libtime.time())
+            if not(settings.status() == 0 and lastdonationpopup is not None and starts is not None and (now >= lastdonationpopup) and (lastdonationpopup > now-everytime) and starts >= 0 and starts < everystarts): 
+                message = QApplication.translate("Message","Please support Artisan with your donation!",None)
+                message += '<br><br><a href="{0}">{0}</a>'.format("https://artisan-scope.org/donate/")
+                donate_message_box = QMessageBox(self)
+                donate_message_box.setText(message)    
+                donate_message_box.setIcon(QMessageBox.Information)
+                donate_message_box.setModal(True)
+                donate_message_box.setStandardButtons(QMessageBox.Ok)
+                donate_message_box.setDefaultButton(QMessageBox.Ok)
+                donate_message_box.exec()
+                settings.setValue("lastdonationpopup",now)
+                settings.setValue("starts",0)
+                settings.sync()
+        except Exception:
+            pass
 
     @pyqtSlot(str)
     def setCanvasColor(self,c):
@@ -31795,17 +31833,17 @@ class ApplicationWindow(QMainWindow):
             ["mode",                "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Mode',None)                 ],
             ["BTU_batch",           "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU Batch',None)            ],
             ["BTU_batch_per_green_kg","comp","float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU Batch per green kg',None)],
-            ["CO2_batch",           "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO² Batch',None)            ],
+            ["CO2_batch",           "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2 Batch',None).replace("CO2","CO²")            ],
             ["BTU_preheat",         "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU Preheat',None)          ],
-            ["CO2_preheat",         "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO² Preheat',None)          ],
+            ["CO2_preheat",         "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2 Preheat',None).replace("CO2","CO²")          ],
             ["BTU_bbp",             "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU BBP',None)              ],
-            ["CO2_bbp",             "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO² BBP',None)              ],
+            ["CO2_bbp",             "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2 BBP',None).replace("CO2","CO²")              ],
             ["BTU_cooling",         "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU Cooling',None)          ],
-            ["CO2_cooling",         "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO² Cooling',None)          ],
+            ["CO2_cooling",         "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2 Cooling',None).replace("CO2","CO²")          ],
             ["BTU_roast",           "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU Roast',None)            ],
             ["BTU_roast_per_green_kg","comp","float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU Roast per green kg',None)],
-            ["CO2_roast",           "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO² Roast',None)            ],
-            ["CO2_batch_per_green_kg","comp","float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO² Batch per green kg',None)],
+            ["CO2_roast",           "comp",  "float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2 Roast',None).replace("CO2","CO²")            ],
+            ["CO2_batch_per_green_kg","comp","float1",   "false",  "(g)",   QApplication.translate('HTML Report Template','CO2 Batch per green kg',None).replace("CO2","CO²")],
             ["BTU_LPG",             "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU LPG',None)              ],
             ["BTU_NG",              "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU NG',None)               ],
             ["BTU_ELEC",            "comp",  "float1",   "false",  "(BTU)", QApplication.translate('HTML Report Template','BTU ELEC',None)             ],
@@ -33077,7 +33115,7 @@ class ApplicationWindow(QMainWindow):
                 color=color,
                 energy_label=QApplication.translate("HTML Report Template", "Energy:", None),
                 energy=energy,
-                CO2_label=QApplication.translate("HTML Report Template", "CO²:", None),
+                CO2_label=QApplication.translate("HTML Report Template", "CO2:", None).replace("CO2","CO²"),
                 CO2=CO2,
                 charge_label=QApplication.translate("HTML Report Template", "CHARGE:", None),
                 charge=charge,
