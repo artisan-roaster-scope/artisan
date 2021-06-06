@@ -8710,6 +8710,8 @@ class tgraphcanvas(FigureCanvas):
                     prop.set_size(prop_size)
                 if aw.qmc.graphfont == 2:   #Comic
                     ls = 1.2
+                if aw.qmc.graphfont == 9:   #Dijkstra
+                    ls = 1.2
 
                 if aw.qmc.legendloc != 1:
                     # legend not in upper right
@@ -27780,7 +27782,6 @@ class ApplicationWindow(QMainWindow):
                         elif self.qmc.autosaveimageformat == "JSON":
                             self.exportJSON(filename_also + ".json")
                         else:
-                            self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=filename_also)
                             self.resizeImgToSize(0,0,self.qmc.autosaveimageformat,fname=filename_also)
                     return True
                 else:
