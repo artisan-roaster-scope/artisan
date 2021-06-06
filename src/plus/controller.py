@@ -172,7 +172,11 @@ def connect(clear_on_failure=False,interactive=True):
                     config.logger.info("Artisan v%s (%s, %s) connected",str(__version__),str(__revision__),str(__build__))
                     try:
                         queue.start() # start the outbox queue
-                    except:
+                    except Exception:
+                        pass
+                    try:
+                        config.app_window.resetDonateCounter()
+                    except Exception:
                         pass
                 else:
                     if clear_on_failure:

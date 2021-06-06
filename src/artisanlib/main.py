@@ -18250,8 +18250,14 @@ class ApplicationWindow(QMainWindow):
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatusSlot)
         
-        QTimer.singleShot(10,self.donate)
+        QTimer.singleShot(2000,self.donate)
 
+    def resetDonateCounter(self):
+        settings = QSettings()
+        settings.setValue("lastdonationpopup",int(libtime.time()))
+        settings.setValue("starts",0)
+        settings.sync()
+        
     def donate(self):
         try:
             everytime = 6*30*24*60*60 # 6 month in seconds
@@ -18274,9 +18280,7 @@ class ApplicationWindow(QMainWindow):
                 donate_message_box.setStandardButtons(QMessageBox.Ok)
                 donate_message_box.setDefaultButton(QMessageBox.Ok)
                 donate_message_box.exec()
-                settings.setValue("lastdonationpopup",now)
-                settings.setValue("starts",0)
-                settings.sync()
+                self.resetDonateCounter()
         except Exception:
             pass
 
