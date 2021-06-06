@@ -290,7 +290,6 @@ class Artisan(QtSingleApplication):
             elif url.scheme() == "artisan" and url.authority() == 'profile' and url.hasQuery():
                 try:
                     query = QUrlQuery(url.query())
-                    print(query)
                     if query.hasQueryItem("url"):
                         QTimer.singleShot(5,lambda: aw.importExternalURL(aw.artisanURLextractor,url=QUrl(query.queryItemValue("url"))))
                 except Exception:
@@ -8701,6 +8700,8 @@ class tgraphcanvas(FigureCanvas):
                 tc = aw.labelBorW(fc)                   #text color
                 a = aw.qmc.alpha["statsanalysisbkgnd"]     #alpha
                 ls = 1.7                     #linespacing
+                if aw.qmc.graphfont == 9:   #Dijkstra
+                    ls = 1.2
                 border = 10                  #space around outside of text box (in seconds)
                 margin = 4                   #text to edge of text box
 
