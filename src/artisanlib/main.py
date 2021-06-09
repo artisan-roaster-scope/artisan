@@ -14026,6 +14026,26 @@ def my_get_icon(name):
         None
 
 def my_fedit(data, title="", comment="", icon=None, parent=None, apply=None):
+    # Sorting for default labels (_lineXXX, _imageXXX).
+    def cmp_key(label):
+        match = re.match(r"(_line|_image)(\d+)", label)
+        if match:
+            return match.group(1), int(match.group(2))
+        else:
+            return label, 0
+
+    axes = aw.qmc.ax
+    figure = aw.qmc.fig
+    orig_xlim = axes.get_xlim()
+    orig_ylim = axes.get_ylim()
+    linedict = {}
+    for line in axes.get_lines():
+        label = line.get_label()
+        if label == '_nolegend_':
+            continue
+        linedict[label] = line
+    curvelabels = sorted(linedict, key=cmp_key)
+     
     if len(data) > 1:
         # just take the Curve Styles and drop the Axis settings
         data = data[1][0]
@@ -14066,7 +14086,33 @@ def my_fedit(data, title="", comment="", icon=None, parent=None, apply=None):
                     l[0] = translated_tpls
         except Exception:
             pass
-    return formlayout.fedit_org(data,QApplication.translate("Toolbar", 'Lines', None),comment,icon,parent,apply)
+        def my_apply(data):
+            try:
+                # Set / Curves
+                for index, curve in enumerate(data):
+                    line = linedict[curvelabels[index]]
+                    (label, linestyle, drawstyle, linewidth, color, marker, markersize,
+                     markerfacecolor, markeredgecolor) = curve
+                    line.set_label(label)
+                    line.set_linestyle(linestyle)
+                    line.set_drawstyle(drawstyle)
+                    line.set_linewidth(linewidth)
+                    rgba = mcolors.to_rgba(color)
+                    line.set_alpha(None)
+                    line.set_color(rgba)
+                    if marker != 'none':
+                        line.set_marker(marker)
+                        line.set_markersize(markersize)
+                        line.set_markerfacecolor(markerfacecolor)
+                        line.set_markeredgecolor(markeredgecolor)
+                # Redraw
+                figure.canvas.draw()
+                if not (axes.get_xlim() == orig_xlim and axes.get_ylim() == orig_ylim):
+                    figure.canvas.toolbar.push_current()                                
+                        
+            except Exception:
+                pass
+    return formlayout.fedit_org(data,QApplication.translate("Toolbar", 'Lines', None),comment,icon,parent,my_apply) #@UndefinedVariable
 
 #####
 
@@ -14102,7 +14148,7 @@ class VMToolbar(NavigationToolbar):
             # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
             a = QAction(self._icon("qt4_editor_options.png"),QApplication.translate("Toolbar", 'Lines', None),self)
             a.triggered.connect(self.edit_parameters)
-            a.setToolTip(QApplication.translate("Tooltip", 'Edit axis and curve parameters', None))
+            a.setToolTip(QApplication.translate("Tooltip", 'Line styles', None))
             self.insertAction(self.actions()[-1],a)
 
         # adjust for dark or light canvas and set hover/selection style
@@ -14140,9 +14186,8 @@ class VMToolbar(NavigationToolbar):
         if not svgsupport:
             figureoptions.get_icon = my_get_icon
         # monkey patch _formlayout
-        
         try:
-            formlayout.fedit_org
+            formlayout.fedit_org #@UndefinedVariable
         except Exception:
             # not yet monkey patched
             formlayout.fedit_org = formlayout.fedit
@@ -30059,8 +30104,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.etypes[2] = self.qmc.l_eventtype3dots.get_label()
                 self.qmc.etypes[3] = self.qmc.l_eventtype4dots.get_label()
         except Exception as e:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fetchCurveStyles() {0}").format(str(e)),exc_tb.tb_lineno)
 
