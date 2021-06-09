@@ -175,6 +175,8 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 from matplotlib.backend_bases import LocationEvent as mplLocationevent
 
 import matplotlib.backends.qt_editor.figureoptions as figureoptions
+import matplotlib.backends.qt_editor._formlayout as formlayout
+
 
 
 
@@ -14023,19 +14025,65 @@ def my_get_icon(name):
     else:
         None
 
+def my_fedit(data, title="", comment="", icon=None, parent=None, apply=None):
+    if len(data) > 1:
+        # just take the Curve Styles and drop the Axis settings
+        data = data[1][0]
+        # add translations
+        trans = {
+            "Label": QApplication.translate("Label", 'Label', None),
+            "<b>Line</b>": "<b>{}</b>".format(QApplication.translate("Label", 'Line', None)),
+            "Line style": QApplication.translate("Label", 'Line style', None),
+            "Draw style": QApplication.translate("Label", 'Draw style', None),
+            "Width": QApplication.translate("Label", 'Width', None),
+            "Color (RGBA)": QApplication.translate("Label", 'Color (RGBA)', None),
+            "<b>Marker</b>": "<b>{}</b>".format(QApplication.translate("Label", 'Marker', None)),
+            "Style": QApplication.translate("Label", 'Symbol', None),
+            "Size": QApplication.translate("Label", 'Size', None),
+            "Face color (RGBA)": QApplication.translate("Label", 'Face color (RGBA)', None),
+            "Edge color (RGBA)": QApplication.translate("Label", 'Edge color (RGBA)', None),
+        }
+        try:
+            for l in data:
+                if isinstance(l, (list, tuple)) and len(l)>0:
+                    translated_tpls = [] # translated tuples l[0]
+                    for tpl in l[0]:
+                        if isinstance(tpl, list) and len(tpl) > 0:
+                            if tpl[0] in trans:
+                                tpl[0] = trans[tpl[0]]
+                            translated_tpls.append(tpl)
+                        elif isinstance(tpl, tuple) and len(tpl) > 0:
+                            if tpl[0] in trans:
+                                tpl_list = list(tpl)
+                                tpl_list[0] = trans[tpl[0]]
+                                translated_tpls.append(tuple(tpl_list))
+                            elif len(tpl)>1 and tpl[0] is None and tpl[1] is not None and tpl[1] in trans:
+                                tpl_list = list(tpl)
+                                tpl_list[1] = trans[tpl[1]]
+                                translated_tpls.append(tuple(tpl_list))
+                            else:
+                                translated_tpls.append(tpl)
+                    l[0] = translated_tpls
+        except Exception:
+            pass
+    return formlayout.fedit_org(data,QApplication.translate("Toolbar", 'Lines', None),comment,icon,parent,apply)
+
+#####
+
 class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent,white_icons=False):
+        # toolitem entries of the form (text, tooltip_text, image_file, callback)
         self.toolitems = (
                 ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
                 ('', QApplication.translate("Tooltip", 'Subscription', None), 'plus-pro', 'subscription'),
-                ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
-                ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
-                ('Forward', QApplication.translate("Tooltip", 'Forward to next view', None), 'forward', 'forward'),
+                (QApplication.translate("Toolbar", 'Home', None), QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
+                (QApplication.translate("Toolbar", 'Back', None), QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
+                (QApplication.translate("Toolbar", 'Forward', None), QApplication.translate("Tooltip", 'Forward to next view', None), 'forward', 'forward'),
                 (None, None, None, None),
-                ('Pan', QApplication.translate("Tooltip", 'Pan axes with left mouse, zoom with right', None), 'move', 'pan'),
-                ('Zoom', QApplication.translate("Tooltip", 'Zoom to rectangle', None), 'zoom_to_rect', 'zoom'),
+                (QApplication.translate("Toolbar", 'Pan', None), QApplication.translate("Tooltip", 'Pan axes with left mouse, zoom with right', None), 'move', 'pan'),
+                (QApplication.translate("Toolbar", 'Zoom', None), QApplication.translate("Tooltip", 'Zoom to rectangle', None), 'zoom_to_rect', 'zoom'),
         )
-
+        
         # if true, we render Artisan-specific white versions of the icons
         self.white_icons = white_icons
 
@@ -14052,7 +14100,7 @@ class VMToolbar(NavigationToolbar):
 # add green flag menu on matplotlib v2.0 and later
         if len(self.actions()) > 0:
             # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
-            a = QAction(self._icon("qt4_editor_options.png"),'Customize',self)
+            a = QAction(self._icon("qt4_editor_options.png"),QApplication.translate("Toolbar", 'Lines', None),self)
             a.triggered.connect(self.edit_parameters)
             a.setToolTip(QApplication.translate("Tooltip", 'Edit axis and curve parameters', None))
             self.insertAction(self.actions()[-1],a)
@@ -14091,7 +14139,14 @@ class VMToolbar(NavigationToolbar):
         # monkey patch matplotlib figureoptions that links to svg icon by default (crashes Windows Qt4 builds!)
         if not svgsupport:
             figureoptions.get_icon = my_get_icon
-
+        # monkey patch _formlayout
+        
+        try:
+            formlayout.fedit_org
+        except Exception:
+            # not yet monkey patched
+            formlayout.fedit_org = formlayout.fedit
+            formlayout.fedit = my_fedit
 
     # monkey patch matplotlib navigationbar zoom and pan to update background cache
     def draw_new(self):
