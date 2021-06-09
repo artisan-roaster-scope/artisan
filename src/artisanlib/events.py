@@ -1547,8 +1547,6 @@ class EventsDlg(ArtisanResizeablDialog):
             self.saveSliderSettings()
             self.saveQuantifierSettings()
         elif i == 1: # switched to Button tab
-            # save column widths
-            self.aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())] 
             self.createEventbuttonTable()
             self.saveSliderSettings()
             self.saveQuantifierSettings()
@@ -2133,6 +2131,12 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.buttonlistmaxlen = self.nbuttonsSpinBox.value()
 
     def createEventbuttonTable(self):
+        columns = 10
+        if self.eventbuttontable is not None and self.eventbuttontable.columnCount() == columns:
+            # rows have been already established
+            # save the current columnWidth to reset them afte table creation
+            self.aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())]
+        
         self.nbuttonsSpinBox.setValue(self.aw.buttonlistmaxlen)
         nbuttons = len(self.extraeventstypes)
 
@@ -2142,7 +2146,7 @@ class EventsDlg(ArtisanResizeablDialog):
 #        self.eventbuttontable.clearSelection() # this seems to work also for Ubuntu 16.04
 
         self.eventbuttontable.setRowCount(nbuttons)
-        self.eventbuttontable.setColumnCount(10)
+        self.eventbuttontable.setColumnCount(columns)
         self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Label",None),
                                                          QApplication.translate("Table","Description",None),
                                                          QApplication.translate("Table","Type",None),

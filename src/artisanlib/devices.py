@@ -1320,13 +1320,19 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             
     def createDeviceTable(self):
         try:
+            columns = 15
+            if self.devicetable is not None and self.devicetable.columnCount() == columns:
+                # rows have been already established
+                # save the current columnWidth to reset them afte table creation
+                self.aw.qmc.devicetablecolumnwidths = [self.devicetable.columnWidth(c) for c in range(self.devicetable.columnCount())]
+            
             nddevices = len(self.aw.qmc.extradevices)
             #self.devicetable.clear() # this crashes Ubuntu 16.04
 #            if nddevices != 0:
 #                self.devicetable.clearContents() # this crashes Ubuntu 16.04 if device table is empty
             self.devicetable.clearSelection()
             self.devicetable.setRowCount(nddevices)
-            self.devicetable.setColumnCount(15)
+            self.devicetable.setColumnCount(columns)
             self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device",None),
                                                         QApplication.translate("Table", "Color 1",None),
                                                         QApplication.translate("Table", "Color 2",None),
@@ -1455,14 +1461,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         pass
                 self.devicetable.resizeColumnsToContents()
                 self.devicetable.setColumnWidth(0,150)
+                header = self.devicetable.horizontalHeader()
+                header.setStretchLastSection(True)
                 # remember the columnwidth
                 for i in range(len(self.aw.qmc.devicetablecolumnwidths)):
                     try:
                         self.devicetable.setColumnWidth(i,self.aw.qmc.devicetablecolumnwidths[i])
                     except:
                         pass
-                header = self.devicetable.horizontalHeader()
-                header.setStretchLastSection(True)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createDeviceTable(): {0}").format(str(e)),exc_tb.tb_lineno)
