@@ -1113,8 +1113,8 @@ class PIDcontrol(object):
         self.svLookahead = 0
         self.dutySteps = 1
         self.svSliderMin = 0
-        self.svSliderMax = 480
-        self.svValue = 390 # the value in the setSV textinput box of the PID dialog
+        self.svSliderMax = 230
+        self.svValue = 180 # the value in the setSV textinput box of the PID dialog
         self.dutyMin = -100
         self.dutyMax = 100
         self.pidKp = 15.0
