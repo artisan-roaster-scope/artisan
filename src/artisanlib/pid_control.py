@@ -1117,9 +1117,9 @@ class PIDcontrol(object):
         self.svValue = 390 # the value in the setSV textinput box of the PID dialog
         self.dutyMin = -100
         self.dutyMax = 100
-        self.pidKp = 20.0
+        self.pidKp = 15.0
         self.pidKi = 0.01
-        self.pidKd = 3.0
+        self.pidKd = 20.0
         self.lastEnergy = None
         # Proposional on Measurement mode see: http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
         self.pOnE = True # True for Proposional on Error mode, False for Proposional on Measurement Mode
