@@ -238,6 +238,7 @@ Phidget DC Motor Control modules can be controlled via `IO Command` actions trig
 
 * `accel(ch,a[,sn])` sets acceleration (duty cycle / second)
 * `vel(ch,v[,sn])`   sets target velocity (duty cycle)
+* `limit(ch,v[,sn])`   sets current limit
 * `sleep(s)` : delay processing
 
 with
