@@ -1,453 +1,469 @@
 <head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body><b>AUTOSAVE DIALOG</b><table width="100%" border="1" padding="1" border-collapse="collapse">
-    <tr>
-        <th>Dialog Field</th>
-        <th>Meaning</th>
-    </tr>
-    <tr>
-        <td>Autosave [a]</td>
-        <td>Turn Autosave ON or OFF.  When sampling, the keyboard &#39;a&#39; will save the profile at that moment.<br>NOTE: Files with the same file name will be silently overwritten.  Use ~currdatetime in the file name prefix to get unique file names.</td>
-    </tr>
-    <tr>
-        <td>Add to recent file list</td>
-        <td>When checked, Autosaved files will be added to the Files&gt;&gt; Open Recent files list.</td>
-    </tr>
-    <tr>
-        <td>File Name Prefix</td>
-        <td>Defines the file name to use for Autosave.  See the Autosave Fields section below.</td>
-    </tr>
-    <tr>
-        <td>Preview:</td>
-        <td>Shows an example of the file name based on the File Name Prefix field.<br>A &#39;While Recording:&#39; example will also be shown if the file name will be different when the scope is sampling.</td>
-    </tr>
-    <tr>
-        <td>Path</td>
-        <td>Where to store the Autosaved files.</td>
-    </tr>
-    <tr>
-        <td>Save Also</td>
-        <td>Allows to save an additional file.  Choose the file type from the pull-down menu.</td>
-    </tr>
-    <tr>
-        <td>Path</td>
-        <td>Where to store the additional files.</td>
-    </tr>
+    <thead>
+        <tr>
+            <th>Dialog Field</th>
+            <th>Meaning</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Autosave [a]</td>
+            <td>Turn Autosave ON or OFF.  When sampling, the keyboard &#39;a&#39; will save the profile at that moment.<br>NOTE: Files with the same file name will be silently overwritten.  Use ~currdatetime in the file name prefix to get unique file names.</td>
+        </tr>
+        <tr>
+            <td>Add to recent file list</td>
+            <td>When checked, Autosaved files will be added to the Files&gt;&gt; Open Recent files list.</td>
+        </tr>
+        <tr>
+            <td>File Name Prefix</td>
+            <td>Defines the file name to use for Autosave.  See the Autosave Fields section below.</td>
+        </tr>
+        <tr>
+            <td>Preview:</td>
+            <td>Shows an example of the file name based on the File Name Prefix field.<br>A &#39;While Recording:&#39; example will also be shown if the file name will be different when the scope is sampling.</td>
+        </tr>
+        <tr>
+            <td>Path</td>
+            <td>Where to store the Autosaved files.</td>
+        </tr>
+        <tr>
+            <td>Save Also</td>
+            <td>Allows to save an additional file.  Choose the file type from the pull-down menu.</td>
+        </tr>
+        <tr>
+            <td>Path</td>
+            <td>Where to store the additional files.</td>
+        </tr>
+    </tbody>
 </table><br/><br/><b>AUTOSAVE FIELDS</b><table width="100%" border="1" padding="1" border-collapse="collapse">
-    <tr>
-        <th>Prefix Field</th>
-        <th>Source</th>
-        <th>Example</th>
-    </tr>
-    <tr>
-        <td>~batchprefix</td>
-        <td>The batch prefix set in Config&gt;Batch&gt;Prefix</td>
-        <td>Prod-</td>
-    </tr>
-    <tr>
-        <td>~batchcounter</td>
-        <td>The current batch number</td>
-        <td>653</td>
-    </tr>
-    <tr>
-        <td>~batch</td>
-        <td>Same as &quot;~batchprefix~batchnum&quot;</td>
-        <td>Prod-653</td>
-    </tr>
-    <tr>
-        <td>~batchposition</td>
-        <td>The current batch position, or &quot;Roast of the Day&quot;</td>
-        <td>9</td>
-    </tr>
-    <tr>
-        <td>~batch_long</td>
-        <td>Same as Batch field in Roast Properties<br>&quot;~batchprefix~batchnum (~batchposition)&quot;</td>
-        <td>Prod-653 (9)</td>
-    </tr>
-    <tr>
-        <td>~title</td>
-        <td>From Roast&gt;Properties&gt;Title</td>
-        <td>Ethiopia Guji</td>
-    </tr>
-    <tr>
-        <td>~beans_nn</td>
-        <td>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Beans field.<br>From Roast&gt;Properties&gt;Beans</td>
-        <td>Ethiopia G</td>
-    </tr>
-    <tr>
-        <td>~beans_line</td>
-        <td>The entire first line From Roast&gt;Properties&gt;Beans</td>
-        <td>Ethiopia Guji purchased from Royal</td>
-    </tr>
-    <tr>
-        <td>~date</td>
-        <td>Roast date in format yy-MM-dd</td>
-        <td>20-02-05</td>
-    </tr>
-    <tr>
-        <td>~date_long</td>
-        <td>Roast date in format yyyy-MM-dd</td>
-        <td>2020-02-05</td>
-    </tr>
-    <tr>
-        <td>~time</td>
-        <td>Roast time in format hhmm</td>
-        <td>1742</td>
-    </tr>
-    <tr>
-        <td>~datetime</td>
-        <td>Roast date and time in format yy-MM-dd_hhmm</td>
-        <td>20-02-05_1742</td>
-    </tr>
-    <tr>
-        <td>~datetime_long</td>
-        <td>Roast date and time in format yyyy-MM-dd_hhmm</td>
-        <td>2020-02-05_1742</td>
-    </tr>
-    <tr>
-        <td>~yyyy</td>
-        <td>Roast year in format yyyy</td>
-        <td>2020</td>
-    </tr>
-    <tr>
-        <td>~yy</td>
-        <td>Roast year in format yy</td>
-        <td>20</td>
-    </tr>
-    <tr>
-        <td>~mmm</td>
-        <td>Roast month in format MMM (localized)</td>
-        <td>Feb</td>
-    </tr>
-    <tr>
-        <td>~mm</td>
-        <td>Roast month in format MM</td>
-        <td>02</td>
-    </tr>
-    <tr>
-        <td>~ddd</td>
-        <td>Roast day in format ddd (localized)</td>
-        <td>Wed</td>
-    </tr>
-    <tr>
-        <td>~dd</td>
-        <td>Roast day in format dd</td>
-        <td>05</td>
-    </tr>
-    <tr>
-        <td>~hour</td>
-        <td>Roast hour in format hh</td>
-        <td>17</td>
-    </tr>
-    <tr>
-        <td>~minute</td>
-        <td>Roast minute in format mm</td>
-        <td>42</td>
-    </tr>
-    <tr>
-        <td>~currtime</td>
-        <td>Current date and time with seconds in format yy-MM-dd_hhmmss.  Not the same as roast time. </td>
-        <td>21-01-18_093609</td>
-    </tr>
-    <tr>
-        <td>~operator</td>
-        <td>From Roast&gt;Properties&gt;Operator</td>
-        <td>Dave</td>
-    </tr>
-    <tr>
-        <td>~organization</td>
-        <td>From Roast&gt;Properties&gt;Organization</td>
-        <td>Dave&#39;s Coffee</td>
-    </tr>
-    <tr>
-        <td>~machine</td>
-        <td>From Roast&gt;Properties&gt;Machine</td>
-        <td>SF-6</td>
-    </tr>
-    <tr>
-        <td>~weight</td>
-        <td>From Roast&gt;Properties&gt;Weight Green</td>
-        <td>3</td>
-    </tr>
-    <tr>
-        <td>~roastedweight</td>
-        <td>From Roast&gt;Properties&gt;Weight Roasted</td>
-        <td>2.6</td>
-    </tr>
-    <tr>
-        <td>~weightunits</td>
-        <td>From Roast&gt;Properties&gt;Weight</td>
-        <td>Kg</td>
-    </tr>
-    <tr>
-        <td>~weightloss</td>
-        <td>Calculated weight loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</td>
-        <td>14.1</td>
-    </tr>
-    <tr>
-        <td>~volume</td>
-        <td>From Roast&gt;Properties&gt;Volume Green</td>
-        <td>4.1</td>
-    </tr>
-    <tr>
-        <td>~roastedvolume</td>
-        <td>From Roast&gt;Properties&gt;Volume Roasted</td>
-        <td>6.8</td>
-    </tr>
-    <tr>
-        <td>~volumeunits</td>
-        <td>From Roast&gt;Properties&gt;Volume</td>
-        <td>l</td>
-    </tr>
-    <tr>
-        <td>~volumegain</td>
-        <td>Calculated volume gain in percent</td>
-        <td>61.5</td>
-    </tr>
-    <tr>
-        <td>~density</td>
-        <td>From Roast&gt;Properties&gt;Density Green</td>
-        <td>756.4</td>
-    </tr>
-    <tr>
-        <td>~roasteddensity</td>
-        <td>From Roast&gt;Properties&gt;Density Roasted</td>
-        <td>375.2</td>
-    </tr>
-    <tr>
-        <td>~densityunits</td>
-        <td>From Roast&gt;Properties&gt;Density</td>
-        <td>g_l</td>
-    </tr>
-    <tr>
-        <td>~densityloss</td>
-        <td>Calculated density loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</td>
-        <td>46.8</td>
-    </tr>
-    <tr>
-        <td>~moisture</td>
-        <td>From Roast&gt;Properties&gt;Moisture Green</td>
-        <td>11.7</td>
-    </tr>
-    <tr>
-        <td>~roastedmoisture</td>
-        <td>From Roast&gt;Properties&gt;Moisture Roasted</td>
-        <td>2.8</td>
-    </tr>
-    <tr>
-        <td>~moistureloss</td>
-        <td>Calculated moisture loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</td>
-        <td>8.1</td>
-    </tr>
-    <tr>
-        <td>~drumspeed</td>
-        <td>From Roast&gt;Properties&gt;Drum Speed</td>
-        <td>64</td>
-    </tr>
-    <tr>
-        <td>~colorwhole</td>
-        <td>From Roast&gt;Properties&gt;Color Whole</td>
-        <td>103</td>
-    </tr>
-    <tr>
-        <td>~colorground</td>
-        <td>From Roast&gt;Properties&gt;Color Ground</td>
-        <td>98</td>
-    </tr>
-    <tr>
-        <td>~colorsystem</td>
-        <td>From Roast&gt;Properties&gt;Color System</td>
-        <td>Tonino</td>
-    </tr>
-    <tr>
-        <td>~screenmin</td>
-        <td>From Roast&gt;Properties&gt;Screen Min</td>
-        <td>16</td>
-    </tr>
-    <tr>
-        <td>~screenmax</td>
-        <td>From Roast&gt;Properties&gt;Screen Max</td>
-        <td>18</td>
-    </tr>
-    <tr>
-        <td>~greenstemp</td>
-        <td>From Roast&gt;Properties&gt;(Green) Beans Temperature</td>
-        <td>68.0</td>
-    </tr>
-    <tr>
-        <td>~ambtemp</td>
-        <td>From Roast&gt;Properties&gt;Ambient Temperature</td>
-        <td>70.0</td>
-    </tr>
-    <tr>
-        <td>~ambhumidity</td>
-        <td>From Roast&gt;Properties&gt;Ambient Humidity</td>
-        <td>35.1</td>
-    </tr>
-    <tr>
-        <td>~ambpressure</td>
-        <td>From Roast&gt;Properties&gt;Ambient Pressure</td>
-        <td>1023.8</td>
-    </tr>
-    <tr>
-        <td>~devtime</td>
-        <td>Calculated time from FCs to DROP in seconds</td>
-        <td>112</td>
-    </tr>
-    <tr>
-        <td>~devtime_long</td>
-        <td>Calculated time from FCs to DROP in min_secs</td>
-        <td>01_52</td>
-    </tr>
-    <tr>
-        <td>~dtr</td>
-        <td>From Profile Statistics - DTR (in percent)</td>
-        <td>22.1</td>
-    </tr>
-    <tr>
-        <td>~auc</td>
-        <td>From the Profile Statistics - AUC</td>
-        <td>218</td>
-    </tr>
-    <tr>
-        <td>~aucbase</td>
-        <td>From the Profile Statistics - AUC Base</td>
-        <td>300</td>
-    </tr>
-    <tr>
-        <td>~chargeet</td>
-        <td>From the Profile - ET at CHARGE</td>
-        <td>379.4</td>
-    </tr>
-    <tr>
-        <td>~chargebt</td>
-        <td>From the Profile - BT at CHARGE</td>
-        <td>375.2</td>
-    </tr>
-    <tr>
-        <td>~fcset</td>
-        <td>From the Profile - ET at FCs</td>
-        <td>397.4</td>
-    </tr>
-    <tr>
-        <td>~fcsbt</td>
-        <td>From the Profile -BT at FCs</td>
-        <td>386.7</td>
-    </tr>
-    <tr>
-        <td>~dropet</td>
-        <td>From the Profile - ET at DROP</td>
-        <td>378.6</td>
-    </tr>
-    <tr>
-        <td>~dropbt</td>
-        <td>From the Profile - BT at DROP</td>
-        <td>412.5</td>
-    </tr>
-    <tr>
-        <td>~droptime</td>
-        <td>From the Profile - DROP time in seconds</td>
-        <td>617</td>
-    </tr>
-    <tr>
-        <td>~droptime_long</td>
-        <td>From the Profile - DROP time in min_secs</td>
-        <td>10_17</td>
-    </tr>
-    <tr>
-        <td>~roastingnotes_nn</td>
-        <td>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Roasting Notes field.<br>From Roast&gt;Properties&gt;Roasting Notes</td>
-        <td>No crash, </td>
-    </tr>
-    <tr>
-        <td>~roastingnotes_line</td>
-        <td>The entire first line From Roast&gt;Properties&gt;Roasting Notes</td>
-        <td>No crash, maintained RoR</td>
-    </tr>
-    <tr>
-        <td>~cupptingnotes_nn</td>
-        <td>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Cupping Notes field.<br>From Roast&gt;Properties&gt;Cupping Notes</td>
-        <td>Lots of be</td>
-    </tr>
-    <tr>
-        <td>~cupptingnotes_line</td>
-        <td>The entire first line From Roast&gt;Properties&gt;Cupping Notes</td>
-        <td>Lots of berries and chocolate</td>
-    </tr>
-    <tr>
-        <td>~btubatch</td>
-        <td>From the Profile Energy Use - Total energy used by the batch in BTU</td>
-        <td>8943.2</td>
-    </tr>
-    <tr>
-        <td>~co2batch</td>
-        <td>From the Profile Energy Use - CO2 produced by the batch in g</td>
-        <td>923.3</td>
-    </tr>
-    <tr>
-        <td>~btupreheat</td>
-        <td>From the Profile Energy Use - Energy used during preheat in BTU</td>
-        <td>2538.8</td>
-    </tr>
-    <tr>
-        <td>~co2preheat</td>
-        <td>From the Profile Energy Use - CO2 produced during preheat in g</td>
-        <td>443.9</td>
-    </tr>
-    <tr>
-        <td>~btubbp</td>
-        <td>From the Profile Energy Use - Energy used during Between Batch Protocol in BTU</td>
-        <td>1019.7</td>
-    </tr>
-    <tr>
-        <td>~co2bbp</td>
-        <td>From the Profile Energy Use - CO2 produced during Between Batch Protocol in g</td>
-        <td>254.1</td>
-    </tr>
-    <tr>
-        <td>~bturoast</td>
-        <td>From the Profile Energy Use - Energy used from CHARGE to DROP in BTU</td>
-        <td>7843.2</td>
-    </tr>
-    <tr>
-        <td>~co2roast</td>
-        <td>From the Profile Energy Use - CO2 produced from CHARGE to DROP in g</td>
-        <td>873.9</td>
-    </tr>
-    <tr>
-        <td>~co2pergreenkg</td>
-        <td>From the Profile Energy Use - CO2 produced per kg of green beans in g</td>
-        <td>354.3</td>
-    </tr>
+    <thead>
+        <tr>
+            <th>Prefix Field</th>
+            <th>Source</th>
+            <th>Example</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>~batchprefix</td>
+            <td>The batch prefix set in Config&gt;Batch&gt;Prefix</td>
+            <td>Prod-</td>
+        </tr>
+        <tr>
+            <td>~batchcounter</td>
+            <td>The current batch number</td>
+            <td>653</td>
+        </tr>
+        <tr>
+            <td>~batch</td>
+            <td>Same as &quot;~batchprefix~batchnum&quot;</td>
+            <td>Prod-653</td>
+        </tr>
+        <tr>
+            <td>~batchposition</td>
+            <td>The current batch position, or &quot;Roast of the Day&quot;</td>
+            <td>9</td>
+        </tr>
+        <tr>
+            <td>~batch_long</td>
+            <td>Same as Batch field in Roast Properties<br>&quot;~batchprefix~batchnum (~batchposition)&quot;</td>
+            <td>Prod-653 (9)</td>
+        </tr>
+        <tr>
+            <td>~title</td>
+            <td>From Roast&gt;Properties&gt;Title</td>
+            <td>Ethiopia Guji</td>
+        </tr>
+        <tr>
+            <td>~beans_nn</td>
+            <td>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Beans field.<br>From Roast&gt;Properties&gt;Beans</td>
+            <td>Ethiopia G</td>
+        </tr>
+        <tr>
+            <td>~beans_line</td>
+            <td>The entire first line From Roast&gt;Properties&gt;Beans</td>
+            <td>Ethiopia Guji purchased from Royal</td>
+        </tr>
+        <tr>
+            <td>~date</td>
+            <td>Roast date in format yy-MM-dd</td>
+            <td>20-02-05</td>
+        </tr>
+        <tr>
+            <td>~date_long</td>
+            <td>Roast date in format yyyy-MM-dd</td>
+            <td>2020-02-05</td>
+        </tr>
+        <tr>
+            <td>~time</td>
+            <td>Roast time in format hhmm</td>
+            <td>1742</td>
+        </tr>
+        <tr>
+            <td>~datetime</td>
+            <td>Roast date and time in format yy-MM-dd_hhmm</td>
+            <td>20-02-05_1742</td>
+        </tr>
+        <tr>
+            <td>~datetime_long</td>
+            <td>Roast date and time in format yyyy-MM-dd_hhmm</td>
+            <td>2020-02-05_1742</td>
+        </tr>
+        <tr>
+            <td>~yyyy</td>
+            <td>Roast year in format yyyy</td>
+            <td>2020</td>
+        </tr>
+        <tr>
+            <td>~yy</td>
+            <td>Roast year in format yy</td>
+            <td>20</td>
+        </tr>
+        <tr>
+            <td>~mmm</td>
+            <td>Roast month in format MMM (localized)</td>
+            <td>Feb</td>
+        </tr>
+        <tr>
+            <td>~mm</td>
+            <td>Roast month in format MM</td>
+            <td>02</td>
+        </tr>
+        <tr>
+            <td>~ddd</td>
+            <td>Roast day in format ddd (localized)</td>
+            <td>Wed</td>
+        </tr>
+        <tr>
+            <td>~dd</td>
+            <td>Roast day in format dd</td>
+            <td>05</td>
+        </tr>
+        <tr>
+            <td>~hour</td>
+            <td>Roast hour in format hh</td>
+            <td>17</td>
+        </tr>
+        <tr>
+            <td>~minute</td>
+            <td>Roast minute in format mm</td>
+            <td>42</td>
+        </tr>
+        <tr>
+            <td>~currtime</td>
+            <td>Current date and time with seconds in format yy-MM-dd_hhmmss.  Not the same as roast time. </td>
+            <td>21-01-18_093609</td>
+        </tr>
+        <tr>
+            <td>~operator</td>
+            <td>From Roast&gt;Properties&gt;Operator</td>
+            <td>Dave</td>
+        </tr>
+        <tr>
+            <td>~organization</td>
+            <td>From Roast&gt;Properties&gt;Organization</td>
+            <td>Dave&#39;s Coffee</td>
+        </tr>
+        <tr>
+            <td>~machine</td>
+            <td>From Roast&gt;Properties&gt;Machine</td>
+            <td>SF-6</td>
+        </tr>
+        <tr>
+            <td>~weight</td>
+            <td>From Roast&gt;Properties&gt;Weight Green</td>
+            <td>3</td>
+        </tr>
+        <tr>
+            <td>~roastedweight</td>
+            <td>From Roast&gt;Properties&gt;Weight Roasted</td>
+            <td>2.6</td>
+        </tr>
+        <tr>
+            <td>~weightunits</td>
+            <td>From Roast&gt;Properties&gt;Weight</td>
+            <td>Kg</td>
+        </tr>
+        <tr>
+            <td>~weightloss</td>
+            <td>Calculated weight loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</td>
+            <td>14.1</td>
+        </tr>
+        <tr>
+            <td>~volume</td>
+            <td>From Roast&gt;Properties&gt;Volume Green</td>
+            <td>4.1</td>
+        </tr>
+        <tr>
+            <td>~roastedvolume</td>
+            <td>From Roast&gt;Properties&gt;Volume Roasted</td>
+            <td>6.8</td>
+        </tr>
+        <tr>
+            <td>~volumeunits</td>
+            <td>From Roast&gt;Properties&gt;Volume</td>
+            <td>l</td>
+        </tr>
+        <tr>
+            <td>~volumegain</td>
+            <td>Calculated volume gain in percent</td>
+            <td>61.5</td>
+        </tr>
+        <tr>
+            <td>~density</td>
+            <td>From Roast&gt;Properties&gt;Density Green</td>
+            <td>756.4</td>
+        </tr>
+        <tr>
+            <td>~roasteddensity</td>
+            <td>From Roast&gt;Properties&gt;Density Roasted</td>
+            <td>375.2</td>
+        </tr>
+        <tr>
+            <td>~densityunits</td>
+            <td>From Roast&gt;Properties&gt;Density</td>
+            <td>g_l</td>
+        </tr>
+        <tr>
+            <td>~densityloss</td>
+            <td>Calculated density loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</td>
+            <td>46.8</td>
+        </tr>
+        <tr>
+            <td>~moisture</td>
+            <td>From Roast&gt;Properties&gt;Moisture Green</td>
+            <td>11.7</td>
+        </tr>
+        <tr>
+            <td>~roastedmoisture</td>
+            <td>From Roast&gt;Properties&gt;Moisture Roasted</td>
+            <td>2.8</td>
+        </tr>
+        <tr>
+            <td>~moistureloss</td>
+            <td>Calculated moisture loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</td>
+            <td>8.1</td>
+        </tr>
+        <tr>
+            <td>~drumspeed</td>
+            <td>From Roast&gt;Properties&gt;Drum Speed</td>
+            <td>64</td>
+        </tr>
+        <tr>
+            <td>~colorwhole</td>
+            <td>From Roast&gt;Properties&gt;Color Whole</td>
+            <td>103</td>
+        </tr>
+        <tr>
+            <td>~colorground</td>
+            <td>From Roast&gt;Properties&gt;Color Ground</td>
+            <td>98</td>
+        </tr>
+        <tr>
+            <td>~colorsystem</td>
+            <td>From Roast&gt;Properties&gt;Color System</td>
+            <td>Tonino</td>
+        </tr>
+        <tr>
+            <td>~screenmin</td>
+            <td>From Roast&gt;Properties&gt;Screen Min</td>
+            <td>16</td>
+        </tr>
+        <tr>
+            <td>~screenmax</td>
+            <td>From Roast&gt;Properties&gt;Screen Max</td>
+            <td>18</td>
+        </tr>
+        <tr>
+            <td>~greenstemp</td>
+            <td>From Roast&gt;Properties&gt;(Green) Beans Temperature</td>
+            <td>68.0</td>
+        </tr>
+        <tr>
+            <td>~ambtemp</td>
+            <td>From Roast&gt;Properties&gt;Ambient Temperature</td>
+            <td>70.0</td>
+        </tr>
+        <tr>
+            <td>~ambhumidity</td>
+            <td>From Roast&gt;Properties&gt;Ambient Humidity</td>
+            <td>35.1</td>
+        </tr>
+        <tr>
+            <td>~ambpressure</td>
+            <td>From Roast&gt;Properties&gt;Ambient Pressure</td>
+            <td>1023.8</td>
+        </tr>
+        <tr>
+            <td>~devtime</td>
+            <td>Calculated time from FCs to DROP in seconds</td>
+            <td>112</td>
+        </tr>
+        <tr>
+            <td>~devtime_long</td>
+            <td>Calculated time from FCs to DROP in min_secs</td>
+            <td>01_52</td>
+        </tr>
+        <tr>
+            <td>~dtr</td>
+            <td>From Profile Statistics - DTR (in percent)</td>
+            <td>22.1</td>
+        </tr>
+        <tr>
+            <td>~auc</td>
+            <td>From the Profile Statistics - AUC</td>
+            <td>218</td>
+        </tr>
+        <tr>
+            <td>~aucbase</td>
+            <td>From the Profile Statistics - AUC Base</td>
+            <td>300</td>
+        </tr>
+        <tr>
+            <td>~chargeet</td>
+            <td>From the Profile - ET at CHARGE</td>
+            <td>379.4</td>
+        </tr>
+        <tr>
+            <td>~chargebt</td>
+            <td>From the Profile - BT at CHARGE</td>
+            <td>375.2</td>
+        </tr>
+        <tr>
+            <td>~fcset</td>
+            <td>From the Profile - ET at FCs</td>
+            <td>397.4</td>
+        </tr>
+        <tr>
+            <td>~fcsbt</td>
+            <td>From the Profile -BT at FCs</td>
+            <td>386.7</td>
+        </tr>
+        <tr>
+            <td>~dropet</td>
+            <td>From the Profile - ET at DROP</td>
+            <td>378.6</td>
+        </tr>
+        <tr>
+            <td>~dropbt</td>
+            <td>From the Profile - BT at DROP</td>
+            <td>412.5</td>
+        </tr>
+        <tr>
+            <td>~droptime</td>
+            <td>From the Profile - DROP time in seconds</td>
+            <td>617</td>
+        </tr>
+        <tr>
+            <td>~droptime_long</td>
+            <td>From the Profile - DROP time in min_secs</td>
+            <td>10_17</td>
+        </tr>
+        <tr>
+            <td>~roastingnotes_nn</td>
+            <td>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Roasting Notes field.<br>From Roast&gt;Properties&gt;Roasting Notes</td>
+            <td>No crash, </td>
+        </tr>
+        <tr>
+            <td>~roastingnotes_line</td>
+            <td>The entire first line From Roast&gt;Properties&gt;Roasting Notes</td>
+            <td>No crash, maintained RoR</td>
+        </tr>
+        <tr>
+            <td>~cupptingnotes_nn</td>
+            <td>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Cupping Notes field.<br>From Roast&gt;Properties&gt;Cupping Notes</td>
+            <td>Lots of be</td>
+        </tr>
+        <tr>
+            <td>~cupptingnotes_line</td>
+            <td>The entire first line From Roast&gt;Properties&gt;Cupping Notes</td>
+            <td>Lots of berries and chocolate</td>
+        </tr>
+        <tr>
+            <td>~btubatch</td>
+            <td>From the Profile Energy Use - Total energy used by the batch in BTU</td>
+            <td>8943.2</td>
+        </tr>
+        <tr>
+            <td>~co2batch</td>
+            <td>From the Profile Energy Use - CO2 produced by the batch in g</td>
+            <td>923.3</td>
+        </tr>
+        <tr>
+            <td>~btupreheat</td>
+            <td>From the Profile Energy Use - Energy used during preheat in BTU</td>
+            <td>2538.8</td>
+        </tr>
+        <tr>
+            <td>~co2preheat</td>
+            <td>From the Profile Energy Use - CO2 produced during preheat in g</td>
+            <td>443.9</td>
+        </tr>
+        <tr>
+            <td>~btubbp</td>
+            <td>From the Profile Energy Use - Energy used during Between Batch Protocol in BTU</td>
+            <td>1019.7</td>
+        </tr>
+        <tr>
+            <td>~co2bbp</td>
+            <td>From the Profile Energy Use - CO2 produced during Between Batch Protocol in g</td>
+            <td>254.1</td>
+        </tr>
+        <tr>
+            <td>~bturoast</td>
+            <td>From the Profile Energy Use - Energy used from CHARGE to DROP in BTU</td>
+            <td>7843.2</td>
+        </tr>
+        <tr>
+            <td>~co2roast</td>
+            <td>From the Profile Energy Use - CO2 produced from CHARGE to DROP in g</td>
+            <td>873.9</td>
+        </tr>
+        <tr>
+            <td>~co2pergreenkg</td>
+            <td>From the Profile Energy Use - CO2 produced per kg of green beans in g</td>
+            <td>354.3</td>
+        </tr>
+    </tbody>
 </table><table width="100%" border="1" padding="1" border-collapse="collapse">
-    <tr>
-        <td>NOTES:<br>Anything between single quotes &#39; will show in the file name only when ON.<br>Example: &#39;REC ~batch&#39;<br><br>Anything between double quotes &quot; will show in the file name only when OFF. <br>Example: &quot;~operator&quot;<br><br>For backward compatibility, when the Prefix field is text only the date and time are appended to the file name.<br>Example: &#39;Autosave&#39; will result in file name &#39;Autosave_20-01-13_1705&#39;.<br>To show only the text place a single &#39;!&#39; at the start of the Prefix field<br>Example: &#39;!Autosave&#39; will result in file name &#39;Autosave&#39;.<br><br>To maintain cross platform compatibility, file names may contain only letters, numbers, spaces, <br>and the following special characters:  <br>_ - . ( )</td>
-    </tr>
+    <tbody>
+        <tr>
+            <td>NOTES:<br>Anything between single quotes &#39; will show in the file name only when ON.<br>Example: &#39;REC ~batch&#39;<br><br>Anything between double quotes &quot; will show in the file name only when OFF. <br>Example: &quot;~operator&quot;<br><br>For backward compatibility, when the Prefix field is text only the date and time are appended to the file name.<br>Example: &#39;Autosave&#39; will result in file name &#39;Autosave_20-01-13_1705&#39;.<br>To show only the text place a single &#39;!&#39; at the start of the Prefix field<br>Example: &#39;!Autosave&#39; will result in file name &#39;Autosave&#39;.<br><br>To maintain cross platform compatibility, file names may contain only letters, numbers, spaces, <br>and the following special characters:  <br>_ - . ( )</td>
+        </tr>
+    </tbody>
 </table><br/><br/><b>EXAMPLES</b><table width="100%" border="1" padding="1" border-collapse="collapse">
-    <tr>
-        <td>Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.  </td>
-    </tr>
+    <tbody>
+        <tr>
+            <td>Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.  </td>
+        </tr>
+    </tbody>
 </table><table width="100%" border="1" padding="1" border-collapse="collapse">
-    <tr>
-        <th>Autosave Field</th>
-        <th>Example File Name</th>
-    </tr>
-    <tr>
-        <td>~title Roasted on ~date</td>
-        <td>Burundi Roasted on 20-04-25.alog</td>
-    </tr>
-    <tr>
-        <td>~batchcounter ~title ~date_long</td>
-        <td>1380 Burundi 2020-04-25_1136.alog</td>
-    </tr>
-    <tr>
-        <td>~beans ~machine ~drumspeedRPM ~weight~weightunits ~poisturePCT ~operator ~date ~batch(~batchposition)</td>
-        <td>Burundi Kiganda Murambi Lot44 SF-25 64RPM 10.3Kg 10.2PCT Roberto 20-04-25 Prod-1380(6).alog</td>
-    </tr>
-    <tr>
-        <td>&#x27;Recording ~batchcounter&#39; &quot;~batch&quot; ~title ~datetime_long</td>
-        <td>When OFF:<br>Prod-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog<br>While Recording:<br>Recording 1380  Burundi KigandaMurambi 2020-04-25_1136.alog</td>
-    </tr>
-    <tr>
-        <td>&#x27;Recording ~batchcounter&#39; &quot;~batch&quot; ~title ~date_long_&#39;~currtime&#39;&quot;~time&quot;</td>
-        <td>Creates a unique filename for multiple saves while sampling by using ~currtime.<br>When OFF:<br>Prod-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog<br>While Recording. <br>Recording 1380  Burundi KigandaMurambi 2020-04-25_113809.alog</td>
-    </tr>
+    <thead>
+        <tr>
+            <th>Autosave Field</th>
+            <th>Example File Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>~title Roasted on ~date</td>
+            <td>Burundi Roasted on 20-04-25.alog</td>
+        </tr>
+        <tr>
+            <td>~batchcounter ~title ~date_long</td>
+            <td>1380 Burundi 2020-04-25_1136.alog</td>
+        </tr>
+        <tr>
+            <td>~beans ~machine ~drumspeedRPM ~weight~weightunits ~poisturePCT ~operator ~date ~batch(~batchposition)</td>
+            <td>Burundi Kiganda Murambi Lot44 SF-25 64RPM 10.3Kg 10.2PCT Roberto 20-04-25 Prod-1380(6).alog</td>
+        </tr>
+        <tr>
+            <td>&#x27;Recording ~batchcounter&#39; &quot;~batch&quot; ~title ~datetime_long</td>
+            <td>When OFF:<br>Prod-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog<br>While Recording:<br>Recording 1380  Burundi KigandaMurambi 2020-04-25_1136.alog</td>
+        </tr>
+        <tr>
+            <td>&#x27;Recording ~batchcounter&#39; &quot;~batch&quot; ~title ~date_long_&#39;~currtime&#39;&quot;~time&quot;</td>
+            <td>Creates a unique filename for multiple saves while sampling by using ~currtime.<br>When OFF:<br>Prod-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog<br>While Recording. <br>Recording 1380  Burundi KigandaMurambi 2020-04-25_113809.alog</td>
+        </tr>
+    </tbody>
 </table></body>

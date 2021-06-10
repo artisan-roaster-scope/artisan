@@ -1,13 +1,19 @@
 <head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body><b>TRANSPOSER</b><table width="100%" border="1" padding="1" border-collapse="collapse">
-    <tr>
-        <td>The Transposer allows to map the current profile w.r.t. the time and temperature axis by setting targets time and temperature at major events like yellow point (DRY END) or first crack (FC START) or for time transformations also by target phases duration. Temperature transformation are only applied to the bean temperature (BT) curve while time transformations are applied to the whole profile.<br><br>Three different mapping methods are available to compute from the current profile and the given targets a resulting profile. The linear and quadratic mappings are continuous functions while the discrete option is defined stepwise between the given source/target pairs and extended at the borders<br><br>Pressing the &quot;Apply&quot; button applies the current computed mapping to the loaded profile for inspection. &quot;Reset&quot; returns to the original profile shape. Leaving the Transposer with &quot;OK&quot; applies the current mapping to the profile. Leaving the Transposer with &quot;Cancel&quot; returns to the unchanged initially loaded profile.</td>
-    </tr>
+    <tbody>
+        <tr>
+            <td>The Transposer allows to map the current profile w.r.t. the time and temperature axis by setting targets time and temperature at major events like yellow point (DRY END) or first crack (FC START) or for time transformations also by target phases duration. Temperature transformation are only applied to the bean temperature (BT) curve while time transformations are applied to the whole profile.<br><br>Three different mapping methods are available to compute from the current profile and the given targets a resulting profile. The linear and quadratic mappings are continuous functions while the discrete option is defined stepwise between the given source/target pairs and extended at the borders<br><br>Pressing the &quot;Apply&quot; button applies the current computed mapping to the loaded profile for inspection. &quot;Reset&quot; returns to the original profile shape. Leaving the Transposer with &quot;OK&quot; applies the current mapping to the profile. Leaving the Transposer with &quot;Cancel&quot; returns to the unchanged initially loaded profile.</td>
+        </tr>
+    </tbody>
 </table><br/><br/><b>EXAMPLE 1: ADJUST TOTAL ROAST TIME</b><table width="100%" border="1" padding="1" border-collapse="collapse">
-    <tr>
-        <td>You might want to re-roast a profile, but extended/restricted to a total length of 10:00. <br><br>Load the profile and start the Transposer under Tools. Enter our target roast time of &quot;10:00&quot; minutes into the target DROP field under Time and select &quot;linear&quot; as mapping. Check the resulting times of the main events in the time tables last row, press &quot;Apply&quot; to view the transposed profile in the graph. If you are happy with the result, press &quot;OK&quot; and save the newly generated transposed profile such that you can use it as a template for future roasts.</td>
-    </tr>
+    <tbody>
+        <tr>
+            <td>You might want to re-roast a profile, but extended/restricted to a total length of 10:00. <br><br>Load the profile and start the Transposer under Tools. Enter our target roast time of &quot;10:00&quot; minutes into the target DROP field under Time and select &quot;linear&quot; as mapping. Check the resulting times of the main events in the time tables last row, press &quot;Apply&quot; to view the transposed profile in the graph. If you are happy with the result, press &quot;OK&quot; and save the newly generated transposed profile such that you can use it as a template for future roasts.</td>
+        </tr>
+    </tbody>
 </table><br/><br/><b>EXAMPLE 2: MAP BETWEEN TWO ROASTING MACHINES</b><table width="100%" border="1" padding="1" border-collapse="collapse">
-    <tr>
-        <td>Transpose temperature readings from your smaller machine to your larger machine assuming on your larger machine the DRY and FC START events happen at different temperatures than on your smaller one.<br><br>Load the profile recorded on the smaller machine and open the Transposer. Select the linear mapping and put the DRY and FC START target temperatures as observed on your larger machine into the into the corresponding fields under BT. Underneath the table you see the calculated symbolic formula that can be copy-pasted into the BT symbolic formula under Config &gt;&gt; Devices to adjust the computed mapping automatically while roasting on your smaller machine to see the temperature reading as you expect them on the larger machine.</td>
-    </tr>
+    <tbody>
+        <tr>
+            <td>Transpose temperature readings from your smaller machine to your larger machine assuming on your larger machine the DRY and FC START events happen at different temperatures than on your smaller one.<br><br>Load the profile recorded on the smaller machine and open the Transposer. Select the linear mapping and put the DRY and FC START target temperatures as observed on your larger machine into the into the corresponding fields under BT. Underneath the table you see the calculated symbolic formula that can be copy-pasted into the BT symbolic formula under Config &gt;&gt; Devices to adjust the computed mapping automatically while roasting on your smaller machine to see the temperature reading as you expect them on the larger machine.</td>
+        </tr>
+    </tbody>
 </table></body>

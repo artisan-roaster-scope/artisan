@@ -21660,6 +21660,8 @@ class ApplicationWindow(QMainWindow):
                     BT_subst = 0
                     ET_subst = 0
                     timex = 0
+                    BTB_subst = 0
+                    ETB_subst = 0
                     try:
                         if self.qmc.flagstart:
                             timex = self.qmc.timex[-1]
@@ -21667,6 +21669,13 @@ class ApplicationWindow(QMainWindow):
                                 timex -= self.qmc.timex[self.qmc.timeindex[0]]
                             BT_subst = self.qmc.temp2[-1]
                             ET_subst = self.qmc.temp1[-1]
+                            if self.qmc.background:
+                                btb = self.qmc.backgroundSmoothedBTat(timex)
+                                if btb != -1:
+                                    BTB_subst = btb
+                                etb = self.qmc.backgroundSmoothedETat(timex)
+                                if etb != -1:
+                                    ETB_subst = etb
                         elif self.qmc.flagon:
                             timex = self.qmc.on_timex[-1]
                             if self.qmc.timeindex[0] != -1:
@@ -21681,8 +21690,10 @@ class ApplicationWindow(QMainWindow):
                             cmd_str = cmd_str.replace("{BT}",str(BT_subst))
                             cmd_str = cmd_str.replace("{ET}",str(ET_subst))
                             cmd_str = cmd_str.replace("{t}",str(timex))
+                            cmd_str = cmd_str.replace("{BTB}",str(BTB_subst))
+                            cmd_str = cmd_str.replace("{ETB}",str(ETB_subst))
                         else:
-                            cmd_str = cmd_str.format(BT=BT_subst,ET=ET_subst,t=timex)
+                            cmd_str = cmd_str.format(BT=BT_subst,ET=ET_subst,t=timex,BTB=BTB_subst,ETB=ETB_subst)
                     except:
                         pass
 
