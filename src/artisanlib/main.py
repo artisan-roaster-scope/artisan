@@ -28181,11 +28181,19 @@ class ApplicationWindow(QMainWindow):
 
     def artisanURLextractor(self,url,_):
         import requests
-        from requests_file import FileAdapter  # @UnresolvedImport
-        s = requests.Session()
-        s.mount('file://', FileAdapter())
-        resp = s.get(url.toString(), timeout=(4, 15), headers={"Accept-Encoding" : "gzip"})
-        return ast.literal_eval(resp.text)
+        r = requests.get(url.toString(), 
+            allow_redirects=True, 
+            timeout=(4, 15),
+            headers={"Accept-Encoding" : "gzip"},
+#            verify=False
+            )
+        return ast.literal_eval(r.text)
+#        from requests_file import FileAdapter  # @UnresolvedImport
+#        s = requests.Session()
+#        s.mount('file://', FileAdapter())
+#        resp = s.get(url.toString(), timeout=(4, 15), headers={"Accept-Encoding" : "gzip"})
+#        print(resp.text)
+#        return ast.literal_eval(resp.text)
     
     @pyqtSlot()
     @pyqtSlot(bool)
