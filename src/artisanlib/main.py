@@ -21939,6 +21939,7 @@ class ApplicationWindow(QMainWindow):
                     ##  out(c,v[,sn])   : sets voltage output of channel c to v (float)
                     ##  accel(c,v[,sn]) : sets acceleration of channel c to v (float) on a DCMotor phidget
                     ##  vel(c,v[,sn])   : sets target velocity of channel c to v (float) on a DCMotor phidget
+                    ##  limit(c,v[,sn]) : sets curent limit of channel c to v (float) on a DCMotor phidget
                     #
                     # YOCTOPUCE
                     ##  on(c[,sn])   : turn channel c of the relay module on
@@ -22019,6 +22020,13 @@ class ApplicationWindow(QMainWindow):
                                 else:
                                     sn = None
                                 aw.ser.phidgetDCMotorSetVelocity(toInt(cs_a[1]), toFloat(eval(cs_a[2])),sn)
+
+                            elif cs_a[0] == "limit" and cs_len > 2:
+                                if cs_len > 3:
+                                    sn = cs_a[3]
+                                else:
+                                    sn = None
+                                aw.ser.phidgetDCMotorSetCurrentLimit(toInt(cs_a[1]), toFloat(eval(cs_a[2])),sn)
 
                             elif cs_a[0] == "slider" and cs_len == 3:
                                 v = toFloat(cs_a[2])

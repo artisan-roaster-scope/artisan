@@ -4067,6 +4067,18 @@ class serialport(object):
                     dcm[channel].setTargetVelocity(value)
             except:
                 pass
+                
+    # value: float
+    def phidgetDCMotorSetCurrentLimit(self,channel,value,serial=None):
+        self.phidgetDCMotorAttach(channel,serial)
+        if serial in self.aw.ser.PhidgetDCMotor:
+            dcm = self.aw.ser.PhidgetDCMotor[serial]
+            # set current limit
+            try:
+                if len(dcm) > channel and dcm[channel].getAttached():
+                    dcm[channel].SetCurrentLimit(value)
+            except Exception:
+                pass
     
     def phidgetDCMotorClose(self):
         for c in self.aw.ser.PhidgetDCMotor:
