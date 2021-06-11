@@ -3029,7 +3029,7 @@ class tgraphcanvas(FigureCanvas):
                 if not aw.curFile and __release_sponsor_domain__ and __release_sponsor_url__:
                     QDesktopServices.openUrl(QUrl(__release_sponsor_url__, QUrl.TolerantMode))
                     return
-                if aw.plus_account is not None and aw.qmc.roastUUID is not None:
+                if aw.qmc.roastUUID is not None:
                     QDesktopServices.openUrl(QUrl(plus.util.roastLink(aw.qmc.roastUUID), QUrl.TolerantMode))
                     return
             
@@ -6430,10 +6430,10 @@ class tgraphcanvas(FigureCanvas):
         if bnr != 0 and title != "":
             title = "{}{} {}".format(bprefix,str(bnr),title)
         
-        if not aw.curFile and __release_sponsor_domain__:
-#            sponsor = QApplication.translate("About","sponsored by {}",None).format(__release_sponsor_domain__)
-            sponsor = __release_sponsor_domain__
-            title = "{} – {}".format(title,sponsor)
+#        if not aw.curFile and __release_sponsor_domain__:
+##            sponsor = QApplication.translate("About","sponsored by {}",None).format(__release_sponsor_domain__)
+#            sponsor = __release_sponsor_domain__
+#            title = "{} – {}".format(title,sponsor)
             
         if self.graphfont in [1,9]: # if selected font is Humor or Dijkstra we translate the unicode title into pure ascii
             title = toASCII(title)
