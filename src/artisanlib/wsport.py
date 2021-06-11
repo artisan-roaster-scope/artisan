@@ -91,7 +91,7 @@ class wsport(object):
         self.ws = None  # the WebService client object
         self.wst = None # the WebService thread
 
-    def onMessage(self, message):
+    def onMessage(self, _, message):
         if message is not None:
             j = json.loads(message)
             if self.aw.seriallogflag:
@@ -177,27 +177,27 @@ class wsport(object):
                 # note of current roast set: {"pushMessage": "setRoastingProcessNote", "data": { "note": "A test comment" }}
                 # fill weight of current roast set: {"pushMessage": "setRoastingProcessFillWeight", "data": { "fillWeight": 12 }}
 
-    def onError(self, err):
+    def onError(self, _, err):
         self.aw.qmc.adderror(QApplication.translate("Error Message","WebSocket connection failed: {}",None).format(err))
         if self.aw.seriallogflag:
             self.aw.addserial("wsport onError(): {}".format(err))
 
-    def onClose(self):
+    def onClose(self, _):
         self.aw.sendmessage(QApplication.translate("Message","WebSocket disconnected", None))
         if self.aw.seriallogflag:
             self.aw.addserial("wsport onClose()")
     
-    def onOpen(self):
+    def onOpen(self, _):
         self.open_event.set() # unblock the connect action
         self.aw.sendmessage(QApplication.translate("Message","WebSocket connected", None))
         if self.aw.seriallogflag:
             self.aw.addserial("wsport onOpen()")
     
-    def onPing(self):
+    def onPing(self, _):
         if self.aw.seriallogflag:
             self.aw.addserial("wsport onPing()")
     
-    def onPong(self):
+    def onPong(self, _):
         if self.aw.seriallogflag:
             self.aw.addserial("wsport onPong()")
     

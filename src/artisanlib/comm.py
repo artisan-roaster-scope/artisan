@@ -4076,7 +4076,7 @@ class serialport(object):
             # set current limit
             try:
                 if len(dcm) > channel and dcm[channel].getAttached():
-                    dcm[channel].SetCurrentLimit(value)
+                    dcm[channel].setCurrentLimit(value)
             except Exception:
                 pass
     
