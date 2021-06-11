@@ -326,7 +326,13 @@ def coffee2beans(coffee):
         label = ""
     processing = ""
     try:
-        processing_str = c["processing"].strip()
+        processing_str = c["processing"].strip() # processing_str can have the form "fully washed" or with newer servers "Wet/fully washed"
+        processing_split = processing_str.split("/")
+        # we only use the specific term and ignore the category if given
+        if len(processing_split) > 1:
+            processing_str = processing_split[1].strip()
+        else:
+            processing_str = processing_split[0]
         if len(processing_str)>0 and processing_str != 'null':
             processing = ' {}'.format(processing_str)
     except:
@@ -340,7 +346,10 @@ def coffee2beans(coffee):
     try:
         if "varietals" in c and c["varietals"] != None and len(c["varietals"]) > 0:
             vs = [v.strip() for v in c["varietals"] if v != None and v != 'null' and v != '' ]
-            varietals = ' ({})'.format(', '.join(vs))
+            if processing == "":
+                varietals = ' {}'.format(', '.join(vs))
+            else:
+                varietals = ' ({})'.format(', '.join(vs))
     except:
         pass
     bean = '{}{}{}'.format(processing,grade,varietals)

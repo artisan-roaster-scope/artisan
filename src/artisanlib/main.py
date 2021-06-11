@@ -4,6 +4,10 @@ from artisanlib import __version__
 from artisanlib import __revision__
 from artisanlib import __build__
 
+from artisanlib import __release_sponsor_name__
+from artisanlib import __release_sponsor_domain__
+from artisanlib import __release_sponsor_url__
+
 # ABOUT
 # This program shows how to plot the temperature and its rate of change from a
 # Fuji PID or a thermocouple meter.
@@ -2500,25 +2504,13 @@ class tgraphcanvas(FigureCanvas):
 
     @pyqtSlot()
     def fileDirty(self):
-        try:
-            if aw.curFile:
-                aw.setWindowTitle("* {} - {}".format(aw.strippedName(aw.curFile),aw.windowTitle))
-            else:
-                aw.setWindowTitle("* {}".format(aw.windowTitle))
-        except:
-            pass
         self.safesaveflag = True
+        aw.updateWindowTitle()
 
     @pyqtSlot()
     def fileClean(self):
-        try:
-            if aw.curFile:
-                aw.setWindowTitle("{} - {}".format(aw.strippedName(aw.curFile),aw.windowTitle))
-            else:
-                aw.setWindowTitle(aw.windowTitle)
-        except:
-            pass
         self.safesaveflag = False
+        aw.updateWindowTitle()
     
     def lazyredraw_on_resize(self):
         self.lazyredraw(recomputeAllDeltas=False)
@@ -3033,9 +3025,13 @@ class tgraphcanvas(FigureCanvas):
 
 #PLUS
             if not self.designerflag and not self.wheelflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == 1 and event.dblclick==True and \
-                    event.x < event.y and aw.plus_account is not None and aw.qmc.roastUUID is not None:
-                QDesktopServices.openUrl(QUrl(plus.util.roastLink(aw.qmc.roastUUID), QUrl.TolerantMode))
-                return
+                    event.x < event.y:
+                if not aw.curFile and __release_sponsor_domain__ and __release_sponsor_url__:
+                    QDesktopServices.openUrl(QUrl(__release_sponsor_url__, QUrl.TolerantMode))
+                    return
+                if aw.plus_account is not None and aw.qmc.roastUUID is not None:
+                    QDesktopServices.openUrl(QUrl(plus.util.roastLink(aw.qmc.roastUUID), QUrl.TolerantMode))
+                    return
             
             if not self.designerflag and not self.wheelflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == 1 and event.dblclick==False and \
                     self.backgroundprofile is not None and event.x > event.y:
@@ -5590,7 +5586,7 @@ class tgraphcanvas(FigureCanvas):
                 # and avoid accidential overwriting of existing data
                 #current file name
                 aw.curFile = None
-                aw.setWindowTitle(aw.windowTitle)
+                aw.updateWindowTitle()
 
                 # if on turn mouse crosslines off
                 if aw.qmc.crossmarker:
@@ -6433,8 +6429,13 @@ class tgraphcanvas(FigureCanvas):
             bnr = self.roastbatchnr
         if bnr != 0 and title != "":
             title = "{}{} {}".format(bprefix,str(bnr),title)
+        
+        if not aw.curFile and __release_sponsor_domain__:
+#            sponsor = QApplication.translate("About","sponsored by {}",None).format(__release_sponsor_domain__)
+            sponsor = __release_sponsor_domain__
+            title = "{} – {}".format(title,sponsor)
             
-        if self.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
+        if self.graphfont in [1,9]: # if selected font is Humor or Dijkstra we translate the unicode title into pure ascii
             title = toASCII(title)
         
 #        fontprop_xlarge = aw.mpl_fontproperties.copy()
@@ -15741,12 +15742,8 @@ class ApplicationWindow(QMainWindow):
 
         self.redrawOnResize = True # if a logofilename is set and redrawOnResize is True a redraw is triggered; usually set to True!
 
-        # set window title
-        if app.artisanviewerMode:
-            self.windowTitle = "ArtisanViewer %s"%str(__version__)
-        else:
-            self.windowTitle = "Artisan %s"%str(__version__)
-        self.setWindowTitle(self.windowTitle)
+        self.updateWindowTitle()
+
         # populate recent file menu
         for i in range(self.MaxRecentFiles):
             self.recentFileActs.append(
@@ -18354,6 +18351,30 @@ class ApplicationWindow(QMainWindow):
         self.updatePlusStatusSignal.connect(self.updatePlusStatusSlot)
         
         QTimer.singleShot(2000,self.donate)
+
+    def updateWindowTitle(self):
+        try:
+            if app.artisanviewerMode:
+                appTitle = "ArtisanViewer %s"%str(__version__)
+            else:
+                appTitle = "Artisan %s"%str(__version__)
+            if self.qmc.safesaveflag:
+                # file Dirty
+                dirtySign = "* "
+            else:
+                # file Clean   
+                dirtySign = ""
+            if self.curFile:
+                # profile loaded
+                self.setWindowTitle("{}{} - {}".format(dirtySign,self.strippedName(self.curFile),appTitle))
+            else:
+                # no profile loaded
+                if __release_sponsor_name__:
+                    self.setWindowTitle("{}{} - {} ({})".format(dirtySign,appTitle,__release_sponsor_name__,QApplication.translate("About","Release Sponsor",None)))
+                else:
+                    self.setWindowTitle("{}{}".format(dirtySign,appTitle))
+        except Exception:
+            pass
 
     def resetDonateCounter(self):
         settings = QSettings()
@@ -21939,7 +21960,7 @@ class ApplicationWindow(QMainWindow):
                     ##  out(c,v[,sn])   : sets voltage output of channel c to v (float)
                     ##  accel(c,v[,sn]) : sets acceleration of channel c to v (float) on a DCMotor phidget
                     ##  vel(c,v[,sn])   : sets target velocity of channel c to v (float) on a DCMotor phidget
-                    ##  limit(c,v[,sn]) : sets curent limit of channel c to v (float) on a DCMotor phidget
+                    ##  limit(c,v[,sn]) : sets current limit of channel c to v (float) on a DCMotor phidget
                     #
                     # YOCTOPUCE
                     ##  on(c[,sn])   : turn channel c of the relay module on
@@ -24686,22 +24707,23 @@ class ApplicationWindow(QMainWindow):
     def setCurrentFile(self, fileNamePath,addToRecent=True):
         self.curFile = fileNamePath
         if self.curFile:
-            self.setWindowTitle(("%s - " + self.windowTitle) % self.strippedName(self.curFile))
-            if addToRecent:
-                settings = QSettings()
-                files = toStringList(settings.value('recentFileList'))
-                try:
-                    removeAll(files,fileNamePath)
-                except ValueError:
-                    pass
-                files.insert(0, fileNamePath)
-                del files[self.MaxRecentFiles:]
-                settings.setValue('recentFileList', files)
-                for widget in QApplication.topLevelWidgets():
-                    if isinstance(widget, ApplicationWindow):
-                        widget.updateRecentFileActions()
-        else:
-            self.setWindowTitle(self.windowTitle)
+            try:
+                if addToRecent:
+                    settings = QSettings()
+                    files = toStringList(settings.value('recentFileList'))
+                    try:
+                        removeAll(files,fileNamePath)
+                    except ValueError:
+                        pass
+                    files.insert(0, fileNamePath)
+                    del files[self.MaxRecentFiles:]
+                    settings.setValue('recentFileList', files)
+                    for widget in QApplication.topLevelWidgets():
+                        if isinstance(widget, ApplicationWindow):
+                            widget.updateRecentFileActions()
+            except Exception:
+                pass
+        self.updateWindowTitle()
 
     def updateRecentFileActions(self):
         settings = QSettings()
