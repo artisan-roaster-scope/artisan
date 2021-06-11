@@ -3026,22 +3026,22 @@ class tgraphcanvas(FigureCanvas):
 #PLUS
             if not self.designerflag and not self.wheelflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == 1 and event.dblclick==True and \
                     event.x < event.y:
-                if not aw.curFile and __release_sponsor_domain__ and __release_sponsor_url__:
-                    QDesktopServices.openUrl(QUrl(__release_sponsor_url__, QUrl.TolerantMode))
-                    return
                 if aw.qmc.roastUUID is not None:
                     QDesktopServices.openUrl(QUrl(plus.util.roastLink(aw.qmc.roastUUID), QUrl.TolerantMode))
                     return
             
-            if not self.designerflag and not self.wheelflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == 1 and event.dblclick==False and \
-                    self.backgroundprofile is not None and event.x > event.y:
+            if not self.designerflag and not self.wheelflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == 1 and event.dblclick==False and event.x > event.y:
                 fig = self.ax.get_figure()
                 s = fig.get_size_inches()*fig.dpi
                 if event.x > s[0]*2/3 and event.y > s[1]*2/3:
-                    # toggle background if right top corner above canvas where the subtitle is clicked
-                    self.background = not self.background
-                    self.redraw(recomputeAllDeltas=True)
-                    return
+                    if self.backgroundprofile is None and __release_sponsor_domain__ and __release_sponsor_url__:
+                        QDesktopServices.openUrl(QUrl(__release_sponsor_url__, QUrl.TolerantMode))
+                        return
+                    elif self.backgroundprofile is not None:
+                        # toggle background if right top corner above canvas where the subtitle is clicked
+                        self.background = not self.background
+                        self.redraw(recomputeAllDeltas=True)
+                        return
 
             if event.button == 1 and event.inaxes and aw.qmc.crossmarker and not self.designerflag and not self.wheelflag and not aw.qmc.flagon:
                 self.baseX,self.baseY = event.xdata, event.ydata
@@ -6397,9 +6397,15 @@ class tgraphcanvas(FigureCanvas):
 #        fontprop_small.set_size("xx-small")
         backgroundtitle = backgroundtitle.strip()
         if backgroundtitle != "":
-            if aw.qmc.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
+            if aw.qmc.graphfont in [1,9]: # if selected font is Humor we translate the unicode title into pure ascii
                 backgroundtitle = toASCII(backgroundtitle)
             backgroundtitle = "\n" + aw.qmc.abbrevString(backgroundtitle,30)
+        elif __release_sponsor_domain__:
+            sponsor = QApplication.translate("About","sponsored by {}",None).format(__release_sponsor_domain__)
+#            sponsor = __release_sponsor_domain__
+            backgroundtitle = "\n{}".format(sponsor)
+
+            
         st_artist = self.fig.suptitle(backgroundtitle,
                 horizontalalignment="right",verticalalignment="top",
 #                fontproperties=fontprop_small,  # title not rendered in PDF in MPL3.4.x
@@ -6429,11 +6435,6 @@ class tgraphcanvas(FigureCanvas):
             bnr = self.roastbatchnr
         if bnr != 0 and title != "":
             title = "{}{} {}".format(bprefix,str(bnr),title)
-        
-#        if not aw.curFile and __release_sponsor_domain__:
-##            sponsor = QApplication.translate("About","sponsored by {}",None).format(__release_sponsor_domain__)
-#            sponsor = __release_sponsor_domain__
-#            title = "{} – {}".format(title,sponsor)
             
         if self.graphfont in [1,9]: # if selected font is Humor or Dijkstra we translate the unicode title into pure ascii
             title = toASCII(title)
