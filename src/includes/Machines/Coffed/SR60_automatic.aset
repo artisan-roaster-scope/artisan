@@ -104,6 +104,6 @@ slideractions=2, 2, 0, 2
 slidercommands="write([1,20,{}])", "write([1,30,{}])", , "write([1,40,{}])"
 sliderfactors=1, 1, 1, 1
 slidermax=100, 45, 100, 100
-slidermin=50, 25, 0, 20
+slidermin=45, 25, 0, 20
 slideroffsets=0, 0, 0, 0
 slidervisibilities=1, 1, 0, 1

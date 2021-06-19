@@ -494,6 +494,8 @@ class tareDlg(ArtisanDialog):
         self.tarePopup.tareComboBox.insertSeparator(2)
         self.tarePopup.tareComboBox.addItem("")
         self.tarePopup.tareComboBox.addItems(self.aw.qmc.container_names)
+        width = self.tarePopup.tareComboBox.minimumSizeHint().width()
+        self.tarePopup.tareComboBox.view().setMinimumWidth(width)
         self.tarePopup.tareComboBox.setCurrentIndex(2) # reset to the empty entry
         self.aw.qmc.container_idx = -1
         self.tarePopup.tarePopupEnabled = True
@@ -1231,9 +1233,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.tareComboBox.addItem("<edit> TARE")
         self.tareComboBox.addItem("")
         self.tareComboBox.insertSeparator(1)
-        self.tareComboBox.addItems(self.aw.qmc.container_names)
         self.tareComboBox.setMaximumWidth(80)
         self.tareComboBox.setMinimumWidth(80)
+        self.tareComboBox.addItems(self.aw.qmc.container_names)
+        width = self.tareComboBox.minimumSizeHint().width()
+        self.tareComboBox.view().setMinimumWidth(width)
         self.tareComboBox.setCurrentIndex(self.aw.qmc.container_idx + 3)
         self.tareComboBox.currentIndexChanged.connect(self.tareChanged)
         self.tarePopupEnabled = True # controls if the popup will process tareChange events

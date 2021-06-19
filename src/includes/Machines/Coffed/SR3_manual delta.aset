@@ -93,16 +93,3 @@ type=0
 wordorderLittle=true
 optimizer=true
 fetch_max_blocks=false
-
-[Sliders]
-ModeTempSliders=C
-eventslidercoarse=0, 0, 0, 0
-eventslidersflags=0, 0, 0
-eventslidertemp=0, 0, 0, 0
-slideractions=2, 0, 0, 2
-slidercommands="write([1,1,{}])", , , "write([2,53,{}])"
-sliderfactors=21, 1, 1, 100
-slidermax=100, 100, 100, 100
-slidermin=60, 0, 0, 20
-slideroffsets=2700, 0, 0, 0
-slidervisibilities=0, 0, 0, 0

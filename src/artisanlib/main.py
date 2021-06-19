@@ -6393,8 +6393,8 @@ class tgraphcanvas(FigureCanvas):
             pass
 
         self.background_title_width = 0
-#        fontprop_small = aw.mpl_fontproperties.copy()
-#        fontprop_small.set_size("xx-small")
+##        fontprop_small = aw.mpl_fontproperties.copy()
+##        fontprop_small.set_size("xx-small")
         backgroundtitle = backgroundtitle.strip()
         if backgroundtitle != "":
             if aw.qmc.graphfont in [1,9]: # if selected font is Humor we translate the unicode title into pure ascii
@@ -6402,14 +6402,14 @@ class tgraphcanvas(FigureCanvas):
             backgroundtitle = "\n" + aw.qmc.abbrevString(backgroundtitle,30)
         elif __release_sponsor_domain__:
             sponsor = QApplication.translate("About","sponsored by {}",None).format(__release_sponsor_domain__)
-#            sponsor = __release_sponsor_domain__
             backgroundtitle = "\n{}".format(sponsor)
 
             
         st_artist = self.fig.suptitle(backgroundtitle,
                 horizontalalignment="right",verticalalignment="top",
-#                fontproperties=fontprop_small,  # title not rendered in PDF in MPL3.4.x
-                fontsize="xx-small",
+##                fontproperties=fontprop_small,  # title not rendered in PDF in MPL3.4.x
+#                fontsize="xx-small",
+                fontsize="x-small",
                 x=suptitleX,y=1,
                 color=self.palette["title"])
         try:
@@ -19226,7 +19226,7 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.machinesetup = action.text()
                 else:
                     self.qmc.machinesetup = action.text()
-                    res = False
+                    res = True
                     if self.qmc.device == 29 and self.modbus.type in [3,4]: # MODBUS TCP or UDP
                         host,res = QInputDialog.getText(self,
                             QApplication.translate("Message", "Machine",None),
@@ -37384,7 +37384,7 @@ def main():
         if sys.argv and len(sys.argv) > 1:
             argv_file = str(sys.argv[1])
 
-            if platf == "Windows":
+            if platf in ["Windows", "Linux"]:
                 # send argv_file to running instance and exit this one
                 if app.isRunning():
                     # reformat a file path to a url form

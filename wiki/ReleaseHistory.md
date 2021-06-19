@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v2.4.4 (14.12.2020)
+v2.4.4 (December 14, 2020)
 ------------------
 
 * New Features
@@ -63,7 +63,7 @@ Richard Rodrigues](https://github.com/rich1n))
 _This is the last version supporting Raspbian Stretch_
 
 ----
-v2.4.2 (02.10.2020)
+v2.4.2 (October 2, 2020)
 ------------------
 
 * New Features
@@ -134,7 +134,7 @@ _This is the last version supporting macOS 10.13 and 10.14_
 
 
 ----
-v2.4.0 (03.06.2020)
+v2.4.0 (June 3, 2020)
 ------------------
 
 * New Features
@@ -229,7 +229,7 @@ v2.2.0
 never released
 
 ----
-v2.1.2 (24.12.2019)
+v2.1.2 (December 24, 2019)
 ------------------
 
 * New Features
@@ -257,7 +257,7 @@ v2.1.2 (24.12.2019)
   - prevents disappearing of projection lines on adding events
 
 ----
-v2.1.1 (29.11.2019)
+v2.1.1 (November 29, 2019)
 ------------------
 
 * Fixes
@@ -266,7 +266,7 @@ v2.1.1 (29.11.2019)
   - fixes rare issue with the exit handler
  
 ----
-v2.1.0 (26.11.2019)
+v2.1.0 (November 26, 2019)
 ------------------
 
 * New Features
@@ -364,7 +364,7 @@ function 16
 
   
 ----
-v2.0.0 (04.06.2019)
+v2.0.0 (June 4, 2019)
 ------------------
 
 * New Features
@@ -405,7 +405,7 @@ v2.0.0 (04.06.2019)
   - fixes regression that could lead to a potential hang caused by slow communicating devices
 
 ----
-v1.6.2 (20.03.2019)
+v1.6.2 (March 20, 2019)
 ------------------
 
 * Changes
@@ -418,7 +418,7 @@ v1.6.2 (20.03.2019)
 
 
 ----
-v1.6.1 (10.03.2019)
+v1.6.1 (March 10, 2019)
 ------------------
 
  * New Features
@@ -496,7 +496,7 @@ v1.6.0
 never released
 
 ----
-v1.5.0 (17.10.2018)
+v1.5.0 (October 17, 2018)
 ------------------
 
  * New Features
@@ -527,7 +527,7 @@ v1.5.0 (17.10.2018)
 
 
 ----
-v1.4.0 (03.10.2018)
+v1.4.0 (October 3, 2018)
 ------------------
 
  * New Features
@@ -606,7 +606,7 @@ v1.4.0 (03.10.2018)
 
 
 ----
-v1.3.1 (20.5.2018)
+v1.3.1 (May 20, 2018)
 ------------------
 
  * New Features 
@@ -650,7 +650,7 @@ v1.3.1 (20.5.2018)
      - fixes BC Roaster machine setup
    
 ----
-v1.3.0 (15.4.2018)
+v1.3.0 (April 15, 2018)
 ------------------
 
  * New Features 
@@ -710,7 +710,7 @@ v1.3.0 (15.4.2018)
 
 
 ----
-v1.2.0 (21.12.2017)
+v1.2.0 (December 21, 2017)
 ------------------
 
  * New Features
@@ -792,7 +792,7 @@ v1.2.0 (21.12.2017)
 _This is the last version supporting supporting Mac OS X 10.12 and Linux glibc 2.17_
 
 ----
-v1.1.0 (10.06.2017)
+v1.1.0 (June 10, 2017)
 ------------------
 
  * New Features
@@ -834,7 +834,7 @@ v1.1.0 (10.06.2017)
 _This is the last version supporting supporting Mac OS X 10.9, Windows XP/7 and 32bit OS versions_
         
 ----
-v1.0.0 (24.02.2017)
+v1.0.0 (February 24, 2017)
 ------------------
 
  * New Features
@@ -905,7 +905,7 @@ v1.0.0 (24.02.2017)
 _This is the last version supporting Mac OS X 10.7 and 10.9_
 
 ----
-v0.9.9 (14.03.2016)
+v0.9.9 (March 14, 2016)
 ------------------
 
  * New Features
@@ -948,7 +948,7 @@ v0.9.9 (14.03.2016)
 _This is the last version supporting Mac OS X 10.7 and 10.8_
 
 ----
-v0.9.8 (21.10.2015)
+v0.9.8 (October 21, 2015)
 ------------------
 
  * New Features
@@ -984,7 +984,7 @@ v0.9.8 (21.10.2015)
    * fixes a build issue on Mac OS X to prevent a startup crash related to X11 libraries
 
 ----
-v0.9.7 (29.7.2015)
+v0.9.7 (July 29, 2015)
 ------------------
 
  * Bug Fixes
@@ -993,7 +993,7 @@ v0.9.7 (29.7.2015)
    * fixes Fuji PXR reading of times on "Read Ra/So values"
 
 ----
-v0.9.6 (20.7.2015)
+v0.9.6 (July 20, 2015)
 ------------------
 
  * Bug Fixes
@@ -1004,7 +1004,7 @@ v0.9.6 (20.7.2015)
    * fixed Linux and Windows build setup
 
 ----
-v0.9.5 (6.7.2015)
+v0.9.5 (July 6, 2015)
 ------------------
 
  * New Features
@@ -1027,7 +1027,7 @@ v0.9.5 (6.7.2015)
 _This is the last version supporting the Windows Celeron platform and Mac OS X 10.6 (Intel only)_
 
 ----
-v0.9.4 (6.6.2015)
+v0.9.4 (June 6, 2015)
 ------------------
 
  * New Features
@@ -1044,7 +1044,7 @@ v0.9.4 (6.6.2015)
 
 
 ----
-v0.9.3 (15.1.2015)
+v0.9.3 (January 15, 2015)
 ------------------
 
  * New Features
@@ -1069,7 +1069,7 @@ v0.9.3 (15.1.2015)
 
 
 ----
-v0.9.2 (16.1.2015)
+v0.9.2 (January 16, 2015)
 ------------------
 
  * New Features
@@ -1085,7 +1085,7 @@ v0.9.2 (16.1.2015)
    * fixes MODBUS over UDP/TCP IPv6 issues on Windows
 
 ----
-v0.9.1 (3.1.2015)
+v0.9.1 (Januay 3, 2015)
 -----------------
 
  * New Features
@@ -1105,7 +1105,7 @@ v0.9.1 (3.1.2015)
 
 
 ----
-v0.9.0 (17.11.2014)
+v0.9.0 (November 17, 2014)
 -------------------
 
  * New Features
@@ -1171,7 +1171,7 @@ v0.9.0 (17.11.2014)
 
 
 ----
-v0.8.0 (25.05.2014)
+v0.8.0 (May 25, 2014)
 -------------------
 
  * New Features
@@ -1194,7 +1194,7 @@ v0.8.0 (25.05.2014)
 
 
 ----
-v0.7.5 (06.04.2014)
+v0.7.5 (April 6, 2014)
 -------------------
 
  * New Features
@@ -1217,7 +1217,7 @@ v0.7.5 (06.04.2014)
 
 
 ----
-v0.7.4 (13.01.2014)
+v0.7.4 (January 13, 2014)
 -------------------
 
  * Bug Fixes
@@ -1225,7 +1225,7 @@ v0.7.4 (13.01.2014)
 
 
 ----
-v0.7.3 (12.01.2014)
+v0.7.3 (January 12, 2014)
 -------------------
 
  * New Features
@@ -1238,7 +1238,7 @@ v0.7.3 (12.01.2014)
 
 
 ----
-v0.7.2 (19.12.2013)
+v0.7.2 (December 19, 2013)
 -------------------
 
  * Changes
@@ -1257,7 +1257,7 @@ v0.7.2 (19.12.2013)
 
 
 ----
-v0.7.1 (02.12.2013)
+v0.7.1 (December 2, 2013)
 -------------------
 
  * Bug Fixes
@@ -1269,7 +1269,7 @@ v0.7.1 (02.12.2013)
 
 
 ----
-v0.7.0 (30.11.2013)
+v0.7.0 (November 30, 2013)
 -------------------
 
  * New Features
@@ -1335,7 +1335,7 @@ v0.7.0 (30.11.2013)
 
 
 ----
-v0.6.0 (14.6.2013)
+v0.6.0 (June 14, 2013)
 ------------------
 
  * Events
@@ -1416,7 +1416,7 @@ v0.6.0 (14.6.2013)
    * bug fixes
 
 ----
-v0.5.6 (8.11.2012)
+v0.5.6 (November 8, 2012)
 ------------------
 
  * based on r787 (with modbus support removed)
@@ -1427,7 +1427,7 @@ v0.5.6 (8.11.2012)
 _This is the last version supporting Mac OS X 10.4 and 10.5 (on Intel and PCC)_
 
 ----
-v0.5.5 (28.9.2011)
+v0.5.5 (September 28, 2011)
 ------------------
 
  * fixes ArdruinoTC4 extra devices
@@ -1435,7 +1435,7 @@ v0.5.5 (28.9.2011)
  * fixes serial settings for extra devices
 
 ----
-v0.5.4 (28.8.2011)
+v0.5.4 (August 28, 2011)
 ------------------
 
  * adds events by value
@@ -1449,7 +1449,7 @@ v0.5.4 (28.8.2011)
  * bug fixes
 
 ----
-v0.5.3 (30.7.2011)
+v0.5.3 (July 30, 2011)
 ------------------
  * improves performance of push buttons
  * adds device external-program
@@ -1457,7 +1457,7 @@ v0.5.3 (30.7.2011)
  * fixes Linux Ubuntu and other bugs
 
 ----
-v0.5.2 (23.7.2011)
+v0.5.2 (July 23, 2011)
 ------------------
 
  * added Delta DTA PID support
@@ -1471,13 +1471,13 @@ v0.5.2 (23.7.2011)
  * bug fixes
 
 ----
-v0.5.1 (18.6.2011)
+v0.5.1 (June 18, 2011)
 ------------------
 
  * bug fixes
 
 ----
-v0.5.0 (10.6.2011)
+v0.5.0 (June 10, 2011)
 ------------------
 
  * support for Mac OS X 10.4 and PPC added
@@ -1497,7 +1497,7 @@ v0.5.0 (10.6.2011)
  * bug fixes
 
 ----
-v0.5.0b2 (04.6.2011)
+v0.5.0b2 (June 4, 2011)
 --------------------
 
  * improved cupping graphs
@@ -1505,7 +1505,7 @@ v0.5.0b2 (04.6.2011)
  * bug fixes
 
 ----
-v0.5.0b1 (28.5.2011)
+v0.5.0b1 (May 28, 2011)
 --------------------
 
  * support for Mac OS X 10.4 and PPC added
@@ -1523,7 +1523,7 @@ v0.5.0b1 (28.5.2011)
  * bug fixes
 
 ----
-v0.4.1 (13.4.2011)
+v0.4.1 (April 13, 2011)
 ------------------
 
  * import of CSV is not limited anymore to filenames with "csv" extension
@@ -1531,7 +1531,7 @@ v0.4.1 (13.4.2011)
  * Windows binary includes the language translations that were missing in v0.4.0
 
 ----
-v0.4.0 (10.4.2011)
+v0.4.0 (April 10, 2011)
 ------------------
 
  * improved CSV import/export
@@ -1548,7 +1548,7 @@ v0.4.0 (10.4.2011)
  * bug fixes
 
 ----
-v0.3.4 (28.02.2011)
+v0.3.4 (February 28, 2011)
 -------------------
 
  * adds Arduino/TC4 device support
@@ -1567,7 +1567,7 @@ v0.3.4 (28.02.2011)
  * bug fixes
 
 ----
-v0.3.3 (13.02.2011)
+v0.3.3 (February 13, 2011)
 -------------------
 
  * fixed typo in htmlReport
@@ -1580,7 +1580,7 @@ v0.3.3 (13.02.2011)
  * added axis settings to application preferences
 
 ----
-v0.3.2 (31.01.2011)
+v0.3.2 (January 31, 2011)
 -------------------
 
  * fixed Center 309 communication
@@ -1599,13 +1599,13 @@ v0.3.2 (31.01.2011)
  * new mailing lists for users and developers established
 
 ----
-v0.3.1 (12.01.2011)
+v0.3.1 (January 12, 2011)
 -------------------
 
  * fixed issue on loading the user's application preferences
 
 ----
-v0.3.0 (11.01.2011)
+v0.3.0 (January 11, 2011)
 -------------------
 
  * fixed occasional ET/BT swap
@@ -1621,13 +1621,13 @@ v0.3.0 (11.01.2011)
  * smaller changes and additions
 
 ----
-v0.2.1 (02.01.2011)
+v0.2.1 (January 2, 2011)
 -------------------
 
  * bug fixes
 
 ----
-v0.2.0 (31.12.2010)
+v0.2.0 (December 31, 2010)
 -------------------
 
  * added support for
@@ -1637,7 +1637,7 @@ v0.2.0 (31.12.2010)
  * bug fixes
 
 ----
-v0.1.0 (20.12.2010)
+v0.1.0 (December 20, 2010)
 -------------------
  * Initial release
 ====
