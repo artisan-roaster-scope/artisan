@@ -65,8 +65,7 @@ else: # Linux
             QApplication.addLibraryPath(os.path.dirname(site.getsitepackages()[0]) + "/PyQt5/qt_plugins")
     except Exception:
         pass
-        
-from artisanlib import main
+
 from artisanlib import main, command_utility
 #import numpy # @UnusedImport # what this for!?
 from multiprocessing import freeze_support

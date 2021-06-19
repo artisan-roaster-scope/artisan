@@ -37400,7 +37400,12 @@ def main():
                     app.open_url(url)
             # on Linux (and RPi), local argv_file paths may contain percent encoded spaces %20 and a file:// URL prefix
             if platf == "Linux":
-                argv_file = QUrl(url_parse.unquote_plus(argv_file)).toLocalFile()
+                argv_file_decoded = parse.unquote_plus(argv_file)
+                u = QUrl(parse.unquote_plus(argv_file_decoded))
+                if u.isLocalFile():
+                    argv_file = u.toLocalFile()
+                else:
+                    argv_file = argv_file_decoded
 
             qfile = QFileInfo(argv_file)
             file_suffix = qfile.suffix()
