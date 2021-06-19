@@ -49,6 +49,7 @@ import natsort
 import gc
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
+from urllib import parse
 
 from unidecode import unidecode
 
@@ -37397,6 +37398,9 @@ def main():
                     url = QUrl()
                     url.setUrl(argv_file)
                     app.open_url(url)
+            # on Linux (and RPi), local argv_file paths may contain percent encoded spaces %20 and a file:// URL prefix
+            if platf == "Linux":
+                argv_file = QUrl(url_parse.unquote_plus(argv_file)).toLocalFile()
 
             qfile = QFileInfo(argv_file)
             file_suffix = qfile.suffix()
