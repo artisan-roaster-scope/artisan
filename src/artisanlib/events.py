@@ -2575,6 +2575,11 @@ class EventsDlg(ArtisanResizeablDialog):
     def insertextraeventbutton(self,insert=False):
         if len(self.extraeventstypes) >= self.aw.buttonlistmaxlen * 4: # max 4 rows of buttons of buttonlistmaxlen
             return
+        try:
+            if type(QApplication.focusWidget()) == QLineEdit:
+                QApplication.focusWidget().editingFinished.emit()
+        except Exception:
+            pass
 
         bindex = len(self.extraeventstypes)
         selected = self.eventbuttontable.selectedRanges()
