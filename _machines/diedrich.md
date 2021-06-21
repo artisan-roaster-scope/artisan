@@ -7,7 +7,10 @@ header:
   overlay_image: /assets/images/diedrich.jpg
   image: /assets/images/diedrich1.jpg
   teaser: assets/images/diedrich1-supporter-grey.jpg
+sidebar:
+  nav: "machines"
 ---
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Producer:__ [Diedrich](https://www.diedrichroasters.com/){:target="_blank"}, USA
 * __Machines:__ All IR- and CR-series machines equipped with the 4 or 6 Sensor Data Logging option

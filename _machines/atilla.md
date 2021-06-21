@@ -7,7 +7,10 @@ header:
   overlay_image: /assets/images/atilla4.jpg
   image: /assets/images/atilla3.jpg
   teaser: assets/images/atilla3-supporter-grey.jpg
+sidebar:
+  nav: "machines"
 ---
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Producer:__ [Atilla Roasters](http://www.atilla.com.br/){:target="_blank"}, Brazil
 * __Machine:__ all Atilla Gold plus roasters with 7" touch display (2/5/10/15/30 kg)

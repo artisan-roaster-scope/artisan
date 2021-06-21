@@ -6,7 +6,9 @@ excerpt: "Arc S/800"
 header:
   overlay_image: /assets/images/arcS.jpg
   image: /assets/images/arcS.jpg
-  teaser: assets/images/arc-supporter.jpg
+  teaser: assets/images/arc.jpg
+sidebar:
+  nav: "machines"
 ---
 
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">

@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/froco.jpg
   image: /assets/images/froco.jpg
   teaser: assets/images/froco.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [Froco Coffee](http://www.froco-coffee.com/){:target="_blank"}, Indonesia

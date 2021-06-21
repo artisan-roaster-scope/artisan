@@ -214,6 +214,9 @@ collections:
   machines:
     output: true
     permalink: /:collection/:path/
+  supporters:
+    output: true
+    permalink: /:collection/:path/
   devices:
     output: true
     permalink: /:collection/:path/

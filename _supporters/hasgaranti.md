@@ -6,7 +6,9 @@ excerpt: "HGS/HSR"
 header:
   overlay_image: /assets/images/hasgaranti-large.jpg
   image: /assets/images/hasgaranti-small.jpg
-  teaser: assets/images/hasgaranti-small-supporter.jpg
+  teaser: assets/images/hasgaranti-small.jpg
+sidebar:
+  nav: "machines"
 ---
 
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">

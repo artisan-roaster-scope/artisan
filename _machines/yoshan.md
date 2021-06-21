@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/yoshan.jpg
   image: /assets/images/yoshan.jpg
   teaser: assets/images/yoshan.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [Yoshan](https://www.ysroaster.com/){:target="_blank"}, China

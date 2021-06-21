@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/trobrat.jpg
   image: /assets/images/trobrat.jpg
   teaser: assets/images/trobrat.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Distributor:__ [Trobrat](https://www.trobrat.ru/){:target="_blank"}, Russia

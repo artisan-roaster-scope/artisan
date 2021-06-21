@@ -6,7 +6,9 @@ excerpt: "KN-8828B-2K+, Arduino/TC4/HTC"
 header:
   overlay_image: /assets/images/hottop2.jpg
   image: /assets/images/hottop.jpg
-  teaser: assets/images/hottop-supporter.jpg
+  teaser: assets/images/hottop.jpg
+sidebar:
+  nav: "machines"
 ---
 
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">

@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/tesla.jpg
   image: /assets/images/tesla.jpg
   teaser: assets/images/tesla.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [O Tesla](https://otesla.vn/){:target="_blank"}, Vietnam

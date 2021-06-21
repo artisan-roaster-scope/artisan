@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/bideli.jpg
   image: /assets/images/bideli.jpg
   teaser: assets/images/bideli.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [Bideli](http://en.gzbideli.com/){:target="_blank"}, China

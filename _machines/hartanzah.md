@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/hartanzah.jpg
   image: /assets/images/hartanzah.jpg
   teaser: assets/images/hartanzah.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [HARTANZAH Coffee Roaster](http://hartanzah.com/){:target="_blank"}, Indonesia

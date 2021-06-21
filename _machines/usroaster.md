@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/usroaster.jpg
   image: /assets/images/usroaster.jpg
   teaser: assets/images/usroaster.jpg
+sidebar:
+  nav: "machines"
 ---
 * __Producer:__ [US Roaster Corp](http://www.usroastercorp.com){:target="_blank"}, USA
 * __Machines:__ all with USB connection

@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/buhler.jpg
   image: /assets/images/buhler.jpg
   teaser: assets/images/buhler.jpg
+sidebar:
+  nav: "machines"
 ---
 * __Producer:__ [Bühler GmbH](http://www.buhlergroup.com/){:target="_blank"}, Germany
 * __Machines:__ Roastmaster

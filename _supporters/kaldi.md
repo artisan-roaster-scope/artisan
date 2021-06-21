@@ -6,7 +6,9 @@ excerpt: "Fortis/Tron"
 header:
   overlay_image: /assets/images/Fortis-large.jpg
   image: /assets/images/Fortis-small.jpg
-  teaser: assets/images/Fortis-small-supporter.jpg
+  teaser: assets/images/Fortis-small.jpg
+sidebar:
+  nav: "machines"
 ---
 
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">

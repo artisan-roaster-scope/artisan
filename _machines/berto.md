@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/berto.jpg
   image: /assets/images/berto.jpg
   teaser: assets/images/berto.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [Berto Coffee Roaster](https://berto-online.com/){:target="_blank"}, Indonesia

@@ -6,7 +6,9 @@ excerpt: "TKM-SX, Cafemino,.."
 header:
   overlay_image: /assets/images/toper.jpg
   image: /assets/images/toper.jpg
-  teaser: assets/images/toper-supporter.jpg
+  teaser: assets/images/toper.jpg
+sidebar:
+  nav: "machines"
 ---
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
 

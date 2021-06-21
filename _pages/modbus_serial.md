@@ -57,3 +57,4 @@ Machine                         | Driver | Remarks
 [Santoker](/machines/santoker/) | CP210x
 [Sedona](/machines/sedona/) | CP210x
 [Toper](/machines/toper/) | CP210x | CH34x on some machines
+	

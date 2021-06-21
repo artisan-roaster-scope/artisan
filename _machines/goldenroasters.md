@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/goldenroasters2.jpg
   image: /assets/images/goldenroasters2.jpg
   teaser: assets/images/goldenroasters1.jpg
+sidebar:
+  nav: "machines"
 ---
 * __Producer:__ [Nazarkahve](http://www.nazarkahve.com.tr/){:target="_blank"}, Turkey
 * __Machines:__ GR Automatic, GR Manual with 3x EMKO PIDs, GR with 2x EMKO PIDs, GR with 2x Delta DTA PIDs as well as some legacy models

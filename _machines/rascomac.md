@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/rm.jpg
   image: /assets/images/rm.jpg
   teaser: assets/images/rm.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [Al Riyada Bakeries & Roasteries Equipment Manufacturer](https://www.alriyadafactory.com/){:target="_blank"}, United Arab Emirates

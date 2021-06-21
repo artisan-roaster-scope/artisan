@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/giesen.jpg
   image: /assets/images/giesen.jpg
   teaser: assets/images/giesen.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [GIESEN coffee-roasters](http://www.giesencoffeeroasters.eu){:target="_blank"}, The Netherlands

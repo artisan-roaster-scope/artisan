@@ -6,8 +6,13 @@ excerpt: "Probatone 5/12/25, P Series"
 header:
   overlay_image: /assets/images/probat.jpg
   image: /assets/images/probat.jpg
-  teaser: assets/images/probat-supporter-grey.jpg
+  teaser: /assets/images/probat.jpg
+sidebar:
+  nav: "machines"
 ---
+<!--
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/partner-badge.png" width="150px">
+-->
 
 * __Producer:__ [Probat](http://www.probat-shoproaster.com/en/home/){:target="_blank"}, Germany
 * __Machines:__ 

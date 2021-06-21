@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/IMF.jpg
   image: /assets/images/IMF.jpg
   teaser: assets/images/IMF.jpg
+sidebar:
+  nav: "machines"
 ---
 * __Producer:__ [IMF SRL](http://www.imf-srl.com){:target="_blank"}, Italy
 * __Machines:__ RM5/15/30/60/120/240/480 with PLC

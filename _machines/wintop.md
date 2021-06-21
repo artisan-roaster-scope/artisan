@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/wintop.jpg
   image: /assets/images/wintop.jpg
   teaser: assets/images/wintop.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [Wintop](http://wintopmachinery.com/){:target="_blank"}, China

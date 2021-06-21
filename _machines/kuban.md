@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/kuban2.jpg
   image: /assets/images/kuban2.jpg
   teaser: assets/images/kuban1.jpg
+sidebar:
+  nav: "machines"
 ---
 * __Producer:__ [Kuban](https://kubancoffeeroasters.com/){:target="_blank"}, Turkey
 * __Machines:__ Kuban Supreme

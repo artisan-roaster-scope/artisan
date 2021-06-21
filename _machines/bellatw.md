@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/bellatw.jpg
   image: /assets/images/bellatw.jpg
   teaser: assets/images/bellatw.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Distributor:__ [Bella TW Trading Company Co. Ltd.](http://www.bellataiwan.com/){:target="_blank"}, Taiwan

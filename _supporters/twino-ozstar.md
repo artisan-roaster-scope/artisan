@@ -6,7 +6,9 @@ excerpt: "Os-2/5/10/30/60/120K"
 header:
   overlay_image: /assets/images/twino-ozstar.jpg
   image: /assets/images/twino-ozstar1.jpg
-  teaser: assets/images/twino-ozstar1-supporter.jpg
+  teaser: assets/images/twino-ozstar1.jpg
+sidebar:
+  nav: "machines"
 ---
 
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">

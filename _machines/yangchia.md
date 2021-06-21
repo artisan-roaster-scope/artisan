@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/bellatw.jpg
   image: /assets/images/bellatw.jpg
   teaser: assets/images/bellatw.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [Yang-Chia Machine Works LTD](http://www.feima.com.tw/){:target="_blank"}, Taiwan

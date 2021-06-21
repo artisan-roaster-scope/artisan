@@ -6,7 +6,9 @@ excerpt: "BSC & Bee"
 header:
   overlay_image: /assets/images/besca2.jpg
   image: /assets/images/BescaRoast.jpg
-  teaser: assets/images/BescaRoast-supporter.jpg
+  teaser: assets/images/BescaRoast.jpg
+sidebar:
+  nav: "machines"
 ---
 
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">

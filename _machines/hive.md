@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/hive.jpg
   image: /assets/images/hive.jpg
   teaser: assets/images/hive.jpg
+sidebar:
+  nav: "machines"
 ---
 * __Producer:__ [Hive Roaster](https://hiveroaster.com/){:target="_blank"}, USA
 * __Machines:__ Hive Roaster with Data Dome

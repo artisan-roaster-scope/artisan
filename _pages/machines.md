@@ -1,7 +1,7 @@
 ---
 title: "Supported Machines"
 layout: collection
-collection: machines
+collection: supporters
 classes: wide
 permalink: /machines/
 header:
@@ -13,12 +13,30 @@ sidebar:
   nav: "machines"
 ---
 
-Artisan provides one-click configurations for more than 60 roaster brands representing over 130 different hardware configurations. Companies marked as "Artisan Supporter" have supported the project financially within the past 2 years.
+Artisan provides one-click configurations for more than 60 roaster brands representing over 130 different hardware configurations. 
 
 {: .notice--info}
 **Control!**
-Machine control (incl. heater, air flow, drum speed, ...) via buttons and sliders allowing for automation is currently supported for machines of [Aillio](/machines/aillio), [Besca](/machines/besca), [Carmomaq](/machines/carmomaq), [Coffed](/machines/coffed), [Coffee Tech](/machines/coffeetech), [Coffeetool](/machines/coffeetool), [Giesen](/machines/giesen), [Hottop](/machines/hottop), [IP Xenakis](/machines/ipxenakis), [Kirsch & Mausser](/machines/kirsch), [Kuban](/machines/kuban), [Nordic](/machines/nordic), [Probat](/machines/probat), [San Franciscan](/machines/sf) and [Twino/Ozstar](/machines/twino-ozstar).
+Machine control (incl. heater, air flow, drum speed, ...) via buttons and sliders allowing for automation is currently supported for machines of [Aillio](/machines/aillio), [Besca](/machines/besca), [Carmomaq](/machines/carmomaq), [Coffed](/machines/coffed), [Coffee Tech](/machines/coffeetech), [Coffeetool](/machines/coffeetool), [Giesen](/machines/giesen), [Hottop](/machines/hottop), [IP Xenakis](/machines/ipxenakis), <!-- [Kirsch & Mausser](/machines/kirsch),--> [Kuban](/machines/kuban), [Nordic](/machines/nordic), [Probat](/machines/probat), [San Franciscan](/machines/sf) and [Twino/Ozstar](/machines/twino-ozstar).
 {: .notice--info}
+
+<!--
+# Partners
+
+We especially thank our partners for pushing this project forward. Machines of our partners receive prioritised development updates, joint customer support as well as a one year [artisan.plus](https://artisan.plus/) PRO subscription for free.
+
+
+<p align="center">
+  <a href="/machines/probat/"><img width="460" height="300" src="/assets/images/probat-logo.jpg"></a><br>
+  Sample Roaster • Probatone II • P & G Series • UG & G45 Retro
+</p>
+
+-->
+
+
+# Supporters
+
+The following manufacturers have supported the Artisan project financially within the past 2 years.
 
 {: .notice--info}
 **Support!**

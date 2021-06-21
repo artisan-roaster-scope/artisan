@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/dongyi.jpg
   image: /assets/images/dongyi.jpg
   teaser: assets/images/dongyi.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [Dongyi Coffee Roasters](http://dongyiguoji.com/){:target="_blank"}, China

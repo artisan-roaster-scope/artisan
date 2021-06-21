@@ -7,7 +7,10 @@ header:
   overlay_image: /assets/images/ghibli15.jpg
   image: /assets/images/FZ94-1.jpg
   teaser: assets/images/FZ94-1-supporter-grey.jpg
+sidebar:
+  nav: "machines"
 ---
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Producer:__ [Coffee-Tech Engineering Ltd.](https://www.coffee-tech.com){:target="_blank"}, Israel
 * __Machine:__ FZ-94 Lab Roaster, Ghibli 15/30/45/60/90, and Ghibli Firewood, Silon ZR7

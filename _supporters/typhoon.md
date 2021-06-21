@@ -6,7 +6,9 @@ excerpt: "2/3/4/9kg"
 header:
   overlay_image: /assets/images/typhoon2.jpg
   image: /assets/images/typhoon2.jpg
-  teaser: assets/images/typhoon1-supporter.jpg
+  teaser: assets/images/typhoon1.jpg
+sidebar:
+  nav: "machines"
 ---
 
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">

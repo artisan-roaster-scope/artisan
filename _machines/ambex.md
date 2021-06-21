@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/ambex.jpg
   image: /assets/images/ambex.jpg
   teaser: assets/images/ambex.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Distributor:__ [Ambex Coffee Roasters and Grinders Inc.](https://www.ambexroaster.com/){:target="_blank"}, USA

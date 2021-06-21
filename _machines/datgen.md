@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/datgen.jpg
   image: /assets/images/datgen.jpg
   teaser: assets/images/datgen.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Distributor:__ [Dätgen Roasters](https://datgenroasters.com/){:target="_blank"}, Germany/Turkey

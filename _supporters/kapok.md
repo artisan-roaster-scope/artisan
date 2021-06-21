@@ -6,7 +6,9 @@ excerpt: "K500/1.0/5.0"
 header:
   overlay_image: /assets/images/kapok2.jpg
   image: /assets/images/kapok2.jpg
-  teaser: assets/images/kapok-supporter.jpg
+  teaser: assets/images/kapok1.jpg
+sidebar:
+  nav: "machines"
 ---
 
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">

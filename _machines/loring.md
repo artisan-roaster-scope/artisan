@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/loring.jpg
   image: /assets/images/loring.jpg
   teaser: assets/images/loring.jpg
+sidebar:
+  nav: "machines"
 ---
 * __Producer:__ [Loring Smart Roast Inc](https://loring.com){:target="_blank"}, USA
 * __Machines:__ S7/S15/S35/S70

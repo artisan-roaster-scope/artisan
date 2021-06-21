@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/lilla.jpg
   image: /assets/images/lilla.jpg
   teaser: assets/images/lilla.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [CIA LILLA DE MÁQUINAS IND. E COM.](http://en.lilla.com.br/){:target="_blank"}, Bazil

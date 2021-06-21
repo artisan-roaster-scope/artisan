@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/carmomaq-large.jpg
   image: /assets/images/carmomaq-large.jpg
   teaser: assets/images/carmomaq-small.jpg
+sidebar:
+  nav: "machines"
 ---
 * __Producer:__ [Carmomaq](https://www.carmomaq.com.br/){:target="_blank"}, Brazil
 * __Machines:__ machines with MODBUS support

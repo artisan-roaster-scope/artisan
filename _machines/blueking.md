@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/blueking.jpg
   image: /assets/images/blueking.jpg
   teaser: assets/images/blueking.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [Zhengzhou Blueking Mechanical Equipment Co. Ltd.](https://lanjingmachine.en.alibaba.com/){:target="_blank"}, China

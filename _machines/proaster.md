@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/proaster.jpg
   image: /assets/images/proaster.jpg
   teaser: assets/images/proaster.jpg
+sidebar:
+  nav: "machines"
 ---
 * __Producer:__ [Proaster](http://proaster.coffee){:target="_blank"}, Korea
 * __Machines:__ all models with Autonics TK4S temperature controller

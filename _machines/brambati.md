@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/brambati.jpg
   image: /assets/images/brambati.jpg
   teaser: assets/images/brambati.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [Brambati S.p.A.](http://www.brambati.it/){:target="_blank"}, Italy

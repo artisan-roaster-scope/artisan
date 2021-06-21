@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/petroncini2.jpg
   image: /assets/images/petroncini2.jpg
   teaser: assets/images/petroncini1.jpg
+sidebar:
+  nav: "machines"
 ---
 * __Producer:__ [Petroncini Impianti S.p.A.](https://www.petroncini.com/){:target="_blank"}, Italy
 * __Machines:__ TT 5/10, TT 10/20, TTG 60, TT120 with PLC

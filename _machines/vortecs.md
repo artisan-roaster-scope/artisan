@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/vortecs.jpg
   image: /assets/images/vortecs.jpg
   teaser: assets/images/vortecs.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Distributor:__ [Vortecs Pro](https://vortecspro.com/){:target="_blank"}, Taiwan/China

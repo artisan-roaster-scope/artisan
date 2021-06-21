@@ -44,6 +44,8 @@ machines:
         url: /machines/coffeetech/
       - title: "Coffeetool"
         url: /machines/coffeetool/
+      - title: "Craftsmith"
+        url: /machines/craftsmith/
       - title: "Dätgen"
         url: /machines/datgen/
       - title: "Diedrich"
@@ -110,6 +112,8 @@ machines:
         url: /machines/rascomac/
       - title: "Roaster & Roaster"
         url: /machines/roasterandroaster/
+      - title: "Roastmax"
+        url: /machines/roastmax/
       - title: "Rolltech"
         url: /machines/rolltech/
       - title: "Santoker"

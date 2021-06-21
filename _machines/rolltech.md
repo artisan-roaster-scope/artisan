@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/rolltech.jpg
   image: /assets/images/rolltech.jpg
   teaser: assets/images/rolltech2.jpg
+sidebar:
+  nav: "machines"
 ---
 * __Producer:__ [Rolltech](https://rolltech.qdm.tw/){:target="_blank"}, Taiwan
 * __Machines:__ EL600

@@ -6,7 +6,9 @@ excerpt: "Genius K1 / K3"
 header:
   overlay_image: /assets/images/tostabar2.jpg
   image: /assets/images/tostabar2.jpg
-  teaser: assets/images/tostabar1-supporter.jpg
+  teaser: assets/images/tostabar1.jpg
+sidebar:
+  nav: "machines"
 ---
 
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">

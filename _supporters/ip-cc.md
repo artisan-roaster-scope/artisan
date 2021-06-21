@@ -6,7 +6,9 @@ excerpt: "iRm Series"
 header:
   overlay_image: /assets/images/ip2.jpg
   image: /assets/images/ip2.jpg
-  teaser: assets/images/ip1-supporter.jpg
+  teaser: assets/images/ip1.jpg
+sidebar:
+  nav: "machines"
 ---
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
 

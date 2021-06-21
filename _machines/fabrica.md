@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/fabrica.jpg
   image: /assets/images/fabrica.jpg
   teaser: assets/images/fabrica.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Distributor:__ [Fabrica Coffee Roasters Machine](https://www.fabricaroasters.com/){:target="_blank"}, Turkey

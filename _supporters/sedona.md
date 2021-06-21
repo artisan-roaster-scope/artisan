@@ -6,7 +6,9 @@ excerpt: "Elite"
 header:
   overlay_image: /assets/images/sedona.jpg
   image: /assets/images/sedona.jpg
-  teaser: assets/images/sedona-supporter.jpg
+  teaser: assets/images/sedona.jpg
+sidebar:
+  nav: "machines"
 ---
 
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">

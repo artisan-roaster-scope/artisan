@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/easyster.jpg
   image: /assets/images/easyster.jpg
   teaser: assets/images/easyster.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [EASYSTER Coffee Roaster](http://www.easyster.co.kr/){:target="_blank"}, South Korea

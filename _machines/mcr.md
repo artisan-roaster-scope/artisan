@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/mcr.jpg
   image: /assets/images/mcr.jpg
   teaser: assets/images/mcr.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Distributor:__ [Mill City Roasters](http://millcityroasters.com/){:target="_blank"}, USA/China

@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/opp.jpg
   image: /assets/images/opp.jpg
   teaser: assets/images/opp.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Distributor:__ [OPP Roaster](https://opproaster.com/){:target="_blank"}, Vietnam

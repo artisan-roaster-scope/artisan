@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/santoker.jpg
   image: /assets/images/santoker.jpg
   teaser: assets/images/santoker.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [Santoker](){:target="_blank"}, China

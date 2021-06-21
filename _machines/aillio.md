@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/aillio.jpg
   image: /assets/images/aillio.jpg
   teaser: assets/images/aillio.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [Aillio Limited](https://aillio.com){:target="_blank"}, Taiwan

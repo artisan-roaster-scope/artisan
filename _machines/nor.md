@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/nor.jpg
   image: /assets/images/nor.jpg
   teaser: assets/images/nor.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Distributor:__ [NOR Coffee Roaster](https://norcofeeroaster.com/){:target="_blank"}, Indonesia

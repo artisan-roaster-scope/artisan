@@ -6,7 +6,9 @@ excerpt: "ORO 5/8"
 header:
   overlay_image: /assets/images/phoenix.jpg
   image: /assets/images/phoenix.jpg
-  teaser: assets/images/phoenix-supporter.jpg
+  teaser: assets/images/phoenix.jpg
+sidebar:
+  nav: "machines"
 ---
 
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">

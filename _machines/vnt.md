@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/vnt.jpg
   image: /assets/images/vnt.jpg
   teaser: assets/images/vnt.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Distributor:__ [Sudi Jaya Group](https://sjglobal.id/roaster/){:target="_blank"}, Indonesia

@@ -7,6 +7,8 @@ header:
   overlay_image: /assets/images/oz.jpg
   image: /assets/images/oz.jpg
   teaser: assets/images/oz.jpg
+sidebar:
+  nav: "machines"
 ---
 
 * __Producer:__ [Öztürkbay](http://www.ozturkroasters.com/){:target="_blank"}, Turkey
