@@ -1,7 +1,7 @@
 [General]
 Delay=2000
 Oversampling=false
-roastertype_setup=R&R R Touch
+roastertype_setup=R&R R/RV Automatic
 
 [Device]
 id=29
