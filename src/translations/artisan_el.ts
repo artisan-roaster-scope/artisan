@@ -3,7 +3,7 @@
 <context>
     <name>About</name>
     <message>
-        <location filename="../artisanlib/main.py" line="34020"/>
+        <location filename="../artisanlib/main.py" line="34023"/>
         <source>About</source>
         <translation>Περι</translation>
     </message>
@@ -13,67 +13,67 @@
         <translation type="obsolete">Εκδοση:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34020"/>
+        <location filename="../artisanlib/main.py" line="34023"/>
         <source>Core Developers</source>
         <translation>Προγραμματιστες</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34020"/>
+        <location filename="../artisanlib/main.py" line="34023"/>
         <source>Contributors</source>
         <translation>Συντελεστες</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34020"/>
+        <location filename="../artisanlib/main.py" line="34023"/>
         <source>License</source>
         <translation>Αδεια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34071"/>
+        <location filename="../artisanlib/main.py" line="34074"/>
         <source>A new release is available.</source>
         <translation>Μια νέα κυκλοφορία είναι διαθέσιμη.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34073"/>
+        <location filename="../artisanlib/main.py" line="34076"/>
         <source>Show Change list</source>
         <translation>Εμφάνιση λίστας αλλαγών</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34075"/>
+        <location filename="../artisanlib/main.py" line="34078"/>
         <source>Download Release</source>
         <translation>Λήψη κυκλοφορίας</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34077"/>
+        <location filename="../artisanlib/main.py" line="34080"/>
         <source>You are using the latest release.</source>
         <translation>Χρησιμοποιείτε την τελευταία έκδοση.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34079"/>
+        <location filename="../artisanlib/main.py" line="34082"/>
         <source>You are using a beta continuous build.</source>
         <translation>Χρησιμοποιείτε μια συνεχή έκδοση beta.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34080"/>
+        <location filename="../artisanlib/main.py" line="34083"/>
         <source>You will see a notice here once a new official release is available.</source>
         <translation>Θα δείτε μια ειδοποίηση εδώ μόλις είναι διαθέσιμη μια νέα επίσημη κυκλοφορία.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34086"/>
+        <location filename="../artisanlib/main.py" line="34089"/>
         <source>There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.</source>
         <translation>Παρουσιάστηκε πρόβλημα κατά την ανάκτηση των τελευταίων πληροφοριών έκδοσης. Ελέγξτε τη σύνδεσή σας στο Διαδίκτυο, δοκιμάστε ξανά αργότερα ή ελέγξτε μη αυτόματα.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34089"/>
+        <location filename="../artisanlib/main.py" line="34092"/>
         <source>Update status</source>
         <translation>Ενημέρωση κατάστασης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18374"/>
+        <location filename="../artisanlib/main.py" line="18377"/>
         <source>Release Sponsor</source>
         <translation>Απελευθερώστε τον Χορηγό</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6404"/>
+        <location filename="../artisanlib/main.py" line="6407"/>
         <source>sponsored by {}</source>
         <translation>με τη χορηγία του {}</translation>
     </message>
@@ -81,7 +81,7 @@
 <context>
     <name>AddlInfo</name>
     <message>
-        <location filename="../artisanlib/main.py" line="8576"/>
+        <location filename="../artisanlib/main.py" line="8579"/>
         <source>Roast of the Day</source>
         <translation>Ψητό της ημέρας</translation>
     </message>
@@ -91,57 +91,57 @@
         <translation type="obsolete">Μεγεθος Κοκκου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8635"/>
+        <location filename="../artisanlib/main.py" line="8638"/>
         <source>Moisture Green</source>
         <translation>Υγρασία πράσινο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8650"/>
+        <location filename="../artisanlib/main.py" line="8653"/>
         <source>Moisture Roasted</source>
         <translation>Υγρασία ψητή</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8652"/>
+        <location filename="../artisanlib/main.py" line="8655"/>
         <source>Whole Color</source>
         <translation type="unfinished">Χρωμα Κοκκων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8654"/>
+        <location filename="../artisanlib/main.py" line="8657"/>
         <source>Ground Color</source>
         <translation type="unfinished">Χρωμα Αλεσμενου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8631"/>
+        <location filename="../artisanlib/main.py" line="8634"/>
         <source>Screen Size</source>
         <translation>Μέγεθος οθόνης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8633"/>
+        <location filename="../artisanlib/main.py" line="8636"/>
         <source>Density Green</source>
         <translation>Πυκνότητα πράσινο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8641"/>
+        <location filename="../artisanlib/main.py" line="8644"/>
         <source>Batch Size</source>
         <translation>Μέγεθος παρτίδας</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8648"/>
+        <location filename="../artisanlib/main.py" line="8651"/>
         <source>Density Roasted</source>
         <translation>Πυκνότητα ψητή</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8664"/>
+        <location filename="../artisanlib/main.py" line="8667"/>
         <source>AUC</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8656"/>
+        <location filename="../artisanlib/main.py" line="8659"/>
         <source>Energy</source>
         <translation>Ενέργεια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8660"/>
+        <location filename="../artisanlib/main.py" line="8663"/>
         <source>CO2</source>
         <translation></translation>
     </message>
@@ -149,112 +149,112 @@
 <context>
     <name>Button</name>
     <message>
-        <location filename="../artisanlib/main.py" line="17369"/>
+        <location filename="../artisanlib/main.py" line="17372"/>
         <source>ON</source>
         <translation>ΕΝΕΡΓΟΠΟΙΗΣΗ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17386"/>
+        <location filename="../artisanlib/main.py" line="17389"/>
         <source>START</source>
         <translation>ΕΝΑΡΞΗ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9978"/>
+        <location filename="../artisanlib/main.py" line="9981"/>
         <source>OFF</source>
         <translation>ΠΑΥΣΗ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17404"/>
+        <location filename="../artisanlib/main.py" line="17407"/>
         <source>FC
 START</source>
         <translation>ΕΝΑΡΞΗ FC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17412"/>
+        <location filename="../artisanlib/main.py" line="17415"/>
         <source>FC
 END</source>
         <translation>ΛΗΞΗ FC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17420"/>
+        <location filename="../artisanlib/main.py" line="17423"/>
         <source>SC
 START</source>
         <translation>ΕΝΑΡΞΗ SC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17428"/>
+        <location filename="../artisanlib/main.py" line="17431"/>
         <source>SC
 END</source>
         <translation>ΛΗΞΗ SC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17437"/>
+        <location filename="../artisanlib/main.py" line="17440"/>
         <source>RESET</source>
         <translation>ΑΡΧΙΚΗ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17452"/>
+        <location filename="../artisanlib/main.py" line="17455"/>
         <source>CHARGE</source>
         <translation>ΦΟΡΤΩΜΑ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17461"/>
+        <location filename="../artisanlib/main.py" line="17464"/>
         <source>DROP</source>
         <translation>ΞΕΦΟΡΤΩΜΑ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17470"/>
+        <location filename="../artisanlib/main.py" line="17473"/>
         <source>Control</source>
         <translation>Ελεγχος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17486"/>
+        <location filename="../artisanlib/main.py" line="17489"/>
         <source>EVENT</source>
         <translation>ΣΥΜΒΑΝ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17495"/>
+        <location filename="../artisanlib/main.py" line="17498"/>
         <source>SV +5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17504"/>
+        <location filename="../artisanlib/main.py" line="17507"/>
         <source>SV +10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17513"/>
+        <location filename="../artisanlib/main.py" line="17516"/>
         <source>SV +20</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17522"/>
+        <location filename="../artisanlib/main.py" line="17525"/>
         <source>SV -20</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17531"/>
+        <location filename="../artisanlib/main.py" line="17534"/>
         <source>SV -10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17540"/>
+        <location filename="../artisanlib/main.py" line="17543"/>
         <source>SV -5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17549"/>
+        <location filename="../artisanlib/main.py" line="17552"/>
         <source>HUD</source>
         <translation>ΠΡΟΒ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17564"/>
+        <location filename="../artisanlib/main.py" line="17567"/>
         <source>DRY
 END</source>
         <translation>ΛΗΞΗ ΞΥΡΑΝΣΗΣ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17573"/>
+        <location filename="../artisanlib/main.py" line="17576"/>
         <source>COOL
 END</source>
         <translation>ΛΗΞΗ ΨΥΞΗΣ</translation>
@@ -2348,22 +2348,22 @@ Extra Device</source>
         <translation>λήψη πλήρων μπλοκ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="1585"/>
+        <location filename="../artisanlib/main.py" line="1588"/>
         <source>Propane Gas (LPG)</source>
         <translation>Αέριο προπάνιο (LPG)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="1586"/>
+        <location filename="../artisanlib/main.py" line="1589"/>
         <source>Natural Gas (NG)</source>
         <translation>Φυσικό αέριο (NG)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="1587"/>
+        <location filename="../artisanlib/main.py" line="1590"/>
         <source>Electric</source>
         <translation>Ηλεκτρικός</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2334"/>
+        <location filename="../artisanlib/main.py" line="2337"/>
         <source>Elec</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2381,22 +2381,22 @@ Extra Device</source>
         <translation type="obsolete">Δημιουργια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13033"/>
+        <location filename="../artisanlib/main.py" line="13036"/>
         <source>Config...</source>
         <translation>Διαμορφωση...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13009"/>
+        <location filename="../artisanlib/main.py" line="13012"/>
         <source>Add point</source>
         <translation>Προσθηκη σημειου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13013"/>
+        <location filename="../artisanlib/main.py" line="13016"/>
         <source>Remove point</source>
         <translation>Καταργηση σημειου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13029"/>
+        <location filename="../artisanlib/main.py" line="13032"/>
         <source>Reset Designer</source>
         <translation>Επαναφορα Σχεδιαστηριου</translation>
     </message>
@@ -2406,12 +2406,12 @@ Extra Device</source>
         <translation type="obsolete">Εξοδος Σχεδιαστηριου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13689"/>
+        <location filename="../artisanlib/main.py" line="13692"/>
         <source>Add to Cupping Notes</source>
         <translation>Προσθηκη Σημειωσεων cupping</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13693"/>
+        <location filename="../artisanlib/main.py" line="13696"/>
         <source>Add to Roasting Notes</source>
         <translation>Προσθηκη Σημειωσεων Ψησιματος</translation>
     </message>
@@ -2431,17 +2431,17 @@ Extra Device</source>
         <translation type="obsolete">Εξοδος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13019"/>
+        <location filename="../artisanlib/main.py" line="13022"/>
         <source>Load points</source>
         <translation>Φόρτωση σημείων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13023"/>
+        <location filename="../artisanlib/main.py" line="13026"/>
         <source>Save points</source>
         <translation>Εξοικονομήστε πόντους</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13699"/>
+        <location filename="../artisanlib/main.py" line="13702"/>
         <source>Edit</source>
         <translation type="unfinished">Επεξεργασια</translation>
     </message>
@@ -3695,7 +3695,7 @@ Extra Device</source>
         <translation>Εξαιρεση:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36175"/>
+        <location filename="../artisanlib/main.py" line="36178"/>
         <source>Value Error:</source>
         <translation>Σφαλμα Τιμης:</translation>
     </message>
@@ -3705,7 +3705,7 @@ Extra Device</source>
         <translation>Σφαλμα ΙΟ:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31082"/>
+        <location filename="../artisanlib/main.py" line="31085"/>
         <source>Error</source>
         <translation>Σφαλμα</translation>
     </message>
@@ -3855,32 +3855,32 @@ Extra Device</source>
         <translation type="obsolete">HH806AUθερμο():{0}bytes εληφθησαν αλλα χρειζει14 {806A?} {1 ?} {16 ?}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24601"/>
+        <location filename="../artisanlib/main.py" line="24604"/>
         <source>Error:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12486"/>
+        <location filename="../artisanlib/main.py" line="12489"/>
         <source>Error in lnRegression:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32667"/>
+        <location filename="../artisanlib/main.py" line="32670"/>
         <source>Exception (probably due to an empty profile):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9515"/>
+        <location filename="../artisanlib/main.py" line="9518"/>
         <source>Exception: PhidgetManager couldn&apos;t be started. Verify that the Phidget driver is correctly installed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36781"/>
+        <location filename="../artisanlib/main.py" line="36784"/>
         <source>Analyze: no background profile data available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36784"/>
+        <location filename="../artisanlib/main.py" line="36787"/>
         <source>Analyze: background profile requires CHARGE and DROP events</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3955,22 +3955,22 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12943"/>
+        <location filename="../artisanlib/main.py" line="12946"/>
         <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28275"/>
+        <location filename="../artisanlib/main.py" line="28278"/>
         <source>Exception: {} not a valid settings file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36699"/>
+        <location filename="../artisanlib/main.py" line="36702"/>
         <source>Analyze: DROP event required, none found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36695"/>
+        <location filename="../artisanlib/main.py" line="36698"/>
         <source>Analyze: CHARGE event required, none found</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4186,12 +4186,12 @@ Extra Device</source>
         <translation type="unfinished">Καμπυλες</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3097"/>
+        <location filename="../artisanlib/events.py" line="3102"/>
         <source>Event</source>
         <translation type="unfinished">Συμβαν</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24606"/>
+        <location filename="../artisanlib/main.py" line="24609"/>
         <source>Keyboard Shortcuts Help</source>
         <translation>Βοήθεια για συντομεύσεις πληκτρολογίου</translation>
     </message>
@@ -4246,17 +4246,17 @@ Extra Device</source>
         <translation>Βοήθεια εξωτερικών προγραμμάτων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3058"/>
+        <location filename="../artisanlib/events.py" line="3063"/>
         <source>Event Custom Buttons Help</source>
         <translation>Βοήθεια προσαρμοσμένων κουμπιών συμβάντων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3066"/>
+        <location filename="../artisanlib/events.py" line="3071"/>
         <source>Event Custom Sliders Help</source>
         <translation>Βοήθεια προσαρμοσμένων ρυθμιστικών συμβάντων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3074"/>
+        <location filename="../artisanlib/events.py" line="3079"/>
         <source>Event Annotations Help</source>
         <translation>Βοήθεια σχολιασμών εκδηλώσεων</translation>
     </message>
@@ -4752,27 +4752,27 @@ Extra Device</source>
 <context>
     <name>HTML Report Template</name>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Roasting Report</source>
         <translation type="unfinished">Λεπτομερειες Ψησιματος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Date:</source>
         <translation>Ημερομηνια:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Beans:</source>
         <translation>Κοκκοι:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Size:</source>
         <translation>Mεγεθος:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Weight:</source>
         <translation>Βαρος:</translation>
     </message>
@@ -4782,12 +4782,12 @@ Extra Device</source>
         <translation type="obsolete">Βαθμος:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Volume:</source>
         <translation>Ογκος:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Density:</source>
         <translation>Πυκνοτητα:</translation>
     </message>
@@ -4797,67 +4797,67 @@ Extra Device</source>
         <translation type="obsolete">Υγρασια:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Roaster:</source>
         <translation>Ψηστηρι:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Operator:</source>
         <translation>Χειρηστης:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Cupping:</source>
         <translation>Cupping:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Color:</source>
         <translation>Χρωμα:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>CHARGE:</source>
         <translation>ΦΟΡΤΩΜΑ:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>DRY:</source>
         <translation>ΞΗΡΑΝΣΗ:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>FCs:</source>
         <translation>FCε:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>FCe:</source>
         <translation>FCλ:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>SCs:</source>
         <translation>SCε:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>SCe:</source>
         <translation>SCλ:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>DROP:</source>
         <translation>ΞΕΦΟΡΤΩΜΑ:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>COOL:</source>
         <translation>ΨΗΞΗ:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>RoR:</source>
         <translation>RoR:</translation>
     </message>
@@ -4867,12 +4867,12 @@ Extra Device</source>
         <translation type="obsolete">ETBTa:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Drying:</source>
         <translation>Ξηρανση:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Maillard:</source>
         <translation>Maillard:</translation>
     </message>
@@ -4882,117 +4882,117 @@ Extra Device</source>
         <translation type="obsolete">Αναπτυξη:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Cooling:</source>
         <translation>Ψυξη:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Roasting Notes</source>
         <translation>Σημειωσεις Ψησιματος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Cupping Notes</source>
         <translation>Σημειωσεις cupping</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>TP:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>CM:</source>
         <translation>ΕΚ:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Background:</source>
         <translation>Ιστορικό:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Events</source>
         <translation type="unfinished">Συμβαντα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>MET:</source>
         <translation>ΣΥΝΑΝΤΗΣΕ:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Moisture:</source>
         <translation>Υγρασία:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Ambient:</source>
         <translation>Περιβάλλων:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31891"/>
+        <location filename="../artisanlib/main.py" line="31894"/>
         <source>Batch</source>
         <translation>Σύνολο παραγωγής</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32752"/>
+        <location filename="../artisanlib/main.py" line="32755"/>
         <source>Date</source>
         <translation type="unfinished">Ημερομηνια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31892"/>
+        <location filename="../artisanlib/main.py" line="31895"/>
         <source>Time</source>
         <translation type="unfinished">Χρονος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31893"/>
+        <location filename="../artisanlib/main.py" line="31896"/>
         <source>Profile</source>
         <translation>Προφίλ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31976"/>
+        <location filename="../artisanlib/main.py" line="31979"/>
         <source>Beans</source>
         <translation type="unfinished">Κοκκοι</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32752"/>
+        <location filename="../artisanlib/main.py" line="32755"/>
         <source>In</source>
         <translation>Σε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31673"/>
+        <location filename="../artisanlib/main.py" line="31676"/>
         <source>Out</source>
         <translation>Εξω</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32752"/>
+        <location filename="../artisanlib/main.py" line="32755"/>
         <source>Loss</source>
         <translation>Απώλεια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31496"/>
+        <location filename="../artisanlib/main.py" line="31499"/>
         <source>Roast Batches</source>
         <translation>Παρτίδες ψητού</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31713"/>
+        <location filename="../artisanlib/main.py" line="31716"/>
         <source>SUM</source>
         <translation>ΑΘΡΟΙΣΜΑ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32752"/>
+        <location filename="../artisanlib/main.py" line="32755"/>
         <source>Roast Ranking</source>
         <translation>Συγκριση Ψησιματος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33007"/>
+        <location filename="../artisanlib/main.py" line="33010"/>
         <source>AVG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31654"/>
+        <location filename="../artisanlib/main.py" line="31657"/>
         <source>Production Report</source>
         <translation>Έκθεση παραγωγής</translation>
     </message>
@@ -5007,552 +5007,552 @@ Extra Device</source>
         <translation type="obsolete">ΞΕΦΟΡΤΩΜΑ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32752"/>
+        <location filename="../artisanlib/main.py" line="32755"/>
         <source>Color</source>
         <translation type="unfinished">Χρωμα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>AUC:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Finishing:</source>
         <translation>Φινίρισμα:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31955"/>
+        <location filename="../artisanlib/main.py" line="31958"/>
         <source>AUC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Alarms:</source>
         <translation>Συναγερμός:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Organization:</source>
         <translation>Οργάνωση:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31961"/>
+        <location filename="../artisanlib/main.py" line="31964"/>
         <source>Weight In</source>
         <translation>Βάρος σε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31919"/>
+        <location filename="../artisanlib/main.py" line="31922"/>
         <source>CHARGE BT</source>
         <translation>ΦΟΡΤΙΣΗ BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31926"/>
+        <location filename="../artisanlib/main.py" line="31929"/>
         <source>FCs Time</source>
         <translation>Ώρα FCs</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31928"/>
+        <location filename="../artisanlib/main.py" line="31931"/>
         <source>FCs BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31938"/>
+        <location filename="../artisanlib/main.py" line="31941"/>
         <source>DROP Time</source>
         <translation>Ώρα πτώσης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31940"/>
+        <location filename="../artisanlib/main.py" line="31943"/>
         <source>DROP BT</source>
         <translation>ΣΤΑΣΗ BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31900"/>
+        <location filename="../artisanlib/main.py" line="31903"/>
         <source>Dry Percent</source>
         <translation>Ξηρό ποσοστό</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31901"/>
+        <location filename="../artisanlib/main.py" line="31904"/>
         <source>MAI Percent</source>
         <translation>Ποσοστό MAI</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31902"/>
+        <location filename="../artisanlib/main.py" line="31905"/>
         <source>Dev Percent</source>
         <translation>Ποσοστό προγραμματιστών</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31963"/>
+        <location filename="../artisanlib/main.py" line="31966"/>
         <source>Weight Loss</source>
         <translation>Απώλεια βάρους</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31906"/>
+        <location filename="../artisanlib/main.py" line="31909"/>
         <source>Cupping</source>
         <translation>Βεντούζα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31907"/>
+        <location filename="../artisanlib/main.py" line="31910"/>
         <source>Roaster</source>
         <translation type="unfinished">Ψηστηρι</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31909"/>
+        <location filename="../artisanlib/main.py" line="31912"/>
         <source>Operator</source>
         <translation>Χειριστής</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31910"/>
+        <location filename="../artisanlib/main.py" line="31913"/>
         <source>Organization</source>
         <translation>Οργάνωση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31911"/>
+        <location filename="../artisanlib/main.py" line="31914"/>
         <source>Drum Speed</source>
         <translation>Ταχύτητα τυμπάνου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31912"/>
+        <location filename="../artisanlib/main.py" line="31915"/>
         <source>Whole Color</source>
         <translation type="unfinished">Χρωμα Κοκκων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31913"/>
+        <location filename="../artisanlib/main.py" line="31916"/>
         <source>Ground Color</source>
         <translation type="unfinished">Χρωμα Αλεσμενου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31914"/>
+        <location filename="../artisanlib/main.py" line="31917"/>
         <source>Color System</source>
         <translation>Σύστημα χρωμάτων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31915"/>
+        <location filename="../artisanlib/main.py" line="31918"/>
         <source>Screen Min</source>
         <translation>Ελάχιστη οθόνη</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31916"/>
+        <location filename="../artisanlib/main.py" line="31919"/>
         <source>Screen Max</source>
         <translation>Μέγιστη οθόνη</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31917"/>
+        <location filename="../artisanlib/main.py" line="31920"/>
         <source>Bean Temp</source>
         <translation>Θερμοκρασία φασολιών</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31918"/>
+        <location filename="../artisanlib/main.py" line="31921"/>
         <source>CHARGE ET</source>
         <translation>ΦΟΡΤΙΣΗ ΕΤ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31920"/>
+        <location filename="../artisanlib/main.py" line="31923"/>
         <source>TP Time</source>
         <translation>Ώρα TP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31921"/>
+        <location filename="../artisanlib/main.py" line="31924"/>
         <source>TP ET</source>
         <translation>TP ΕΤ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31922"/>
+        <location filename="../artisanlib/main.py" line="31925"/>
         <source>TP BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31923"/>
+        <location filename="../artisanlib/main.py" line="31926"/>
         <source>DRY Time</source>
         <translation>Στεγνό Ώρα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31924"/>
+        <location filename="../artisanlib/main.py" line="31927"/>
         <source>DRY ET</source>
         <translation>ΣΤΕΓΝΩ ΕΤ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31925"/>
+        <location filename="../artisanlib/main.py" line="31928"/>
         <source>DRY BT</source>
         <translation>ΞΗΡΑ BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31927"/>
+        <location filename="../artisanlib/main.py" line="31930"/>
         <source>FCs ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31929"/>
+        <location filename="../artisanlib/main.py" line="31932"/>
         <source>FCe Time</source>
         <translation>FCe Ώρα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31930"/>
+        <location filename="../artisanlib/main.py" line="31933"/>
         <source>FCe ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31931"/>
+        <location filename="../artisanlib/main.py" line="31934"/>
         <source>FCe BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31932"/>
+        <location filename="../artisanlib/main.py" line="31935"/>
         <source>SCs Time</source>
         <translation>Ώρα SC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31933"/>
+        <location filename="../artisanlib/main.py" line="31936"/>
         <source>SCs ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31934"/>
+        <location filename="../artisanlib/main.py" line="31937"/>
         <source>SCs BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31935"/>
+        <location filename="../artisanlib/main.py" line="31938"/>
         <source>SCe Time</source>
         <translation>Ώρα SCe</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31936"/>
+        <location filename="../artisanlib/main.py" line="31939"/>
         <source>SCe ET</source>
         <translation>SCe ΕΤ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31939"/>
+        <location filename="../artisanlib/main.py" line="31942"/>
         <source>DROP ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31941"/>
+        <location filename="../artisanlib/main.py" line="31944"/>
         <source>COOL Time</source>
         <translation>Καλή ώρα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31942"/>
+        <location filename="../artisanlib/main.py" line="31945"/>
         <source>COOL ET</source>
         <translation>ΨΥΞΗ ΕΤ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31943"/>
+        <location filename="../artisanlib/main.py" line="31946"/>
         <source>COOL BT</source>
         <translation>ΨΥΞΗ BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31944"/>
+        <location filename="../artisanlib/main.py" line="31947"/>
         <source>Total Time</source>
         <translation>Συνολικός χρόνος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31945"/>
+        <location filename="../artisanlib/main.py" line="31948"/>
         <source>Dry Phase Time</source>
         <translation>Χρόνος ξηρής φάσης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31946"/>
+        <location filename="../artisanlib/main.py" line="31949"/>
         <source>Mid Phase Time</source>
         <translation>Ώρα μεσαίας φάσης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31947"/>
+        <location filename="../artisanlib/main.py" line="31950"/>
         <source>Finish Phase Time</source>
         <translation>Χρόνος φάσης ολοκλήρωσης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31948"/>
+        <location filename="../artisanlib/main.py" line="31951"/>
         <source>Dry Phase RoR</source>
         <translation>Ξηρά φάση RoR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31949"/>
+        <location filename="../artisanlib/main.py" line="31952"/>
         <source>Mid Phase RoR</source>
         <translation>RoR μεσαίας φάσης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31950"/>
+        <location filename="../artisanlib/main.py" line="31953"/>
         <source>Finish Phase RoR</source>
         <translation>Ολοκληρώστε τη φάση RoR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31952"/>
+        <location filename="../artisanlib/main.py" line="31955"/>
         <source>Total RoR</source>
         <translation>Σύνολο RoR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31953"/>
+        <location filename="../artisanlib/main.py" line="31956"/>
         <source>FCs RoR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31954"/>
+        <location filename="../artisanlib/main.py" line="31957"/>
         <source>MET</source>
         <translation>ΣΥΝΑΝΤΗΣΕ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31956"/>
+        <location filename="../artisanlib/main.py" line="31959"/>
         <source>AUC Begin</source>
         <translation>Έναρξη AUC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31957"/>
+        <location filename="../artisanlib/main.py" line="31960"/>
         <source>AUC Base</source>
         <translation>Βάση AUC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31959"/>
+        <location filename="../artisanlib/main.py" line="31962"/>
         <source>Mid Phase AUC</source>
         <translation>AUC μεσαίας φάσης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31960"/>
+        <location filename="../artisanlib/main.py" line="31963"/>
         <source>Finish Phase AUC</source>
         <translation>Ολοκληρώστε τη φάση AUC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31962"/>
+        <location filename="../artisanlib/main.py" line="31965"/>
         <source>Weight Out</source>
         <translation>Βάρος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31964"/>
+        <location filename="../artisanlib/main.py" line="31967"/>
         <source>Volume In</source>
         <translation>Ένταση σε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31965"/>
+        <location filename="../artisanlib/main.py" line="31968"/>
         <source>Volume Out</source>
         <translation>Έξοδος έντασης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31966"/>
+        <location filename="../artisanlib/main.py" line="31969"/>
         <source>Volume Gain</source>
         <translation>Κέρδος όγκου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31967"/>
+        <location filename="../artisanlib/main.py" line="31970"/>
         <source>Green Density</source>
         <translation>Πράσινη πυκνότητα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31968"/>
+        <location filename="../artisanlib/main.py" line="31971"/>
         <source>Roasted Density</source>
         <translation>Ψητή πυκνότητα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31969"/>
+        <location filename="../artisanlib/main.py" line="31972"/>
         <source>Moisture Greens</source>
         <translation type="unfinished">Συνθηκες Αποθυκευσης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31970"/>
+        <location filename="../artisanlib/main.py" line="31973"/>
         <source>Moisture Roasted</source>
         <translation>Υγρασία ψητή</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31971"/>
+        <location filename="../artisanlib/main.py" line="31974"/>
         <source>Moisture Loss</source>
         <translation>Απώλεια υγρασίας</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31972"/>
+        <location filename="../artisanlib/main.py" line="31975"/>
         <source>Organic Loss</source>
         <translation>Οργανική απώλεια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31973"/>
+        <location filename="../artisanlib/main.py" line="31976"/>
         <source>Ambient Humidity</source>
         <translation>Υγρασία περιβάλλοντος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31974"/>
+        <location filename="../artisanlib/main.py" line="31977"/>
         <source>Ambient Pressure</source>
         <translation>Περιβαλλοντική πίεση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31975"/>
+        <location filename="../artisanlib/main.py" line="31978"/>
         <source>Ambient Temperature</source>
         <translation>Θερμοκρασία περιβάλλοντος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31979"/>
+        <location filename="../artisanlib/main.py" line="31982"/>
         <source>Heavy FC</source>
         <translation type="unfinished">Eντονο FC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31980"/>
+        <location filename="../artisanlib/main.py" line="31983"/>
         <source>Low FC</source>
         <translation type="unfinished">Αδυναμο FC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31981"/>
+        <location filename="../artisanlib/main.py" line="31984"/>
         <source>Light Cut</source>
         <translation type="unfinished">Ανοικτοχρωμο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31982"/>
+        <location filename="../artisanlib/main.py" line="31985"/>
         <source>Dark Cut</source>
         <translation type="unfinished">Σκουροχρωμο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31983"/>
+        <location filename="../artisanlib/main.py" line="31986"/>
         <source>Drops</source>
         <translation type="unfinished">Στιγματα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31984"/>
+        <location filename="../artisanlib/main.py" line="31987"/>
         <source>Oily</source>
         <translation type="unfinished">Ελαιωδης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31985"/>
+        <location filename="../artisanlib/main.py" line="31988"/>
         <source>Uneven</source>
         <translation type="unfinished">Ανομοιο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31986"/>
+        <location filename="../artisanlib/main.py" line="31989"/>
         <source>Tipping</source>
         <translation type="unfinished">Tipping</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31987"/>
+        <location filename="../artisanlib/main.py" line="31990"/>
         <source>Scorching</source>
         <translation type="unfinished">scorching</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31988"/>
+        <location filename="../artisanlib/main.py" line="31991"/>
         <source>Divots</source>
         <translation type="unfinished">Καψιματα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31989"/>
+        <location filename="../artisanlib/main.py" line="31992"/>
         <source>Mode</source>
         <translation>Τρόπος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32865"/>
+        <location filename="../artisanlib/main.py" line="32868"/>
         <source>Ranking Report</source>
         <translation>Αναφορά κατάταξης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31908"/>
+        <location filename="../artisanlib/main.py" line="31911"/>
         <source>Capacity</source>
         <translation>Χωρητικότητα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31937"/>
+        <location filename="../artisanlib/main.py" line="31940"/>
         <source>SCe BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31951"/>
+        <location filename="../artisanlib/main.py" line="31954"/>
         <source>Finish Phase Rise</source>
         <translation>Τελειώστε τη φάση άνοδο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31958"/>
+        <location filename="../artisanlib/main.py" line="31961"/>
         <source>Dry Phase AUC</source>
         <translation>AUC ξηράς φάσης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31990"/>
+        <location filename="../artisanlib/main.py" line="31993"/>
         <source>BTU Batch</source>
         <translation>BTU παρτίδα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31991"/>
+        <location filename="../artisanlib/main.py" line="31994"/>
         <source>BTU Batch per green kg</source>
         <translation>BTU παρτίδα ανά πράσινο κιλό</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31992"/>
+        <location filename="../artisanlib/main.py" line="31995"/>
         <source>CO2 Batch</source>
         <translation>Παρτίδα CO2</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31993"/>
+        <location filename="../artisanlib/main.py" line="31996"/>
         <source>BTU Preheat</source>
         <translation>Προθέρμανση BTU</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31994"/>
+        <location filename="../artisanlib/main.py" line="31997"/>
         <source>CO2 Preheat</source>
         <translation>Προθέρμανση CO2</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31995"/>
+        <location filename="../artisanlib/main.py" line="31998"/>
         <source>BTU BBP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31996"/>
+        <location filename="../artisanlib/main.py" line="31999"/>
         <source>CO2 BBP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31997"/>
+        <location filename="../artisanlib/main.py" line="32000"/>
         <source>BTU Cooling</source>
         <translation>Ψύξη BTU</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31998"/>
+        <location filename="../artisanlib/main.py" line="32001"/>
         <source>CO2 Cooling</source>
         <translation>Ψύξη CO2</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31999"/>
+        <location filename="../artisanlib/main.py" line="32002"/>
         <source>BTU Roast</source>
         <translation>Ψητό BTU</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32000"/>
+        <location filename="../artisanlib/main.py" line="32003"/>
         <source>BTU Roast per green kg</source>
         <translation>BTU Ψητό ανά πράσινο κιλό</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32001"/>
+        <location filename="../artisanlib/main.py" line="32004"/>
         <source>CO2 Roast</source>
         <translation>Ψητό CO2</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32002"/>
+        <location filename="../artisanlib/main.py" line="32005"/>
         <source>CO2 Batch per green kg</source>
         <translation>Παρτίδα CO2 ανά πράσινο kg</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32003"/>
+        <location filename="../artisanlib/main.py" line="32006"/>
         <source>BTU LPG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32004"/>
+        <location filename="../artisanlib/main.py" line="32007"/>
         <source>BTU NG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32005"/>
+        <location filename="../artisanlib/main.py" line="32008"/>
         <source>BTU ELEC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32006"/>
+        <location filename="../artisanlib/main.py" line="32009"/>
         <source>Efficiency Batch</source>
         <translation>Παρτίδα αποδοτικότητας</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32007"/>
+        <location filename="../artisanlib/main.py" line="32010"/>
         <source>Efficiency Roast</source>
         <translation>Ψητό απόδοσης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>Energy:</source>
         <translation>Ενέργεια:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33248"/>
+        <location filename="../artisanlib/main.py" line="33251"/>
         <source>CO2:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9431,7 +9431,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">DeltaBT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3069"/>
+        <location filename="../artisanlib/main.py" line="3072"/>
         <source>at</source>
         <translation>στους</translation>
     </message>
@@ -9471,27 +9471,27 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation>ΞΕΦΟΡΤΩΜΑ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3095"/>
+        <location filename="../artisanlib/main.py" line="3098"/>
         <source>EVENT</source>
         <translation>ΣΥΜΒΑΝ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12900"/>
+        <location filename="../artisanlib/main.py" line="12903"/>
         <source>BackgroundET</source>
         <translation>ΦοντοET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12904"/>
+        <location filename="../artisanlib/main.py" line="12907"/>
         <source>BackgroundBT</source>
         <translation>ΦοντοBT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7003"/>
+        <location filename="../artisanlib/main.py" line="7006"/>
         <source>BackgroundDeltaET</source>
         <translation>ΦοντοDeltaET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7007"/>
+        <location filename="../artisanlib/main.py" line="7010"/>
         <source>BackgroundDeltaBT</source>
         <translation>ΦοντοDeltaBT</translation>
     </message>
@@ -9501,7 +9501,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">d/m</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14377"/>
+        <location filename="../artisanlib/main.py" line="14380"/>
         <source>Time</source>
         <translation>Χρονος</translation>
     </message>
@@ -9516,22 +9516,22 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">ET{0}d/mfor{1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17670"/>
+        <location filename="../artisanlib/main.py" line="17673"/>
         <source>PID SV</source>
         <translation>PID SV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17674"/>
+        <location filename="../artisanlib/main.py" line="17677"/>
         <source>PID %</source>
         <translation>PID %</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17739"/>
+        <location filename="../artisanlib/main.py" line="17742"/>
         <source>Event #&lt;b&gt;0 &lt;/b&gt;</source>
         <translation>Event#&lt;b&gt;0&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24622"/>
+        <location filename="../artisanlib/main.py" line="24625"/>
         <source>Event #&lt;b&gt;{0} &lt;/b&gt;</source>
         <translation>Event#&lt;b&gt;{0}&lt;/b&gt;</translation>
     </message>
@@ -9571,7 +9571,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">{0} to reach ET target{1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36002"/>
+        <location filename="../artisanlib/main.py" line="36005"/>
         <source> at {0}</source>
         <translation type="unfinished"> at{0}</translation>
     </message>
@@ -9581,22 +9581,22 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">{0} to reach BT target{1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36014"/>
+        <location filename="../artisanlib/main.py" line="36017"/>
         <source>{0} after FCs</source>
         <translation type="unfinished">{0}afterFCS</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36021"/>
+        <location filename="../artisanlib/main.py" line="36024"/>
         <source>{0} after FCe</source>
         <translation type="unfinished">{0}afterFCe</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36054"/>
+        <location filename="../artisanlib/main.py" line="36057"/>
         <source>ET - BT = {0}</source>
         <translation type="unfinished">ET-BT={0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36102"/>
+        <location filename="../artisanlib/main.py" line="36105"/>
         <source>ET - BT = {0}{1}</source>
         <translation type="unfinished">ET-BT={0}{1}</translation>
     </message>
@@ -9816,7 +9816,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Στυλ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14060"/>
+        <location filename="../artisanlib/main.py" line="14063"/>
         <source>Width</source>
         <translation type="unfinished">Πλατος</translation>
     </message>
@@ -9881,7 +9881,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Χρωμα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14062"/>
+        <location filename="../artisanlib/main.py" line="14065"/>
         <source>Marker</source>
         <translation type="unfinished">Σημανση</translation>
     </message>
@@ -9896,7 +9896,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Διαφανεια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14064"/>
+        <location filename="../artisanlib/main.py" line="14067"/>
         <source>Size</source>
         <translation type="unfinished">Μεγεθος</translation>
     </message>
@@ -10276,7 +10276,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">T</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36852"/>
+        <location filename="../artisanlib/main.py" line="36855"/>
         <source>RoR</source>
         <translation></translation>
     </message>
@@ -10286,7 +10286,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation>Αρχή</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11582"/>
+        <location filename="../artisanlib/main.py" line="11585"/>
         <source>CM</source>
         <translation>ΕΚ</translation>
     </message>
@@ -10306,12 +10306,12 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26163"/>
+        <location filename="../artisanlib/main.py" line="26166"/>
         <source>Start recording</source>
         <translation type="unfinished">Εναρξη καταγραφης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26177"/>
+        <location filename="../artisanlib/main.py" line="26180"/>
         <source>Charge the beans</source>
         <translation>Φορτίστε τα φασόλια</translation>
     </message>
@@ -10336,47 +10336,47 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation>Σειριακη Θυρα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11575"/>
+        <location filename="../artisanlib/main.py" line="11578"/>
         <source>MET</source>
         <translation>ΣΥΝΑΝΤΗΣΕ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21199"/>
+        <location filename="../artisanlib/main.py" line="21202"/>
         <source>DRY%</source>
         <translation>ΣΤΕΓΝΟΣ%</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21062"/>
+        <location filename="../artisanlib/main.py" line="21065"/>
         <source>RAMP%</source>
         <translation>ΑΝΑΒΑΘΜΙΔΑ%</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21129"/>
+        <location filename="../artisanlib/main.py" line="21132"/>
         <source>DEV%</source>
         <translation>% DEV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33167"/>
+        <location filename="../artisanlib/main.py" line="33170"/>
         <source>greens</source>
         <translation>χόρτα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33172"/>
+        <location filename="../artisanlib/main.py" line="33175"/>
         <source>roasted</source>
         <translation>ψητό</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14385"/>
+        <location filename="../artisanlib/main.py" line="14388"/>
         <source>/min</source>
         <translation>/ λεπτό</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33141"/>
+        <location filename="../artisanlib/main.py" line="33144"/>
         <source>/m</source>
         <translation>/Μ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20513"/>
+        <location filename="../artisanlib/main.py" line="20516"/>
         <source>Delta Span</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10411,17 +10411,17 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">Εξοδο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6905"/>
+        <location filename="../artisanlib/main.py" line="6908"/>
         <source>BackgroundXT</source>
         <translation>Ιστορικό XT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13517"/>
+        <location filename="../artisanlib/main.py" line="13520"/>
         <source>BT {0} {1}/min for {2}</source>
         <translation>BT {0} {1} / λεπτό για {2}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13533"/>
+        <location filename="../artisanlib/main.py" line="13536"/>
         <source>ET {0} {1}/min for {2}</source>
         <translation>ET {0} {1} / λεπτό για {2}</translation>
     </message>
@@ -10441,7 +10441,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">Εξτρα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12896"/>
+        <location filename="../artisanlib/main.py" line="12899"/>
         <source>Designer</source>
         <translation type="unfinished">Σχεδιαστηριο</translation>
     </message>
@@ -10466,7 +10466,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Ολισθητης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20898"/>
+        <location filename="../artisanlib/main.py" line="20901"/>
         <source>AUC</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10476,22 +10476,22 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Απο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20161"/>
+        <location filename="../artisanlib/main.py" line="20164"/>
         <source>AUC FCs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8183"/>
+        <location filename="../artisanlib/main.py" line="8186"/>
         <source>BTprojection</source>
         <translation>BTπροβολή</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8188"/>
+        <location filename="../artisanlib/main.py" line="8191"/>
         <source>ETprojection</source>
         <translation>ETπροβολή</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8194"/>
+        <location filename="../artisanlib/main.py" line="8197"/>
         <source>AUCguide</source>
         <translation>Οδηγός AUC</translation>
     </message>
@@ -10511,7 +10511,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Χρωμα Κειμενου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11584"/>
+        <location filename="../artisanlib/main.py" line="11587"/>
         <source>FC</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10521,132 +10521,132 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Θερμοκρασια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19400"/>
+        <location filename="../artisanlib/main.py" line="19403"/>
         <source>Markers</source>
         <translation type="unfinished">Δεικτες</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19406"/>
+        <location filename="../artisanlib/main.py" line="19409"/>
         <source>Time Guide</source>
         <translation>Οδηγός ώρας</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19409"/>
+        <location filename="../artisanlib/main.py" line="19412"/>
         <source>Background ET</source>
         <translation>Ιστορικό ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19412"/>
+        <location filename="../artisanlib/main.py" line="19415"/>
         <source>Background BT</source>
         <translation>Ιστορικό BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19421"/>
+        <location filename="../artisanlib/main.py" line="19424"/>
         <source>Background Extra</source>
         <translation>Ιστορικό επιπλέον</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19424"/>
+        <location filename="../artisanlib/main.py" line="19427"/>
         <source>X Label</source>
         <translation type="unfinished">Επιγραφη Αξονα Χ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19430"/>
+        <location filename="../artisanlib/main.py" line="19433"/>
         <source>Canvas</source>
         <translation>Καμβάς</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19427"/>
+        <location filename="../artisanlib/main.py" line="19430"/>
         <source>Y Label</source>
         <translation type="unfinished">Επιγραφη Αξονα Y</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19433"/>
+        <location filename="../artisanlib/main.py" line="19436"/>
         <source>SpecialEventText</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19433"/>
+        <location filename="../artisanlib/main.py" line="19436"/>
         <source>SpecialEventBox</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19499"/>
+        <location filename="../artisanlib/main.py" line="19502"/>
         <source>Legend bkgnd</source>
         <translation>Θρύλος bkgnd</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19451"/>
+        <location filename="../artisanlib/main.py" line="19454"/>
         <source>MET Text</source>
         <translation>Κείμενο ΜΕΤ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19454"/>
+        <location filename="../artisanlib/main.py" line="19457"/>
         <source>MET Box</source>
         <translation>MET κουτί</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19458"/>
+        <location filename="../artisanlib/main.py" line="19461"/>
         <source>Timer LCD Digits</source>
         <translation>Ψηφία LCD χρονοδιακόπτη</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19458"/>
+        <location filename="../artisanlib/main.py" line="19461"/>
         <source>Timer LCD Background</source>
         <translation>Φόντο LCD χρονοδιακόπτη</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19467"/>
+        <location filename="../artisanlib/main.py" line="19470"/>
         <source>ET LCD Digits</source>
         <translation>Ψηφία ET LCD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19467"/>
+        <location filename="../artisanlib/main.py" line="19470"/>
         <source>ET LCD Background</source>
         <translation>Φόντο LCD ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19470"/>
+        <location filename="../artisanlib/main.py" line="19473"/>
         <source>BT LCD Digits</source>
         <translation>Ψηφία BT LCD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19470"/>
+        <location filename="../artisanlib/main.py" line="19473"/>
         <source>BT LCD Background</source>
         <translation>Φόντο LCD BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19473"/>
+        <location filename="../artisanlib/main.py" line="19476"/>
         <source>Extra/PID LCD Digits</source>
         <translation>Ψηφία Extra / PID LCD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19473"/>
+        <location filename="../artisanlib/main.py" line="19476"/>
         <source>Extra/PID LCD Background</source>
         <translation>Φόντο LCD Extra / PID</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19511"/>
+        <location filename="../artisanlib/main.py" line="19514"/>
         <source>Event button</source>
         <translation>Κουμπί συμβάντος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19511"/>
+        <location filename="../artisanlib/main.py" line="19514"/>
         <source>its text</source>
         <translation>το κείμενό του</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21158"/>
+        <location filename="../artisanlib/main.py" line="21161"/>
         <source>TIME MODE</source>
         <translation>ΛΕΙΤΟΥΡΓΙΑ ΧΡΟΝΟΥ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21162"/>
+        <location filename="../artisanlib/main.py" line="21165"/>
         <source>PERCENTAGE MODE</source>
         <translation>ΛΕΙΤΟΥΡΓΙΑ ΠΟΣΟΣΤΟΥ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21166"/>
+        <location filename="../artisanlib/main.py" line="21169"/>
         <source>TEMP MODE</source>
         <translation>ΛΕΙΤΟΥΡΓΙΑ TEMP</translation>
     </message>
@@ -10656,12 +10656,12 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Μηχανή</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3313"/>
+        <location filename="../artisanlib/main.py" line="3316"/>
         <source>TIMEguide</source>
         <translation>Οδηγός TIME</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20960"/>
+        <location filename="../artisanlib/main.py" line="20963"/>
         <source>ALL FINISHING MODE</source>
         <translation>ΟΛΟΣ ΤΟΝ ΛΕΙΤΟΥΡΓΙΑ ΤΕΛΙΚΟΥ</translation>
     </message>
@@ -10676,32 +10676,32 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Δυναμη</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19436"/>
+        <location filename="../artisanlib/main.py" line="19439"/>
         <source>Bg SpecialEventText</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19436"/>
+        <location filename="../artisanlib/main.py" line="19439"/>
         <source>Bg SpecialEventBox</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8610"/>
+        <location filename="../artisanlib/main.py" line="8613"/>
         <source>RPM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36862"/>
+        <location filename="../artisanlib/main.py" line="36865"/>
         <source>ln()</source>
         <translation>ln ()</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36860"/>
+        <location filename="../artisanlib/main.py" line="36863"/>
         <source>x</source>
         <translation type="unfinished">χ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36856"/>
+        <location filename="../artisanlib/main.py" line="36859"/>
         <source>Bkgnd</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10711,77 +10711,77 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation>Διάρκεια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20480"/>
+        <location filename="../artisanlib/main.py" line="20483"/>
         <source>Max Delta</source>
         <translation>Μέγιστο Δέλτα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20481"/>
+        <location filename="../artisanlib/main.py" line="20484"/>
         <source>Swing</source>
         <translation>Κούνια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20482"/>
+        <location filename="../artisanlib/main.py" line="20485"/>
         <source>ABC/secs</source>
         <translation>ABC / δευτερόλεπτα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20510"/>
+        <location filename="../artisanlib/main.py" line="20513"/>
         <source>Curve Fit</source>
         <translation>Fit καμπύλη</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20511"/>
+        <location filename="../artisanlib/main.py" line="20514"/>
         <source>Samples Threshold</source>
         <translation>Όριο δειγμάτων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20511"/>
+        <location filename="../artisanlib/main.py" line="20514"/>
         <source>Delta Threshold</source>
         <translation>Όριο Δέλτα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20512"/>
+        <location filename="../artisanlib/main.py" line="20515"/>
         <source>Sample rate (secs)</source>
         <translation>Ποσοστό δείγματος (δευτερόλεπτα)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20513"/>
+        <location filename="../artisanlib/main.py" line="20516"/>
         <source>Delta Smoothing</source>
         <translation>Δέλτα εξομάλυνσης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20514"/>
+        <location filename="../artisanlib/main.py" line="20517"/>
         <source>Fit RoRoR (C/min/min)</source>
         <translation>Fit RoRoR (C / λεπτό / λεπτό)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20514"/>
+        <location filename="../artisanlib/main.py" line="20517"/>
         <source>Actual RoR at FCs</source>
         <translation>Πραγματική RoR στα FCs</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36851"/>
+        <location filename="../artisanlib/main.py" line="36854"/>
         <source>MSE BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36852"/>
+        <location filename="../artisanlib/main.py" line="36855"/>
         <source>@FCs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36853"/>
+        <location filename="../artisanlib/main.py" line="36856"/>
         <source>Max+/Max- RoR</source>
         <translation>Μέγιστο + / Max- RoR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20500"/>
+        <location filename="../artisanlib/main.py" line="20503"/>
         <source>Segment Analysis (rise, crash and flick)</source>
         <translation>Ανάλυση τμήματος (άνοδος, σφάλμα και κίνηση)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20512"/>
+        <location filename="../artisanlib/main.py" line="20515"/>
         <source>Smooth Curves/Spikes</source>
         <translation>Ομαλές καμπύλες / αιχμές</translation>
     </message>
@@ -10796,12 +10796,12 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Ευθυγραμμιση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35991"/>
+        <location filename="../artisanlib/main.py" line="35994"/>
         <source>{0} to reach ET {1}{2}</source>
         <translation>{0} για να φτάσετε στο ET {1} {2}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36004"/>
+        <location filename="../artisanlib/main.py" line="36007"/>
         <source>{0} to reach BT {1}{2}</source>
         <translation>{0} για να φτάσετε στο BT {1} {2}</translation>
     </message>
@@ -11430,7 +11430,7 @@ LCDs All</source>
         <translation>Επιπλέον 2</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6940"/>
+        <location filename="../artisanlib/main.py" line="6943"/>
         <source>BackgroundYT</source>
         <translation>ΙστορικόYT</translation>
     </message>
@@ -11520,7 +11520,7 @@ LCDs All</source>
         <translation>ρεύμα:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11609"/>
+        <location filename="../artisanlib/main.py" line="11612"/>
         <source>min</source>
         <comment>abbrev. of minutes</comment>
         <translation type="unfinished">Ελαχιστο</translation>
@@ -11552,42 +11552,42 @@ LCDs All</source>
         <translation>Για περισσότερες πληροφορίες επισκεφθείτε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2356"/>
+        <location filename="../artisanlib/main.py" line="2359"/>
         <source>Preheat Measured</source>
         <translation>Μετρημένη προθέρμανση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2357"/>
+        <location filename="../artisanlib/main.py" line="2360"/>
         <source>Preheat %</source>
         <translation>Προθέρμανση%</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2358"/>
+        <location filename="../artisanlib/main.py" line="2361"/>
         <source>BBP Measured</source>
         <translation>Μετρημένο BBP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2359"/>
+        <location filename="../artisanlib/main.py" line="2362"/>
         <source>BBP %</source>
         <translation>% BBP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2360"/>
+        <location filename="../artisanlib/main.py" line="2363"/>
         <source>Cooling Measured</source>
         <translation>Μετρημένη ψύξη</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2361"/>
+        <location filename="../artisanlib/main.py" line="2364"/>
         <source>Cooling %</source>
         <translation>Ψύξη%</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2362"/>
+        <location filename="../artisanlib/main.py" line="2365"/>
         <source>Continuous</source>
         <translation>Συνεχής</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2363"/>
+        <location filename="../artisanlib/main.py" line="2366"/>
         <source>Roast Event</source>
         <translation>Εκδήλωση ψητού</translation>
     </message>
@@ -11677,32 +11677,32 @@ LCDs All</source>
         <translation>Μοντέλο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14058"/>
+        <location filename="../artisanlib/main.py" line="14061"/>
         <source>Line style</source>
         <translation>Στυλ γραμμής</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14059"/>
+        <location filename="../artisanlib/main.py" line="14062"/>
         <source>Draw style</source>
         <translation>Στυλ σχεδίασης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14061"/>
+        <location filename="../artisanlib/main.py" line="14064"/>
         <source>Color (RGBA)</source>
         <translation>Χρώμα (RGBA)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14065"/>
+        <location filename="../artisanlib/main.py" line="14068"/>
         <source>Face color (RGBA)</source>
         <translation>Χρώμα προσώπου (RGBA)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14066"/>
+        <location filename="../artisanlib/main.py" line="14069"/>
         <source>Edge color (RGBA)</source>
         <translation>Χρώμα άκρου (RGBA)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14063"/>
+        <location filename="../artisanlib/main.py" line="14066"/>
         <source>Symbol</source>
         <translation type="unfinished">Σύμβολο</translation>
     </message>
@@ -11811,7 +11811,7 @@ LCDs All</source>
         <translation type="obsolete">JSON...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15949"/>
+        <location filename="../artisanlib/main.py" line="15952"/>
         <source>RoastLogger...</source>
         <translation>Καταγραφικο...</translation>
     </message>
@@ -12171,12 +12171,12 @@ LCDs All</source>
         <translation>PNG ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15967"/>
+        <location filename="../artisanlib/main.py" line="15970"/>
         <source>SVG...</source>
         <translation>SVG ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15971"/>
+        <location filename="../artisanlib/main.py" line="15974"/>
         <source>PDF...</source>
         <translation>PDF ...</translation>
     </message>
@@ -12191,17 +12191,17 @@ LCDs All</source>
         <translation>Μεγάλο (1200x;) ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15919"/>
+        <location filename="../artisanlib/main.py" line="15922"/>
         <source>Fahrenheit...</source>
         <translation>Θερμόμετρο Φαρενάιτ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15923"/>
+        <location filename="../artisanlib/main.py" line="15926"/>
         <source>Celsius...</source>
         <translation>Κελσίου ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15945"/>
+        <location filename="../artisanlib/main.py" line="15948"/>
         <source>Probat Pilot...</source>
         <translation>Πιλότος Probat ...</translation>
     </message>
@@ -12211,12 +12211,12 @@ LCDs All</source>
         <translation type="unfinished">Επιλογή μηχανής</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15935"/>
+        <location filename="../artisanlib/main.py" line="15938"/>
         <source>Artisan CSV...</source>
         <translation>Artisan CSV ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15939"/>
+        <location filename="../artisanlib/main.py" line="15942"/>
         <source>Artisan JSON...</source>
         <translation>Artisan JSON ...</translation>
     </message>
@@ -12261,17 +12261,17 @@ LCDs All</source>
         <translation>Καμπύλες...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19357"/>
+        <location filename="../artisanlib/main.py" line="19360"/>
         <source>Load Theme...</source>
         <translation>Φόρτωση θέματος ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15959"/>
+        <location filename="../artisanlib/main.py" line="15962"/>
         <source>JPEG...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15963"/>
+        <location filename="../artisanlib/main.py" line="15966"/>
         <source>BMP...</source>
         <translation></translation>
     </message>
@@ -12306,12 +12306,12 @@ LCDs All</source>
         <translation>Μετατροπη Θερμοκρασιων Προφιλ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16450"/>
+        <location filename="../artisanlib/main.py" line="16453"/>
         <source>Clear results</source>
         <translation>Καθαρά αποτελέσματα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16442"/>
+        <location filename="../artisanlib/main.py" line="16445"/>
         <source>Fit BT to</source>
         <translation>Τοποθετήστε το BT σε</translation>
     </message>
@@ -12321,12 +12321,12 @@ LCDs All</source>
         <translation>Αποθηκευση Στατιστική...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16446"/>
+        <location filename="../artisanlib/main.py" line="16449"/>
         <source>Fit BT to Bkgnd</source>
         <translation>Προσαρμογή BT στο Bkgnd</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16431"/>
+        <location filename="../artisanlib/main.py" line="16434"/>
         <source>Auto All</source>
         <translation>Αυτόματα όλα</translation>
     </message>
@@ -12374,52 +12374,52 @@ LCDs All</source>
 <context>
     <name>Message</name>
     <message>
-        <location filename="../artisanlib/main.py" line="3787"/>
+        <location filename="../artisanlib/main.py" line="3790"/>
         <source>HUD OFF</source>
         <translation>ΠΡΟΒΟΛΕΑΣ ΑΝΕΝΕΡΓΟΣ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3799"/>
+        <location filename="../artisanlib/main.py" line="3802"/>
         <source>HUD ON</source>
         <translation>ΠΡΟΒΟΛΕΑΣ ΕΝΕΡΓΟΣ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3225"/>
+        <location filename="../artisanlib/main.py" line="3228"/>
         <source>Alarm notice</source>
         <translation>Σημειωμα συναγερμου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4048"/>
+        <location filename="../artisanlib/main.py" line="4051"/>
         <source>Alarm is calling: {0}</source>
         <translation type="unfinished">Καλει συναγερμος {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4060"/>
+        <location filename="../artisanlib/main.py" line="4063"/>
         <source>Alarm trigger button error, description &apos;{0}&apos; not a number</source>
         <translation type="unfinished">Σφαλμα πληκτρου συναγερμου,περιγραφη &apos;{0}&apos;δεν ειναι αριθμος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4089"/>
+        <location filename="../artisanlib/main.py" line="4092"/>
         <source>Alarm trigger slider error, description &apos;{0}&apos; not a valid number [0-100]</source>
         <translation type="unfinished">Σφαλμα ολισθητηρα συναγερμου,περιγραφη &apos;{0}&apos;δεν ειναι πρεπων αριθμος[0-100]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5258"/>
+        <location filename="../artisanlib/main.py" line="5261"/>
         <source>Save the profile, Discard the profile (Reset), or Cancel?</source>
         <translation>Αποθηκευση προφιλ,Επαναφορα η Απορριψη?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5263"/>
+        <location filename="../artisanlib/main.py" line="5266"/>
         <source>Profile unsaved</source>
         <translation>Προφιλ μη αποθηκευμενο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19346"/>
+        <location filename="../artisanlib/main.py" line="19349"/>
         <source>Action canceled</source>
         <translation>Ενεργεια καταργηθηκε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5402"/>
+        <location filename="../artisanlib/main.py" line="5405"/>
         <source>Scope has been reset</source>
         <translation>Επαναφορα καταγραφεα</translation>
     </message>
@@ -12429,82 +12429,82 @@ LCDs All</source>
         <translation type="obsolete">Σφαλμα χρονικου τυπου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8942"/>
+        <location filename="../artisanlib/main.py" line="8945"/>
         <source>Convert profile data to Fahrenheit?</source>
         <translation>Μετατροπη προφιλ σε Φαρεναιτ?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9055"/>
+        <location filename="../artisanlib/main.py" line="9058"/>
         <source>Convert Profile Temperature</source>
         <translation>Μετατροπη Θερμοκρασιων Προφιλ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8990"/>
+        <location filename="../artisanlib/main.py" line="8993"/>
         <source>Profile changed to Fahrenheit</source>
         <translation>Το Προφιλ μετατραπηκε σε Φαρεναιτ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8993"/>
+        <location filename="../artisanlib/main.py" line="8996"/>
         <source>Unable to comply. You already are in Fahrenheit</source>
         <translation>Αδυνατη ενεργεια.Ειναι ηδη Φαρεναιτ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9057"/>
+        <location filename="../artisanlib/main.py" line="9060"/>
         <source>Profile not changed</source>
         <translation>Καμια αλλαγη στο Προφιλ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9002"/>
+        <location filename="../artisanlib/main.py" line="9005"/>
         <source>Convert profile data to Celsius?</source>
         <translation>Μετατροπη πληροφοριων προφιλ σε Κελσιου?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9055"/>
+        <location filename="../artisanlib/main.py" line="9058"/>
         <source>Unable to comply. You already are in Celsius</source>
         <translation>Αδυνατη ενεργεια.Ειναι ηδη Κελσιου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9052"/>
+        <location filename="../artisanlib/main.py" line="9055"/>
         <source>Profile changed to Celsius</source>
         <translation>Το Προφιλ μετατραπηκε σε Κελσιου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9064"/>
+        <location filename="../artisanlib/main.py" line="9067"/>
         <source>Convert Profile Scale</source>
         <translation>Μετατροπη κλιμακας Προφιλ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9064"/>
+        <location filename="../artisanlib/main.py" line="9067"/>
         <source>No profile data found</source>
         <translation>Δεν ευρεθησαν πληροφοριες του προφιλ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9092"/>
+        <location filename="../artisanlib/main.py" line="9095"/>
         <source>Colors set to defaults</source>
         <translation>Καθορισμος αρχικων χρωματων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9096"/>
+        <location filename="../artisanlib/main.py" line="9099"/>
         <source>Colors set to grey</source>
         <translation>Καθορισμος χρωματων σε κλιμακα του Γκρι</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9571"/>
+        <location filename="../artisanlib/main.py" line="9574"/>
         <source>Scope monitoring...</source>
         <translation>Καταγραφεας ενεργοςι...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9646"/>
+        <location filename="../artisanlib/main.py" line="9649"/>
         <source>Scope stopped</source>
         <translation>Καταγραφεας σταματησε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9975"/>
+        <location filename="../artisanlib/main.py" line="9978"/>
         <source>Scope recording...</source>
         <translation>Καταγραφεας λειτουργει...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10046"/>
+        <location filename="../artisanlib/main.py" line="10049"/>
         <source>Scope recording stopped</source>
         <translation>Λειτουργια καταγραφεα σταματησε</translation>
     </message>
@@ -12514,7 +12514,7 @@ LCDs All</source>
         <translation type="obsolete">Μη συλλογη ικανων πληροφοριων.Δοκιμαστε ξανα  σε μερικα δευτερα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10210"/>
+        <location filename="../artisanlib/main.py" line="10213"/>
         <source>Roast time starts now 00:00 BT = {0}</source>
         <translation type="unfinished">Εναρξη χρονου ψησιματος τωρα 00:00 ΒΤ{0}</translation>
     </message>
@@ -12524,52 +12524,52 @@ LCDs All</source>
         <translation type="obsolete">Καταγραφεας ανενεργος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10343"/>
+        <location filename="../artisanlib/main.py" line="10346"/>
         <source>[DRY END] recorded at {0} BT = {1}</source>
         <translation type="unfinished">[ΛΗΞΗ ΞΥΡΑΝΣΗΣ]Καταγραφηκε στις {0} ΒΤ = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10452"/>
+        <location filename="../artisanlib/main.py" line="10455"/>
         <source>[FC START] recorded at {0} BT = {1}</source>
         <translation type="unfinished">[ΕΝΡΞΗ FC]Καταγραφηκε στις {0} ΒΤ = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10552"/>
+        <location filename="../artisanlib/main.py" line="10555"/>
         <source>[FC END] recorded at {0} BT = {1}</source>
         <translation type="unfinished">[ΛΗΞΗ FC]Καταγραφηκε στις {0} ΒΤ = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10660"/>
+        <location filename="../artisanlib/main.py" line="10663"/>
         <source>[SC START] recorded at {0} BT = {1}</source>
         <translation type="unfinished">[ΕΝΑΡΞΗ SC]Καταγραφηκε στις {0} ΒΤ = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10765"/>
+        <location filename="../artisanlib/main.py" line="10768"/>
         <source>[SC END] recorded at {0} BT = {1}</source>
         <translation type="unfinished">[ΛΗΞΗ SC]Καταγραφηκε στις {0} ΒΤ = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10914"/>
+        <location filename="../artisanlib/main.py" line="10917"/>
         <source>Roast ended at {0} BT = {1}</source>
         <translation type="unfinished">Τελος Ψησιματος στις {0}ΒΤ={1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11039"/>
+        <location filename="../artisanlib/main.py" line="11042"/>
         <source>[COOL END] recorded at {0} BT = {1}</source>
         <translation type="unfinished">[ΛΗΞΗ ΨΥΞΗΣ]Καταγραφηκε στις {0} ΒΤ = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11344"/>
+        <location filename="../artisanlib/main.py" line="11347"/>
         <source>Event # {0} recorded at BT = {1} Time = {2}</source>
         <translation type="unfinished">Συμβαν # {0} καταγραφηκε στις ΒΤ={1} Χρονος = {2}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11364"/>
+        <location filename="../artisanlib/main.py" line="11367"/>
         <source>Timer is OFF</source>
         <translation>Χρονομετρο Ανενεργο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11398"/>
+        <location filename="../artisanlib/main.py" line="11401"/>
         <source>Computer Event # {0} recorded at BT = {1} Time = {2}</source>
         <translation type="unfinished">Συμβαν Υπολογιστη # {0} καταγραφηκε στις ΒΤ={1} Χρονος = {2}</translation>
     </message>
@@ -12579,42 +12579,42 @@ LCDs All</source>
         <translation type="obsolete">Ακυρωση στατιστικων:Χρειζει ολοκληρωμενου προφιλ [ΦΟΡΤΩΜΑ] + [ΞΕΦΟΡΤΩΜΑ]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12282"/>
+        <location filename="../artisanlib/main.py" line="12285"/>
         <source>Unable to move background</source>
         <translation>Αδυνατη μετακινηση φοντου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12341"/>
+        <location filename="../artisanlib/main.py" line="12344"/>
         <source>No finished profile found</source>
         <translation>Δεν ευρεθησαν ολοκληρωμενα προφιλ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12359"/>
+        <location filename="../artisanlib/main.py" line="12362"/>
         <source>Polynomial coefficients (Horner form):</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12362"/>
+        <location filename="../artisanlib/main.py" line="12365"/>
         <source>Knots:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12365"/>
+        <location filename="../artisanlib/main.py" line="12368"/>
         <source>Residual:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12368"/>
+        <location filename="../artisanlib/main.py" line="12371"/>
         <source>Roots:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12372"/>
+        <location filename="../artisanlib/main.py" line="12375"/>
         <source>Profile information</source>
         <translation>Πληροφοριες Προφιλ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12730"/>
+        <location filename="../artisanlib/main.py" line="12733"/>
         <source>Designer Start</source>
         <translation>Εναρξη Σχεδιαστηριου</translation>
     </message>
@@ -12626,55 +12626,55 @@ Continue?</source>
         <translation type="obsolete">Εισαγωγη προφιλ στο Σχεδιαστηριο θα διαγραψει ολες πληροφοριες εκτος κυριων σημειων[points].Συνεχεια?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12832"/>
+        <location filename="../artisanlib/main.py" line="12835"/>
         <source>Designer Init</source>
         <translation>Προκαθορισμενο Σχεδιαστηριο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12832"/>
+        <location filename="../artisanlib/main.py" line="12835"/>
         <source>Unable to start designer.
 Profile missing [CHARGE] or [DROP]</source>
         <translation>Αδυνατη εναρξη σχεδιαστηριου.Ελλειψη στο προφιλ[ΦΟΡΤΩΜΑ] η [ΞΕΦΟΡΤΩΜΑ]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13123"/>
+        <location filename="../artisanlib/main.py" line="13126"/>
         <source>[ CHARGE ]</source>
         <translation>[ΦΟΡΤΩΜΑ]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13126"/>
+        <location filename="../artisanlib/main.py" line="13129"/>
         <source>[ DRY END ]</source>
         <translation>[ΛΗΞΗ ΞΥΡΑΝΣΗΣ]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13129"/>
+        <location filename="../artisanlib/main.py" line="13132"/>
         <source>[ FC START ]</source>
         <translation>[ΕΝΑΡΞΗ FC]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13132"/>
+        <location filename="../artisanlib/main.py" line="13135"/>
         <source>[ FC END ]</source>
         <translation>[ΛΗΞΗ FC]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13135"/>
+        <location filename="../artisanlib/main.py" line="13138"/>
         <source>[ SC START ]</source>
         <translation>[ENARJH ΣΨ]]]]
 
 [ΕΝΑΡΞΗ SC]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13138"/>
+        <location filename="../artisanlib/main.py" line="13141"/>
         <source>[ SC END ]</source>
         <translation>[ΛΗΞΗ SC]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13141"/>
+        <location filename="../artisanlib/main.py" line="13144"/>
         <source>[ DROP ]</source>
         <translation>[ΞΕΦΟΡΤΩΜΑ]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13455"/>
+        <location filename="../artisanlib/main.py" line="13458"/>
         <source>New profile created</source>
         <translation>Δημιουργηθηκε νεο προφιλ</translation>
     </message>
@@ -12684,22 +12684,22 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation>Ανοιγμα γραφικου ροδας</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13649"/>
+        <location filename="../artisanlib/main.py" line="13652"/>
         <source> added to cupping notes</source>
         <translation>Προστεθηκε σε σημειωσεις cupping</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13660"/>
+        <location filename="../artisanlib/main.py" line="13663"/>
         <source> added to roasting notes</source>
         <translation>Προστεθηκε σε σημειωσεις ψησιματος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13947"/>
+        <location filename="../artisanlib/main.py" line="13950"/>
         <source>Mouse Cross ON: move mouse around</source>
         <translation>Κερσορας ποντικου ΕΝΕΡΓΟΣ:μετακινηστε ποντικι</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13968"/>
+        <location filename="../artisanlib/main.py" line="13971"/>
         <source>Mouse cross OFF</source>
         <translation>Κερσορας ποντικου ΑΝΕΝΕΡΓΟΣ</translation>
     </message>
@@ -12709,17 +12709,17 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation type="obsolete">Επιθυμειτε επαναφορα ολων των ρυθμισεων?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23346"/>
+        <location filename="../artisanlib/main.py" line="23349"/>
         <source>Factory Reset</source>
         <translation>Εργοστασιακη επαναφορα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24001"/>
+        <location filename="../artisanlib/main.py" line="24004"/>
         <source>Exit Designer?</source>
         <translation>Εξοδος Σχεδιαστηριου?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24002"/>
+        <location filename="../artisanlib/main.py" line="24005"/>
         <source>Designer Mode ON</source>
         <translation>Λειτουργια σχεδιαστηριου ΕΝΕΡΓΗ</translation>
     </message>
@@ -12729,22 +12729,22 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation type="obsolete">Εξτρα Πληκτρο Συμβαντος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24258"/>
+        <location filename="../artisanlib/main.py" line="24261"/>
         <source>Keyboard moves turned ON</source>
         <translation>Κινηση Πληκτρολογιου ΕΝΕΡΓΗ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24266"/>
+        <location filename="../artisanlib/main.py" line="24269"/>
         <source>Keyboard moves turned OFF</source>
         <translation>Κινηση Πληκτρολογιου ΑΝΕΝΕΡΓΗ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24562"/>
+        <location filename="../artisanlib/main.py" line="24565"/>
         <source>Profile {0} saved in: {1}</source>
         <translation type="unfinished">Προφιλ {0} αποθυκευτηκε σε {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24597"/>
+        <location filename="../artisanlib/main.py" line="24600"/>
         <source>Empty path or box unchecked in Autosave</source>
         <translation>Κενη Διαδρομη η κουτι αμαρκαριστο στην Αυτοματη Αποθυκευση</translation>
     </message>
@@ -12824,17 +12824,17 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation type="obsolete">Συντομευσεις Πληκτρολογιου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24698"/>
+        <location filename="../artisanlib/main.py" line="24701"/>
         <source>Event #{0}:  {1} has been updated</source>
         <translation type="unfinished">Συμβαν #{0}: {1} εχει ενημερωθει</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24811"/>
+        <location filename="../artisanlib/main.py" line="24814"/>
         <source>Save</source>
         <translation>Αποθυκευση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24820"/>
+        <location filename="../artisanlib/main.py" line="24823"/>
         <source>Select Directory</source>
         <translation>Επιλεξτε Ευρετηριο</translation>
     </message>
@@ -12844,27 +12844,27 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation type="unfinished">Δεν ευρεθει Προφιλ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24876"/>
+        <location filename="../artisanlib/main.py" line="24879"/>
         <source>{0} has been saved. New roast has started</source>
         <translation type="unfinished">{0} εχει αποθυκευτει.Εναρξη νεου ψησιματος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="37242"/>
+        <location filename="../artisanlib/main.py" line="37245"/>
         <source>Invalid artisan format</source>
         <translation>Μη αποδεκτη φορμα artisan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24946"/>
+        <location filename="../artisanlib/main.py" line="24949"/>
         <source>{0}  loaded </source>
         <translation type="unfinished">{0}  φορτωθηκε </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25403"/>
+        <location filename="../artisanlib/main.py" line="25406"/>
         <source>Background {0} loaded successfully {1}</source>
         <translation type="unfinished">Το Φοντο {0}  φορτωθηκε  με επιτυχια {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25528"/>
+        <location filename="../artisanlib/main.py" line="25531"/>
         <source>Artisan CSV file loaded successfully</source>
         <translation>Αρχειο artisan csv φορτωθηκε με επιτυχια</translation>
     </message>
@@ -12880,57 +12880,57 @@ Continue?</source>
         <translation type="obsolete">Ευρεθει διαφορετικος αριθμος καμπυλων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27885"/>
+        <location filename="../artisanlib/main.py" line="27888"/>
         <source>Save Profile</source>
         <translation>Αποθυκευση Προφιλ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27901"/>
+        <location filename="../artisanlib/main.py" line="27904"/>
         <source>Profile saved</source>
         <translation>Προφιλ Αποθυκευτηκε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34676"/>
+        <location filename="../artisanlib/main.py" line="34679"/>
         <source>Cancelled</source>
         <translation>Ακυρωθηκε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27947"/>
+        <location filename="../artisanlib/main.py" line="27950"/>
         <source>Readings exported</source>
         <translation>Εγινε εξαγωγη δεδομενων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27962"/>
+        <location filename="../artisanlib/main.py" line="27965"/>
         <source>Export CSV</source>
         <translation>Εξαγωγη CSV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27967"/>
+        <location filename="../artisanlib/main.py" line="27970"/>
         <source>Export JSON</source>
         <translation>Εξαγωγη JSON</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27972"/>
+        <location filename="../artisanlib/main.py" line="27975"/>
         <source>Export RoastLogger</source>
         <translation>Εξαγωγη Καταγραφεα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28217"/>
+        <location filename="../artisanlib/main.py" line="28220"/>
         <source>Readings imported</source>
         <translation>Δεδομενα εισηχθησαν</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28253"/>
+        <location filename="../artisanlib/main.py" line="28256"/>
         <source>Import CSV</source>
         <translation>Εισαγωγη CSV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28258"/>
+        <location filename="../artisanlib/main.py" line="28261"/>
         <source>Import JSON</source>
         <translation>Εισαγωγη JSON</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28263"/>
+        <location filename="../artisanlib/main.py" line="28266"/>
         <source>Import RoastLogger</source>
         <translation>Εισαγωγη  Καταγραφεα</translation>
     </message>
@@ -12945,12 +12945,12 @@ Continue?</source>
         <translation type="obsolete">Δευτερολεπτα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34934"/>
+        <location filename="../artisanlib/main.py" line="34937"/>
         <source>Alarm Config</source>
         <translation>Διαμορφωση Συναγερμου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34934"/>
+        <location filename="../artisanlib/main.py" line="34937"/>
         <source>Alarms are not available for device None</source>
         <translation>Συναγερμοι δεν ειναι διαθεσιμοι για συσκευη Καμια</translation>
     </message>
@@ -12965,32 +12965,32 @@ Continue?</source>
         <translation type="obsolete">Επιτυχης αλλαγη γλωσσας.Επανεκκινηστε Εφαρμογη.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35194"/>
+        <location filename="../artisanlib/main.py" line="35197"/>
         <source>Import K202 CSV</source>
         <translation>Εισαγωγη Κ202 CSV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35247"/>
+        <location filename="../artisanlib/main.py" line="35250"/>
         <source>K202 file loaded successfully</source>
         <translation>Αρχειο Κ202 φορτωθηκε με επιτυχια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35263"/>
+        <location filename="../artisanlib/main.py" line="35266"/>
         <source>Import K204 CSV</source>
         <translation>Εισαγωγη K204 CSV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35330"/>
+        <location filename="../artisanlib/main.py" line="35333"/>
         <source>K204 file loaded successfully</source>
         <translation>Αρχειο Κ204 φορτωθηκε με επιτυχια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35672"/>
+        <location filename="../artisanlib/main.py" line="35675"/>
         <source>Import HH506RA CSV</source>
         <translation>Εισαγωγη HH506RA CSV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35724"/>
+        <location filename="../artisanlib/main.py" line="35727"/>
         <source>HH506RA file loaded successfully</source>
         <translation>Αρχειο HH506RA φορτωθηκε με επιτυχια</translation>
     </message>
@@ -13000,22 +13000,22 @@ Continue?</source>
         <translation type="obsolete">Αποθυκευση Γραφικου ως PNG</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35934"/>
+        <location filename="../artisanlib/main.py" line="35937"/>
         <source>{0}  size({1},{2}) saved</source>
         <translation type="unfinished">{0} μεγεθος({1},{2})αποθυκευτηκε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35945"/>
+        <location filename="../artisanlib/main.py" line="35948"/>
         <source>Save Graph as SVG</source>
         <translation>Αποθυκευση Γραφικου ως SVG</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35963"/>
+        <location filename="../artisanlib/main.py" line="35966"/>
         <source>{0} saved</source>
         <translation type="unfinished">{0} Αποθυκευτηκε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36164"/>
+        <location filename="../artisanlib/main.py" line="36167"/>
         <source>Invalid Wheel graph format</source>
         <translation>Μη αποδεκτο φορμα Γραφικου Ροδας</translation>
     </message>
@@ -13140,32 +13140,32 @@ Continue?</source>
         <translation type="obsolete">Συμβολικες Λειτουργιες</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36535"/>
+        <location filename="../artisanlib/main.py" line="36538"/>
         <source>Save Palettes</source>
         <translation>Αποθυκευση Προτυπων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36539"/>
+        <location filename="../artisanlib/main.py" line="36542"/>
         <source>Palettes saved</source>
         <translation>Προτυπα Αποθυκευτηκαν</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36614"/>
+        <location filename="../artisanlib/main.py" line="36617"/>
         <source>Invalid palettes file format</source>
         <translation>Μη Αποδεκτη φορμα Προτυπων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36617"/>
+        <location filename="../artisanlib/main.py" line="36620"/>
         <source>Palettes loaded</source>
         <translation>Προτυπα Φορτωθηκαν</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36629"/>
+        <location filename="../artisanlib/main.py" line="36632"/>
         <source>Load Palettes</source>
         <translation>Φορτωση Προτυπων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36655"/>
+        <location filename="../artisanlib/main.py" line="36658"/>
         <source>Alarms loaded</source>
         <translation>Συναγερμοι Φορτωθηκαν</translation>
     </message>
@@ -13265,12 +13265,12 @@ Continue?</source>
         <translation type="obsolete">Πληκτρα Συμβαντων Χρηστη</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3035"/>
+        <location filename="../artisanlib/events.py" line="3040"/>
         <source>Event configuration saved</source>
         <translation type="unfinished">Διαμορφωση Συμβαντων Αποθυκευτηκε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3038"/>
+        <location filename="../artisanlib/events.py" line="3043"/>
         <source>Found empty event type box</source>
         <translation type="unfinished">Ευρεθει κενο κουτι τυπου συμβαντων</translation>
     </message>
@@ -13335,7 +13335,7 @@ Continue?</source>
         <translation type="unfinished">Προφιλ Φοντου δεν ευρεθει</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9283"/>
+        <location filename="../artisanlib/main.py" line="9286"/>
         <source>Background does not match number of labels</source>
         <translation>Το Φοντο Δεν ταιριαζει ως προς αριθμο επιγραφων</translation>
     </message>
@@ -13350,7 +13350,7 @@ Continue?</source>
         <translation type="obsolete">Προφιλ Φοντου δεν ευρεθει</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25217"/>
+        <location filename="../artisanlib/main.py" line="25220"/>
         <source>Reading background profile...</source>
         <translation type="unfinished">Αναγνωση προφιλ φοντου...</translation>
     </message>
@@ -13570,7 +13570,7 @@ Continue?</source>
         <translation type="unfinished">Γραφημα Ροδας Αποθυκευτηκε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23923"/>
+        <location filename="../artisanlib/main.py" line="23926"/>
         <source>Load Alarms</source>
         <translation>Φορτωση Συναγερμων</translation>
     </message>
@@ -13819,7 +13819,7 @@ Proceed?</source>
         <translation type="unfinished">Aδυνατος καθορισμος νεου sv</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35943"/>
+        <location filename="../artisanlib/main.py" line="35946"/>
         <source>Save Graph as PDF</source>
         <translation>Αποθυκευση Γραφικου ως PDF</translation>
     </message>
@@ -13829,7 +13829,7 @@ Proceed?</source>
         <translation type="obsolete">Θερμοκρασια των 145.2 κ συχνακις εμφανιζεται ως 1452.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12730"/>
+        <location filename="../artisanlib/main.py" line="12733"/>
         <source>Importing a profile in to Designer will decimate all data except the main [points].
 Continue?</source>
         <translation>Η εισαγωγή ενός προφίλ στο Designer θα αποδεκατίσει όλα τα δεδομένα εκτός από τα κύρια [σημεία].
@@ -13841,172 +13841,172 @@ Continue?</source>
         <translation>Προειδοποίηση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34120"/>
+        <location filename="../artisanlib/main.py" line="34123"/>
         <source>Oversampling is only active with a sampling interval equal or larger than 3s.</source>
         <translation>Η υπερ δειγματοληψία είναι ενεργή μόνο με διάστημα δειγματοληψίας ίσο ή μεγαλύτερο από 3 δευτερόλεπτα.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34296"/>
+        <location filename="../artisanlib/main.py" line="34299"/>
         <source>Hottop control turned off</source>
         <translation>Ο έλεγχος Hottop απενεργοποιήθηκε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34310"/>
+        <location filename="../artisanlib/main.py" line="34313"/>
         <source>Hottop control turned on</source>
         <translation>Ο έλεγχος Hottop είναι ενεργοποιημένος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34520"/>
+        <location filename="../artisanlib/main.py" line="34523"/>
         <source>artisan-settings</source>
         <translation>τεχνίτης-ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34521"/>
+        <location filename="../artisanlib/main.py" line="34524"/>
         <source>Save Settings</source>
         <translation>Αποθηκεύσετε τις ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34525"/>
+        <location filename="../artisanlib/main.py" line="34528"/>
         <source>Settings saved</source>
         <translation>Οι ρυθμίσεις αποθηκεύτηκαν</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4209"/>
+        <location filename="../artisanlib/main.py" line="4212"/>
         <source>Alarm {0} triggered</source>
         <translation>Ενεργοποιήθηκε το ξυπνητήρι {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4050"/>
+        <location filename="../artisanlib/main.py" line="4053"/>
         <source>Calling alarm failed on {0}</source>
         <translation>Η κλήση συναγερμού απέτυχε στις {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10236"/>
+        <location filename="../artisanlib/main.py" line="10239"/>
         <source>[TP] recorded at {0} BT = {1}</source>
         <translation>[TP] ηχογραφήθηκε σε {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34327"/>
+        <location filename="../artisanlib/main.py" line="34330"/>
         <source>PID Standby ON</source>
         <translation>Αναμονή PID ΕΝΕΡΓΟ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34332"/>
+        <location filename="../artisanlib/main.py" line="34335"/>
         <source>PID Standby OFF</source>
         <translation>Αναμονή PID OFF</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="37106"/>
+        <location filename="../artisanlib/main.py" line="37109"/>
         <source>Assignment problem</source>
         <translation>Πρόβλημα ανάθεσης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14256"/>
+        <location filename="../artisanlib/main.py" line="14259"/>
         <source>follow on</source>
         <translation>ακολούθησε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14258"/>
+        <location filename="../artisanlib/main.py" line="14261"/>
         <source>follow off</source>
         <translation>ακολουθεί</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20144"/>
+        <location filename="../artisanlib/main.py" line="20147"/>
         <source>super on</source>
         <translation>σούπερ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20146"/>
+        <location filename="../artisanlib/main.py" line="20149"/>
         <source>super off</source>
         <translation>σούπερ μακριά</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12761"/>
+        <location filename="../artisanlib/main.py" line="12764"/>
         <source>Save Points</source>
         <translation>Αποθήκευση πόντων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12771"/>
+        <location filename="../artisanlib/main.py" line="12774"/>
         <source>Points saved</source>
         <translation>Οι πόντοι αποθηκεύτηκαν</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12782"/>
+        <location filename="../artisanlib/main.py" line="12785"/>
         <source>Load Points</source>
         <translation>Φόρτωση πόντων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12795"/>
+        <location filename="../artisanlib/main.py" line="12798"/>
         <source>Points loaded</source>
         <translation>Φορτώθηκαν πόντοι</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23954"/>
+        <location filename="../artisanlib/main.py" line="23957"/>
         <source>PID Mode: Ramp/Soak</source>
         <translation>Λειτουργία PID: Ράμπα / Μουλιάστε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23956"/>
+        <location filename="../artisanlib/main.py" line="23959"/>
         <source>PID Mode: Background</source>
         <translation>Λειτουργία PID: Φόντο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23952"/>
+        <location filename="../artisanlib/main.py" line="23955"/>
         <source>PID Mode: Manual</source>
         <translation>Λειτουργία PID: Μη αυτόματη</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23970"/>
+        <location filename="../artisanlib/main.py" line="23973"/>
         <source>PID Lookahead: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23905"/>
+        <location filename="../artisanlib/main.py" line="23908"/>
         <source>Load Background</source>
         <translation>Φόρτωση φόντου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24790"/>
+        <location filename="../artisanlib/main.py" line="24793"/>
         <source>Open</source>
         <translation type="unfinished">Ανοιγμα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28178"/>
+        <location filename="../artisanlib/main.py" line="28181"/>
         <source>Converting...</source>
         <translation>Μετατροπή ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10148"/>
+        <location filename="../artisanlib/main.py" line="10151"/>
         <source>Not enough data collected yet. Try again in a few seconds</source>
         <translation>Δεν έχουν συλλεχθεί ακόμη αρκετά δεδομένα. Δοκιμάστε ξανά σε λίγα δευτερόλεπτα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24595"/>
+        <location filename="../artisanlib/main.py" line="24598"/>
         <source>Autosave path does not exist. Autosave failed.</source>
         <translation>Η διαδρομή αυτόματης αποθήκευσης δεν υπάρχει. Η αυτόματη αποθήκευση απέτυχε.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28197"/>
+        <location filename="../artisanlib/main.py" line="28200"/>
         <source>Target file {0} exists. {1} not converted.</source>
         <translation>Το αρχείο προορισμού {0} υπάρχει. {1} δεν μετατράπηκε.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27977"/>
+        <location filename="../artisanlib/main.py" line="27980"/>
         <source>Export Probat Pilot</source>
         <translation>Εξαγωγή πιλότου Probat</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35364"/>
+        <location filename="../artisanlib/main.py" line="35367"/>
         <source>Import Probat Recipe</source>
         <translation>Εισαγωγή συνταγής Probat</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35525"/>
+        <location filename="../artisanlib/main.py" line="35528"/>
         <source>Probat Pilot data imported successfully</source>
         <translation>Τα δεδομένα πιλότου Probat εισήχθησαν με επιτυχία</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34579"/>
+        <location filename="../artisanlib/main.py" line="34582"/>
         <source>Settings not found</source>
         <translation>Δεν βρέθηκαν ρυθμίσεις</translation>
     </message>
@@ -14016,7 +14016,7 @@ Continue?</source>
         <translation type="obsolete">Ρύθμιση για {0}?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19193"/>
+        <location filename="../artisanlib/main.py" line="19196"/>
         <source>Adjust Settings</source>
         <translation>Ρυθμίστε τις Ρυθμίσεις</translation>
     </message>
@@ -14031,27 +14031,27 @@ Continue?</source>
         <translation type="obsolete">Όνομα δικτύου δικτύου ή διεύθυνση IP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19298"/>
+        <location filename="../artisanlib/main.py" line="19301"/>
         <source>Machine</source>
         <translation>Μηχανή</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19243"/>
+        <location filename="../artisanlib/main.py" line="19246"/>
         <source>Network name or IP address</source>
         <translation>Όνομα δικτύου ή διεύθυνση IP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4178"/>
+        <location filename="../artisanlib/main.py" line="4181"/>
         <source>Alarm trigger SV slider error, description &apos;{0}&apos; not a valid number</source>
         <translation>Σφάλμα ρυθμιστή συναγερμού SV, περιγραφή &quot;{0}&quot; όχι έγκυρος αριθμός</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2837"/>
+        <location filename="../artisanlib/main.py" line="2840"/>
         <source>seconds before FCs</source>
         <translation>δευτερόλεπτα πριν από τα FC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2840"/>
+        <location filename="../artisanlib/main.py" line="2843"/>
         <source>seconds after FCs</source>
         <translation>δευτερόλεπτα μετά τα FC</translation>
     </message>
@@ -14061,439 +14061,439 @@ Continue?</source>
         <translation type="obsolete">Συντομευσεις Πληκτρολογιου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19271"/>
+        <location filename="../artisanlib/main.py" line="19274"/>
         <source>Comm Port</source>
         <translation type="unfinished">Θυρα Επικοινωνιας</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36161"/>
+        <location filename="../artisanlib/main.py" line="36164"/>
         <source>Wheel {0} loaded</source>
         <translation>Ο τροχός {0} φορτώθηκε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34620"/>
+        <location filename="../artisanlib/main.py" line="34623"/>
         <source>Load theme {0}?</source>
         <translation>Φόρτωση θέματος {0};</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34621"/>
+        <location filename="../artisanlib/main.py" line="34624"/>
         <source>Adjust Theme Related Settings</source>
         <translation>Προσαρμογή σχετικών ρυθμίσεων θέματος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34586"/>
+        <location filename="../artisanlib/main.py" line="34589"/>
         <source>artisan-theme</source>
         <translation>τεχνίτης-θέμα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34587"/>
+        <location filename="../artisanlib/main.py" line="34590"/>
         <source>Save Theme</source>
         <translation>Αποθήκευση θέματος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34590"/>
+        <location filename="../artisanlib/main.py" line="34593"/>
         <source>Theme saved</source>
         <translation>Το θέμα αποθηκεύτηκε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19329"/>
+        <location filename="../artisanlib/main.py" line="19332"/>
         <source>Artisan configured for {0}</source>
         <translation>Ο καλλιτέχνης έχει διαμορφωθεί για {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32694"/>
+        <location filename="../artisanlib/main.py" line="32697"/>
         <source>Profile missing Dry event</source>
         <translation>Λείπει το προφίλ Dry event</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32712"/>
+        <location filename="../artisanlib/main.py" line="32715"/>
         <source>Profile missing phase events</source>
         <translation>Στο προφίλ λείπουν συμβάντα φάσης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19271"/>
+        <location filename="../artisanlib/main.py" line="19274"/>
         <source>Port Configuration</source>
         <translation>Διαμόρφωση θύρας</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35141"/>
+        <location filename="../artisanlib/main.py" line="35144"/>
         <source>Switching the language needs a restart. Restart now?</source>
         <translation>Η αλλαγή της γλώσσας χρειάζεται επανεκκίνηση. Επανεκκίνηση τώρα?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35142"/>
+        <location filename="../artisanlib/main.py" line="35145"/>
         <source>Restart</source>
         <translation>Επανεκκίνηση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9080"/>
+        <location filename="../artisanlib/main.py" line="9083"/>
         <source>Colors set to Default Theme</source>
         <translation>Τα χρώματα έχουν οριστεί σε προεπιλεγμένο θέμα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23345"/>
+        <location filename="../artisanlib/main.py" line="23348"/>
         <source>Do you want to reset all settings?&lt;br&gt; Artisan has to be restarted!</source>
         <translation>Θέλετε να επαναφέρετε όλες τις ρυθμίσεις; &lt;br&gt; Πρέπει να γίνει επανεκκίνηση του Artisan!</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19577"/>
+        <location filename="../artisanlib/main.py" line="19580"/>
         <source>Detected a color pair that may be hard to see: </source>
         <translation>Εντοπίστηκε ένα ζεύγος χρωμάτων που μπορεί να είναι δύσκολο να το δείτε:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34618"/>
+        <location filename="../artisanlib/main.py" line="34621"/>
         <source>Load Theme</source>
         <translation>Φόρτωση θέματος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34644"/>
+        <location filename="../artisanlib/main.py" line="34647"/>
         <source>Theme loaded</source>
         <translation>Το θέμα φορτώθηκε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34627"/>
+        <location filename="../artisanlib/main.py" line="34630"/>
         <source>Loaded theme {0}</source>
         <translation>Φορτωμένο θέμα {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31725"/>
+        <location filename="../artisanlib/main.py" line="31728"/>
         <source>Excel Production Report exported to {0}</source>
         <translation>Η αναφορά παραγωγής του Excel εξήχθη στο {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33061"/>
+        <location filename="../artisanlib/main.py" line="33064"/>
         <source>Excel Ranking Report exported to {0}</source>
         <translation>Η αναφορά κατάταξης του Excel εξήχθη στο {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34313"/>
+        <location filename="../artisanlib/main.py" line="34316"/>
         <source>To control a Hottop you need to activate the super user mode via a right click on the timer LCD first!</source>
         <translation>Για να ελέγξετε ένα Hottop πρέπει να ενεργοποιήσετε τη λειτουργία σούπερ χρήστη μέσω ενός δεξιού κλικ πρώτα στο χρονοδιακόπτη LCD!</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27957"/>
+        <location filename="../artisanlib/main.py" line="27960"/>
         <source>Export Excel</source>
         <translation>Εξαγωγή Excel</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25675"/>
+        <location filename="../artisanlib/main.py" line="25678"/>
         <source>The Probat Shop Pilot Software expects files named &lt;Name&gt;_&lt;Index&gt;.xml like in Test_0.xml on import</source>
         <translation>Το πιλοτικό λογισμικό Probat Shop αναμένει αρχεία με όνομα &lt;Name&gt; _ &lt;Index&gt; .xml όπως στο Test_0.xml κατά την εισαγωγή</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35536"/>
+        <location filename="../artisanlib/main.py" line="35539"/>
         <source>Import Probat Pilot failed</source>
         <translation>Η εισαγωγή του πιλότου Probat απέτυχε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9741"/>
+        <location filename="../artisanlib/main.py" line="9744"/>
         <source>Temperature: {}{}</source>
         <translation>Θερμοκρασία: {} {}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9735"/>
+        <location filename="../artisanlib/main.py" line="9738"/>
         <source>Humidity: {}%</source>
         <translation>Υγρασία: {}%</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9745"/>
+        <location filename="../artisanlib/main.py" line="9748"/>
         <source>Pressure: {}hPa</source>
         <translation>Πίεση: {} hPa</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32477"/>
+        <location filename="../artisanlib/main.py" line="32480"/>
         <source>Ranking Report</source>
         <translation>Αναφορά κατάταξης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24861"/>
+        <location filename="../artisanlib/main.py" line="24864"/>
         <source>NEW ROAST canceled: incomplete profile lacking CHARGE and DROP found</source>
         <translation>Η ΝΕΑ ΑΠΟΣΤΟΛΗ ακυρώθηκε: Βρέθηκε ελλιπές προφίλ χωρίς CHARGE και DROP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24866"/>
+        <location filename="../artisanlib/main.py" line="24869"/>
         <source>NEW ROAST canceled: incomplete profile lacking DROP found</source>
         <translation>Ακυρώθηκε η ΝΕΑ ROAST: βρέθηκε ελλιπές προφίλ χωρίς DROP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32477"/>
+        <location filename="../artisanlib/main.py" line="32480"/>
         <source>Ranking graphs are only generated up to {0} profiles</source>
         <translation>Τα γραφήματα κατάταξης δημιουργούνται μόνο έως {0} προφίλ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24768"/>
+        <location filename="../artisanlib/main.py" line="24771"/>
         <source>Select</source>
         <translation type="unfinished">Επιλογη</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23343"/>
+        <location filename="../artisanlib/main.py" line="23346"/>
         <source>Do you want to reset all settings?&lt;br&gt; ArtisanViewer has to be restarted!</source>
         <translation>Θέλετε να επαναφέρετε όλες τις ρυθμίσεις; &lt;br&gt; Πρέπει να γίνει επανεκκίνηση του ArtisanViewer!</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18326"/>
+        <location filename="../artisanlib/main.py" line="18329"/>
         <source>The Artisan Team</source>
         <translation>Η Τεχνική Ομάδα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35885"/>
+        <location filename="../artisanlib/main.py" line="35888"/>
         <source>Save Graph as</source>
         <translation>Αποθήκευση γραφήματος ως</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18320"/>
+        <location filename="../artisanlib/main.py" line="18323"/>
         <source>Welcome to the ArtisanViewer!</source>
         <translation>Καλώς ήλθατε στο ArtisanViewer!</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18321"/>
+        <location filename="../artisanlib/main.py" line="18324"/>
         <source>This is a one time message to introduce you to the ArtisanViewer.</source>
         <translation>Αυτό είναι ένα μοναδικό μήνυμα για να σας παρουσιάσουμε στο ArtisanViewer.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18322"/>
+        <location filename="../artisanlib/main.py" line="18325"/>
         <source>The ArtisanViewer opens whenever a copy of Artisan is already running.</source>
         <translation>Το ArtisanViewer ανοίγει όποτε εκτελείται ήδη αντίγραφο του Artisan.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18323"/>
+        <location filename="../artisanlib/main.py" line="18326"/>
         <source>ArtisanViewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start ArtisanViewer.</source>
         <translation>Το ArtisanViewer θα διατηρήσει όλες τις ρυθμίσεις διαμόρφωσης κατά την έξοδο, ώστε να είναι αυτόματα διαθέσιμοι την επόμενη φορά που θα ξεκινήσετε το ArtisanViewer.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18324"/>
+        <location filename="../artisanlib/main.py" line="18327"/>
         <source>Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using &apos;Help&gt;Save Settings&apos; and &apos;Help&gt;Load Settings&apos;.</source>
         <translation>Προσοχή, ο μόνος τρόπος κοινής χρήσης των ρυθμίσεων μεταξύ Artisan και ArtisanViewer είναι να τις αποθηκεύσετε και να τις φορτώσετε ρητά χρησιμοποιώντας «Βοήθεια&gt; Αποθήκευση ρυθμίσεων» και «Βοήθεια&gt; Φόρτωση ρυθμίσεων».</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18325"/>
+        <location filename="../artisanlib/main.py" line="18328"/>
         <source>Enjoy using ArtisanViewer,</source>
         <translation>Απολαύστε τη χρήση του ArtisanViewer,</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22516"/>
+        <location filename="../artisanlib/main.py" line="22519"/>
         <source>Alarms on</source>
         <translation>Ενεργοποίηση συναγερμών</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22519"/>
+        <location filename="../artisanlib/main.py" line="22522"/>
         <source>Alarms off</source>
         <translation>Συναγερμοί</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22528"/>
+        <location filename="../artisanlib/main.py" line="22531"/>
         <source>autoCHARGE on</source>
         <translation>αυτόματη χρέωση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22531"/>
+        <location filename="../artisanlib/main.py" line="22534"/>
         <source>autoCHARGE off</source>
         <translation>απενεργοποίηση αυτόματης χρέωσης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22540"/>
+        <location filename="../artisanlib/main.py" line="22543"/>
         <source>autoDROP on</source>
         <translation>το autoDROP είναι ενεργοποιημένο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22543"/>
+        <location filename="../artisanlib/main.py" line="22546"/>
         <source>autoDROP off</source>
         <translation>απενεργοποιημένο το autoDROP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28293"/>
+        <location filename="../artisanlib/main.py" line="28296"/>
         <source>Batch Counter</source>
         <translation>Μετρητής παρτίδας</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28296"/>
+        <location filename="../artisanlib/main.py" line="28299"/>
         <source>Load Settings canceled</source>
         <translation>Οι ρυθμίσεις φόρτωσης ακυρώθηκαν</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18308"/>
+        <location filename="../artisanlib/main.py" line="18311"/>
         <source>Welcome to version {0} of Artisan!</source>
         <translation>Καλώς ορίσατε στην έκδοση {0} του Artisan!</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18309"/>
+        <location filename="../artisanlib/main.py" line="18312"/>
         <source>This is a one time message to inform you about a change in Artisan.</source>
         <translation>Αυτό είναι ένα εφάπαξ μήνυμα που σας ενημερώνει για μια αλλαγή στο Artisan.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18310"/>
+        <location filename="../artisanlib/main.py" line="18313"/>
         <source>If you never run older versions of Artisan you can skip this message, the change does not affect you.</source>
         <translation>Εάν δεν εκτελείτε παλαιότερες εκδόσεις του Artisan, μπορείτε να παραλείψετε αυτό το μήνυμα, η αλλαγή δεν σας επηρεάζει.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18311"/>
+        <location filename="../artisanlib/main.py" line="18314"/>
         <source>Artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start Artisan.</source>
         <translation>Το Artisan διατηρεί όλες τις ρυθμίσεις διαμόρφωσης όταν βγείτε, ώστε να είναι αυτόματα διαθέσιμοι την επόμενη φορά που θα ξεκινήσετε το Artisan.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18312"/>
+        <location filename="../artisanlib/main.py" line="18315"/>
         <source>Beginning with release v2.0, settings will no longer be automatically shared at start-up with versions before v2.0.</source>
         <translation>Ξεκινώντας με την έκδοση v2.0, οι ρυθμίσεις δεν θα κοινοποιούνται πλέον αυτόματα κατά την εκκίνηση με εκδόσεις πριν από το v2.0.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18313"/>
+        <location filename="../artisanlib/main.py" line="18316"/>
         <source>Do not worry. Since this is the first time you opened this new version Artisan has already loaded your last used settings.</source>
         <translation>Μην ανησυχείς. Δεδομένου ότι είναι η πρώτη φορά που ανοίξατε αυτήν τη νέα έκδοση, η Artisan έχει ήδη φορτώσει τις ρυθμίσεις που χρησιμοποιήσατε τελευταία.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18314"/>
+        <location filename="../artisanlib/main.py" line="18317"/>
         <source>To share settings between this version and Artisan versions before v2.0 use &apos;Help&gt;Save Settings&apos; and &apos;Help&gt;Load Settings&apos;.</source>
         <translation>Για να κάνετε κοινή χρήση των ρυθμίσεων μεταξύ αυτής της έκδοσης και των εκδόσεων Artisan πριν από το v2.0 χρησιμοποιήστε τις επιλογές &quot;Βοήθεια&gt; Αποθήκευση ρυθμίσεων&quot; και &quot;Βοήθεια&gt; Φόρτωση ρυθμίσεων&quot;.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18315"/>
+        <location filename="../artisanlib/main.py" line="18318"/>
         <source>Enjoy using Artisan, The Artisan Team</source>
         <translation>Απολαύστε τη χρήση του Artisan, The Artisan Team</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18316"/>
+        <location filename="../artisanlib/main.py" line="18319"/>
         <source>One time message about loading settings at start-up</source>
         <translation>Μία φορά μήνυμα σχετικά με τη φόρτωση των ρυθμίσεων κατά την εκκίνηση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="294"/>
+        <location filename="../artisanlib/main.py" line="297"/>
         <source>URL open profile: {0}</source>
         <translation>Ανοιχτό προφίλ διεύθυνσης URL: {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8546"/>
+        <location filename="../artisanlib/main.py" line="8549"/>
         <source>Load Image File</source>
         <translation>Φόρτωση αρχείου εικόνας</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8552"/>
+        <location filename="../artisanlib/main.py" line="8555"/>
         <source>Loaded watermark image {0}</source>
         <translation>Φορτωμένη εικόνα υδατογραφήματος {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14363"/>
+        <location filename="../artisanlib/main.py" line="14366"/>
         <source>Subscription</source>
         <translation>Συνδρομή</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36711"/>
+        <location filename="../artisanlib/main.py" line="36714"/>
         <source>Fitting curves...</source>
         <translation>Συναρμολόγηση καμπυλών ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5261"/>
+        <location filename="../artisanlib/main.py" line="5264"/>
         <source>Save the profile or Cancel?</source>
         <translation>Αποθήκευση προφίλ ή Ακύρωση;</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22576"/>
+        <location filename="../artisanlib/main.py" line="22579"/>
         <source>PID mode manual</source>
         <translation>Εγχειρίδιο λειτουργίας PID</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22579"/>
+        <location filename="../artisanlib/main.py" line="22582"/>
         <source>PID mode Ramp/Soak</source>
         <translation>Λειτουργία PID Ramp / Soak</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22582"/>
+        <location filename="../artisanlib/main.py" line="22585"/>
         <source>PID mode background</source>
         <translation>Φόντο λειτουργίας PID</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22592"/>
+        <location filename="../artisanlib/main.py" line="22595"/>
         <source>playback off</source>
         <translation>η αναπαραγωγή είναι απενεργοποιημένη</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22596"/>
+        <location filename="../artisanlib/main.py" line="22599"/>
         <source>playback by time</source>
         <translation>αναπαραγωγή με το χρόνο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22600"/>
+        <location filename="../artisanlib/main.py" line="22603"/>
         <source>playback by BT</source>
         <translation>αναπαραγωγή από BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22604"/>
+        <location filename="../artisanlib/main.py" line="22607"/>
         <source>playback by ET</source>
         <translation>αναπαραγωγή από ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19191"/>
+        <location filename="../artisanlib/main.py" line="19194"/>
         <source>Configure for {0}?&lt;br&gt;&lt;br&gt;Your current settings will be overwritten!&lt;br&gt;&lt;br&gt;It is advisable to save your current settings beforehand via menu Help &gt;&gt; Save Settings.</source>
         <translation>Διαμόρφωση για {0}; &lt;br&gt; &lt;br&gt; Οι τρέχουσες ρυθμίσεις σας θα αντικατασταθούν! &lt;br&gt; &lt;br&gt; Συνιστάται να αποθηκεύσετε τις τρέχουσες ρυθμίσεις σας εκ των προτέρων μέσω του μενού Βοήθεια &gt;&gt; Αποθήκευση ρυθμίσεων.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19215"/>
+        <location filename="../artisanlib/main.py" line="19218"/>
         <source>Ambient</source>
         <translation>Περιβάλλων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19215"/>
+        <location filename="../artisanlib/main.py" line="19218"/>
         <source>Elevation (MASL)</source>
         <translation>Υψόμετρο (MASL)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31573"/>
+        <location filename="../artisanlib/main.py" line="31576"/>
         <source>Statistics Saved</source>
         <translation>Τα στατιστικά στοιχεία αποθηκεύτηκαν</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36956"/>
+        <location filename="../artisanlib/main.py" line="36959"/>
         <source>Analysis earlier than Curve fit</source>
         <translation>Ανάλυση νωρίτερα από το Curve fit</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31553"/>
+        <location filename="../artisanlib/main.py" line="31556"/>
         <source>No statistics found</source>
         <translation>Δεν βρέθηκαν στατιστικά στοιχεία</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31568"/>
+        <location filename="../artisanlib/main.py" line="31571"/>
         <source>Save Statistics</source>
         <translation>Αποθήκευση στατιστικών</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36955"/>
+        <location filename="../artisanlib/main.py" line="36958"/>
         <source>Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.
 Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
         <translation>Προειδοποίηση: Η έναρξη του διαστήματος ανάλυσης ενδιαφέροντος είναι νωρίτερα από την έναρξη της προσαρμογής καμπύλης.
 Διορθώστε το στην καρτέλα Config&gt; Curves&gt; Analysis.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9461"/>
+        <location filename="../artisanlib/main.py" line="9464"/>
         <source>Phidget service discovery started...</source>
         <translation>Ξεκίνησε η ανακάλυψη υπηρεσίας Phidget ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35636"/>
+        <location filename="../artisanlib/main.py" line="35639"/>
         <source>Import Cropster XLS</source>
         <translation>Εισαγωγή Cropster XLS</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35661"/>
+        <location filename="../artisanlib/main.py" line="35664"/>
         <source>Import IKAWA CSV</source>
         <translation>Εισαγωγή IKAWA CSV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12493"/>
+        <location filename="../artisanlib/main.py" line="12496"/>
         <source>Curve fit problem</source>
         <translation>Πρόβλημα προσαρμογής καμπύλης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35651"/>
+        <location filename="../artisanlib/main.py" line="35654"/>
         <source>Import Giesen CSV</source>
         <translation>Εισαγωγή Giesen CSV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26703"/>
+        <location filename="../artisanlib/main.py" line="26706"/>
         <source>Found a different set of extra devices</source>
         <translation>Βρέθηκε ένα διαφορετικό σύνολο επιπλέον συσκευών</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35620"/>
+        <location filename="../artisanlib/main.py" line="35623"/>
         <source>{0} imported</source>
         <translation>{0} εισήχθη</translation>
     </message>
@@ -14703,7 +14703,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
         <translation>Ο πίνακας του κουμπιού συμβάντος αντιγράφηκε στο πρόχειρο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26699"/>
+        <location filename="../artisanlib/main.py" line="26702"/>
         <source>To fully load this profile the extra device configuration needs to be modified.
 
 Overwrite your extra device definitions using the values from the profile?
@@ -14786,27 +14786,27 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation>Ένα στενό διάστημα δειγματοληψίας μπορεί να οδηγήσει σε αστάθεια σε ορισμένα μηχανήματα. Προτείνουμε τουλάχιστον 3 δευτερόλεπτα.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24792"/>
+        <location filename="../artisanlib/main.py" line="24795"/>
         <source>URL</source>
         <translation>Διεύθυνση URL</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35646"/>
+        <location filename="../artisanlib/main.py" line="35649"/>
         <source>Import RoastPATH URL</source>
         <translation>Εισαγωγή διεύθυνσης URL RoastPATH</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="37211"/>
+        <location filename="../artisanlib/main.py" line="37214"/>
         <source>Simulator stopped</source>
         <translation>Ο προσομοιωτής σταμάτησε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="37240"/>
+        <location filename="../artisanlib/main.py" line="37243"/>
         <source>Simulator started @{}x</source>
         <translation>Ο προσομοιωτής ξεκίνησε @ {} x</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35641"/>
+        <location filename="../artisanlib/main.py" line="35644"/>
         <source>Import RoastLog URL</source>
         <translation>Εισαγωγή διεύθυνσης URL RoastLog</translation>
     </message>
@@ -14846,72 +14846,72 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation>Τίποτα εδώ για επεξεργασία.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10185"/>
+        <location filename="../artisanlib/main.py" line="10188"/>
         <source>CHARGE: Scope is not recording</source>
         <translation>ΦΟΡΤΙΣΗ: Το εύρος δεν εγγράφεται</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10311"/>
+        <location filename="../artisanlib/main.py" line="10314"/>
         <source>DRY END: Scope is not recording</source>
         <translation>DRY END: Το πεδίο δεν εγγράφεται</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10418"/>
+        <location filename="../artisanlib/main.py" line="10421"/>
         <source>FC START: Scope is not recording</source>
         <translation>FC START: Το πεδίο δεν εγγράφεται</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10515"/>
+        <location filename="../artisanlib/main.py" line="10518"/>
         <source>FC END: Scope is not recording</source>
         <translation>FC END: Το πεδίο δεν εγγράφεται</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10616"/>
+        <location filename="../artisanlib/main.py" line="10619"/>
         <source>SC START: Scope is not recording</source>
         <translation>SC START: Το πεδίο δεν εγγράφεται</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10722"/>
+        <location filename="../artisanlib/main.py" line="10725"/>
         <source>SC END: Scope is not recording</source>
         <translation>SC END: Το εύρος δεν εγγράφεται</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10865"/>
+        <location filename="../artisanlib/main.py" line="10868"/>
         <source>DROP: Scope is not recording</source>
         <translation>DROP: Το πεδίο δεν εγγράφεται</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10994"/>
+        <location filename="../artisanlib/main.py" line="10997"/>
         <source>COOL: Scope is not recording</source>
         <translation>ΨΥΞΗ: Το πεδίο δεν εγγράφεται</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25095"/>
+        <location filename="../artisanlib/main.py" line="25098"/>
         <source>No profile data.  ET/BT not recalculated</source>
         <translation>Δεν υπάρχουν δεδομένα προφίλ. Το ET / BT δεν υπολογίστηκε εκ νέου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25097"/>
+        <location filename="../artisanlib/main.py" line="25100"/>
         <source>Problem with the profile data.  ET/BT not recalculated</source>
         <translation>Πρόβλημα με τα δεδομένα προφίλ. Το ET / BT δεν υπολογίστηκε εκ νέου</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35666"/>
+        <location filename="../artisanlib/main.py" line="35669"/>
         <source>Import Rubase CSV</source>
         <translation>Εισαγωγή Rubase CSV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32845"/>
+        <location filename="../artisanlib/main.py" line="32848"/>
         <source>CSV Ranking Report exported to {0}</source>
         <translation>Η αναφορά κατάταξης CSV εξήχθη στο {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35543"/>
+        <location filename="../artisanlib/main.py" line="35546"/>
         <source>Import Aillio RoasTime</source>
         <translation>Εισαγωγή Aillio RoasTime</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35553"/>
+        <location filename="../artisanlib/main.py" line="35556"/>
         <source>Import Aillio Roast.World URL</source>
         <translation>Εισαγωγή Aillio Roast.World URL</translation>
     </message>
@@ -14926,47 +14926,47 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation>Το μοτίβο ράμπας / ενυδάτωσης ολοκληρώθηκε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18327"/>
+        <location filename="../artisanlib/main.py" line="18330"/>
         <source>One time message about ArtisanViewer</source>
         <translation>Μία φορά μήνυμα για το ArtisanViewer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12137"/>
+        <location filename="../artisanlib/main.py" line="12140"/>
         <source>No profile data</source>
         <translation>Δεν υπάρχουν δεδομένα προφίλ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11895"/>
+        <location filename="../artisanlib/main.py" line="11898"/>
         <source>Profile has no DROP event</source>
         <translation>Το προφίλ δεν έχει καμία εκδήλωση DROP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11946"/>
+        <location filename="../artisanlib/main.py" line="11949"/>
         <source>Missing CHARGE or DROP event</source>
         <translation>Λείπει το συμβάν CHARGE ή DROP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18399"/>
+        <location filename="../artisanlib/main.py" line="18402"/>
         <source>Please support Artisan with your donation!</source>
         <translation>Υποστηρίξτε τον Artisan με τη δωρεά σας!</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19287"/>
+        <location filename="../artisanlib/main.py" line="19290"/>
         <source>Machine Capacity (kg)</source>
         <translation>Χωρητικότητα μηχανήματος (kg)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19328"/>
+        <location filename="../artisanlib/main.py" line="19331"/>
         <source>Energy loads configured for {0} {1}kg</source>
         <translation>Ενεργειακά φορτία διαμορφωμένα για {0} {1} kg</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28244"/>
+        <location filename="../artisanlib/main.py" line="28247"/>
         <source>Import Artisan URL</source>
         <translation>Εισαγωγή Artisan URL</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35656"/>
+        <location filename="../artisanlib/main.py" line="35659"/>
         <source>Import Petroncini CSV</source>
         <translation>Εισαγωγή Petroncini CSV</translation>
     </message>
@@ -15094,7 +15094,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation>Η ταυτοποίηση απέτυχε</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14348"/>
+        <location filename="../artisanlib/main.py" line="14351"/>
         <source>Paid until</source>
         <translation>Πληρώθηκε έως</translation>
     </message>
@@ -15119,17 +15119,17 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation>Αποκατάσταση σφαλμάτων artisan.plus OFF.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14344"/>
+        <location filename="../artisanlib/main.py" line="14347"/>
         <source>1 day left</source>
         <translation>Απομένει 1 ημέρα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14346"/>
+        <location filename="../artisanlib/main.py" line="14349"/>
         <source>{} days left</source>
         <translation>{} μέρες που απομένουν</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14357"/>
+        <location filename="../artisanlib/main.py" line="14360"/>
         <source>Please visit our {0}shop{1} to extend your subscription</source>
         <translation>Επισκεφτείτε το {0} κατάστημα {1} μας για να επεκτείνετε τη συνδρομή σας</translation>
     </message>
@@ -15195,27 +15195,27 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="obsolete">ΕΝΑΡΞΗ 00:00</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10301"/>
+        <location filename="../artisanlib/main.py" line="10304"/>
         <source>DE {0}</source>
         <translation type="unfinished">DE{0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10407"/>
+        <location filename="../artisanlib/main.py" line="10410"/>
         <source>FCs {0}</source>
         <translation type="unfinished">FCε{0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10508"/>
+        <location filename="../artisanlib/main.py" line="10511"/>
         <source>FCe {0}</source>
         <translation type="unfinished">FCλ{0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10606"/>
+        <location filename="../artisanlib/main.py" line="10609"/>
         <source>SCs {0}</source>
         <translation type="unfinished">SCε{0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10715"/>
+        <location filename="../artisanlib/main.py" line="10718"/>
         <source>SCe {0}</source>
         <translation type="unfinished">SCλ{0}</translation>
     </message>
@@ -15225,22 +15225,22 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="obsolete">ΛΗΞΗ{0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10986"/>
+        <location filename="../artisanlib/main.py" line="10989"/>
         <source>CE {0}</source>
         <translation type="unfinished">ΛΨ{0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10159"/>
+        <location filename="../artisanlib/main.py" line="10162"/>
         <source>CHARGE</source>
         <translation type="unfinished">ΦΟΡΤΩΜΑ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10228"/>
+        <location filename="../artisanlib/main.py" line="10231"/>
         <source>TP {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10831"/>
+        <location filename="../artisanlib/main.py" line="10834"/>
         <source>DROP {0}</source>
         <translation>ΣΤΑΣΗ {0}</translation>
     </message>
@@ -16335,212 +16335,212 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
 <context>
     <name>Textbox</name>
     <message>
-        <location filename="../artisanlib/main.py" line="869"/>
+        <location filename="../artisanlib/main.py" line="872"/>
         <source>Acidity</source>
         <translation>Οξυτητα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="868"/>
+        <location filename="../artisanlib/main.py" line="871"/>
         <source>Aftertaste</source>
         <translation>Μεταγευση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="817"/>
+        <location filename="../artisanlib/main.py" line="820"/>
         <source>Clean Cup</source>
         <translation>Καθαριοτητα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="780"/>
+        <location filename="../artisanlib/main.py" line="783"/>
         <source>Head</source>
         <translation>Κεφαλη</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="856"/>
+        <location filename="../artisanlib/main.py" line="859"/>
         <source>Fragrance</source>
         <translation>Ευωδια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="848"/>
+        <location filename="../artisanlib/main.py" line="851"/>
         <source>Sweetness</source>
         <translation>Γλυκητητα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="865"/>
+        <location filename="../artisanlib/main.py" line="868"/>
         <source>Aroma</source>
         <translation>Αρωμα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="872"/>
+        <location filename="../artisanlib/main.py" line="875"/>
         <source>Balance</source>
         <translation>Ισορροπια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="870"/>
+        <location filename="../artisanlib/main.py" line="873"/>
         <source>Body</source>
         <translation>Σωμα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="790"/>
+        <location filename="../artisanlib/main.py" line="793"/>
         <source>Sour</source>
         <translation>Ξυνιλα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="835"/>
+        <location filename="../artisanlib/main.py" line="838"/>
         <source>Flavor</source>
         <translation>Γευση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="792"/>
+        <location filename="../artisanlib/main.py" line="795"/>
         <source>Critical
 Stimulus</source>
         <translation>Κρισιμο κινητρο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="794"/>
+        <location filename="../artisanlib/main.py" line="797"/>
         <source>Bitter</source>
         <translation>Πικρα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="795"/>
+        <location filename="../artisanlib/main.py" line="798"/>
         <source>Astringency</source>
         <translation>Στυπτικοτητα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="796"/>
+        <location filename="../artisanlib/main.py" line="799"/>
         <source>Solubles
 Concentration</source>
         <translation>Περιεκτηκοτητα διαλυματων</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="843"/>
+        <location filename="../artisanlib/main.py" line="846"/>
         <source>Mouthfeel</source>
         <translation>Στο στομα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="798"/>
+        <location filename="../artisanlib/main.py" line="801"/>
         <source>Other</source>
         <translation>Αλλα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="799"/>
+        <location filename="../artisanlib/main.py" line="802"/>
         <source>Aromatic
 Complexity</source>
         <translation>Αρωματικη Πολυπλοκοτητα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="800"/>
+        <location filename="../artisanlib/main.py" line="803"/>
         <source>Roast
 Color</source>
         <translation>Χρωμα Ψησιματος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="801"/>
+        <location filename="../artisanlib/main.py" line="804"/>
         <source>Aromatic
 Pungency</source>
         <translation>Αρωματικη Οξυτητα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="802"/>
+        <location filename="../artisanlib/main.py" line="805"/>
         <source>Sweet</source>
         <translation>Γλυκα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="804"/>
+        <location filename="../artisanlib/main.py" line="807"/>
         <source>pH</source>
         <translation>ΡΗ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="807"/>
+        <location filename="../artisanlib/main.py" line="810"/>
         <source>Fragance</source>
         <translation>Ευωδια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="814"/>
+        <location filename="../artisanlib/main.py" line="817"/>
         <source>Dry Fragrance</source>
         <translation>Ξηρα Ευωδια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="815"/>
+        <location filename="../artisanlib/main.py" line="818"/>
         <source>Uniformity</source>
         <translation>Ομοιομορφια</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="816"/>
+        <location filename="../artisanlib/main.py" line="819"/>
         <source>Complexity</source>
         <translation>Πολυπλοκοτητα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="851"/>
+        <location filename="../artisanlib/main.py" line="854"/>
         <source>Finish</source>
         <translation>Τελειωμα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="822"/>
+        <location filename="../artisanlib/main.py" line="825"/>
         <source>Brightness</source>
         <translation>Λαμπεροτητα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="823"/>
+        <location filename="../artisanlib/main.py" line="826"/>
         <source>Wet Aroma</source>
         <translation>Υγρο Αρωμα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="827"/>
+        <location filename="../artisanlib/main.py" line="830"/>
         <source>Taste</source>
         <translation>Γευση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="828"/>
+        <location filename="../artisanlib/main.py" line="831"/>
         <source>Nose</source>
         <translation>Οσφρηση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="833"/>
+        <location filename="../artisanlib/main.py" line="836"/>
         <source>Fragrance-Aroma</source>
         <translation>Ευωδια-Αρωμα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="867"/>
+        <location filename="../artisanlib/main.py" line="870"/>
         <source>Flavour</source>
         <translation>Γευση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="853"/>
+        <location filename="../artisanlib/main.py" line="856"/>
         <source>Roast Color</source>
         <translation>Χρωμα Ψησιματος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="854"/>
+        <location filename="../artisanlib/main.py" line="857"/>
         <source>Crema Texture</source>
         <translation>Υφη Κρεμας</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="855"/>
+        <location filename="../artisanlib/main.py" line="858"/>
         <source>Crema Volume</source>
         <translation>Ογκος Κρεμας</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="859"/>
+        <location filename="../artisanlib/main.py" line="862"/>
         <source>Bitterness</source>
         <translation>Πικριλα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="860"/>
+        <location filename="../artisanlib/main.py" line="863"/>
         <source>Defects</source>
         <translation>Ελαττωματα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="861"/>
+        <location filename="../artisanlib/main.py" line="864"/>
         <source>Aroma Intensity</source>
         <translation>Ενταση Αρωματος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="862"/>
+        <location filename="../artisanlib/main.py" line="865"/>
         <source>Aroma Persistence</source>
         <translation>Πιστοτητα Αρωματος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="874"/>
+        <location filename="../artisanlib/main.py" line="877"/>
         <source>Overall</source>
         <translation>Συνολικά</translation>
     </message>
@@ -16548,32 +16548,32 @@ Pungency</source>
 <context>
     <name>Toolbar</name>
     <message>
-        <location filename="../artisanlib/main.py" line="14124"/>
+        <location filename="../artisanlib/main.py" line="14127"/>
         <source>Home</source>
         <translation>Σπίτι</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14124"/>
+        <location filename="../artisanlib/main.py" line="14127"/>
         <source>Back</source>
         <translation>Πίσω</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14124"/>
+        <location filename="../artisanlib/main.py" line="14127"/>
         <source>Forward</source>
         <translation>Προς τα εμπρός</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14124"/>
+        <location filename="../artisanlib/main.py" line="14127"/>
         <source>Pan</source>
         <translation>Τηγάνι</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14124"/>
+        <location filename="../artisanlib/main.py" line="14127"/>
         <source>Zoom</source>
         <translation>Ανίπταμαι διαγωνίως</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14151"/>
+        <location filename="../artisanlib/main.py" line="14154"/>
         <source>Lines</source>
         <translation>Γραμμές</translation>
     </message>
@@ -16581,22 +16581,22 @@ Pungency</source>
 <context>
     <name>Tooltip</name>
     <message>
-        <location filename="../artisanlib/main.py" line="9582"/>
+        <location filename="../artisanlib/main.py" line="9585"/>
         <source>Stop monitoring</source>
         <translation>Παυση παρακολουθησης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17371"/>
+        <location filename="../artisanlib/main.py" line="17374"/>
         <source>Start monitoring</source>
         <translation>Εναρξηπαρακολουθησης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9979"/>
+        <location filename="../artisanlib/main.py" line="9982"/>
         <source>Stop recording</source>
         <translation>Παυση καταγραφης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17388"/>
+        <location filename="../artisanlib/main.py" line="17391"/>
         <source>Start recording</source>
         <translation>Εναρξη καταγραφης</translation>
     </message>
@@ -16621,7 +16621,7 @@ Pungency</source>
         <translation type="obsolete">Μαρκαρει ληξη SC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17448"/>
+        <location filename="../artisanlib/main.py" line="17451"/>
         <source>Reset</source>
         <translation>Επαναφορα</translation>
     </message>
@@ -16641,37 +16641,37 @@ Pungency</source>
         <translation type="obsolete">Μαρκαρει συμβαν</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17500"/>
+        <location filename="../artisanlib/main.py" line="17503"/>
         <source>Increases the current SV value by 5</source>
         <translation>Αυξανει τιμη SV κατα 5</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17509"/>
+        <location filename="../artisanlib/main.py" line="17512"/>
         <source>Increases the current SV value by 10</source>
         <translation>Αυξανει τιμη SV κατα 10</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17518"/>
+        <location filename="../artisanlib/main.py" line="17521"/>
         <source>Increases the current SV value by 20</source>
         <translation>Αυξανει τιμη SV κατα 20</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17527"/>
+        <location filename="../artisanlib/main.py" line="17530"/>
         <source>Decreases the current SV value by 20</source>
         <translation>Μειωνει τιμη SV κατα 20</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17536"/>
+        <location filename="../artisanlib/main.py" line="17539"/>
         <source>Decreases the current SV value by 10</source>
         <translation>Μειωνει τιμη SV κατα 10</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17545"/>
+        <location filename="../artisanlib/main.py" line="17548"/>
         <source>Decreases the current SV value by 5</source>
         <translation>Μειωνει τιμη SV κατα 5</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17555"/>
+        <location filename="../artisanlib/main.py" line="17558"/>
         <source>Turns ON/OFF the HUD</source>
         <translation>Ανοιγει/Κλεινει Προβολεα</translation>
     </message>
@@ -16686,87 +16686,87 @@ Pungency</source>
         <translation type="obsolete">Μαρκαρει ληξη περιοδου ψυξης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17639"/>
+        <location filename="../artisanlib/main.py" line="17642"/>
         <source>Timer</source>
         <translation>Χρονομετρο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17640"/>
+        <location filename="../artisanlib/main.py" line="17643"/>
         <source>ET Temperature</source>
         <translation>Θερμοκρασια ΕΤ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17641"/>
+        <location filename="../artisanlib/main.py" line="17644"/>
         <source>BT Temperature</source>
         <translation>Θερμοκρασια ΒΤ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17642"/>
+        <location filename="../artisanlib/main.py" line="17645"/>
         <source>ET/time (degrees/min)</source>
         <translation>ΕΤ/Χρονος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17643"/>
+        <location filename="../artisanlib/main.py" line="17646"/>
         <source>BT/time (degrees/min)</source>
         <translation>ΒΤ/Χρονος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17644"/>
+        <location filename="../artisanlib/main.py" line="17647"/>
         <source>Value of SV in PID</source>
         <translation>Τιμη SV στο PID</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17645"/>
+        <location filename="../artisanlib/main.py" line="17648"/>
         <source>PID power %</source>
         <translation>Δυναμη PID%</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17744"/>
+        <location filename="../artisanlib/main.py" line="17747"/>
         <source>Number of events found</source>
         <translation>αΡΙΘΜΟς ΣΥΜΒΑΝΤΩΝ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17754"/>
+        <location filename="../artisanlib/main.py" line="17757"/>
         <source>Type of event</source>
         <translation>Τυπος συμβαντος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17761"/>
+        <location filename="../artisanlib/main.py" line="17764"/>
         <source>Value of event</source>
         <translation>Τιμη συμβαντος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17773"/>
+        <location filename="../artisanlib/main.py" line="17776"/>
         <source>Updates the event</source>
         <translation>Ενημερωνει συμβαντα</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36333"/>
+        <location filename="../artisanlib/main.py" line="36336"/>
         <source>&lt;b&gt;Label&lt;/b&gt;= </source>
         <translation>&lt;b&gt; Ετικέτα &lt;/b&gt; =</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36334"/>
+        <location filename="../artisanlib/main.py" line="36337"/>
         <source>&lt;b&gt;Description &lt;/b&gt;= </source>
         <translation>&lt;b&gt;Περιγραφη &lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36335"/>
+        <location filename="../artisanlib/main.py" line="36338"/>
         <source>&lt;b&gt;Type &lt;/b&gt;= </source>
         <translation>&lt;b&gt; Τύπος &lt;/b&gt; =</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36337"/>
+        <location filename="../artisanlib/main.py" line="36340"/>
         <source>&lt;b&gt;Value &lt;/b&gt;= </source>
         <translation>&lt;b&gt; Τιμή &lt;/b&gt; =</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36339"/>
+        <location filename="../artisanlib/main.py" line="36342"/>
         <source>&lt;b&gt;Documentation &lt;/b&gt;= </source>
         <translation>&lt;b&gt; Τεκμηρίωση &lt;/b&gt; =</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36340"/>
+        <location filename="../artisanlib/main.py" line="36343"/>
         <source>&lt;b&gt;Button# &lt;/b&gt;= </source>
         <translation>&lt;b&gt; Κουμπί # &lt;/b&gt; =</translation>
     </message>
@@ -16876,72 +16876,72 @@ Pungency</source>
         <translation type="unfinished">Επαναφορα προτυπων απο κειμενο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17408"/>
+        <location filename="../artisanlib/main.py" line="17411"/>
         <source>First Crack Start</source>
         <translation>Πρώτη εκκίνηση Crack</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17416"/>
+        <location filename="../artisanlib/main.py" line="17419"/>
         <source>First Crack End</source>
         <translation>Πρώτο τέλος ρωγμών</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17424"/>
+        <location filename="../artisanlib/main.py" line="17427"/>
         <source>Second Crack Start</source>
         <translation>Έναρξη δεύτερης ρωγμής</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17432"/>
+        <location filename="../artisanlib/main.py" line="17435"/>
         <source>Second Crack End</source>
         <translation>Δεύτερο τέλος ρωγμών</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17456"/>
+        <location filename="../artisanlib/main.py" line="17459"/>
         <source>Charge</source>
         <translation>Χρέωση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17465"/>
+        <location filename="../artisanlib/main.py" line="17468"/>
         <source>Drop</source>
         <translation>Πτώση</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17490"/>
+        <location filename="../artisanlib/main.py" line="17493"/>
         <source>Event</source>
         <translation type="unfinished">Συμβαν</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17568"/>
+        <location filename="../artisanlib/main.py" line="17571"/>
         <source>Dry End</source>
         <translation>Στεγνό άκρο</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17577"/>
+        <location filename="../artisanlib/main.py" line="17580"/>
         <source>Cool End</source>
         <translation>Τέλειο τέλος</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14124"/>
+        <location filename="../artisanlib/main.py" line="14127"/>
         <source>Reset original view</source>
         <translation>Επαναφορά αρχικής προβολής</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14124"/>
+        <location filename="../artisanlib/main.py" line="14127"/>
         <source>Back to  previous view</source>
         <translation>Επιστροφή στην προηγούμενη προβολή</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14124"/>
+        <location filename="../artisanlib/main.py" line="14127"/>
         <source>Forward to next view</source>
         <translation>Προώθηση στην επόμενη προβολή</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14124"/>
+        <location filename="../artisanlib/main.py" line="14127"/>
         <source>Pan axes with left mouse, zoom with right</source>
         <translation>Μετατόπιση αξόνων με αριστερό ποντίκι, ζουμ με δεξιά</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14124"/>
+        <location filename="../artisanlib/main.py" line="14127"/>
         <source>Zoom to rectangle</source>
         <translation>Μεγέθυνση σε ορθογώνιο</translation>
     </message>
@@ -16951,65 +16951,65 @@ Pungency</source>
         <translation type="obsolete">Επεξεργασία παραμέτρων άξονα και καμπύλης</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18073"/>
+        <location filename="../artisanlib/main.py" line="18076"/>
         <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE</source>
         <translation>LCD φάσης: κάντε δεξί κλικ για κύλιση στο TIME, PERCENTAGE και TEMP MODE</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20992"/>
+        <location filename="../artisanlib/main.py" line="20995"/>
         <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in TIME MODE</source>
         <translation>LCD φάσης: κάντε δεξί κλικ για κύλιση στο TIME, PERCENTAGE και TEMP MODE
 Προς το παρόν σε TIME MODE</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21010"/>
+        <location filename="../artisanlib/main.py" line="21013"/>
         <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in PERCENTAGE MODE</source>
         <translation>LCD φάσης: κάντε δεξί κλικ για κύλιση στο TIME, PERCENTAGE και TEMP MODE
 Αυτήν τη στιγμή σε PERCENTAGE MODE</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21024"/>
+        <location filename="../artisanlib/main.py" line="21027"/>
         <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in TEMP MODE</source>
         <translation>LCD φάσης: κάντε δεξί κλικ για κύλιση στο TIME, PERCENTAGE και TEMP MODE
 Προς το παρόν σε TEMP MODE</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18751"/>
+        <location filename="../artisanlib/main.py" line="18754"/>
         <source>Disconnect artisan.plus</source>
         <translation>Αποσυνδέστε το artisan.plus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18754"/>
+        <location filename="../artisanlib/main.py" line="18757"/>
         <source>Connect artisan.plus</source>
         <translation>Συνδέστε το artisan.plus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20955"/>
+        <location filename="../artisanlib/main.py" line="20958"/>
         <source>Phase LCDs
 Currently in ALL FINISHING MODE</source>
         <translation>LCD φάσης
 Προς το παρόν σε ΟΛΟ ΤΟΝ ΤΕΛΙΚΟ ΤΕΛΕΙΟΥ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18724"/>
+        <location filename="../artisanlib/main.py" line="18727"/>
         <source>Syncing with artisan.plus</source>
         <translation>Συγχρονισμός με artisan.plus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18731"/>
+        <location filename="../artisanlib/main.py" line="18734"/>
         <source>Upload to artisan.plus</source>
         <translation>Μεταφόρτωση στο artisan.plus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14124"/>
+        <location filename="../artisanlib/main.py" line="14127"/>
         <source>Connect to plus service</source>
         <translation>Συνδεθείτε στην υπηρεσία συν</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14124"/>
+        <location filename="../artisanlib/main.py" line="14127"/>
         <source>Subscription</source>
         <translation>Συνδρομή</translation>
     </message>
@@ -17323,7 +17323,7 @@ has to be reduced by 4 times.</source>
         <translation>Το μέγιστο ονομαστικό μέγεθος παρτίδας της μηχανής σε kg</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14153"/>
+        <location filename="../artisanlib/main.py" line="14156"/>
         <source>Line styles</source>
         <translation>Στυλ γραμμής</translation>
     </message>
