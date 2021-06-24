@@ -10,9 +10,9 @@ header:
 sidebar:
   nav: "machines"
 ---
-<!--
-<img class="tab-image" src="{{ site.baseurl }}/assets/images/partner-badge.png" width="150px">
--->
+
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+
 
 * __Producer:__ [Probat](http://www.probat-shoproaster.com/en/home/){:target="_blank"}, Germany
 * __Machines:__ 
@@ -37,8 +37,9 @@ sidebar:
   * CMD-3: adds a third slider for fan speed control
 - the air pressure LCD & Curve are hidden by default, but can be made visible by ticking the Curve2/LCD2 flags of the first extra device entry (menu `Config` >> `Device`, tab `Extra Devices`)
 - you might need to update your Probatones firmware to the lastest version via Probat to enjoy all features
+<!--
 - version v1.6.1 of Artisan add support for the [Probat Roaster Middleware](https://www.probat.com/en/products/shoproaster/produkte/roasters/probatone-series/){:target="_blank"} and allows to read data from all its supported roasting machines
-
+-->
 
 **Watch out!** Artisan doesn't monitor unsafe temperatures, so you should never leave the roaster alone.
 {: .notice--primary}

@@ -19,18 +19,38 @@ gallery:
     image_path: /assets/images/phidgets-logo.jpg
     alt: "Phidgets"
     title: "Phidgets"
-  - url: https://www.hottopusa.com/
-    image_path: /assets/images/hottop-logo.png
-    alt: "Hottop"
-    title: "Hottop"
+  - url: https://www.probat.com/
+    image_path: /assets/images/probat-logo.jpg
+    alt: "Probat"
+    title: "Probat"
   - url: https://www.yoctopuce.com/
     image_path: /assets/images/yoctopuce-logo.png
     alt: "Yoctopuce"
     title: "Yoctopuce"
+  - url: https://www.sweetmarias.com/
+    image_path: /assets/images/sweet-marias-logo.jpeg
+    alt: "Sweet Maria's"
+    title: "Sweet Maria's"
   - url: http://www.buckeyecoffee.com/
     image_path: /assets/images/bc-logo.jpg
     alt: "Buckeye Coffee"
     title: "Buckeye Coffee"
+  - url: http://www.roastmaxroasters.com.au
+    image_path: /assets/images/roastmax_logo.jpg
+    alt: "Roastmax"
+    title: "Roastmax"
+  - url: https://www.ip-cc.com/
+    image_path: /assets/images/IP-CC-logo.jpg
+    alt: "IP-CC"
+    title: "IP-CC"
+  - url: https://www.hottopusa.com/
+    image_path: /assets/images/hottop-logo.png
+    alt: "Hottop"
+    title: "Hottop"
+  - url: http://www.kaldi.co.kr
+    image_path: /assets/images/kaldi-logo.jpg
+    alt: "KALDI Coffee Roaster"
+    title: "KALDI Coffee Roaster"
   - url: http://www.hasgaranti.com.tr
     image_path: /assets/images/hasgaranti-logo.jpg
     alt: "Has Garanti"
@@ -39,18 +59,12 @@ gallery:
     image_path: /assets/images/besca-logo.jpg
     alt: "Besca Roasters"
     title: "Besca Roasters"
-  - url: https://www.ip-cc.com/
-    image_path: /assets/images/IP-CC-logo.jpg
-    alt: "IP-CC"
-    title: "IP-CC"
   - url: https://www.toper.com/
     image_path: /assets/images/toper-logo.jpg
     alt: "Toper"
     title: "Toper"
-  - url: http://www.kaldi.co.kr
-    image_path: /assets/images/kaldi-logo.jpg
-    alt: "KALDI Coffee Roaster"
-    title: "KALDI Coffee Roaster"
+    
+    
 
 ---
 
