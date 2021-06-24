@@ -2,9 +2,19 @@
 Delay=2000
 Oversampling=false
 roastertype_setup=Probat G/UG Retro
+ExtraEventSamplingDelay=0
 
 [Device]
 id=79
+
+[DefaultButtons]
+buttonactions=0, 0, 0, 0, 0, 0, 0, 0
+buttonactionstrings=, , , , , , , 
+buttonvisibility=true, true, true, true, true, false, true, true
+extrabuttonactions=0, 0, 0
+extrabuttonactionstrings=, , 
+xextrabuttonactions=0, 0
+xextrabuttonactionstrings=, 
 
 [ExtraComm]
 extrabaudrate=19200, 19200, 19200
