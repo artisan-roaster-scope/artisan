@@ -34,7 +34,7 @@ If you need support for your device, go to the [help page](https://artisan-scope
 
 ### Configure for Extra Devices Beyond Two
 
-Artisan supports two primary devices for BT and ET, and you can add additional LCDs and Curves by using Extra Devices tab on the `Config`>> `Devices` dialog.  Each physical device can have two channels, so on that tab you first select your device by its name in the drop down.  You pick a color for the display, apply a label/name for the device, add a formula to be applied to the device reading if any, and select if LCDs or Curves will be displayed. If you check the delta box, that will map the device to the right hand axis scale (the RoR axis) instead of the temperature axis.  
+Artisan supports two primary devices for BT and ET, and you can add additional LCDs and Curves by using Extra Devices tab on the `Config`>> `Devices` dialog.  Each physical device can have two channels, so on that tab you first select your device by its name in the drop down.  Picking the correct device is critical, and if your device has more than two channels you might see some numbers after the name which indicates the additional channels such as Center 304 34.  You pick a color for the display, apply a label/name for the device, add a formula to be applied to the device reading if any, and select if LCDs or Curves will be displayed. If you check the delta box, that will map the device to the right hand axis scale (the RoR axis) instead of the temperature axis.  
 
 ### Configure Language, Temps and Sampling
 
