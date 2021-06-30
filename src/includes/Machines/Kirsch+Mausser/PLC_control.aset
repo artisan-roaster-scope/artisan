@@ -38,8 +38,8 @@ extradevicecolor2=#000000, #45a6cf, #49b360, #49b360
 extradevices=80, 81, 82, 110
 extramathexpression1=, , , 
 extramathexpression2=, , , 
-extraname1=IT, Power, Gas hPA, Cooling
-extraname2=AT, Air, Drum hPA, Drum
+extraname1=IT, Power, Gas mbar, Cooling
+extraname2=AT, Air, Drum Pa, Drum
 
 [ExtraEventButtons]
 buttonlistmaxlen=14

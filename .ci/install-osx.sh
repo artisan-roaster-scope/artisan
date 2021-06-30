@@ -5,6 +5,8 @@ set -ex # reduced logging
 
 #.ci/slience.sh brew update # this seems to help to work around some homebrew issues; and fails on others
 
+brew install gdbm
+
 # Python 3.7.5 is installed by default
 # to update use either:
 #brew upgrade python
