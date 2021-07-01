@@ -26,6 +26,7 @@
 import sys
 import os
 import shelve
+import dbm
 import portalocker
 from pathlib import Path
 
@@ -36,9 +37,11 @@ from plus import config, util
 register_semaphore = QSemaphore(1)
 
 uuid_cache_path = util.getDirectory(config.uuid_cache,share=True)
+uuid_cache_path_lock = util.getDirectory(config.uuid_cache + "_lock",share=True)
 
 
 def addPathShelve(uuid,path,fh):
+    config.logger.debug("register: addPathShelve(%s,%s,_fh_)",uuid,path)
     try:
         with shelve.open(uuid_cache_path) as db:
             db[uuid] = str(path)
@@ -51,7 +54,9 @@ def addPathShelve(uuid,path,fh):
             config.logger.info("register: clean uuid cache %s",str(uuid_cache_path))
             # note that this deletes all "uuid" files including those for the Viewer and other files of that name prefix like uuid.db.org!!
             for p in Path(Path(uuid_cache_path).parent).glob("{}*".format(config.uuid_cache)):
-                p.unlink()
+                if str(p) != uuid_cache_path_lock:
+                    # if not the lock file, delete:
+                    p.unlink()
             # try again to acccess/create the shelve file
             with shelve.open(uuid_cache_path) as db:
                 db[uuid] = str(path)
@@ -64,12 +69,12 @@ def addPathShelve(uuid,path,fh):
 
 # register the path for the given uuid, assuming it points to the .alog profile containing that uuid
 def addPath(uuid,path):
+    config.logger.debug("register: addPath(%s,%s)",uuid,path)
     try:
         register_semaphore.acquire(1)
         config.logger.debug("register:addPath(%s,%s)",str(uuid),str(path))
-        with portalocker.Lock(uuid_cache_path, timeout=0.5) as fh:
+        with portalocker.Lock(uuid_cache_path_lock, timeout=0.5) as fh:
             addPathShelve(uuid,path,fh)
-        portalocker.unlock(uuid_cache_path)
     except portalocker.exceptions.LockException as e:
         _, _, exc_tb = sys.exc_info()
         config.logger.info("register: LockException in addPath(%s,%s) line: %s %s",str(uuid),str(path),exc_tb.tb_lineno,e)
@@ -77,11 +82,10 @@ def addPath(uuid,path):
         # we remove the lock file and retry with a shorter timeout
         try:
             config.logger.info("register: clean lock %s",str(uuid_cache_path))
-            Path(uuid_cache_path).unlink()  # the lock file is not called *_lock for the uuid register as for the sync and account locks!
+            Path(uuid_cache_path_lock).unlink()
             config.logger.debug("retry register:addPath(%s,%s)",str(uuid),str(path))
-            with portalocker.Lock(uuid_cache_path, timeout=0.3) as fh:
+            with portalocker.Lock(uuid_cache_path_lock, timeout=0.3) as fh:
                 addPathShelve(uuid,path,fh)
-            portalocker.unlock(uuid_cache_path)
         except portalocker.exceptions.LockException as e:
             _, _, exc_tb = sys.exc_info()
             config.logger.error("register: LockException in addPath(%s,%s) line: %s %s",str(uuid),str(path),exc_tb.tb_lineno,e)
@@ -97,10 +101,11 @@ def addPath(uuid,path):
     
 # returns None if given uuid is not registered, otherwise the registered path
 def getPath(uuid):
+    config.logger.debug("register: getPath(%s)",uuid)
     try:
         register_semaphore.acquire(1)
         config.logger.debug("register:getPath(%s)",str(uuid))
-        with portalocker.Lock(uuid_cache_path, timeout=0.5) as fh:
+        with portalocker.Lock(uuid_cache_path_lock, timeout=0.5) as fh:
             try:
                 with shelve.open(uuid_cache_path) as db:
                     try:
@@ -114,17 +119,16 @@ def getPath(uuid):
             finally:
                 fh.flush()
                 os.fsync(fh.fileno())
-        portalocker.unlock(uuid_cache_path)
     except portalocker.exceptions.LockException as e:
         _, _, exc_tb = sys.exc_info()
         config.logger.info("register: LockException in getPath(%s) line: %s %s",uuid,exc_tb.tb_lineno,e)
         # we couldn't fetch this lock. It seems to be blocked forever (from a crash?)
         # we remove the lock file and retry with a shorter timeout
         try:
-            config.logger.info("register: clean lock %s",str(uuid_cache_path))
-            Path(uuid_cache_path).unlink()
+            config.logger.info("register: clean lock %s",str(uuid_cache_path_lock))
+            Path(uuid_cache_path_lock).unlink()
             config.logger.debug("retry register:getPath(%s)",str(uuid))
-            with portalocker.Lock(uuid_cache_path, timeout=0.3) as fh:
+            with portalocker.Lock(uuid_cache_path_lock, timeout=0.3) as fh:
                 try:
                     with shelve.open(uuid_cache_path) as db:
                         try:
@@ -138,7 +142,6 @@ def getPath(uuid):
                 finally:
                     fh.flush()
                     os.fsync(fh.fileno())
-            portalocker.unlock(uuid_cache_path)
         except portalocker.exceptions.LockException as e:
             _, _, exc_tb = sys.exc_info()
             config.logger.error("register: LockException in getPath(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
@@ -158,6 +161,7 @@ def getPath(uuid):
 
 # scanns all .alog files for uuids and registers them in the cache
 def scanDir(path=None):
+    config.logger.debug("register: scanDir(%s)",path)
     try:
         config.logger.debug("register:scanDir(" + str(path) + ")")
         if path is None:

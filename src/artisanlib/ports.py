@@ -27,7 +27,7 @@ from artisanlib.comm import serialport
 from help import modbus_help
 from help import s7_help
 
-from PyQt5.QtCore import (Qt, pyqtSlot, QEvent)
+from PyQt5.QtCore import (Qt, pyqtSlot, QEvent, QSettings)
 from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
                              QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy,
@@ -1587,6 +1587,9 @@ class comportDlg(ArtisanResizeablDialog):
             self.dialogbuttons.button(QDialogButtonBox.Ok)
         else:
             self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        settings = QSettings()
+        if settings.contains("PortsGeometry"):
+            self.restoreGeometry(settings.value("PortsGeometry"))
     
     @pyqtSlot(int)
     def s7_optimize_toggle(self,i):
@@ -1773,10 +1776,12 @@ class comportDlg(ArtisanResizeablDialog):
 
     def closeEvent(self,_):
         self.closeHelp()
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("PortsGeometry",self.saveGeometry())
 
     @pyqtSlot()
     def accept(self):
-        self.closeHelp()
         #validate serial parameter against input errors
         class comportError(Exception): pass
         class timeoutError(Exception): pass
@@ -1807,6 +1812,7 @@ class comportDlg(ArtisanResizeablDialog):
                 self.timeoutEdit.selectAll()
                 self.timeoutEdit.setFocus()
                 return
+        self.closeEvent(None)
         QDialog.accept(self)
 
     def closeserialports(self):

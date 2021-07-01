@@ -29,7 +29,7 @@ from artisanlib.widgets import MyQComboBox
 from help import programs_help
 from help import symbolic_help
 
-from PyQt5.QtCore import (Qt, pyqtSlot, QSettings,)
+from PyQt5.QtCore import (Qt, pyqtSlot, QSettings)
 from PyQt5.QtGui import (QStandardItem, QColor)
 from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
                              QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,
@@ -1902,20 +1902,24 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setextracolor(): {0}").format(str(e)),exc_tb.tb_lineno)
 
+
+    def close(self):
+        self.closeHelp()
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("DeviceAssignmentGeometry",self.saveGeometry()) 
+        self.aw.DeviceAssignmentDlg_activeTab = self.TabWidget.currentIndex()
+        self.aw.closeEventSettings() # save all app settings
+    
     @pyqtSlot()
     def cancelEvent(self):
         self.aw.DeviceAssignmentDlg_activeTab = self.TabWidget.currentIndex()
-        self.closeHelp()
+        self.close()
         self.reject()
 
     @pyqtSlot()
     def okEvent(self):
         try:
-            self.closeHelp()
-            settings = QSettings()
-            #save window geometry
-            settings.setValue("DeviceAssignmentGeometry",self.saveGeometry()) 
-            self.aw.DeviceAssignmentDlg_activeTab = self.TabWidget.currentIndex()
         
             self.aw.qmc.device_logging = self.deviceLoggingFlag.isChecked()
             
@@ -2883,7 +2887,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             #if device is not None or not external-program (don't need serial settings config)
             if not(self.aw.qmc.device in self.aw.qmc.nonSerialDevices):
                 self.aw.setcommport()
-            #self.close()
+            self.close()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " device accept(): {0}").format(str(e)),exc_tb.tb_lineno)

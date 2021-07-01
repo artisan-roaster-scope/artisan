@@ -612,6 +612,7 @@ class WindowsDlg(ArtisanDialog):
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue("AxisPosition",self.frameGeometry().topLeft())
+        self.aw.closeEventSettings()
         super(WindowsDlg,self).close()
 
     @pyqtSlot(bool)

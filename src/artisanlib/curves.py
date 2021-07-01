@@ -2476,7 +2476,8 @@ class HUDDlg(ArtisanDialog):
         self.aw.qmc.updateDeltaSamples()
         self.aw.qmc.redraw(recomputeAllDeltas=True)
         self.aw.clearMessageLine() #clears plotter possible exceptions if Cancel
-        self.accept()
+        
+        self.reject()
 
     #button OK
     @pyqtSlot()
@@ -2552,4 +2553,5 @@ class HUDDlg(ArtisanDialog):
         self.aw.qmc.resetdeltalines()
         self.aw.qmc.resetlines()
         self.aw.qmc.redraw(recomputeAllDeltas=True)
+        self.aw.closeEventSettings()
         self.accept()

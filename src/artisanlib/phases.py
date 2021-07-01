@@ -310,6 +310,7 @@ class phasesGraphDlg(ArtisanDialog):
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue("PhasesPosition",self.frameGeometry().topLeft())
+        self.aw.closeEventSettings()
         self.accept()
 
     @pyqtSlot()

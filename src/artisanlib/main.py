@@ -9156,6 +9156,7 @@ class tgraphcanvas(FigureCanvas):
                 self.backgrounddeltabtcolor = str(dialog.bgdeltabtButton.text())
                 self.backgroundxtcolor = str(dialog.bgextraButton.text())
                 self.backgroundytcolor = str(dialog.bgextra2Button.text())
+                aw.closeEventSettings()
             #deleteLater() will not work here as the dialog is still bound via the parent
             #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
             # the following will immedately release the memory dispite this parent link
@@ -9887,7 +9888,7 @@ class tgraphcanvas(FigureCanvas):
         # close Yocto Relay Outputs
         aw.ser.yoctoRELclose()
         # close Yocto Servo Outputs
-        aw.ser.yoctoSRERVOclose()
+        aw.ser.yoctoSERVOclose()
         # close Yocto PWM Outputs
         aw.ser.yoctoPWMclose()
 
@@ -11054,6 +11055,15 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.batchcounter -= 1 # we decrease the batch counter
             # set the batchcounter of the current profile
             aw.qmc.roastbatchnr = 0
+            # store updated batchcounter immediately in the app settings
+            try:
+                app_settings = QSettings()
+                app_settings.beginGroup("Batch")
+                app_settings.setValue("batchcounter",aw.qmc.batchcounter)
+                app_settings.setValue("batchsequence",aw.qmc.batchsequence)
+                app_settings.endGroup()
+            except Exception:
+                pass
             # decr. the batchcounter of the loaded app settings
             if aw.settingspath and aw.settingspath != "":
                 try:
@@ -11064,6 +11074,7 @@ class tgraphcanvas(FigureCanvas):
                         bprefix = toString(settings.value("batchprefix",aw.qmc.batchprefix))
                         if bc > -1 and bc == aw.qmc.batchcounter+1 and aw.qmc.batchprefix == bprefix:
                             settings.setValue("batchcounter",bc - 1)
+                            settings.setValue("batchsequence",aw.qmc.batchsequence)
                     settings.endGroup()
                 except Exception:
                     aw.settingspath = ""
@@ -11078,6 +11089,8 @@ class tgraphcanvas(FigureCanvas):
             else:
                 aw.qmc.batchsequence += 1
             aw.qmc.roastbatchpos = aw.qmc.batchsequence
+        # update lastroastepoch to time of roastdate
+        aw.qmc.lastroastepoch = aw.qmc.roastepoch
         # set roastbatchpos
         if aw.qmc.batchcounter > -1 and not bool(aw.simulator):
             aw.qmc.batchcounter += 1 # we increase the batch counter
@@ -11085,6 +11098,16 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.roastbatchnr = aw.qmc.batchcounter
             # set the batchprefix of the current profile
             aw.qmc.roastbatchprefix = aw.qmc.batchprefix
+            # store updated batchcounter immediately in the app settings
+            try:
+                app_settings = QSettings()
+                app_settings.beginGroup("Batch")
+                app_settings.setValue("batchcounter",aw.qmc.batchcounter)
+                app_settings.setValue("batchsequence",aw.qmc.batchsequence)
+                app_settings.setValue("lastroastepoch",aw.qmc.lastroastepoch)
+                app_settings.endGroup()
+            except Exception:
+                pass
             # incr. the batchcounter of the loaded app settings
             if aw.settingspath and aw.settingspath != "":
                 try:
@@ -11095,14 +11118,14 @@ class tgraphcanvas(FigureCanvas):
                         bprefix = toString(settings.value("batchprefix",aw.qmc.batchprefix))
                         if bc > -1 and aw.qmc.batchprefix == bprefix:
                             settings.setValue("batchcounter",aw.qmc.batchcounter)
+                            settings.setValue("batchsequence",aw.qmc.batchsequence)
+                            settings.setValue("lastroastepoch",aw.qmc.lastroastepoch)
                     settings.endGroup()
                 except Exception:
                     aw.settingspath = ""
         else: # batch counter system inactive
             # set the batchcounter of the current profiles
             aw.qmc.roastbatchnr = 0
-        # update lastroastepoch to time of roastdate
-        aw.qmc.lastroastepoch = aw.qmc.roastepoch
 
     # action of the EVENT button
     @pyqtSlot(bool)
@@ -28311,7 +28334,7 @@ class ApplicationWindow(QMainWindow):
                         aw.updateCanvasColors()
                     # remove window geometry settings
                     for s in ["RoastGeometry","FlavorProperties","CalculatorGeometry","EventsGeometry", "CompareGeometry",
-                        "BackgroundGeometry","LCDGeometry","DeltaLCDGeometry","ExtraLCDGeometry","PhasesLCDGeometry","AlarmsGeometry","DeviceAssignmentGeometry",
+                        "BackgroundGeometry","LCDGeometry","DeltaLCDGeometry","ExtraLCDGeometry","PhasesLCDGeometry","AlarmsGeometry","DeviceAssignmentGeometry","PortsGeometry",
                         "TransformatorPosition", "CurvesPosition", "StatisticsPosition", "AxisPosition","PhasesPosition", "BatchPosition",
                         "SamplingPosition", "autosaveGeometry", "PIDPosition", "DesignerPosition"]:
                         settings.remove(s)
@@ -34282,6 +34305,7 @@ class ApplicationWindow(QMainWindow):
             #print(sip.isdeleted(dialog))
         except:
             pass
+        self.closeEventSettings() # save all app settings
 
     def toggleHottopControl(self):
         if self.HottopControlActive:
@@ -34911,7 +34935,6 @@ class ApplicationWindow(QMainWindow):
         if self.editgraphdialog != False: # Roast Properties dialog is not blocked!
             self.editgraphdialog = editGraphDlg(self,self,self.editGraphDlg_activeTab)
             self.editgraphdialog.show()
-            self.editgraphdialog = None
 
     @pyqtSlot()
     @pyqtSlot(bool)

@@ -3045,6 +3045,7 @@ class EventsDlg(ArtisanResizeablDialog):
                 self.aw.updateSlidersProperties() # set visibility and event names on slider widgets
             #save special event annotations
             self.saveAnnotationsSettings()
+            self.aw.closeEventSettings()
         except Exception as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)

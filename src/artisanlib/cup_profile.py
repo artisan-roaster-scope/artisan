@@ -303,4 +303,5 @@ class flavorDlg(ArtisanResizeablDialog):
         self.aw.redrawOnResize = True
         self.aw.qmc.redraw(recomputeAllDeltas=False)
         self.aw.showControls()
+        self.aw.closeEventSettings() # save all app settings
         self.accept()

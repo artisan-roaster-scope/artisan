@@ -83,7 +83,8 @@ class SamplingDlg(ArtisanDialog):
             self.move(settings.value("SamplingPosition"))
         
         layout.setSizeConstraint(QLayout.SetFixedSize)
-        
+    
+    #window close box
     def closeEvent(self,_):
         self.close()
         
@@ -93,11 +94,13 @@ class SamplingDlg(ArtisanDialog):
         self.aw.qmc.delay = self.org_delay
         self.aw.qmc.flagKeepON = self.org_flagKeepON
         self.aw.qmc.flagOpenCompleted = self.org_flagOpenCompleted
+        self.storeSettings()
+        self.reject()
+    
+    def storeSettings(self):
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue("SamplingPosition",self.frameGeometry().topLeft())
-        self.accept()
-        self.reject()
     
     #ok button
     @pyqtSlot()
@@ -106,9 +109,8 @@ class SamplingDlg(ArtisanDialog):
         self.aw.qmc.flagOpenCompleted = bool(self.openCompletedFlag.isChecked())
         self.aw.qmc.delay = int(self.interval.value()*1000.)
         if self.aw.qmc.delay < self.aw.qmc.default_delay:
-            QMessageBox.warning(self.aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None))  
-        #save window position (only; not size!)
-        settings = QSettings()
-        settings.setValue("SamplingPosition",self.frameGeometry().topLeft())      
+            QMessageBox.warning(self.aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None)) 
+        self.storeSettings() 
+        self.aw.closeEventSettings()
         self.accept()
 

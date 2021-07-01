@@ -49,8 +49,8 @@ account_cache_lock_path = util.getDirectory(config.account_cache + "_lock",share
 # returns the number associated to account_id or None on error
 def setAccount(account_id):
     try:
-        config.logger.debug("account:setAccount(%s)",str(account_id))
         account_cache_semaphore.acquire(1)
+        config.logger.debug("account:setAccount(%s)",str(account_id))
         with portalocker.Lock(account_cache_lock_path, timeout=0.5) as fh:
             try:
                 with shelve.open(account_cache_path) as db:
