@@ -2,7 +2,7 @@
 layout: single
 permalink: /machines/typhoon/
 title: "Typhoon"
-excerpt: "2/3/4/9kg"
+excerpt: "2.5/3/5/9kg"
 header:
   overlay_image: /assets/images/typhoon2.jpg
   image: /assets/images/typhoon2.jpg
