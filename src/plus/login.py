@@ -62,14 +62,15 @@ class Login(ArtisanDialog):
             pass
         self.dialogbuttons.button(QDialogButtonBox.Cancel).addActions([cancelAction])
         
-        self.textName = QLineEdit(self)
-        self.textName.setPlaceholderText(QApplication.translate("Plus","Email",None))
-        if email is not None:
-            self.textName.setText(email)
-        self.textName.textChanged.connect(self.textChanged)
         self.textPass = QLineEdit(self)
         self.textPass.setEchoMode(QLineEdit.Password)
         self.textPass.setPlaceholderText(QApplication.translate("Plus","Password",None))
+        
+        self.textName = QLineEdit(self)
+        self.textName.setPlaceholderText(QApplication.translate("Plus","Email",None))
+        self.textName.textChanged.connect(self.textChanged)
+        if email is not None:
+            self.textName.setText(email)
         
         self.textPass.textChanged.connect(self.textChanged)
                 
@@ -104,12 +105,14 @@ class Login(ArtisanDialog):
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(5)
         
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocusPolicy(Qt.StrongFocus)
+        
         if saved_password is not None:
             self.passwd = saved_password
             self.textPass.setText(self.passwd)
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(True)
             self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(False)
             self.dialogbuttons.button(QDialogButtonBox.Ok).setDefault(True)
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(True)
         
     @pyqtSlot()
     def reject(self):
@@ -120,14 +123,17 @@ class Login(ArtisanDialog):
     def rememberCheckChanged(self,i):
         self.remember = bool(i)
     
-    @pyqtSlot(str)
-    def textChanged(self,_):
+    def isInputReasonable(self):
         login = self.textName.text()
         passwd = self.textPass.text()
-        if len(passwd) >= config.min_passwd_len and len(login) >= config.min_login_len and "@" in login and "." in login:
+        return len(passwd) >= config.min_passwd_len and len(login) >= config.min_login_len and "@" in login and "." in login
+    
+    @pyqtSlot(str)
+    def textChanged(self,_):
+        if self.isInputReasonable():
             self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(False)
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(True)
             self.dialogbuttons.button(QDialogButtonBox.Ok).setDefault(True)
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(True)
         else:
             self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(True)
             self.dialogbuttons.button(QDialogButtonBox.Ok).setDefault(False)

@@ -45,6 +45,7 @@ def addPathShelve(uuid,path,fh):
     try:
         with shelve.open(uuid_cache_path) as db:
             db[uuid] = str(path)
+        config.logger.debug("register: DB type: %s", str(dbm.whichdb(uuid_cache_path)))
     except Exception as e:
         _, _, exc_tb = sys.exc_info()
         config.logger.error("register: Exception in addPathShelve(%s,%s) line: %s shelve.open (1) %s",str(uuid),str(path),exc_tb.tb_lineno,e)
@@ -109,7 +110,9 @@ def getPath(uuid):
             try:
                 with shelve.open(uuid_cache_path) as db:
                     try:
-                        return str(db[uuid])
+                        res_path = str(db[uuid])
+                        config.logger.debug("register:getPath(%s): %s",str(uuid),res_path)
+                        return res_path
                     except:
                         return None
             except Exception as e:
@@ -132,7 +135,9 @@ def getPath(uuid):
                 try:
                     with shelve.open(uuid_cache_path) as db:
                         try:
-                            return str(db[uuid])
+                            res_path = str(db[uuid])    
+                            config.logger.debug("register:getPath(%s): %s",str(uuid),res_path)
+                            return res_path
                         except:
                             return None
                 except Exception as e:

@@ -34,6 +34,8 @@ from artisanlib import __build__
 #import keyring.backends.kwallet
 #import keyring.backends.multi
 
+import threading
+
 
 import platform
 if platform.system().startswith("Windows") or platform.system() == 'Darwin':
@@ -112,7 +114,7 @@ def toggle(app_window):
                     if app_window.qmc.checkSaved(allow_discard=False):
                         queue.addRoast()
             else:
-                connect(True) # we try to re-connect and disconnect on failure
+                disconnect(remove_credentials = False, stop_queue = True, interactive = True, keepON=False)
 
 # if clear_on_failure is set, credentials are removed if connect fails
 def connect(clear_on_failure=False,interactive=True):
@@ -125,7 +127,9 @@ def connect(clear_on_failure=False,interactive=True):
                 account = config.app_window.plus_account
                 if account is None:
                     account = config.app_window.plus_email
-                    interactive = True
+                    if isinstance(threading.current_thread(), threading._MainThread):
+                        # this is dangerous and should only be done while running in the main GUI thread as a consequence are GUI actions which might crash in other threads
+                        interactive = True
                 if account is not None: # @UndefinedVariable
                     try:
                         # try-catch as the keyring might not work
@@ -158,17 +162,17 @@ def connect(clear_on_failure=False,interactive=True):
                                 config.logger.error("controller: keyring Exception %s",e)
                                 if not platform.system().startswith("Windows") and platform.system() != 'Darwin':
                                     # on Linux remind to install the gnome-keyring
-                                    config.app_window.sendmessage(QApplication.translate("Plus","Keyring error: Ensure that gnome-keyring is installed.",None)) # @UndefinedVariable 
+                                    config.app_window.sendmessageSignal.emit(QApplication.translate("Plus","Keyring error: Ensure that gnome-keyring is installed.",None),True,None) # @UndefinedVariable 
                         config.passwd = passwd # remember password in memory for this session
             if config.app_window.plus_account is None: # @UndefinedVariable
                 if interactive:
-                    config.app_window.sendmessage(QApplication.translate("Plus","Login aborted",None)) # @UndefinedVariable
+                    config.app_window.sendmessageSignal.emit(QApplication.translate("Plus","Login aborted",None),True,None) # @UndefinedVariable
             else:
                 success = connection.authentify()
                 if success:
                     config.connected = success
-                    config.app_window.sendmessage(config.app_window.plus_account + " " + QApplication.translate("Plus","authentified",None)) # @UndefinedVariable
-                    config.app_window.sendmessage(QApplication.translate("Plus","Connected to artisan.plus",None))  # @UndefinedVariable
+                    config.app_window.sendmessageSignal.emit(config.app_window.plus_account + " " + QApplication.translate("Plus","authentified",None),True,None) # @UndefinedVariable
+                    config.app_window.sendmessageSignal.emit(QApplication.translate("Plus","Connected to artisan.plus",None),True,None)  # @UndefinedVariable
                     config.logger.info("Artisan v%s (%s, %s) connected",str(__version__),str(__revision__),str(__build__))
                     try:
                         queue.start() # start the outbox queue
@@ -181,27 +185,27 @@ def connect(clear_on_failure=False,interactive=True):
                 else:
                     if clear_on_failure:
                         connection.clearCredentials()
-                        config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus turned off",None))  # @UndefinedVariable
+                        config.app_window.sendmessageSignal.emit(QApplication.translate("Plus","artisan.plus turned off",None),True,None)  # @UndefinedVariable
                     elif interactive:
                         message = QApplication.translate("Plus","Authentication failed",None)
                         if not config.app_window.plus_account is None: # @UndefinedVariable
                             message = config.app_window.plus_account + " " + message # @UndefinedVariable
-                        config.app_window.sendmessage(message) # @UndefinedVariable
+                        config.app_window.sendmessageSignal.emit(message,True,None) # @UndefinedVariable
         except Exception as e:
             if interactive:
                 config.logger.error("controller: connect Exception %s",e)
             if clear_on_failure:
                 connection.clearCredentials()
                 if interactive:
-                    config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus turned off",None)) # @UndefinedVariable
+                    config.app_window.sendmessageSignal.emit(QApplication.translate("Plus","artisan.plus turned off",None),True,None)
             else:
                 if interactive:
-                    config.app_window.sendmessage(QApplication.translate("Plus","Couldn't connect to artisan.plus",None)) # @UndefinedVariable
+                    config.app_window.sendmessageSignal.emit(QApplication.translate("Plus","Couldn't connect to artisan.plus",None),True,None)
                 config.connected = False
         finally:
             if connect_semaphore.available() < 1:
                 connect_semaphore.release(1)
-        config.app_window.updatePlusStatus() # @UndefinedVariable
+        config.app_window.updatePlusStatusSignal.emit() # @UndefinedVariable
         if interactive and is_connected():
             stock.update()
 
@@ -218,8 +222,8 @@ def disconnect_confirmed():
 
 # if keepON is set (the default), the credentials are not removed at all and just the connected flag is toggled to keep plus in ON (dark-grey) state
 def disconnect(remove_credentials = True, stop_queue = True, interactive = False, keepON=True):
-    config.logger.info("controller:disconnect(%s,%s)",remove_credentials,stop_queue)
-    if is_connected() and (not interactive or disconnect_confirmed()):
+    config.logger.info("controller:disconnect(%s,%s,%s,%s)",remove_credentials,stop_queue,interactive,keepON)
+    if (is_connected() or is_on()) and (not interactive or disconnect_confirmed()):
         try:
             connect_semaphore.acquire(1)
             # disconnect
@@ -228,15 +232,15 @@ def disconnect(remove_credentials = True, stop_queue = True, interactive = False
             if not keepON:
                 connection.clearCredentials(remove_from_keychain=remove_credentials)
             if remove_credentials:
-                config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus turned off",None)) # @UndefinedVariable
+                config.app_window.sendmessageSignal.emit(QApplication.translate("Plus","artisan.plus turned off",None),True,None)
             else:
-                config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus disconnected",None)) # @UndefinedVariable
+                config.app_window.sendmessageSignal.emit(QApplication.translate("Plus","artisan.plus disconnected",None),True,None)
             if stop_queue:
                 queue.stop() # stop the outbox queue
         finally:
             if connect_semaphore.available() < 1:
                 connect_semaphore.release(1)
-        config.app_window.updatePlusStatus() # @UndefinedVariable 
+        config.app_window.updatePlusStatusSignal.emit() # @UndefinedVariable
         
 def reconnected():
     if not is_connected():
@@ -247,7 +251,7 @@ def reconnected():
         finally:
             if connect_semaphore.available() < 1:
                 connect_semaphore.release(1)
-        config.app_window.updatePlusStatus() # @UndefinedVariable
+        config.app_window.updatePlusStatusSignal.emit() # @UndefinedVariable
         if is_connected():
             queue.start() # restart the outbox queue
     

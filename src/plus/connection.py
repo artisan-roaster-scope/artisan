@@ -179,6 +179,7 @@ def authentify():
                 config.logger.debug("connection: -> authentifying %s",config.app_window.plus_account) # @UndefinedVariable
                 data = {"email":config.app_window.plus_account,"password": config.passwd} # @UndefinedVariable
                 r = postData(config.auth_url,data,False)
+                config.logger.debug("connection: -> authentifying reply status code: %s",r.status_code) # @UndefinedVariable
                 # returns 404: login wrong and 401: passwd wrong
                 res = r.json()
                 if "success" in res and res["success"] and "result" in res and "user" in res["result"] and "token" in res["result"]["user"]:

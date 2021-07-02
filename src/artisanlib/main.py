@@ -11886,7 +11886,7 @@ class tgraphcanvas(FigureCanvas):
             energymetrics = {}
             btu_list = []
             if len(self.timex) == 0:
-                aw.sendmessage(QApplication.translate("Message","No profile data", None),append=False)
+                #aw.sendmessage(QApplication.translate("Message","No profile data", None),append=False)
                 return energymetrics, btu_list
 
             # helping function
@@ -11916,7 +11916,7 @@ class tgraphcanvas(FigureCanvas):
                 prev_loadtime = [self.timex[self.timeindex[6]]]*4
             else:
                 prev_loadtime = [self.timex[-1]]*4
-                aw.sendmessage(QApplication.translate("Message","Profile has no DROP event", None),append=False)
+                #aw.sendmessage(QApplication.translate("Message","Profile has no DROP event", None),append=False)
                     
             for i in range(0,4):
                 # iterate specialevents in reverse from DROP to the first event
@@ -11967,7 +11967,7 @@ class tgraphcanvas(FigureCanvas):
                         duration = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
                     else:
                         duration = 0
-                        aw.sendmessage(QApplication.translate("Message","Missing CHARGE or DROP event", None),append=False)
+                        #aw.sendmessage(QApplication.translate("Message","Missing CHARGE or DROP event", None),append=False)
                     load_pct = toInt(self.loadevent_hundpcts[i])  #needed only for the btu_list and outmsg
                     if self.presssure_percents[i] and self.sourcetypes[i] in [0,1]:   # gas loads only
                         # convert pressure to heat
@@ -12158,7 +12158,7 @@ class tgraphcanvas(FigureCanvas):
         coolDuration = 0
         try:    
             if len(self.timex) == 0:
-                aw.sendmessage(QApplication.translate("Message","No profile data", None),append=False)
+                #aw.sendmessage(QApplication.translate("Message","No profile data", None),append=False)
                 return [-1]*4, [-1]*4, 0, 0
 
             def getEnergy(i,j,duration): 

@@ -87,6 +87,8 @@ class ArtisanDialog(QDialog):
         modifiers = event.modifiers()
         if key == 16777216 or (key == 87 and modifiers == Qt.ControlModifier): #ESCAPE or CMD-W
             self.close()
+        else:
+            super(ArtisanDialog, self).keyPressEvent(event)
 
 class ArtisanResizeablDialog(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
