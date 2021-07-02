@@ -11,3 +11,7 @@ src/Artisan.app/
 src/.settings/
 src/translations copy/
 src/Artisan-10.6.app/
+src/.project
+src/.pydevproject
+src/artisan-mac-2.4.5-beta.dmg
+src/artisan-mac-2.4.5.dmg
