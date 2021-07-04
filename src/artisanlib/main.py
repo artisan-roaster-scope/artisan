@@ -6401,10 +6401,6 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.graphfont in [1,9]: # if selected font is Humor we translate the unicode title into pure ascii
                 backgroundtitle = toASCII(backgroundtitle)
             backgroundtitle = "\n" + aw.qmc.abbrevString(backgroundtitle,30)
-        elif __release_sponsor_domain__:
-            sponsor = QApplication.translate("About","sponsored by {}",None).format(__release_sponsor_domain__)
-            backgroundtitle = "\n{}".format(sponsor)
-
             
         st_artist = self.fig.suptitle(backgroundtitle,
                 horizontalalignment="right",verticalalignment="top",
@@ -6629,12 +6625,15 @@ class tgraphcanvas(FigureCanvas):
                     any(aw.extraDelta2[:len(self.extratimex)]))
 
                 titleB = ""
-                if self.backgroundprofile != None and not ((aw.qmc.flagstart and not aw.qmc.title_show_always) or self.title is None or self.title.strip() == ""):
-                    if self.roastbatchnrB == 0:
-                        titleB = self.titleB
-                    else:
-                        titleB = self.roastbatchprefixB + str(self.roastbatchnrB) + " " + self.titleB
-                self.setProfileBackgroundTitle(titleB)
+                if not ((aw.qmc.flagstart and not aw.qmc.title_show_always) or self.title is None or self.title.strip() == ""):
+                    if self.backgroundprofile != None:
+                        if self.roastbatchnrB == 0:
+                            titleB = self.titleB
+                        else:
+                            titleB = self.roastbatchprefixB + str(self.roastbatchnrB) + " " + self.titleB
+                    elif __release_sponsor_domain__:
+                        sponsor = QApplication.translate("About","sponsored by {}",None).format(__release_sponsor_domain__)
+                        titleB = "\n{}".format(sponsor)
 
     #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
     #            self.ax.spines['top'].set_color('none')
@@ -8235,6 +8234,7 @@ class tgraphcanvas(FigureCanvas):
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
                     self.fig.canvas.draw_idle()
+                self.setProfileBackgroundTitle(titleB)
 
     def checkOverlap(self, anno, eventno, annotext):
         overlapallowed = max(0,min(aw.qmc.overlappct,100))/100  #the input is validated but this here to prevent any escapes
@@ -37468,6 +37468,9 @@ def main():
                 except Exception:
                     aw.qmc.background = False
                     aw.qmc.backgroundprofile = None
+            if not aw.lastLoadedBackground and not aw.lastLoadedProfile:
+                # redraw once to get geometry right
+                aw.qmc.redraw(False,sampling=False,smooth=aw.qmc.optimalSmoothing)
     except Exception:
         pass
 
