@@ -3,11 +3,11 @@ wheel==0.35.1
 pyserial==3.5 # 3.4
 pymodbus==2.5.2
 python-snap7==1.0 # 0.11
-yoctopuce==1.10.45343
+yoctopuce==1.10.45664
 Phidget22==1.7.20210504
 unidecode==1.2.0 # 1.1.2
 bottle==0.12.19
-qrcode==6.1
+qrcode==7.1
 requests==2.25.1
 requests-file==1.5.1
 pefile==2019.4.18
