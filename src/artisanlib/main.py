@@ -280,12 +280,15 @@ class Artisan(QtSingleApplication):
             pass
 
     # takes a QUrl and interprets it as follows
-    # artisan://roast/<UUID> : loads profile from path associated with the given roast <UUID>
-    # artisan://profile?url=<url>
-    # file://<path>
+    # artisan://roast/<UUID>         : loads profile from path associated with the given roast <UUID>
+    # artisan://template/<UUID>      : loads background profile from path associated with the given roast <UUID>
+    # artisan://profile?url=<url>    : loads proflie from given URL
+    # file://<path>                  : loads file from path
+    #                                  if query is "background" Artisan is not raised to the foreground
+    #                                  if query is "template" and the file has an .alog extension, the profile is loaded as background profile
     def open_url(self, url):
         if not aw.qmc.flagon and not aw.qmc.designerflag and not aw.qmc.wheelflag and aw.qmc.flavorchart_plot is None: # only if not yet monitoring
-            if url.scheme() == "artisan" and url.authority() == 'roast':
+            if url.scheme() == "artisan" and url.authority() in ['roast','template']:
                 # we try to resolve this one into a file URL and recurse
                 roast_UUID = url.toString(QUrl.RemoveScheme | QUrl.RemoveAuthority | QUrl.RemoveQuery | QUrl.RemoveFragment | QUrl.StripTrailingSlash)[1:]
                 if aw.qmc.roastUUID is None or aw.qmc.roastUUID != roast_UUID:
@@ -293,7 +296,10 @@ class Artisan(QtSingleApplication):
                     profile_path = plus.register.getPath(roast_UUID)
                     if profile_path:
                         aw.sendmessage(QApplication.translate("Message","URL open profile: {0}",None).format(profile_path))
-                        self.open_url(QUrl.fromLocalFile(profile_path))
+                        file_url = QUrl.fromLocalFile(profile_path)
+                        if url.authority() == 'template':
+                            file_url.setQuery("template")
+                        self.open_url(file_url)
             elif url.scheme() == "artisan" and url.authority() == 'profile' and url.hasQuery():
                 try:
                     query = QUrlQuery(url.query())
@@ -302,9 +308,14 @@ class Artisan(QtSingleApplication):
                 except Exception:
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
-                    pass                
+                    pass
             elif url.scheme() == "file":
-                if not url.hasQuery() or  url.query() != "background":
+                aw.sendmessage(QApplication.translate("Message","URL open profile from file: {0}",None).format(url.toDisplayString()))
+                url_query = None
+                if url.hasQuery():
+                    url_query = url.query()
+                if url_query is None or url_query != "background":
+                    # by default we raise Artisan to the foreground
                     QTimer.singleShot(20,lambda: self.activateWindow())
                 url.setQuery(None) # remove any query to get a valid file path
                 url.setFragment(None) # remove also any potential fragment
@@ -317,7 +328,10 @@ class Artisan(QtSingleApplication):
                         QTimer.singleShot(20,lambda : aw.comparator.addProfiles([filename]))
                     else:
                         # load Artisan profile on double-click on *.alog file
-                        QTimer.singleShot(20,lambda : aw.loadFile(filename))
+                        if url_query is not None and url_query == "template":
+                            aw.loadBackgroundSignal.emit(filename)
+                        else:
+                            QTimer.singleShot(20,lambda : aw.loadFile(filename))
                 elif file_suffix == "alrm":
                     # load Artisan alarms on double-click on *.alrm file
                     QTimer.singleShot(20,lambda : aw.loadAlarms(filename))
@@ -5577,7 +5591,7 @@ class tgraphcanvas(FigureCanvas):
                 except Exception:
                     pass
 
-                aw.pidcontrol.sv = None
+                #aw.pidcontrol.sv = None
                 aw.fujipid.sv = None
                 aw.qmc.dutycycle = -1
                 aw.qmc.dutycycleTX = 0.
@@ -35973,9 +35987,9 @@ class ApplicationWindow(QMainWindow):
             if filename:
                 if extension not in filename:
                     filename += extension
-                #mpl.rcParams['pdf.fonttype'] = 3   # 3 or 42
-                #mpl.rc('pdf', fonttype=3)
-                    aw.qmc.fig.savefig(filename,
+                    #mpl.rcParams['pdf.fonttype'] = 3   # 3 or 42
+                    #mpl.rc('pdf', fonttype=3)
+                aw.qmc.fig.savefig(filename,
                         transparent=(aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"]=='None'),
                         #bbox_inches='tight',
                         #backend='pgf', # slow and fails on # characters in TeX backend

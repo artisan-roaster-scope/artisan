@@ -1321,6 +1321,8 @@ class PIDcontrol(object):
                 self.pidActive = True
                 self.aw.qmc.pid.on()
                 self.aw.button_10.setStyleSheet(self.aw.pushbuttonstyles["PIDactive"])
+            if self.sv is None:
+                self.setSV(self.svValue)
 
     def pidOff(self):
         self.aw.sendmessage(QApplication.translate("Message","PID OFF", None))
