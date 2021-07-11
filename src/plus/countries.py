@@ -291,8 +291,8 @@ QApplication.translate("Countries","Zambia", None)
 QApplication.translate("Countries","Zimbabwe", None)
 
 # those lead to issues in the translation system due to the accent characters and are thus left out from translations for now
-#QApplication.translate("Countries","Curaçao", None)
-#QApplication.translate("Countries","Galápagos", None)
-#QApplication.translate("Countries","Saint Barthélemy", None)
-#QApplication.translate("Countries","Réunion", None)
-#QApplication.translate("Countries","São Tomé", None)
+QApplication.translate("Countries","Curaçao", None)
+QApplication.translate("Countries","Galápagos", None)
+QApplication.translate("Countries","Saint Barthélemy", None)
+QApplication.translate("Countries","Réunion", None)
+QApplication.translate("Countries","São Tomé", None)
