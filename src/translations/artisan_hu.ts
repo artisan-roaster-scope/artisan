@@ -3657,31 +3657,6 @@ Extra eszköz</translation>
         <source>USA</source>
         <translation></translation>
     </message>
-    <message encoding="UTF-8">
-        <location filename="../plus/countries.py" line="294"/>
-        <source>Curaçao</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message encoding="UTF-8">
-        <location filename="../plus/countries.py" line="295"/>
-        <source>Galápagos</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message encoding="UTF-8">
-        <location filename="../plus/countries.py" line="296"/>
-        <source>Saint Barthélemy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message encoding="UTF-8">
-        <location filename="../plus/countries.py" line="297"/>
-        <source>Réunion</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message encoding="UTF-8">
-        <location filename="../plus/countries.py" line="298"/>
-        <source>São Tomé</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>Dialog</name>

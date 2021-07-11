@@ -12,7 +12,7 @@
 #
 # This file is part of Artisan.
 
-# not sure if the following is strictly needed
+# not sure if the following is strictly needed (might be needed for accent characters in source of translations)
 CODECFORSRC = UTF-8
 CODECFORTR = UTF-8
 

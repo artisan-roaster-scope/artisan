@@ -3638,16 +3638,6 @@ Dispositivo aggiuntivo</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="84"/>
-        <source>Cura&#xe7;ao</source>
-        <translation type="obsolete">Curacao</translation>
-    </message>
-    <message>
-        <location filename="../plus/countries.py" line="208"/>
-        <source>R&#xe9;union</source>
-        <translation type="obsolete">Riunione</translation>
-    </message>
-    <message>
         <location filename="../plus/countries.py" line="36"/>
         <source>ANI</source>
         <translation></translation>
@@ -3746,31 +3736,6 @@ Dispositivo aggiuntivo</translation>
         <location filename="../plus/countries.py" line="278"/>
         <source>USA</source>
         <translation></translation>
-    </message>
-    <message encoding="UTF-8">
-        <location filename="../plus/countries.py" line="294"/>
-        <source>Curaçao</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message encoding="UTF-8">
-        <location filename="../plus/countries.py" line="295"/>
-        <source>Galápagos</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message encoding="UTF-8">
-        <location filename="../plus/countries.py" line="296"/>
-        <source>Saint Barthélemy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message encoding="UTF-8">
-        <location filename="../plus/countries.py" line="297"/>
-        <source>Réunion</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message encoding="UTF-8">
-        <location filename="../plus/countries.py" line="298"/>
-        <source>São Tomé</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
