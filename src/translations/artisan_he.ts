@@ -2434,1184 +2434,1284 @@ Extra Device</source>
         <translation>אנגווילה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="36"/>
+        <location filename="../plus/countries.py" line="37"/>
         <source>Antarctica</source>
         <translation>אנטארקטיקה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="37"/>
+        <location filename="../plus/countries.py" line="38"/>
         <source>Antigua and Barbuda</source>
         <translation>אנטיגואה וברבודה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="38"/>
+        <location filename="../plus/countries.py" line="39"/>
         <source>Argentina</source>
         <translation>ארגנטינה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="39"/>
+        <location filename="../plus/countries.py" line="40"/>
         <source>Armenia</source>
         <translation>אַרְמֶנִיָה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="40"/>
+        <location filename="../plus/countries.py" line="41"/>
         <source>Aruba</source>
         <translation>ארובה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="41"/>
+        <location filename="../plus/countries.py" line="42"/>
         <source>Australia</source>
         <translation>אוֹסטְרַלִיָה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="42"/>
+        <location filename="../plus/countries.py" line="43"/>
         <source>Austria</source>
         <translation>אוֹסְטְרֵיָה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="43"/>
+        <location filename="../plus/countries.py" line="44"/>
         <source>Azerbaijan</source>
         <translation>אזרבייג&apos;ן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="44"/>
+        <location filename="../plus/countries.py" line="45"/>
         <source>Bahamas</source>
         <translation>איי בהאמה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="45"/>
+        <location filename="../plus/countries.py" line="46"/>
         <source>Bahrain</source>
         <translation>בחריין</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="46"/>
+        <location filename="../plus/countries.py" line="48"/>
         <source>Bangladesh</source>
         <translation>בנגלדש</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="47"/>
+        <location filename="../plus/countries.py" line="49"/>
         <source>Barbados</source>
         <translation>ברבדוס</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="48"/>
+        <location filename="../plus/countries.py" line="50"/>
         <source>Belarus</source>
         <translation>בלארוס</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="49"/>
+        <location filename="../plus/countries.py" line="51"/>
         <source>Belgium</source>
         <translation>בלגיה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="50"/>
+        <location filename="../plus/countries.py" line="52"/>
         <source>Belize</source>
         <translation>בליז</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="51"/>
+        <location filename="../plus/countries.py" line="53"/>
         <source>Benin</source>
         <translation>בנין</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="52"/>
+        <location filename="../plus/countries.py" line="54"/>
         <source>Bermuda</source>
         <translation>ברמודה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="53"/>
+        <location filename="../plus/countries.py" line="55"/>
         <source>Bhutan</source>
         <translation>בהוטן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="54"/>
+        <location filename="../plus/countries.py" line="56"/>
         <source>Bolivia</source>
         <translation>בוליביה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="55"/>
+        <location filename="../plus/countries.py" line="57"/>
         <source>Bonaire, Sint Eustatius and Saba</source>
         <translation>בונייר, סינט אוסטאציוס וסבא</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="56"/>
+        <location filename="../plus/countries.py" line="59"/>
         <source>Bosnia and Herzegovina</source>
         <translation>בוסניה והרצגובינה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="57"/>
+        <location filename="../plus/countries.py" line="60"/>
         <source>Botswana</source>
         <translation>בוצואנה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="58"/>
+        <location filename="../plus/countries.py" line="61"/>
         <source>Bouvet Island</source>
         <translation>האי בובוט</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="59"/>
+        <location filename="../plus/countries.py" line="62"/>
         <source>Brazil</source>
         <translation>בְּרָזִיל</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="60"/>
+        <location filename="../plus/countries.py" line="63"/>
         <source>British Indian Ocean Territory</source>
         <translation>הטריטוריה הבריטית באוקיאנוס ההודי</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="61"/>
+        <location filename="../plus/countries.py" line="64"/>
         <source>Brunei Darussalam</source>
         <translation>ברוניי דארוסלאם</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="62"/>
+        <location filename="../plus/countries.py" line="65"/>
         <source>Bulgaria</source>
         <translation>בולגריה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="63"/>
+        <location filename="../plus/countries.py" line="66"/>
         <source>Burkina Faso</source>
         <translation>בורקינה פאסו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="64"/>
+        <location filename="../plus/countries.py" line="67"/>
         <source>Burundi</source>
         <translation>בורונדי</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="65"/>
+        <location filename="../plus/countries.py" line="68"/>
         <source>Cape Verde</source>
         <translation>קייפ ורדה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="66"/>
+        <location filename="../plus/countries.py" line="69"/>
         <source>Cambodia</source>
         <translation>קמבודיה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="67"/>
+        <location filename="../plus/countries.py" line="70"/>
         <source>Cameroon</source>
         <translation>קמרון</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="68"/>
+        <location filename="../plus/countries.py" line="71"/>
         <source>Canada</source>
         <translation>קנדה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="69"/>
+        <location filename="../plus/countries.py" line="73"/>
         <source>Cayman Islands</source>
         <translation>איי קיימן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="70"/>
+        <location filename="../plus/countries.py" line="74"/>
         <source>Central African Republic</source>
         <translation>הרפובליקה המרכז - אפריקאית</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="71"/>
+        <location filename="../plus/countries.py" line="75"/>
         <source>Chad</source>
         <translation>צ&apos;אד</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="72"/>
+        <location filename="../plus/countries.py" line="76"/>
         <source>Chile</source>
         <translation>צ&apos;ילה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="73"/>
+        <location filename="../plus/countries.py" line="77"/>
         <source>China</source>
         <translation>חרסינה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="74"/>
+        <location filename="../plus/countries.py" line="78"/>
         <source>Christmas Island</source>
         <translation>אי חג המולד</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="75"/>
+        <location filename="../plus/countries.py" line="79"/>
         <source>Cocos (Keeling) Islands</source>
         <translation>איי קוקוס (קילינג)</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="76"/>
+        <location filename="../plus/countries.py" line="80"/>
         <source>Colombia</source>
         <translation>קולומביה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="77"/>
+        <location filename="../plus/countries.py" line="81"/>
         <source>Comoros</source>
         <translation>קומורו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="78"/>
+        <location filename="../plus/countries.py" line="82"/>
         <source>Congo, DR</source>
         <translation>קונגו, ד&quot;ר</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="79"/>
+        <location filename="../plus/countries.py" line="83"/>
         <source>Congo, Republic</source>
         <translation>קונגו, הרפובליקה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="80"/>
+        <location filename="../plus/countries.py" line="84"/>
         <source>Cook Islands</source>
         <translation>איי קוק</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="81"/>
+        <location filename="../plus/countries.py" line="85"/>
         <source>Costa Rica</source>
         <translation>קוסטה ריקה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="82"/>
+        <location filename="../plus/countries.py" line="86"/>
         <source>Croatia</source>
         <translation>קרואטיה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="83"/>
+        <location filename="../plus/countries.py" line="87"/>
         <source>Cuba</source>
         <translation>קובה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="84"/>
+        <location filename="../plus/countries.py" line="88"/>
         <source>Cyprus</source>
         <translation>קַפרִיסִין</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="85"/>
+        <location filename="../plus/countries.py" line="89"/>
         <source>Czechia</source>
         <translation>צ&apos;כיה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="86"/>
+        <location filename="../plus/countries.py" line="90"/>
         <source>Denmark</source>
         <translation>דנמרק</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="87"/>
+        <location filename="../plus/countries.py" line="91"/>
         <source>Djibouti</source>
         <translation>ג&apos;יבוטי</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="88"/>
+        <location filename="../plus/countries.py" line="92"/>
         <source>Dominica</source>
         <translation>דומיניקה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="89"/>
+        <location filename="../plus/countries.py" line="93"/>
         <source>Dominican Republic</source>
         <translation>הרפובליקה הדומיניקנית</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="90"/>
+        <location filename="../plus/countries.py" line="94"/>
         <source>Ecuador</source>
         <translation>אקוודור</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="91"/>
+        <location filename="../plus/countries.py" line="95"/>
         <source>Egypt</source>
         <translation>מִצְרַיִם</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="92"/>
+        <location filename="../plus/countries.py" line="96"/>
         <source>El Salvador</source>
         <translation>אל סלבדור</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="93"/>
+        <location filename="../plus/countries.py" line="97"/>
         <source>Equatorial Guinea</source>
         <translation>גיניאה המשוונית</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="94"/>
+        <location filename="../plus/countries.py" line="98"/>
         <source>Eritrea</source>
         <translation>אריתריאה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="95"/>
+        <location filename="../plus/countries.py" line="99"/>
         <source>Estonia</source>
         <translation>אסטוניה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="96"/>
+        <location filename="../plus/countries.py" line="100"/>
         <source>Eswatini</source>
         <translation>אסווטיני</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="97"/>
+        <location filename="../plus/countries.py" line="101"/>
         <source>Ethiopia</source>
         <translation>אֶתִיוֹפִּיָה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="98"/>
+        <location filename="../plus/countries.py" line="102"/>
         <source>Falkland Islands [Malvinas]</source>
         <translation>איי פוקלנד [Malvinas]</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="99"/>
+        <location filename="../plus/countries.py" line="103"/>
         <source>Faroe Islands</source>
         <translation>איי פרו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="100"/>
+        <location filename="../plus/countries.py" line="104"/>
         <source>Fiji</source>
         <translation>פיג&apos;י</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="101"/>
+        <location filename="../plus/countries.py" line="106"/>
         <source>Finland</source>
         <translation>פינלנד</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="102"/>
+        <location filename="../plus/countries.py" line="107"/>
         <source>France</source>
         <translation>צָרְפַת</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="103"/>
+        <location filename="../plus/countries.py" line="108"/>
         <source>French Guiana</source>
         <translation>גיאנה הצרפתית</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="104"/>
+        <location filename="../plus/countries.py" line="109"/>
         <source>French Polynesia</source>
         <translation>פולינזיה הצרפתית</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="105"/>
+        <location filename="../plus/countries.py" line="110"/>
         <source>French Southern Territories</source>
         <translation>השטחים הדרומיים הצרפתיים</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="106"/>
+        <location filename="../plus/countries.py" line="111"/>
         <source>Gabon</source>
         <translation>גבון</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="107"/>
+        <location filename="../plus/countries.py" line="112"/>
         <source>Gambia</source>
         <translation>גמביה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="108"/>
+        <location filename="../plus/countries.py" line="113"/>
         <source>Georgia</source>
         <translation>ג&apos;ורג&apos;יה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="109"/>
+        <location filename="../plus/countries.py" line="114"/>
         <source>Germany</source>
         <translation>גֶרמָנִיָה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="110"/>
+        <location filename="../plus/countries.py" line="115"/>
         <source>Ghana</source>
         <translation>גאנה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="111"/>
+        <location filename="../plus/countries.py" line="116"/>
         <source>Gibraltar</source>
         <translation>גיברלטר</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="112"/>
+        <location filename="../plus/countries.py" line="117"/>
         <source>Greece</source>
         <translation>יָוָן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="113"/>
+        <location filename="../plus/countries.py" line="118"/>
         <source>Greenland</source>
         <translation>גרינלנד</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="114"/>
+        <location filename="../plus/countries.py" line="119"/>
         <source>Grenada</source>
         <translation>גרנדה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="115"/>
+        <location filename="../plus/countries.py" line="120"/>
         <source>Guadeloupe</source>
         <translation>גוואדלופ</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="116"/>
+        <location filename="../plus/countries.py" line="121"/>
         <source>Guam</source>
         <translation>גואם</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="117"/>
+        <location filename="../plus/countries.py" line="122"/>
         <source>Guatemala</source>
         <translation>גואטמלה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="118"/>
+        <location filename="../plus/countries.py" line="123"/>
         <source>Guernsey</source>
         <translation>גרנזי</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="119"/>
+        <location filename="../plus/countries.py" line="124"/>
         <source>Guinea</source>
         <translation>גינאה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="120"/>
+        <location filename="../plus/countries.py" line="125"/>
         <source>Guinea-Bissau</source>
         <translation>גינאה ביסאו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="121"/>
+        <location filename="../plus/countries.py" line="126"/>
         <source>Guyana</source>
         <translation>גיאנה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="122"/>
+        <location filename="../plus/countries.py" line="127"/>
         <source>Haiti</source>
         <translation>האיטי</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="123"/>
+        <location filename="../plus/countries.py" line="129"/>
         <source>Heard Island and McDonald Islands</source>
         <translation>האי הרד ואיי מקדונלד</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="124"/>
+        <location filename="../plus/countries.py" line="130"/>
         <source>Honduras</source>
         <translation>הונדורס</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="125"/>
+        <location filename="../plus/countries.py" line="131"/>
         <source>Hong Kong</source>
         <translation>הונג קונג</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="126"/>
+        <location filename="../plus/countries.py" line="132"/>
         <source>Hungary</source>
         <translation>הונגריה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="127"/>
+        <location filename="../plus/countries.py" line="133"/>
         <source>Iceland</source>
         <translation>אִיסלַנד</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="128"/>
+        <location filename="../plus/countries.py" line="134"/>
         <source>India</source>
         <translation>הוֹדוּ</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="129"/>
+        <location filename="../plus/countries.py" line="135"/>
         <source>Indonesia</source>
         <translation>אִינדוֹנֵזִיָה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="130"/>
+        <location filename="../plus/countries.py" line="136"/>
         <source>Iran</source>
         <translation>איראן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="131"/>
+        <location filename="../plus/countries.py" line="137"/>
         <source>Iraq</source>
         <translation>עִירַאק</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="132"/>
+        <location filename="../plus/countries.py" line="138"/>
         <source>Ireland</source>
         <translation>אירלנד</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="133"/>
+        <location filename="../plus/countries.py" line="139"/>
         <source>Isle of Man</source>
         <translation>האי מאן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="134"/>
+        <location filename="../plus/countries.py" line="140"/>
         <source>Israel</source>
         <translation>ישראל</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="135"/>
+        <location filename="../plus/countries.py" line="141"/>
         <source>Italy</source>
         <translation>אִיטַלִיָה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="136"/>
+        <location filename="../plus/countries.py" line="142"/>
         <source>Ivory Coast</source>
         <translation>חוף שנהב</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="137"/>
+        <location filename="../plus/countries.py" line="143"/>
         <source>Jamaica</source>
         <translation>ג&apos;מייקה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="138"/>
+        <location filename="../plus/countries.py" line="144"/>
         <source>Japan</source>
         <translation>יפן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="139"/>
+        <location filename="../plus/countries.py" line="146"/>
         <source>Jersey</source>
         <translation>ג&apos;רזי</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="140"/>
+        <location filename="../plus/countries.py" line="147"/>
         <source>Jordan</source>
         <translation>יַרדֵן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="141"/>
+        <location filename="../plus/countries.py" line="148"/>
         <source>Kazakhstan</source>
         <translation>קזחסטן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="142"/>
+        <location filename="../plus/countries.py" line="149"/>
         <source>Kenya</source>
         <translation>קניה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="143"/>
+        <location filename="../plus/countries.py" line="150"/>
         <source>Kiribati</source>
         <translation>קיריבטי</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="144"/>
+        <location filename="../plus/countries.py" line="151"/>
         <source>North Korea</source>
         <translation>צפון קוריאה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="145"/>
+        <location filename="../plus/countries.py" line="152"/>
         <source>South Korea</source>
         <translation>דרום קוריאה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="146"/>
+        <location filename="../plus/countries.py" line="153"/>
         <source>Kuwait</source>
         <translation>כווית</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="147"/>
+        <location filename="../plus/countries.py" line="154"/>
         <source>Kyrgyzstan</source>
         <translation>קירגיזסטן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="148"/>
+        <location filename="../plus/countries.py" line="155"/>
         <source>Laos</source>
         <translation>לאוס</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="149"/>
+        <location filename="../plus/countries.py" line="156"/>
         <source>Latvia</source>
         <translation>לטביה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="150"/>
+        <location filename="../plus/countries.py" line="157"/>
         <source>Lebanon</source>
         <translation>לבנון</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="151"/>
+        <location filename="../plus/countries.py" line="158"/>
         <source>Lesotho</source>
         <translation>לסוטו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="152"/>
+        <location filename="../plus/countries.py" line="159"/>
         <source>Liberia</source>
         <translation>ליבריה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="153"/>
+        <location filename="../plus/countries.py" line="160"/>
         <source>Libya</source>
         <translation>לוב</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="154"/>
+        <location filename="../plus/countries.py" line="161"/>
         <source>Liechtenstein</source>
         <translation>ליכטנשטיין</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="155"/>
+        <location filename="../plus/countries.py" line="162"/>
         <source>Lithuania</source>
         <translation>ליטא</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="156"/>
+        <location filename="../plus/countries.py" line="163"/>
         <source>Luxembourg</source>
         <translation>לוקסמבורג</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="157"/>
+        <location filename="../plus/countries.py" line="164"/>
         <source>Macao</source>
         <translation>מקאו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="158"/>
+        <location filename="../plus/countries.py" line="165"/>
         <source>Macedonia, the former Yugoslav Republic of</source>
         <translation>מקדוניה, הרפובליקה היוגוסלבית לשעבר של</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="159"/>
+        <location filename="../plus/countries.py" line="166"/>
         <source>Madagascar</source>
         <translation>מדגסקר</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="160"/>
+        <location filename="../plus/countries.py" line="167"/>
         <source>Malawi</source>
         <translation>מלאווי</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="161"/>
+        <location filename="../plus/countries.py" line="168"/>
         <source>Malaysia</source>
         <translation>מלזיה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="162"/>
+        <location filename="../plus/countries.py" line="169"/>
         <source>Maldives</source>
         <translation>האיים המלדיביים</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="163"/>
+        <location filename="../plus/countries.py" line="170"/>
         <source>Mali</source>
         <translation>מאלי</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="164"/>
+        <location filename="../plus/countries.py" line="171"/>
         <source>Malta</source>
         <translation>מלטה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="165"/>
+        <location filename="../plus/countries.py" line="172"/>
         <source>Marshall Islands</source>
         <translation>איי מרשל</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="166"/>
+        <location filename="../plus/countries.py" line="173"/>
         <source>Martinique</source>
         <translation>מרטיניק</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="167"/>
+        <location filename="../plus/countries.py" line="174"/>
         <source>Mauritania</source>
         <translation>מאוריטניה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="168"/>
+        <location filename="../plus/countries.py" line="175"/>
         <source>Mauritius</source>
         <translation>מאוריציוס</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="169"/>
+        <location filename="../plus/countries.py" line="176"/>
         <source>Mayotte</source>
         <translation>מיוט</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="170"/>
+        <location filename="../plus/countries.py" line="177"/>
         <source>Mexico</source>
         <translation>מקסיקו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="171"/>
+        <location filename="../plus/countries.py" line="179"/>
         <source>Micronesia, Federated States of</source>
         <translation>מיקרונזיה, מדינות הפדרציה של</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="172"/>
+        <location filename="../plus/countries.py" line="181"/>
         <source>Moldova, the Republic of</source>
         <translation>מולדובה, הרפובליקה של</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="173"/>
+        <location filename="../plus/countries.py" line="182"/>
         <source>Monaco</source>
         <translation>מונקו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="174"/>
+        <location filename="../plus/countries.py" line="183"/>
         <source>Mongolia</source>
         <translation>מונגוליה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="175"/>
+        <location filename="../plus/countries.py" line="184"/>
         <source>Montenegro</source>
         <translation>מונטנגרו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="176"/>
+        <location filename="../plus/countries.py" line="185"/>
         <source>Montserrat</source>
         <translation>מונטסראט</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="177"/>
+        <location filename="../plus/countries.py" line="187"/>
         <source>Morocco</source>
         <translation>מָרוֹקוֹ</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="178"/>
+        <location filename="../plus/countries.py" line="188"/>
         <source>Mozambique</source>
         <translation>מוזמביק</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="179"/>
+        <location filename="../plus/countries.py" line="189"/>
         <source>Myanmar</source>
         <translation>מיאנמר</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="180"/>
+        <location filename="../plus/countries.py" line="190"/>
         <source>Namibia</source>
         <translation>נמיביה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="181"/>
+        <location filename="../plus/countries.py" line="191"/>
         <source>Nauru</source>
         <translation>נאורו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="182"/>
+        <location filename="../plus/countries.py" line="192"/>
         <source>Nepal</source>
         <translation>נפאל</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="183"/>
+        <location filename="../plus/countries.py" line="193"/>
         <source>Netherlands</source>
         <translation>הולנד</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="184"/>
+        <location filename="../plus/countries.py" line="194"/>
         <source>New Caledonia</source>
         <translation>קלדוניה החדשה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="185"/>
+        <location filename="../plus/countries.py" line="195"/>
         <source>New Zealand</source>
         <translation>ניו זילנד</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="186"/>
+        <location filename="../plus/countries.py" line="196"/>
         <source>Nicaragua</source>
         <translation>ניקרגואה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="187"/>
+        <location filename="../plus/countries.py" line="197"/>
         <source>Niger</source>
         <translation>ניז&apos;ר</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="188"/>
+        <location filename="../plus/countries.py" line="198"/>
         <source>Nigeria</source>
         <translation>ניגריה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="189"/>
+        <location filename="../plus/countries.py" line="199"/>
         <source>Niue</source>
         <translation>ניואה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="190"/>
+        <location filename="../plus/countries.py" line="200"/>
         <source>Norfolk Island</source>
         <translation>האי נורפולק</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="191"/>
+        <location filename="../plus/countries.py" line="201"/>
         <source>Northern Mariana Islands</source>
         <translation>איי מריאנה הצפוניים</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="192"/>
+        <location filename="../plus/countries.py" line="202"/>
         <source>Norway</source>
         <translation>נורווגיה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="193"/>
+        <location filename="../plus/countries.py" line="203"/>
         <source>Oman</source>
         <translation>עומאן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="194"/>
+        <location filename="../plus/countries.py" line="204"/>
         <source>Pakistan</source>
         <translation>פקיסטן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="195"/>
+        <location filename="../plus/countries.py" line="205"/>
         <source>Palau</source>
         <translation>פלאו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="196"/>
+        <location filename="../plus/countries.py" line="207"/>
         <source>Palestine, State of</source>
         <translation>פלסטין, מדינת</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="197"/>
+        <location filename="../plus/countries.py" line="208"/>
         <source>Panama</source>
         <translation>פנמה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="198"/>
+        <location filename="../plus/countries.py" line="210"/>
         <source>PNG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="199"/>
+        <location filename="../plus/countries.py" line="211"/>
         <source>Paraguay</source>
         <translation>פרגוואי</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="200"/>
+        <location filename="../plus/countries.py" line="212"/>
         <source>Peru</source>
         <translation>פרו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="201"/>
+        <location filename="../plus/countries.py" line="213"/>
         <source>Philippines</source>
         <translation>הפיליפינים</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="202"/>
+        <location filename="../plus/countries.py" line="214"/>
         <source>Pitcairn</source>
         <translation>פיטקארן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="203"/>
+        <location filename="../plus/countries.py" line="215"/>
         <source>Poland</source>
         <translation>פּוֹלִין</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="204"/>
+        <location filename="../plus/countries.py" line="216"/>
         <source>Portugal</source>
         <translation>פּוֹרטוּגָל</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="205"/>
+        <location filename="../plus/countries.py" line="217"/>
         <source>Puerto Rico</source>
         <translation>פוארטו ריקו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="206"/>
+        <location filename="../plus/countries.py" line="218"/>
         <source>Qatar</source>
         <translation>קטאר</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="207"/>
+        <location filename="../plus/countries.py" line="219"/>
         <source>Romania</source>
         <translation>רומניה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="208"/>
+        <location filename="../plus/countries.py" line="220"/>
         <source>Russian Federation</source>
         <translation>הפדרציה הרוסית</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="209"/>
+        <location filename="../plus/countries.py" line="221"/>
         <source>Rwanda</source>
         <translation>רואנדה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="210"/>
+        <location filename="../plus/countries.py" line="222"/>
         <source>St. Helena</source>
         <translation>סנט הלנה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="211"/>
+        <location filename="../plus/countries.py" line="223"/>
         <source>Saint Kitts and Nevis</source>
         <translation>סנט קיטס ונוויס</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="212"/>
+        <location filename="../plus/countries.py" line="225"/>
         <source>Saint Lucia</source>
         <translation>סנט לוסיה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="213"/>
+        <location filename="../plus/countries.py" line="226"/>
         <source>Saint Martin (French part)</source>
         <translation>סן מרטין (חלק צרפתי)</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="214"/>
+        <location filename="../plus/countries.py" line="227"/>
         <source>Saint Pierre and Miquelon</source>
         <translation>סן פייר ומיקלון</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="215"/>
+        <location filename="../plus/countries.py" line="228"/>
         <source>St. Vincent</source>
         <translation>סנט וינסנט</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="216"/>
+        <location filename="../plus/countries.py" line="229"/>
         <source>Samoa</source>
         <translation>סמואה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="217"/>
+        <location filename="../plus/countries.py" line="230"/>
         <source>San Marino</source>
         <translation>סן מרינו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="218"/>
+        <location filename="../plus/countries.py" line="231"/>
         <source>Saudi Arabia</source>
         <translation>ערב הסעודית</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="219"/>
+        <location filename="../plus/countries.py" line="232"/>
         <source>Senegal</source>
         <translation>סנגל</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="220"/>
+        <location filename="../plus/countries.py" line="233"/>
         <source>Serbia</source>
         <translation>סרביה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="221"/>
+        <location filename="../plus/countries.py" line="234"/>
         <source>Seychelles</source>
         <translation>סיישל</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="222"/>
+        <location filename="../plus/countries.py" line="235"/>
         <source>Sierra Leone</source>
         <translation>סיירה לאונה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="223"/>
+        <location filename="../plus/countries.py" line="236"/>
         <source>Singapore</source>
         <translation>סינגפור</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="224"/>
+        <location filename="../plus/countries.py" line="237"/>
         <source>Sint Maarten (Dutch part)</source>
         <translation>סנט מארטן (חלק הולנדי)</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="225"/>
+        <location filename="../plus/countries.py" line="238"/>
         <source>Slovakia</source>
         <translation>סלובקיה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="226"/>
+        <location filename="../plus/countries.py" line="239"/>
         <source>Slovenia</source>
         <translation>סלובניה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="227"/>
+        <location filename="../plus/countries.py" line="240"/>
         <source>Solomon Islands</source>
         <translation>איי שלמה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="228"/>
+        <location filename="../plus/countries.py" line="241"/>
         <source>Somalia</source>
         <translation>סומליה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="229"/>
+        <location filename="../plus/countries.py" line="242"/>
         <source>South Africa</source>
         <translation>דרום אפריקה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="230"/>
+        <location filename="../plus/countries.py" line="243"/>
         <source>South Georgia and the South Sandwich Islands</source>
         <translation>דרום ג&apos;ורג&apos;יה ואיי הכריך הדרומיים</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="231"/>
+        <location filename="../plus/countries.py" line="244"/>
         <source>South Sudan</source>
         <translation>דרום סודן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="232"/>
+        <location filename="../plus/countries.py" line="245"/>
         <source>Spain</source>
         <translation>סְפָרַד</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="233"/>
+        <location filename="../plus/countries.py" line="246"/>
         <source>Sri Lanka</source>
         <translation>סרי לנקה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="234"/>
+        <location filename="../plus/countries.py" line="247"/>
         <source>Sudan</source>
         <translation>סודן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="235"/>
+        <location filename="../plus/countries.py" line="251"/>
         <source>Suriname</source>
         <translation>סורינאם</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="236"/>
+        <location filename="../plus/countries.py" line="252"/>
         <source>Svalbard and Jan Mayen</source>
         <translation>סוולבארד ויאן מאיין</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="237"/>
+        <location filename="../plus/countries.py" line="253"/>
         <source>Sweden</source>
         <translation>שבדיה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="238"/>
+        <location filename="../plus/countries.py" line="254"/>
         <source>Switzerland</source>
         <translation>שוויץ</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="239"/>
+        <location filename="../plus/countries.py" line="255"/>
         <source>Syrian Arab Republic</source>
         <translation>הרפובליקה הערבית של סוריה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="240"/>
+        <location filename="../plus/countries.py" line="257"/>
         <source>Taiwan (Province of China)</source>
         <translation>טייוואן (מחוז סין)</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="241"/>
+        <location filename="../plus/countries.py" line="258"/>
         <source>Tajikistan</source>
         <translation>טג&apos;יקיסטן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="242"/>
+        <location filename="../plus/countries.py" line="259"/>
         <source>Tanzania</source>
         <translation>טנזניה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="243"/>
+        <location filename="../plus/countries.py" line="260"/>
         <source>Thailand</source>
         <translation>תאילנד</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="244"/>
+        <location filename="../plus/countries.py" line="261"/>
         <source>Timor, East</source>
         <translation>טימור, מזרח</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="245"/>
+        <location filename="../plus/countries.py" line="262"/>
         <source>Togo</source>
         <translation>ללכת</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="246"/>
+        <location filename="../plus/countries.py" line="263"/>
         <source>Tokelau</source>
         <translation>טוקלאו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="247"/>
+        <location filename="../plus/countries.py" line="264"/>
         <source>Tonga</source>
         <translation>טונגה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="248"/>
+        <location filename="../plus/countries.py" line="266"/>
         <source>Trinidad &amp; Tobago</source>
         <translation>טרינידד וטובגו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="249"/>
+        <location filename="../plus/countries.py" line="267"/>
         <source>Tunisia</source>
         <translation>תוניסיה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="250"/>
+        <location filename="../plus/countries.py" line="268"/>
         <source>Turkey</source>
         <translation>טורקיה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="251"/>
+        <location filename="../plus/countries.py" line="269"/>
         <source>Turkmenistan</source>
         <translation>טורקמניסטן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="252"/>
+        <location filename="../plus/countries.py" line="270"/>
         <source>Turks and Caicos Islands</source>
         <translation>איי טורקס וקאיקוס</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="253"/>
+        <location filename="../plus/countries.py" line="271"/>
         <source>Tuvalu</source>
         <translation>טובאלו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="254"/>
+        <location filename="../plus/countries.py" line="272"/>
         <source>Uganda</source>
         <translation>אוגנדה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="255"/>
+        <location filename="../plus/countries.py" line="273"/>
         <source>Ukraine</source>
         <translation>אוקראינה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="256"/>
+        <location filename="../plus/countries.py" line="274"/>
         <source>United Arab Emirates</source>
         <translation>איחוד האמירויות הערביות</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="257"/>
+        <location filename="../plus/countries.py" line="276"/>
         <source>United Kingdom of Great Britain and Northern Ireland</source>
         <translation>הממלכה המאוחדת של בריטניה הגדולה וצפון אירלנד</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="258"/>
+        <location filename="../plus/countries.py" line="277"/>
         <source>United States Minor Outlying Islands</source>
         <translation>האיים הקטנים של ארצות הברית</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="259"/>
+        <location filename="../plus/countries.py" line="279"/>
         <source>United States of America</source>
         <translation>ארצות הברית</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="260"/>
+        <location filename="../plus/countries.py" line="280"/>
         <source>Uruguay</source>
         <translation>אורוגוואי</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="261"/>
+        <location filename="../plus/countries.py" line="281"/>
         <source>Uzbekistan</source>
         <translation>אוזבקיסטן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="262"/>
+        <location filename="../plus/countries.py" line="282"/>
         <source>Vanuatu</source>
         <translation>ונואטו</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="263"/>
+        <location filename="../plus/countries.py" line="283"/>
         <source>Venezuela</source>
         <translation>ונצואלה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="264"/>
+        <location filename="../plus/countries.py" line="284"/>
         <source>Vietnam</source>
         <translation>וייטנאם</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="265"/>
+        <location filename="../plus/countries.py" line="285"/>
         <source>Virgin Islands (British)</source>
         <translation>איי הבתולה (בריטיים)</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="266"/>
+        <location filename="../plus/countries.py" line="286"/>
         <source>Virgin Islands (U.S.)</source>
         <translation>איי הבתולה (ארה&quot;ב)</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="267"/>
+        <location filename="../plus/countries.py" line="287"/>
         <source>Wallis and Futuna</source>
         <translation>וואליס ופוטונה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="268"/>
+        <location filename="../plus/countries.py" line="288"/>
         <source>Western Sahara</source>
         <translation>סהרה המערבית</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="269"/>
+        <location filename="../plus/countries.py" line="289"/>
         <source>Yemen</source>
         <translation>תֵימָן</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="270"/>
+        <location filename="../plus/countries.py" line="290"/>
         <source>Zambia</source>
         <translation>זמביה</translation>
     </message>
     <message>
-        <location filename="../plus/countries.py" line="271"/>
+        <location filename="../plus/countries.py" line="291"/>
         <source>Zimbabwe</source>
         <translation>זימבבואה</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="36"/>
+        <source>ANI</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="47"/>
+        <source>Bali</source>
+        <translation>באלי</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="58"/>
+        <source>Borneo</source>
+        <translation>בורנאו</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="72"/>
+        <source>Canary Islands</source>
+        <translation>האיים הקנריים</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="105"/>
+        <source>Flores</source>
+        <translation>פלורס</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="128"/>
+        <source>Hawaii</source>
+        <translation>הוואי</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="145"/>
+        <source>Java</source>
+        <translation>ג&apos;אווה</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="178"/>
+        <source>Micronesia</source>
+        <translation>מיקרונזיה</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="180"/>
+        <source>Moldova</source>
+        <translation>מולדובה</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="186"/>
+        <source>North Macedonia</source>
+        <translation>צפון מקדוניה</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="206"/>
+        <source>Palestine</source>
+        <translation>פלשתינה</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="209"/>
+        <source>Papua</source>
+        <translation>פפואה</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="224"/>
+        <source>St. Lucia</source>
+        <translation>סנט לוסיה</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="248"/>
+        <source>Sulawesi</source>
+        <translation>סולאווסי</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="249"/>
+        <source>Sumatra</source>
+        <translation>סומטרה</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="250"/>
+        <source>Sumbawa</source>
+        <translation>סומבאווה</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="256"/>
+        <source>Taiwan</source>
+        <translation>טייוואן</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="265"/>
+        <source>Trinidad and Tobago</source>
+        <translation>טרינידד וטובגו</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="275"/>
+        <source>UK</source>
+        <translation>בְּרִיטַנִיָה</translation>
+    </message>
+    <message>
+        <location filename="../plus/countries.py" line="278"/>
+        <source>USA</source>
+        <translation>ארה&quot;ב</translation>
     </message>
 </context>
 <context>
@@ -13200,7 +13300,7 @@ Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="298"/>
+        <location filename="../artisanlib/main.py" line="313"/>
         <source>URL open profile: {0}</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14171,11 +14271,6 @@ Repeat Operation at the end: {0}</source>
         <location filename="../artisanlib/main.py" line="18437"/>
         <source>Please support Artisan with your donation!</source>
         <translation>אנא תמכו ב- Artisan בתרומתכם!</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="313"/>
-        <source>URL open profile from file: {0}</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

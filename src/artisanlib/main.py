@@ -310,7 +310,7 @@ class Artisan(QtSingleApplication):
 #                    traceback.print_exc(file=sys.stdout)
                     pass
             elif url.scheme() == "file":
-                aw.sendmessage(QApplication.translate("Message","URL open profile from file: {0}",None).format(url.toDisplayString()))
+                aw.sendmessage(QApplication.translate("Message","URL open profile: {0}",None).format(url.toDisplayString()))
                 url_query = None
                 if url.hasQuery():
                     url_query = url.query()
