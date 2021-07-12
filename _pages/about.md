@@ -63,6 +63,10 @@ gallery:
     image_path: /assets/images/toper-logo.jpg
     alt: "Toper"
     title: "Toper"
+  - url: https://coffed.pl/
+    image_path: /assets/images/coffed-logo-light.png
+    alt: "Coffed"
+    title: "Coffed"
     
     
 
