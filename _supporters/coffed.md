@@ -6,7 +6,7 @@ excerpt: "SR3/5/15/25/60"
 header:
   overlay_image: /assets/images/coffed.jpg
   image: /assets/images/coffed.jpg
-  teaser: assets/images/coffed-supporter-grey.jpg
+  teaser: assets/images/coffed.jpg
 sidebar:
   nav: "machines"
 ---
