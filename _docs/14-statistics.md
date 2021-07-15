@@ -14,8 +14,8 @@ Menu: `Config` >> `Statistics`
 The statistics of a roast appear post roast on the right side of the screen.  Post roast, the placement and formatting of the statistic summary has been improved to make things more readable.  You can now save the Statistics box to a file so that you can print it for a coffee bag.  The format is PDF on a Mac and .png on Windows.  You can also change the background color and opacity under the Colors settings.  What goes in the box is determined by what you put in Roast Properties dialog as well as batch prefix/number, roast number of the day, ambient data (temp/humidity/pressure),machine name and drum speed. 
 
 ![save stats](/assets/images/gsg/save stats.png)
-
-![statistic dialog](/assets/images/gsg/statistics dialog.png)
+D
+![statistic dialog](/assets/images/gsg/Statistics Dialog.png)
 
 These selections allow you to see the three roast phases in the classic Artisan colors (green, yellow, brown) at the end of the roast, with the items you check: time, bar, average ROR, AUC, evaluation (descriptive words).  Phases example with the time, bar and F/min:
 
