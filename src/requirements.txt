@@ -1,19 +1,19 @@
-setuptools==57.0.0 # 56.0.0
-wheel==0.35.1
+setuptools==57.2.0 # 56.0.0
+wheel==0.36.2
 pyserial==3.5 # 3.4
 pymodbus==2.5.2
-python-snap7==1.0 # 0.11
+python-snap7==1.1 # 1.0
 yoctopuce==1.10.45664
-Phidget22==1.7.20210504
+Phidget22==1.7.20210706
 unidecode==1.2.0 # 1.1.2
 bottle==0.12.19
 qrcode==7.1
-requests==2.25.1
+requests==2.26.0
 requests-file==1.5.1
 pefile==2019.4.18
 altgraph==0.17
 macholib==1.14
-pyusb==1.1.1 # 1.1.0
+pyusb==1.2.1 # 1.1.1 # 1.1.0
 persist-queue==0.6.0 #0.5.1
 portalocker==2.3.0
 natsort==7.1.1 # 7.1.0

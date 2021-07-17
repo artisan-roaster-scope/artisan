@@ -211,12 +211,12 @@ OPTIONS = {
 #                    'QtOpenGL','QtScript','QtScriptTools',
 #                    'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
     'packages': ['yoctopuce','gevent','openpyxl','numpy','scipy','certifi', 
-        'matplotlib','PIL'], # MPL and PIL added for mpl v3.3.x
+        'matplotlib','PIL', 'lxml'], # MPL and PIL added for mpl v3.3.x
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
     'arch': 'x86_64',
-    'matplotlib_backends': '-', # '-' for imported or explicit 'qt5agg'
+    'matplotlib_backends': '-', # '-' for imported or explicit "Qt5Agg, PDF, PS, SVG"
     'includes': ['serial',
                  'PyQt5',
                  'PyQt5.QtCore',
