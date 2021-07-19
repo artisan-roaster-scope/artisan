@@ -60,7 +60,7 @@ For Phases LCD mode, choose time for Drying, Temp for Maillard, and check the bo
 Fill in the information and start saving the various roast profiles.
 13.	`Roast` >> [`Background`](https://artisan-scope.org/docs/background/)  
 See the documentation on how to load a profile into the background.
-14.	´File` >> `Report` and `File` >> `Save Graph`  
+14.	`File` >> `Report` and `File` >> `Save Graph`  
 Learn how to export reports on your roasts and graphs to post. You can use “;” to take a screenshot.  
 15. `Help` >> `Save Settings`  
 Maybe the most important step. Save your settings and make a habit of it before every upgrade and when you change settings.  
@@ -71,7 +71,7 @@ Once you have roasted a few batches, go back and read the documentation on the i
 18.	[Shortcuts](https://artisan-scope.org/docs/shortcuts/)  
 Go to `Help` >> `Shortcuts` to see how to enable them and see what keyboard shortcuts are available.  
 19.	More personalization  
-Go to `Config` >> [`Colors`](https://artisan-scope.org/docs/colors/) and `Config´ >> [`Themes`](https://artisan-scope.org/docs/themes/) to explore the options.  Note that some of the graph configurations are accessed with the last icon in the set on the left on the Roast graph (the one with jagged up arrow).  `Config` >> `Curves`, UI, pick a font and background image, IF you wish to personalize your use
+Go to `Config` >> [`Colors`](https://artisan-scope.org/docs/colors/) and `Config` >> [`Themes`](https://artisan-scope.org/docs/themes/) to explore the options.  Note that some of the graph configurations are accessed with the last icon in the set on the left on the Roast graph (the one with jagged up arrow).  `Config` >> `Curves`, UI, pick a font and background image, IF you wish to personalize your use
 20.	READY FOR YOUR FIRST ROAST
 
 The main controls look like this:
