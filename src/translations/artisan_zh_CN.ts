@@ -3990,12 +3990,12 @@ Extra Device</source>
         <translation type="obsolete">S7 错误:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="696"/>
+        <location filename="../artisanlib/s7port.py" line="709"/>
         <source>S7 Communication Resumed</source>
         <translation>S7 通信恢复</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="707"/>
+        <location filename="../artisanlib/s7port.py" line="720"/>
         <source>S7 Communication Error</source>
         <translation>S7 通信错误</translation>
     </message>
@@ -4085,12 +4085,12 @@ Extra Device</source>
         <translation>分析：需要投豆事件，并没有找到</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="388"/>
+        <location filename="../artisanlib/s7port.py" line="401"/>
         <source>readActiveRegisters() S7 Communication Error</source>
         <translation>readActiveRegisters() S7通信错误</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="703"/>
+        <location filename="../artisanlib/s7port.py" line="716"/>
         <source>S7 Error: connecting to PLC failed</source>
         <translation>S7错误：连接到PLC失败</translation>
     </message>
@@ -14225,7 +14225,7 @@ Continue?</source>
         <translation>为{0}配置的Artisan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="275"/>
+        <location filename="../artisanlib/s7port.py" line="288"/>
         <source>S7 connected</source>
         <translation>S7 已连接</translation>
     </message>
@@ -14265,7 +14265,7 @@ Continue?</source>
         <translation type="obsolete">导入 Aillio R1 JSON</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="292"/>
+        <location filename="../artisanlib/s7port.py" line="305"/>
         <source>S7 Connected</source>
         <translation>S7 已连接</translation>
     </message>

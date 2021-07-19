@@ -4020,12 +4020,12 @@ anlegen</translation>
         <translation type="obsolete">S7 Fehler:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="696"/>
+        <location filename="../artisanlib/s7port.py" line="709"/>
         <source>S7 Communication Resumed</source>
         <translation>S7 Verbindung wiederhergestellt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="707"/>
+        <location filename="../artisanlib/s7port.py" line="720"/>
         <source>S7 Communication Error</source>
         <translation>S7 Verbindungsfehler</translation>
     </message>
@@ -4115,12 +4115,12 @@ anlegen</translation>
         <translation>Analyse: CHARGE-Ereignis erforderlich, keines gefunden</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="388"/>
+        <location filename="../artisanlib/s7port.py" line="401"/>
         <source>readActiveRegisters() S7 Communication Error</source>
         <translation>readActiveRegisters () S7 Kommunikationsfehler</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="703"/>
+        <location filename="../artisanlib/s7port.py" line="716"/>
         <source>S7 Error: connecting to PLC failed</source>
         <translation>S7 Fehler: Verbindung zur SPS fehlgeschlagen</translation>
     </message>
@@ -14468,7 +14468,7 @@ Continue?</source>
         <translation>Artisan konfiguriert für {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="275"/>
+        <location filename="../artisanlib/s7port.py" line="288"/>
         <source>S7 connected</source>
         <translation>S7 Verbunden</translation>
     </message>
@@ -14508,7 +14508,7 @@ Continue?</source>
         <translation type="obsolete">Importiere Aillio R1 JSON</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="292"/>
+        <location filename="../artisanlib/s7port.py" line="305"/>
         <source>S7 Connected</source>
         <translation>S7 Verbunden</translation>
     </message>

@@ -22,8 +22,8 @@ try:
     if system() == 'Darwin':
         os.environ["QT_MAC_WANTS_LAYER"] = "1" # some widgets under PyQt 5.15.1 on macOS seem not to update properly without this (see the discussion on the pyqt mailing list from 15.6.2020 "Widgets are not updated - is this a bug?")
     if pyqtversion < 6:
-        from PyQt5.QtWidgets import QApplication
-        from PyQt5.QtCore import Qt
+        from PyQt5.QtWidgets import QApplication  # @UnusedImport
+        from PyQt5.QtCore import Qt  # @UnusedImport
     else:
         from PyQt6.QtWidgets import QApplication
         from PyQt6.QtCore import Qt
@@ -36,7 +36,7 @@ except:
 try:
     # PyQt new exit scheme (default from 5.14 on)
     if pyqtversion < 6:
-        from PyQt5.QtCore import pyqt5_enable_new_onexit_scheme  # @UnresolvedImport
+        from PyQt5.QtCore import pyqt5_enable_new_onexit_scheme  # @UnresolvedImport @UnusedImport
     else:
         from PyQt6.QtCore import pyqt5_enable_new_onexit_scheme  # @UnresolvedImport
     pyqt5_enable_new_onexit_scheme(True)
@@ -49,10 +49,14 @@ if system() == 'Darwin':
     try:
         if str(sys.frozen) == "macosx_app":
             if pyqtversion < 6:
-                from PyQt5.QtWidgets import QApplication # @Reimport
+                from PyQt5.QtWidgets import QApplication # @Reimport  @UnusedImport
             else:
                 from PyQt6.QtWidgets import QApplication # @Reimport
-            QApplication.addLibraryPath(os.path.dirname(os.path.abspath(__file__)) + "/qt_plugins/")
+            #QApplication.addLibraryPath(os.path.dirname(os.path.abspath(__file__)) + "/qt_plugins/")
+
+            libpath = os.path.dirname(sys.executable) # Contents/MacOS
+            plugins_path = os.path.abspath(os.path.join(libpath,"../PlugIns/"))
+            QApplication.addLibraryPath(plugins_path)
     except Exception:
         pass
 elif system().startswith("Windows"):
@@ -62,7 +66,7 @@ elif system().startswith("Windows"):
 #            or imp.is_frozen("__main__")) # tools/freeze
              or getattr(sys, 'frozen', False)) # tools/freeze
         if pyqtversion < 6:
-            from PyQt5.QtWidgets import QApplication # @Reimport
+            from PyQt5.QtWidgets import QApplication # @Reimport   @UnusedImport
         else:
             from PyQt6.QtWidgets import QApplication # @Reimport 
         if ib:
@@ -78,7 +82,7 @@ else: # Linux
     try:
         ib = getattr(sys, 'frozen', False)
         if pyqtversion < 6:
-            from PyQt5.QtWidgets import QApplication # @Reimport
+            from PyQt5.QtWidgets import QApplication # @Reimport @UnusedImport
         else:
             from PyQt6.QtWidgets import QApplication # @Reimport
         if ib:

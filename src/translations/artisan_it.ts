@@ -4012,12 +4012,12 @@ Dispositivo aggiuntivo</translation>
         <translation>Errore di comunicazione Modbus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="696"/>
+        <location filename="../artisanlib/s7port.py" line="709"/>
         <source>S7 Communication Resumed</source>
         <translation>Comunicazione S7 ripresa</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="707"/>
+        <location filename="../artisanlib/s7port.py" line="720"/>
         <source>S7 Communication Error</source>
         <translation>Errore di comunicazione S7</translation>
     </message>
@@ -4042,12 +4042,12 @@ Dispositivo aggiuntivo</translation>
         <translation>Analizza: evento CHARGE richiesto, nessuno trovato</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="388"/>
+        <location filename="../artisanlib/s7port.py" line="401"/>
         <source>readActiveRegisters() S7 Communication Error</source>
         <translation>readActiveRegisters () Errore di comunicazione S7</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="703"/>
+        <location filename="../artisanlib/s7port.py" line="716"/>
         <source>S7 Error: connecting to PLC failed</source>
         <translation>S7 Error: connessione al PLC non riuscita</translation>
     </message>
@@ -14804,7 +14804,7 @@ Si consiglia di salvare preventivamente le impostazioni correnti tramite il menu
         <translation> Eventi n. {0} eliminati</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="292"/>
+        <location filename="../artisanlib/s7port.py" line="305"/>
         <source>S7 Connected</source>
         <translation>S7 connesso</translation>
     </message>
@@ -14839,7 +14839,7 @@ Si consiglia di salvare preventivamente le impostazioni correnti tramite il menu
         <translation>Importa URL RoastLog</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="275"/>
+        <location filename="../artisanlib/s7port.py" line="288"/>
         <source>S7 connected</source>
         <translation>S7 connesso</translation>
     </message>

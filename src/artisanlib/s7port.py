@@ -22,6 +22,8 @@ import struct
 import os
 import sys
 
+from snap7.types import Areas
+
 import artisanlib.util
 from artisanlib.suppress_errors import suppress_stdout_stderr
 
@@ -74,13 +76,21 @@ class s7port(object):
         
         self.COMsemaphore = QSemaphore(1)
         
+#        self.areas = [
+#            0x81, # PE, 129
+#            0x82, # PA, 130
+#            0x83, # MK, 131
+#            0x1C, # CT, 28
+#            0x1D, # TM, 29
+#            0x84, # DB, 132
+#        ]
         self.areas = [
-            0x81, # PE, 129
-            0x82, # PA, 130
-            0x83, # MK, 131
-            0x1C, # CT, 28
-            0x1D, # TM, 29
-            0x84, # DB, 132
+            Areas.PE,
+            Areas.PA,
+            Areas.MK,
+            Areas.CT,
+            Areas.TM,
+            Areas.DB
         ]
         
         self.last_request_timestamp = time.time()
@@ -234,7 +244,6 @@ class s7port(object):
 
     def connect(self):
         if not self.libLoaded:
-            #from artisanlib.s7client import S7Client
             from snap7.common import load_library as load_snap7_library
             # first load shared lib if needed
             platf = str(platform.system())
@@ -244,6 +253,10 @@ class s7port(object):
                     snap7dll = os.path.join(libpath,"libsnap7.so")
                 else: # Windows:
                     snap7dll = os.path.join(libpath,"snap7.dll")
+                load_snap7_library(snap7dll) # will ensure to load it only once
+            elif platf in ['Darwin'] and artisanlib.util.appFrozen():
+                libpath = os.path.dirname(sys.executable)
+                snap7dll = os.path.abspath(os.path.join(libpath,"../Frameworks/libsnap7.dylib"))
                 load_snap7_library(snap7dll) # will ensure to load it only once
             self.libLoaded = True
         
@@ -267,7 +280,7 @@ class s7port(object):
                 try:
                     self.plc.connect(self.host,self.rack,self.slot,self.port)
                     time.sleep(0.2)
-                except:
+                except Exception:
                     pass
             
             if self.isConnected():

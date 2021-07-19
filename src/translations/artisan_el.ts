@@ -4045,12 +4045,12 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="696"/>
+        <location filename="../artisanlib/s7port.py" line="709"/>
         <source>S7 Communication Resumed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="707"/>
+        <location filename="../artisanlib/s7port.py" line="720"/>
         <source>S7 Communication Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4075,12 +4075,12 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="388"/>
+        <location filename="../artisanlib/s7port.py" line="401"/>
         <source>readActiveRegisters() S7 Communication Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="703"/>
+        <location filename="../artisanlib/s7port.py" line="716"/>
         <source>S7 Error: connecting to PLC failed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14871,7 +14871,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation> Τα συμβάντα # {0} διαγράφηκαν</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="292"/>
+        <location filename="../artisanlib/s7port.py" line="305"/>
         <source>S7 Connected</source>
         <translation>S7 Συνδεδεμένο</translation>
     </message>
@@ -14911,7 +14911,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation>Εισαγωγή διεύθυνσης URL RoastLog</translation>
     </message>
     <message>
-        <location filename="../artisanlib/s7port.py" line="275"/>
+        <location filename="../artisanlib/s7port.py" line="288"/>
         <source>S7 connected</source>
         <translation>S7 συνδεδεμένο</translation>
     </message>
