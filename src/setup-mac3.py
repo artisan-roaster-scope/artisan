@@ -211,7 +211,7 @@ OPTIONS = {
 #                    'QtOpenGL','QtScript','QtScriptTools',
 #                    'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
     'packages': ['yoctopuce','gevent','openpyxl','numpy','scipy','certifi', 
-        'matplotlib','PIL', 'lxml'], # MPL and PIL added for mpl v3.3.x
+        'matplotlib','PIL', 'lxml', 'snap7'], # MPL and PIL added for mpl v3.3.x
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',

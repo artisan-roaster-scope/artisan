@@ -13,35 +13,35 @@ v2.4.6 (July xx, 2021)
   - adds Roast Properties setup tab which includes machines nominal batch size and heating type
   - adds graph image export optimized for Facebook and Instagram and improves overall quality of image exports
   - adds Vietnamese, Danish, Scottish, Lativian and Slovak translations
-  - adds AppImage package for a simple installation option on Linux
-  - adds Kirsch & Mausser machine setup with control functionallity
-  - adds custom buttons to all Giesen machine setups to control additional actors (intake, flavouring, discharge, cooling, stirrer) on W30/W45/W60 machines
-  - adds Giesen machine setup for machines with coarse burner control in 10% steps
-  - adds CoffeeTech FZ94 EVO machine setup
-  - adds Roastmax machine machine setup
-  - adds Craftsmith machine setup
-  - adds Petroncini Maestro i06 machine setup
-  - adds Carmomaq roasters machine setup incl. control of buner, airflow and drum speed
-  - adds import of Petroncini CSV files
-  - adds command_utility to perform commandline utility tasks (help and version for now) (PR #542)
-  - adds current time to the autosave fields (~currtime)
+  - adds AppImage package for a simple installation option on Linux ([Issue #557](../../../issues/557))
+  - adds [Kirsch & Mausser](https://www.kirschundmausser.de/) machine setup with control functionallity
+  - adds custom buttons to all [Giesen](https://www.giesencoffeeroasters.eu/) machine setups to control additional actors (intake, flavouring, discharge, cooling, stirrer) on W30/W45/W60 machines
+  - adds [Giesen](https://www.giesencoffeeroasters.eu/) machine setup for machines with coarse burner control in 10% steps
+  - adds [CoffeeTech FZ94 EVO](https://www.coffee-tech.com/products/shop-roasters/fz94-evo/) machine setup
+  - adds [Roastmax](http://www.roastmaxroasters.com.au/) machine machine setup
+  - adds [Craftsmith](https://www.craftsmithroasters.com/) machine setup
+  - adds [Carmomaq](https://www.carmomaq.com.br/) roasters machine setup incl. control of buner, airflow and drum speed
+  - adds [Petroncini](https://www.petroncini.com/) Maestro i06 machine setup
+  - adds import of [Petroncini](https://www.petroncini.com/) CSV files
+  - adds command_utility to perform commandline utility tasks (help and version for now) ([PR #542](../../../pull/542))
+  - adds current time `~currtime` to the autosave fields
   - adds a check for running Artisan while installing on Windows
   - adds ArtisanCommands moveBackground and pidLookahead
   - allow comments in button definitions, everything after '#' is ignored (as in alarm descriptions)
-  - adds MODBUS command writeSingle(s,r,v) and writeSingle([s,r,v],..,[s,r,v]) to write a single MODBUS 16bit integer register.
-  - adds Phidget frequency(ch,v[,<sn>]) PWM Command to set the PWM frequency on supported modules like the OUT1100
-  - adds IO Command limit(c,v[,sn]) to set the current limit on a DCMotor Phidget (Issue #626)
-  - adds device logging for Phidgets
+  - adds MODBUS command `writeSingle(s,r,v)` and `writeSingle([s,r,v],..,[s,r,v])` to write a single MODBUS 16bit integer register.
+  - adds [Phidgets](https://www.phidgets.com/) `frequency(ch,v[,<sn>])` PWM Command to set the PWM frequency on supported modules like the OUT1100
+  - adds IO Command `limit(c,v[,sn])` to set the current limit on a DCMotor [Phidgets](https://www.phidgets.com/) ([Issue #626](../../../issues/626))
+  - adds device logging for [Phidgets](https://www.phidgets.com/)
   - adds support for the Yoctopuce modules Yocto-0-10V-Rx, Yocto-milliVolt-Rx and Yocto-Serial
-  - adds {BTB} and {ETB} command substitution replacing those placeholders by the value of BT and ET of the background profile, if loaded, at the current time in Serial/CallProgram/MODBUS/S7/WebSocket command actions
-  - adds options to let event quantifiers fire slider actions and to avoid the quantification block delay on observing SVs instead of PVs
-  - adds "RoR@FC", "roastersize", energy/CO2 data to plus roast record
-  - adds importing of Artisan profiles from URL inputs and artisan://profile?url=<url> links
-  - adds from support for artisan://template?<UUID> links to load background profiles identified by the given UUID
+  - adds `{BTB}` and `{ETB}` command substitution replacing those placeholders by the value of BT and ET of the background profile, if loaded, at the current time in Serial/CallProgram/MODBUS/S7/WebSocket command actions
+  - adds options to let event quantifiers fire slider actions and to avoid the quantification block delay on observing SVs instead of PVs ([Issue #608](../../../issues/608))
+  - adds `RoR@FC`, `roastersize`, and energy/CO2 data to plus roast record
+  - adds importing of Artisan profiles from URL inputs and `artisan://profile?url=<url>` links
+  - adds from support for `artisan://template?<UUID>` links to load background profiles identified by the given UUID
   - adds donation popup
   - adds release sponsor
 * Changes
-  - Spanish translations updated (PRs: 543, 553, 554)
+  - Spanish translations updated ([PR #543](../../../pull/543), [PR #553](../../../pull/553), [PR #554](../../../pull/554))
   - Chinese translations updated (thanks to Leo Huang)
   - most other translations updated and extended
   - allows mini editor to show and change time before recording CHARGE
@@ -51,19 +51,19 @@ v2.4.6 (July xx, 2021)
   - better handling of decimal number input in Roast Properties by automatic conversion of decimal separators
   - dynamically update recent roasts according to artisan.plus stock blend replacement situations
   - when available use greens temp in linear regressions computed by the profile analyzer
-  - slider actions do now bind floats to the placeholder {} instead of integers, also for S7 commands (in previous versions only for IO, VOUT and RC Commands)
+  - slider actions do now bind floats to the placeholder `{}` instead of integers, also for S7 commands (in previous versions only for IO, VOUT and RC Commands)
   - replaces the AUC readings per phase in the statistic line by the temperature delta per phase
   - marks roasted properties that are likely wrong (larger yield than batch size)
   - removes PLC_stop command on S7 disconnect
   - set step size of up/down arrow key action on coarse event sliders to 10
-  - increases p-i-d input control for the internal Software PID to 3 decimals (Issue #618)
-  - align to begin of background profile on START instead of its CHARGE event
+  - increases p-i-d input control for the internal Software PID to 3 decimals ([Issue #618](../../../issues/618))
+  - align to begin of background profile on START instead of its CHARGE event ([Issue #616](../../../issues/616))
   - energy result values added to ranking reports
   - Dry, Mid and Finish Phase values added to the Excel and CSV ranking reports
   - align behavior of opening profiles per double-click on Linux to the one on macOS and Windows (see [Working Together – Artisan, ArtisanViewer and artisan.plus
   ](https://artisan-roasterscope.blogspot.com/2020/06/working-together-artisan-artisanviewer.html))
 * Fixes
-  - fixes adjustSV for Fuji PXF PID (Issue #547)
+  - fixes adjustSV for Fuji PXF PID ([Issue #547](../../../issues/547))
   - prevent the automatic delta axis mechanism to make adjustments on starting a new recording
   - always convert computed volume in/out and weight in/out when any value present
   - fixes timer LCD color during cooling
@@ -76,6 +76,7 @@ v2.4.6 (July xx, 2021)
   - ensures that slider title color gets correctly set on restart on macOS and Linux
   - ensure that that serial communication log is updated also in OFF mode
   - corrrectly open profiles with spaces in the file path per double-click under Linux
+  - fixes an unhandled exception in the quantifiers dialog box ([Issue #607](../../../issues/607))
 
 ----
 v2.4.4 (December 14, 2020)
