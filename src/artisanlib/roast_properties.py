@@ -2707,14 +2707,14 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.tabWidget.setTabText(2,QApplication.translate("Tab","Protocol",None))
             self.energy_ui.resultunitLabel.setText(QApplication.translate("Label","Results in",None))
             self.energy_ui.EnergyGroupBox.setTitle(QApplication.translate("GroupBox","Energy",None))
-            self.energy_ui.CO2GroupBox.setTitle(QApplication.translate("GroupBox","CO2",None).replace("CO2","CO²"))
+            self.energy_ui.CO2GroupBox.setTitle(QApplication.translate("GroupBox","CO2",None).replace("CO2","CO₂"))
             # Details tab
             self.energy_ui.copyTableButton.setText(QApplication.translate("Button","Copy Table",None))
             self.energy_ui.copyTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
             self.energy_ui.datatable.horizontalHeaderItem(0).setText(QApplication.translate("Table","Power",None))
             self.energy_ui.datatable.horizontalHeaderItem(1).setText(QApplication.translate("Table","Duration",None))
             self.energy_ui.datatable.horizontalHeaderItem(2).setText("BTU")
-            self.energy_ui.datatable.horizontalHeaderItem(3).setText(QApplication.translate("Table","CO2",None).replace("CO2","CO²") + " (g)")
+            self.energy_ui.datatable.horizontalHeaderItem(3).setText(QApplication.translate("Table","CO2",None).replace("CO2","CO₂") + " (g)")
             self.energy_ui.datatable.horizontalHeaderItem(4).setText(QApplication.translate("Table","Load",None))
             self.energy_ui.datatable.horizontalHeaderItem(5).setText(QApplication.translate("Table","Source",None))
             self.energy_ui.datatable.horizontalHeaderItem(6).setText(QApplication.translate("Table","Kind",None))
@@ -3514,7 +3514,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         elif abs(n) < 1:
             res = "{:.3f}".format(n).rstrip('0').rstrip('.')
         elif abs(n) >= 1000:
-            res = "{:.0f}".format(n).rstrip('0').rstrip('.')
+            res = "{:.0f}".format(n)
         elif abs(n) >= 100:
             res = "{:.1f}".format(n).rstrip('0').rstrip('.')
         else:
