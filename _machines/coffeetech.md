@@ -19,7 +19,7 @@ sidebar:
    * FZ-94 EVO, Ghibli (touch), Silon ZR7 (touch): MODBUS TCP via network connection
 * __Features:__ 
   - logging of environmental temperature (ET), bean temperature (BT), drum temperature (DT)
-  - control of set value (SV), fan speed and drum speed on some machines (FZ-94, Ghibli/Silon touch with latest firmware)
+  - control of set value (SV), fan speed and drum speed on some machines (FZ-94, FZ-94 EVO, Ghibli/Silon touch with latest firmware)
 
 ### Netwok Setup
 
