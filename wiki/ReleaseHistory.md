@@ -17,7 +17,7 @@ v2.4.6 (July xx, 2021)
   - adds [Kirsch & Mausser](https://www.kirschundmausser.de/) machine setup with control functionallity
   - adds custom buttons to all [Giesen](https://www.giesencoffeeroasters.eu/) machine setups to control additional actors (intake, flavouring, discharge, cooling, stirrer) on W30/W45/W60 machines
   - adds [Giesen](https://www.giesencoffeeroasters.eu/) machine setup for machines with coarse burner control in 10% steps
-  - adds [CoffeeTech FZ94 EVO](https://www.coffee-tech.com/products/shop-roasters/fz94-evo/) machine setup
+  - adds [CoffeeTech FZ94 EVO](https://www.coffee-tech.com/products/shop-roasters/fz94-evo/) machine setup incl. control of burner, airflow and drum speed
   - adds [Roastmax](http://www.roastmaxroasters.com.au/) machine machine setup
   - adds [Craftsmith](https://www.craftsmithroasters.com/) machine setup
   - adds [Carmomaq](https://www.carmomaq.com.br/) roasters machine setup incl. control of buner, airflow and drum speed

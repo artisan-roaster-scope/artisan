@@ -21,8 +21,8 @@ extraDelta1=false, false, false, false, false, false, false, false, false, false
 extraDelta2=false, false, false, false, false, false, false, false, false, false
 extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-extraLCDvisibility1=true, true, false, false, false, false, false, false, false, false
-extraLCDvisibility2=true, true, false, false, false, false, false, false, false, false
+extraLCDvisibility1=false, false, false, false, false, false, false, false, false, false
+extraLCDvisibility2=true, false, false, false, false, false, false, false, false, false
 extradevicecolor1=#9b001d, #3da54d
 extradevicecolor2=#6b006d, #3796c4
 extradevices=33, 55
@@ -30,6 +30,26 @@ extramathexpression1=,
 extramathexpression2=, 
 extraname1={3}, {1}
 extraname2=SV, {0}
+
+[ExtraEventButtons]
+buttonWidth=50
+buttonlistmaxlen=11
+buttonpalette=@Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0)
+buttonpaletteWidth=60, 60, 60, 60, 60, 60, 60, 60, 60, 60
+buttonpalette_shortcuts=true
+buttonpalettemaxlen=11, 14, 14, 14, 14, 14, 14, 14, 14, 14
+buttonsize=1
+eventbuttontablecolumnwidths=70, 80, 100, 50, 150, 125, 80, 80, 80, 153
+extraeventbuttoncolor=#ad0018, #bd5563, #808080, #00aa44, #65b686, #808080, #0098c9, #70bdd7
+extraeventbuttontextcolor=white, white, white, white, white, white, white, white
+extraeventsactions=4, 4, 0, 4, 4, 0, 4, 4
+extraeventsactionstrings="writeSingle(1,35,{})", "writeSingle(1,35,{})", , "writeSingle(1,16,{})", "writeSingle(1,16,{})", , "writeSingle(1,20,{})", "writeSingle(1,20,{})"
+extraeventsbuttonsflags=1, 1, 1
+extraeventsdescriptions=, , , , , , , 
+extraeventslabels=\\t\n+10%, \\tr\n-10%, E, \\t\n+10%, \\tr\n-10%, E, \\t\n+10%, \\tr\n-10%
+extraeventstypes=8, 8, 4, 6, 6, 4, 5, 5
+extraeventsvalues=2, -2, 0, 2, -2, 0, 2, -2
+extraeventsvisibility=1, 1, 0, 1, 1, 0, 1, 1
 
 [Modbus]
 PID_OFF_action=
@@ -134,6 +154,21 @@ quantifiercoarse=0, 0, 0, 0
 quantifiermax=70, 70, 100, 100
 quantifiermin=30, 30, 0, 0
 quantifiersource=5, 4, 0, 2
+
+[Sliders]
+ModeTempSliders=C
+eventsliderBernoulli=0, 0, 0, 0
+eventslidercoarse=0, 0, 0, 0
+eventslidersflags=1, 1, 1
+eventslidertemp=0, 0, 0, 0
+eventsliderunits=, , , 
+slideractions=2, 2, 0, 2
+slidercommands="writeSingle(1,20,{})", "writeSingle(1,16,{})", , "writeSingle(1,35,{})"
+sliderfactors=1, 1, 1, 1
+slidermax=70, 70, 100, 100
+slidermin=30, 30, 0, 0
+slideroffsets=0, 0, 0, 0
+slidervisibilities=1, 1, 0, 1
 
 [Style]
 ETname=DT
