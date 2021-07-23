@@ -13,7 +13,7 @@ toc: false
 Use this table to estimate the roaster burner rating based on the roaster capacity.  
  
 **Watch out!** The values in this table are rough guidelines based on a survey of published roaster specifications.  Individual roasters may have higher or lower actual ratings.  
-{: .notice--primary}
+{: .notice--info}
 
 |Size|Capacity (kg)|Rating (kW)|Rating (BTU/h)|
 |:---|:-----:|:-----:|:-----:|
