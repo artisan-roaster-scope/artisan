@@ -11,7 +11,7 @@ toc: false
 # Burner Ratings
 
 
-For selected manufactors (Aillio, Hottop, [Probat](/machines/probat/#Energy-Ratings), K&M, Coffed, SF, IP-CC) machine specific ratings are listed on the corresponding pages.
+For selected manufactors (Aillio, Hottop, [Probat](/machines/probat/#EnergyRatings), K&M, Coffed, SF, IP-CC) machine specific ratings are listed on the corresponding pages.
 
 For other machines, the table below estimate the roaster burner rating based on the roaster capacity.
  
