@@ -23908,6 +23908,14 @@ class ApplicationWindow(QMainWindow):
             self.EventsGroupLayout.setVisible(True)
         else:
             self.EventsGroupLayout.setVisible(False)
+    
+    def toggleForegroundShowfullFlag(self):
+        self.qmc.foregroundShowFullflag = not self.qmc.foregroundShowFullflag
+        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
+
+    def toggleBackroundShowfullFlag(self):
+        self.qmc.backgroundShowFullflag = not self.qmc.backgroundShowFullflag
+        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
     def keyPressEvent(self,event):
@@ -23933,6 +23941,10 @@ class ApplicationWindow(QMainWindow):
                 elif aw.buttonpalette_shortcuts and control_modifier and key in numberkeys: # palette switch via SHIFT-NUM-Keys
                     self.setbuttonsfrom(numberkeys.index(key))
 
+                elif key == 73:                       #I (toggle foreground showfull flag)
+                    self.toggleForegroundShowfullFlag()
+                elif key == 79:                       #O (toggle background showfull flag)
+                    self.toggleBackroundShowfullFlag()
                 elif key == 72:                       #H
                     if not self.qmc.designerflag:
                         if alt_modifier and platf != 'Windows' or ((control_shift_modifier or control_alt_modifier) and platf == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
@@ -24155,9 +24167,9 @@ class ApplicationWindow(QMainWindow):
 #                       else:
 #                            if aw.buttonpalette_shortcuts:
 #                               self.setbuttonsfrom(button.index(key))
-                elif key == 58 and not aw.qmc.flagon: # screenshots only if not sampling!
+                elif key == 58 and not aw.qmc.flagon: # key ";": screenshots only if not sampling!
                     self.desktopscreenshot()
-                elif key == 59 and not aw.qmc.flagon: # screenshots only if not sampling!
+                elif key == 59 and not aw.qmc.flagon: # key ":": screenshots only if not sampling!
                     self.applicationscreenshot()
                 else:
                     QWidget.keyPressEvent(self, event)

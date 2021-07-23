@@ -7,32 +7,32 @@ v2.4.6 (July xx, 2021)
 
 * New Features
   - adds energy and CO2 calculator
-  - adds a flag "Show Full" to the Curve and Background dialog to control of foreground and background curves before CHARGE and after DROP
+  - adds a flag "Show Full" to the Curve and Background dialog to control of foreground and background curves before CHARGE and after DROP (keyboard shortcuts `i` and `o`)
   - adds "Clear the background before loading a new profile" and "Always hide background when loading a profile" flags to the Background dialog
   - adds hiding of background profile by a click on its (sub-)title
   - adds Roast Properties setup tab which includes machines nominal batch size and heating type
   - adds graph image export optimized for Facebook and Instagram and improves overall quality of image exports
   - adds Vietnamese, Danish, Scottish, Lativian and Slovak translations
   - adds AppImage package for a simple installation option on Linux ([Issue #557](../../../issues/557))
-  - adds [Kirsch & Mausser](https://www.kirschundmausser.de/) machine setup with control functionallity
+  - adds [Kirsch & Mausser](https://www.kirschundmausser.de/) machine setup with control functionality
   - adds custom buttons to all [Giesen](https://www.giesencoffeeroasters.eu/) machine setups to control additional actors (intake, flavouring, discharge, cooling, stirrer) on W30/W45/W60 machines
   - adds [Giesen](https://www.giesencoffeeroasters.eu/) machine setup for machines with coarse burner control in 10% steps
   - adds [CoffeeTech FZ94 EVO](https://www.coffee-tech.com/products/shop-roasters/fz94-evo/) machine setup incl. control of burner, airflow and drum speed
   - adds [Roastmax](http://www.roastmaxroasters.com.au/) machine machine setup
   - adds [Craftsmith](https://www.craftsmithroasters.com/) machine setup
-  - adds [Carmomaq](https://www.carmomaq.com.br/) roasters machine setup incl. control of buner, airflow and drum speed
+  - adds [Carmomaq](https://www.carmomaq.com.br/) roasters machine setup incl. control of burner, airflow and drum speed
   - adds [Petroncini](https://www.petroncini.com/) Maestro i06 machine setup
   - adds import of [Petroncini](https://www.petroncini.com/) CSV files
-  - adds command_utility to perform commandline utility tasks (help and version for now) ([PR #542](../../../pull/542))
+  - adds command_utility to perform command line utility tasks (help and version for now) ([PR #542](../../../pull/542))
   - adds current time `~currtime` to the autosave fields
   - adds a check for running Artisan while installing on Windows
-  - adds ArtisanCommands moveBackground and pidLookahead
+  - adds `ArtisanCommand`s `moveBackground` and `pidLookahead`
   - allow comments in button definitions, everything after '#' is ignored (as in alarm descriptions)
   - adds MODBUS command `writeSingle(s,r,v)` and `writeSingle([s,r,v],..,[s,r,v])` to write a single MODBUS 16bit integer register.
   - adds [Phidgets](https://www.phidgets.com/) `frequency(ch,v[,<sn>])` PWM Command to set the PWM frequency on supported modules like the OUT1100
   - adds IO Command `limit(c,v[,sn])` to set the current limit on a DCMotor [Phidgets](https://www.phidgets.com/) ([Issue #626](../../../issues/626))
   - adds device logging for [Phidgets](https://www.phidgets.com/)
-  - adds support for the Yoctopuce modules Yocto-0-10V-Rx, Yocto-milliVolt-Rx and Yocto-Serial
+  - adds support for the Yoctopuce modules [Yocto-0-10V-Rx](https://www.yoctopuce.com/EN/products/usb-electrical-sensors/yocto-0-10v-rx), [Yocto-milliVolt-Rx](https://www.yoctopuce.com/EN/products/usb-electrical-sensors/yocto-millivolt-rx) and [Yocto-Serial](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-serial)
   - adds `{BTB}` and `{ETB}` command substitution replacing those placeholders by the value of BT and ET of the background profile, if loaded, at the current time in Serial/CallProgram/MODBUS/S7/WebSocket command actions
   - adds options to let event quantifiers fire slider actions and to avoid the quantification block delay on observing SVs instead of PVs ([Issue #608](../../../issues/608))
   - adds `RoR@FC`, `roastersize`, and energy/CO2 data to plus roast record
@@ -60,7 +60,7 @@ v2.4.6 (July xx, 2021)
   - align to begin of background profile on START instead of its CHARGE event ([Issue #616](../../../issues/616))
   - energy result values added to ranking reports
   - Dry, Mid and Finish Phase values added to the Excel and CSV ranking reports
-  - align behavior of opening profiles per double-click on Linux to the one on macOS and Windows (see [Working Together – Artisan, ArtisanViewer and artisan.plus
+  - synchronizes the behavior of opening profiles per double-click on Linux to the one on macOS and Windows (see [Working Together – Artisan, ArtisanViewer and artisan.plus
   ](https://artisan-roasterscope.blogspot.com/2020/06/working-together-artisan-artisanviewer.html))
 * Fixes
   - fixes adjustSV for Fuji PXF PID ([Issue #547](../../../issues/547))
@@ -75,7 +75,7 @@ v2.4.6 (July xx, 2021)
   - fixes a RoR unit conversion bug
   - ensures that slider title color gets correctly set on restart on macOS and Linux
   - ensure that that serial communication log is updated also in OFF mode
-  - corrrectly open profiles with spaces in the file path per double-click under Linux
+  - correctly open profiles with spaces in the file path per double-click under Linux
   - fixes an unhandled exception in the quantifiers dialog box ([Issue #607](../../../issues/607))
 
 ----
@@ -129,7 +129,7 @@ Richard Rodrigues](https://github.com/rich1n))
   - fixes broken RPi Stretch build ([Issue #518](../../../issues/518))
   - fixes Phidget async sampling modes that could take readings beyond the current sampling interval on communication drops
   - corrects alarm nr in roast properties table
-  - fixes Excel export issue occuring with DeltaBT turned off
+  - fixes Excel export issue occurring with DeltaBT turned off
   - hides annotations for curves hidden by clicking the legend
   - renamed ET and BT curves can be hidden by clicking the legend
   - enables the PID SV buttons also for the internal software PID as well as for external MODBUS/S7 PIDs
@@ -144,7 +144,7 @@ v2.4.2 (October 2, 2020)
 ------------------
 
 * New Features
-  - extendded machine support
+  - extended machine support
      - adds [CTE Ghibli touch](https://artisan-scope.org/machines/coffeetech/) setup incl. control of burner, fan and drum speed
      - adds updated [IMF RM](https://artisan-scope.org/machines/imf/) setups
      - adds burner control to [San Franciscan](https://www.sanfranroaster.com/) setup
@@ -221,7 +221,7 @@ v2.4.0 (June 3, 2020)
   - adds custom [special event annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html) in step and step+ modes that will show roast data including time, temperature DTR, etc. 
   - adds support for the [Giesen IR sensor](https://artisan-scope.org/machines/giesen/)
   - adds support for [Twino/Ozstar roasting machines](https://artisan-scope.org/machines/twino-ozstar/)
-  - adds S7 and MODBUS communciation optimizer
+  - adds S7 and MODBUS communication optimizer
   - adds two more S7 and MODBUS channels
   - adds support for Yoctopuce [Yocto-0-10V-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-0-10v-tx), [Yocto-4-20mA-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-4-20ma-tx), [Yocto-PWM-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-pwm-tx), [Yocto-4-20mA-Rx](https://www.yoctopuce.com/EN/products/usb-electrical-sensors/yocto-4-20ma-rx), [Yocto-Servo](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-servo) and Yoctopuce Relays modules ([Yocto-Relay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-relay), [Yocto-LatchedRelay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-latchedrelay), [Yocto-MaxiCoupler-V2](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-maxicoupler-v2), [Yocto-PowerRelay-V2](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-powerrelay-v2), [Yocto-PowerRelay-V3](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-powerrelay-v3), and [Yocto-MaxiPowerRelay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-maxipowerrelay))
   - adds support for Phidget VINT DCMotor modules ([DCC1000](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=965), [DCC1002](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=1117) and [DCC1003](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=1118)), mDNS Phidget server service discovery and support for multiple Phidget IO modules identified by their hub serial number and port
@@ -286,7 +286,7 @@ v2.4.0 (June 3, 2020)
   - improved crossline, timeline, AUC guide and projection line rendering
   - improved rendering of timestamps in mouse coordinates widget
   - background annotations setting now restored on exiting analyzer
-  - disables dragging of items in extra event button table (header tragging is still enabled and processed)
+  - disables dragging of items in extra event button table (header dragging is still enabled and processed)
   - accepts floats for extra devices serial timeouts
   - fixes to MET marker and to copy table
   - fixes a regression introduced in v2.0 that broke the input of negative alarm values
@@ -508,7 +508,7 @@ v1.6.1 (March 10, 2019)
    - adds support for the Phidget [DAQ1400](https://www.phidgets.com/?tier=3&catid=49&pcid=42&prodid=961) (current/frequency/digital/voltage input)
    - adds support for the Phidget RC Servo API supporting the servo controllers [Phidget RCC 1000](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1015) (16x VINT, ext. powered), [Phidget 1061](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1032) (8x USB, ext. powered), and [Phidget 1066](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1044) (1x USB powered) together with a wide range of servo motors from Phidgets (like the [Phidget 3540 10cm Linear Actor](https://www.phidgets.com/?tier=3&catid=25&pcid=22&prodid=406)) or other sources
    - adds support for the [Yocotopuce Meteo](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-meteo-v2) ambient sensors
-   - adds support for the (upcomming) [Yocotopuce](http://www.yoctopuce.com/EN/products/category/usb-environmental-sensors) IR module
+   - adds support for the (upcoming) [Yocotopuce](http://www.yoctopuce.com/EN/products/category/usb-environmental-sensors) IR module
    - adds support for the [Probat Roaster Middleware](https://www.probat.com/en/products/shoproaster/produkte/roasters/probatone-series/)
    - adds 2in1 variant of Sedona Elite machine configuration
    - adds CMD-A keyboard shortcut to open alarms dialog
@@ -530,7 +530,7 @@ v1.6.1 (March 10, 2019)
    - faster attach of Phidget devices
    - extends the range of allowed event values in the mini editor from 0-100 to 0-9999
    - allow to control Hottop 2k+ while not logging
-   - udated French translations (thanks Nico!)
+   - updated French translations (thanks Nico!)
    - adds 0.05C and 0.02C Phidget Change Triggers
    - adds default focus to OK button and assigns CMD-W and CMD-. shortcuts to the Cancel button of most dialogs ([Issue 321](../../../issues/321))
    - improved Roast Properties dialog layout
@@ -562,7 +562,7 @@ v1.6.1 (March 10, 2019)
    - fixes an issue on CHARGE on newer Aillio R1 firmware versions ([Issue #297](../../../issues/297))
    - fixes Phidgets 1046 async mode
    - fixes the broken negative target slider (PID) ([Issue #314](../../../issues/314))
-   - moves the connected to modbus message from errors to messages
+   - moves the connected to MODBU message from errors to messages
    - fixes an issue on older Qt/PyQt version not supporting certain keyboard shortcuts ([Issue #326](../../../issues/326))
    - fixes a logical issue on Artisan discarding profiles when it should not do so ([Issue #329](../../../issues/329))
 
@@ -755,7 +755,7 @@ v1.3.0 (April 15, 2018)
    - reorganized some menus and dialogs
    - improves location calc for statssummary
    - allow alarm button action to trigger several buttons at once via a list. The following string is now valid: "1,2,3 # docu"
-   - imports a broader range of aillio bullet r1 profiles
+   - imports a broader range of Aillio bullet R1 profiles
    - various ranking report graph improvements
    - statistic summary layout improvements
    - enhances "Show on BT" to include all special events
@@ -793,7 +793,7 @@ v1.2.0 (December 21, 2017)
  * New Features
 	- adds alarm file name to Roasting Report
 	- adds SV alarm action
-	- adds event replay by temperature (donated by doubleshot)
+	- adds event replay by temperature (donated by [doubleshot](https://www.doubleshot.cz/))
   		- event replay is active only after CHARGE
   		- replay-by-temperature is active only after TP and before it falls back to replay-by-time
   		- to replay an event its event slider must be active (ticked) and the event name has to correspond to that of the background profile
