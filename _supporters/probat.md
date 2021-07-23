@@ -46,3 +46,18 @@ sidebar:
 
 **Watch out!** On network problems with a Probatone II with Wago PLC and small touch panel: The small touch panel of the Wago based machines has the fixed IP address 192.168.2.1. Thus on networks running on 192.168.2.x usually the routers IP address is 192.168.2.1 and thus clashes with that internal displays address. Solution: choose an address range for your network different too 192.168.2.x as advised in the roasters manual.
 {: .notice--primary}
+
+<a name="Energy-Ratings"></a>
+## Energy Ratings
+
+|Model|Source|Burner (kW)|Motor (kW)|
+|-----:|:-----:|:-----:|:-----:|
+|||
+| Probatone 5 | LPG/NG | 13.86 | 1.2 |
+| Probatone 12 | LPG/NG | 28 | 1.5 |
+| Probatone 25 | LPG/NG | 55 | 2.8 |
+|||
+| P05 III | LPG/NG | 13.86 | 1.2 |
+| P05 III | Elec | 17 | 1.2 |
+| P12 III | LPG/NG | 28 | 1.5 |
+| P25 III | LPG/NG | 55 | 2.8 |

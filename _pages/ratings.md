@@ -10,7 +10,18 @@ toc: false
 
 # Burner Ratings
 
-Use this table to estimate the roaster burner rating based on the roaster capacity.  
+
+For selected manufactors machine specific ratings are listed on the corresponding pages:
+
+- Aillio R1
+- Hottop
+- [Probat](/machines/probat/#Energy-Ratings)
+- K&M
+- Coffed
+- SF
+- IP-CC
+
+For other machines, the table below estimate the roaster burner rating based on the roaster capacity.
  
 **Watch out!** The values in this table are rough guidelines based on a survey of published roaster specifications.  Individual roasters may have higher or lower actual ratings.  
 {: .notice--info}
