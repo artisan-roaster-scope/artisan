@@ -11918,6 +11918,7 @@ class tgraphcanvas(FigureCanvas):
             bean_weight = aw.convertWeight(w,aw.qmc.weight_units.index(aw.qmc.weight[2]),1) # to kg
                         
             #reference: https://www.eia.gov/environment/emissions/co2_vol_mass.php
+            #           https://www.parliament.uk/globalassets/documents/post/postpn_383-carbon-footprint-electricity-generation.pdf
             #           https://carbonpositivelife.com/co2-per-kwh-of-electricity/
             #           https://www.eia.gov/tools/faqs/faq.php?id=74&t=11
             # entries must match those in self.sourcenames

@@ -3210,11 +3210,11 @@ class editGraphDlg(ArtisanResizeablDialog):
                     scaled_co2_batch = str(self.scalefloat(metrics["CO2_batch"]))+'g' if metrics["CO2_batch"]<1000 else str(self.scalefloat(metrics["CO2_batch"]/1000.)) +'kg'
                     self.energy_ui.totalCO2Label.setText(scaled_co2_batch)
                     #
-                    scaled_co2_preheat = str(self.scalefloat(metrics["CO2_preheat"]))+'g' if metrics["CO2_preheat"]<1000 else str(self.scalefloat(metrics["CO2_preheat"]/1000.,1)) +'kg'
+                    scaled_co2_preheat = str(self.scalefloat(metrics["CO2_preheat"]))+'g' if metrics["CO2_preheat"]<1000 else str(self.scalefloat(metrics["CO2_preheat"]/1000.)) +'kg'
                     self.energy_ui.preheatCO2label.setText("{} ({})".format(scaled_co2_preheat,QApplication.translate("Label","Preheat",None)))
-                    scaled_co2_bbp = str(self.scalefloat(metrics["CO2_bbp"]))+'g' if metrics["CO2_bbp"]<1000 else str(self.scalefloat(metrics["CO2_bbp"]/1000.,1)) +'kg'
+                    scaled_co2_bbp = str(self.scalefloat(metrics["CO2_bbp"]))+'g' if metrics["CO2_bbp"]<1000 else str(self.scalefloat(metrics["CO2_bbp"]/1000.)) +'kg'
                     self.energy_ui.BBPCO2label.setText("{} ({})".format(scaled_co2_bbp,QApplication.translate("Label","BBP",None)))
-                    scaled_co2_roast = str(self.scalefloat(metrics["CO2_roast"]))+'g' if metrics["CO2_roast"]<1000 else str(self.scalefloat(metrics["CO2_roast"]/1000.,1)) +'kg'
+                    scaled_co2_roast = str(self.scalefloat(metrics["CO2_roast"]))+'g' if metrics["CO2_roast"]<1000 else str(self.scalefloat(metrics["CO2_roast"]/1000.)) +'kg'
                     self.energy_ui.roastCO2label.setText("{} ({})".format(scaled_co2_roast,QApplication.translate("Label","Roast",None)))
                     
                     # a green weight is available
