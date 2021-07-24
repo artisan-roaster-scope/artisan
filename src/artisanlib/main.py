@@ -12033,7 +12033,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.betweenbatchenergies[i] != 0 and (aw.qmc.roastbatchpos > 1 or aw.qmc.betweenbatch_after_preheat or aw.qmc.roastbatchpos==0):
                     if self.betweenbatchenergies[i] < 0 and self.betweenbatchDuration > 0:
                         # percent load multiplied by duration
-                        load_pct = abs(self.preheatenergies[i] * 1000./10)
+                        load_pct = abs(self.betweenbatchenergies[i] * 1000./10)
                         if self.presssure_percents[i] and self.sourcetypes[i] in [0,1]:   # gas loads only
                             # convert pressure to heat
                             factor = math.sqrt(load_pct / 100)
@@ -12061,7 +12061,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.coolingenergies[i] != 0 and aw.qmc.roastbatchpos == 1:
                     if self.coolingenergies[i] < 0 and self.coolingDuration > 0:
                         # percent load multiplied by duration
-                        load_pct = abs(self.preheatenergies[i] * 1000./10)
+                        load_pct = abs(self.coolingenergies[i] * 1000./10)
                         if self.presssure_percents[i] and self.sourcetypes[i] in [0,1]:   # gas loads only
                             # convert pressure to heat
                             factor = math.sqrt(load_pct / 100)
