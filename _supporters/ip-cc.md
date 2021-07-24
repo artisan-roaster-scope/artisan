@@ -28,3 +28,16 @@ This can be done on Windows using the Network Sharing Center by adding a TCP/IPv
 
 **Watch out!** Artisan doesn't monitor unsafe temperatures, so you should never leave the roaster alone.
 {: .notice--primary}
+
+
+<a name="EnergyRatings"></a>
+## Energy Ratings
+
+|Model|Source|Burner (kW)|
+|:-----|:-----:|:-----:|
+|||
+| iRm_10 | LPG/NG | 45 |
+| iRm_20| LPG/NG | 90 |
+| iRm_35 | LPG/NG | 165 |
+| iRm_70 | LPG/NG | 450 |
+| iRm_140 | LPG/NG | 850 |

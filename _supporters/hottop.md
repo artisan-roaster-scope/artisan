@@ -33,3 +33,11 @@ The Artisan blog contains a [detailed post](https://artisan-roasterscope.blogspo
 **Watch out!**
 There is also setup supporting Hottop machines modified with an [Arduino/TC4/HTC combination](http://blog.oilslickcoffee.com/2016/03/15/how-to-install-hottop-htri-control-board/){:target="_blank"}.
 {: .notice--primary}
+
+<a name="EnergyRatings"></a>
+## Energy Ratings
+
+|Model|Source|Heater (kW)|
+|:-----|:-----:|:-----:|
+|||
+| KN-8828 | Elec | 0.75 |

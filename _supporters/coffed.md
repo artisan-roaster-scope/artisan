@@ -25,3 +25,15 @@ sidebar:
 **Check out the step-by-step documentation by Coffed!**  
 ["How to connect your computer to an automatic Coffed roaster?"](https://coffed.pl/wp-content/uploads/2020/11/Connnect-computer-with-roaster-1.pdf){:target="_blank"}
 {: .notice--primary}
+
+<a name="EnergyRatings"></a>
+## Energy Ratings
+
+|Model|Source|Burner (kW)|
+|:-----|:-----:|:-----:|
+|||
+| SR3 | LPG/NG | 10 |
+| SR5 | LPG/NG | 18 |
+| SR15 | LPG/NG | 40 |
+| SR25 | LPG/NG | 60 |
+| SR60 | LPG/NG | 120 |

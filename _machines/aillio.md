@@ -38,3 +38,11 @@ temperatures, so you should never leave the roaster alone.
 
 **Watch out!** Running Artisan in parallel with another roast logging software, like RoastTime, connected to the same machine might lead to unstabilities and crashes.
 {: .notice--primary}
+
+<a name="EnergyRatings"></a>
+## Energy Ratings
+
+|Model|Source|Heater (kW)|
+|:-----|:-----:|:-----:|
+|||
+| Bullet R1 | Elec | 1.55 |

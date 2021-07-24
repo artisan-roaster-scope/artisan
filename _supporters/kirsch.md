@@ -19,7 +19,20 @@ sidebar:
 * __Features:__
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
   - logging of inlet temperature (IT), burner level, air flow, gas and drum pressure, and drum speed
-
-<!--
   - on machines with PLC firmware version 2 or better all available actors like burner, drum speed, air flow, feeder, discharge/release doors, etc. can be controlled via sliders and buttons as well as automated actions (alarms, event replay, PID controller)
--->
+
+
+<a name="EnergyRatings"></a>
+## Energy Ratings
+
+|Model|Source|Burner (kW)|Motor (kW)|
+|:-----|:-----:|:-----:|:-----:|
+|||
+| UG 15 | LPG/NG | 55 | 4 |
+| UG 25 | LPG/NG | 80 | 4 |
+|||
+| G45 | LPG/NG | 145 | 10 |
+| G60 | LPG/NG | 160 | 13 |
+| G75 | LPG/NG | 200 | 13 |
+| G90 | LPG/NG | 230 | 15 |
+| G120 | LPG/NG | 280 | 15 |

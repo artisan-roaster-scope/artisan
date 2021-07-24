@@ -51,7 +51,7 @@ sidebar:
 ## Energy Ratings
 
 |Model|Source|Burner (kW)|Motor (kW)|
-|:-----:|:-----:|:-----:|:-----:|
+|:-----|:-----:|:-----:|:-----:|
 |||
 | Probatone 5 | LPG/NG | 13.86 | 1.2 |
 | Probatone 12 | LPG/NG | 28 | 1.5 |
@@ -61,3 +61,12 @@ sidebar:
 | P05 III | Elec | 17 | 1.2 |
 | P12 III | LPG/NG | 28 | 1.5 |
 | P25 III | LPG/NG | 55 | 2.8 |
+|||
+| UG 15 | LPG/NG | 55 | 4 |
+| UG 25 | LPG/NG | 80 | 4 |
+|||
+| G45 | LPG/NG | 145 | 10 |
+| G60 | LPG/NG | 160 | 13 |
+| G75 | LPG/NG | 200 | 13 |
+| G90 | LPG/NG | 230 | 15 |
+| G120 | LPG/NG | 280 | 15 |

@@ -20,3 +20,15 @@ sidebar:
   - gas control on machines produced after 8/2019
 
 To activate the gas control, press CMD-2 to switch to the second [palette](https://artisan-roasterscope.blogspot.com/2013/02/events-buttons-and-palettes.html) which defines the slider to set the gas. CMD-1 activates the setup without the gas control slider.
+
+<a name="EnergyRatings"></a>
+## Energy Ratings
+
+|Model|Source|Burner (BTU/h)|Burner (kW)|
+|:-----|:-----:|:-----:|:-----:|
+|||
+| SF-1 (0.4kg) | LPG/NG | 10000 | 2.93 |
+| SF-6 (2.7kg)| LPG/NG | 30000 | 8.79 |
+| SF-10 (4.5kg) | LPG/NG | 50000 | 14.65 |
+| SF-25 (11.3kg) | LPG/NG | 100000 | 29.31 |
+| SF-75 (34kg) | LPG/NG | 300000 | 87.92 |
