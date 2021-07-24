@@ -3550,8 +3550,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         try:
             if s == s.strip('%'):
                 f = self.aw.float2float(toFloat(self.aw.comma2dot(str(s))),2)
-                if f <= 1.0 and f > 0.0:
-                    res = str(int(f*1000./10)) + '%'  # using 1000/10 to get around Pythons decimal error ex. .58*100 = 57.999
+                if f < 0:
+                    res = str(abs(int(f*1000./10))) + '%'  # using 1000/10 to get around Pythons decimal error ex. .58*100 = 57.999
                 else:
                     res = self.validateNumText(s)
             else:
@@ -3571,7 +3571,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             elif s == s.strip('%'):
                 res = toFloat(self.scalefloat(s))
             else:
-                res = self.aw.float2float(toFloat(s.strip('%'))/100,2)
+                # percentage values are stored as a negative decimal
+                res = -self.aw.float2float(toFloat(s.strip('%'))/100,2)
         except:
             res = 0
         return res
