@@ -1,4 +1,4 @@
-<img align="right" src="https://raw.githubusercontent.com/MAKOMO/artisan/master/wiki/screenshots/artisan.png" width="70">
+<img align="right" src="https://raw.githubusercontent.com/artisan-roaster-scope/artisan/master/wiki/screenshots/artisan.png" width="70">
 
 [Artisan](https://artisan-scope.org/) 
 ==========
@@ -27,7 +27,7 @@ If you think Artisan is useful to you, contribute financially to its further dev
 > *Home roasting enthusiasts often donate 10-100.- (in $ or EUR), while small roasting businesses and consultant that use Artisan in their daily work tend to donate 100-300.- (in $ or EUR). For extra tech support, please inquire.*
 
 
-![](https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/artisan-cover.png?raw=true)
+![](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/screenshots/artisan-cover.png?raw=true)
 
 [Download](https://github.com/artisan-roaster-scope/artisan/releases/latest) (macOS/Windows/Linux)
 
