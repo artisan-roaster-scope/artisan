@@ -6,7 +6,7 @@ v2.4.6 (July xx, 2021)
 ------------------
 
 * New Features
-  - adds energy and CO2 calculator
+  - adds [energy and CO2 calculator](https://artisan-roasterscope.blogspot.com/2021/07/tracking-energy-consumption-co2.html)
   - adds a flag "Show Full" to the Curve and Background dialog to control of foreground and background curves before CHARGE and after DROP (keyboard shortcuts `i` and `o`)
   - adds "Clear the background before loading a new profile" and "Always hide background when loading a profile" flags to the Background dialog
   - adds hiding of background profile by a click on its (sub-)title
@@ -17,8 +17,8 @@ v2.4.6 (July xx, 2021)
   - adds [Kirsch & Mausser](https://www.kirschundmausser.de/) machine setup with control functionality
   - adds custom buttons to all [Giesen](https://www.giesencoffeeroasters.eu/) machine setups to control additional actors (intake, flavouring, discharge, cooling, stirrer) on W30/W45/W60 machines
   - adds [Giesen](https://www.giesencoffeeroasters.eu/) machine setup for machines with coarse burner control in 10% steps
-  - adds [CoffeeTech FZ94 EVO](https://www.coffee-tech.com/products/shop-roasters/fz94-evo/) machine setup incl. control of burner, airflow and drum speed
-  - adds [Roastmax](http://www.roastmaxroasters.com.au/) machine machine setup
+  - adds [Coffee-Tech FZ94 EVO](https://www.coffee-tech.com/products/shop-roasters/fz94-evo/) machine setup incl. control of burner, airflow and drum speed
+  - adds [Roastmax](http://www.roastmaxroasters.com.au/) machine setup
   - adds [Craftsmith](https://www.craftsmithroasters.com/) machine setup
   - adds [Carmomaq](https://www.carmomaq.com.br/) roasters machine setup incl. control of burner, airflow and drum speed
   - adds [Petroncini](https://www.petroncini.com/) Maestro i06 machine setup
@@ -44,6 +44,7 @@ v2.4.6 (July xx, 2021)
   - Spanish translations updated ([PR #543](../../../pull/543), [PR #553](../../../pull/553), [PR #554](../../../pull/554))
   - Chinese translations updated (thanks to Leo Huang)
   - most other translations updated and extended
+  - updates some [Coffed](https://artisan-scope.org/machines/coffed/) machine setup
   - allows mini editor to show and change time before recording CHARGE
   - statistics bar always use DE event value if it is set, if no DE event exists use the phases table temp
   - allows for a y-axis step sizes below 10
