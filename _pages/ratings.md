@@ -15,7 +15,7 @@ For selected manufactors ([Aillio](/machines/aillio/#EnergyRatings), [Hottop](/m
 
 For other machines, the table below estimate the roaster burner and motor rating based on the roaster capacity.
  
-**Watch out!** The values in this table are rough guidelines based on a survey of published roaster specifications.  Individual roasters may have higher or lower actual ratings.  
+**Watch out!** The values in this table are rough guidelines based on a survey of published roaster specifications conducted in 2021.  Individual roasters may have higher or lower actual ratings.  
 {: .notice--info}
 
 |Size|Capacity (kg)|Burner (kW)|Burner (BTU/h)|Motors (kW)|
