@@ -18,14 +18,14 @@ For other machines, the table below estimate the roaster burner and motor rating
 **Watch out!** The values in this table are rough guidelines based on a survey of published roaster specifications.  Individual roasters may have higher or lower actual ratings.  
 {: .notice--info}
 
-|Size|Capacity (kg)|Rating (kW)|Rating (BTU/h)||Motor/Fan Rating (kW)|
+|Size|Capacity (kg)|Burner (kW)|Burner (BTU/h)|Motors (kW)|
 |:---|:-----:|:-----:|:-----:|:-----:|
-|||||
+||||||
 |Tiny||||
-| | 0.5|2.93|10000|0.20
+| | 0.5|2.93|10000|0.20|
 | | 1|4.98|17000|0.20
 | | 1.5|7.03|24000|0.40
-||||
+||||||
 |Small||||
 | | 2|8.79|30000|0.71
 | | 3|12.9|44000|0.85
@@ -34,7 +34,7 @@ For other machines, the table below estimate the roaster burner and motor rating
 | | 10|36.0|123000|1.83
 | | 12|40.7|139000|2.11
 | | 15|46.0|157000|2.53
-|||||
+||||||
 |Midsize||||
 | | 18|49.5|169000|2.95
 | | 20|51.0|174000|3.23
@@ -42,7 +42,7 @@ For other machines, the table below estimate the roaster burner and motor rating
 | | 30|76.5|261000|4.64
 | | 40|92.9|317000|6.04
 | | 60|131|447000|8.85
-|||||
+||||||
 |Large||||
 | | 70|153|521000|9.48
 | | 120|285|972000|12.3
