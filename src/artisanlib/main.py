@@ -3055,6 +3055,7 @@ class tgraphcanvas(FigureCanvas):
                     elif self.backgroundprofile is not None:
                         # toggle background if right top corner above canvas where the subtitle is clicked
                         self.background = not self.background
+                        aw.autoAdjustAxis()
                         self.redraw(recomputeAllDeltas=True)
                         return
 
@@ -23911,11 +23912,11 @@ class ApplicationWindow(QMainWindow):
     
     def toggleForegroundShowfullFlag(self):
         self.qmc.foregroundShowFullflag = not self.qmc.foregroundShowFullflag
-        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
+        self.qmc.redraw(recomputeAllDeltas=False)
 
     def toggleBackroundShowfullFlag(self):
         self.qmc.backgroundShowFullflag = not self.qmc.backgroundShowFullflag
-        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
+        self.qmc.redraw(recomputeAllDeltas=False)
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
     def keyPressEvent(self,event):
@@ -24991,6 +24992,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.fileCleanSignal.emit()
                 if self.qmc.hideBgafterprofileload:
                     aw.qmc.background = False
+                    aw.autoAdjustAxis()
                 #Plot everything
                 self.qmc.redraw()
                 self.updatePhasesLCDs()
