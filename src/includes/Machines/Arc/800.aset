@@ -41,3 +41,6 @@ comport=COM4
 parity=N
 stopbits=1
 timeout=0.8
+
+[MachineSetup]
+capacity=0.8

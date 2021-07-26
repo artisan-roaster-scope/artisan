@@ -172,3 +172,7 @@ slidervisibilities=1, 1, 0, 1
 
 [Style]
 ETname=DT
+
+[MachineSetup]
+capacity=2.4
+heating_type=3

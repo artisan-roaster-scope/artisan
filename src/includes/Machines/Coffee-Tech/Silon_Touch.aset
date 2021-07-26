@@ -161,3 +161,6 @@ slidermax=70, 70, 100, 100
 slidermin=30, 30, 0, 0
 slideroffsets=0, 0, 0, 0
 slidervisibilities=1, 1, 0, 1
+
+[MachineSetup]
+capacity=7

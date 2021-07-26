@@ -179,3 +179,7 @@ slidermax=70, 100, 100, 100
 slidermin=30, 30, 0, 0
 slideroffsets=0, 0, 0, 0
 slidervisibilities=0, 0, 0, 0
+
+[MachineSetup]
+capacity=2.4
+heating_type=3

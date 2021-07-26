@@ -148,3 +148,6 @@ quantifiercoarse=0, 0, 0, 0
 quantifiermax=100, 100, 100, 100
 quantifiermin=0, 0, 0, 0
 quantifiersource=5, 4, 0, 0
+
+[MachineSetup]
+capacity=7

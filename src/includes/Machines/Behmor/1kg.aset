@@ -58,3 +58,7 @@ ETname=CT
 
 [events]
 etypes=Air, Drum, Damper, Heater, --
+
+[MachineSetup]
+capacity=1
+heating_type=3

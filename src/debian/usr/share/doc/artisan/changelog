@@ -3,7 +3,7 @@ artisan (2.4.6-0) precise; urgency=low
   * changes since 2.4.4:
    - adds energy tab
    - bug fixes
- --  <marko.luther@gmx.net>  Sun, 11 Dec 2021 19:32:14 +0200
+ --  <marko.luther@gmx.net>  Fri, 30 Jul 2021 19:32:14 +0200
 
 artisan (2.4.4-0) precise; urgency=low
   * new upstream release
