@@ -9575,6 +9575,7 @@ class tgraphcanvas(FigureCanvas):
             aw.initializedMonitoringExtraDeviceStructures()
 
             #reset alarms
+            self.silent_alarms = False
             self.temporaryalarmflag = -3
             self.alarmstate = [-1]*len(self.alarmflag)  #1- = not triggered; any other value = triggered; value indicates the index in self.timex at which the alarm was triggered
             #reset TPalarmtimeindex to trigger a new TP recognition during alarm processing
@@ -37270,9 +37271,7 @@ class ApplicationWindow(QMainWindow):
                     self.comparator = roastCompareDlg(self,self,foreground,background)
                     self.comparator.addProfiles(filenames)
                     self.comparator.show()
-                self.roastCompareAction.setChecked(bool(self.comparator))
-            else:
-                self.roastCompareAction.setChecked(bool(self.comparator))
+            self.roastCompareAction.setChecked(bool(self.comparator))
 
     @pyqtSlot()
     @pyqtSlot(bool)
