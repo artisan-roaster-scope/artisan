@@ -121,7 +121,7 @@ cp ../LICENSE dist/LICENSE.txt
 #rm -f dist/libz.so.1 # removing this lib seems to break the build on some RPi Buster version
 #rm -f dist/libglib-2.0.so.0 # removed for v1.6 and later
 
-rm -f libusb-1.0.so.0
+#rm -f dist/libusb-1.0.so.0
 
 
 
