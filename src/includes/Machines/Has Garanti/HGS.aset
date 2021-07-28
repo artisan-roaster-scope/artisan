@@ -1,5 +1,6 @@
 [Device]
 id=29
+roastertype_setup=Has Garanti HGS
 
 [Modbus]
 PID_OFF_action=
@@ -88,6 +89,3 @@ type=0
 wordorderLittle=true
 optimizer=true
 fetch_max_blocks=false
-
-[RoastProperties]
-roastertype=Has Garanti HGS

@@ -2,6 +2,7 @@
 Delay=3000
 ETfunction=Y3
 Oversampling=false
+roastertype_setup=Santoker 1xPXR
 
 [Device]
 id=29
@@ -116,6 +117,3 @@ stopbits=1
 timeout=0.4
 type=0
 wordorderLittle=true
-
-[RoastProperties]
-roastertype=Santoker 1xPXR

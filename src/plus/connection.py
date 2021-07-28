@@ -39,7 +39,10 @@ import platform
 
 if platform.system().startswith("Windows") or platform.system() == 'Darwin':
     import keyring.backends.fail # @UnusedImport
-    import keyring.backends.OS_X # @UnusedImport
+    try:
+        import keyring.backends.macOS # @UnusedImport @UnresolvedImport
+    except:
+        import keyring.backends.OS_X # @UnusedImport @UnresolvedImport
     import keyring.backends.SecretService # @UnusedImport
     import keyring.backends.Windows # @UnusedImport
 import keyring # @Reimport # imported last to make py2app work
@@ -111,7 +114,10 @@ def setKeyring():
             keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())   # @UndefinedVariable                  
         elif platform.system() == 'Darwin':
             import keyring # @Reimport
-            keyring.set_keyring(keyring.backends.OS_X.Keyring())
+            try:
+                keyring.set_keyring(keyring.backends.macOS.Keyring())
+            except:
+                keyring.set_keyring(keyring.backends.OS_X.Keyring())
         else: # Linux
             try:
 #                import os
@@ -173,6 +179,7 @@ def authentify():
                 config.logger.debug("connection: -> authentifying %s",config.app_window.plus_account) # @UndefinedVariable
                 data = {"email":config.app_window.plus_account,"password": config.passwd} # @UndefinedVariable
                 r = postData(config.auth_url,data,False)
+                config.logger.debug("connection: -> authentifying reply status code: %s",r.status_code) # @UndefinedVariable
                 # returns 404: login wrong and 401: passwd wrong
                 res = r.json()
                 if "success" in res and res["success"] and "result" in res and "user" in res["result"] and "token" in res["result"]["user"]:
@@ -227,6 +234,13 @@ def authentify():
 def getHeaders(authorized=True,decompress=True):
     os,os_version = config.app_window.get_os() # @UndefinedVariable
     headers = {'user-agent': 'Artisan/' + __version__ + " (" + os + "; " + os_version + ")"}
+    try:
+        locale = config.app_window.get_locale()
+        if locale is not None and locale != "":
+            locale = locale.lower().replace("_","-")
+            headers['Accept-Language'] = locale
+    except:
+        pass
     if authorized:
         token = getToken()
         if token is not None:

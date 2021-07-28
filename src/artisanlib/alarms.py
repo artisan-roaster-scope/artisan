@@ -22,7 +22,7 @@ import prettytable
 
 from artisanlib.util import deltaLabelUTF8#, stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanResizeablDialog
-from artisanlib.widgets import (MyQComboBox, MyTableWidgetItemInt, MyTableWidgetItemQCheckBox,
+from artisanlib.widgets import (MyQComboBox, MyTableWidgetItemNumber, MyTableWidgetItemQCheckBox,
                                 MyTableWidgetItemQComboBox, MyTableWidgetItemQLineEdit, MyTableWidgetItemQTime)
 
 from help import alarms_help
@@ -89,7 +89,9 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.dialogbuttons.accepted.connect(self.closealarms)
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
         
-        helpButton = QPushButton(QApplication.translate("Button","Help",None))
+        helpDialogButton = QDialogButtonBox()
+        helpButton = helpDialogButton.addButton(QDialogButtonBox.Help)
+        self.setButtonTranslations(helpButton,"Help",QApplication.translate("Button","Help", None))
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
         helpButton.setFocusPolicy(Qt.NoFocus)
         helpButton.setMinimumWidth(80)
@@ -529,7 +531,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         
     def renumberRows(self):
         for i in range(self.alarmtable.rowCount()):
-            self.alarmtable.setItem(i, 0, MyTableWidgetItemInt(str(i+1),i))
+            self.alarmtable.setItem(i, 0, MyTableWidgetItemNumber(str(i+1),i))
 
     @pyqtSlot(bool)
     def deletealarm(self,_):
@@ -691,6 +693,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         settings = QSettings()
         #save window geometry
         settings.setValue("AlarmsGeometry",self.saveGeometry())
+        self.aw.closeEventSettings()
         
         self.aw.AlarmDlg_activeTab = self.TabWidget.currentIndex()
         self.accept()
@@ -906,7 +909,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         #text description
         descriptionedit = QLineEdit(self.aw.qmc.alarmstrings[i])
         descriptionedit.setCursorPosition(0)
-        self.alarmtable.setItem(i, 0, MyTableWidgetItemInt(str(i+1),i))
+        self.alarmtable.setItem(i, 0, MyTableWidgetItemNumber(str(i+1),i))
         self.alarmtable.setCellWidget(i,1,flagComboBox)
         self.alarmtable.setItem(i, 1, MyTableWidgetItemQCheckBox(flagComboBox))
         self.alarmtable.setCellWidget(i,2,guardedit)

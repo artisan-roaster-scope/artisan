@@ -5,6 +5,7 @@ Oversampling=false
 curvefilter=1
 filterDropOuts=true
 optimalSmoothing=false
+roastertype_setup=Phidget 2xRTD
 
 [Device]
 id=68
@@ -42,6 +43,3 @@ DeltaETspan=5
 DeltaSpan=5
 deltaETfilter=7
 deltafilter=7
-
-[RoastProperties]
-roastertype=Phidget 2xRTD

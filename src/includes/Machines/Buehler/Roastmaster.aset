@@ -1,6 +1,7 @@
 [General]
 Delay=1000
 Oversampling=false
+roastertype_setup=B\xfchler Roastmaster
 
 [Device]
 id=79
@@ -25,9 +26,6 @@ extramathexpression1=,
 extramathexpression2=, 
 extraname1=AT, Speed
 extraname2=Drum, Air
-
-[RoastProperties]
-roastertype=B\xfchler Roastmaster
 
 [S7]
 PID_OFF_action=

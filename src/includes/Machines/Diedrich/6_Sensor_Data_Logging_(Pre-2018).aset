@@ -5,6 +5,7 @@ Delay=1000
 ETcurve=false
 ETlcd=false
 Oversampling=false
+roastertype_setup=Diedrich 6-Sensor (Pre-2018)
 
 [CurveStyles]
 BTlinestyle=-
@@ -88,6 +89,3 @@ extraname2=Drum Exhaust, Inlet Temp, Roast Air 100%, Roast Air 0%, ,
 [RoC]
 DeltaET=false
 DeltaETlcd=false
-
-[RoastProperties]
-roastertype=Diedrich 6-Sensor (Pre-2018)

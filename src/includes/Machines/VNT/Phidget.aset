@@ -4,6 +4,7 @@ Oversampling=false
 curvefilter=1
 filterDropOuts=true
 optimalSmoothing=false
+roastertype_setup=VNT Phidget
 
 [Device]
 id=34
@@ -17,6 +18,3 @@ DeltaETspan=15
 DeltaSpan=15
 deltaETfilter=13
 deltafilter=13
-
-[RoastProperties]
-roastertype=VNT Phidget

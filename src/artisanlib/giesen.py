@@ -8,6 +8,22 @@ import csv
 
 from PyQt5.QtWidgets import QApplication
 
+from artisanlib.util import fill_gaps
+
+def replace_duplicates(data):
+    lv = -1
+    data_core = []
+    for v in data:
+        if v == lv:
+            data_core.append(-1)
+        else:
+            data_core.append(v)
+            lv = v
+    # reconstruct first and last reading
+    if len(data)>0:
+        data_core[-1] = data[-1]
+    return fill_gaps(data_core)
+
 # returns a dict containing all profile information contained in the given IKAWA CSV file
 def extractProfileGiesenCSV(file,_):
     res = {} # the interpreted data set
@@ -133,8 +149,8 @@ def extractProfileGiesenCSV(file,_):
     csvFile.close()
             
     res["timex"] = timex
-    res["temp1"] = temp1
-    res["temp2"] = temp2
+    res["temp1"] = replace_duplicates(temp1)
+    res["temp2"] = replace_duplicates(temp2)
     res["timeindex"] = timeindex
     
     res["extradevices"] = [25,25]

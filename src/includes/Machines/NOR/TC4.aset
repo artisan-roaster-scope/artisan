@@ -4,6 +4,7 @@ Delay=3000
 Oversampling=false
 dropDuplicates=true
 dropDuplicatesLimit=0.3
+roastertype_setup=NOR TC4
 
 [Device]
 ArduinoFILT=70, 70, 70, 70
@@ -12,9 +13,6 @@ arduinoBTChannel=2
 arduinoETChannel=1
 PIDbuttonflag=false
 id=19
-
-[RoastProperties]
-roastertype=NOR TC4
 
 [SerialPort]
 baudrate=115200

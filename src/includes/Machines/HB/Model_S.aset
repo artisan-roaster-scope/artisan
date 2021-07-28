@@ -4,6 +4,7 @@ Delay=4000
 Oversampling=false
 dropDuplicates=true
 dropDuplicatesLimit=0.3
+roastertype_setup=HB Model S
 
 [Device]
 id=115
@@ -32,9 +33,6 @@ extramathexpression1=,
 extramathexpression2=, 
 extraname1=Drum, AT
 extraname2=Inlet, Extra 2
-
-[RoastProperties]
-roastertype=HB Model S
 
 [SerialPort]
 baudrate=115200

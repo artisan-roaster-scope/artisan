@@ -19,7 +19,7 @@
 from artisanlib.util import stringtoseconds
 
 from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot)
-from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QTableWidgetItem, QSizePolicy, QLCDNumber)
+from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox)
 from PyQt5.QtGui import QFontMetrics
 
 class MyQComboBox(QComboBox):
@@ -88,7 +88,7 @@ class MyTableWidgetItemQTime(QTableWidgetItem):
         b = other.sortKey.time().minute() * 60 + other.sortKey.time().second()
         return a < b
 
-class MyTableWidgetItemInt(QTableWidgetItem):
+class MyTableWidgetItemNumber(QTableWidgetItem):
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, text, sortKey):
         super(QTableWidgetItem,self).__init__(text, QTableWidgetItem.UserType)
@@ -96,8 +96,8 @@ class MyTableWidgetItemInt(QTableWidgetItem):
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     def __lt__(self, other):
-        return self.sortKey < other.sortKey 
-        
+        return self.sortKey < other.sortKey
+  
 class MyTableWidgetItemQCheckBox(QTableWidgetItem):
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey):
@@ -179,6 +179,20 @@ class ClickableQLabel(QLabel):
         elif event.button() == Qt.RightButton:
             self.right_clicked.emit()
 
+class ClickableQGroupBox(QGroupBox):
+    clicked = pyqtSignal()
+    left_clicked = pyqtSignal()
+    right_clicked = pyqtSignal()
+    
+    def __init__(self, *args, **kwargs):
+        super(ClickableQGroupBox, self).__init__(*args, **kwargs)
+
+    def mousePressEvent(self, event):
+        self.clicked.emit()
+        if event.button() == Qt.LeftButton:
+            self.left_clicked.emit()
+        elif event.button() == Qt.RightButton:
+            self.right_clicked.emit()
 
 class MyQLCDNumber(QLCDNumber):
     clicked = pyqtSignal()

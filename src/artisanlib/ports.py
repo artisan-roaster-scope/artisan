@@ -27,7 +27,7 @@ from artisanlib.comm import serialport
 from help import modbus_help
 from help import s7_help
 
-from PyQt5.QtCore import (Qt, pyqtSlot, QEvent)
+from PyQt5.QtCore import (Qt, pyqtSlot, QEvent, QSettings)
 from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
                              QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy,
@@ -717,6 +717,11 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_full_block.setChecked(self.aw.modbus.fetch_max_blocks)
         self.modbus_full_block.setFocusPolicy(Qt.NoFocus)
         self.modbus_full_block.setEnabled(bool(self.aw.modbus.optimizer))
+        
+        self.modbus_reset = QCheckBox(QApplication.translate("ComboBox","reset",None))
+        self.modbus_reset.setChecked(self.aw.modbus.reset_socket)
+        self.modbus_reset.setFocusPolicy(Qt.NoFocus)
+        self.modbus_reset.setToolTip(QApplication.translate("Tooltip","Reset socket connection on error", None))
 
         ##########################    TAB 4 WIDGETS   SCALE
         scale_devicelabel = QLabel(QApplication.translate("Label", "Device", None))
@@ -812,8 +817,7 @@ class comportDlg(ArtisanResizeablDialog):
         
         helpButton = self.dialogbuttons.addButton(QDialogButtonBox.Help)
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
-        if self.aw.locale not in self.aw.qtbase_locales:
-            helpButton.setText(QApplication.translate("Button","Help", None))
+        self.setButtonTranslations(helpButton,"Help",QApplication.translate("Button","Help", None))
         helpButton.clicked.connect(self.showModbusbuttonhelp)
         helpButton.setFocusPolicy(Qt.NoFocus)
         
@@ -904,6 +908,8 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_setup.addWidget(self.modbus_optimize)
         modbus_setup.addSpacing(5)
         modbus_setup.addWidget(self.modbus_full_block)
+        modbus_setup.addSpacing(5)
+        modbus_setup.addWidget(self.modbus_reset)
         modbus_setup.addSpacing(7)
         modbus_setup.addStretch()
         modbus_setup.addWidget(modbus_typelabel)
@@ -1581,6 +1587,9 @@ class comportDlg(ArtisanResizeablDialog):
             self.dialogbuttons.button(QDialogButtonBox.Ok)
         else:
             self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        settings = QSettings()
+        if settings.contains("PortsGeometry"):
+            self.restoreGeometry(settings.value("PortsGeometry"))
     
     @pyqtSlot(int)
     def s7_optimize_toggle(self,i):
@@ -1767,10 +1776,12 @@ class comportDlg(ArtisanResizeablDialog):
 
     def closeEvent(self,_):
         self.closeHelp()
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("PortsGeometry",self.saveGeometry())
 
     @pyqtSlot()
     def accept(self):
-        self.closeHelp()
         #validate serial parameter against input errors
         class comportError(Exception): pass
         class timeoutError(Exception): pass
@@ -1801,6 +1812,7 @@ class comportDlg(ArtisanResizeablDialog):
                 self.timeoutEdit.selectAll()
                 self.timeoutEdit.setFocus()
                 return
+        self.closeEvent(None)
         QDialog.accept(self)
 
     def closeserialports(self):

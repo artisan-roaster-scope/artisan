@@ -1,0 +1,73 @@
+[General]
+Delay=2000
+Oversampling=false
+roastertype_setup=Probat G/UG
+ExtraEventSamplingDelay=0
+
+[Device]
+id=79
+
+[DefaultButtons]
+buttonactions=0, 0, 0, 0, 0, 0, 0, 0
+buttonactionstrings=, , , , , , , 
+buttonvisibility=true, true, true, true, true, false, true, true
+extrabuttonactions=0, 0, 0
+extrabuttonactionstrings=, , 
+xextrabuttonactions=0, 0
+xextrabuttonactionstrings=, 
+
+[ExtraComm]
+extrabaudrate=19200, 19200, 19200
+extrabytesize=8, 8, 8
+extracomport=COM1, COM1, COM1
+extraparity=E, E, E
+extrastopbits=1, 1, 1
+extratimeout=1, 1, 1
+
+[ExtraDev]
+extraCurveVisibility1=false, false, false, true, true, true, true, true, true, true
+extraCurveVisibility2=true, false, false, true, true, true, true, true, true, true
+extraLCDvisibility1=true, true, true, false, false, false, false, false, false, false
+extraLCDvisibility2=true, true, true, false, false, false, false, false, false, false
+extradevicecolor1=black, black, black
+extradevicecolor2=black, black, black
+extradevices=80, 81, 82
+extramathexpression1=, , 
+extramathexpression2=, , 
+extraname1=IT, Power, GasP
+extraname2=DrumSpeed, Air, DrumP
+
+[Quantifiers]
+clusterEventsFlag=false
+quantifieractive=1, 0, 0, 1
+quantifiercoarse=0, 0, 0, 0
+quantifiermax=100, 100, 100, 100
+quantifiermin=0, 0, 0, 0
+quantifiersource=5, 0, 0, 4
+
+[RoastProperties]
+roastertype=K+M UG retro
+
+[S7]
+PID_OFF_action=
+PID_ON_action=
+PID_SV_register=0
+PID_area=0
+PID_d_register=0
+PID_db_nr=0
+PID_i_register=0
+PID_p_register=0
+PIDmultiplier=0
+SVmultiplier=0
+area=6, 6, 6, 6, 6, 6, 6, 6, 0, 0
+db_nr=100, 100, 100, 100, 100, 100, 100, 100, 1, 1
+div=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+host=10.32.176.124
+mode=1, 1, 1, 0, 0, 0, 0, 0, 0, 0
+port=102
+rack=0
+slot=0
+start=4, 8, 0, 22, 28, 30, 16, 18, 0, 0
+type=1, 1, 1, 0, 0, 0, 0, 0, 0, 0
+optimizer=true
+fetch_max_blocks=true

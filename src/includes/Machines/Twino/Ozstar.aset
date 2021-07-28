@@ -1,6 +1,7 @@
 [General]
 Delay=2000
 Oversampling=false
+roastertype_setup=Twino/Ozstar
 
 [Device]
 id=29
@@ -136,9 +137,6 @@ timeout=0.4
 type=3
 wordorderLittle=true
 optimizer=false
-
-[RoastProperties]
-roastertype=Twino/Ozstar
 
 [Sliders]
 ModeTempSliders=C

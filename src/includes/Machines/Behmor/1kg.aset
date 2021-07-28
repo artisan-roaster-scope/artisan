@@ -6,6 +6,7 @@ extrabuttonactions=1, 1, 0
 extrabuttonactionstrings="heatingmode,1,0\\r\\nheater,1,1\\r\\ndutycycle,1,0\\r\\nmotor,1,1\\r\\nmotordc,1,100\\r\\nrelay,2,1\\r\\nrelay,1,1\\r\\nfan,1,1\\r\\nfan,2,1\\r\\nfan,3,1\\r\\nfan,4,1\\r\\n", "motor,1,0\\r\\nrelay,2,0\\r\\nrelay,1,0\\r\\nfan,1,0\\r\\nfan,2,0\\r\\nfan,3,0\\r\\nfan,4,0\\r\\nheater,1,0\\r\\n", 
 xextrabuttonactions=0, 0
 xextrabuttonactionstrings=, 
+roastertype_setup=Behmor Jake
 
 [Device]
 id=101
@@ -29,9 +30,6 @@ extraeventslabels=Air\n+10%, Air\n-10%, DROP, Heater\n+10%, Heater\n-10%, E, Doo
 extraeventstypes=5, 5, 4, 8, 8, 4, 4, 4, 4, 4, 4
 extraeventsvalues=2, -2, 0, 2, -2, 0, 1, 1, 0, 1, 1
 extraeventsvisibility=1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1
-
-[RoastProperties]
-roastertype=Behmor Jake
 
 [SerialPort]
 baudrate=57600
@@ -60,3 +58,7 @@ ETname=CT
 
 [events]
 etypes=Air, Drum, Damper, Heater, --
+
+[MachineSetup]
+capacity=1
+heating_type=3

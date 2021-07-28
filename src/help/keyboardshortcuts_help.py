@@ -27,6 +27,8 @@ def content():
     tbl_KeyboardShortcuts.add_row(['p',QApplication.translate('HelpDlg','Toggle PID mode',None)])
     tbl_KeyboardShortcuts.add_row(['h\u00A0\u00A0\u00A0[Windows: CTRL+h]',QApplication.translate('HelpDlg','Load background profile',None)])
     tbl_KeyboardShortcuts.add_row(['ALT+h\u00A0\u00A0\u00A0[Windows: CTRL+SHIFT+h]',QApplication.translate('HelpDlg','Remove background profile',None)])
+    tbl_KeyboardShortcuts.add_row(['I',QApplication.translate('HelpDlg','Toggle foreground curves “show full”',None)])
+    tbl_KeyboardShortcuts.add_row(['o',QApplication.translate('HelpDlg','Toggle background curves “show full”',None)])
     tbl_KeyboardShortcuts.add_row(['l',QApplication.translate('HelpDlg','Load alarms',None)])
     tbl_KeyboardShortcuts.add_row(['+,-',QApplication.translate('HelpDlg','Inc/dec PID lookahead',None)])
     tbl_KeyboardShortcuts.add_row(['CRTL 0-9',QApplication.translate('HelpDlg','Changes Event Button Palettes',None)])

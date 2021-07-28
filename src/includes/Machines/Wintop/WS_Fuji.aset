@@ -1,15 +1,13 @@
 [General]
 Delay=2000
 Oversampling=false
+roastertype_setup=Sedona Elite PXF
 
 [Device]
 controlETpid=4, 2
 id=0
 readBTpid=4, 1
 showFujiLCDs=false
-
-[RoastProperties]
-roastertype=Sedona Elite PXF
 
 [SerialPort]
 baudrate=9600

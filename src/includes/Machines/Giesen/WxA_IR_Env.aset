@@ -1,6 +1,9 @@
 [General]
-Delay=1000
+Delay=2000
 Oversampling=false
+roastertype_setup=Giesen WxA IR Env
+dropDuplicates=true
+dropDuplicatesLimit=0.2
 
 [ArduinoPID]
 dutyMax=100
@@ -28,7 +31,7 @@ svSoaks=0, 0, 0, 0, 0, 0, 0, 0
 svValue=280
 svValues=0, 0, 0, 0, 0, 0, 0, 0
 optimizer=true
-fetch_max_blocks=true
+fetch_max_blocks=false
 
 [Device]
 id=79
@@ -82,9 +85,6 @@ quantifiercoarse=0, 0, 0, 0
 quantifiermax=350, 60, 250, 100
 quantifiermin=80, 35, 0, 0
 quantifiersource=7, 4, 5, 6
-
-[RoastProperties]
-roastertype=Giesen WxA IR Env
 
 [S7]
 PID_OFF_action="getDBint(2,48);setDBint(2,14,_)"

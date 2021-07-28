@@ -1,6 +1,7 @@
 [General]
 Delay=1000
 Oversampling=false
+roastertype_setups=Brambati
 
 [Device]
 id=79
@@ -29,9 +30,6 @@ extramathexpression1=,
 extramathexpression2=, 
 extraname1=Burner, Drum
 extraname2=Exhaust, Air
-
-[RoastProperties]
-roastertype=Brambati
 
 [S7]
 PID_OFF_action=

@@ -17,8 +17,6 @@
 from PyQt5.QtWidgets import QApplication # @Reimport
 
 import platform
-
-import sys
         
 platf = str(platform.system())
 
@@ -50,7 +48,7 @@ FILE_MENU_SAVECOPYAS = QApplication.translate("Menu", "Save a Copy As...", None)
 FILE_MENU_EXPORT = QApplication.translate("Menu", "Export", None)
 FILE_MENU_CONVERT = QApplication.translate("Menu", "Convert To", None)
 FILE_MENU_SAVEGRAPH = QApplication.translate("Menu", "Save Graph", None)
-FILE_MENU_SAVEGRAPH_FULL_SIZE = QApplication.translate("Menu", "Full Size...", None)
+FILE_MENU_SAVEGRAPH_FULL_SIZE = QApplication.translate("Menu", "PNG...", None)
 FILE_MENU_SAVEGRAPH_Large = QApplication.translate("Menu", "Large (1200x?)...", None)
 FILE_MENU_REPORT = QApplication.translate("Menu", "Report", None)
 FILE_MENU_HTMLREPORT = QApplication.translate("Menu", "Roast", None)
@@ -127,7 +125,7 @@ CONF_MENU_FARSI = "\u0641\u0627\u0631\u0633\u06cc" # Do not translate
 CONF_MENU_FINISH = "Suomalainen" # Do not translate
 CONF_MENU_FRENCH = "Fran\u00e7ais" # Do not translate
 CONF_MENU_HEBREW = "\u05e2\u05d1\u05e8\u05d9\u05ea" # Do not translate
-CONF_MENU_HUNGARIAN = "Hungarian" # Do not translate
+CONF_MENU_HUNGARIAN = "Magyar" # Do not translate
 CONF_MENU_INDONESIAN = "Indonesia" # Do not translate
 CONF_MENU_ITALIAN = "Italiano" # Do not translate
 CONF_MENU_JAPANESE = "\u65e5\u672c\u8a9e" # Do not translate
@@ -144,6 +142,11 @@ CONF_MENU_TURKISH = "T\xfcrk\u00e7e" # Do not translate
 CONF_MENU_VIETNAMESE = "Ti\u1EBFng Vi\u1EC7t" # Do not translate
 CONF_MENU_CHINESE_CN = "\u7b80\u4f53\u4e2d\u6587" # Do not translate
 CONF_MENU_CHINESE_TW = "\u7e41\u9ad4\u4e2d\u6587" # Do not translate
+CONF_MENU_DANISH = "Dansk" # Do not translate
+CONF_MENU_SCOTTISH_GAELIC = "G\u00e0idhlig na h-Alba" # Do not translate
+CONF_MENU_LATVIAN = "Latviete" # Do not translate
+CONF_MENU_SLOVAK = "Slov\u00e1k" # Do not translate
+
 
 #Toolkit menu
 TOOLKIT_MENU = QApplication.translate("Menu", "Tools", None)

@@ -1,5 +1,6 @@
 [General]
 Delay=2000
+roastertype_setup=TRINITAS T2
 
 [Device]
 id=29
@@ -117,5 +118,5 @@ wordorderLittle=true
 optimizer=true
 fetch_max_blocks=false
 
-[RoastProperties]
-roastertype=TRINITAS T2
+[MachineSetup]
+capacity=2

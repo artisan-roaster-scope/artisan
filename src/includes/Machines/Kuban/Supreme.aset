@@ -2,6 +2,7 @@
 Delay=1000
 Oversampling=false
 BackgroundAlpha=0.1
+roastertype_setup=Kuban Supreme
 
 [ArduinoPID]
 dutyMax=100
@@ -94,9 +95,6 @@ quantifiercoarse=0, 0, 0, 0
 quantifiermax=100, 100, 100, 100
 quantifiermin=0, 0, 0, 0
 quantifiersource=3, 2, 5, 4
-
-[RoastProperties]
-roastertype=Kuban Supreme
 
 [S7]
 PID_OFF_action=

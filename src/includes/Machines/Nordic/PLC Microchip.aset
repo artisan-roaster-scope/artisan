@@ -1,5 +1,6 @@
 [General]
 Delay=2000
+roastertype_setup=Nordic Microchip PLC
 
 [Device]
 id=29
@@ -134,9 +135,6 @@ quantifiermax=100, 100, 100, 100
 quantifiermin=30, 30, 0, 0
 quantifiersource=4, 5, 0, 3
 
-[RoastProperties]
-roastertype=Nordic PLC
-
 [Sliders]
 ModeTempSliders=C
 eventsliderBernoulli=0, 0, 0, 0
@@ -145,9 +143,9 @@ eventslidersflags=0, 1, 1
 eventslidertemp=0, 0, 0, 0
 eventsliderunits=, , , 
 slideractions=2, 2, 0, 2
-slidercommands="writeWord(4,4648,{})", "writeWord(4,4646,{})", , "writeWord(4,4651,{})"
-sliderfactors=1, 1, 1, 1
+slidercommands="writeSingle(4,4648,{})", "writeSingle(4,4646,{})", , "writeSingle(4,4651,{})"
+sliderfactors=60, 50, 1, 1
 slidermax=100, 100, 100, 100
-slidermin=30, 30, 0, 0
+slidermin=0, 0, 0, 0
 slideroffsets=0, 0, 0, 0
 slidervisibilities=1, 1, 0, 1

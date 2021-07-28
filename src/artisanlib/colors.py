@@ -559,8 +559,7 @@ class graphColorDlg(ArtisanDialog):
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
         self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
         self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.recolor1)
-        if self.aw.locale not in self.aw.qtbase_locales:
-            self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults).setText(QApplication.translate("Button","Defaults", None))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults),"Restore Defaults",QApplication.translate("Button","Restore Defaults", None))
         
         greyButton = QPushButton(QApplication.translate("Button","Grey", None))
         greyButton.setFocusPolicy(Qt.NoFocus)

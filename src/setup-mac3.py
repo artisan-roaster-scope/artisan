@@ -124,14 +124,18 @@ DATA_FILES = [
     ("../translations", [r"translations/artisan_tr.qm"]),
     ("../translations", [r"translations/artisan_vi.qm"]),
     ("../translations", [r'translations/artisan_zh_CN.qm']),
-    ("../translations", [r'translations/artisan_zh_TW.qm']),
+    ("../translations", [r'translations/artisan_zh_TW.qm']),    
+    ("../translations", [r"translations/qtbase_da.qm"]), # from Qt 6.1
     ("../translations", [r"translations/qtbase_el.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ("../translations", [r"translations/qtbase_fa.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
+    ("../translations", [r"translations/qtbase_gd.qm"]), # from Qt 6.1
+    ("../translations", [r"translations/qtbase_lv.qm"]), # from Qt 6.1
     ("../translations", [r"translations/qtbase_nl.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ("../translations", [r"translations/qtbase_pt.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
-    ("../translations", [r"translations/qtbase_pt_BR.qm"]), # just a copy of qtbase_pt
+    ("../translations", [r"translations/qtbase_sk.qm"]), # from Qt 6.1
+    ("../translations", [r"translations/qtbase_pt_BR.qm"]), # from Qt 6.1
     ("../translations", [r"translations/qtbase_sv.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
-    ("../translations", [r"translations/qtbase_zh_CN.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
+    ("../translations", [r"translations/qtbase_zh_CN.qm"]), # from Qt 6.1
     ("../Resources", [r"qt.conf"]),
     ("../Resources", [r"artisanProfile.icns"]),
     ("../Resources", [r"artisanAlarms.icns"]),
@@ -207,12 +211,12 @@ OPTIONS = {
 #                    'QtOpenGL','QtScript','QtScriptTools',
 #                    'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
     'packages': ['yoctopuce','gevent','openpyxl','numpy','scipy','certifi', 
-        'matplotlib','PIL'], # MPL and PIL added for mpl v3.3.x
+        'matplotlib','PIL', 'lxml', 'snap7'], # MPL and PIL added for mpl v3.3.x
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
     'arch': 'x86_64',
-    'matplotlib_backends': '-', # '-' for imported or explicit 'qt5agg'
+    'matplotlib_backends': '-', # '-' for imported or explicit "Qt5Agg, PDF, PS, SVG"
     'includes': ['serial',
                  'PyQt5',
                  'PyQt5.QtCore',
@@ -256,12 +260,12 @@ os.chdir('./dist')
 try:
     PYTHONPATH = os.environ["PYTHONPATH"] + r'/'
 except:
-    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/'
+    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/'
 
 try:
     PYTHON_V = os.environ["PYTHON_V"]
 except:
-    PYTHON_V = '3.8'
+    PYTHON_V = '3.9'
     
 # (independent) matplotlib (installed via pip) shared libs are not copied by py2app (both cp are needed!)
 # UPDATE 9/2020: pip install of MPL v3.3.x does not come with a .dylibs directory any longer
@@ -276,7 +280,7 @@ except:
     subprocess.check_call(r'cp -f /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib',shell = True)
 
 # add localization stubs to make OS X translate the systems menu item and native dialogs
-for lang in ['ar', 'de','el','en','es','fa','fi','fr','he','hu','id','it','ja','ko','nl','no','pl','pt_BR','pt','ru','sv','th','tr','vi','zh_CN','zh_TW']:
+for lang in ['ar', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id','it','ja','ko','lv', 'nl','no','pl','pt_BR','pt','ru','sk', 'sv','th','tr','vi','zh_CN','zh_TW']:
     loc_dir = r'Artisan.app/Contents/Resources/' + lang + r'.lproj'
     subprocess.check_call(r'mkdir ' + loc_dir,shell = True)
     subprocess.check_call(r'touch ' + loc_dir + r'/Localizable.string',shell = True)
@@ -333,10 +337,26 @@ for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/'):
 #except:
 #    pass
 try:
+    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.8/PyQt5/Qt5",shell = True)
     subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.8/PyQt5/Qt",shell = True)
 except:
     pass
-                        
+try:
+    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.9/PyQt5/Qt5",shell = True)
+    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.9/PyQt5/Qt",shell = True)
+except:
+    pass
+
+
+# remove duplicate mpl_data folder
+try:
+    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/mpl-data",shell = True)
+except:
+    pass
+try:
+    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.9/matplotlib/mpl-data/sample_data",shell = True)
+except:
+    pass
 
 print('*** Removing unused files ***')
 for root, dirs, files in os.walk('.'):

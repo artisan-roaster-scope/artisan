@@ -23,6 +23,8 @@ from PyQt5.QtWidgets import (QApplication, QAction, QDialog, QMessageBox, QDialo
             QHBoxLayout, QVBoxLayout, QLabel, QLineEdit)
 from PyQt5.QtGui import QKeySequence
 
+from artisanlib.widgets import MyQComboBox
+
 class ArtisanDialog(QDialog):
     def __init__(self, parent=None, aw = None):
         super(ArtisanDialog,self).__init__(parent)
@@ -52,9 +54,10 @@ class ArtisanDialog(QDialog):
         self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(False)
         self.dialogbuttons.button(QDialogButtonBox.Cancel).setAutoDefault(False)
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocusPolicy(Qt.StrongFocus) # to add to tab focus switch
-        if self.aw is not None and self.aw.locale not in self.aw.qtbase_locales:
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setText(QApplication.translate("Button","OK", None))
-            self.dialogbuttons.button(QDialogButtonBox.Cancel).setText(QApplication.translate("Button","Cancel",None))
+        for btn,txt,trans in [
+            (self.dialogbuttons.button(QDialogButtonBox.Ok),"OK", QApplication.translate("Button","OK", None)),
+            (self.dialogbuttons.button(QDialogButtonBox.Cancel),"Cancel",QApplication.translate("Button","Cancel", None))]:
+            self.setButtonTranslations(btn,txt,trans)
         # add additional CMD-. shortcut to close the dialog
         self.dialogbuttons.button(QDialogButtonBox.Cancel).setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog (ESC on Mac OS X)
@@ -64,7 +67,15 @@ class ArtisanDialog(QDialog):
         except:
             pass
         self.dialogbuttons.button(QDialogButtonBox.Cancel).addActions([cancelAction])
-
+    
+    def setButtonTranslations(self,btn,txt,trans):
+        current_trans = btn.text()
+        if txt == current_trans:
+            # if standard qtbase tanslations fail, revert to artisan translations
+            current_trans = trans
+        if txt != current_trans:
+            btn.setText(current_trans)
+                        
     def closeEvent(self,_):
         self.dialogbuttons.rejected.emit()
 
@@ -76,6 +87,8 @@ class ArtisanDialog(QDialog):
         modifiers = event.modifiers()
         if key == 16777216 or (key == 87 and modifiers == Qt.ControlModifier): #ESCAPE or CMD-W
             self.close()
+        else:
+            super(ArtisanDialog, self).keyPressEvent(event)
 
 class ArtisanResizeablDialog(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
@@ -125,7 +138,12 @@ class HelpDlg(ArtisanDialog):
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
         self.dialogbuttons.accepted.connect(self.close)
 
+        homeLabel = QLabel()
+        homeLabel.setText("{} {}".format(QApplication.translate("Label", "For more details visit", None),
+                 "<a href='https://artisan-scope.org'>artisan-scope.org</a>"))
+        homeLabel.setOpenExternalLinks(True)
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(homeLabel)
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
         hLayout = QVBoxLayout()
@@ -176,3 +194,31 @@ class ArtisanInputDialog(ArtisanDialog):
         urls = event.mimeData().urls()
         if urls and len(urls)>0:
             self.inputLine.setText(urls[0].toString())
+
+class ArtisanComboBoxDialog(ArtisanDialog):
+    def __init__(self, parent = None, aw = None, title="",label="",choices=[],default=-1):
+        super(ArtisanComboBoxDialog,self).__init__(parent, aw)
+        
+        self.idx = None
+        
+        self.setWindowTitle(title) 
+        self.setModal(True)
+        label = QLabel(label)
+        self.comboBox = MyQComboBox()
+        self.comboBox.addItems(choices)
+        self.comboBox.setCurrentIndex(default)
+        layout = QVBoxLayout()
+        layout.addWidget(label)
+        layout.addWidget(self.comboBox)
+        layout.addWidget(self.dialogbuttons)
+        self.setLayout(layout)
+        self.setFixedHeight(self.sizeHint().height())
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.rejected.connect(self.reject)
+        self.dialogbuttons.accepted.connect(self.accept)
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+    
+    @pyqtSlot()
+    def accept(self):
+        self.idx = self.comboBox.currentIndex()
+        QDialog.accept(self)

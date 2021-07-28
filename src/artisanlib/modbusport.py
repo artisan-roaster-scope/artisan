@@ -136,6 +136,9 @@ class modbusport(object):
         # this dict is re-computed on each connect() by a call to updateActiveRegisters()
         # NOTE: for registers of type float and BCD (32bit = 2x16bit) also the succeeding registers are registered
         self.fetch_max_blocks = False # if set, the optimizer fetches only one sequence per area from the minimum to the maximum register ignoring gaps
+        
+        self.reset_socket = False # reset socket connection on error (True by default in pymodbus>v2.5.2, False by default in pymodbus v2.3)
+        
         self.activeRegisters = {}        
         # the readings cache that is filled by requesting sequences of values in blocks
         self.readingsCache = {}
@@ -206,8 +209,9 @@ class modbusport(object):
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        retry_on_empty=True,
-                        retry_on_invalid=True,
+                        retry_on_empty=False,
+                        retry_on_invalid=False,
+                        reset_socket=self.reset_socket,
                         timeout=self.timeout)
                 elif self.type == 2: # Serial Binary
                     from pymodbus.client.sync import ModbusSerialClient # @Reimport
@@ -218,8 +222,9 @@ class modbusport(object):
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        retry_on_empty=True,
-                        retry_on_invalid=True,
+                        retry_on_empty=False,
+                        retry_on_invalid=False,
+                        reset_socket=self.reset_socket,
                         timeout=self.timeout)  
                 elif self.type == 3: # TCP
                     from pymodbus.client.sync import ModbusTcpClient
@@ -227,8 +232,9 @@ class modbusport(object):
                         self.master = ModbusTcpClient(
                                 host=self.host, 
                                 port=self.port,
-                                retry_on_empty=True,
-                                retry_on_invalid=True,
+                                retry_on_empty=False,   # only supported for serial clients in v2.5.2
+                                retry_on_invalid=False, # only supported for serial clients in v2.5.2
+                                reset_socket=self.reset_socket,
                                 retries=1,
                                 timeout=0.5, #self.timeout
                                 )
@@ -244,8 +250,9 @@ class modbusport(object):
                         self.master = ModbusUdpClient(
                             host=self.host, 
                             port=self.port,
-                            retry_on_empty=True,
-                            retry_on_invalid=True,
+                            retry_on_empty=False,   # only supported for serial clients in v2.5.2
+                            retry_on_invalid=False, # only supported for serial clients in v2.5.2
+                            reset_socket=self.reset_socket,
                             retries=3,
                             timeout=0.4, #self.timeout
                             )
@@ -263,7 +270,9 @@ class modbusport(object):
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        retry_on_empty=False,
+                        retry_on_empty=False,  # by default False for faster speed
+                        retry_on_invalid=False, # by default False
+                        reset_socket=self.reset_socket,
                         strict=False, # settings this to False disables the inter char timeout restriction
                         timeout=self.timeout)
 #                    self.master.inter_char_timeout = 0.05
@@ -484,8 +493,8 @@ class modbusport(object):
             self.master.mask_write_register(int(register),int(and_mask),int(or_mask),unit=int(slave))
             time.sleep(.03)
         except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:

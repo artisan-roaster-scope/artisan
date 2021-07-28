@@ -1,6 +1,7 @@
 [General]
 Delay=1000
 Oversampling=false
+roastertype_setup=Petroncini Maestro i06
 
 [Device]
 id=79
@@ -24,14 +25,11 @@ extraLCDvisibility1=true, true, false, false, false, false, false, false, true, 
 extraLCDvisibility2=true, true, false, false, false, false, false, false, true, true
 extradevicecolor1=#ad0427, #45a6cf
 extradevicecolor2=#000000, #49b260
-extradevices=80, 81
+extradevices=80, 81s
 extramathexpression1=, 
 extramathexpression2=, 
 extraname1=Burner, Airflow
 extraname2=Gas, DrumSpeed
-
-[RoastProperties]
-roastertype=Petroncini Maestro i06
 
 [S7]
 PID_OFF_action=
@@ -55,5 +53,15 @@ optimizer=true
 port=102
 rack=0
 slot=1
-start=0, 8, 4, 32, 34, 34, 0, 0, 0, 0
+start=0, 8, 4, 32, 34, 36, 0, 0, 0, 0
 type=1, 1, 1, 0, 0, 0, 0, 0, 0, 0
+
+[Quantifiers]
+clusterEventsFlag=false
+eventquantifierSV=0, 0, 0, 0
+eventquantifieraction=0, 0, 0, 0
+quantifieractive=1, 1, 0, 1
+quantifiercoarse=0, 0, 0, 0
+quantifiermax=100, 100, 100, 100
+quantifiermin=0, 0, 0, 0
+quantifiersource=4, 5, 0, 3

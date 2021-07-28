@@ -65,7 +65,6 @@ class flavorDlg(ArtisanResizeablDialog):
         delButton.clicked.connect(self.poplabel)
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
-        #saveImgButton.clicked.connect(self.aw.resizeImg_0_1) # save as PNG (raster)
         saveImgButton.clicked.connect(self.aw.saveVectorGraph_PDF) # save as PDF (vector)
         
         # connect the ArtisanDialog standard OK/Cancel buttons
@@ -304,4 +303,5 @@ class flavorDlg(ArtisanResizeablDialog):
         self.aw.redrawOnResize = True
         self.aw.qmc.redraw(recomputeAllDeltas=False)
         self.aw.showControls()
+        self.aw.closeEventSettings() # save all app settings
         self.accept()

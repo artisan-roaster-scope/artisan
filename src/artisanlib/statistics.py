@@ -236,7 +236,7 @@ class StatisticsDlg(ArtisanDialog):
             return
         self.aw.qmc.statisticsflags[i] = value
         self.aw.qmc.redraw(recomputeAllDeltas=False)
-
+        
     @pyqtSlot()
     def accept(self):
         self.aw.qmc.statsmaxchrperline = self.statsmaxchrperlineedit.value()
@@ -284,4 +284,5 @@ class StatisticsDlg(ArtisanDialog):
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue("StatisticsPosition",self.frameGeometry().topLeft())
+        self.aw.closeEventSettings()
         self.close()

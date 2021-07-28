@@ -26,6 +26,7 @@
 import os
 import sys
 import shelve
+import dbm
 import portalocker
 from pathlib import Path
 import requests
@@ -44,33 +45,60 @@ from plus import config, util, connection, controller, roast
 
 sync_cache_semaphore = QSemaphore(1)
 
-# if lock is True, return the path of the corresponding lock file
-def getSyncPath(lock=False):
+def getSyncName():
     if config.account_nr is None or config.account_nr == 0:
         fn = config.sync_cache
     else:
         fn = config.sync_cache + str(config.account_nr)
+    return fn
+
+# if lock is True, return the path of the corresponding lock file
+def getSyncPath(lock=False):
+    fn = getSyncName()
     if lock:
         fn = fn + "_lock"
     return util.getDirectory(fn,share=True)
 
+
+def addSyncShelve(uuid,modified_at,fh):
+    config.logger.debug("sync: addSyncShelve(%s,%s,_fh_)",uuid,modified_at)
+    try:
+        with shelve.open(getSyncPath()) as db:
+            db[uuid] = modified_at
+        config.logger.debug("sync: DB type: %s", str(dbm.whichdb(getSyncPath())))
+    except Exception as e:
+        _, _, exc_tb = sys.exc_info()
+        config.logger.error("sync: Exception in addSyncShelve(%s,%s) line: %s shelve.open (1) %s",str(uuid),str(modified_at),exc_tb.tb_lineno,e)
+        try:
+            # in case we couldn't open the shelve file as  "shelve.open db type could not be determined"
+            # remove all files name getSyncPath() with any extension as we do not know which extension is choosen by shelve
+            config.logger.info("register: clean uuid cache %s",str(getSyncPath()))
+            # note that this deletes all "uuid" files including those for the Viewer and other files of that name prefix like uuid.db.org!!
+            sync_lock_file = getSyncPath(lock=True)
+            for p in Path(Path(getSyncPath()).parent).glob("{}*".format(getSyncName())):
+                if str(p) != sync_lock_file:
+                    # if not the lock file, delete:
+                    p.unlink()
+            # try again to acccess/create the shelve file
+            with shelve.open(getSyncPath()) as db:
+                db[uuid] = modified_at
+            config.logger.debug("sync: DB type: %s", str(dbm.whichdb(getSyncPath())))
+        except Exception as e:
+            config.logger.error("register: Exception in addPathShelve(%s,%s) line: %s shelve.open (2) %s",str(uuid),str(modified_at),exc_tb.tb_lineno,e)          
+    finally:
+        fh.flush()
+        os.fsync(fh.fileno())
+
 # register the modified_at timestamp (EPOC as float with milliseoncds) for the given uuid, assuming it holds the last timepoint modifications were last synced with the server
 def addSync(uuid,modified_at):
     try:
-        config.logger.debug("sync:addSync(%s,%s)", str(uuid), str(modified_at))
         sync_cache_semaphore.acquire(1)
+        config.logger.debug("sync:addSync(%s,%s)", str(uuid), str(modified_at))
         with portalocker.Lock(getSyncPath(lock=True), timeout=0.5) as fh:
-            try:
-                with shelve.open(getSyncPath()) as db:
-                    db[uuid] = modified_at
-            except Exception as e:
-                _, _, exc_tb = sys.exc_info()
-                config.logger.error("register: Exception in addSync(%s,%s) line: %s shelve.open %s",str(uuid),str(modified_at),exc_tb.tb_lineno,e)
-            finally:
-                fh.flush()
-                os.fsync(fh.fileno())
+            addSyncShelve(uuid,modified_at,fh)
     except portalocker.exceptions.LockException as e:
-        config.logger.info("register: LockException in addSync(%s,%s) line: %s %s",str(uuid), str(modified_at),exc_tb.tb_lineno,e)
+        _, _, exc_tb = sys.exc_info()
+        config.logger.info("sync: LockException in addSync(%s,%s) line: %s %s",str(uuid), str(modified_at),exc_tb.tb_lineno,e)
         # we couldn't fetch this lock. It seems to be blocked forever (from a crash?)
         # we remove the lock file and retry with a shorter timeout
         try:
@@ -79,18 +107,10 @@ def addSync(uuid,modified_at):
             lock_path.unlink()
             config.logger.debug("retry sync:addSync(%s,%s)",str(uuid), str(modified_at))
             with portalocker.Lock(lock_path, timeout=0.3) as fh:
-                try:
-                    with shelve.open(getSyncPath()) as db:
-                        db[uuid] = modified_at
-                except Exception as e:
-                    _, _, exc_tb = sys.exc_info()
-                    config.logger.error("register: Exception in addSync(%s,%s) line: %s shelve.open %s",str(uuid),str(modified_at),exc_tb.tb_lineno,e) 
-                finally:
-                    fh.flush()
-                    os.fsync(fh.fileno())
+                addSyncShelve(uuid,modified_at,fh)
         except portalocker.exceptions.LockException as e:
             _, _, exc_tb = sys.exc_info()
-            config.logger.error("register: LockException in addSync(%s,%s) line: %s %s",str(uuid),str(modified_at),exc_tb.tb_lineno,e)
+            config.logger.error("sync: LockException in addSync(%s,%s) line: %s %s",str(uuid),str(modified_at),exc_tb.tb_lineno,e)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             config.logger.error("sync: Exception in addSync(%s,%s) line: %s %s",str(uuid),uuid(modified_at),exc_tb.tb_lineno,e)
@@ -104,8 +124,8 @@ def addSync(uuid,modified_at):
 # returns None if given uuid is not registered for syncing, otherwise the last modified_at timestamp in EPOC milliseconds
 def getSync(uuid):
     try:
-        config.logger.debug("sync:getSync(%s)", str(uuid))
         sync_cache_semaphore.acquire(1)
+        config.logger.debug("sync:getSync(%s)", str(uuid))
         with portalocker.Lock(getSyncPath(lock=True), timeout=0.5) as fh:
             try:
                 with shelve.open(getSyncPath()) as db:
@@ -118,13 +138,13 @@ def getSync(uuid):
                         return None
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
-                config.logger.error("register: Exception in getSync(%s) line: %s shelve.open %s",str(uuid),exc_tb.tb_lineno,e)
+                config.logger.error("sync: Exception in getSync(%s) line: %s shelve.open %s",str(uuid),exc_tb.tb_lineno,e)
                 return None
             finally:
                 fh.flush()
                 os.fsync(fh.fileno())
     except portalocker.exceptions.LockException as e:
-        config.logger.info("register: LockException in getSync(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
+        config.logger.info("sync: LockException in getSync(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
         # we couldn't fetch this lock. It seems to be blocked forever (from a crash?)
         # we remove the lock file and retry with a shorter timeout
         try:
@@ -144,7 +164,7 @@ def getSync(uuid):
                             return None
                 except Exception as e:
                     _, _, exc_tb = sys.exc_info()
-                    config.logger.error("register: Exception in getSync(%s) line: %s shelve.open %s",str(uuid),exc_tb.tb_lineno,e)
+                    config.logger.error("sync: Exception in getSync(%s) line: %s shelve.open %s",str(uuid),exc_tb.tb_lineno,e)
                     return None
                 finally:
                     fh.flush()
@@ -167,23 +187,23 @@ def getSync(uuid):
             
 def delSync(uuid):
     try:
-        config.logger.debug("sync:delSync(%s)", str(uuid))
         sync_cache_semaphore.acquire(1)
+        config.logger.debug("sync:delSync(%s)", str(uuid))
         with portalocker.Lock(getSyncPath(lock=True), timeout=0.5) as fh:
             try:
                 with shelve.open(getSyncPath()) as db:
                     del db[uuid]
             except KeyError as e:
                 _, _, exc_tb = sys.exc_info()
-                config.logger.debug("register: Exception in delSync(%s) line: %s KeyError %s",str(uuid),exc_tb.tb_lineno,e)
+                config.logger.debug("sync: Exception in delSync(%s) line: %s KeyError %s",str(uuid),exc_tb.tb_lineno,e)
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
-                config.logger.error("register: Exception in delSync(%s) line: %s shelve.open %s",str(uuid),exc_tb.tb_lineno,e)
+                config.logger.error("sync: Exception in delSync(%s) line: %s shelve.open %s",str(uuid),exc_tb.tb_lineno,e)
             finally:
                 fh.flush()
                 os.fsync(fh.fileno())
     except portalocker.exceptions.LockException as e:
-        config.logger.info("register: LockException in delSync(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
+        config.logger.info("sync: LockException in delSync(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
         # we couldn't fetch this lock. It seems to be blocked forever (from a crash?)
         # we remove the lock file and retry with a shorter timeout
         try:
@@ -196,10 +216,10 @@ def delSync(uuid):
                     with shelve.open(getSyncPath()) as db:
                         del db[uuid]
                 except KeyError:
-                    config.logger.debug("register: Exception in delSync(%s) line: %s KeyError %s",str(uuid),exc_tb.tb_lineno,e)
+                    config.logger.debug("sync: Exception in delSync(%s) line: %s KeyError %s",str(uuid),exc_tb.tb_lineno,e)
                 except Exception as e:
                     _, _, exc_tb = sys.exc_info()
-                    config.logger.error("register: Exception in delSync(%s) line: %s shelve.open %s",str(uuid),exc_tb.tb_lineno,e)
+                    config.logger.error("sync: Exception in delSync(%s) line: %s shelve.open %s",str(uuid),exc_tb.tb_lineno,e)
                 finally:
                     fh.flush()
                     os.fsync(fh.fileno())
@@ -265,10 +285,12 @@ def clearSyncRecordHash():
 def syncRecordUpdated(roast_record = None):
     global cached_sync_record_hash
     try:
-        config.logger.debug("sync:syncRecordUpdated()")
+        config.logger.debug("sync:syncRecordUpdated(%s)",roast_record)
         sync_record_semaphore.acquire(1)
         _,current_sync_record_hash = roast.getSyncRecord(roast_record)
-        return cached_sync_record_hash != current_sync_record_hash
+        res = cached_sync_record_hash != current_sync_record_hash
+        config.logger.debug("sync:syncRecordUpdated() => %s",res)
+        return res
     except Exception as e:
         config.logger.error("sync: Exception in syncRecordUpdated() %s",e)
         return False
@@ -287,9 +309,26 @@ def diffCachedSyncRecord(roast_record):
             return roast_record
         else:
             res = dict(roast_record) # make a copy of the given roast_record
+            keys_with_equal_values = [] 
+            # entries with values equal on server and client do not need to be synced
             for key, value in cached_sync_record.items():
                 if key != "roast_id" and key in res and res[key] == value:
                     del res[key]
+                    keys_with_equal_values.append(key)
+            # for items where we supress zero values we need to force the propagate of zeros in case on server there is no zero established yet
+            for key in roast.sync_record_zero_supressed_attributes:
+                if key in cached_sync_record and cached_sync_record[key] and key not in res \
+                        and key not in keys_with_equal_values: # not if data is euqal on both sides and thus the key got deleted from res in the step before
+                    # we explicitly set the value of key to 0 dispite it is part of the sync_record_zero_supressed_attributes
+                    # to sync back the local 0 value with the non-zero value currently on the server
+                    res[key] = 0
+            # for items where we supress empty string values we need to force the propagate of empty strings in case on server there is no zero established yet
+            for key in roast.sync_record_empty_string_supressed_attributes:
+                if key in cached_sync_record and cached_sync_record[key] and key not in res \
+                        and key not in keys_with_equal_values: # not if data is euqal on both sides and thus the key got deleted from res in the step before
+                    # we explicitly set the value of key to "" dispite it is part of the sync_record_empty_string_supressed_attributes
+                    # to sync back the local "" value with the non-zero value currently on the server
+                    res[key] = ""
             return res
     except Exception as e:
         config.logger.error("sync: Exception in diffCachedSyncRecord() %s",e)
@@ -337,6 +376,7 @@ def getApplidedServerUpdatesModifiedAt():
 # the values of "syncable" properties in data are applied to the apps variables directly 
 # if the contained UUID
 def applyServerUpdates(data):
+    global cached_sync_record
     dirty = False
     title_changed = False
     try:
@@ -385,6 +425,10 @@ def applyServerUpdates(data):
             if "label" in data["coffee"] and data["coffee"]["label"] != aw.qmc.plus_coffee_label:
                 aw.qmc.plus_coffee_label = data["coffee"]["label"]
                 dirty = True
+            if aw.qmc.plus_coffee is not None:
+                aw.qmc.plus_blend_label = None
+                aw.qmc.plus_blend_spec = None
+                aw.qmc.plus_blend_spec_labels = None
         if "blend" in data and data["blend"] is not None and "label" in data["blend"] and "ingredients" in data["blend"] \
                and data["blend"]["ingredients"]:
             try:
@@ -401,12 +445,20 @@ def applyServerUpdates(data):
                 blend_spec = {
                     "label": data["blend"]["label"],
                     "ingredients": ingredients}
-                blend_spec_labels = [i["coffee"]["label"] for i in ingredients]
+                blend_spec_labels = [i["coffee"]["label"] for i in data["blend"]["ingredients"]]
                 aw.qmc.plus_blend_spec = blend_spec
                 aw.qmc.plus_blend_spec_labels = blend_spec_labels
                 dirty = True
-            except:
+            except Exception:
                 pass
+            if aw.qmc.plus_blend_spec is not None:
+                aw.qmc.plus_coffee = None
+                aw.qmc.plus_coffee_label = None
+        
+        # ensure that location is None if neither coffee nor blend is set
+        if aw.qmc.plus_coffee is None and aw.qmc.plus_blend_spec is None and aw.qmc.plus_store is not None:
+            aw.qmc.plus_store = None
+        
         if "color_system" in data and data["color_system"] != aw.qmc.color_systems[aw.qmc.color_system_idx]:
             try:
                 aw.qmc.color_system_idx = aw.qmc.color_systems.index(data["color_system"])
@@ -430,18 +482,39 @@ def applyServerUpdates(data):
             dirty = True  
         if "moisture" in data and data["moisture"] != aw.qmc.density_roasted[0]:
             aw.qmc.moisture_roasted = data["moisture"]
-            dirty = True  
-#        if "volume_in" in data and data["volume_in"] is not None:
-#            v = aw.convertVolume(data["volume_in"],aw.qmc.volume_units.index("l"),aw.qmc.volume_units.index(aw.qmc.volume[2]))
-#            if w != aw.qmc.volume[0]:
-#                aw.qmc.volume[0] = v
-#                dirty = True
-#        if "volume_out" in data and data["volume_out"] is not None:
-#            v = aw.convertVolume(data["volume_out"],aw.qmc.volume_units.index("l"),aw.qmc.volume_units.index(aw.qmc.volume[2]))
-#            if w != aw.qmc.volume[1]:
-#                aw.qmc.volume[1] = v
-#                dirty = True
-        setSyncRecordHash()
+            dirty = True
+        if "temperature" in data and data["temperature"] != aw.qmc.ambientTemp:
+            aw.qmc.ambientTemp = data["temperature"]
+            dirty = True
+        if "pressure" in data and data["pressure"] != aw.qmc.ambient_pressure:
+            aw.qmc.ambient_pressure = data["pressure"]
+            dirty = True
+        if "humidity" in data and data["humidity"] != aw.qmc.ambient_humidity:
+            aw.qmc.ambient_humidity = data["humidity"]
+            dirty = True
+        if "roastersize" in data and data["roastersize"] != aw.qmc.roastersize:
+            aw.qmc.roastersize = data["roastersize"]
+            dirty = True
+        if "roasterheating" in data and data["roasterheating"] != aw.qmc.roasterheating:
+            aw.qmc.roasterheating = data["roasterheating"]
+            dirty = True
+        setSyncRecordHash() # here the sync record is taken form the profiles data after application of the recieved server updates
+        # not that this sync record does not contain null values not transferred for attributes from the server side
+        # to fix this, we will update that sync record with all attributes not in the server data set to null values
+        # this forces those non-null values from the profile to be transmitted to the server on next sync
+        updated_record = {}
+        for key, value in cached_sync_record.items():
+            if not (key in data):
+                # we explicitly add the implicit null value (0 or "") for that key
+                if key in roast.sync_record_zero_supressed_attributes and value != 0:
+                    updated_record[key] = 0
+                elif key in roast.sync_record_empty_string_supressed_attributes and value != "":
+                    updated_record[key] = ""
+            else:
+                updated_record[key] = value
+        cached_sync_record,cached_sync_record_hash = roast.getSyncRecord(updated_record)
+        setSyncRecordHash(cached_sync_record,cached_sync_record_hash)
+        
     except Exception as e:
         config.logger.error("sync: Exception in applyServerUpdates() %s",e)
     finally: 

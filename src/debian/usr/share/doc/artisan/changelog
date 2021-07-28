@@ -1,9 +1,16 @@
-artisan (2.4.4-0) precise; urgency=low
+artisan (2.4.6-0) precise; urgency=low
   * new upstream release
   * changes since 2.4.4:
+   - adds energy tab
+   - bug fixes
+ --  <marko.luther@gmx.net>  Fri, 30 Jul 2021 19:32:14 +0200
+
+artisan (2.4.4-0) precise; urgency=low
+  * new upstream release
+  * changes since 2.4.2:
    - adds PID Ramp/Soak pattern actions and templates
    - bug fixes
- --  <marko.luther@gmx.net>  Tue, 1 Deec 2020 19:32:14 +0200
+ --  <marko.luther@gmx.net>  Tue, 1 Dec 2020 19:32:14 +0200
 
 artisan (2.4.2-0) precise; urgency=low
   * new upstream release

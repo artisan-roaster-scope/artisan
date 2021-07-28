@@ -154,7 +154,7 @@ def float2floatMin(fs,n=1):
 ## Prepare numbers for sending
 # for numbers out of range None is returned
 def limitnum(minn,maxn,n):
-    if n is None or n>maxn or n<minn:
+    if n is None or (maxn is not None and n>maxn) or (minn is not None and n<minn):
         return None
     else:
         return n
@@ -193,21 +193,29 @@ def addString2dict(dict_source,key_source,dict_target,key_target,maxlen):
         txt = limittext(maxlen,decode(dict_source[key_source]))
         if txt is not None:
             dict_target[key_target] = txt
-            
-def addNum2dict(dict_source,key_source,dict_target,key_target,minn,maxn,digits):
+
+# factor is multiplied to the original value before the min/max calculation
+# if min or max is None, the corresponding limit is not enforced, otherwise numbers beyond the given limit are replaced by None
+# Note: None and 0 values are just dropped and no entry is added
+def addNum2dict(dict_source,key_source,dict_target,key_target,minn,maxn,digits,factor=1):
     if key_source in dict_source and dict_source[key_source]:
-        n = limitnum(minn,maxn,dict_source[key_source])
-        if n is not None:
+        n = dict_source[key_source]
+        if n is not None and factor is not None:
+            n = n * factor
+        n = limitnum(minn,maxn,n) # may return None
+        if n:
             dict_target[key_target] = float2floatMin(n,digits)
             
 # consumes a list of source-target pairs, or just strings used as both source and target key, to be processed with add2dict
-def addAllNum2dict(dict_source,dict_target,key_source_target_pairs,minn,maxn,digits):
+# factor is multiplied to the original value before the min/max calculation
+# if min or max is None, the corresponding limit is not enforced, otherwise numbers beyond the given limit are replaced by None
+def addAllNum2dict(dict_source,dict_target,key_source_target_pairs,minn,maxn,digits,factor=1):
     for p in key_source_target_pairs:
         if isinstance(p, tuple):
             (key_source,key_target) = p
         else:
             key_source = key_target = p
-        addNum2dict(dict_source,key_source,dict_target,key_target,minn,maxn,digits)
+        addNum2dict(dict_source,key_source,dict_target,key_target,minn,maxn,digits,factor)
         
 def addTime2dict(dict_source,key_source,dict_target,key_target):
     if key_source in dict_source and dict_source[key_source]:
@@ -274,18 +282,29 @@ def roastLink(plus_roast):
 
 
 ## Logging
-
+            
 def debugLogON():
     config.logger.info("util:debugLogON()")
     config.logger.setLevel(logging.DEBUG)
     config.handler.setLevel(logging.DEBUG)
     config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus debug logging ON.",None)) # @UndefinedVariable 
+    try:
+        aw = config.app_window
+        aw.qmc.deviceLogDEBUG()
+    except Exception as e:
+        print(e)
+        pass
 
 def debugLogOFF():
     config.logger.info("util:debugLogOFF()")
     config.logger.setLevel(logging.INFO)
     config.handler.setLevel(logging.INFO)
     config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus debug logging OFF.",None)) # @UndefinedVariable 
+    try:
+        aw = config.app_window
+        aw.qmc.deviceLogINFO()
+    except Exception:
+        pass
 
 def debugLogToggle():
     if config.logger.isEnabledFor(logging.DEBUG):
@@ -306,20 +325,40 @@ def sendLog():
     message["Subject"] = "artisan.plus client log"
     message["X-Unsent"] = "1"
     #message["X-Uniform-Type-Identifier"] = "com.apple.mail-draft"
-    message.attach(MIMEText("Please find attached the artisan.plus log file written by Artisan!\nPlease forward this email to {}\n--\n".format(message["To"]), "plain"))
-    with open(config.log_file_path, "rb") as attachment:
-        # Add file as application/octet-stream
-        # Email client can usually download this automatically as attachment
-        part = MIMEBase("application", "octet-stream")
-        part.set_payload(attachment.read())
-    # Encode file in ASCII characters to send by email
-    encoders.encode_base64(part)
-    # Add header as key/value pair to attachment part
-    part.add_header(
-        "Content-Disposition",
-        "attachment; filename= {}{}".format(config.log_file,".log"))
-    # Add attachment to message and convert message to string
-    message.attach(part)    
+    message.attach(MIMEText("Please find attached the log files written by Artisan!\nPlease forward this email to {}\n--\n".format(message["To"]), "plain"))
+    try:
+        with open(config.log_file_path, "rb") as attachment:
+            # Add file as application/octet-stream
+            # Email client can usually download this automatically as attachment
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment.read())
+        # Encode file in ASCII characters to send by email
+        encoders.encode_base64(part)
+        # Add header as key/value pair to attachment part
+        part.add_header(
+            "Content-Disposition",
+            "attachment; filename= {}{}".format(config.log_file,".log"))
+        # Add attachment to message and convert message to string
+        message.attach(part)
+    except Exceptioin:
+        pass
+    try:
+        aw = config.app_window
+        with open(aw.qmc.device_log_file, "rb") as attachment:
+            # Add file as application/octet-stream
+            # Email client can usually download this automatically as attachment
+            part2 = MIMEBase("application", "octet-stream")
+            part2.set_payload(attachment.read())
+        # Encode file in ASCII characters to send by email
+        encoders.encode_base64(part2)
+        # Add header as key/value pair to attachment part
+        part2.add_header(
+            "Content-Disposition",
+            "attachment; filename= {}{}".format(aw.qmc.device_log_file_name,".log"))
+        # Add attachment to message and convert message to string
+        message.attach(part2)
+    except Exception:
+        pass
     # Save message to file tmp file
     tmpfile = QDir(QDir.tempPath()).filePath("plus-log.eml")
     try:

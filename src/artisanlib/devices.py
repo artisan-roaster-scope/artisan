@@ -29,7 +29,7 @@ from artisanlib.widgets import MyQComboBox
 from help import programs_help
 from help import symbolic_help
 
-from PyQt5.QtCore import (Qt, pyqtSlot, QSettings,)
+from PyQt5.QtCore import (Qt, pyqtSlot, QSettings)
 from PyQt5.QtGui import (QStandardItem, QColor)
 from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
                              QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,
@@ -80,6 +80,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.lcds = QGroupBox(QApplication.translate("GroupBox","LCDs",None))
         self.lcds.setLayout(self.lcdHBox)
         
+        self.deviceLoggingFlag = QCheckBox(QApplication.translate("Label", "Logging", None))
+        self.deviceLoggingFlag.setChecked(self.aw.qmc.device_logging)
+        
         self.controlButtonFlag = QCheckBox(QApplication.translate("Label", "Control", None))
         self.controlButtonFlag.setChecked(self.aw.qmc.Controlbuttonflag)
         self.controlButtonFlag.stateChanged.connect(self.showControlbuttonToggle)
@@ -118,7 +121,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         selectprogrambutton =  QPushButton(QApplication.translate("Button","Select",None))
         selectprogrambutton.setFocusPolicy(Qt.NoFocus)
         selectprogrambutton.clicked.connect(self.loadprogramname)
-        helpprogrambutton =  QPushButton(QApplication.translate("Button","Help",None))
+        
+        # hack to access the Qt automatic translation of the RestoreDefaults button
+        db_help = QDialogButtonBox(QDialogButtonBox.Help)
+        help_text_translated = db_help.button(QDialogButtonBox.Help).text()
+        helpprogrambutton =  QPushButton(help_text_translated)
+        self.setButtonTranslations(helpprogrambutton,"Help",QApplication.translate("Button","Help", None))
         helpprogrambutton.setFocusPolicy(Qt.NoFocus)
         helpprogrambutton.clicked.connect(self.showhelpprogram)
         selectoutprogrambutton =  QPushButton(QApplication.translate("Button","Select",None))
@@ -216,7 +224,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         labelBTadvanced = QLabel(QApplication.translate("Label", "BT Y(x)",None))
         self.ETfunctionedit = QLineEdit(str(self.aw.qmc.ETfunction))
         self.BTfunctionedit = QLineEdit(str(self.aw.qmc.BTfunction))
-        symbolicHelpButton = QPushButton(QApplication.translate("Button","Help",None))
+        symbolicHelpButton = QPushButton(help_text_translated)
+        self.setButtonTranslations(symbolicHelpButton,"Help",QApplication.translate("Button","Help", None))
         symbolicHelpButton.setMaximumSize(symbolicHelpButton.sizeHint())
         symbolicHelpButton.setMinimumSize(symbolicHelpButton.minimumSizeHint())
         symbolicHelpButton.setFocusPolicy(Qt.NoFocus)
@@ -235,11 +244,16 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.addButton.setMinimumWidth(100)
         #self.addButton.setMaximumWidth(100)
         self.addButton.clicked.connect(self.adddevice)
-        resetButton = QPushButton(QApplication.translate("Button","Reset",None))
+        # hack to access the Qt automatic translation of the RestoreDefaults button
+        db_reset = QDialogButtonBox(QDialogButtonBox.Reset)
+        reset_text_translated = db_reset.button(QDialogButtonBox.Reset).text()
+        resetButton =  QPushButton(reset_text_translated)
+        self.setButtonTranslations(resetButton,"Reset",QApplication.translate("Button","Reset", None))
         resetButton.setFocusPolicy(Qt.NoFocus)
         resetButton.setMinimumWidth(100)
         resetButton.clicked.connect(self.resetextradevices)
-        extradevHelpButton = QPushButton(QApplication.translate("Button","Help",None))
+        extradevHelpButton = QPushButton(help_text_translated)
+        self.setButtonTranslations(extradevHelpButton,"Help",QApplication.translate("Button","Help", None))
         extradevHelpButton.setMinimumWidth(100)
         extradevHelpButton.setFocusPolicy(Qt.NoFocus)
         extradevHelpButton.clicked.connect(self.showExtradevHelp)
@@ -1144,6 +1158,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         grid.addWidget(programGroupBox,5,1)
         grid.setSpacing(3)
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(self.deviceLoggingFlag)
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
         buttonLayout.setSpacing(10)
@@ -1305,13 +1320,19 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             
     def createDeviceTable(self):
         try:
+            columns = 15
+            if self.devicetable is not None and self.devicetable.columnCount() == columns:
+                # rows have been already established
+                # save the current columnWidth to reset them afte table creation
+                self.aw.qmc.devicetablecolumnwidths = [self.devicetable.columnWidth(c) for c in range(self.devicetable.columnCount())]
+            
             nddevices = len(self.aw.qmc.extradevices)
             #self.devicetable.clear() # this crashes Ubuntu 16.04
 #            if nddevices != 0:
 #                self.devicetable.clearContents() # this crashes Ubuntu 16.04 if device table is empty
             self.devicetable.clearSelection()
             self.devicetable.setRowCount(nddevices)
-            self.devicetable.setColumnCount(15)
+            self.devicetable.setColumnCount(columns)
             self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device",None),
                                                         QApplication.translate("Table", "Color 1",None),
                                                         QApplication.translate("Table", "Color 2",None),
@@ -1440,14 +1461,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         pass
                 self.devicetable.resizeColumnsToContents()
                 self.devicetable.setColumnWidth(0,150)
+                header = self.devicetable.horizontalHeader()
+                header.setStretchLastSection(True)
                 # remember the columnwidth
                 for i in range(len(self.aw.qmc.devicetablecolumnwidths)):
                     try:
                         self.devicetable.setColumnWidth(i,self.aw.qmc.devicetablecolumnwidths[i])
                     except:
                         pass
-                header = self.devicetable.horizontalHeader()
-                header.setStretchLastSection(True)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createDeviceTable(): {0}").format(str(e)),exc_tb.tb_lineno)
@@ -1881,21 +1902,27 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setextracolor(): {0}").format(str(e)),exc_tb.tb_lineno)
 
+
+    def close(self):
+        self.closeHelp()
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("DeviceAssignmentGeometry",self.saveGeometry()) 
+        self.aw.DeviceAssignmentDlg_activeTab = self.TabWidget.currentIndex()
+        self.aw.closeEventSettings() # save all app settings
+    
     @pyqtSlot()
     def cancelEvent(self):
         self.aw.DeviceAssignmentDlg_activeTab = self.TabWidget.currentIndex()
-        self.closeHelp()
+        self.close()
         self.reject()
 
     @pyqtSlot()
     def okEvent(self):
         try:
-            self.closeHelp()
-            settings = QSettings()
-            #save window geometry
-            settings.setValue("DeviceAssignmentGeometry",self.saveGeometry()) 
-            self.aw.DeviceAssignmentDlg_activeTab = self.TabWidget.currentIndex()
         
+            self.aw.qmc.device_logging = self.deviceLoggingFlag.isChecked()
+            
             #save any extra devices here
             self.savedevicetable(redraw=False)
             self.aw.qmc.devicetablecolumnwidths = [self.devicetable.columnWidth(c) for c in range(self.devicetable.columnCount())]
@@ -2860,7 +2887,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             #if device is not None or not external-program (don't need serial settings config)
             if not(self.aw.qmc.device in self.aw.qmc.nonSerialDevices):
                 self.aw.setcommport()
-            #self.close()
+            self.close()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " device accept(): {0}").format(str(e)),exc_tb.tb_lineno)

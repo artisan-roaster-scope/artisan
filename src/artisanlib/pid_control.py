@@ -1113,13 +1113,13 @@ class PIDcontrol(object):
         self.svLookahead = 0
         self.dutySteps = 1
         self.svSliderMin = 0
-        self.svSliderMax = 480
-        self.svValue = 390 # the value in the setSV textinput box of the PID dialog
+        self.svSliderMax = 230
+        self.svValue = 180 # the value in the setSV textinput box of the PID dialog
         self.dutyMin = -100
         self.dutyMax = 100
-        self.pidKp = 20.0
+        self.pidKp = 15.0
         self.pidKi = 0.01
-        self.pidKd = 3.0
+        self.pidKd = 20.0
         self.lastEnergy = None
         # Proposional on Measurement mode see: http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
         self.pOnE = True # True for Proposional on Error mode, False for Proposional on Measurement Mode
@@ -1321,6 +1321,8 @@ class PIDcontrol(object):
                 self.pidActive = True
                 self.aw.qmc.pid.on()
                 self.aw.button_10.setStyleSheet(self.aw.pushbuttonstyles["PIDactive"])
+            if self.sv is None:
+                self.setSV(self.svValue)
 
     def pidOff(self):
         self.aw.sendmessage(QApplication.translate("Message","PID OFF", None))

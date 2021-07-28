@@ -8,10 +8,10 @@ set -e  # reduced logging
 if [ ! -z $APPVEYOR ]; then
     # Appveyor CI builds
     echo "NOTICE: Appveyor build"
-    export PYTHON=/Users/appveyor/venv3.8.6
+    export PYTHON=/Users/appveyor/venv3.9.1
     export PYTHONBIN=$PYTHON/bin
-    export PYTHONPATH=$PYTHON/lib/python3.8
-    export PYTHON_V=3.8
+    export PYTHONPATH=$PYTHON/lib/python3.9
+    export PYTHON_V=3.9
     
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt5 # from PyQt v5.15.4 this dir changed form PyQt5/Qt to PyQt5/Qt5
     export QT_SRC_PATH=${QT_PATH}

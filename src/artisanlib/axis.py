@@ -231,8 +231,7 @@ class WindowsDlg(ArtisanDialog):
         
         resetButton = self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
         resetButton.clicked.connect(self.reset)
-        if self.aw.locale not in self.aw.qtbase_locales:
-            resetButton.setText(QApplication.translate("Button","Defaults", None))
+        self.setButtonTranslations(resetButton,"Restore Defaults",QApplication.translate("Button","Restore Defaults", None))
             
         self.loadAxisFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load from profile",None))
         self.loadAxisFromProfile.setChecked(self.aw.qmc.loadaxisfromprofile)
@@ -603,6 +602,7 @@ class WindowsDlg(ArtisanDialog):
         self.aw.qmc.autotimex = self.autotimexFlag.isChecked()
         self.aw.qmc.autodeltaxET = self.autodeltaxETFlag.isChecked()
         self.aw.qmc.autodeltaxBT = self.autodeltaxBTFlag.isChecked()
+        self.aw.autoAdjustAxis()
         self.aw.qmc.redraw(recomputeAllDeltas=False)
         string = QApplication.translate("Message","xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})",None).format(str(self.ylimitEdit_min.text()),str(self.ylimitEdit.text()),str(self.xlimitEdit_min.text()),str(self.xlimitEdit.text()),str(self.zlimitEdit_min.text()),str(self.zlimitEdit.text()))                                   
         self.aw.sendmessage(string)
@@ -613,6 +613,7 @@ class WindowsDlg(ArtisanDialog):
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue("AxisPosition",self.frameGeometry().topLeft())
+        self.aw.closeEventSettings()
         super(WindowsDlg,self).close()
 
     @pyqtSlot(bool)

@@ -157,12 +157,13 @@ def path2url(path):
       'file:', urllib.pathname2url(path))
         
 # remaining artifacts from Qt4/5 compatibility layer:
+# note: those conversion functions are sometimes called with string arguments thus a simple int(round(s)) won't work and a int(round(float(s))) needs to be applied
 def toInt(x):
     if x is None:
         return 0
     else:
         try:
-            return int(x)
+            return int(round(float(x)))
         except:
             return 0
 def toString(x):
@@ -173,14 +174,6 @@ def toList(x):
     else:
         return list(x)
 def toFloat(x):
-    if x is None:
-        return 0.
-    else:
-        try:
-            return float(x)
-        except:
-            return 0.
-def toDouble(x):
     if x is None:
         return 0.
     else:
@@ -208,4 +201,48 @@ def toMap(x):
     return x
 def removeAll(l,s):
     for _ in range(l.count(s)):  # @UndefinedVariable
-        l.remove(s) 
+        l.remove(s)
+        
+# fills in intermediate interpolated values replacing -1 values based on surrounding values
+# [1, 2, 3, -1, -1, -1, 10, 11] => [1, 2, 3, 4.75, 6.5, 8.25, 11]
+# [1,2,3,-1,-1,-1,-1] => [1,2,3,-1,-1,-1,-1] # no final value to interpolate too, so trailing -1 are kept!
+# [-1,-1,2] => [2, 2.0, 2] # a prefix of -1 will be replaced by the first value in l that is not -1
+# INVARIANT: the resulting list has always the same lenght as l
+def fill_gaps(l):
+    res = []
+    last_val = -1
+    skip = -1
+    for i,e in enumerate(l):
+        if i >= skip:
+            if e == -1 and last_val == -1:
+                # a prefix of -1 will be replaced by the first value in l that is not -1
+                s = -1
+                for e in l:
+                    if e != -1:
+                        s = e
+                        break
+                res.append(s)
+                last_val = s
+            elif e == -1 and last_val != -1:
+                next_val = None
+                next_idx = None # first index of an element beyond i of a value different to -1
+                for j in range(i+1,len(l)):
+                    if l[j] != -1:
+                        next_val = l[j]
+                        next_idx = j
+                        break
+                if next_val is None:
+                    # no further valid values, we append the tail
+                    res.extend(l[i:])
+                    return res
+                else:
+                    # compute intermediate values
+                    step = (next_val - last_val) / (j-i+1.)
+                    for _ in range(j-i):
+                        last_val = last_val + step
+                        res.append(last_val)
+                    skip = next_idx
+            else:
+                res.append(e)
+                last_val = e
+    return res

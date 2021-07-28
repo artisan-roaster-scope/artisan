@@ -1,5 +1,3 @@
 [Device]
 id=52
-
-[RoastProperties]
-roastertype=Hive Roaster Plug-and-Play Data Dome
+roastertype_setup=Hive Roaster Plug-and-Play Data Dome
