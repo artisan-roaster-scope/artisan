@@ -37271,6 +37271,8 @@ class ApplicationWindow(QMainWindow):
                     self.comparator.addProfiles(filenames)
                     self.comparator.show()
                 self.roastCompareAction.setChecked(bool(self.comparator))
+            else:
+                self.roastCompareAction.setChecked(bool(self.comparator))
 
     @pyqtSlot()
     @pyqtSlot(bool)
