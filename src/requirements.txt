@@ -1,4 +1,4 @@
-setuptools==57.2.0 # 56.0.0
+setuptools==57.4.0 # 57.2.0
 wheel==0.36.2
 pyserial==3.5 # 3.4
 pymodbus==2.5.2
@@ -7,7 +7,7 @@ yoctopuce==1.10.45664
 Phidget22==1.7.20210706
 unidecode==1.2.0 # 1.1.2
 bottle==0.12.19
-qrcode==7.1
+qrcode==7.2
 requests==2.26.0
 requests-file==1.5.1
 pefile==2019.4.18
