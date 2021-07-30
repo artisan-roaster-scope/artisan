@@ -21520,11 +21520,11 @@ class ApplicationWindow(QMainWindow):
                 if not (action in [6, 14, 15, 21]): # only for IO, VOUT, S7 and RC Commands we keep the floats
                     value = int(round(value))
                 if action in [8,9,16,17,18]: # for Hottop/R1 Heater or Fan, we just forward the value
-                    cmd = int(round(value))
+                    cmd = str(int(round(value)))
                 else:
                     cmd = self.eventslidercommands[n]
                     cmd = cmd.format(*(tuple([value]*cmd.count("{}"))))
-                self.eventaction(action,cmd)
+                self.eventaction(action,cmd) # cmd needs to be a string!
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fireslideraction() {0}").format(str(e)),exc_tb.tb_lineno)
