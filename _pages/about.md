@@ -68,6 +68,31 @@ gallery:
     alt: "Coffed"
     title: "Coffed"
     
+  - url: https://www.ingnapoli.com/
+    image_path: /assets/images/tostabar-logo.png
+    alt: "Tostabar"
+    title: "Tostabar"
+  - url: https://showroomcoffee.com/
+    image_path: /assets/images/showroom-logo.png
+    alt: "Showroom"
+    title: "Showroom"
+  - url: https://typhoon.coffee/
+    image_path: /assets/images/typhoon-logo.png
+    alt: "Typhoon"
+    title: "Typhoon"
+  - url: https://www.kapokcoffee.com/
+    image_path: /assets/images/kapok-logo.png
+    alt: "KapoK"
+    title: "KapoK"
+  - url: http://novustec.co.kr/
+    image_path: /assets/images/novustec-logo.png
+    alt: "Novustec"
+    title: "Novustec"
+  - url: http://www.twinoroasters.com/
+    image_path: /assets/images/twino-logo.png
+    alt: "Twino"
+    title: "Twino"
+
     
 
 ---
