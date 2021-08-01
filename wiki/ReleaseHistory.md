@@ -63,6 +63,7 @@ v2.4.6 (July 30, 2021)
   - Dry, Mid and Finish Phase values added to the Excel and CSV ranking reports
   - synchronizes the behavior of opening profiles per double-click on Linux to the one on macOS and Windows (see [Working Together – Artisan, ArtisanViewer and artisan.plus
   ](https://artisan-roasterscope.blogspot.com/2020/06/working-together-artisan-artisanviewer.html))
+  - the currently displayed profile is reopened after loading a new settings file
 * Fixes
   - fixes adjustSV for Fuji PXF PID ([Issue #547](../../../issues/547))
   - prevent the automatic delta axis mechanism to make adjustments on starting a new recording
