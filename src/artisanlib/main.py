@@ -8669,11 +8669,11 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.ground_color > 0:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Ground Color", None) + ': #' + str(aw.qmc.ground_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx])
                 if "BTU_batch" in cp and cp["BTU_batch"]:
-                    statstr += "\n{}: {}kW".format(QApplication.translate("AddlInfo", "Energy", None),str(aw.float2float(aw.qmc.convertHeat(cp["BTU_batch"],0,3),2)))
+                    statstr += "\n{}: {}kWh".format(QApplication.translate("AddlInfo", "Energy", None),str(aw.float2float(aw.qmc.convertHeat(cp["BTU_batch"],0,3),2)))
                     if "BTU_batch_per_green_kg" in cp and cp["BTU_batch_per_green_kg"]:
                         statstr += " ({}kWh/kg)".format(str(aw.float2float(aw.qmc.convertHeat(cp["BTU_batch_per_green_kg"],0,3),2)))
                 if "CO2_batch" in cp and cp["CO2_batch"]:
-                    statstr += "\n{}: {}g".format(QApplication.translate("AddlInfo", "CO2", None).replace("CO2","CO₂"),str(aw.float2float(cp["CO2_batch"],0)))
+                    statstr += "\n{}: {}g".format(QApplication.translate("AddlInfo", "CO2", None),str(aw.float2float(cp["CO2_batch"],0)))
                     if "CO2_batch_per_green_kg" in cp and cp["CO2_batch_per_green_kg"]:
                         statstr += " ({}g/kg)".format(str(aw.float2float(cp["CO2_batch_per_green_kg"],0)))
                 if cp["AUC"]:
