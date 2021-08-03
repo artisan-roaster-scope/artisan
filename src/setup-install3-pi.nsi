@@ -306,6 +306,7 @@ Section Uninstall
   RMDir /r "$INSTDIR\importlib_metadata-2.0.0-py3.7.egg-info"
   RMDir /r "$INSTDIR\importlib_metadata-4.0.1-py3.8.egg-info"
   RMDir /r "$INSTDIR\importlib_metadata-4.6.1-py3.8.egg-info"
+  RMDir /r "$INSTDIR\importlib_metadata-4.6.3-py3.8.egg-info"
 
   RMDir /r "$INSTDIR\keyring-23.0.1-py3.8.egg-info"
   RMDir /r "$INSTDIR\prettytable-2.1.0-py3.8.egg-info"
