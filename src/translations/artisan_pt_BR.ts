@@ -1026,7 +1026,7 @@ Virtual Extra</translation>
         <translation>Máscara de Análise</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2712"/>
+        <location filename="../artisanlib/roast_properties.py" line="2714"/>
         <source>Copy Table</source>
         <translation>Copiar Tabela</translation>
     </message>
@@ -1126,7 +1126,7 @@ Virtual Extra</translation>
         <translation>Restaurar padrões</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3598"/>
+        <location filename="../artisanlib/roast_properties.py" line="3600"/>
         <source>Save Defaults</source>
         <translation>Salvar padrões</translation>
     </message>
@@ -1757,12 +1757,12 @@ Virtual Extra</translation>
         <translation type="obsolete">l</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3665"/>
+        <location filename="../artisanlib/roast_properties.py" line="3667"/>
         <source>ET</source>
         <translation>ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3666"/>
+        <location filename="../artisanlib/roast_properties.py" line="3668"/>
         <source>BT</source>
         <translation>BT</translation>
     </message>
@@ -3912,7 +3912,7 @@ Virtual Extra</translation>
         <translation>Erro</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4554"/>
+        <location filename="../artisanlib/roast_properties.py" line="4556"/>
         <source>Unable to move CHARGE to a value that does not exist</source>
         <translation>Impossível mover CARGA para um valor que não existe</translation>
     </message>
@@ -4543,12 +4543,12 @@ Virtual Extra</translation>
         <translation>Ajuda S7</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3621"/>
+        <location filename="../artisanlib/roast_properties.py" line="3623"/>
         <source>Energy Help</source>
         <translation>Ajuda de energia</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4925"/>
+        <location filename="../artisanlib/roast_properties.py" line="4927"/>
         <source>Set Measure from Profile</source>
         <translation>Definir medida do perfil</translation>
     </message>
@@ -4986,12 +4986,12 @@ Virtual Extra</translation>
         <translation>Filtro de exibição</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2709"/>
+        <location filename="../artisanlib/roast_properties.py" line="2711"/>
         <source>Energy</source>
         <translation>Energia</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2710"/>
+        <location filename="../artisanlib/roast_properties.py" line="2712"/>
         <source>CO2</source>
         <translation></translation>
     </message>
@@ -9802,12 +9802,12 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="obsolete">°/min</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3817"/>
+        <location filename="../artisanlib/roast_properties.py" line="3819"/>
         <source>ET</source>
         <translation>ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3818"/>
+        <location filename="../artisanlib/roast_properties.py" line="3820"/>
         <source>BT</source>
         <translation>BT</translation>
     </message>
@@ -10082,7 +10082,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="obsolete">Torrador</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3591"/>
+        <location filename="../artisanlib/roast_properties.py" line="3593"/>
         <source>Operator</source>
         <translation>Operador</translation>
     </message>
@@ -10247,7 +10247,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="obsolete">paleta #</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2733"/>
+        <location filename="../artisanlib/roast_properties.py" line="2735"/>
         <source>Event</source>
         <translation>Evento</translation>
     </message>
@@ -10327,7 +10327,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation>seg</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4875"/>
+        <location filename="../artisanlib/roast_properties.py" line="4877"/>
         <source>Cooling</source>
         <translation>Resfriamento</translation>
     </message>
@@ -10637,7 +10637,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation>Prefixo</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2732"/>
+        <location filename="../artisanlib/roast_properties.py" line="2734"/>
         <source>Source</source>
         <translation>Fonte</translation>
     </message>
@@ -10732,7 +10732,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation>Porta</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2731"/>
+        <location filename="../artisanlib/roast_properties.py" line="2733"/>
         <source>Unit</source>
         <translation>Unidade</translation>
     </message>
@@ -10772,7 +10772,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="obsolete">final</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2881"/>
+        <location filename="../artisanlib/roast_properties.py" line="2883"/>
         <source>Batch</source>
         <translation>Lote</translation>
     </message>
@@ -11172,7 +11172,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation>Deslizante do SV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3595"/>
+        <location filename="../artisanlib/roast_properties.py" line="3597"/>
         <source>Drum Speed</source>
         <translation>Velocidade do Tambor</translation>
     </message>
@@ -11387,7 +11387,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation>Artisan Fuji PXF usa unidades MINUTOS:SEGUNDOS na Rampa/Plataforma</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3592"/>
+        <location filename="../artisanlib/roast_properties.py" line="3594"/>
         <source>Machine</source>
         <translation>Máquina</translation>
     </message>
@@ -11511,7 +11511,7 @@ Fases LCDs</translation>
         <translation>Suavização</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4477"/>
+        <location filename="../artisanlib/roast_properties.py" line="4479"/>
         <source>organic material</source>
         <translation>material orgânico</translation>
     </message>
@@ -11591,7 +11591,7 @@ Fases LCDs</translation>
         <translation>Fundo</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2755"/>
+        <location filename="../artisanlib/roast_properties.py" line="2757"/>
         <source>Duration</source>
         <translation>Duração</translation>
     </message>
@@ -11811,7 +11811,7 @@ Fases LCDs</translation>
         <translation>Não disponível no ArtisanViewer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3590"/>
+        <location filename="../artisanlib/roast_properties.py" line="3592"/>
         <source>Organization</source>
         <translation>Organização</translation>
     </message>
@@ -11906,7 +11906,7 @@ Fases LCDs</translation>
         <translation>Tempo Limite de Pop Up</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2729"/>
+        <location filename="../artisanlib/roast_properties.py" line="2731"/>
         <source>Label</source>
         <translation>Rótulo</translation>
     </message>
@@ -11938,32 +11938,32 @@ Fases LCDs</translation>
         <translation>Conjunto de Alarme Atual</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2708"/>
+        <location filename="../artisanlib/roast_properties.py" line="2710"/>
         <source>Results in</source>
         <translation>Resulta em</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2730"/>
+        <location filename="../artisanlib/roast_properties.py" line="2732"/>
         <source>Rating</source>
         <translation>Avaliação</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4855"/>
+        <location filename="../artisanlib/roast_properties.py" line="4857"/>
         <source>Pre-Heating</source>
         <translation>Pré-aquecimento</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4865"/>
+        <location filename="../artisanlib/roast_properties.py" line="4867"/>
         <source>Between Batches</source>
         <translation>Entre Lotes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2750"/>
+        <location filename="../artisanlib/roast_properties.py" line="2752"/>
         <source>(mm:ss)</source>
         <translation>(mm: ss)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2756"/>
+        <location filename="../artisanlib/roast_properties.py" line="2758"/>
         <source>Measured Energy or Output %</source>
         <translation>Energia medida ou% de saída</translation>
     </message>
@@ -11973,7 +11973,7 @@ Fases LCDs</translation>
         <translation type="obsolete">Queimador</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3223"/>
+        <location filename="../artisanlib/roast_properties.py" line="3225"/>
         <source>Roast</source>
         <translation>Torra</translation>
     </message>
@@ -12013,27 +12013,27 @@ Fases LCDs</translation>
         <translation>Evento Torra</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2745"/>
+        <location filename="../artisanlib/roast_properties.py" line="2747"/>
         <source>Between Batches after Pre-Heating</source>
         <translation>Entre lotes após pré-aquecimento</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3214"/>
+        <location filename="../artisanlib/roast_properties.py" line="3216"/>
         <source>Preheat</source>
         <translation>Pré-aqueça</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3216"/>
+        <location filename="../artisanlib/roast_properties.py" line="3218"/>
         <source>BBP</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2735"/>
+        <location filename="../artisanlib/roast_properties.py" line="2737"/>
         <source>Electric Energy Mix:</source>
         <translation>Mix de energia elétrica:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2736"/>
+        <location filename="../artisanlib/roast_properties.py" line="2738"/>
         <source>Renewable</source>
         <translation>Renovável</translation>
     </message>
@@ -12048,12 +12048,12 @@ Fases LCDs</translation>
         <translation>% De resfriamento</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3262"/>
+        <location filename="../artisanlib/roast_properties.py" line="3264"/>
         <source>Load</source>
         <translation>Tamanho do Lote</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2734"/>
+        <location filename="../artisanlib/roast_properties.py" line="2736"/>
         <source>Pressure %</source>
         <translation>Pressão %</translation>
     </message>
@@ -12068,17 +12068,17 @@ Fases LCDs</translation>
         <translation>Exploração madeireira</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3593"/>
+        <location filename="../artisanlib/roast_properties.py" line="3595"/>
         <source>Model</source>
         <translation>Modelo</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3594"/>
+        <location filename="../artisanlib/roast_properties.py" line="3596"/>
         <source>Heating</source>
         <translation>Aquecimento</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3232"/>
+        <location filename="../artisanlib/roast_properties.py" line="3234"/>
         <source>per kg green coffee</source>
         <translation>por kg de café verde</translation>
     </message>
@@ -13225,7 +13225,7 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation>Selecionar pasta</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4217"/>
+        <location filename="../artisanlib/roast_properties.py" line="4219"/>
         <source>No profile found</source>
         <translation>Perfil não encontrado</translation>
     </message>
@@ -13577,22 +13577,22 @@ Continuar?</translation>
         <translation>[alvo ET 1 = {0}] [alvo BT 1 = {1}] [alvo ET 2 = {2}] [alvo BT 2 = {3}]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4214"/>
+        <location filename="../artisanlib/roast_properties.py" line="4216"/>
         <source>Event #{0} added</source>
         <translation>Evento #{0} adicionado</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4255"/>
+        <location filename="../artisanlib/roast_properties.py" line="4257"/>
         <source> Event #{0} deleted</source>
         <translation> Evento #{0} removido</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4261"/>
+        <location filename="../artisanlib/roast_properties.py" line="4263"/>
         <source>No events found</source>
         <translation>Não foram encontrados eventos</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4821"/>
+        <location filename="../artisanlib/roast_properties.py" line="4823"/>
         <source>Roast properties updated but profile not saved to disk</source>
         <translation>Propriedades da torra atualizadas mas o perfil não foi gravado em disco</translation>
     </message>
@@ -14976,7 +14976,7 @@ Corrija isso na guia Config&gt; Curves&gt; Analyze.</translation>
         <translation>Autosave OFF. Prefixo: {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4077"/>
+        <location filename="../artisanlib/roast_properties.py" line="4079"/>
         <source>Data table copied to clipboard</source>
         <translation>Tabela de dados copiada para a área de transferência</translation>
     </message>
@@ -14991,7 +14991,7 @@ Corrija isso na guia Config&gt; Curves&gt; Analyze.</translation>
         <translation>Auxiliar de reprodução ativado em {0} segundos</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4117"/>
+        <location filename="../artisanlib/roast_properties.py" line="4119"/>
         <source>Event table copied to clipboard</source>
         <translation>Tabela de eventos copiada para a área de transferência</translation>
     </message>
@@ -15210,12 +15210,12 @@ Repita a operação no final: {0}</translation>
         <translation>Ramp / Soak foi encontrado em Hold! Desligue antes de mudar o padrão</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4185"/>
+        <location filename="../artisanlib/roast_properties.py" line="4187"/>
         <source>Alarms from events #{0} created</source>
         <translation>Alarmes de eventos nº {0} criados</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4249"/>
+        <location filename="../artisanlib/roast_properties.py" line="4251"/>
         <source> Events #{0} deleted</source>
         <translation> Eventos nº {0} excluídos</translation>
     </message>
@@ -15405,7 +15405,7 @@ Repita a operação no final: {0}</translation>
         <translation>Capacidade da máquina (kg)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3431"/>
+        <location filename="../artisanlib/roast_properties.py" line="3433"/>
         <source>The 0% value must be less than the 100% value.</source>
         <translation>O valor de 0% deve ser menor que o valor de 100%.</translation>
     </message>
@@ -16317,17 +16317,17 @@ Repita a operação no final: {0}</translation>
         <translation>Energia</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2705"/>
+        <location filename="../artisanlib/roast_properties.py" line="2707"/>
         <source>Details</source>
         <translation>Detalhes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2707"/>
+        <location filename="../artisanlib/roast_properties.py" line="2709"/>
         <source>Protocol</source>
         <translation>Protocolo</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2706"/>
+        <location filename="../artisanlib/roast_properties.py" line="2708"/>
         <source>Loads</source>
         <translation>Cargas</translation>
     </message>
@@ -16345,7 +16345,7 @@ Repita a operação no final: {0}</translation>
         <translation type="obsolete">Tempo Rel</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3960"/>
+        <location filename="../artisanlib/roast_properties.py" line="3962"/>
         <source>ET</source>
         <translation>ET</translation>
     </message>
@@ -16410,17 +16410,17 @@ Repita a operação no final: {0}</translation>
         <translation>Tempo</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3960"/>
+        <location filename="../artisanlib/roast_properties.py" line="3962"/>
         <source>Description</source>
         <translation>Descrição</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3960"/>
+        <location filename="../artisanlib/roast_properties.py" line="3962"/>
         <source>Type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3960"/>
+        <location filename="../artisanlib/roast_properties.py" line="3962"/>
         <source>Value</source>
         <translation>Valor</translation>
     </message>
@@ -16615,7 +16615,7 @@ Repita a operação no final: {0}</translation>
         <translation>A Partir</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2719"/>
+        <location filename="../artisanlib/roast_properties.py" line="2721"/>
         <source>Source</source>
         <translation>Fonte</translation>
     </message>
@@ -16650,32 +16650,32 @@ Repita a operação no final: {0}</translation>
         <translation type="obsolete">INICIAR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3897"/>
+        <location filename="../artisanlib/roast_properties.py" line="3899"/>
         <source>DRY END</source>
         <translation>FINAL SECAGEM</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3900"/>
+        <location filename="../artisanlib/roast_properties.py" line="3902"/>
         <source>FC START</source>
         <translation>INÍCIO PC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3903"/>
+        <location filename="../artisanlib/roast_properties.py" line="3905"/>
         <source>FC END</source>
         <translation>FINAL PC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3906"/>
+        <location filename="../artisanlib/roast_properties.py" line="3908"/>
         <source>SC START</source>
         <translation>INÍCIO SC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3909"/>
+        <location filename="../artisanlib/roast_properties.py" line="3911"/>
         <source>SC END</source>
         <translation>FINAL SC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3915"/>
+        <location filename="../artisanlib/roast_properties.py" line="3917"/>
         <source>COOL</source>
         <translation>CAFÉ RESFRIADO</translation>
     </message>
@@ -16685,12 +16685,12 @@ Repita a operação no final: {0}</translation>
         <translation type="obsolete">EVENTO #{1} {2}{3}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3912"/>
+        <location filename="../artisanlib/roast_properties.py" line="3914"/>
         <source>DROP</source>
         <translation>DESCARGA</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3894"/>
+        <location filename="../artisanlib/roast_properties.py" line="3896"/>
         <source>CHARGE</source>
         <translation>CARGA</translation>
     </message>
@@ -16770,7 +16770,7 @@ Repita a operação no final: {0}</translation>
         <translation>P9</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3884"/>
+        <location filename="../artisanlib/roast_properties.py" line="3886"/>
         <source>#{0} {1}{2}</source>
         <translation>#{0} {1}{2}</translation>
     </message>
@@ -16820,27 +16820,27 @@ Repita a operação no final: {0}</translation>
         <translation type="obsolete">Queimador</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2715"/>
+        <location filename="../artisanlib/roast_properties.py" line="2717"/>
         <source>Duration</source>
         <translation>Duração</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2720"/>
+        <location filename="../artisanlib/roast_properties.py" line="2722"/>
         <source>Kind</source>
         <translation>Gentil</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2714"/>
+        <location filename="../artisanlib/roast_properties.py" line="2716"/>
         <source>Power</source>
         <translation>Potência</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2718"/>
+        <location filename="../artisanlib/roast_properties.py" line="2720"/>
         <source>Load</source>
         <translation>Tamanho do Lote</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2717"/>
+        <location filename="../artisanlib/roast_properties.py" line="2719"/>
         <source>CO2</source>
         <translation></translation>
     </message>
@@ -17661,7 +17661,7 @@ Atualmente em TODO O MODO DE ACABAMENTO</translation>
         <translation>Se selecionado, o contador de lotes nunca será modificado ao carregar um arquivo de configurações</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2713"/>
+        <location filename="../artisanlib/roast_properties.py" line="2715"/>
         <source>Copy table to clipboard, OPTION or ALT click for tabular text</source>
         <translation>Copia tabela para a área de transferência, OPÇÃO ou ALT clique para texto tabulado</translation>
     </message>
@@ -17836,7 +17836,7 @@ tem que ser reduzido em 4 vezes.</translation>
         <translation>Adicionar nomes de arquivos salvos automaticamente à lista de arquivos recentes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3589"/>
+        <location filename="../artisanlib/roast_properties.py" line="3591"/>
         <source>The maximum nominal batch size of the machine in kg</source>
         <translation>O tamanho máximo do lote nominal da máquina em kg</translation>
     </message>

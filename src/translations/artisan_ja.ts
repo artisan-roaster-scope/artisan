@@ -866,7 +866,7 @@ END</translation>
         <translation>インサート</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2712"/>
+        <location filename="../artisanlib/roast_properties.py" line="2714"/>
         <source>Copy Table</source>
         <translation>テーブルをコピー</translation>
     </message>
@@ -1103,7 +1103,7 @@ Extra Device</source>
         <translation>デフォルトに戻す</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3598"/>
+        <location filename="../artisanlib/roast_properties.py" line="3600"/>
         <source>Save Defaults</source>
         <translation>デフォルトを保存</translation>
     </message>
@@ -1719,12 +1719,12 @@ Extra Device</source>
         <translation type="obsolete">l</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3665"/>
+        <location filename="../artisanlib/roast_properties.py" line="3667"/>
         <source>ET</source>
         <translation type="unfinished">ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3666"/>
+        <location filename="../artisanlib/roast_properties.py" line="3668"/>
         <source>BT</source>
         <translation type="unfinished">BT</translation>
     </message>
@@ -3864,7 +3864,7 @@ Extra Device</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4554"/>
+        <location filename="../artisanlib/roast_properties.py" line="4556"/>
         <source>Unable to move CHARGE to a value that does not exist</source>
         <translation type="unfinished">値が存在しないため、CHARGE に移行できません</translation>
     </message>
@@ -4465,12 +4465,12 @@ Extra Device</source>
         <translation>S7ヘルプ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3621"/>
+        <location filename="../artisanlib/roast_properties.py" line="3623"/>
         <source>Energy Help</source>
         <translation>エネルギーヘルプ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4925"/>
+        <location filename="../artisanlib/roast_properties.py" line="4927"/>
         <source>Set Measure from Profile</source>
         <translation>プロファイルからメジャーを設定</translation>
     </message>
@@ -4893,12 +4893,12 @@ Extra Device</source>
         <translation>ディスプレイフィルター</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2709"/>
+        <location filename="../artisanlib/roast_properties.py" line="2711"/>
         <source>Energy</source>
         <translation>エネルギー</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2710"/>
+        <location filename="../artisanlib/roast_properties.py" line="2712"/>
         <source>CO2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9496,12 +9496,12 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="obsolete">度/分</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3817"/>
+        <location filename="../artisanlib/roast_properties.py" line="3819"/>
         <source>ET</source>
         <translation>ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3818"/>
+        <location filename="../artisanlib/roast_properties.py" line="3820"/>
         <source>BT</source>
         <translation>BT</translation>
     </message>
@@ -9841,7 +9841,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="obsolete">焙煎機</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3591"/>
+        <location filename="../artisanlib/roast_properties.py" line="3593"/>
         <source>Operator</source>
         <translation type="unfinished">オペレーター</translation>
     </message>
@@ -10011,7 +10011,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="obsolete">パターン #</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2733"/>
+        <location filename="../artisanlib/roast_properties.py" line="2735"/>
         <source>Event</source>
         <translation>イベント</translation>
     </message>
@@ -10091,7 +10091,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="unfinished">秒</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4875"/>
+        <location filename="../artisanlib/roast_properties.py" line="4877"/>
         <source>Cooling</source>
         <translation type="unfinished">Cooling</translation>
     </message>
@@ -10411,7 +10411,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="unfinished">記録を開始</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2732"/>
+        <location filename="../artisanlib/roast_properties.py" line="2734"/>
         <source>Source</source>
         <translation type="unfinished">ソース</translation>
     </message>
@@ -10756,7 +10756,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation>温度モード</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3592"/>
+        <location filename="../artisanlib/roast_properties.py" line="3594"/>
         <source>Machine</source>
         <translation type="unfinished">機械</translation>
     </message>
@@ -10811,7 +10811,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2755"/>
+        <location filename="../artisanlib/roast_properties.py" line="2757"/>
         <source>Duration</source>
         <translation>デュレーション</translation>
     </message>
@@ -11261,7 +11261,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation>粗い</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2731"/>
+        <location filename="../artisanlib/roast_properties.py" line="2733"/>
         <source>Unit</source>
         <translation>単位</translation>
     </message>
@@ -11415,7 +11415,7 @@ LCDすべて</translation>
         <translation>ロースト</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2881"/>
+        <location filename="../artisanlib/roast_properties.py" line="2883"/>
         <source>Batch</source>
         <translation>バッチ</translation>
     </message>
@@ -11445,7 +11445,7 @@ LCDすべて</translation>
         <translation>水分</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3595"/>
+        <location filename="../artisanlib/roast_properties.py" line="3597"/>
         <source>Drum Speed</source>
         <translation>ドラムスピード</translation>
     </message>
@@ -11470,7 +11470,7 @@ LCDすべて</translation>
         <translation>テンプレート</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4477"/>
+        <location filename="../artisanlib/roast_properties.py" line="4479"/>
         <source>organic material</source>
         <translation>有機材料</translation>
     </message>
@@ -11510,7 +11510,7 @@ LCDすべて</translation>
         <translation>ArtisanViewerでは使用できません</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3590"/>
+        <location filename="../artisanlib/roast_properties.py" line="3592"/>
         <source>Organization</source>
         <translation>組織</translation>
     </message>
@@ -11605,7 +11605,7 @@ LCDすべて</translation>
         <translation>ポップアップタイムアウト</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2729"/>
+        <location filename="../artisanlib/roast_properties.py" line="2731"/>
         <source>Label</source>
         <translation>ラベル</translation>
     </message>
@@ -11637,32 +11637,32 @@ LCDすべて</translation>
         <translation>現在のアラームセット</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2708"/>
+        <location filename="../artisanlib/roast_properties.py" line="2710"/>
         <source>Results in</source>
         <translation>結果は</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2730"/>
+        <location filename="../artisanlib/roast_properties.py" line="2732"/>
         <source>Rating</source>
         <translation>評価</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4855"/>
+        <location filename="../artisanlib/roast_properties.py" line="4857"/>
         <source>Pre-Heating</source>
         <translation>予熱</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4865"/>
+        <location filename="../artisanlib/roast_properties.py" line="4867"/>
         <source>Between Batches</source>
         <translation>バッチ間</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2750"/>
+        <location filename="../artisanlib/roast_properties.py" line="2752"/>
         <source>(mm:ss)</source>
         <translation>（mm：ss）</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2756"/>
+        <location filename="../artisanlib/roast_properties.py" line="2758"/>
         <source>Measured Energy or Output %</source>
         <translation>測定されたエネルギーまたは出力％</translation>
     </message>
@@ -11672,7 +11672,7 @@ LCDすべて</translation>
         <translation type="obsolete">バーナー</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3223"/>
+        <location filename="../artisanlib/roast_properties.py" line="3225"/>
         <source>Roast</source>
         <translation type="unfinished">焙煎</translation>
     </message>
@@ -11712,27 +11712,27 @@ LCDすべて</translation>
         <translation>ローストイベント</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2745"/>
+        <location filename="../artisanlib/roast_properties.py" line="2747"/>
         <source>Between Batches after Pre-Heating</source>
         <translation>予熱後のバッチ間</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3214"/>
+        <location filename="../artisanlib/roast_properties.py" line="3216"/>
         <source>Preheat</source>
         <translation>予熱</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3216"/>
+        <location filename="../artisanlib/roast_properties.py" line="3218"/>
         <source>BBP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2735"/>
+        <location filename="../artisanlib/roast_properties.py" line="2737"/>
         <source>Electric Energy Mix:</source>
         <translation>電気エネルギーミックス：</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2736"/>
+        <location filename="../artisanlib/roast_properties.py" line="2738"/>
         <source>Renewable</source>
         <translation>再生可能</translation>
     </message>
@@ -11747,12 +11747,12 @@ LCDすべて</translation>
         <translation>冷却％</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3262"/>
+        <location filename="../artisanlib/roast_properties.py" line="3264"/>
         <source>Load</source>
         <translation type="unfinished">ロード</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2734"/>
+        <location filename="../artisanlib/roast_properties.py" line="2736"/>
         <source>Pressure %</source>
         <translation>圧力％</translation>
     </message>
@@ -11767,17 +11767,17 @@ LCDすべて</translation>
         <translation>ロギング</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3593"/>
+        <location filename="../artisanlib/roast_properties.py" line="3595"/>
         <source>Model</source>
         <translation>モデル</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3594"/>
+        <location filename="../artisanlib/roast_properties.py" line="3596"/>
         <source>Heating</source>
         <translation>暖房</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3232"/>
+        <location filename="../artisanlib/roast_properties.py" line="3234"/>
         <source>per kg green coffee</source>
         <translation>グリーンコーヒー1kgあたり</translation>
     </message>
@@ -12950,7 +12950,7 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation>ディレクトリを選択</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4217"/>
+        <location filename="../artisanlib/roast_properties.py" line="4219"/>
         <source>No profile found</source>
         <translation type="unfinished">プロファイルがありません</translation>
     </message>
@@ -13302,22 +13302,22 @@ Continue?</source>
         <translation type="unfinished">[ETターゲット 1 = {0}] [BTターゲット 1 = {1}] [ETターゲット 2 = {2}] [BTターゲット 2 = {3}]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4214"/>
+        <location filename="../artisanlib/roast_properties.py" line="4216"/>
         <source>Event #{0} added</source>
         <translation type="unfinished">Event #{0} は追加されました</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4255"/>
+        <location filename="../artisanlib/roast_properties.py" line="4257"/>
         <source> Event #{0} deleted</source>
         <translation type="unfinished"> Event #{0} は削除されました</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4261"/>
+        <location filename="../artisanlib/roast_properties.py" line="4263"/>
         <source>No events found</source>
         <translation type="unfinished">イベントがありません</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4821"/>
+        <location filename="../artisanlib/roast_properties.py" line="4823"/>
         <source>Roast properties updated but profile not saved to disk</source>
         <translation type="unfinished">焙煎プロパティは更新されましたが、プロファイルはディスクに保存されていません</translation>
     </message>
@@ -14631,7 +14631,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4077"/>
+        <location filename="../artisanlib/roast_properties.py" line="4079"/>
         <source>Data table copied to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14646,7 +14646,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4117"/>
+        <location filename="../artisanlib/roast_properties.py" line="4119"/>
         <source>Event table copied to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14870,12 +14870,12 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4185"/>
+        <location filename="../artisanlib/roast_properties.py" line="4187"/>
         <source>Alarms from events #{0} created</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4249"/>
+        <location filename="../artisanlib/roast_properties.py" line="4251"/>
         <source> Events #{0} deleted</source>
         <translation type="unfinished"></translation>
     </message>
@@ -15055,7 +15055,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3431"/>
+        <location filename="../artisanlib/roast_properties.py" line="3433"/>
         <source>The 0% value must be less than the 100% value.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -15967,17 +15967,17 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation>エネルギー</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2705"/>
+        <location filename="../artisanlib/roast_properties.py" line="2707"/>
         <source>Details</source>
         <translation>詳細</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2707"/>
+        <location filename="../artisanlib/roast_properties.py" line="2709"/>
         <source>Protocol</source>
         <translation>プロトコル</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2706"/>
+        <location filename="../artisanlib/roast_properties.py" line="2708"/>
         <source>Loads</source>
         <translation>負荷</translation>
     </message>
@@ -15995,7 +15995,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="obsolete">相対時間</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3960"/>
+        <location filename="../artisanlib/roast_properties.py" line="3962"/>
         <source>ET</source>
         <translation type="unfinished">ET</translation>
     </message>
@@ -16065,17 +16065,17 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="unfinished">時間</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3960"/>
+        <location filename="../artisanlib/roast_properties.py" line="3962"/>
         <source>Description</source>
         <translation type="unfinished">記述</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3960"/>
+        <location filename="../artisanlib/roast_properties.py" line="3962"/>
         <source>Type</source>
         <translation type="unfinished">タイプ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3960"/>
+        <location filename="../artisanlib/roast_properties.py" line="3962"/>
         <source>Value</source>
         <translation type="unfinished">値</translation>
     </message>
@@ -16270,7 +16270,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="unfinished">From</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2719"/>
+        <location filename="../artisanlib/roast_properties.py" line="2721"/>
         <source>Source</source>
         <translation type="unfinished">ソース</translation>
     </message>
@@ -16300,37 +16300,37 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="unfinished">Soak 時:分</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3897"/>
+        <location filename="../artisanlib/roast_properties.py" line="3899"/>
         <source>DRY END</source>
         <translation type="unfinished">DRY END</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3900"/>
+        <location filename="../artisanlib/roast_properties.py" line="3902"/>
         <source>FC START</source>
         <translation type="unfinished">FC START</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3903"/>
+        <location filename="../artisanlib/roast_properties.py" line="3905"/>
         <source>FC END</source>
         <translation type="unfinished">FC END</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3906"/>
+        <location filename="../artisanlib/roast_properties.py" line="3908"/>
         <source>SC START</source>
         <translation type="unfinished">SC START</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3909"/>
+        <location filename="../artisanlib/roast_properties.py" line="3911"/>
         <source>SC END</source>
         <translation type="unfinished">SC END</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3912"/>
+        <location filename="../artisanlib/roast_properties.py" line="3914"/>
         <source>DROP</source>
         <translation type="unfinished">DROP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3915"/>
+        <location filename="../artisanlib/roast_properties.py" line="3917"/>
         <source>COOL</source>
         <translation type="unfinished">COOL</translation>
     </message>
@@ -16340,7 +16340,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="obsolete">START</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3894"/>
+        <location filename="../artisanlib/roast_properties.py" line="3896"/>
         <source>CHARGE</source>
         <translation type="unfinished">CHARGE</translation>
     </message>
@@ -16375,7 +16375,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation>だがしかし</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3884"/>
+        <location filename="../artisanlib/roast_properties.py" line="3886"/>
         <source>#{0} {1}{2}</source>
         <translation>＃{0} {1} {2}</translation>
     </message>
@@ -16480,27 +16480,27 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="obsolete">バーナー</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2715"/>
+        <location filename="../artisanlib/roast_properties.py" line="2717"/>
         <source>Duration</source>
         <translation>デュレーション</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2720"/>
+        <location filename="../artisanlib/roast_properties.py" line="2722"/>
         <source>Kind</source>
         <translation>種類</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2714"/>
+        <location filename="../artisanlib/roast_properties.py" line="2716"/>
         <source>Power</source>
         <translation type="unfinished">Power</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2718"/>
+        <location filename="../artisanlib/roast_properties.py" line="2720"/>
         <source>Load</source>
         <translation type="unfinished">ロード</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2717"/>
+        <location filename="../artisanlib/roast_properties.py" line="2719"/>
         <source>CO2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -17242,7 +17242,7 @@ Currently in ALL FINISHING MODE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2713"/>
+        <location filename="../artisanlib/roast_properties.py" line="2715"/>
         <source>Copy table to clipboard, OPTION or ALT click for tabular text</source>
         <translation type="unfinished"></translation>
     </message>
@@ -17477,7 +17477,7 @@ has to be reduced by 4 times.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3589"/>
+        <location filename="../artisanlib/roast_properties.py" line="3591"/>
         <source>The maximum nominal batch size of the machine in kg</source>
         <translation type="unfinished"></translation>
     </message>

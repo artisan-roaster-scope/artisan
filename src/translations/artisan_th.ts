@@ -880,7 +880,7 @@ END</source>
         <translation>แทรก</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2712"/>
+        <location filename="../artisanlib/roast_properties.py" line="2714"/>
         <source>Copy Table</source>
         <translation>คัดลอกตาราง</translation>
     </message>
@@ -1022,7 +1022,7 @@ Extra Device</source>
         <translation>คืนค่าเริ่มต้น</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3598"/>
+        <location filename="../artisanlib/roast_properties.py" line="3600"/>
         <source>Save Defaults</source>
         <translation>บันทึกค่าเริ่มต้น</translation>
     </message>
@@ -1638,12 +1638,12 @@ Extra Device</source>
         <translation type="unfinished">อุณหภูมิ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3665"/>
+        <location filename="../artisanlib/roast_properties.py" line="3667"/>
         <source>ET</source>
         <translation type="unfinished">อุณหภูมิอากาศ(ET)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3666"/>
+        <location filename="../artisanlib/roast_properties.py" line="3668"/>
         <source>BT</source>
         <translation type="unfinished">อุณหภูมิเมล็ด(BT)</translation>
     </message>
@@ -3833,7 +3833,7 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4554"/>
+        <location filename="../artisanlib/roast_properties.py" line="4556"/>
         <source>Unable to move CHARGE to a value that does not exist</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4156,12 +4156,12 @@ Extra Device</source>
         <translation>วิธีใช้ S7</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3621"/>
+        <location filename="../artisanlib/roast_properties.py" line="3623"/>
         <source>Energy Help</source>
         <translation>ความช่วยเหลือด้านพลังงาน</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4925"/>
+        <location filename="../artisanlib/roast_properties.py" line="4927"/>
         <source>Set Measure from Profile</source>
         <translation>ตั้งค่าการวัดจากโปรไฟล์</translation>
     </message>
@@ -4529,12 +4529,12 @@ Extra Device</source>
         <translation>ตัวกรองการแสดงผล</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2709"/>
+        <location filename="../artisanlib/roast_properties.py" line="2711"/>
         <source>Energy</source>
         <translation>พลังงาน</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2710"/>
+        <location filename="../artisanlib/roast_properties.py" line="2712"/>
         <source>CO2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9132,12 +9132,12 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
 <context>
     <name>Label</name>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3817"/>
+        <location filename="../artisanlib/roast_properties.py" line="3819"/>
         <source>ET</source>
         <translation>อุณหภูมิอากาศ(ET)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3818"/>
+        <location filename="../artisanlib/roast_properties.py" line="3820"/>
         <source>BT</source>
         <translation>อุณหภูมิเมล็ด(BT)</translation>
     </message>
@@ -9557,7 +9557,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="unfinished">พอร์ท</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2731"/>
+        <location filename="../artisanlib/roast_properties.py" line="2733"/>
         <source>Unit</source>
         <translation type="unfinished">หน่วย</translation>
     </message>
@@ -9612,7 +9612,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="unfinished">วันที่</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2881"/>
+        <location filename="../artisanlib/roast_properties.py" line="2883"/>
         <source>Batch</source>
         <translation type="unfinished">ชุด</translation>
     </message>
@@ -9692,7 +9692,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="obsolete">เครื่องคั่ว</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3591"/>
+        <location filename="../artisanlib/roast_properties.py" line="3593"/>
         <source>Operator</source>
         <translation type="unfinished">ผู้คุมเครื่อง</translation>
     </message>
@@ -9872,7 +9872,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="obsolete">รูปแบบปัจจุบัน</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2733"/>
+        <location filename="../artisanlib/roast_properties.py" line="2735"/>
         <source>Event</source>
         <translation>เหตุการณ์</translation>
     </message>
@@ -9897,7 +9897,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="unfinished">ปัจจัย</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2732"/>
+        <location filename="../artisanlib/roast_properties.py" line="2734"/>
         <source>Source</source>
         <translation type="unfinished">แหล่ง</translation>
     </message>
@@ -10297,7 +10297,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="obsolete">พิเศษ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3592"/>
+        <location filename="../artisanlib/roast_properties.py" line="3594"/>
         <source>Machine</source>
         <translation type="unfinished">เครื่อง</translation>
     </message>
@@ -10347,7 +10347,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2755"/>
+        <location filename="../artisanlib/roast_properties.py" line="2757"/>
         <source>Duration</source>
         <translation>ระยะเวลา</translation>
     </message>
@@ -10971,7 +10971,7 @@ LCD ทั้งหมด</translation>
         <translation>ความชื้น</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3595"/>
+        <location filename="../artisanlib/roast_properties.py" line="3597"/>
         <source>Drum Speed</source>
         <translation>ความเร็วกลอง</translation>
     </message>
@@ -10996,7 +10996,7 @@ LCD ทั้งหมด</translation>
         <translation>เทมเพลต</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4477"/>
+        <location filename="../artisanlib/roast_properties.py" line="4479"/>
         <source>organic material</source>
         <translation>วัสดุอินทรีย์</translation>
     </message>
@@ -11056,7 +11056,7 @@ LCD ทั้งหมด</translation>
         <translation>ไม่มีใน ArtisanViewer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3590"/>
+        <location filename="../artisanlib/roast_properties.py" line="3592"/>
         <source>Organization</source>
         <translation>องค์กร</translation>
     </message>
@@ -11151,7 +11151,7 @@ LCD ทั้งหมด</translation>
         <translation>หมดเวลาป๊อปอัป</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2729"/>
+        <location filename="../artisanlib/roast_properties.py" line="2731"/>
         <source>Label</source>
         <translation>ฉลาก</translation>
     </message>
@@ -11183,32 +11183,32 @@ LCD ทั้งหมด</translation>
         <translation>ตั้งปลุกปัจจุบัน</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2708"/>
+        <location filename="../artisanlib/roast_properties.py" line="2710"/>
         <source>Results in</source>
         <translation>ผลลัพธ์ใน</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2730"/>
+        <location filename="../artisanlib/roast_properties.py" line="2732"/>
         <source>Rating</source>
         <translation>คะแนน</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4855"/>
+        <location filename="../artisanlib/roast_properties.py" line="4857"/>
         <source>Pre-Heating</source>
         <translation>ก่อนการทำความร้อน</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4865"/>
+        <location filename="../artisanlib/roast_properties.py" line="4867"/>
         <source>Between Batches</source>
         <translation>ระหว่างแบทช์</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2750"/>
+        <location filename="../artisanlib/roast_properties.py" line="2752"/>
         <source>(mm:ss)</source>
         <translation>(มม.: เอสเอส)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2756"/>
+        <location filename="../artisanlib/roast_properties.py" line="2758"/>
         <source>Measured Energy or Output %</source>
         <translation>พลังงานที่วัดได้หรือ% เอาท์พุท</translation>
     </message>
@@ -11218,7 +11218,7 @@ LCD ทั้งหมด</translation>
         <translation type="obsolete">หัวตะเกียงก๊าซ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3223"/>
+        <location filename="../artisanlib/roast_properties.py" line="3225"/>
         <source>Roast</source>
         <translation type="unfinished">การคั่ว</translation>
     </message>
@@ -11258,32 +11258,32 @@ LCD ทั้งหมด</translation>
         <translation>งานย่าง</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2745"/>
+        <location filename="../artisanlib/roast_properties.py" line="2747"/>
         <source>Between Batches after Pre-Heating</source>
         <translation>ระหว่างแบทช์หลังจากทำความร้อนล่วงหน้า</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3214"/>
+        <location filename="../artisanlib/roast_properties.py" line="3216"/>
         <source>Preheat</source>
         <translation>เปิดเตา</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3216"/>
+        <location filename="../artisanlib/roast_properties.py" line="3218"/>
         <source>BBP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2735"/>
+        <location filename="../artisanlib/roast_properties.py" line="2737"/>
         <source>Electric Energy Mix:</source>
         <translation>การผสมผสานพลังงานไฟฟ้า:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4875"/>
+        <location filename="../artisanlib/roast_properties.py" line="4877"/>
         <source>Cooling</source>
         <translation>คูลลิ่ง</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2736"/>
+        <location filename="../artisanlib/roast_properties.py" line="2738"/>
         <source>Renewable</source>
         <translation>ทดแทนได้</translation>
     </message>
@@ -11298,12 +11298,12 @@ LCD ทั้งหมด</translation>
         <translation>คูลลิ่ง%</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3262"/>
+        <location filename="../artisanlib/roast_properties.py" line="3264"/>
         <source>Load</source>
         <translation type="unfinished">โหลด (Load)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2734"/>
+        <location filename="../artisanlib/roast_properties.py" line="2736"/>
         <source>Pressure %</source>
         <translation>ความดัน %</translation>
     </message>
@@ -11318,17 +11318,17 @@ LCD ทั้งหมด</translation>
         <translation>การบันทึก</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3593"/>
+        <location filename="../artisanlib/roast_properties.py" line="3595"/>
         <source>Model</source>
         <translation>รุ่น</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3594"/>
+        <location filename="../artisanlib/roast_properties.py" line="3596"/>
         <source>Heating</source>
         <translation>เครื่องทำความร้อน</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3232"/>
+        <location filename="../artisanlib/roast_properties.py" line="3234"/>
         <source>per kg green coffee</source>
         <translation>กาแฟเขียวต่อกิโลกรัม</translation>
     </message>
@@ -12477,7 +12477,7 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4217"/>
+        <location filename="../artisanlib/roast_properties.py" line="4219"/>
         <source>No profile found</source>
         <translation type="unfinished">ไม่พบรายละเอียด</translation>
     </message>
@@ -13263,7 +13263,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4077"/>
+        <location filename="../artisanlib/roast_properties.py" line="4079"/>
         <source>Data table copied to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13288,7 +13288,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4117"/>
+        <location filename="../artisanlib/roast_properties.py" line="4119"/>
         <source>Event table copied to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13855,32 +13855,32 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4185"/>
+        <location filename="../artisanlib/roast_properties.py" line="4187"/>
         <source>Alarms from events #{0} created</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4261"/>
+        <location filename="../artisanlib/roast_properties.py" line="4263"/>
         <source>No events found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4214"/>
+        <location filename="../artisanlib/roast_properties.py" line="4216"/>
         <source>Event #{0} added</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4249"/>
+        <location filename="../artisanlib/roast_properties.py" line="4251"/>
         <source> Events #{0} deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4255"/>
+        <location filename="../artisanlib/roast_properties.py" line="4257"/>
         <source> Event #{0} deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="4821"/>
+        <location filename="../artisanlib/roast_properties.py" line="4823"/>
         <source>Roast properties updated but profile not saved to disk</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14070,7 +14070,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3431"/>
+        <location filename="../artisanlib/roast_properties.py" line="3433"/>
         <source>The 0% value must be less than the 100% value.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14907,17 +14907,17 @@ Repeat Operation at the end: {0}</source>
         <translation>พลังงาน</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2705"/>
+        <location filename="../artisanlib/roast_properties.py" line="2707"/>
         <source>Details</source>
         <translation>รายละเอียด</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2707"/>
+        <location filename="../artisanlib/roast_properties.py" line="2709"/>
         <source>Protocol</source>
         <translation>มาตรการ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2706"/>
+        <location filename="../artisanlib/roast_properties.py" line="2708"/>
         <source>Loads</source>
         <translation>โหลด</translation>
     </message>
@@ -14925,37 +14925,37 @@ Repeat Operation at the end: {0}</source>
 <context>
     <name>Table</name>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3897"/>
+        <location filename="../artisanlib/roast_properties.py" line="3899"/>
         <source>DRY END</source>
         <translation type="unfinished">จบ ช่วงการอบ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3900"/>
+        <location filename="../artisanlib/roast_properties.py" line="3902"/>
         <source>FC START</source>
         <translation type="unfinished">เริ่ม แกร๊กแรก</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3903"/>
+        <location filename="../artisanlib/roast_properties.py" line="3905"/>
         <source>FC END</source>
         <translation type="unfinished">จบ แคร๊กแรก</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3906"/>
+        <location filename="../artisanlib/roast_properties.py" line="3908"/>
         <source>SC START</source>
         <translation type="unfinished">เริ่ม แคร๊กสอง</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3909"/>
+        <location filename="../artisanlib/roast_properties.py" line="3911"/>
         <source>SC END</source>
         <translation type="unfinished">จบ แคร๊กสอง</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3912"/>
+        <location filename="../artisanlib/roast_properties.py" line="3914"/>
         <source>DROP</source>
         <translation type="unfinished">หยุด</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3915"/>
+        <location filename="../artisanlib/roast_properties.py" line="3917"/>
         <source>COOL</source>
         <translation type="unfinished">ทำให้เย็น</translation>
     </message>
@@ -15015,7 +15015,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished">P9</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3960"/>
+        <location filename="../artisanlib/roast_properties.py" line="3962"/>
         <source>ET</source>
         <translation type="unfinished">อุณหภูมิอากาศ(ET)</translation>
     </message>
@@ -15040,22 +15040,22 @@ Repeat Operation at the end: {0}</source>
         <translation type="obsolete">EVENT #{0} {1}{2}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3894"/>
+        <location filename="../artisanlib/roast_properties.py" line="3896"/>
         <source>CHARGE</source>
         <translation type="unfinished">ใส่เมล็ด</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3960"/>
+        <location filename="../artisanlib/roast_properties.py" line="3962"/>
         <source>Description</source>
         <translation type="unfinished">คำอธิบาย</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3960"/>
+        <location filename="../artisanlib/roast_properties.py" line="3962"/>
         <source>Type</source>
         <translation type="unfinished">ชนิด</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3960"/>
+        <location filename="../artisanlib/roast_properties.py" line="3962"/>
         <source>Value</source>
         <translation type="unfinished">ค่า</translation>
     </message>
@@ -15125,7 +15125,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished">จาก</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2719"/>
+        <location filename="../artisanlib/roast_properties.py" line="2721"/>
         <source>Source</source>
         <translation type="unfinished">แหล่งที่มา</translation>
     </message>
@@ -15175,7 +15175,7 @@ Repeat Operation at the end: {0}</source>
         <translation>หนังบู๊</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3884"/>
+        <location filename="../artisanlib/roast_properties.py" line="3886"/>
         <source>#{0} {1}{2}</source>
         <translation># {0} {1} {2}</translation>
     </message>
@@ -15355,27 +15355,27 @@ Repeat Operation at the end: {0}</source>
         <translation type="obsolete">หัวตะเกียงก๊าซ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2715"/>
+        <location filename="../artisanlib/roast_properties.py" line="2717"/>
         <source>Duration</source>
         <translation>ระยะเวลา</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2720"/>
+        <location filename="../artisanlib/roast_properties.py" line="2722"/>
         <source>Kind</source>
         <translation>ชนิด</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2714"/>
+        <location filename="../artisanlib/roast_properties.py" line="2716"/>
         <source>Power</source>
         <translation>อำนาจ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2718"/>
+        <location filename="../artisanlib/roast_properties.py" line="2720"/>
         <source>Load</source>
         <translation type="unfinished">โหลด (Load)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2717"/>
+        <location filename="../artisanlib/roast_properties.py" line="2719"/>
         <source>CO2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -15908,7 +15908,7 @@ Currently in ALL FINISHING MODE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="2713"/>
+        <location filename="../artisanlib/roast_properties.py" line="2715"/>
         <source>Copy table to clipboard, OPTION or ALT click for tabular text</source>
         <translation type="unfinished"></translation>
     </message>
@@ -16270,7 +16270,7 @@ has to be reduced by 4 times.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="3589"/>
+        <location filename="../artisanlib/roast_properties.py" line="3591"/>
         <source>The maximum nominal batch size of the machine in kg</source>
         <translation type="unfinished"></translation>
     </message>

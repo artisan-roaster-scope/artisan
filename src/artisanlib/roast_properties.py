@@ -2539,6 +2539,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         settings.setValue("RoastGeometry",self.saveGeometry())
         self.aw.editGraphDlg_activeTab = self.TabWidget.currentIndex()
         self.aw.closeEventSettings() # save all app settings
+        self.aw.editgraphdialog = None
 
     # triggered via the cancel button
     @pyqtSlot()
@@ -2585,6 +2586,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         
         self.aw.qmc.roastpropertiesAutoOpenFlag = self.org_roastpropertiesAutoOpenFlag
         self.aw.qmc.roastpropertiesAutoOpenDropFlag = self.org_roastpropertiesAutoOpenDropFlag
+        self.aw.editgraphdialog = None
         
         self.reject()
 
