@@ -36,6 +36,10 @@ If you think Artisan is useful to you, contribute financially to its further dev
 [Documentation](https://artisan-scope.org/docs/)
 
 
+FOLLOW!  
+<a href="https://www.facebook.com/ArtisanScope"><img src="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/screenshots/facebook-square.svg" width="30"></a>&nbsp;&nbsp;<a href="https://www.instagram.com/artisanscope/"><img src="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/screenshots/instagram-square.svg" width="30"></a>
+
+
 <a id="version_history"></a>
 Version History
 ---------------
