@@ -4788,7 +4788,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         # load selected recent roast template in the background
         if self.aw.loadbackgroundUUID(self.template_file,self.template_uuid):
             try:
-                self.aw.qmc.background = True
+                self.aw.qmc.background = not self.aw.qmc.hideBgafterprofileload
                 self.aw.qmc.timealign(redraw=False)
                 self.aw.qmc.redraw()
             except:

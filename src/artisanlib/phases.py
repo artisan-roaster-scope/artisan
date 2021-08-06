@@ -222,7 +222,7 @@ class phasesGraphDlg(ArtisanDialog):
             settings.setValue("Phases",self.aw.qmc.phases)
 
     def bevents2phases(self):
-        if self.aw.qmc.phasesfromBackgroundflag and self.aw.qmc.background:
+        if self.aw.qmc.phasesfromBackgroundflag and self.aw.qmc.backgroundprofile is not None:
             # adjust phases by DryEnd and FCs events from background profile
             if self.aw.qmc.timeindexB[1]:
                 self.aw.qmc.phases[1] = int(round(self.aw.qmc.temp2B[self.aw.qmc.timeindexB[1]]))

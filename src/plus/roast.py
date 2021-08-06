@@ -278,7 +278,7 @@ def getRoast():
         except Exception as e:
             config.logger.info("roast: Exception in getRoast() %s",e)
             
-        if aw.qmc.background and aw.qmc.backgroundprofile:
+        if aw.qmc.backgroundprofile:
             bp = aw.qmc.backgroundprofile
             template = getTemplate(bp)
             d["template"] = template

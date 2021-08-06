@@ -320,7 +320,7 @@ class profileTransformatorDlg(ArtisanDialog):
             if self.phases_target_widgets_time[i].text() != "" or self.phases_target_widgets_percent[i].text() != "":
                 self.phases_target_widgets_time[i].setText("")
                 self.phases_target_widgets_percent[i].setText("")
-            elif self.aw.qmc.background and self.aw.qmc.timeindexB[1]>0 and self.aw.qmc.timeindexB[2]>0 and self.aw.qmc.timeindexB[6]>0 and \
+            elif self.aw.qmc.backgroundprofile is not None and self.aw.qmc.timeindexB[1]>0 and self.aw.qmc.timeindexB[2]>0 and self.aw.qmc.timeindexB[6]>0 and \
                     self.aw.qmc.timeindex[1]>0 and self.aw.qmc.timeindex[2]>0 and self.aw.qmc.timeindex[6]>0:
                 back_offset = self.backgroundOffset()
                 back_dry = self.aw.qmc.timeB[self.aw.qmc.timeindexB[1]]
@@ -354,7 +354,7 @@ class profileTransformatorDlg(ArtisanDialog):
             if self.time_target_widgets[i].text() != "":
                 self.time_target_widgets[i].setText("")
                 self.updateTimeResults()
-            elif self.aw.qmc.background:
+            elif self.aw.qmc.backgroundprofile is not None:
                 timeidx = [1,2,4,6][i]
                 if self.aw.qmc.timeindex[timeidx] and self.aw.qmc.timeindexB[timeidx]:
                     s = stringfromseconds(self.aw.qmc.timeB[self.aw.qmc.timeindexB[timeidx]]-self.backgroundOffset(),False)
@@ -374,7 +374,7 @@ class profileTransformatorDlg(ArtisanDialog):
             if self.temp_target_widgets[i].text() != "":
                 self.temp_target_widgets[i].setText("")
                 self.updateTempResults()
-            elif self.aw.qmc.background:
+            elif self.aw.qmc.backgroundprofile is not None:
                 timeidx = [0,1,2,4,6][i]
                 if self.aw.qmc.timeindexB[timeidx] > 0:
                     self.temp_target_widgets[i].setText(str(self.aw.float2float(self.aw.qmc.temp2B[self.aw.qmc.timeindexB[timeidx]])))

@@ -1520,8 +1520,8 @@ class tgraphcanvas(FigureCanvas):
 
         self.pid = pid.PID()
 
-        #background profile # set to True if background profile is shown
-        self.background = False
+        #background profile 
+        self.background = False # set to True if loaded background profile is shown and False if hidden
         self.backgroundprofile = None # if not None, a background profile is loaded
         self.backgroundDetails = True
         self.backgroundeventsflag = True
@@ -3714,7 +3714,7 @@ class tgraphcanvas(FigureCanvas):
                                         self.samplingsemaphore.release(1)
                             #-- end update display
 
-                        if self.background and (self.timeindex[0] > -1 or self.timeindexB[0] < 0):
+                        if self.backgroundprofile is not None and (self.timeindex[0] > -1 or self.timeindexB[0] < 0):
                             if self.backgroundReproduce or self.backgroundPlaybackEvents:
                                 self.playbackevent()
                             if self.backgroundPlaybackDROP:
@@ -4521,7 +4521,7 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     index = 0      #if plotting but nothing loaded.
             #if background
-            if self.background and "B" in mathexpression:
+            if self.backgroundprofile is not None and "B" in mathexpression:
                 bindex = self.backgroundtime2index(t)         #use background time
 
             replacements = {'+':'p','-':'m','*':'m','/':'d','(':'o',')':'c'} # characters to be replaced from symb variable for substitution
@@ -4565,7 +4565,7 @@ class tgraphcanvas(FigureCanvas):
                     if len(sample_delta2) > 0 and sample_delta2[-1] and sample_delta2[-1] > 0:
                         mathdictionary[v] = 0
                         if v == "pDRY":
-                            if self.background and self.timeindexB[1] and not self.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
+                            if self.backgroundprofile is not None and self.timeindexB[1] and not self.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
                                 drytarget = self.temp2B[self.timeindexB[1]] # Background DRY BT temperature
                             else:
                                 drytarget = self.phases[1] # Drying max phases definition
@@ -4573,7 +4573,7 @@ class tgraphcanvas(FigureCanvas):
                                 mathdictionary[v] = (drytarget - sample_temp2[-1])/(sample_delta2[-1]/60.)
                         elif v == "pFCs":
                             # display expected time to reach FCs as defined in the background profile or the phases dialog
-                            if self.background and self.timeindexB[2]:
+                            if self.backgroundprofile is not None and self.timeindexB[2]:
                                 fcstarget = self.temp2B[self.timeindexB[2]] # Background FCs BT temperature
                             else:
                                 fcstarget = self.phases[2] # FCs min phases definition
@@ -4605,7 +4605,7 @@ class tgraphcanvas(FigureCanvas):
                         mathdictionary["AUCbase"] = None # Event not set yet, no AUCbase
                 else:
                     mathdictionary["AUCbase"] = self.AUCbase
-                if self.AUCtargetFlag and self.background and self.AUCbackground > 0:
+                if self.AUCtargetFlag and self.backgroundprofile is not None and self.AUCbackground > 0:
                     mathdictionary["AUCtarget"] = self.AUCbackground
                 else:
                     mathdictionary["AUCtarget"] = self.AUCtarget
@@ -6635,7 +6635,7 @@ class tgraphcanvas(FigureCanvas):
                     pass
 
                 two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or
-                    (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))or
+                    (aw.qmc.background and aw.qmc.backgroundprofile and (self.DeltaETBflag or self.DeltaBTBflag))or
                     any(aw.extraDelta1[:len(self.extratimex)]) or
                     any(aw.extraDelta2[:len(self.extratimex)]))
 
@@ -6860,7 +6860,7 @@ class tgraphcanvas(FigureCanvas):
                 rcParams['path.sketch'] = (scale, length, randomness)
 
                 #check BACKGROUND flag
-                if self.background:
+                if self.background and self.backgroundprofile:
                     if smooth:
                         # re-smooth background curves
                         tb = self.timeB
@@ -7077,8 +7077,8 @@ class tgraphcanvas(FigureCanvas):
                             self.overlapList = []
                             for i in range(len(self.backgroundEvents)):
                                 event_idx = self.backgroundEvents[i]
-#                                if event_idx < bcharge_idx or event_idx > bdrop_idx:
-#                                    continue
+                                if not self.backgroundShowFullflag and (event_idx < bcharge_idx or event_idx > bdrop_idx):
+                                    continue
                                 pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
                                 if self.backgroundEtypes[i] == 0 and aw.qmc.showEtypes[0]:
                                     self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
@@ -7305,8 +7305,8 @@ class tgraphcanvas(FigureCanvas):
                                 Bevalues = [self.E1backgroundvalues[:],self.E2backgroundvalues[:],self.E3backgroundvalues[:],self.E4backgroundvalues[:]]
                             for i in range(len(self.backgroundEvents)):
                                 event_idx = self.backgroundEvents[i]
-#                                if event_idx < bcharge_idx or event_idx > bdrop_idx:
-#                                    continue
+                                if not self.backgroundShowFullflag and (event_idx < bcharge_idx or event_idx > bdrop_idx):
+                                    continue
                                 if self.backgroundEtypes[i] == 4 or self.eventsGraphflag in [0,3,4]:
                                     if self.backgroundEtypes[i] < 4 and (not aw.qmc.renderEventsDescr or len(self.backgroundEStrings[i].strip()) == 0):
                                         Betype = self.Betypesf(self.backgroundEtypes[i])
@@ -7496,14 +7496,16 @@ class tgraphcanvas(FigureCanvas):
                         #count (as length of the list) and collect their times for each different type. Each type will have a different plot heigh
                         netypes=[[],[],[],[]]
                         for i in range(Nevents):
-                            if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
-                                netypes[0].append(self.timex[self.specialevents[i]])
-                            elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
-                                netypes[1].append(self.timex[self.specialevents[i]])
-                            elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
-                                netypes[2].append(self.timex[self.specialevents[i]])
-                            elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
-                                netypes[3].append(self.timex[self.specialevents[i]])
+                            tx = self.timex[self.specialevents[i]]
+                            if self.foregroundShowFullflag or ((self.timeindex[0] > -1 and tx >= self.timex[self.timeindex[0]]) and (self.timeindex[6] > 0 and tx <= self.timex[self.timeindex[6]])):
+                                if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
+                                    netypes[0].append(self.timex[self.specialevents[i]])
+                                elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
+                                    netypes[1].append(self.timex[self.specialevents[i]])
+                                elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
+                                    netypes[2].append(self.timex[self.specialevents[i]])
+                                elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
+                                    netypes[3].append(self.timex[self.specialevents[i]])
 
                         letters = "".join((char1,char2,char3,char4))   #"NPDF" first letter for each type (None, Power, Damper, Fan)
                         colors = [self.palette["rect2"],self.palette["rect3"]] #rotating colors
@@ -7586,7 +7588,11 @@ class tgraphcanvas(FigureCanvas):
                         for i in range(Nevents):
                             pos = max(0,int(round((self.specialeventsvalue[i]-1)*10)))
                             if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
-                                self.E1timex.append(self.timex[self.specialevents[i]])
+                                tx = self.timex[self.specialevents[i]]
+                                if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                    # don't draw event lines before CHARGE if foregroundShowFullflag is not set
+                                    continue
+                                self.E1timex.append(tx)
                                 if self.clampEvents: # in clamp mode we render also event values higher than 100:
                                     self.E1values.append(pos)
                                 else:
@@ -7621,7 +7627,11 @@ class tgraphcanvas(FigureCanvas):
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
                             elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
-                                self.E2timex.append(self.timex[self.specialevents[i]])
+                                tx = self.timex[self.specialevents[i]]
+                                if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                    # don't draw event lines before CHARGE if foregroundShowFullflag is not set
+                                    continue
+                                self.E2timex.append(tx)
                                 if self.clampEvents: # in clamp mode we render also event values higher than 100:
                                     self.E2values.append(pos)
                                 else:
@@ -7657,7 +7667,11 @@ class tgraphcanvas(FigureCanvas):
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
                             elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
-                                self.E3timex.append(self.timex[self.specialevents[i]])
+                                tx = self.timex[self.specialevents[i]]
+                                if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                    # don't draw event lines before CHARGE if foregroundShowFullflag is not set
+                                    continue
+                                self.E3timex.append(tx)
                                 if self.clampEvents: # in clamp mode we render also event values higher than 100:
                                     self.E3values.append(pos)
                                 else:
@@ -7692,7 +7706,11 @@ class tgraphcanvas(FigureCanvas):
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
                             elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
-                                self.E4timex.append(self.timex[self.specialevents[i]])
+                                tx = self.timex[self.specialevents[i]]
+                                if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                    # don't draw event lines before CHARGE if foregroundShowFullflag is not set
+                                    continue
+                                self.E4timex.append(tx)
                                 if self.clampEvents: # in clamp mode we render also event values higher than 100:
                                     self.E4values.append(pos)
                                 else:
@@ -7733,7 +7751,7 @@ class tgraphcanvas(FigureCanvas):
                             pos = max(0,int(round((self.specialeventsvalue[E1_last]-1)*10)))
                             if not self.clampEvents: # in clamp mode we render also event values higher than 100:
                                 pos = (pos*event_pos_factor)+event_pos_offset
-                            if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E1_last]]):   #if cool exists and last event was earlier
+                            if self.foregroundShowFullflag and (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E1_last]]):   #if cool exists and last event was earlier
                                 self.E1timex.append(self.timex[self.timeindex[7]]) #time of cool
                                 self.E1values.append(pos) #repeat last event value
                             elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E1_last]]):   #if drop exists and last event was earlier
@@ -7757,7 +7775,7 @@ class tgraphcanvas(FigureCanvas):
                             pos = max(0,int(round((self.specialeventsvalue[E2_last]-1)*10)))
                             if not self.clampEvents: # in clamp mode we render also event values higher than 100:
                                 pos = (pos*event_pos_factor)+event_pos_offset
-                            if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E2_last]]):   #if cool exists and last event was earlier
+                            if self.foregroundShowFullflag and (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E2_last]]):   #if cool exists and last event was earlier
                                 self.E2timex.append(self.timex[self.timeindex[7]]) #time of cool
                                 self.E2values.append(pos) #repeat last event value
                             elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E2_last]]):   #if drop exists and last event was earlier
@@ -7781,7 +7799,7 @@ class tgraphcanvas(FigureCanvas):
                             pos = max(0,int(round((self.specialeventsvalue[E3_last]-1)*10)))
                             if not self.clampEvents: # in clamp mode we render also event values higher than 100:
                                 pos = (pos*event_pos_factor)+event_pos_offset
-                            if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E3_last]]):   #if cool exists and last event was earlier
+                            if self.foregroundShowFullflag and (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E3_last]]):   #if cool exists and last event was earlier
                                 self.E3timex.append(self.timex[self.timeindex[7]]) #time of cool
 #                                self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E3_last]-1)*10))))]) #repeat last event value
                                 self.E3values.append(pos) #repeat last event value
@@ -7807,7 +7825,7 @@ class tgraphcanvas(FigureCanvas):
                             pos = max(0,int(round((self.specialeventsvalue[E4_last]-1)*10)))
                             if not self.clampEvents: # in clamp mode we render also event values higher than 100:
                                 pos = (pos*event_pos_factor)+event_pos_offset
-                            if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E4_last]]):   #if cool exists and last event was earlier
+                            if self.foregroundShowFullflag and (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E4_last]]):   #if cool exists and last event was earlier
                                 self.E4timex.append(self.timex[self.timeindex[7]]) #time of cool
 #                                self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E4_last]-1)*10))))]) #repeat last event value
                                 self.E4values.append(pos) #repeat last event value
@@ -7835,8 +7853,6 @@ class tgraphcanvas(FigureCanvas):
                             evalues = [self.E1values[:],self.E2values[:],self.E3values[:],self.E4values[:]]
                         for i in range(Nevents):
                             event_idx = int(self.specialevents[i])
-                            if not self.flagstart and not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
-                                continue
                             if self.specialeventstype[i] == 4 or self.eventsGraphflag in [0,3,4]:
                                 if self.specialeventstype[i] < 4 and (not aw.qmc.renderEventsDescr or len(self.specialeventsStrings[i].strip()) == 0):
                                     etype = self.etypesf(self.specialeventstype[i])
@@ -7853,6 +7869,7 @@ class tgraphcanvas(FigureCanvas):
                                     height = 50
                                 else:
                                     height = 20
+
                                 #some times ET is not drawn (ET = 0) when using device NONE
                                 # plot events on BT when showeventsonbt is true
                                 if not aw.qmc.showeventsonbt and self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])] and aw.qmc.ETcurve:
@@ -7875,10 +7892,13 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         temp = self.stemp2[int(self.specialevents[i])]
 
+                                if not self.flagstart and not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
+                                    continue
+
                                 if self.eventsGraphflag == 4 and self.specialeventstype[i] < 4 and aw.qmc.showEtypes[self.specialeventstype[i]]:
                                     temp = evalues[self.specialeventstype[i]][0]
                                     evalues[self.specialeventstype[i]] = evalues[self.specialeventstype[i]][1:]
-
+                                
                                 if temp != None and aw.qmc.showEtypes[self.specialeventstype[i]]:
                                     if self.specialeventstype[i] == 0:
                                         boxstyle = 'roundtooth,pad=0.4'
@@ -19107,7 +19127,7 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.resetlinecountcaches()
                 if aw.loadbackgroundUUID(rr["background"],background_UUID):
                     try:
-                        aw.qmc.background = True
+                        aw.qmc.background = not aw.qmc.hideBgafterprofileload
                         aw.qmc.timealign(redraw=False)
                         aw.qmc.redraw()
                     except:
@@ -20605,7 +20625,7 @@ class ApplicationWindow(QMainWindow):
     def curveSimilarity(self,BTlimit=None):
         try:
             # if background profile is loaded and both profiles have a DROP even set
-            if aw.qmc.background and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
+            if aw.qmc.backgroundprofile is not None and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
                 # calculate time delta between background and foreground DROP event
                 dropTimeDelta = aw.qmc.timex[aw.qmc.timeindex[6]] - aw.qmc.timeB[aw.qmc.timeindexB[6]]
                 totalQuadraticDeltaET = 0
@@ -20931,7 +20951,7 @@ class ApplicationWindow(QMainWindow):
                         auc_value_str = str(v)
                     auc_style = "QLCDNumber { color: black; }"
                 elif aw.qmc.AUCLCDmode == 1:
-                    if aw.qmc.AUCtargetFlag and aw.qmc.background and aw.qmc.AUCbackground > 0:
+                    if aw.qmc.AUCtargetFlag and aw.qmc.backgroundprofile is not None and aw.qmc.AUCbackground > 0:
                         # background AUC as target
                         target = aw.qmc.AUCbackground
                     else:
@@ -21134,7 +21154,7 @@ class ApplicationWindow(QMainWindow):
                             DRYlabel = "&raquo;" + QApplication.translate("Label", "DRY",None)
                         if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                             # display expected time to reach DRY as defined in the background profile or the phases dialog
-                            if self.qmc.background and self.qmc.timeindexB[1] and not aw.qmc.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
+                            if self.qmc.backgroundprofile is not None and self.qmc.timeindexB[1] and not aw.qmc.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
                                 drytarget = self.qmc.temp2B[self.qmc.timeindexB[1]] # Background DRY BT temperature
                             else:
                                 drytarget = self.qmc.phases[1] # Drying max phases definition
@@ -21217,7 +21237,7 @@ class ApplicationWindow(QMainWindow):
                         if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                             ## after DRY:
                             # display expected time to reach FCs as defined in the background profile or the phases dialog
-                            if self.qmc.background and self.qmc.timeindexB[2]:
+                            if self.qmc.backgroundprofile is not None and self.qmc.timeindexB[2]:
                                 fcstarget = self.qmc.temp2B[self.qmc.timeindexB[2]] # Background FCs BT temperature
                             else:
                                 fcstarget = self.qmc.phases[2] # FCs min phases definition
@@ -25279,13 +25299,14 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message","Reading background profile...",None))
                 self.qmc.resetlinecountcaches()
                 self.loadbackground(filename)
-                self.qmc.background = True
+                self.qmc.background = not self.qmc.hideBgafterprofileload
                 self.autoAdjustAxis()
                 self.qmc.timealign(redraw=True)
             except:
                 self.deleteBackground() # delete a loaded background if any
 
     # Loads background profile
+    # NOTE: this does NOT set the self.qmc.background flag to make the loaded background visible.
     def loadbackground(self,filename):
         try:
             f = QFile(filename)
@@ -27363,7 +27384,7 @@ class ApplicationWindow(QMainWindow):
                 if os.path.isfile(self.qmc.backgroundpath):
                     try:
                         aw.loadbackground(self.qmc.backgroundpath)
-                        aw.qmc.background = True
+                        aw.qmc.background = not aw.qmc.hideBgafterprofileload
                         aw.qmc.timealign(redraw=False) # there will be a later redraw triggered that also recomputes the deltas
                     except:
                         self.deleteBackground() # delete a loaded background if any
@@ -27373,7 +27394,7 @@ class ApplicationWindow(QMainWindow):
                     if background_path is not None and os.path.isfile(background_path):
                         try:
                             aw.loadbackground(background_path)
-                            aw.qmc.background = True
+                            aw.qmc.background = not aw.qmc.hideBgafterprofileload
                             aw.qmc.timealign(redraw=False) # there will be a later redraw triggered that also recomputes the deltas
                             self.qmc.backgroundpath = background_path
                             aw.qmc.fileDirtySignal.emit() # as we updated the background path we force a profile save
@@ -33783,7 +33804,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.AUCvalue > 0): # there is already some AUC available
 
             # so let's compute the AUCtarget
-            if aw.qmc.AUCtargetFlag and aw.qmc.background and aw.qmc.AUCbackground > 0:
+            if aw.qmc.AUCtargetFlag and aw.qmc.backgroundprofile is not None and aw.qmc.AUCbackground > 0:
                 # background AUC as target
                 target = aw.qmc.AUCbackground
             else:
@@ -34934,7 +34955,7 @@ class ApplicationWindow(QMainWindow):
             if foreground_profile_path:
                 # load foreground into background
                 aw.loadbackground(foreground_profile_path)
-                aw.qmc.background = True
+                aw.qmc.background = not aw.qmc.hideBgafterprofileload
                 aw.qmc.timealign(redraw=True,recompute=True)
             else:
                 # delete background
@@ -37508,7 +37529,7 @@ def main():
             if aw.lastLoadedBackground and aw.lastLoadedBackground != "" and not aw.curFile:
                 try:
                     aw.loadbackground(aw.lastLoadedBackground)
-                    aw.qmc.background = True
+                    aw.qmc.background = not aw.qmc.hideBgafterprofileload
                     if not aw.lastLoadedProfile and not(aw.logofilename != "" and aw.logoimgflag):
                         # this extra redraw is not needed if a watermark is loaded as it is triggered by the resize-redraw mechanism
                         aw.qmc.redraw()
