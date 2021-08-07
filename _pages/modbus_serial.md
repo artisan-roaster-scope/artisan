@@ -49,7 +49,7 @@ Machine                         | Driver | Remarks
 [HARTANZAH](/machines/hartanzah/) | FTDI
 [HB](/machines/hb/) | CP210x
 [KapoK](/machines/kapok/) | CH34x
-[NOR](/machines/nor/) | CH34x
+[NOR](/machines/nor/) | FTDI | CH34x (on N Series V.4 old machines)
 [Nordic](/machines/nordic/) | PL2303
 [Phoenix](/machines/phoenix/) | CH34x
 [Proaster](/machines/proaster/) | FTDI
