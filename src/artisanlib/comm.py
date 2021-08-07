@@ -2105,7 +2105,7 @@ class serialport(object):
         
         for i in range(self.aw.modbus.channels):
             if self.aw.modbus.inputSlaves[i] and not force or i in [0,1]: # in force mode (second request in oversampling mode) read only first two channels (ET/BT)
-                if not self.aw.modbus.optimizer:
+                if not self.aw.modbus.optimizer or force:
                     self.aw.modbus.sleepBetween() # we start with a sleep, as it could be that just a send command happend before the semaphore was catched
                 if self.aw.modbus.inputFloats[i]:
                     res[i] = self.aw.modbus.readFloat(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i],force)

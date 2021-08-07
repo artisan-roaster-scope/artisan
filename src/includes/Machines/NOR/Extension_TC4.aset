@@ -4,7 +4,7 @@ Delay=3000
 Oversampling=false
 dropDuplicates=true
 dropDuplicatesLimit=0.3
-roastertype_setup=NOR TC4
+roastertype_setup=NOR Extension  TC4
 
 [Device]
 ArduinoFILT=70, 70, 70, 70

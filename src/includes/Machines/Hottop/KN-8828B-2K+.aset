@@ -2,6 +2,7 @@
 Delay=2000
 Oversampling=true
 roastertype_setup=Hottop 2K+
+dropDuplicates=true
 
 [ArduinoPID]
 dutyMax=100

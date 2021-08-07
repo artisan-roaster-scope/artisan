@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -102,8 +102,11 @@ class modbusport(object):
     def __init__(self,aw):
         self.aw = aw
         
+        self.modbus_serial_read_delay = 0.035 # in seconds
+        self.modbus_serial_write_delay = 0.080 # in seconds
+        
         # retries
-        self.readRetries = 1
+        self.readRetries = 0
         #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
         self.comport = "COM5"      #NOTE: this string should not be translated.
         self.baudrate = 115200
@@ -166,16 +169,16 @@ class modbusport(object):
     # this sleep delays between requests seems to be beneficial on slow RTU serial connections like those of the FZ-94
     def sleepBetween(self,write=False):
         if write:
+            pass # handled in MODBUS lib
 #            if self.type in [3,4]: # TCP or UDP
-#                time.sleep(0.040)
-                pass # handled in MODBUS lib
+#                pass
 #            else:
-                time.sleep(0.035)
+#                time.sleep(self.modbus_serial_write_delay)
         else:
             if self.type in [3,4]: # delay between writes only on serial connections
                 pass
             else:
-                time.sleep(0.035)
+                time.sleep(self.modbus_serial_read_delay)
 
     def address2register(self,addr,code=3):
         if code == 3 or code == 6:
@@ -192,6 +195,10 @@ class modbusport(object):
         except Exception:
             pass
         self.master = None
+    
+    # t a duration between start and end time in seconds to be formated in a string as ms
+    def formatMS(self,start,end):
+        return "{:.1f}".format((end-start)*1000)
 
     def connect(self):
 #        if self.master and not self.master.socket:
@@ -213,6 +220,7 @@ class modbusport(object):
                         retry_on_invalid=False,
                         reset_socket=self.reset_socket,
                         timeout=self.timeout)
+                    self.readRetries = 0
                 elif self.type == 2: # Serial Binary
                     from pymodbus.client.sync import ModbusSerialClient # @Reimport
                     self.master = ModbusSerialClient(
@@ -225,7 +233,8 @@ class modbusport(object):
                         retry_on_empty=False,
                         retry_on_invalid=False,
                         reset_socket=self.reset_socket,
-                        timeout=self.timeout)  
+                        timeout=self.timeout) 
+                    self.readRetries = 0 
                 elif self.type == 3: # TCP
                     from pymodbus.client.sync import ModbusTcpClient
                     try:
@@ -236,7 +245,7 @@ class modbusport(object):
                                 retry_on_invalid=False, # only supported for serial clients in v2.5.2
                                 reset_socket=self.reset_socket,
                                 retries=1,
-                                timeout=0.5, #self.timeout
+                                timeout=0.3, #self.timeout
                                 )
                         self.readRetries = 0
                     except:
@@ -253,9 +262,10 @@ class modbusport(object):
                             retry_on_empty=False,   # only supported for serial clients in v2.5.2
                             retry_on_invalid=False, # only supported for serial clients in v2.5.2
                             reset_socket=self.reset_socket,
-                            retries=3,
-                            timeout=0.4, #self.timeout
+                            retries=1,
+                            timeout=0.2, #self.timeout
                             )
+                        self.readRetries = 0
                     except: # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
                         self.master = ModbusUdpClient(
                             host=self.host, 
@@ -276,7 +286,7 @@ class modbusport(object):
                         strict=False, # settings this to False disables the inter char timeout restriction
                         timeout=self.timeout)
 #                    self.master.inter_char_timeout = 0.05
-                    self.readRetries = 1
+                    self.readRetries = 0
                 self.master.connect()
                 self.updateActiveRegisters()
                 self.clearReadingsCache()
@@ -351,6 +361,8 @@ class modbusport(object):
                         if just_send:
                             self.sleepBetween() # we start with a sleep, as it could be that just a send command happend before the semaphore was catched
                         just_send = True
+                        if self.aw.seriallogflag:
+                            tx = time.time()
                         while True:
                             try:
                                 # we cache only MODBUS function 3 and 4 (not 1 and 2!)
@@ -363,21 +375,17 @@ class modbusport(object):
                             if res is None or res.isError(): # requires pymodbus v1.5.1
                                 if retry > 0:
                                     retry = retry - 1
-                                    time.sleep(0.020)
+                                    #time.sleep(0.020) # no retry delay as timeout time should already be larger enough
                                 else:
                                     raise Exception("Exception response")
                             else:
                                 break
-                        if res is not None:
-                            if self.commError: # we clear the previous error and send a message
-                                self.commError = False
-                                self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
-                            self.cacheReadings(code,slave,register,res.registers)
 
                         #note: logged chars should be unicode not binary
                         if self.aw.seriallogflag:
                             if self.type < 3: # serial MODBUS
-                                ser_str = "MODBUS readActiveRegisters : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx# = {} results".format(
+                                ser_str = "MODBUS readActiveRegisters : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx# = {} results".format(
+                                    self.formatMS(tx,time.time()),
                                     self.comport,
                                     self.baudrate,
                                     self.bytesize,
@@ -389,7 +397,8 @@ class modbusport(object):
                                     code,
                                     len(res.registers))
                             else: # IP MODBUS
-                                ser_str = "MODBUS readActiveRegisters : {}:{} || Slave = {} || Register = {} || Code = {} || Rx# = {} results".format(
+                                ser_str = "MODBUS readActiveRegisters : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx# = {} results".format(
+                                    self.formatMS(tx,time.time()),
                                     self.host,
                                     self.port,
                                     slave,
@@ -397,6 +406,12 @@ class modbusport(object):
                                     code,
                                     len(res.registers))
                             self.aw.addserial(ser_str)
+                        
+                        if res is not None:
+                            if self.commError: # we clear the previous error and send a message
+                                self.commError = False
+                                self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
+                            self.cacheReadings(code,slave,register,res.registers)
 
         except Exception: # as ex:
 #            self.disconnect()
@@ -578,6 +593,9 @@ class modbusport(object):
         if slave == 0:
             return
         r = None
+        retry = self.readRetries
+        if self.aw.seriallogflag:
+            tx = time.time()
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -590,7 +608,6 @@ class modbusport(object):
                 return r
             else:
                 self.connect()
-                retry = self.readRetries
                 while True:
                     if code==3:
                         res = self.master.read_holding_registers(int(register),2,unit=int(slave))
@@ -599,7 +616,7 @@ class modbusport(object):
                     if res is None or res.isError(): # requires pymodbus v1.5.1
                         if retry > 0:
                             retry = retry - 1
-                            #time.sleep(0.020)
+                            #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
                         else:
                             raise Exception("Exception response")
                     else:
@@ -624,7 +641,8 @@ class modbusport(object):
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = "MODBUS readFloat :{},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    ser_str = "MODBUS readFloat : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}".format(
+                        self.formatMS(tx,time.time()),
                         self.comport,
                         self.baudrate,
                         self.bytesize,
@@ -634,15 +652,18 @@ class modbusport(object):
                         slave,
                         register,
                         code,
-                        r)
+                        r,
+                        self.readRetries-retry)
                 else: # IP MODBUS
-                    ser_str = "MODBUS readFloat : {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    ser_str = "MODBUS readFloat : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}".format(
+                        self.formatMS(tx,time.time()),
                         self.host,
                         self.port,
                         slave,
                         register,
                         code,
-                        r)
+                        r,
+                        self.readRetries-retry)
                 self.aw.addserial(ser_str)
             
             
@@ -652,6 +673,9 @@ class modbusport(object):
         if slave == 0:
             return
         r = None
+        retry = self.readRetries
+        if self.aw.seriallogflag:
+            tx = time.time()
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -664,7 +688,6 @@ class modbusport(object):
                 return convert_from_bcd(r)
             else:
                 self.connect()
-                retry = self.readRetries
                 while True:
                     if code==3:
                         res = self.master.read_holding_registers(int(register),2,unit=int(slave))
@@ -673,7 +696,7 @@ class modbusport(object):
                     if res is None or res.isError(): # requires pymodbus v1.5.1
                         if retry > 0:
                             retry = retry - 1
-                            #time.sleep(0.020)
+                            #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
                         else:
                             raise Exception("Exception response")
                     else:
@@ -700,7 +723,8 @@ class modbusport(object):
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = "MODBUS readBCD : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    ser_str = "MODBUS readBCD : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}".format(
+                        self.formatMS(tx,time.time()),
                         self.comport,
                         self.baudrate,
                         self.bytesize,
@@ -710,15 +734,18 @@ class modbusport(object):
                         slave,
                         register,
                         code,
-                        r)
+                        r,
+                        self.readRetries-retry)
                 else: # IP MODBUS
-                    ser_str = "MODBUS readBCD : {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    ser_str = "MODBUS readBCD : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}".format(
+                        self.formatMS(tx,time.time()),
                         self.host,
                         self.port,
                         slave,
                         register,
                         code,
-                        r)
+                        r,
+                        self.readRetries-retry)
                 self.aw.addserial(ser_str)
 
     # as readSingleRegister, but does not retry nor raise and error and returns a None instead
@@ -763,6 +790,9 @@ class modbusport(object):
         if slave == 0:
             return
         r = None
+        retry = self.readRetries
+        if self.aw.seriallogflag:
+            tx = time.time()
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -774,7 +804,6 @@ class modbusport(object):
                 return r
             else:
                 self.connect()
-                retry = self.readRetries
                 while True:
                     try:
                         if code==1:
@@ -790,7 +819,7 @@ class modbusport(object):
                     if res is None or res.isError(): # requires pymodbus v1.5.1
                         if retry > 0:
                             retry = retry - 1
-                            time.sleep(0.020)
+                            #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
                         else:
                             raise Exception("Exception response")
                     else:
@@ -826,7 +855,8 @@ class modbusport(object):
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = "MODBUS readSingleRegister : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    ser_str = "MODBUS readSingleRegister : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}".format(
+                        self.formatMS(tx,time.time()),
                         self.comport,
                         self.baudrate,
                         self.bytesize,
@@ -836,15 +866,18 @@ class modbusport(object):
                         slave,
                         register,
                         code,
-                        r)
+                        r,
+                        self.readRetries-retry)
                 else: # IP MODBUS
-                    ser_str = "MODBUS readSingleRegister : {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    ser_str = "MODBUS readSingleRegister : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}".format(
+                        self.formatMS(tx,time.time()),
                         self.host,
                         self.port,
                         slave,
                         register,
                         code,
-                        r)
+                        r,
+                        self.readRetries-retry)
                 self.aw.addserial(ser_str)
 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
@@ -853,6 +886,9 @@ class modbusport(object):
         if slave == 0:
             return
         r = None
+        retry = self.readRetries
+        if self.aw.seriallogflag:
+            tx = time.time()
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -865,7 +901,6 @@ class modbusport(object):
                 return r
             else:
                 self.connect()
-                retry = self.readRetries
                 while True:
                     if code==3:
                         res = self.master.read_holding_registers(int(register),2,unit=int(slave))
@@ -874,7 +909,7 @@ class modbusport(object):
                     if res is None or res.isError(): # requires pymodbus v1.5.1
                         if retry > 0:
                             retry = retry - 1
-                            #time.sleep(0.020)
+                            #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
                         else:
                             raise Exception("Exception response")
                     else:
@@ -899,7 +934,8 @@ class modbusport(object):
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = "MODBUS readInt32 :{},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    ser_str = "MODBUS readInt32 : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}".format(
+                        self.formatMS(tx,time.time()),
                         self.comport,
                         self.baudrate,
                         self.bytesize,
@@ -909,15 +945,18 @@ class modbusport(object):
                         slave,
                         register,
                         code,
-                        r)
+                        r,
+                        self.readRetries-retry)
                 else: # IP MODBUS
-                    ser_str = "MODBUS readInt32 : {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    ser_str = "MODBUS readInt32 : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}".format(
+                        self.formatMS(tx,time.time()),
                         self.host,
                         self.port,
                         slave,
                         register,
                         code,
-                        r)
+                        r,
+                        self.readRetries-retry)
                 self.aw.addserial(ser_str)
             
 
@@ -932,6 +971,9 @@ class modbusport(object):
         if slave == 0:
             return
         r = None
+        retry = self.readRetries
+        if self.aw.seriallogflag:
+            tx = time.time()
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -943,7 +985,6 @@ class modbusport(object):
                 return convert_from_bcd(r)
             else:
                 self.connect()
-                retry = self.readRetries
                 while True:
                     try:
                         if code==3:
@@ -955,7 +996,7 @@ class modbusport(object):
                     if res is None or res.isError(): # requires pymodbus v1.5.1
                         if retry > 0:
                             retry = retry - 1
-                            time.sleep(0.020)
+                            # time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
                         else:
                             raise Exception("Exception response")
                     else:
@@ -982,7 +1023,8 @@ class modbusport(object):
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = "MODBUS readBCDint : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    ser_str = "MODBUS readBCDint : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}".format(
+                        self.formatMS(tx,time.time()),
                         self.comport,
                         self.baudrate,
                         self.bytesize,
@@ -992,15 +1034,18 @@ class modbusport(object):
                         slave,
                         register,
                         code,
-                        r)
+                        r,
+                        self.readRetries-retry)
                 else: # IP MODBUS
-                    ser_str = "MODBUS readBCDint : {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    ser_str = "MODBUS readBCDint : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}".format(
+                        self.formatMS(tx,time.time()),
                         self.host,
                         self.port,
                         slave,
                         register,
                         code,
-                        r)
+                        r,
+                        self.readRetries-retry)
                 self.aw.addserial(ser_str)
 
     def setTarget(self,sv):
