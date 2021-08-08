@@ -94,6 +94,9 @@ for:
     - cmd: copy ..\LICENSE LICENSE.txt
     - cmd: 7z a artisan-win-%ARTISAN_VERSION%.zip Setup*.exe LICENSE.txt README.txt
 
+  test_script:
+    - python -m unittest discover
+
 #  artifacts:
 #    - path: 'src\artisan-*.zip'
 
@@ -128,6 +131,9 @@ for:
     - chmod +x src/*.sh
     - .ci/script-${ARTISAN_OS}.sh
 
+  test_script:
+    - python -m unittest discover -s src
+
 #  artifacts:
 #    - path: 'src/artisan-*.dmg'
 
@@ -159,6 +165,9 @@ for:
     - echo "Linux Build"
     - chmod +x src/*.sh
     - .ci/script-${ARTISAN_OS}.sh
+
+  test_script:
+    - QT_QPA_PLATFORM=offscreen python -m unittest discover -s src
 
 #  artifacts:
 #    - path: 'src/artisan-*.deb'
