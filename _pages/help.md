@@ -111,7 +111,9 @@ If you need support please check the [documentation](#documentation) or ask the 
 **9) There is a delta between the Artisan readings and those displayed on my machine. How to fix this?**  
 : Maybe Artisan is set to display readings in Fahrenheit while your machine displays them in Centigrade (check menu `Config` >> `Temperature`). The differences can also result from a misconfiguration (wrong device temperature unit set in the MODBUS tab or wrong thermocouple type specified in the Phidget tab). Often it is just caused by the differences in the exact time the readings were taken or in the post processing on the readings (filtering, smoothing, rounding, averaging, ..). The reading displayed on the machine could be taken from a probe in another location than the one forwarding the signal to Artisan. Note that even the two probes fitted in dual-probes often report slightly different values due to differences in the positioning inside the shared shield. You can add a [symbolic formula](https://artisan-roasterscope.blogspot.com/2019/11/symbolic-formulas-basics-new-variables.html#applications){:target="_blank"} to compensate for this effect. Thus often a simple offset will only work on one end of the temperature range. In that case your symbolic formula need to encode a linear or even quadratic mapping.
 
-
+<a name="FAQ-Setup-10"></a>
+**10) Does Artisan run under iOS on my iPad?**  
+: No, not directly and this will unlikely change. However, you can have Artisan to display TIME/ET/BT as [WebLCDs](https://artisan-roasterscope.blogspot.com/2016/03/lcds.html){:target="_blank"} introduced in Artisan v0.9) on any Web browser in the network (incl. an iPad). This does not give you the graph nor does it allow you to use the Artisan event buttons or sliders. Still the computer running Artisan (eg. a simple [Raspberry Pi](https://www.raspberrypi.org/)) could share its screen (by running a VNC server which is setup by default on the Raspberry Pi) over the network to an iPad. That way it looks like Artisan is running on the iPad, while the iPad is just acting as an external wireless display to the computer in the network running Artisan.
 
 <br>
 

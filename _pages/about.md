@@ -147,6 +147,8 @@ __Marko Luther__ –– maintainer
 
 __Dave Baxter__ –– design wizard & genius
 
+__Benoit Clennett-Sirois__ –– SOLID style guru
+
 __Michael Herbert__ –– documentation & fundraising
 
 __Rui Paulo__ –– Aillio master & CI
