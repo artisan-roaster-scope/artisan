@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -46,7 +46,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBo
         
 class equDataDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
-        super(equDataDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setWindowTitle(QApplication.translate("Form Caption","Plotter Data",None))
         self.setModal(True)
 
@@ -220,7 +220,7 @@ class equDataDlg(ArtisanDialog):
             header.setSectionResizeMode(4, QHeaderView.Fixed)
             header.setSectionResizeMode(len(columns) - 1, QHeaderView.Stretch)
             self.datatable.resizeColumnsToContents()
-        except:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
@@ -264,7 +264,7 @@ class equDataDlg(ArtisanDialog):
 
 class HUDDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None, activeTab = 0):
-        super(HUDDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         
         self.app = QCoreApplication.instance()
         
@@ -436,14 +436,14 @@ class HUDDlg(ArtisanDialog):
         self.deltaBTspan.addItems([str(i) + "s" for i in self.spanitems])
         try:
             self.deltaBTspan.setCurrentIndex(self.spanitems.index(self.aw.qmc.deltaBTspan))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.deltaBTspan.currentIndexChanged.connect(self.changeDeltaBTspan)  #toggle
         self.deltaETspan = QComboBox()
         self.deltaETspan.addItems([str(i) + "s" for i in self.spanitems])
         try:
             self.deltaETspan.setCurrentIndex(self.spanitems.index(self.aw.qmc.deltaETspan))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.deltaETspan.currentIndexChanged.connect(self.changeDeltaETspan)  #toggle
 
@@ -995,6 +995,7 @@ class HUDDlg(ArtisanDialog):
         # build list of available curves
         self.curves = []
         self.curvenames = []
+        self.deltacurves = [] # list of flags. True if delta curve, False otherwise
         self.c1ComboBox = QComboBox()
         self.c2ComboBox = QComboBox()
         univarButton.clicked.connect(self.showunivarinfo)
@@ -1167,7 +1168,7 @@ class HUDDlg(ArtisanDialog):
         try:
             #pylint: disable=E1102
             self.styleComboBox.setCurrentIndex(list(map(lambda x:x.lower(),available)).index(self.aw.appearance.lower()))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.styleComboBox.currentIndexChanged.connect(self.setappearance)
         self.resolutionSpinBox = QSpinBox()
@@ -1230,7 +1231,7 @@ class HUDDlg(ArtisanDialog):
         if self.aw.WebLCDs:
             try:
                 self.setWebLCDsURL()
-            except:
+            except Exception: # pylint: disable=broad-except
                 self.WebLCDsURL.setText("")
                 self.QRpic.setPixmap(QPixmap())
                 self.aw.WebLCDs = False
@@ -1408,7 +1409,7 @@ class HUDDlg(ArtisanDialog):
     @pyqtSlot(bool)
     def fittoBackground(self,_):
         if len(self.expresult.text()) > 0:
-            self.aw.deleteBackground
+            self.aw.deleteBackground()
             self.setbackgroundequ1(mathequ=True)
             QApplication.processEvents()  #occasionally the fit curve remains showing.
             self.aw.qmc.redraw(recomputeAllDeltas=True)
@@ -1429,7 +1430,7 @@ class HUDDlg(ArtisanDialog):
     def analyzetimeoffsetChanged(self):
         try:
             self.aw.qmc.analysisoffset = int(self.analyzetimeoffset.text())
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         return
         
@@ -1456,7 +1457,7 @@ class HUDDlg(ArtisanDialog):
     def curvefittimeoffsetChanged(self):
         try:
             self.aw.qmc.curvefitoffset = int(self.curvefittimeoffset.text())
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         return
         
@@ -1469,9 +1470,9 @@ class HUDDlg(ArtisanDialog):
     
     @pyqtSlot(bool)
     def expradiobuttonClicked(self,_=False):
-        self.expradioButton = self.sender()
+        expradioButton = self.sender()
         if self.expradioButton.isChecked():
-            self.exppower = self.expradioButton.power
+            self.exppower = expradioButton.power
             self.expvarCheck.setChecked(False)
             self.expvar(0)
             self.expvarCheck.setChecked(True)
@@ -1527,10 +1528,13 @@ class HUDDlg(ArtisanDialog):
         url_str = self.getWebLCDsURL()
         # set URL label
         self.WebLCDsURL.setText('<a href="' + url_str + '">' + url_str + '</a>')
-        # set QR label 
-        from artisanlib.qrcode import QRlabel
-        qr = QRlabel(url_str)
-        self.QRpic.setPixmap(qr.make_image().pixmap())
+        # set QR label
+        try:
+            from artisanlib.qrcode import QRlabel
+            qr = QRlabel(url_str)
+            self.QRpic.setPixmap(qr.make_image().pixmap())
+        except Exception: # pylint: disable=broad-except
+            pass
         
     def getWebLCDsURL(self):
         import socket
@@ -1553,7 +1557,7 @@ class HUDDlg(ArtisanDialog):
                     self.WebLCDsAlerts.setDisabled(False)
                     self.WebLCDsPort.setDisabled(True)
                     self.WebLCDsFlag.setChecked(True)
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
                 self.aw.sendmessage(str(e))
                 self.WebLCDsAlerts.setDisabled(True)
                 self.WebLCDsFlag.setChecked(False)
@@ -1584,9 +1588,9 @@ class HUDDlg(ArtisanDialog):
             value = self.resolutionSpinBox.value()
             self.aw.setdpi(value)
             self.aw.qmc.redraw(recomputeAllDeltas=False)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " changedpi(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " changedpi(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def setcurvecolor0(self,_=False):
@@ -1634,9 +1638,9 @@ class HUDDlg(ArtisanDialog):
                 self.equc9colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[8])
 
             self.plotequ()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setcurvecolor(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setcurvecolor(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def update_equbuttons(self):
         self.equvdevicebutton.setFocusPolicy(Qt.NoFocus)
@@ -1666,7 +1670,7 @@ class HUDDlg(ArtisanDialog):
         else:
             try:
                 self.equvdevicebutton.disconnect()
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
    
     @pyqtSlot(bool)
@@ -1802,18 +1806,18 @@ class HUDDlg(ArtisanDialog):
                 fsize = 12
                 try:
                     fsize = int(annvars[3])
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
                 anno = self.aw.qmc.ax.annotate(text, xy=(time,temp),xytext=(time,temp),alpha=5.,color=self.aw.qmc.plotcurvecolor[cindex],fontsize=fsize)
                 try:
                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                except: # mpl before v3.0 do not have this set_in_layout() function
+                except Exception: # mpl before v3.0 do not have this set_in_layout() function # pylint: disable=broad-except
                     pass
 #            else:
 #                self.aw.qmc.plottermessage = QApplication.translate("Error Message","Plotter: incorrect syntax: annotate(text,time,temperature,fontsize)", None)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " annotate() syntax: {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " annotate() syntax: {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def plotterb(self):
         try:
@@ -1823,10 +1827,11 @@ class HUDDlg(ArtisanDialog):
                 x = self.aw.qmc.endofx*numpy.random.rand(self.aw.qmc.endofx/6)
                 y = self.aw.qmc.ylimit*numpy.random.rand(self.aw.qmc.endofx/6)
                 self.aw.qmc.ax.plot(x,y,'o',color=colorb[int(round(6*numpy.random.rand(1)[0]))])
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotterb() syntax: {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotterb() syntax: {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
+    # TODO: maybe remove the plotterprogram feature completely as it can be dangerous due to the eval/exce 
     def plotterprogram(self,program,e):
         try:
             #remove enclosing brackets {}
@@ -1835,9 +1840,9 @@ class HUDDlg(ArtisanDialog):
             #"if 2 > 1: a = \"OXXX\"; print a"
             p = compile(program,"a","exec")
             exec(p)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotterprogram(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotterprogram(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def plotequ(self,_=False):
@@ -1901,18 +1906,18 @@ class HUDDlg(ArtisanDialog):
             self.updatePlotterleftlabels()
 #            self.equlabel.setText(self.aw.qmc.plottermessage)
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotequ(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotequ(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(int)
     def setappearance(self,_):
         try:
             self.app.setStyle(str(self.styleComboBox.currentText()))
             self.aw.appearance = str(self.styleComboBox.currentText()).lower()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info() 
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setappearance(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setappearance(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def showunivarinfo(self,_):
@@ -1928,7 +1933,7 @@ class HUDDlg(ArtisanDialog):
             if self.aw.qmc.timeindex[0] > -1:
                 try:
                     curvefit_starttime = int(self.exptimeoffset.text()) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                except:
+                except Exception: # pylint: disable=broad-except
                     curvefit_starttime = 0
                 res = self.aw.qmc.lnRegression(curvefit_starttime=curvefit_starttime)
                 self.lnresult.setText(res)
@@ -1948,7 +1953,7 @@ class HUDDlg(ArtisanDialog):
             if self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6]:
                 try:
                     curvefit_starttime = int(self.exptimeoffset.text()) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                except:
+                except Exception: # pylint: disable=broad-except
                     curvefit_starttime = 0
                 res = self.aw.qmc.lnRegression(power=self.exppower, curvefit_starttime=curvefit_starttime)
                 self.expresult.setText(res)
@@ -2122,7 +2127,7 @@ class HUDDlg(ArtisanDialog):
                 self.result.setText("")
                 self.result.repaint()
                 self.aw.qmc.resetlines()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.startEdit.setDisabled(False)
         self.startEdit.blockSignals(False)
@@ -2208,7 +2213,7 @@ class HUDDlg(ArtisanDialog):
                 self.result.repaint()
                 self.aw.qmc.resetlines()
                 self.redraw_enabled_math_curves()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
@@ -2290,12 +2295,12 @@ class HUDDlg(ArtisanDialog):
                 try:
                     self.aw.qmc.patheffects = v
                     self.aw.qmc.redraw(recomputeAllDeltas=False)
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
                 self.PathEffects.blockSignals(False)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "changePathEffects(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "changePathEffects(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(int)
     def changeGraphStyle(self,n):
@@ -2317,13 +2322,13 @@ class HUDDlg(ArtisanDialog):
                 try:
                     self.aw.qmc.deltaBTfilter = v
                     self.aw.qmc.redraw(recomputeAllDeltas=True)
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
                 self.DeltaBTfilter.setDisabled(False)
                 self.DeltaBTfilter.blockSignals(False)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "changeDeltaBTfilter(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "changeDeltaBTfilter(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot()
     def changeDeltaETfilter(self):
@@ -2335,13 +2340,13 @@ class HUDDlg(ArtisanDialog):
                 try:
                     self.aw.qmc.deltaETfilter = v
                     self.aw.qmc.redraw(recomputeAllDeltas=True)
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
                 self.DeltaETfilter.setDisabled(False)
                 self.DeltaETfilter.blockSignals(False)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "changeDeltaETfilter(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "changeDeltaETfilter(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(int)
     def changeOptimalSmoothingFlag(self,_=0):
@@ -2394,9 +2399,9 @@ class HUDDlg(ArtisanDialog):
                 self.aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
                 self.Filter.setDisabled(False)
                 self.Filter.setFocus()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " changeFilter(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " changeFilter(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(int)
     def changeProjection(self,_=0):

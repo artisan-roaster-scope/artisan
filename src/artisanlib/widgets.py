@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -24,7 +24,7 @@ from PyQt5.QtGui import QFontMetrics
 
 class MyQComboBox(QComboBox):
     def __init__(self, *args, **kwargs):
-        super(MyQComboBox, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.setFocusPolicy(Qt.StrongFocus)
         self.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
@@ -34,7 +34,7 @@ class MyQComboBox(QComboBox):
 
 class MyQDoubleSpinBox(QDoubleSpinBox):
     def __init__(self, *args, **kwargs):
-        super(MyQDoubleSpinBox, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.setFocusPolicy(Qt.StrongFocus)
 
     def wheelEvent(self, *args, **kwargs):
@@ -47,16 +47,16 @@ class MyQDoubleSpinBox(QDoubleSpinBox):
     # leads to a non-terminating sequence of setvalue() calls until the end of the spinner is reached.
     # Note: a triple click still has this effect
     def mouseDoubleClickEvent(self, event):
-        super(MyQDoubleSpinBox, self).mouseReleaseEvent(event)
-        super(MyQDoubleSpinBox, self).mouseDoubleClickEvent(event)
-        super(MyQDoubleSpinBox, self).mouseReleaseEvent(event)
+        super().mouseReleaseEvent(event)
+        super().mouseDoubleClickEvent(event)
+        super().mouseReleaseEvent(event)
 
 class MyTableWidgetItemQLineEdit(QTableWidgetItem):
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey):
         #call custom constructor with UserType item type
         #QTableWidgetItem.__init__(self, "", QTableWidgetItem.UserType)
-        super(QTableWidgetItem,self).__init__("", QTableWidgetItem.UserType)
+        super().__init__("", QTableWidgetItem.UserType)
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
@@ -70,7 +70,7 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem):
             try:
                 # if those are numbers
                 return int(a) < int(b)
-            except:
+            except Exception: # pylint: disable=broad-except
                 # else we do a string compare
                 return a < b
 
@@ -79,7 +79,7 @@ class MyTableWidgetItemQTime(QTableWidgetItem):
     def __init__(self, sortKey):
         #call custom constructor with UserType item type
         #QTableWidgetItem.__init__(self, "", QTableWidgetItem.UserType)
-        super(QTableWidgetItem,self).__init__("", QTableWidgetItem.UserType)
+        super().__init__("", QTableWidgetItem.UserType)
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
@@ -91,7 +91,7 @@ class MyTableWidgetItemQTime(QTableWidgetItem):
 class MyTableWidgetItemNumber(QTableWidgetItem):
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, text, sortKey):
-        super(QTableWidgetItem,self).__init__(text, QTableWidgetItem.UserType)
+        super().__init__(text, QTableWidgetItem.UserType)
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
@@ -102,7 +102,7 @@ class MyTableWidgetItemQCheckBox(QTableWidgetItem):
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey):
         #call custom constructor with UserType item type
-        super(QTableWidgetItem,self).__init__("", QTableWidgetItem.UserType)
+        super().__init__("", QTableWidgetItem.UserType)
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
@@ -113,7 +113,7 @@ class MyTableWidgetItemQComboBox(QTableWidgetItem):
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey):
         #call custom constructor with UserType item type
-        super(QTableWidgetItem,self).__init__("", QTableWidgetItem.UserType)
+        super().__init__("", QTableWidgetItem.UserType)
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
@@ -124,7 +124,7 @@ class MyTableWidgetItemQComboBox(QTableWidgetItem):
 class MyQLabel(QLabel):
     __slots__ = [] # save some memory by using slots
     def __init__(self, *args, **kargs):
-        super(MyQLabel, self).__init__(*args, **kargs)
+        super().__init__(*args, **kargs)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Ignored,QSizePolicy.Ignored))
         self.setMinSize(14)
 
@@ -135,7 +135,7 @@ class MyQLabel(QLabel):
         self.setMinimumSize(br.width(), br.height())
 
     def resizeEvent(self, event):
-        super(MyQLabel, self).resizeEvent(event)
+        super().resizeEvent(event)
         if not self.text():
             return
         #--- fetch current parameters ----
@@ -168,9 +168,6 @@ class ClickableQLabel(QLabel):
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
-    
-    def __init__(self, *args, **kwargs):
-        super(ClickableQLabel, self).__init__(*args, **kwargs)
 
     def mousePressEvent(self, event):
         self.clicked.emit()
@@ -183,9 +180,6 @@ class ClickableQGroupBox(QGroupBox):
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
-    
-    def __init__(self, *args, **kwargs):
-        super(ClickableQGroupBox, self).__init__(*args, **kwargs)
 
     def mousePressEvent(self, event):
         self.clicked.emit()
@@ -196,11 +190,8 @@ class ClickableQGroupBox(QGroupBox):
 
 class MyQLCDNumber(QLCDNumber):
     clicked = pyqtSignal()
-    
-    def __init__(self, *args, **kwargs):
-        super(MyQLCDNumber, self).__init__(*args, **kwargs)
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, _event):
         self.clicked.emit()
 
 
@@ -211,24 +202,24 @@ class ClickableTextEdit(QTextEdit):
     receivedFocus = pyqtSignal()
     
     def __init__(self, *args, **kwargs):
-        super(ClickableTextEdit, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._changed = False
         self.setTabChangesFocus(True)
         self.textChanged.connect(self._handle_text_changed)
         
     def mousePressEvent(self, event):
-        super(ClickableTextEdit, self).mousePressEvent(event)
+        super().mousePressEvent(event)
         if event.modifiers() == Qt.ControlModifier:
             self.clicked.emit()
 
     def focusInEvent(self, event):
-        super(ClickableTextEdit, self).focusInEvent(event)
+        super().focusInEvent(event)
         self.receivedFocus.emit()
 
     def focusOutEvent(self, event):
         if self._changed:
             self.editingFinished.emit()
-        super(ClickableTextEdit, self).focusOutEvent(event)
+        super().focusOutEvent(event)
 
     @pyqtSlot()
     def _handle_text_changed(self):

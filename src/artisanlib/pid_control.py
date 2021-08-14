@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -1193,7 +1193,7 @@ class PIDcontrol(object):
                     self.aw.block_quantification_sampling_ticks[slidernr] = self.aw.sampling_ticks_to_block_quantifiction
                     cool = int(round(numpy.interp(vn,[-100,0],[self.aw.eventslidermax[slidernr],self.aw.eventslidermin[slidernr]])))
                     self.aw.qmc.temporarymovenegativeslider = (slidernr,cool)
-            except:
+            except Exception: # pylint: disable=broad-except
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 pass
@@ -1218,7 +1218,7 @@ class PIDcontrol(object):
                 for j in range(len(self.RS_svValues[n])):
                     if self.RS_svValues[n][j] != 0:
                         self.RS_svValues[n][j] = fromFtoC(self.RS_svValues[n][j])
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
@@ -1243,7 +1243,7 @@ class PIDcontrol(object):
                 for j in range(len(self.RS_svValues[n])):
                     if self.RS_svValues[n][j] != 0:
                         self.RS_svValues[n][j] = fromCtoF(self.RS_svValues[n][j])
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
@@ -1314,7 +1314,7 @@ class PIDcontrol(object):
                 self.aw.qmc.pid.setDutySteps(self.aw.pidcontrol.dutySteps)
                 self.aw.qmc.pid.setDutyMin(self.aw.pidcontrol.dutyMin)
                 self.aw.qmc.pid.setDutyMax(self.aw.pidcontrol.dutyMax)
-                self.aw.qmc.pid.setControl(lambda v: self.aw.pidcontrol.setEnergy(v))
+                self.aw.qmc.pid.setControl(self.aw.pidcontrol.setEnergy)
                 if self.aw.pidcontrol.svMode == 0:
                     self.aw.pidcontrol.setSV(self.aw.sliderSV.value())
 #                    self.aw.pidcontrol.setSV(self.aw.pidcontrol.svValue)
@@ -1566,7 +1566,7 @@ class PIDcontrol(object):
                 self.svActions = self.RS_svActions[n]
                 self.svBeeps = self.RS_svBeeps[n]
                 self.svDescriptions = self.RS_svDescriptions[n]
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
@@ -1577,7 +1577,7 @@ class PIDcontrol(object):
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             return self.RS_svLabels.index(label)
-        except:
+        except Exception: # pylint: disable=broad-except
             return None
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:

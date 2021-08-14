@@ -25,7 +25,7 @@ class suppress_stdout_stderr(object):
         try:
             #self.save_fds = [os.dup(1), os.dup(2)] # fails on Windows 7 under Python 3.7.4 with "OSError: [WinError 87] The parameter is incorrect"
             self.save_fds = [os.dup(sys.stdout.fileno()), os.dup(sys.stderr.fileno())]
-        except:
+        except Exception: # pylint: disable=broad-except
             self.save_fds = None
 
     def __enter__(self):

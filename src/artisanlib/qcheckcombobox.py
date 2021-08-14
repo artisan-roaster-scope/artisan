@@ -58,7 +58,7 @@ class CheckComboBox(QComboBox):
                 style.drawPrimitive(QStyle.PE_IndicatorToolBarSeparator,
                                     opt, painter, option.widget)
             else:
-                super(CheckComboBox.ComboItemDelegate, self).paint(painter, option, index)
+                super().paint(painter, option, index)
 
     class ComboMenuDelegate(QAbstractItemDelegate):
         """
@@ -164,11 +164,10 @@ class CheckComboBox(QComboBox):
 
     def __init__(self, parent=None, placeholderText="", separator=", ",
                  **kwargs):
-        super(CheckComboBox, self).__init__(parent, **kwargs)
+        super().__init__(parent, **kwargs)
         self.setFocusPolicy(Qt.StrongFocus)
 
         self.__popupIsShown = False
-        self.__supressPopupHide = False
         self.__blockMouseReleaseTimer = QTimer(self, singleShot=True)
         self.__initialMousePos = None
         self.__separator = separator
@@ -178,7 +177,7 @@ class CheckComboBox(QComboBox):
     def mousePressEvent(self, event):
         """Reimplemented."""
         self.__popupIsShown = False
-        super(CheckComboBox, self).mousePressEvent(event)
+        super().mousePressEvent(event)
         if self.__popupIsShown:
             self.__initialMousePos = self.mapToGlobal(event.pos())
             self.__blockMouseReleaseTimer.start(
@@ -188,11 +187,11 @@ class CheckComboBox(QComboBox):
         """Reimplemented."""
         if event.type() == QEvent.StyleChange:
             self.__updateItemDelegate()
-        super(CheckComboBox, self).changeEvent(event)
+        super().changeEvent(event)
 
     def showPopup(self):
         """Reimplemented."""
-        super(CheckComboBox, self).showPopup()
+        super().showPopup()
         view = self.view()
         view.installEventFilter(self)
         view.viewport().installEventFilter(self)
@@ -204,7 +203,7 @@ class CheckComboBox(QComboBox):
         self.view().viewport().removeEventFilter(self)
         self.__popupIsShown = False
         self.__initialMousePos = None
-        super(CheckComboBox, self).hidePopup()
+        super().hidePopup()
         self.view().clearFocus()
 
     def eventFilter(self, obj, event):
@@ -258,9 +257,9 @@ class CheckComboBox(QComboBox):
                 return True
             # TODO: handle Qt.Key_Enter, Key_Return?
 
-        return super(CheckComboBox, self).eventFilter(obj, event)
+        return super().eventFilter(obj, event)
 
-    def paintEvent(self, event):
+    def paintEvent(self, _event):
         """Reimplemented."""
         painter = QStylePainter(self)
         option = QStyleOptionComboBox()
@@ -355,7 +354,7 @@ class CheckComboBox(QComboBox):
             event.ignore()
             return
 
-        super(CheckComboBox, self).keyPressEvent(event)
+        super().keyPressEvent(event)
 
     def __updateItemDelegate(self):
         opt = QStyleOptionComboBox()

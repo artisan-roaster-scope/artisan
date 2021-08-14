@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -33,7 +33,7 @@ from PyQt5.QtWidgets import (QApplication, QHeaderView, QAbstractItemView, QWidg
 
 class profileTransformatorDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
-        super(profileTransformatorDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Profile Transposer",None))
         
@@ -395,12 +395,12 @@ class profileTransformatorDlg(ArtisanDialog):
             try:
                 time_idx = self.phases_target_widgets_time.index(sender)
                 self.phases_target_widgets_percent[time_idx].setText("")
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             try:
                 percent_idx = self.phases_target_widgets_percent.index(sender)
                 self.phases_target_widgets_time[percent_idx].setText("")
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         self.updateTimeResults()
     
@@ -584,7 +584,7 @@ class profileTransformatorDlg(ArtisanDialog):
                             res.append(None)
                 except numpy.RankWarning:
                     pass
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
         return res
 
@@ -626,7 +626,7 @@ class profileTransformatorDlg(ArtisanDialog):
                             res.append(None)
                 except numpy.RankWarning:
                     pass
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
         return res,fit
     
@@ -691,7 +691,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 deg = min(len(xa) - 1,deg)
                 z = numpy.polyfit(xa, ya, deg)
                 return numpy.poly1d(z)
-            except:
+            except Exception: # pylint: disable=broad-except
                 return None
         else:
             return None
@@ -714,7 +714,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 else:
                     z = numpy.polyfit(xa, ya, deg)
                 return z
-            except:
+            except Exception: # pylint: disable=broad-except
                 return None
         else:
             return None
@@ -809,7 +809,7 @@ class profileTransformatorDlg(ArtisanDialog):
             for timex in self.org_extratimex:
                 try:
                     timex_trans = self.applyDiscreteTimeMapping(timex,fits)
-                except:
+                except Exception: # pylint: disable=broad-except
                     timex_trans = timex
                 self.aw.qmc.extratimex.append(timex_trans)
         else:
@@ -911,8 +911,8 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.phasestable.verticalHeader().sizeHint().width(),
             self.phasestable.verticalHeader().length() + 
                 self.phasestable.horizontalHeader().height())
-        self.phasestable.setEditTriggers(QAbstractItemView.NoEditTriggers);
-        self.phasestable.setFocusPolicy(Qt.NoFocus);
+        self.phasestable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.phasestable.setFocusPolicy(Qt.NoFocus)
         self.phasestable.setSelectionMode(QAbstractItemView.NoSelection)
         self.phasestable.setAutoScroll(False)
         self.phasestable.verticalHeader().sectionClicked.connect(self.phasesTableRowHeaderClicked)
@@ -1005,8 +1005,8 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.timetable.verticalHeader().sizeHint().width(),
             self.timetable.verticalHeader().length() + 
                 self.timetable.horizontalHeader().height())
-        self.timetable.setEditTriggers(QAbstractItemView.NoEditTriggers);
-        self.timetable.setFocusPolicy(Qt.NoFocus);
+        self.timetable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.timetable.setFocusPolicy(Qt.NoFocus)
         self.timetable.setSelectionMode(QAbstractItemView.NoSelection)
         self.timetable.setAutoScroll(False)
 #        self.timetable.setStyleSheet("QTableWidget { background-color: #fafafa; }")
@@ -1070,8 +1070,8 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.temptable.verticalHeader().sizeHint().width(),
             self.temptable.verticalHeader().length() + 
                 self.temptable.horizontalHeader().height())
-        self.temptable.setEditTriggers(QAbstractItemView.NoEditTriggers);
-        self.temptable.setFocusPolicy(Qt.NoFocus);
+        self.temptable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.temptable.setFocusPolicy(Qt.NoFocus)
         self.temptable.setSelectionMode(QAbstractItemView.NoSelection)
         self.temptable.setAutoScroll(False)
         self.temptable.verticalHeader().sectionClicked.connect(self.tempTableRowHeaderClicked)

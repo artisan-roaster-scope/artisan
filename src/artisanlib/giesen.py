@@ -116,7 +116,7 @@ def extractProfileGiesenCSV(file,_):
                         specialeventsStrings.append(item["speed"] + "%")
                 else:
                     speed_last = None
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         if "power" in item:
             try:
@@ -143,7 +143,7 @@ def extractProfileGiesenCSV(file,_):
                         specialeventsStrings.append(item["power"] + "%")
                 else:
                     power_last = None
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
     csvFile.close()

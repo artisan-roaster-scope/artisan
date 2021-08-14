@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -56,7 +56,7 @@ static_path = ""
         
 # pickle hack:
 def work(p,rp,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag):
-    global port, static_path, nonesymbol, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showbt, showet
+    global port, static_path, nonesymbol, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showbt, showet # pylint: disable=global-statement
     port = p
     static_path = rp
     nonesymbol = nonesym
@@ -73,7 +73,7 @@ def work(p,rp,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag):
     s.serve_forever()
         
 def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag):
-    global port, process, static_path, nonesymbol, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showet, showbt
+    global port, process, static_path, nonesymbol, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showet, showbt # pylint: disable=global-statement
     port = p
     static_path = resourcePath
     nonesymbol = nonesym
@@ -117,7 +117,7 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
         return False
     
 def stopWeb():
-    global wsocks, process
+    global wsocks, process # pylint: disable=global-statement
     for ws in wsocks:
         ws.close()
     wsocks = []
@@ -138,14 +138,14 @@ def send_all(msg):
                 if ws.closed:
                     try:
                         wsocks.remove(ws)
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                 else:
                     ws.send(msg)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             try:
                 wsocks.remove(ws)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
 # route to push new data to the client
@@ -165,7 +165,7 @@ def handle_websocket():
             if wsock.closed:
                 try:
                     wsocks.remove(wsock)
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
                 break
             else:
@@ -173,13 +173,13 @@ def handle_websocket():
                 if message is None:
                     try:
                         wsocks.remove(wsock)
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     break
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             try:
                 wsocks.remove(wsock)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             break
             

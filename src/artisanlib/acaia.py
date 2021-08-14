@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -16,7 +16,7 @@
 # AUTHOR
 # Marko Luther, 2019
 
-class AcaiaBLE(object):
+class AcaiaBLE():
 
     SERVICE_UUID = "00001820-0000-1000-8000-00805f9b34fb"
     CHAR_UUID =    "00002a80-0000-1000-8000-00805f9b34fb"
@@ -59,7 +59,7 @@ class AcaiaBLE(object):
         self.msgType = None
         self.weight = None
         self.battery = None
-        self.firmware = None # on connect this is set to a tripel of ints, (major, minor, patch)-version
+        self.firmware = None # on connect this is set to a triple of integers, (major, minor, patch)-version
         self.unit = 2 # 1: kg, 2: g, 5: ounce
         self.max_weight = 0 # in g
     
@@ -67,7 +67,8 @@ class AcaiaBLE(object):
         self.__init__()
 
     # return a bytearray of len 2 containing the even and odd CRCs over the given payload
-    def crc(self,payload):
+    @staticmethod
+    def crc(payload):
         cksum1 = 0
         cksum2 = 0
         for i in range(len(payload)):
@@ -176,7 +177,7 @@ class AcaiaBLE(object):
             return -1
         else:
             b = payload[0]
-            if 0 <= b and b <= 100:
+            if 0 <= b <= 100:
                 self.battery = int(payload[0])
                 #print("bat","{}%".format(self.battery))
             return self.EVENT_BATTERY_LEN
@@ -299,7 +300,7 @@ class AcaiaBLE(object):
                 if len(data) < (l + 2):
 #                    print("Invalid data length")
                     return None, None
-                self.parseScaleData(write,self.msgType,data[offset:offset+l-1]);
+                self.parseScaleData(write,self.msgType,data[offset:offset+l-1])
             self.msgType = None # message consumed completely
             
         if old_weight == self.weight:

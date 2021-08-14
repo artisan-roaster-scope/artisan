@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 # ABOUT
-# This program realizes a PID controler as part of the open-source roast logging software Artisan.
+# This program realizes a PID controller as part of the open-source roast logging software Artisan.
 
 # LICENSE
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -16,7 +16,7 @@
 # AUTHOR
 # Marko Luther, 2016
 
-# Inspiered by http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/
+# Inspired by http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/
 
 import time
 import numpy
@@ -160,7 +160,7 @@ class PID(object):
                         if self.lastOutput == None or int_output >= self.lastOutput + self.dutySteps or int_output <= self.lastOutput - self.dutySteps:
                             self.control(int_output)
                             self.lastOutput = output # kept to initialize Iterm on reactivating the PID   
-        except Exception:
+        except Exception: # pylint: disable=broad-except
 #            import sys
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -168,7 +168,7 @@ class PID(object):
             
     # bring the PID to its initial state (to be called externally)
     def reset(self):
-        self.initialize()
+        self.init()
         self.Iterm = 0.0
         
     # re-initalize the PID on restarting it after a temporary off state
@@ -181,10 +181,14 @@ class PID(object):
         self.Pterm = 0.0
         self.input_decay_weights = None
         self.previous_inputs = []
-        if False: # self.lastOutput != None:
-            self.Iterm = self.lastOutput
-        else:
-            self.Iterm = 0.0
+        
+        self.Iterm = 0.0 # for now just reset to 0 in all cases
+#        if self.lastOutput != None:
+#            self.Iterm = self.lastOutput
+#        else:
+#            self.Iterm = 0.0
+
+
         self.lastOutput = None
         # initialize the output smoothing
         self.output_decay_weights = None

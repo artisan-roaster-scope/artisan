@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -47,13 +47,13 @@ class PhidgetManager():
             if attachedChannel.getParent().getDeviceClass() != DeviceClass.PHIDCLASS_HUB:
                 # we do not add the hub itself
                 self.addChannel(attachedChannel)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
     
     def detachHandler(self,_,attachedChannel):
         try:
             self.deleteChannel(attachedChannel)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
     
     def addChannel(self,channel):
@@ -81,12 +81,12 @@ class PhidgetManager():
                                     state = False
                                 #else:
                                 #   do nothing
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             self.attachedPhidgetChannels[channel] = state
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             pass
         finally:
             if self.managersemaphore.available() < 1:
@@ -108,12 +108,12 @@ class PhidgetManager():
                                 khubport = k.getHubPort()
                                 if khub == hub and khubport == hubport:                                    
                                     self.attachedPhidgetChannels[k] = True
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             self.attachedPhidgetChannels.pop(channel, None)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         finally:
             if self.managersemaphore.available() < 1:
@@ -139,7 +139,7 @@ class PhidgetManager():
                     k.getChannel() == channel:
                     return k
             return None
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             return None
         finally:
             if self.managersemaphore.available() < 1:
@@ -167,11 +167,11 @@ class PhidgetManager():
                         try:
                             if k.getHub() == hub and k.getHubPort() == port:
                                 self.attachedPhidgetChannels[k] = False
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                 #else:
                 #  not a HUB port
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         finally:
             if self.managersemaphore.available() < 1:
@@ -191,9 +191,9 @@ class PhidgetManager():
                         try:
                             if k.getHub() == hub and k.getHubPort() == port:
                                 self.attachedPhidgetChannels[k] = True
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass                
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         finally:
             if self.managersemaphore.available() < 1:
@@ -248,7 +248,7 @@ class PhidgetManager():
                 return p.getDeviceSerialNumber(), port
             else:
                 return None, None
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             return None, None
         finally:
             if self.managersemaphore.available() < 1:

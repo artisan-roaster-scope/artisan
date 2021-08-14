@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -37,7 +37,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushB
 
 class PID_DlgControl(ArtisanDialog):
     def __init__(self, parent = None, aw = None, activeTab = 0):
-        super(PID_DlgControl,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setModal(True)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle(QApplication.translate("Form Caption","PID Control",None))
@@ -431,7 +431,7 @@ class PID_DlgControl(ArtisanDialog):
             beepLayout = QHBoxLayout()
             beepLayout.addStretch()
             beepLayout.addWidget(beepCheckBox)
-            beepLayout.addSpacing(6);        
+            beepLayout.addSpacing(6)
             beepLayout.addStretch()
             beepLayout.setContentsMargins(0,0,0,0)
             beepLayout.setSpacing(0)
@@ -564,7 +564,7 @@ class PID_DlgControl(ArtisanDialog):
                 beepLayout = QHBoxLayout()
                 beepLayout.addStretch()
                 beepLayout.addWidget(beepCheckBox)
-                beepLayout.addSpacing(6);        
+                beepLayout.addSpacing(6)
                 beepLayout.addStretch()
                 beepLayout.setContentsMargins(0,0,0,0)
                 beepLayout.setSpacing(0)
@@ -717,7 +717,7 @@ class PID_DlgControl(ArtisanDialog):
             self.setrampsoaks()
             self.aw.pidcontrol.rsfile = ""
             self.rsfile.setText(self.aw.pidcontrol.rsfile)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     def getRSnSVLabel(self,n):
@@ -781,11 +781,11 @@ class PID_DlgControl(ArtisanDialog):
             self.setrampsoaks()
             self.aw.qmc.rsfile = filename
             self.rsfile.setText(self.aw.qmc.rsfile)            
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importrampsoaksJSON() {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importrampsoaksJSON() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
                 self.aw.qmc.rampSoakSemaphore.release(1)
@@ -815,9 +815,9 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.qmc.rsfile = filename
             self.rsfile.setText(self.aw.qmc.rsfile) 
             return True
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " exportrampsoaksJSON(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " exportrampsoaksJSON(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
@@ -958,8 +958,6 @@ class PID_DlgControl(ArtisanDialog):
 
 # common code for all Fuji PXxx subclasses
 class PXpidDlgControl(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(PXpidDlgControl,self).__init__(parent, aw)
 
     @pyqtSlot(bool)
     def setpointET(self,_):
@@ -1003,9 +1001,9 @@ class PXpidDlgControl(ArtisanDialog):
                 self.status.showMessage(message, 5000)
             else:
                 self.status.showMessage(QApplication.translate("StatusBar","Problem setting decimal position",None),5000)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setpoint(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setpoint(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def setthermocoupletypeET(self,_):
@@ -1060,9 +1058,9 @@ class PXpidDlgControl(ArtisanDialog):
                 self.status.showMessage(message, 5000)
             else:
                 self.status.showMessage(QApplication.translate("StatusBar","Problem setting thermocouple type",None),5000)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setthermocoupletype(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setthermocoupletype(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def readthermocoupletypeET(self,_):
@@ -1128,9 +1126,9 @@ class PXpidDlgControl(ArtisanDialog):
                         message = "BT type %i: %s"%(Thtype,thermotypes[conversiontoindex.index(Thtype)])
                         self.BTthermocombobox.setCurrentIndex(conversiontoindex.index(Thtype))
                 self.status.showMessage(message,5000)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " readthermocoupletype(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " readthermocoupletype(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
 
@@ -1140,7 +1138,7 @@ class PXpidDlgControl(ArtisanDialog):
 
 class PXRpidDlgControl(PXpidDlgControl):
     def __init__(self, parent = None, aw = None):
-        super(PXRpidDlgControl,self).__init__(parent,aw)
+        super().__init__(parent,aw)
         self.setModal(True)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle(QApplication.translate("Form Caption","Fuji PXR PID Control",None))
@@ -1564,11 +1562,11 @@ class PXRpidDlgControl(PXpidDlgControl):
                 mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby()"
                 self.status.showMessage(mssg,5000)
                 self.aw.qmc.adderror(mssg)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby() {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def setsv(self,_):
@@ -1791,7 +1789,7 @@ class PXRpidDlgControl(PXpidDlgControl):
                         strcommand += "::" + str(self.aw.fujipid.PXR[svkey][0]) + "::" + str(self.aw.fujipid.PXR[rampkey][0]) + "::" + str(self.aw.fujipid.PXR[soakkey][0])+"::"
                         result += strcommand
                         strcommand = "SETRS"
-                    result = result.strip("::")
+                    result = result.strip(":")
                     self.aw.qmc.DeviceEventRecord(result)
                 else:
                     self.status.showMessage(QApplication.translate("StatusBar","RampSoak could not be changed",None), 5000)
@@ -1961,7 +1959,7 @@ class PXRpidDlgControl(PXpidDlgControl):
 
 class PXG4pidDlgControl(PXpidDlgControl):
     def __init__(self, parent = None, aw = None):
-        super(PXG4pidDlgControl,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setModal(True)
         self.setAttribute(Qt.WA_DeleteOnClose)
         if self.aw.ser.controlETpid[0] == 0:
@@ -2677,11 +2675,11 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 self.aw.fujipid.PXG4[rampkey][0] = stringtoseconds(segments[rampkey])
                 self.aw.fujipid.PXG4[soakkey][0] = stringtoseconds(segments[soakkey])
             self.createsegmenttable()
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadPIDJSON() {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadPIDJSON() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def writeSetValues(self,_=False):
@@ -2743,9 +2741,9 @@ class PXG4pidDlgControl(PXpidDlgControl):
             outfile.write('\n')
             outfile.close()
             return True
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " savePIDJSON(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " savePIDJSON(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
 
     @pyqtSlot(bool)
@@ -2768,9 +2766,9 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 self.status.showMessage(message, 5000)
             else:
                 self.status.showMessage(QApplication.translate("StatusBar","Problem setting time units",None),5000)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " settimeunits(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " settimeunits(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
     
     @pyqtSlot(int)
     def paintlabels(self,_=0):
@@ -3684,7 +3682,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                     strcommand += "::" + str(reg_dict[svkey][0]) + "::" + str(reg_dict[rampkey][0]) + "::" + str(reg_dict[soakkey][0])+"::"
                     result += strcommand
                     strcommand = "SETRS"
-                result = result.strip("::")
+                result = result.strip(":")
                 self.aw.qmc.DeviceEventRecord(result)
             else:
                 self.status.showMessage(QApplication.translate("StatusBar","RampSoak could not be changed",None), 5000)
@@ -3741,11 +3739,11 @@ class PXG4pidDlgControl(PXpidDlgControl):
             else:
                 message = QApplication.translate("StatusBar","Unable",None)
                 self.status.showMessage(QApplication.translate("StatusBar","No data received",None),5000)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby() {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     #get all Ramp Soak values for all 8 segments
     @pyqtSlot(bool)
@@ -3941,7 +3939,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
 
 class DTApidDlgControl(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
-        super(DTApidDlgControl,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setModal(True)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle(QApplication.translate("Form Caption","Delta DTA PID Control",None))

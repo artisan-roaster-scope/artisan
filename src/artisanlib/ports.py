@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -36,7 +36,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBo
 
 class scanModbusDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
-        super(scanModbusDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setModal(True)
         # current setup selected in the MODBUS tab
         self.port = ""
@@ -170,7 +170,7 @@ class scanModbusDlg(ArtisanDialog):
                     if res is not None:
                         result += str(register) + "(3)," + str(res) + "<br>"
                         self.modbusEdit.setHtml(result)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         # reconstruct MODBUS setup
         self.aw.modbus.comport = self.port_aw
@@ -208,7 +208,7 @@ class scanModbusDlg(ArtisanDialog):
 
 class scanS7Dlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
-        super(scanS7Dlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setModal(True)
         # current setup selected in the S7 tab
         self.shost = "127.0.0.1"
@@ -328,7 +328,7 @@ class scanS7Dlg(ArtisanDialog):
                     result += "{}: {}<br>".format(str(register),str(res))
                     self.S7Edit.setHtml(result)
                 time.sleep(0.4)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         # reconstruct S7 setup
         self.aw.s7.host = self.shost_aw
@@ -365,7 +365,7 @@ class scanS7Dlg(ArtisanDialog):
 class PortComboBox(QComboBox):
     __slots__ = ['selection','ports','edited'] # save some memory by using slots
     def __init__(self, parent = None, selection = None):
-        super(PortComboBox, self).__init__(parent)
+        super().__init__(parent)
         self.installEventFilter(self)
         self.selection = selection # just the port name (first element of one of the triples in self.ports)
         # a list of triples as returned by serial.tools.list_ports
@@ -387,7 +387,7 @@ class PortComboBox(QComboBox):
             try:
                 self.selection = self.ports[i][0]
                 self.edited = None # reset the user text editing
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
 
     def eventFilter(self, obj, event):
@@ -396,7 +396,7 @@ class PortComboBox(QComboBox):
 #            self.setSelection(self.currentIndex())
         if event.type() == QEvent.MouseButtonPress:
             self.updateMenu()
-        return super(PortComboBox, self).eventFilter(obj, event)
+        return super().eventFilter(obj, event)
 
     def updateMenu(self):
         self.blockSignals(True)
@@ -416,15 +416,15 @@ class PortComboBox(QComboBox):
             try:
                 pos = [p[0] for p in self.ports].index(self.selection)
                 self.setCurrentIndex(pos)
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         self.blockSignals(False)
 
 class comportDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None, aw = None):
-        super(comportDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setAttribute(Qt.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
         self.setWindowTitle(QApplication.translate("Form Caption","Ports Configuration",None))
         self.setModal(True)
@@ -730,7 +730,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.scale_deviceEdit.addItems(supported_scales)
         try:
             self.scale_deviceEdit.setCurrentIndex(supported_scales.index(self.aw.scale.device))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.scale_deviceEdit.setCurrentIndex(0)
         self.scale_deviceEdit.setEditable(False)
         scale_devicelabel.setBuddy(self.scale_deviceEdit)
@@ -773,7 +773,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.color_deviceEdit.addItems(supported_color_meters)
         try:
             self.color_deviceEdit.setCurrentIndex(supported_color_meters.index(self.aw.color.device))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.color_deviceEdit.setCurrentIndex(0)
         self.color_deviceEdit.setEditable(False)
         self.color_deviceEdit.activated.connect(self.colorDeviceIndexChanged)
@@ -1613,7 +1613,7 @@ class comportDlg(ArtisanResizeablDialog):
             elif i==1: # Tiny Tonino
                 self.aw.color.baudrate = 57600
             self.color_baudrateComboBox.setCurrentIndex(self.color_bauds.index(str(self.aw.color.baudrate)))
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
     
     @pyqtSlot(bool)
@@ -1706,9 +1706,9 @@ class comportDlg(ArtisanResizeablDialog):
                             self.serialtable.setCellWidget(i,5,stopbitsComboBox)
                             self.serialtable.setCellWidget(i,6,timeoutEdit)
                 self.serialtable.resizeColumnsToContents()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createserialTable(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createserialTable(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def saveserialtable(self):
         try:
@@ -1748,9 +1748,9 @@ class comportDlg(ArtisanResizeablDialog):
                 self.aw.extraser[i].parity = str(self.aw.extraparity[i])
                 self.aw.extraser[i].stopbits = self.aw.extrastopbits[i]
                 self.aw.extraser[i].timeout = self.aw.extratimeout[i]
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info() 
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " saveserialtable(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " saveserialtable(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def showModbusbuttonhelp(self,_=False):

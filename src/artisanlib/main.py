@@ -16,7 +16,7 @@ from artisanlib import __release_sponsor_url__
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -63,7 +63,7 @@ try:
         else:
             return importlib_metadata.version(pkg_name)
     importlib_metadata.version = md_version
-except:
+except Exception: # pylint: disable=broad-except
     pass
 ## MONKEY PATCH END:
 
@@ -72,7 +72,7 @@ import prettytable  # @UnresolvedImport
 #try:
 #    from PyQt6.QtCore import QLibraryInfo  # @UnusedImport @UnresolvedImport
 #    pyqtversion = 6
-#except Exception as e:
+#except Exception as e: # pylint: disable=broad-except
 #    pyqtversion = 5
 pyqtversion = 5 # until MPL and all build tools fully support PyQt6 we run on PyQt5
 
@@ -80,13 +80,13 @@ try: # activate support for hiDPI screens on Windows
     if str(platform.system()).startswith("Windows"):
         os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
         os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "1"
-except:
+except Exception: # pylint: disable=broad-except
     pass
 
 # write logtrace to Console on OS X:
 #try:
 #..
-#except Exception as e:
+#except Exception as e: # pylint: disable=broad-except
 #    import syslog
 #    syslog.openlog("artisan")
 #    syslog.syslog(syslog.LOG_ALERT, str(e))
@@ -109,34 +109,34 @@ if pyqtversion < 6:
     from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport @UnusedImport
     from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport @UnusedImport
                               qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport @UnusedImport
-                              QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnusedImport
+                              QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnusedImport
     from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @UnusedImport
     
     try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
         from PyQt5 import sip # @UnusedImport
-    except:
+    except Exception: # pylint: disable=broad-except
         pass
 else:
-    from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport @UnresolvedImport # pylint: disable=import-error
                              QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnresolvedImport
                              QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport
                              QSlider, QStackedWidget, # @Reimport @UnresolvedImport
                              QColorDialog, QFrame, QProgressDialog, # @Reimport @UnresolvedImport
                              QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport
-    from PyQt6.QtGui import (QAction, QImageReader, QWindow,  # @Reimport @UnresolvedImport
-                                QKeySequence, # s@UnresolvedImport
+    from PyQt6.QtGui import (QAction, QImageReader, QWindow,  # @Reimport @UnresolvedImport # pylint: disable=import-error
+                                QKeySequence, # @Reimport s@UnresolvedImport
                                 QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport @UnresolvedImport
                                 QRegularExpressionValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport @UnresolvedImport
-    from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport @UnresolvedImport
-    from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport @UnresolvedImport
+    from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport @UnresolvedImport # pylint: disable=import-error
+    from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport @UnresolvedImport # pylint: disable=import-error
                               qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport @UnresolvedImport
-                              QRegularExpression, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnresolvedImport
-    from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @UnresolvedImport
+                              QRegularExpression, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnresolvedImport
+    from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @Reimport @UnusedImport @UnresolvedImport # pylint: disable=import-error
     
     try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
-        from PyQt6 import sip # @UnusedImport @UnresolvedImport
-    except:
+        from PyQt6 import sip # @Reimport @UnusedImport @UnresolvedImport
+    except Exception: # pylint: disable=broad-except
         pass
 
 from artisanlib.suppress_errors import suppress_stdout_stderr
@@ -151,7 +151,7 @@ if mpl_version[0] > 2 and mpl_version[1] > 2:
     if mpl_version[1] > 3:
         from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatio # @UnresolvedImport @UnusedImport
     else:
-        from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatioF # @UnresolvedImport @UnusedImport
+        from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatioF # @Reimport @UnresolvedImport @UnusedImport
     from matplotlib.backend_bases import _Mode as MPL_Mode  # @UnresolvedImport
 
 
@@ -189,8 +189,8 @@ import matplotlib.backends.qt_editor._formlayout as formlayout
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
     if str(platform.system()).startswith("Windows"):
-        import win_inet_pton # @UnresolvedImport @UnusedImport
-except:
+        import win_inet_pton # @UnresolvedImport @UnusedImport # pylint: disable=import-error
+except Exception: # pylint: disable=broad-except
     pass
 
 
@@ -214,7 +214,7 @@ except:
 import unicodedata # @UnresolvedImport
 
 import artisanlib.arabic_reshaper
-from artisanlib.util import (appFrozen, stringp, uchr, d, encodeLocal, s2a, fill_gaps, 
+from artisanlib.util import (appFrozen, stringp, uchr, decodeLocal, encodeLocal, s2a, fill_gaps, 
         deltaLabelPrefix, deltaLabelUTF8, deltaLabelBigPrefix, deltaLabelMathPrefix, stringfromseconds, stringtoseconds,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toBool, toStringList, toMap, removeAll)
@@ -229,7 +229,7 @@ from Phidget22.LogLevel import LogLevel as PhidgetLogLevel
 try:
     # spanning a second multiprocessing instance (Hottop server) on macOS falils to import the YAPI interface
     from yoctopuce.yocto_api import YAPI
-except:
+except Exception: # pylint: disable=broad-except
     pass
 
 platf = str(platform.system())
@@ -244,7 +244,7 @@ viewerAppGuid = '9068bd2fa8e54945a6be1f1a0a589e93'
 
 class Artisan(QtSingleApplication):
     def __init__(self, args):
-        super(Artisan, self).__init__(appGuid,viewerAppGuid,args)
+        super().__init__(appGuid,viewerAppGuid,args)
 
         self.sentToBackground = None # set to timestamp on putting app to background without any open dialog
         self.plus_sync_cache_expiration = 1*60 # how long a plus sync is valid in seconds
@@ -267,7 +267,7 @@ class Artisan(QtSingleApplication):
                         if aw is not None and aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None and \
                                 libtime.time() - self.sentToBackground > self.plus_sync_cache_expiration:
                             plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     self.sentToBackground = None
 
@@ -276,7 +276,7 @@ class Artisan(QtSingleApplication):
                     self.sentToBackground = libtime.time() # keep the timestamp on sending the app with the main window to background
                 else: # on raising another dialog/widget was open, reset timer
                     self.sentToBackground = None
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     # takes a QUrl and interprets it as follows
@@ -305,7 +305,7 @@ class Artisan(QtSingleApplication):
                     query = QUrlQuery(url.query())
                     if query.hasQueryItem("url"):
                         QTimer.singleShot(5,lambda: aw.importExternalURL(aw.artisanURLextractor,url=QUrl(query.queryItemValue("url"))))
-                except Exception:
+                except Exception: # pylint: disable=broad-except
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     pass
@@ -316,7 +316,7 @@ class Artisan(QtSingleApplication):
                     url_query = url.query()
                 if url_query is None or url_query != "background":
                     # by default we raise Artisan to the foreground
-                    QTimer.singleShot(20,lambda: self.activateWindow())
+                    QTimer.singleShot(20,self.activateWindow)
                 url.setQuery(None) # remove any query to get a valid file path
                 url.setFragment(None) # remove also any potential fragment
                 filename = url.toString(QUrl.PreferLocalFile)
@@ -368,9 +368,9 @@ class Artisan(QtSingleApplication):
                         application_path = sys.argv[0]
                     application_path = re.sub(r"\\",r"/",application_path)
                     # must start viewer without an argv else it thinks it was started from a link and sends back to artisan
-                    os.startfile(application_path)  # @UndefinedVariable
+                    os.startfile(application_path)  # @UndefinedVariable # pylint: disable=maybe-no-member
                     QTimer.singleShot(3000,lambda : self._sendMessage2ArtisanInstance(message,instance_id))
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         else:
             self._sendMessage2ArtisanInstance(message,instance_id)
@@ -415,11 +415,11 @@ class Artisan(QtSingleApplication):
                     else:
                         # try to open the file in Viewer if it is running
                         self.sendMessage2ArtisanInstance(message,self._viewer_id)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             return 1
         else:
-            return super(Artisan, self).event(event)
+            return super().event(event)
 
 # configure multiprocessing
 if sys.platform.startswith("darwin"):
@@ -438,21 +438,21 @@ if sys.platform.startswith("darwin"):
 #            # this breaks on starting WebLCDs in macOS (and linux) builds with py2app, pyinstaller
 #            # https://bugs.python.org/issue32146
 #            # https://github.com/pyinstaller/pyinstaller/issues/4865
-    except:
+    except Exception: # pylint: disable=broad-except
         pass
 
-args = sys.argv
+app_args = sys.argv
 if sys.platform.startswith("linux"):
     # avoid a GTK bug in Ubuntu Unity
-    args = args + ['-style','Fusion']
+    app_args = app_args + ['-style','Fusion']
 #if platf == 'Windows':
 #    # highDPI support must be set before creating the Application instance
 #    try:
 #        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
 #        QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
-#    except Exception as e:
+#    except Exception as e: # pylint: disable=broad-except
 #        pass
-app = Artisan(args)
+app = Artisan(app_args)
 
 # On the first run if there are legacy settings under "YourQuest" but no new settings under "artisan-scope" then the legacy settings
 # will be copied to the new settings location. Once settings exist under "artisan-scope" the legacy settings under "YourQuest" will
@@ -491,7 +491,7 @@ try:
             newsettings.setValue(key,legacysettings.value(key))
     del legacysettings   #free up memmory?
     del newsettings      #free up memmory?
-except:
+except Exception: # pylint: disable=broad-except
     pass
 
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
@@ -507,7 +507,7 @@ if platf == 'Windows':
 #        app.setAttribute(Qt.AA_EnableHighDpiScaling)
 #        if hasattr(QStyleFactory, 'AA_UseHighDpiPixmaps'):
 #            app.setAttribute(Qt.AA_UseHighDpiPixmaps)
-#    except Exception as e:
+#    except Exception as e: # pylint: disable=broad-except
 #        pass
 
 
@@ -526,7 +526,6 @@ if sys.platform.startswith("darwin"):
 
 # to make py2exe happy with scipy >0.11 (adding hidden imports)
 def __dependencies_for_freezing():
-    import matplotlib.numerix # not to break bbfreeze 1.1.3 on Linux  @UnresolvedImport @UnusedImport
     from scipy.sparse.csgraph import _validation # @UnresolvedImport @UnusedImport
     from scipy.special import _ufuncs_cxx # @UnresolvedImport @UnusedImport
     from scipy import integrate # @UnresolvedImport @UnusedImport
@@ -544,21 +543,18 @@ def __dependencies_for_freezing():
     import packaging.markers # @UnresolvedImport @UnusedImport
     import packaging.requirements # @UnresolvedImport @UnusedImport
 
-    import pkg_resources.py2_warn  # @UnresolvedImport @UnusedImport # for setuptools > 45.0.0.0
-
     import PyQt5.QtSvg  # @UnusedImport
     import PyQt5.QtXml  # @UnusedImport
     import PyQt5.QtDBus # needed for QT5 builds  # @UnusedImport
     import PyQt5.QtPrintSupport # needed for by platform plugin libqcocoa  # @UnusedImport
 
     # for gevent bundling
-    from gevent import signal, core, resolver_thread, resolver_ares, socket, threadpool, thread, threading, select, subprocess, pywsgi, server, hub # @UnusedImport @Reimport
+    from gevent import signal as gevent_signal, core, resolver_thread, resolver_ares, socket, threadpool, thread, threading as gevent_threading, select, subprocess as gevent_subprocess, pywsgi, server, hub # @UnusedImport @Reimport
 
 del __dependencies_for_freezing
 
 
 #Localization support
-global locale
 
 if QSettings().contains('resetqsettings') and not toInt(QSettings().value('resetqsettings')):
     locale = toString(QSettings().value('locale'))
@@ -665,18 +661,18 @@ def toASCII(s):
                 utf8_string = utf8_string.replace(k, umlaute_dict[k])
         return unidecode(utf8_string)
 
-def QDateTimeToEpoch(datetime):
+def QDateTimeToEpoch(dt):
     try:
-        return datetime.toSecsSinceEpoch() # intoduced in Qt5.8, not available on RPi Stretch unning Qt5.7.1, returns 64bit uint
-    except:
-        return datetime.toTime_t() # deprecated, returns 32bit uint; for compatibility with RPi Stretch only
+        return dt.toSecsSinceEpoch() # intoduced in Qt5.8, not available on RPi Stretch unning Qt5.7.1, returns 64bit uint
+    except Exception: # pylint: disable=broad-except
+        return dt.toTime_t() # deprecated, returns 32bit uint; for compatibility with RPi Stretch only
 
 from const import UIconst
 from artisanlib.s7port import s7port
 from artisanlib.wsport import wsport
 from artisanlib.modbusport import modbusport
 from artisanlib.phidgets import PhidgetManager
-from artisanlib.sliderStyle import *
+from artisanlib.sliderStyle import artisan_slider_style
 from artisanlib.cropster import extractProfileCropsterXLS
 from artisanlib.giesen import extractProfileGiesenCSV
 from artisanlib.petroncini import extractProfilePetronciniCSV
@@ -732,16 +728,17 @@ import plus.register
 #################### Ambient Data Collection  #########################################
 #######################################################################################
 
-class AmbientThread(QThread):
-    def __init__(self):
-        super(AmbientThread,self).__init__()
-
+class AmbientWorker(QObject):
+    finished = pyqtSignal()
+    
     def run(self):
         libtime.sleep(2.5) # wait a moment after ON until all other devices are attached
         try:
             aw.qmc.getAmbientData()
-        except:
+        except Exception:  # pylint: disable=broad-except
             pass
+        finally:
+            self.finished.emit()
 
 #######################################################################################
 #################### GRAPH DRAWING WINDOW  ############################################
@@ -889,6 +886,10 @@ class tgraphcanvas(FigureCanvas):
                                             QApplication.translate("Textbox", "Overall",None)]
 
         self.ax1 = self.ax2 = None
+        
+        # Ambient Data Worker and Thread
+        self.ambiWorker = None
+        self.ambiThread = None
 
         self.flavorlabels = list(self.artisanflavordefaultlabels)
         #Initial flavor parameters.
@@ -910,7 +911,7 @@ class tgraphcanvas(FigureCanvas):
             try:
                 if QSettings().value('AppleTemperatureUnit') == 'Celsius':
                     self.mode = "C"
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
         self.mode_tempsliders = self.mode # the temperature mode of event slider to convert min/max limits
@@ -966,6 +967,9 @@ class tgraphcanvas(FigureCanvas):
         self.AUCsinceFCs = 0 # the running AUC since FCs calculated during recording
         self.AUCguideTime = 0 # the expected time in seconds the AUC target is reached (calculated by the AUC guide mechanism)
         self.AUCshowFlag = False
+        
+        # timing statistics on loaded profile
+        self.statisticstimes = [0,0,0,0,0] # total, dry phase, mid phase, finish phase  and cooling phase times
 
         #DEVICES
         self.device = 18                                    # default device selected to None (18). Calls appropiate function
@@ -985,7 +989,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1048_async = [False]*4
         self.phidget1048_changeTriggers = [0]*4
         self.phidget1048_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
-        self.phidget1048_changeTriggersStrings = list(map(lambda x:'{0:.1f}C'.format(x),self.phidget1048_changeTriggersValues))
+        self.phidget1048_changeTriggersStrings = list(map(lambda x:'{0:.1f}C'.format(x),self.phidget1048_changeTriggersValues)) # pylint: disable=unnecessary-lambda
         # add 0.02C and 0.05C change triggers
         self.phidget1048_changeTriggersValues.insert(1,0.05)
         self.phidget1048_changeTriggersValues.insert(1,0.02)
@@ -1337,6 +1341,8 @@ class tgraphcanvas(FigureCanvas):
         self.plotcurves=[""]*9
         self.plotcurvecolor = ["black"]*9
 
+        self.overlapList = []
+        
         self.tight_layout_params = {"pad":.3,"h_pad":0.0,"w_pad":0.0} # slightly less space for axis labels
 #        self.tight_layout_params = True
         self.fig = Figure(tight_layout=self.tight_layout_params,frameon=True,dpi=dpi)
@@ -1533,7 +1539,7 @@ class tgraphcanvas(FigureCanvas):
         self.roastbatchnrB = 0
         self.roastbatchprefixB = ""
         self.roastbatchposB = 1
-        self.temp1B,self.temp2B,self.temp1BX,self.temp2BX,self.timeB,self.temp1Bdelta,self.temp1Bdelta = [],[],[],[],[],[],[]
+        self.temp1B,self.temp2B,self.temp1BX,self.temp2BX,self.timeB,self.temp1Bdelta,self.temp1Bdelta,self.temp2Bdelta,self.temp2Bdelta = [],[],[],[],[],[],[],[],[]
         self.stemp1B,self.stemp2B,self.stemp1BX,self.stemp2BX = [],[],[],[] # smoothed versions of the background curves
         self.extraname1B,self.extraname2B = [],[]
         self.extratimexB = []
@@ -1758,7 +1764,7 @@ class tgraphcanvas(FigureCanvas):
                 if not QSettings().value('AppleMetricUnits'):
                     self.weight = [0,0,self.weight_units[2]]
                     self.volume = [0,0,self.volume_units[1]]
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
         self.volumeCalcUnit = 0
@@ -2158,6 +2164,8 @@ class tgraphcanvas(FigureCanvas):
         self.BTsplinedegree = 3
         self.ETsplinedegree = 3
         self.reproducedesigner = 0      #flag to add events to help reproduce (replay) the profile: 0 = none; 1 = sv; 2 = ramp
+        self.designertemp1init = []
+        self.designertemp2init = []
 
         ###########################         filterDropOut variables     ################################
 
@@ -2240,7 +2248,11 @@ class tgraphcanvas(FigureCanvas):
 
         #flag to plot cross lines from mouse
         self.crossmarker = False
-        self.crossmouseid = 0
+        self.crossmouseid = None # connect mouse signal id
+        self.onreleaseid = None # connect release signal id
+        
+        #
+        self.analyzer_connect_id = None # analyzer connect signal id
 
 
         #########  temporary serial variables
@@ -2338,6 +2350,7 @@ class tgraphcanvas(FigureCanvas):
         self.idx_met = None
         self.showmet = False
         self.met_annotate = []
+        self.met_timex_temp1_delta = None
         self.extendevents = True
         self.statssummary = False
         self.showtimeguide = True
@@ -2408,6 +2421,7 @@ class tgraphcanvas(FigureCanvas):
         #references to legend objects
         self.handles = []
         self.labels = []
+        self.legend_lines = []
 
         #used for picked event messages
         self.eventmessage = ""
@@ -2531,7 +2545,7 @@ class tgraphcanvas(FigureCanvas):
         self.lazyredraw(recomputeAllDeltas=False)
 
     def resizeEvent(self, event):
-        super(tgraphcanvas,self).resizeEvent(event)
+        super().resizeEvent(event)
         # we only trigger a redraw on resize if a watermark is displayed to fix its aspect ratio
         if aw.redrawOnResize and aw.logofilename != "":
             dw = event.size().width() - event.oldSize().width()   # width change
@@ -2589,7 +2603,7 @@ class tgraphcanvas(FigureCanvas):
                 # NotImplementedError
                 #self.fig.canvas.flush_events() # don't FLUSH event as this can lead to a second redraw started from within the same GUI thread and
                 # causen a hang by the blocked semaphore
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
             self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.get_figure().bbox)
@@ -2637,7 +2651,7 @@ class tgraphcanvas(FigureCanvas):
                         res = numpy.mean([e for e in aw.qmc.extratemp2[(self.ambientTempSource - 3)//2][start:end] if e is not None and e != -1])
                     else:
                         res = numpy.mean([e for e in aw.qmc.extratemp1[(self.ambientTempSource - 3)//2][start:end] if e is not None and e != -1])
-            except: # the array to average over might get empty and mean thus invoking an exception
+            except Exception: # pylint: disable=broad-except # the array to average over might get empty and mean thus invoking an exception
                 pass
         if res:
             res = aw.float2float(res)
@@ -2648,10 +2662,10 @@ class tgraphcanvas(FigureCanvas):
             AT_device = None
             try:
                 AT_device = aw.qmc.extradevices.index(36)
-            except:
+            except Exception: # pylint: disable=broad-except
                 try:
                     AT_device = aw.qmc.extradevices.index(60)
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             if AT_device is not None:
                 # 1048_AT channel #36, TMP1101_AT channel #60
@@ -2663,7 +2677,7 @@ class tgraphcanvas(FigureCanvas):
                         if aw.qmc.mode == "F":
                             at = aw.float2float(fromCtoF(at))
                         aw.qmc.ambientTemp = aw.float2float(at)
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             # in case the AT channel of the 1048 or the TMP1101 is not used as extra device, we try to attach to it anyhow and read the temp off
             elif aw.qmc.ambientTemp == 0.0 and aw.qmc.device in [34,58]: # Phidget 1048 or TMP1101 channel 4 (use internal temp)
@@ -2686,7 +2700,7 @@ class tgraphcanvas(FigureCanvas):
                             aw.qmc.ambientTemp = aw.float2float(t)
                         if ambient.getAttached():
                             ambient.close()
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
         res = aw.qmc.ambientTempSourceAvg()
         if res is not None and (isinstance(res, float) or isinstance(res, int)) and not math.isnan(res):
@@ -2697,7 +2711,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             aw.qmc.startPhidgetManager()
             aw.qmc.getAmbientData()
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     # eventsvalues maps the given internal event value v to an external event int value as displayed to the user as special event value
@@ -2752,10 +2766,11 @@ class tgraphcanvas(FigureCanvas):
         elif value < 0:
             return ""
         else:
-            if True: #aw.qmc.LCDdecimalplaces:
-                return str(int(round(value)))
-            else:
-                return str(int(round(value / 10.)))
+#            if aw.qmc.LCDdecimalplaces:
+#                return str(int(round(value)))
+#            else:
+#                return str(int(round(value / 10.)))
+            return str(int(round(value)))
 
     # the inverse to eventsvalues above (string -> value)
     def str2eventsvalue(self,s):
@@ -2782,7 +2797,7 @@ class tgraphcanvas(FigureCanvas):
                         self.title_artist.set_text(self.title_text)
                     if prev_title_text != self.title_artist.get_text():
                         redraw = True
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             if self.xlabel_text is not None and self.xlabel_artist is not None and self.xlabel_width is not None:
                 try:
@@ -2794,7 +2809,7 @@ class tgraphcanvas(FigureCanvas):
                         self.xlabel_artist.set_text(self.xlabel_text)
                     if prev_xlabel_text != self.xlabel_artist.get_text():
                         redraw = True
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass 
             try:
                 if redraw:
@@ -2808,10 +2823,9 @@ class tgraphcanvas(FigureCanvas):
                         self.fig.canvas.draw()
                     # Reset the draw event callbacks
                     self.fig.canvas.callbacks.callbacks["draw_event"] = func_handles
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
-
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
     
     # hook up to mpls event handling framework for draw events
@@ -2851,7 +2865,7 @@ class tgraphcanvas(FigureCanvas):
                     met_time_str = str(self.met_timex_temp1_delta[2])
                     met_time_msg = QApplication.translate("Message","seconds before FCs", None)
                 else:
-                    met_time_str = str(-self.met_timex_temp1_delta[2])
+                    met_time_str = str(-1*self.met_timex_temp1_delta[2])
                     met_time_msg = QApplication.translate("Message","seconds after FCs", None)
 
                 message = "MET {}{} @ {}, {} {}".format(
@@ -2881,21 +2895,21 @@ class tgraphcanvas(FigureCanvas):
                     try:
                         label = event.artist.get_text()
                         idx = self.labels.index(label)
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     if label==aw.ETname:
                         label = "ET"  #allows for a match below to the label in legend_lines
                         try:
                             for a in self.l_eteventannos:
                                 a.set_visible(not a.get_visible())
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                     if label==aw.BTname:
                         label = "BT"  #allows for a match below to the label in legend_lines
                         try:
                             for a in self.l_bteventannos:
                                 a.set_visible(not a.get_visible())
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                     try:
                         # toggle also the visibility of the legend handle
@@ -2903,7 +2917,7 @@ class tgraphcanvas(FigureCanvas):
                         artist = next((x for x in self.legend_lines if x.get_label() == clean_label), None)
                         if artist:
                             artist.set_visible(not artist.get_visible())
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                 # toggle the visibility of the corresponding line
                 if idx is not None and artist:
@@ -2925,7 +2939,7 @@ class tgraphcanvas(FigureCanvas):
                             elif i == 3:
                                 for a in self.l_eventtype4annos:
                                     a.set_visible(not a.get_visible())
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                             
 
@@ -2973,11 +2987,11 @@ class tgraphcanvas(FigureCanvas):
                             self.eventmessage += " @ " + stringfromseconds(self.timex[self.specialevents[i]] - start) + " " + str(aw.float2float(self.temp2[self.specialevents[i]],digits)) + aw.qmc.mode
                             self.starteventmessagetimer()
                             break
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onpick() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onpick() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def onrelease_after_pick(self,_):
         if self.legend is not None:
@@ -2989,11 +3003,11 @@ class tgraphcanvas(FigureCanvas):
                 self.baseX,self.baseY = None, None
                 try:
                     aw.qmc.ax.lines.remove(self.base_horizontalcrossline)
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
                 try:
                     aw.qmc.ax.lines.remove(self.base_verticalcrossline)
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
                 self.base_horizontalcrossline, self.base_verticalcrossline = None, None
             # save the location of analysis results after dragging
@@ -3006,11 +3020,11 @@ class tgraphcanvas(FigureCanvas):
                 self.segmentpickflag = False
                 corners = aw.qmc.ax.transAxes.inverted().transform(aw.segmentresultsanno.get_bbox_patch().get_extents())
                 aw.qmc.segmentresultsloc = (corners[0][0], corners[0][1] + (corners[1][1] - corners[0][1])/2)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onclick() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onclick() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
     def disconnect_draggableannotations_motion_notifiers(self):
@@ -3027,7 +3041,7 @@ class tgraphcanvas(FigureCanvas):
             # disconnecting all established motion_notify_event_handlers of DraggableAnnotations
             for cid in cids:
                 aw.qmc.fig.canvas.mpl_disconnect(cid)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     def onclick(self,event):
@@ -3119,11 +3133,11 @@ class tgraphcanvas(FigureCanvas):
                         # show menu
                         menu.triggered.connect(self.event_popup_action)
                         menu.popup(QCursor.pos())
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onclick() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onclick() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot("QAction*")
     def event_popup_action(self,action):
@@ -3143,19 +3157,19 @@ class tgraphcanvas(FigureCanvas):
                 try:
                     # update ambient temperature if a ambient temperature source is configured and no value yet established
                     aw.qmc.updateAmbientTempFromPhidgetModulesOrCurve()
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
 #PLUS
                 # only on first setting the DROP event (not set yet and no previous DROP undone), we upload to PLUS
                 if firstDROP and aw.qmc.autoDROPenabled and aw.plus_account is not None:
                     try:
                         aw.updatePlusStatus()
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                         # add to out-queue
                     try:
                         plus.queue.addRoast()
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
 
             # update phases
@@ -3183,9 +3197,9 @@ class tgraphcanvas(FigureCanvas):
                 try: # sip not supported on older PyQt versions (RPi!)
                     sip.delete(dlg)
                     #print(sip.isdeleted(dlg))
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
     def updateWebLCDs(self,bt=None,et=None,time=None,alertTitle=None,alertText=None,alertTimeout=None):
@@ -3212,7 +3226,7 @@ class tgraphcanvas(FigureCanvas):
             from requests import post as request_post
             from json import dumps as json_dumps
             request_post(url, data=json_dumps(payload),headers=headers,timeout=0.3)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 
     # note that partial values might be given here (time might update, but not the values)
@@ -3224,7 +3238,7 @@ class tgraphcanvas(FigureCanvas):
                     # in monitoring only mode, timer might be set by PID RS
                     time = None
                 aw.largeLCDs_dialog.updateValues([et],[bt],time=time)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     @pyqtSlot(str,str)
@@ -3232,7 +3246,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             if aw.largeLCDs_dialog is not None:
                 aw.largeLCDs_dialog.setTimerLCDcolor(fc,bc)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
     
     @pyqtSlot(str,int)
@@ -3249,7 +3263,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             if aw.largeLCDs_dialog is not None:
                 aw.largeLCDs_dialog.updateValues([et],[bt])
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     @pyqtSlot(str)
@@ -3257,7 +3271,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             if aw.largeLCDs_dialog is not None:
                 aw.largeLCDs_dialog.updateValues([],[],time=time)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     # note that partial values might be given here
@@ -3265,7 +3279,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             if aw.largeDeltaLCDs_dialog is not None:
                 aw.largeDeltaLCDs_dialog.updateValues([deltaet],[deltabt])
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     # note that partial values might be given here
@@ -3273,14 +3287,14 @@ class tgraphcanvas(FigureCanvas):
         try:
             if aw.largePIDLCDs_dialog is not None:
                 aw.largePIDLCDs_dialog.updateValues([sv],[duty])
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     def updateLargeExtraLCDs(self,extra1=None,extra2=None):
         try:
             if aw.largeExtraLCDs_dialog is not None:
                 aw.largeExtraLCDs_dialog.updateValues(extra1,extra2)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     # returns True if the extra device n, channel c, is of type MODBUS or S7, has no factor defined and is of type int
@@ -3318,9 +3332,9 @@ class tgraphcanvas(FigureCanvas):
             elif self.extradevices[n] == 110: # S7_910
                 return aw.s7.type[8+c] != 1 and aw.s7.mode[8+c] == 0 and (aw.s7.div[8+c] == 0 or aw.s7.type[8+c] == 2)
             else:
-                False
+                return False
         else:
-            False
+            return False
 
     def update_additional_artists(self):
         if aw.qmc.flagstart and ((aw.qmc.device == 18 and aw.simulator is None) or aw.qmc.showtimeguide): # not NONE device
@@ -3383,7 +3397,7 @@ class tgraphcanvas(FigureCanvas):
                                     etstr = lcdformat%float(sample_temp1[-1])            # ET
                                 elif self.LCDdecimalplaces and len(sample_temp1) and -10000 < sample_temp1[-1] < 100000:
                                     etstr = "%.0f"%float(sample_temp1[-1])
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                         aw.lcd2.display(etstr)
                         btstr = resLCD
@@ -3393,7 +3407,7 @@ class tgraphcanvas(FigureCanvas):
                                     btstr = lcdformat%float(sample_temp2[-1])            # BT
                                 elif self.LCDdecimalplaces and len(sample_temp2) and -10000 < sample_temp2[-1] < 100000:
                                     btstr = "%.0f"%float(sample_temp2[-1])
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                         aw.lcd3.display(btstr)
                         deltaetstr = resLCD
@@ -3401,18 +3415,18 @@ class tgraphcanvas(FigureCanvas):
                         try:
                             if -100 < self.rateofchange1 < 1000:
                                 deltaetstr = lcdformat%float(self.rateofchange1)        # rate of change ET (degress per minute)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                         try:
                             if -100 < self.rateofchange2 < 1000:
                                 deltabtstr = lcdformat%float(self.rateofchange2)        # rate of change BT (degrees per minute)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                         aw.lcd4.display(deltaetstr)
                         aw.lcd5.display(deltabtstr)
                         try:
                             self.updateLargeDeltaLCDs(deltabt=deltabtstr,deltaet=deltaetstr)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                         try:
                             if aw.ser.showFujiLCDs and self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid
@@ -3421,7 +3435,7 @@ class tgraphcanvas(FigureCanvas):
                                 pidduty = lcdformat%self.dutycycle
                                 aw.lcd7.display(pidduty)
                                 self.updateLargePIDLCDs(sv=pidsv,duty=pidduty)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
 
                         ndev = len(self.extradevices)
@@ -3446,7 +3460,7 @@ class tgraphcanvas(FigureCanvas):
                                             extra1_value = "uu"
                                         aw.extraLCD1[i].display(extra1_value)
                                         extra1_values.append(extra1_value)
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     extra1_value = "--"
                                     extra1_values.append(extra1_value)
                                     aw.extraLCD1[i].display(extra1_value)
@@ -3467,7 +3481,7 @@ class tgraphcanvas(FigureCanvas):
                                             extra2_value = "uu"
                                         aw.extraLCD2[i].display(extra2_value)
                                         extra2_values.append(extra2_value)
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     extra2_value = "--"
                                     extra2_values.append(extra2_value)
                                     aw.extraLCD2[i].display(extra2_value)
@@ -3496,15 +3510,15 @@ class tgraphcanvas(FigureCanvas):
                 self.temporarysetsv = None
 
                 #check move slider pending actions
-                if self.temporarymovepositiveslider:
-                    slidernr,value = self.temporarymovepositiveslider
+                if self.temporarymovepositiveslider is not None:
+                    slidernr,value = self.temporarymovepositiveslider # pylint: disable=unpacking-non-sequence
                     if aw.sliderpos(slidernr) != value or self.temporayslider_force_move:
                         aw.moveslider(slidernr,value) # move slider
                         aw.fireslideraction(slidernr) # fire action
                         self.temporayslider_force_move = False
                 self.temporarymovepositiveslider = None
-                if self.temporarymovenegativeslider:
-                    slidernr,value = self.temporarymovenegativeslider
+                if self.temporarymovenegativeslider is not None:
+                    slidernr,value = self.temporarymovenegativeslider # pylint: disable=unpacking-non-sequence
                     if aw.sliderpos(slidernr) != value or self.temporayslider_force_move:
                         aw.moveslider(slidernr,value) # move slider
                         aw.fireslideraction(slidernr) # fire action
@@ -3525,7 +3539,7 @@ class tgraphcanvas(FigureCanvas):
                         #### lock shared resources #####
                         aw.qmc.seriallogsemaphore.acquire(1)
                         aw.serial_dlg.update()
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     finally:
                         if aw.qmc.seriallogsemaphore.available() < 1:
@@ -3544,7 +3558,7 @@ class tgraphcanvas(FigureCanvas):
                             self.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=value,eventdescription="Q"+self.eventsvalues(value),doupdategraphics=False)
                         if self.flagon and aw.eventquantifieraction[el[0]]:
                             aw.fireslideractionSignal.emit(el[0])
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                 self.quantifiedEvent = []
 
@@ -3625,23 +3639,23 @@ class tgraphcanvas(FigureCanvas):
                                             if self.DeltaETflag and self.l_delta1 is not None:
                                                 try:
                                                     self.ax.draw_artist(self.l_delta1)
-                                                except:
+                                                except Exception: # pylint: disable=broad-except
                                                     pass
                                             if self.DeltaBTflag and self.l_delta2 is not None:
                                                 try:
                                                     self.ax.draw_artist(self.l_delta2)
-                                                except:
+                                                except Exception: # pylint: disable=broad-except
                                                     pass
                                         else:
                                             if self.DeltaBTflag and self.l_delta2 is not None:
                                                 try:
                                                     self.ax.draw_artist(self.l_delta2)
-                                                except:
+                                                except Exception: # pylint: disable=broad-except
                                                     pass
                                             if self.DeltaETflag and self.l_delta1 is not None:
                                                 try:
                                                     self.ax.draw_artist(self.l_delta1)
-                                                except:
+                                                except Exception: # pylint: disable=broad-except
                                                     pass
 
                                         # draw extra curves
@@ -3653,54 +3667,54 @@ class tgraphcanvas(FigureCanvas):
                                                 if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
                                                     try:
                                                         self.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
-                                                    except:
+                                                    except Exception: # pylint: disable=broad-except
                                                         pass
                                                     xtra_dev_lines1 = xtra_dev_lines1 + 1
                                                 if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
                                                     try:
                                                         self.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
-                                                    except:
+                                                    except Exception: # pylint: disable=broad-except
                                                         pass
                                                     xtra_dev_lines2 = xtra_dev_lines2 + 1
-                                        except:
+                                        except Exception: # pylint: disable=broad-except
                                             pass
                                         if self.swaplcds:
                                             # draw ET
                                             if self.ETcurve:
                                                 try:
                                                     self.ax.draw_artist(self.l_temp1)
-                                                except:
+                                                except Exception: # pylint: disable=broad-except
                                                     pass
                                             # draw BT
                                             if self.BTcurve:
                                                 try:
                                                     self.ax.draw_artist(self.l_temp2)
-                                                except:
+                                                except Exception: # pylint: disable=broad-except
                                                     pass
                                         else:
                                             # draw BT
                                             if self.BTcurve:
                                                 try:
                                                     self.ax.draw_artist(self.l_temp2)
-                                                except:
+                                                except Exception: # pylint: disable=broad-except
                                                     pass
                                             # draw ET
                                             if self.ETcurve:
                                                 try:
                                                     self.ax.draw_artist(self.l_temp1)
-                                                except:
+                                                except Exception: # pylint: disable=broad-except
                                                     pass
 
                                         try:
                                             if self.BTcurve:
                                                 for a in self.l_annotations:
                                                     self.ax.draw_artist(a)
-                                        except:
+                                        except Exception: # pylint: disable=broad-except
                                             pass
 
                                         try:
                                             self.update_additional_artists()
-                                        except:
+                                        except Exception: # pylint: disable=broad-except
                                             pass
 
                                         self.fig.canvas.blit(self.ax.get_figure().bbox)
@@ -3719,9 +3733,9 @@ class tgraphcanvas(FigureCanvas):
                                 self.playbackevent()
                             if self.backgroundPlaybackDROP:
                                 self.playbackdrop()
-                    except Exception as e:
+                    except Exception as e: # pylint: disable=broad-except
                         _, _, exc_tb = sys.exc_info()
-                        self.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),exc_tb.tb_lineno)
+                        self.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
                     #####
                     if self.patheffects:
@@ -3738,7 +3752,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.HUDflag:
                         try:
                             aw.showHUD[aw.HUDfunction]()
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
 
                 #check triggered alarms
@@ -3747,11 +3761,11 @@ class tgraphcanvas(FigureCanvas):
                     self.temporaryalarmflag = -3 # self.setalarm(i) can take longer to run than the sampling interval
                     self.setalarm(i)
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),exc_tb.tb_lineno)
+            self.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def setLCDtime(self,ts):
         timestr = stringfromseconds(ts)
@@ -3875,11 +3889,11 @@ class tgraphcanvas(FigureCanvas):
                     self.updateBackground()
             elif redraw and force: # only on aligning with CHARGE we redraw even if nothing is moved to redraw the time axis
                 self.updateBackground()
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " timealign() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " timealign() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # we count
     # - foreground curves
@@ -4072,7 +4086,7 @@ class tgraphcanvas(FigureCanvas):
                     for bnr in bnrs:
                         try:
                             button_number = int(str(bnr.strip())) - 1 # the event buttons presented to the user are numbered from 1 on
-                        except Exception:
+                        except Exception: # pylint: disable=broad-except
                             aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '{0}' not a number",None).format(string))
                         if button_number is not None:
                             if button_number > -1 and button_number < len(aw.buttonlist):
@@ -4099,9 +4113,9 @@ class tgraphcanvas(FigureCanvas):
                                 value = aw.float2float((slidervalue + 10.0) / 10.0)
                                 aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=str("A%d (S%d)"%(number,slidernr)))
                             aw.fireslideraction(slidernr)
-                    except Exception as e:
+                    except Exception as e: # pylint: disable=broad-except
                         _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                         aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '{0}' not a valid number [0-100]",None).format(string))
     
                 elif action == 7:
@@ -4188,9 +4202,9 @@ class tgraphcanvas(FigureCanvas):
                                 sv = max(0,sv) # we don't send SV < 0
                                 #aw.qmc.temporarysetsv = sv
                                 aw.pidcontrol.setSV(sv,init=False)
-                    except Exception as e:
+                    except Exception as e: # pylint: disable=broad-except
                         _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " processAlarm() {0}").format(str(e)),exc_tb.tb_lineno)
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " processAlarm() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                         aw.sendmessage(QApplication.translate("Message","Alarm trigger SV slider error, description '{0}' not a valid number",None).format(string))
                 elif action == 22:
                     # Playback ON
@@ -4207,9 +4221,9 @@ class tgraphcanvas(FigureCanvas):
                     # Reset Canvas Color
                     aw.resetCanvasColorSignal.emit()
 
-            except Exception as ex:
+            except Exception as ex: # pylint: disable=broad-except
                 _, _, exc_tb = sys.exc_info()
-                self.adderror((QApplication.translate("Error Message","Exception:",None) + " processAlarm() {0}").format(str(ex)),exc_tb.tb_lineno)
+                self.adderror((QApplication.translate("Error Message","Exception:",None) + " processAlarm() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
     def setalarm(self,alarmnumber):
@@ -4234,9 +4248,9 @@ class tgraphcanvas(FigureCanvas):
                     (aw.qmc.replayType == 1 and aw.qmc.TPalarmtimeindex and self.stemp2B[self.timeindexB[6]] - self.ctemp2[-1] <= 0) or # by BT
                     (aw.qmc.replayType == 2 and aw.qmc.TPalarmtimeindex and self.stemp21[self.timeindexB[6]] - self.ctemp1[-1] <= 0)): # by ET
                     aw.qmc.autoDropIdx = len(aw.qmc.timex) - 2
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " playbackdrop() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " playbackdrop() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # called only after CHARGE
     def playbackevent(self):
@@ -4343,9 +4357,9 @@ class tgraphcanvas(FigureCanvas):
                     if len(text):
                         if text[0] == ">":
                             aw.clearMessageLine(style="background-color:'transparent';")
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " playbackevent() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " playbackevent() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     #make a projection of change of rate of BT on the graph
     def updateProjection(self):
@@ -4426,9 +4440,9 @@ class tgraphcanvas(FigureCanvas):
                             self.l_ETprojection.set_data([],[])
                         if self.l_BTprojection:
                             self.l_BTprojection.set_data([],[])
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updateProjection() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updateProjection() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # this function is called from the HUD DLg and reports the linear time (straight line) it would take to reach a temperature target
     # acording to the current rate of change
@@ -4555,7 +4569,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         # before the event we return 0
                         mathdictionary[v] = 0
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
             # prediction of the time to DRY and FCs before the event
@@ -4582,7 +4596,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         # if a prediction is not possible (before TP), we return the error value -1
                         mathdictionary[v] = -1
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
             # add AUC variables (AUCbase, AUCtarget, AUCvalue)
@@ -4609,7 +4623,7 @@ class tgraphcanvas(FigureCanvas):
                     mathdictionary["AUCtarget"] = self.AUCbackground
                 else:
                     mathdictionary["AUCtarget"] = self.AUCtarget
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
             #timeshift working vars
@@ -4673,7 +4687,7 @@ class tgraphcanvas(FigureCanvas):
                                     body = mathexpression[i+3:end_idx]
                                     val = -1
                                     try:
-                                        absolute_index = eval(body,{"__builtins__":None},mathdictionary)
+                                        absolute_index = eval(body,{"__builtins__":None},mathdictionary) # pylint: disable=eval-used
                                         if absolute_index > -1:
                                             if nint == 1: #ET
                                                 val = sample_temp1[absolute_index]
@@ -4686,7 +4700,7 @@ class tgraphcanvas(FigureCanvas):
                                                     val = sample_extratemp1[edindex][absolute_index]
                                                 else:
                                                     val = sample_extratemp2[edindex][absolute_index]
-                                    except:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                                     #add expression and values found
                                     literal_body = body
@@ -4716,7 +4730,7 @@ class tgraphcanvas(FigureCanvas):
                         if "k" not in mathdictionary:
                             try:
                                 mathdictionary['k'] = (aw.qmc.ylimit - aw.qmc.ylimit_min) / float(aw.qmc.zlimit - aw.qmc.zlimit_min)
-                            except Exception:
+                            except Exception: # pylint: disable=broad-except
                                 mathdictionary['k'] = 1
 
                     #the offset to plot C/min delta_ax values on the standard temperature axis
@@ -4724,7 +4738,7 @@ class tgraphcanvas(FigureCanvas):
                         if "o" not in mathdictionary:
                             try:
                                 mathdictionary['o'] = aw.qmc.ylimit_min - (aw.qmc.zlimit_min * (aw.qmc.ylimit - aw.qmc.ylimit_min) / float(aw.qmc.zlimit - aw.qmc.zlimit_min))
-                            except Exception:
+                            except Exception: # pylint: disable=broad-except
                                 mathdictionary['o'] = 0
 
                     elif mathexpression[i] == "R":
@@ -4777,7 +4791,7 @@ class tgraphcanvas(FigureCanvas):
                                         body = mathexpression[i+k+3:end_idx]
                                         val = -1
                                         try:
-                                            absolute_index = eval(body,{"__builtins__":None},mathdictionary)
+                                            absolute_index = eval(body,{"__builtins__":None},mathdictionary)  # pylint: disable=eval-used
                                             if absolute_index > -1:
                                                 if nint == 1: #DeltaET
                                                     if k == 0:
@@ -4789,7 +4803,7 @@ class tgraphcanvas(FigureCanvas):
                                                         val = sample_delta2[absolute_index]
                                                     else:
                                                         val = self.delta2B[absolute_index]
-                                        except:
+                                        except Exception: # pylint: disable=broad-except
                                             pass
                                         #add expression and values found
                                         literal_body = body
@@ -4812,7 +4826,7 @@ class tgraphcanvas(FigureCanvas):
                                                 mathdictionary['R2'] = sample_delta2[index]
                                             else:
                                                 mathdictionary['RB2'] = self.delta2B[index]
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             # if deltas of backgrounds are not visible the data is not calculated and thus this fails with an exception
                             pass
 
@@ -4865,10 +4879,10 @@ class tgraphcanvas(FigureCanvas):
                             body = mathexpression[i+2:end_idx]
                             val = -1
                             try:
-                                absolute_index = eval(body,{"__builtins__":None},mathdictionary)
+                                absolute_index = eval(body,{"__builtins__":None},mathdictionary)  # pylint: disable=eval-used
                                 if absolute_index > -1:
                                     val = timex[absolute_index]
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             literal_body = body
                             for k, v in replacements.items():
@@ -4951,7 +4965,7 @@ class tgraphcanvas(FigureCanvas):
                                     body = mathexpression[i+3:end_idx]
                                     val = -1
                                     try:
-                                        absolute_index = eval(body,{"__builtins__":None},mathdictionary)
+                                        absolute_index = eval(body,{"__builtins__":None},mathdictionary)  # pylint: disable=eval-used
                                         if absolute_index > -1:
                                             if nint == 1: #ET
                                                 val = self.temp1B[absolute_index]
@@ -4967,7 +4981,7 @@ class tgraphcanvas(FigureCanvas):
                                                     val = self.temp1BX[n3][absolute_index]
                                                 else:
                                                     val = self.temp2BX[n3][absolute_index]
-                                    except:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                                     #add expression and values found
                                     literal_body = body
@@ -5053,7 +5067,7 @@ class tgraphcanvas(FigureCanvas):
                         for i in range(len(timeshiftexpressions)):
                             if timeshiftexpressions[i] not in mathdictionary:
                                 mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
 
                 #background symbols just in case there was no profile loaded but a background loaded.
@@ -5072,13 +5086,13 @@ class tgraphcanvas(FigureCanvas):
                         if me[0] == "(" and me[-1] == ")":
                             # only if the whole expression is in brackets, errors bound to variables are not propagated
                             propagate_error = False
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     if propagate_error and any([((k in me) if k not in (["Y1","x","t","b"] if ("max" in me) else ["Y1","t","b"]) else False) for k,v in mathdictionary.items() if (v == -1 and not (k in main_events))]):
                         # if any variable is bound to the error value -1 we return -1 for the full formula
                         return -1
                     else:
-                        res = float(eval(me,{"__builtins__":None},mathdictionary))
+                        res = float(eval(me,{"__builtins__":None},mathdictionary)) # pylint: disable=eval-used
                 except TypeError:
                     res = -1
                 except ValueError:
@@ -5098,7 +5112,7 @@ class tgraphcanvas(FigureCanvas):
                         self.plotterequationresults[equeditnumber-1].append(res)
                     return res
 
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
 
@@ -5115,7 +5129,7 @@ class tgraphcanvas(FigureCanvas):
                         e = str(e)
                         _, _, exc_tb = sys.exc_info()
                         mathexpression = mathexpression.replace("{","(").replace("}",")") # avoid {x} leading to key arrows
-                        self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_curve_expression(): %s {0} "%mathexpression).format(e),exc_tb.tb_lineno)
+                        self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_curve_expression(): %s {0} "%mathexpression).format(e),getattr(exc_tb, 'tb_lineno', '?'))
                     return -1
         return -1
 
@@ -5212,12 +5226,12 @@ class tgraphcanvas(FigureCanvas):
                 # depending on the z-order of ax vs delta_ax the one or the other one is correct
                 #res = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,x))[1]))[1])
                 res = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
         elif not self.fmt_data_RoR and aw.qmc.designerflag and self.delta_ax:
             try:
                 res = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
         if aw.qmc.LCDdecimalplaces:
             return aw.float2float(res)
@@ -5349,11 +5363,11 @@ class tgraphcanvas(FigureCanvas):
             if andLCDs:
                 self.clearLCDs()
 
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " clearMeasurements() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " clearMeasurements() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -5375,7 +5389,7 @@ class tgraphcanvas(FigureCanvas):
             focused_widget = QApplication.focusWidget()
             if focused_widget and focused_widget != aw.centralWidget():
                 focused_widget.clearFocus()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 
         if not self.checkSaved():
@@ -5387,8 +5401,8 @@ class tgraphcanvas(FigureCanvas):
                 try:
                     fileURL = QUrl.fromLocalFile(aw.curFile)
                     fileURL.setQuery("background") # open the file URL without rasing the app to the foreground
-                    QTimer.singleShot(10,lambda : app.sendMessage2ArtisanInstance(fileURL.toString(),app._viewer_id))
-                except:
+                    QTimer.singleShot(10,lambda : app.sendMessage2ArtisanInstance(fileURL.toString(),app._viewer_id)) # pylint: disable=protected-access
+                except Exception: # pylint: disable=broad-except
                     pass
 
             if soundOn:
@@ -5398,7 +5412,7 @@ class tgraphcanvas(FigureCanvas):
                 try:
                     # the RESET button action needs to be fired outside of the sempaphore to avoid lockups
                     aw.eventactionx(aw.qmc.xextrabuttonactions[0],aw.qmc.xextrabuttonactionstrings[0])
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             try:
                 #### lock shared resources #####
@@ -5456,7 +5470,7 @@ class tgraphcanvas(FigureCanvas):
                     self.roastingnotes = ""
                     self.cuppingnotes = ""
                     self.beans = ""
-                    self.plus_location = None
+                    self.plus_store = None
                     self.plus_coffee = None
                     self.plus_blend_spec = None
                     # copy setup
@@ -5576,6 +5590,9 @@ class tgraphcanvas(FigureCanvas):
                     self.designertemp2init = [380,300,390,395,410,412,420]
                 self.disconnect_designer()  #sets designer flag false
                 self.setCursor(Qt.ArrowCursor)
+                
+                # disconnect analyzer signal
+                self.fig.canvas.mpl_disconnect(self.analyzer_connect_id)
 
                 #reset cupping flavor values
                 self.flavors = [5.]*len(self.flavorlabels)
@@ -5589,7 +5606,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.buttonlist[aw.lastbuttonpressed].setStyleSheet(normalstyle)
                     # reset lastbuttonpressed
                     aw.lastbuttonpressed = -1
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
 
                 #aw.pidcontrol.sv = None
@@ -5646,11 +5663,11 @@ class tgraphcanvas(FigureCanvas):
                 if aw is not None:
                     aw.updatePlusStatus()
 
-            except Exception as ex:
+            except Exception as ex: # pylint: disable=broad-except
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " reset() {0}").format(str(ex)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " reset() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
@@ -5705,17 +5722,17 @@ class tgraphcanvas(FigureCanvas):
                     if window == 'flat': #moving average
                         w = numpy.ones(window_len,'d')
                     else:
-                        w = eval('numpy.'+window+'(window_len)')
+                        w = eval('numpy.'+window+'(window_len)') # pylint: disable=eval-used
                     try:
                         ys = numpy.convolve(w/w.sum(),s,mode='valid')
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         return y
                     hwl = int((window_len/2))
                     res = ys[hwl:-hwl]
                     if len(res)+1 == len(y) and len(res) > 0:
                         try:
                             return ys[hwl-1:-hwl]
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             return y
                     elif len(res) != len(y):
                         return y
@@ -5725,11 +5742,11 @@ class tgraphcanvas(FigureCanvas):
                     return y
             else:
                 return y
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " smooth() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " smooth() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return x
 
 
@@ -5767,7 +5784,7 @@ class tgraphcanvas(FigureCanvas):
 #                    from scipy.signal import medfilt as scipy_medfilt
 #                    b = scipy_medfilt(numpy.array(b),5)
                     res = b
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             # 4. smooth data
             if window_len>2:
@@ -5882,7 +5899,7 @@ class tgraphcanvas(FigureCanvas):
             temp_anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
             temp_anno.draggable(use_blit=True)
             temp_anno.set_picker(aw.draggable_text_box_picker)
-        except: # mpl before v3.0 do not have this set_in_layout() function
+        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
             pass
         #anotate time
         if draggable and draggable_anno_key is not None and draggable_anno_key in self.l_annotations_pos_dict:
@@ -5900,7 +5917,7 @@ class tgraphcanvas(FigureCanvas):
             if draggable:
                 time_anno.draggable(use_blit=True)
                 time_anno.set_picker(aw.draggable_text_box_picker)
-        except: # mpl before v3.0 do not have this set_in_layout() function
+        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
             pass
         if aw.qmc.patheffects:
             rcParams['path.effects'] = []
@@ -5909,7 +5926,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.l_annotations_dict[draggable_anno_key] = [temp_anno, time_anno]
         return res
 
-    def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,time2=None,timeindex2=None,TP_time=-1,TP_time_loaded=-1,draggable=True):
+    def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,timeindex2=None,TP_time=-1,TP_time_loaded=-1,draggable=True):
         ystep_down = ystep_up = 0
         anno_artists = []
         #Add markers for CHARGE
@@ -5969,11 +5986,6 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-#                    if timeindex2 and timeindex2[1] and timex[timeindex[1]] < time2[timeindex2[1]]:
-#                        e = -80
-#                    else:
-#                        e = 0
-                    e = 0
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,1)
 
                 #Add 1Cs markers
@@ -6064,7 +6076,6 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         tx = t0idx
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[tx],stemp[tidx],d)
-                    ystep_down = ystep_down
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None),stringfromseconds(timex[tidx]-t0,False))
                     if aw.qmc.graphfont == 1:
                         st1 = toASCII(st1)
@@ -6085,14 +6096,14 @@ class tgraphcanvas(FigureCanvas):
                         fc_artist = self.ax.axvspan(timex[timeindex[2]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
                         try:
                             fc_artist.set_in_layout(False) # remove title from tight_layout calculation
-                        except: # set_in_layout not available in mpl<3.x
+                        except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                             pass
                     #do water mark if SCs, but no SCe
                     if timeindex[4] and not timeindex[5] and not timeindex2 and self.watermarksflag:
                         sc_artist = self.ax.axvspan(timex[timeindex[4]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
                         try:
                             sc_artist.set_in_layout(False) # remove title from tight_layout calculation
-                        except: # set_in_layout not available in mpl<3.x
+                        except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                             pass
                 # add COOL mark
                 if timeindex[7] and not timeindex2:
@@ -6104,13 +6115,13 @@ class tgraphcanvas(FigureCanvas):
                         cool_mark = self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette["rect4"], ec='none', alpha=0.3, clip_on=True, lw=None)#,lod=False)
                         try:
                             cool_mark.set_in_layout(False) # remove title from tight_layout calculation
-                        except: # set_in_layout not available in mpl<3.x
+                        except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                             pass
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " place_annotations() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " place_annotations() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return anno_artists
 
     def apply_symbolic_delta_formula(self,fct,deltas,timex,RTsname):
@@ -6119,7 +6130,7 @@ class tgraphcanvas(FigureCanvas):
                 return [aw.qmc.eval_math_expression(fct,timex[i],RTsname=RTsname,RTsval=d) for i,d in enumerate(deltas)]
             else:
                 return deltas
-        except:
+        except Exception: # pylint: disable=broad-except
             return deltas
     
     # computes the RoR over the time and temperature arrays tx and temp via polynoms of degree 1 at index i using a window of wsize
@@ -6193,7 +6204,7 @@ class tgraphcanvas(FigureCanvas):
                                 dist = (lin1[-1] - lin1[0]) / (len(lin1) - 1)
                                 z1 = savgol_filter(nt1_lin, dsETs, 1, deriv=1,delta=dsET)
                                 z1 = z1 * (60./dist) * dsETs
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                 # https://github.com/numpy/numpy/issues/16744
                                 # original version just picking the corner values:
@@ -6203,7 +6214,7 @@ class tgraphcanvas(FigureCanvas):
                             try:
                                 # variant using incremental polyfit RoR computation
                                 z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))]
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                 # https://github.com/numpy/numpy/issues/16744
                                 # original version just picking the corner values:
@@ -6213,7 +6224,7 @@ class tgraphcanvas(FigureCanvas):
                             try:
                                 # variant using incremental polyfit RoR computation
                                 z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))]
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                 # https://github.com/numpy/numpy/issues/16744
                                 # original version just picking the corner values:
@@ -6268,7 +6279,7 @@ class tgraphcanvas(FigureCanvas):
                                 dist = (lin2[-1] - lin2[0]) / (len(lin2) - 1)
                                 z2 = savgol_filter(nt2_lin, dsBTs, 1, deriv=1,delta=dsBTs)
                                 z2 = z2 * (60./dist) * dsBTs
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                 # https://github.com/numpy/numpy/issues/16744
                                 # original version just picking the corner values
@@ -6277,7 +6288,7 @@ class tgraphcanvas(FigureCanvas):
                             # in this case we use the standard algo
                             try:
                                 z2 = [self.polyRoR(tx_roast,nt2,dsBT,i) for i in range(len(nt2))]
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                 # https://github.com/numpy/numpy/issues/16744
                                 # original version just picking the corner values
@@ -6287,7 +6298,7 @@ class tgraphcanvas(FigureCanvas):
                             try:
                                 # variant using incremental polyfit RoR computation
                                 z2 = [self.polyRoR(tx_roast,nt2,dsBT,i) for i in range(len(nt2))]
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                 # https://github.com/numpy/numpy/issues/16744
                                 # original version just picking the corner values
@@ -6322,11 +6333,11 @@ class tgraphcanvas(FigureCanvas):
                 delta2 = None
 
             return delta1, delta2
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " recomputeDeltas() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " recomputeDeltas() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return [0]*len(timex),[0]*len(timex)
 
     def bisection(self,array,value):
@@ -6376,7 +6387,7 @@ class tgraphcanvas(FigureCanvas):
             if verts:
                 poly = Polygon(verts, facecolor=self.palette["aucarea"], edgecolor='0.5', alpha=0.3)
                 self.ax.add_patch(poly)
-        except:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
@@ -6392,11 +6403,11 @@ class tgraphcanvas(FigureCanvas):
             )
         try:
             self.xlabel_width = self.xlabel_artist.get_window_extent(renderer=self.fig.canvas.get_renderer()).width
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             self.xlabel_artist.set_in_layout(False) # remove x-axis labels from tight_layout calculation
-        except: # set_in_layout not available in mpl<3.x
+        except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
             pass
     
     def setProfileBackgroundTitle(self,backgroundtitle):
@@ -6405,7 +6416,7 @@ class tgraphcanvas(FigureCanvas):
             ax_width = self.ax.get_window_extent(renderer=self.fig.canvas.get_renderer()).width # total width of axis in display coordinates
             ax_begin = self.ax.transAxes.transform((0,0))[0] # left of axis in display coordinates
             suptitleX = self.fig.transFigure.inverted().transform((ax_width + ax_begin,0))[0]
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
         self.background_title_width = 0
@@ -6426,14 +6437,14 @@ class tgraphcanvas(FigureCanvas):
                 color=self.palette["title"])
         try:
             st_artist.set_in_layout(False)  # remove title from tight_layout calculation
-        except:  # set_in_layout not available in mpl<3.x
+        except Exception: # pylint: disable=broad-except  # set_in_layout not available in mpl<3.x
             pass
         try:
             if len(backgroundtitle)>0:
                 self.background_title_width = st_artist.get_window_extent(renderer=self.fig.canvas.get_renderer()).width
             else:
                 self.background_title_width = 0
-        except:
+        except Exception: # pylint: disable=broad-except
             self.background_title_width = 0
     
     # if updatebackground is True, the samplingsemaphore is catched and updatebackground() is called
@@ -6461,11 +6472,11 @@ class tgraphcanvas(FigureCanvas):
                     horizontalalignment="left",verticalalignment="top",x=0)
         try: # this one seems not to work for titles, subtitles and axis!?
             self.title_artist.set_in_layout(False) # remove title from tight_layout calculation
-        except: # set_in_layout not available in mpl<3.x
+        except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
             pass
         try:
             self.title_width = self.title_artist.get_window_extent(renderer=self.fig.canvas.get_renderer()).width
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         
         if updatebackground:
@@ -6611,11 +6622,11 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(len(aw.qmc.extratimex)):
                     try:
                         extraname1_subst[i] = extraname1_subst[i].format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3])
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     try:
                         extraname2_subst[i] = extraname2_subst[i].format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3])
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
 
                 if aw.qmc.flagstart:
@@ -6631,7 +6642,7 @@ class tgraphcanvas(FigureCanvas):
 
                 try:
                     y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
-                except: # set_in_layout not available in mpl<3.x
+                except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                     pass
 
                 two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or
@@ -6701,7 +6712,7 @@ class tgraphcanvas(FigureCanvas):
                             )
                     try:
                         y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
-                    except: # set_in_layout not available in mpl<3.x
+                    except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                         pass
                     self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                     if self.zgrid > 0:
@@ -7059,7 +7070,7 @@ class tgraphcanvas(FigureCanvas):
                                                     alpha=min(self.backgroundalpha + 0.1, 1.0))
                                 try:
                                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                except: # mpl before v3.0 do not have this set_in_layout() function
+                                except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                     pass
                                 self.l_background_annotations.append(anno)
                         #background events by value
@@ -7101,23 +7112,23 @@ class tgraphcanvas(FigureCanvas):
                                                         )
                                             try:
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
                                             try:
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
                                             try:
-                                                overlap = self.checkOverlap(anno, i, E1b_annotation)
+                                                overlap = self.checkOverlap(anno)# , i, E1b_annotation)
                                                 if overlap:
                                                     anno.remove()
-                                            except:
+                                            except Exception: # pylint: disable=broad-except
                                                 pass
-                                    except Exception as ex:
+                                    except Exception as ex: # pylint: disable=broad-except
 #                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
-                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
+                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                 elif self.backgroundEtypes[i] == 1 and aw.qmc.showEtypes[1]:
                                     self.E2backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     if self.clampEvents:
@@ -7138,23 +7149,23 @@ class tgraphcanvas(FigureCanvas):
                                                         )
                                             try:
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
                                             try:
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
                                             try:
-                                                overlap = self.checkOverlap(anno, i, E2b_annotation)
+                                                overlap = self.checkOverlap(anno) #, i, E2b_annotation)
                                                 if overlap:
                                                     anno.remove()
-                                            except:
+                                            except Exception: # pylint: disable=broad-except
                                                 pass
-                                    except Exception as ex:
+                                    except Exception as ex: # pylint: disable=broad-except
 #                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
-                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
+                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                 elif self.backgroundEtypes[i] == 2 and aw.qmc.showEtypes[2]:
                                     self.E3backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     if self.clampEvents:
@@ -7175,23 +7186,23 @@ class tgraphcanvas(FigureCanvas):
                                                         )
                                             try:
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
                                             try:
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
                                             try:
-                                                overlap = self.checkOverlap(anno, i, E3b_annotation)
+                                                overlap = self.checkOverlap(anno) #, i, E3b_annotation)
                                                 if overlap:
                                                     anno.remove()
-                                            except:
+                                            except Exception: # pylint: disable=broad-except
                                                 pass
-                                    except Exception as ex:
+                                    except Exception as ex: # pylint: disable=broad-except
 #                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
-                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
+                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                 elif self.backgroundEtypes[i] == 3 and aw.qmc.showEtypes[3]:
                                     self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     if self.clampEvents:
@@ -7212,23 +7223,23 @@ class tgraphcanvas(FigureCanvas):
                                                         )
                                             try:
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
                                             try:
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
                                             try:
-                                                overlap = self.checkOverlap(anno, i, E4b_annotation)
+                                                overlap = self.checkOverlap(anno) #, i, E4b_annotation)
                                                 if overlap:
                                                     anno.remove()
-                                            except:
+                                            except Exception: # pylint: disable=broad-except
                                                 pass
-                                    except Exception as ex:
+                                    except Exception as ex: # pylint: disable=broad-except
 #                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
-                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
+                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 #                            every = None
                             if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
                                 if (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if drop exists and last event was earlier
@@ -7364,7 +7375,7 @@ class tgraphcanvas(FigureCanvas):
                                                          )
                                             try:
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
                                         elif self.eventsGraphflag == 4:
                                             if thirdletter != "":
@@ -7381,7 +7392,7 @@ class tgraphcanvas(FigureCanvas):
                                                          )
                                             try:
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
                     #check backgroundDetails flag
                     if self.backgroundDetails:
@@ -7397,8 +7408,8 @@ class tgraphcanvas(FigureCanvas):
                                 startB = 0
                         try:
                             # background annotations are not draggable
-                            aw.qmc.l_background_annotations.extend(self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timex,self.timeindex,TP_time=self.TP_time_B,TP_time_loaded=self.TP_time_B_loaded, draggable=False))
-                        except Exception:
+                            aw.qmc.l_background_annotations.extend(self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timeindex,TP_time=self.TP_time_B,TP_time_loaded=self.TP_time_B_loaded, draggable=False))
+                        except Exception: # pylint: disable=broad-except
                             pass
 #                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
@@ -7462,7 +7473,7 @@ class tgraphcanvas(FigureCanvas):
 #                            print("BT RoR mean:",numpy.mean([x for x in self.delta2[start:end] if x is not None]))
 #                            print("BT RoR std (old):",numpy.std([x for x in self.delta2[start:end] if x is not None]))
 #                            print("BT RoR std (new):",numpy.std(self.delta2))
-#                        except Exception as e:
+#                        except Exception as e: # pylint: disable=broad-except
 #                            print(e)
                 
                 # CHARGE-DROP curve index limits
@@ -7569,7 +7580,7 @@ class tgraphcanvas(FigureCanvas):
                                                      fontproperties=fontprop_small)
                                     try:
                                         anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                    except: # mpl before v3.0 do not have this set_in_layout() function
+                                    except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                         pass
 
                     elif self.eventsGraphflag in [2,3,4]: # in this mode we have to generate the plots even if Nevents=0 to avoid redraw issues resulting from an incorrect number of plot count
@@ -7613,19 +7624,19 @@ class tgraphcanvas(FigureCanvas):
                                         self.l_eventtype1annos.append(anno)
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                             pass
                                         try:
-                                            overlap = self.checkOverlap(anno, i, E1_annotation)
+                                            overlap = self.checkOverlap(anno) #, i, E1_annotation)
                                             if overlap:
                                                 anno.remove()
-                                        except:
+                                        except Exception: # pylint: disable=broad-except
                                             pass
-                                except Exception as ex:
+                                except Exception as ex: # pylint: disable=broad-except
 #                                    import traceback
 #                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
-                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
+                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                             elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
                                 tx = self.timex[self.specialevents[i]]
                                 if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
@@ -7652,20 +7663,20 @@ class tgraphcanvas(FigureCanvas):
                                         self.l_eventtype2annos.append(anno)
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                             pass
                                         try:
-                                            overlap = self.checkOverlap(anno, i, E2_annotation)
+                                            overlap = self.checkOverlap(anno) #, i, E2_annotation)
                                             if overlap:
                                                 anno.remove()
-                                        except:
+                                        except Exception: # pylint: disable=broad-except
                                             pass
 
-                                except Exception as ex:
+                                except Exception as ex: # pylint: disable=broad-except
 #                                    import traceback
 #                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
-                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
+                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                             elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
                                 tx = self.timex[self.specialevents[i]]
                                 if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
@@ -7692,19 +7703,19 @@ class tgraphcanvas(FigureCanvas):
                                         self.l_eventtype3annos.append(anno)
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                             pass
                                         try:
-                                            overlap = self.checkOverlap(anno, i, E3_annotation)
+                                            overlap = self.checkOverlap(anno) #, i, E3_annotation)
                                             if overlap:
                                                 anno.remove()
-                                        except:
+                                        except Exception: # pylint: disable=broad-except
                                             pass
-                                except Exception as ex:
+                                except Exception as ex: # pylint: disable=broad-except
 #                                    import traceback
 #                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
-                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
+                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                             elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
                                 tx = self.timex[self.specialevents[i]]
                                 if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
@@ -7731,19 +7742,19 @@ class tgraphcanvas(FigureCanvas):
                                         self.l_eventtype4annos.append(anno)
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                             pass
                                         try:
-                                            overlap = self.checkOverlap(anno, i, E4_annotation)
+                                            overlap = self.checkOverlap(anno) #, i, E4_annotation)
                                             if overlap:
                                                 anno.remove()
-                                        except:
+                                        except Exception: # pylint: disable=broad-except
                                             pass
-                                except Exception as ex:
+                                except Exception as ex: # pylint: disable=broad-except
 #                                    import traceback
 #                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
-                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
+                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
 #                        every = None
 
@@ -7941,7 +7952,7 @@ class tgraphcanvas(FigureCanvas):
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                             anno.draggable(use_blit=True)
                                             anno.set_picker(aw.draggable_text_box_picker)
-                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                             pass
                                         # register draggable flag annotation to be re-created after re-positioning on redraw
                                         self.l_event_flags_dict[i] = anno
@@ -7971,7 +7982,7 @@ class tgraphcanvas(FigureCanvas):
                                             self.l_eventtype4annos.append(anno)
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                             pass
 
                 #plot delta ET (self.delta1) and delta BT (self.delta2)
@@ -8021,9 +8032,9 @@ class tgraphcanvas(FigureCanvas):
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],
                                 drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
-                    except Exception as ex:
+                    except Exception as ex: # pylint: disable=broad-except
                         _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                     try:
                         if aw.extraCurveVisibility2[i]:
                             if (not aw.qmc.flagon or aw.qmc.smooth_curves_on_recording) and (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
@@ -8044,9 +8055,9 @@ class tgraphcanvas(FigureCanvas):
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i],visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
-                    except Exception as ex:
+                    except Exception as ex: # pylint: disable=broad-except
                         _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                 ##### ET,BT curves
                 
                 if not self.flagstart and not self.foregroundShowFullflag:
@@ -8091,7 +8102,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.handles.append(self.extratemp1lines[idx1])
                                 try:
                                     self.labels.append(aw.arabicReshape(l1.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     # a key error can occure triggered by the format if curley braces are used without reference
                                     self.labels.append(aw.arabicReshape(l1))
                         if aw.extraCurveVisibility2[i]:
@@ -8102,7 +8113,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.handles.append(self.extratemp2lines[idx2])
                                 try:
                                     self.labels.append(aw.arabicReshape(l2.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     # a key error can occure triggered by the format if curley braces are used without reference
                                     self.labels.append(aw.arabicReshape(l2))
 
@@ -8168,12 +8179,12 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             loc = self.legendloc_pos # a user define legend position set by drag-and-drop
                     else:
-                        loc = self.legend._loc
+                        loc = self.legend._loc # pylint: disable=protected-access
                     leg = self.ax.legend(self.handles,self.labels,loc=loc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
 
                     try:
                         leg.set_in_layout(False) # remove legend from tight_layout calculation
-                    except: # set_in_layout not available in mpl<3.x
+                    except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                         pass
                     self.legend = leg
                     self.legend_lines = leg.get_lines()
@@ -8186,7 +8197,7 @@ class tgraphcanvas(FigureCanvas):
                     try:
                         leg.set_draggable(state=True,use_blit=True)  #,update='bbox')
                         leg.set_picker(aw.draggable_text_box_picker)
-                    except: # not available in mpl<3.x
+                    except Exception: # pylint: disable=broad-except # not available in mpl<3.x
                         leg.draggable(state=True) # for mpl 2.x
                     frame = leg.get_frame()
                     frame.set_facecolor(self.palette["legendbg"])
@@ -8246,14 +8257,14 @@ class tgraphcanvas(FigureCanvas):
                 try:
                     if platf == 'Darwin' and app.allWindows()[0].visibility() == QWindow.FullScreen or aw.full_screen_mode_active or aw.isFullScreen():
                         aw.qmc.repaint()
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
 
-            except Exception as ex:
+            except Exception as ex: # pylint: disable=broad-except
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
                 # we initialize at the end of the redraw the event and flag annotation custom position loaded from a profile as those should have been consumed by now
                 self.l_annotations_pos_dict = {}
@@ -8271,7 +8282,7 @@ class tgraphcanvas(FigureCanvas):
                     self.fig.canvas.draw_idle()
                 self.setProfileBackgroundTitle(titleB)
 
-    def checkOverlap(self, anno, eventno, annotext):
+    def checkOverlap(self, anno): #, eventno, annotext):
         overlapallowed = max(0,min(aw.qmc.overlappct,100))/100  #the input is validated but this here to prevent any escapes
         overlap = False
         try:
@@ -8294,11 +8305,11 @@ class tgraphcanvas(FigureCanvas):
                         overlap = True
                         break
             if not overlap:
-                # note to self, the annotext can be removed from the list.  Only here for debug prints
-                self.overlapList.append((xl,xr,yl,yu,eventno,annotext))
-        except Exception as e:
+                # note to self, the eventno and annotext can be removed from the list.  Only here for debug prints
+                self.overlapList.append((xl,xr,yl,yu)) #,eventno,annotext))
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkOverlap() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkOverlap() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return overlap
 
     def annoboxCorners(self,anno):
@@ -8311,9 +8322,9 @@ class tgraphcanvas(FigureCanvas):
             bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
             bbox = Bbox(bbox_data) # x0, y0, width, height
             corners = (bbox.bounds[0],bbox.bounds[0]+bbox.bounds[2],bbox.bounds[1],bbox.bounds[1]+bbox.bounds[3])
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " annoboxCorners() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " annoboxCorners() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return corners  # x0, x1, y0, y1
 
     def parseSpecialeventannotation(self,eventanno, eventnum, applyto="foreground", postFCs=False):
@@ -8325,11 +8336,11 @@ class tgraphcanvas(FigureCanvas):
                 y2 = self.temp2B[self.backgroundEvents[eventnum]]
                 try:
                     delta1 = str(aw.float2float(self.delta1B[self.backgroundEvents[eventnum]])) if self.delta1B[self.backgroundEvents[eventnum]] != None else "--"
-                except:
+                except Exception: # pylint: disable=broad-except
                     delta1 = "\u03C5\u03c5"
                 try:
                     delta2 = str(aw.float2float(self.delta2B[self.backgroundEvents[eventnum]])) if self.delta2B[self.backgroundEvents[eventnum]] != None else "--"
-                except:
+                except Exception: # pylint: disable=broad-except
                     delta2 = "\u03C5\u03c5"
                 descr = self.backgroundEStrings[eventnum]
                 etype = self.Betypes[self.backgroundEtypes[eventnum]]
@@ -8389,11 +8400,11 @@ class tgraphcanvas(FigureCanvas):
                 y2 = self.temp2[self.specialevents[eventnum]]
                 try:
                     delta1 = str(aw.float2float(self.delta1[self.specialevents[eventnum]])) if self.delta1[self.specialevents[eventnum]] != None else "--"
-                except:
+                except Exception: # pylint: disable=broad-except
                     delta1 = "\u03C5\u03c5"
                 try:
                     delta2 = str(aw.float2float(self.delta2[self.specialevents[eventnum]])) if self.delta2[self.specialevents[eventnum]] != None else "--"
-                except:
+                except Exception: # pylint: disable=broad-except
                     delta2 = "\u03C5\u03c5"
                 descr = self.specialeventsStrings[eventnum]
                 etype = self.etypes[self.specialeventstype[eventnum]]
@@ -8446,8 +8457,7 @@ class tgraphcanvas(FigureCanvas):
                 ("quot", '"'),
                 ]
 
-            #replace with self.fieldDelim
-            self.fieldDelim = '~'
+            fieldDelim = '~'
             #delimiter to show before FCs only
             preFCsDelim = "'"
             #delimiter to show after FCs only
@@ -8464,17 +8474,17 @@ class tgraphcanvas(FigureCanvas):
             eventanno = eventanno.replace('\n', '')
 
             #text between single quotes ' will show only before FCs
-            eventanno = re.sub(r"{}([^{}]+){}".format(preFCsDelim,preFCsDelim,preFCsDelim),
-                r"\1",eventanno) if not postFCs else re.sub(r"{}([^{}]+){}".format(preFCsDelim,preFCsDelim,preFCsDelim),
+            eventanno = re.sub(r"{pd}([^{pd}]+){pd}".format(pd=preFCsDelim),
+                r"\1",eventanno) if not postFCs else re.sub(r"{pd}([^{pd}]+){pd}".format(pd=preFCsDelim),
                 r"",eventanno)
             #text between double quotes " will show only after FCs
-            eventanno = re.sub(r'{}([^{}]+){}'.format(postFCsDelim,postFCsDelim,postFCsDelim),
-                r'\1',eventanno) if postFCs else re.sub(r'{}([^{}]+){}'.format(postFCsDelim,postFCsDelim,postFCsDelim),
+            eventanno = re.sub(r'{pd}([^{pd}]+){pd}'.format(pd=postFCsDelim),
+                r'\1',eventanno) if postFCs else re.sub(r'{pd}([^{pd}]+){pd}'.format(pd=postFCsDelim),
                 r'',eventanno)
 
             #text between back ticks ` will show only within 90 seconds before FCs
-            eventanno = re.sub(r'{}([^{}]+){}'.format(fcsWindowDelim,fcsWindowDelim,fcsWindowDelim),
-                r'\1',eventanno) if (fcsWindow) else re.sub(r'{}([^{}]+){}'.format(fcsWindowDelim,fcsWindowDelim,fcsWindowDelim),
+            eventanno = re.sub(r'{wd}([^{wd}]+){wd}'.format(wd=fcsWindowDelim),
+                r'\1',eventanno) if (fcsWindow) else re.sub(r'{wd}([^{wd}]+){wd}'.format(wd=fcsWindowDelim),
                 r'',eventanno)
 
             # substitute numeric to nominal values if in the annotationstring
@@ -8491,7 +8501,7 @@ class tgraphcanvas(FigureCanvas):
             # does the pattern.split always result in the same list pattern?  ex:
             #     ['', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '|', '100', 'A Point', '']
 #            pattern = re.compile(fr".*{nominalDelimopen}(?P<nominalstr>[^{nominalDelimclose}]+){nominalDelimclose}")
-            pattern = re.compile(r".*{}(?P<nominalstr>[^{}]+){}".format(nominalDelimopen,nominalDelimclose,nominalDelimclose),_ignorecase)
+            pattern = re.compile(r".*{ndo}(?P<nominalstr>[^{ndc}]+){ndc}".format(ndo=nominalDelimopen,ndc=nominalDelimclose),_ignorecase)
             matched = pattern.match(eventanno)
             if matched != None:
                 pattern = re.compile(r"([0-9]+)([A-Za-z]+[A-Za-z 0-9]+)",_ignorecase)
@@ -8507,14 +8517,14 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         j += 3
 #                pattern = re.compile(fr"({nominalDelimopen}[^{nominalDelimclose}]+{nominalDelimclose})")
-                pattern = re.compile(r"({}[^{}]+{})".format(nominalDelimopen,nominalDelimclose,nominalDelimclose))
+                pattern = re.compile(r"({ndo}[^{ndc}]+{ndc})".format(ndo=nominalDelimopen,ndc=nominalDelimclose))
                 eventanno = pattern.sub(replacestring,eventanno)
 
             # make all the remaining substitutions
             for i in range(len(fields)):
-#                pattern = re.compile(fr"(.*{self.fieldDelim})({fields[i][0]})(?P<mathop>[/*+-][0-9.]+)?(({nominalstringDelim}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?")
+#                pattern = re.compile(fr"(.*{fieldDelim})({fields[i][0]})(?P<mathop>[/*+-][0-9.]+)?(({nominalstringDelim}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?")
                 pattern = re.compile(r"(.*{})({})(?P<mathop>[/*+-][0-9.]+)?(({}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?".format(
-                    self.fieldDelim,fields[i][0],nominalstringDelim),_ignorecase)
+                    fieldDelim,fields[i][0],nominalstringDelim),_ignorecase)
                 matched = pattern.match(eventanno)
                 if matched != None:
 
@@ -8523,15 +8533,15 @@ class tgraphcanvas(FigureCanvas):
                     # do simple math if an operator is in the string
                     if matched.group('mathop') != None:
                         replacestring += matched.group('mathop')
-                        replacestring = str(aw.float2float(eval(replacestring),1))
+                        replacestring = str(aw.float2float(eval(replacestring),1)) # pylint: disable=eval-used
 
-#                    pattern = re.compile(fr"{self.fieldDelim}{fields[i][0]}([/*+-][0-9.]+)?")
-                    pattern = re.compile(r"{}{}([/*+-][0-9.]+)?".format(self.fieldDelim,fields[i][0]),_ignorecase)
+#                    pattern = re.compile(fr"{fieldDelim}{fields[i][0]}([/*+-][0-9.]+)?")
+                    pattern = re.compile(r"{}{}([/*+-][0-9.]+)?".format(fieldDelim,fields[i][0]),_ignorecase)
                     eventanno = pattern.sub(replacestring,eventanno)
 
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " parseSpecialeventannotation() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " parseSpecialeventannotation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             eventanno = ""
 
         return eventanno
@@ -8567,13 +8577,13 @@ class tgraphcanvas(FigureCanvas):
             if self.ai is not None:
                 try:
                     self.ai.remove()
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             self.ai = self.ax.imshow(self.logoimg, zorder=0, extent=extent, alpha=aw.logoimgalpha/10, aspect='auto', resample=False)
 
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " placelogoimage() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " placelogoimage() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     #watermark image
     def logoloadfile(self,filename=None):
@@ -8587,9 +8597,9 @@ class tgraphcanvas(FigureCanvas):
             aw.logofilename = filename
             aw.sendmessage(QApplication.translate("Message","Loaded watermark image {0}", None).format(filename))
             QTimer.singleShot(500, lambda : self.redraw(recomputeAllDeltas=False)) #some time needed before the redraw on artisan start with no profile loaded.  processevents() does not work here.
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " logoloadfile() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " logoloadfile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             aw.logofilename = ""
 
     #add stats summmary to graph
@@ -8807,9 +8817,9 @@ class tgraphcanvas(FigureCanvas):
 #                    fontproperties=prop, # fails to render in PDF on MPL 3.4.x
                     color=tc,zorder=11,path_effects=[])
                 text.set_in_layout(False)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " statsSummary() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " statsSummary() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def statstextboxBounds(self,x_pos,y_pos,textstr,ls,prop,fc):
         from matplotlib.transforms import Bbox
@@ -9004,7 +9014,7 @@ class tgraphcanvas(FigureCanvas):
                                             aw.qmc.extratemp1[e][i] = fromCtoF(aw.qmc.extratemp1[e][i])
                                         if not (len(aw.qmc.extraNoneTempHint2) > e and aw.qmc.extraNoneTempHint2[e]):
                                             aw.qmc.extratemp2[e][i] = fromCtoF(aw.qmc.extratemp2[e][i])
-                                    except Exception:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                         if self.ambientTemp is not None and self.ambientTemp != 0:
                             self.ambientTemp = fromCtoF(self.ambientTemp)  #ambient temperature
@@ -9065,7 +9075,7 @@ class tgraphcanvas(FigureCanvas):
                                             aw.qmc.extratemp1[e][i] = fromFtoC(aw.qmc.extratemp1[e][i])
                                         if not (len(aw.qmc.extraNoneTempHint2) > e and aw.qmc.extraNoneTempHint2[e]):
                                             aw.qmc.extratemp2[e][i] = fromFtoC(aw.qmc.extratemp2[e][i])
-                                    except Exception:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
 
                         if self.ambientTemp is not None and self.ambientTemp != 0:
@@ -9115,8 +9125,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.loadSettings_theme(fn=fname,remember=False,reset=False)
                 aw.sendmessage(QApplication.translate("Message","Colors set to Default Theme", None))
             else:
-                for key in list(self.palette1.keys()):
-                    self.palette[key] = self.palette1[key]
+                for k in list(self.palette1.keys()):
+                    self.palette[k] = self.palette1[k]
                 self.backgroundmetcolor     = self.palette["et"]
                 self.backgroundbtcolor      = self.palette["bt"]
                 self.backgrounddeltaetcolor = self.palette["deltaet"]
@@ -9130,10 +9140,10 @@ class tgraphcanvas(FigureCanvas):
 
         if color == 2:
             aw.sendmessage(QApplication.translate("Message","Colors set to grey", None))
-            for key in list(aw.qmc.palette.keys()):
-                c = aw.qmc.palette[key]
+            for k in list(aw.qmc.palette.keys()):
+                c = aw.qmc.palette[k]
                 nc = aw.convertToGreyscale(c)
-                self.palette[key] = nc
+                self.palette[k] = nc
             for i in range(len(aw.qmc.extradevices)):
                 c = aw.qmc.extradevicecolor1[i]
                 aw.qmc.extradevicecolor1[i] = aw.convertToGreyscale(c)
@@ -9199,7 +9209,7 @@ class tgraphcanvas(FigureCanvas):
             try: # sip not supported on older PyQt versions (RPi!)
                 sip.delete(dialog)
                 #print(sip.isdeleted(dialog))
-            except:
+            except Exception:  # pylint: disable=broad-except
                 pass
 
         #update screen with new colors
@@ -9232,7 +9242,7 @@ class tgraphcanvas(FigureCanvas):
             if self.ax1 is not None:
                 try:
                     self.fig.delaxes(self.ax1)
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor='None') #) radar green facecolor='#d5de9c'
 
@@ -9240,7 +9250,7 @@ class tgraphcanvas(FigureCanvas):
             try:
                 ticks_loc = self.ax1.get_yticks()
                 self.ax1.yaxis.set_major_locator(ticker.FixedLocator(ticks_loc))
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             
             self.ax1.set_aspect(self.flavoraspect)
@@ -9262,11 +9272,11 @@ class tgraphcanvas(FigureCanvas):
             title_artist = self.ax1.set_title(" -\n ", alpha=0.0)
             try:
                 xlabel_artist.set_in_layout(False) # remove x-axis labels from tight_layout calculation
-            except: # set_in_layout not available in mpl<3.x
+            except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                 pass
             try:
                 title_artist.set_in_layout(False) # remove x-axis labels from tight_layout calculation
-            except: # set_in_layout not available in mpl<3.x
+            except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                 pass
 
             #create water marks 6-7 anf 8-9
@@ -9304,7 +9314,7 @@ class tgraphcanvas(FigureCanvas):
                                     xytext=(self.flavorchart_angles[i],1.1),horizontalalignment=ha,verticalalignment='center')
                 try:
                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                except: # mpl before v3.0 do not have this set_in_layout() function
+                except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                     pass
                 self.flavorchart_labels.append(anno)
 
@@ -9338,7 +9348,7 @@ class tgraphcanvas(FigureCanvas):
 
             #self.fig.canvas.draw()
             self.fig.canvas.draw_idle()
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
@@ -9381,7 +9391,7 @@ class tgraphcanvas(FigureCanvas):
         # collections need to be redrawn completely
         try:
             self.flavorchart_fill.remove()
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         self.flavorchart_fill = self.ax1.fill_between(self.flavorchart_angles,0,self.flavorchart_plotf, facecolor='#1985ba', alpha=0.1, interpolate=True)
 
@@ -9496,7 +9506,7 @@ class tgraphcanvas(FigureCanvas):
                     PhidgetNetwork.enableServerDiscovery(PhidgetServerType.PHIDGETSERVER_DEVICEREMOTE)
                     self.phidgetServiceDiscoveryStarted = True
                     aw.sendmessage(QApplication.translate("Message","Phidget service discovery started...", None))
-                except Exception:
+                except Exception:  # pylint: disable=broad-except
                     pass
             else:
                 PhidgetNetwork.addServer("PhidgetServer",self.phidgetServerID,self.phidgetPort,self.phidgetPassword,0)
@@ -9507,7 +9517,7 @@ class tgraphcanvas(FigureCanvas):
             from Phidget22.Net import Net as PhidgetNetwork
             try:
                 PhidgetNetwork.removeServer("PhidgetServer")
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             self.phidgetServerAdded = False
             if self.phidgetServiceDiscoveryStarted:
@@ -9515,7 +9525,7 @@ class tgraphcanvas(FigureCanvas):
                     from Phidget22.PhidgetServerType import PhidgetServerType
                     PhidgetNetwork.disableServerDiscovery(PhidgetServerType.PHIDGETSERVER_DEVICEREMOTE)
                     self.phidgetServiceDiscoveryStarted = False
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
     
     def deviceLogDEBUG(self):
@@ -9533,25 +9543,25 @@ class tgraphcanvas(FigureCanvas):
         try:
             PhidgetLog.enable(PhidgetLogLevel.PHIDGET_LOG_DEBUG, self.device_log_file)
             PhidgetLog.enableRotating()
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             if self.phidgetRemoteFlag:
                 try:
                     self.addPhidgetServer()
-                except:
+                except Exception: # pylint: disable=broad-except
                     if aw.qmc.device in aw.qmc.phidgetDevices:
                         aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!",None))
 #                        _, _, exc_tb = sys.exc_info()
-#                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " addPhidgetServer() {0}").format(str(e)),exc_tb.tb_lineno)
+#                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " addPhidgetServer() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.phidgetManager is None:
                 try:
                     self.phidgetManager = PhidgetManager()
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     if aw.qmc.device in aw.qmc.phidgetDevices:
                         aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!",None))
 #                        _, _, exc_tb = sys.exc_info()
-#                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startPhidgetManager() {0}").format(str(e)),exc_tb.tb_lineno)
+#                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startPhidgetManager() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             sys.stderr = _stderr
 
@@ -9562,7 +9572,7 @@ class tgraphcanvas(FigureCanvas):
         self.removePhidgetServer()
         try:
             PhidgetLog.disable()
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     def restartPhidgetManager(self):
@@ -9574,7 +9584,13 @@ class tgraphcanvas(FigureCanvas):
             self.startPhidgetManager()
             # collect ambient data if any
             if self.ambient_pressure_device or self.ambient_humidity_device or self.ambient_temperature_device:
-                self.ambiThread = AmbientThread()
+                self.ambiThread = QThread()
+                self.ambiWorker = AmbientWorker()
+                self.ambiWorker.moveToThread(self.ambiThread)
+                self.ambiThread.started.connect(self.ambiWorker.run)
+                self.ambiWorker.finished.connect(self.ambiThread.quit)
+                self.ambiWorker.finished.connect(self.ambiWorker.deleteLater)
+                self.ambiThread.finished.connect(self.ambiThread.deleteLater)
                 self.ambiThread.start()
 
             self.generateNoneTempHints()
@@ -9589,7 +9605,7 @@ class tgraphcanvas(FigureCanvas):
                 startHottop(0.6,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
             try:
                 aw.eventactionx(aw.qmc.extrabuttonactions[0],aw.qmc.extrabuttonactionstrings[0])
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
 
             aw.initializedMonitoringExtraDeviceStructures()
@@ -9630,9 +9646,9 @@ class tgraphcanvas(FigureCanvas):
             self.threadserver.createSampleThread()
             if not bool(aw.simulator):
                 self.StartAsyncSamplingAction()
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OnMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OnMonitor() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def OffMonitor(self):
         try:
@@ -9663,7 +9679,7 @@ class tgraphcanvas(FigureCanvas):
                 if aw.fujipid.sv and aw.fujipid.sv > 0:
                     try:
                         aw.fujipid.setsv(0,silent=True)
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     aw.fujipid.sv = 0
             QTimer.singleShot(5,self.disconnectProbes)
@@ -9705,7 +9721,7 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.autosaveflag and aw.qmc.autosavepath:
                     try:
                         aw.automaticsave()
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
             #appnope.nap()
             aw.eventactionx(aw.qmc.extrabuttonactions[1],aw.qmc.extrabuttonactionstrings[1])
@@ -9717,14 +9733,14 @@ class tgraphcanvas(FigureCanvas):
             if aw.serial_dlg:
                 try:
                     aw.serial_dlg.update()
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
                                         
             if recording and self.flagKeepON:
                 self.OnMonitor()
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def getAmbientData(self):
         # this is needed to surpress the message on the ignored Exception
@@ -9797,7 +9813,7 @@ class tgraphcanvas(FigureCanvas):
         # close main serial port
         try:
             ser.closeport()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         # disconnect phidgets
         if ser.PhidgetTemperatureSensor is not None:
@@ -9808,7 +9824,7 @@ class tgraphcanvas(FigureCanvas):
                     deviceType = ser.PhidgetTemperatureSensor[0].getDeviceID()
                     ser.PhidgetTemperatureSensor[0].close()
                     ser.phidget1048detached(serial,port,deviceType,0) # call detach handler to release from PhidgetManager
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             try:
                 if len(ser.PhidgetTemperatureSensor) > 1 and ser.PhidgetTemperatureSensor[1].getAttached():
@@ -9817,7 +9833,7 @@ class tgraphcanvas(FigureCanvas):
                     deviceType = ser.PhidgetTemperatureSensor[1].getDeviceID()
                     ser.PhidgetTemperatureSensor[1].close()
                     ser.phidget1048detached(serial,port,deviceType,1) # call detach handler to release from PhidgetManager
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             ser.Phidget1048values = [[],[],[],[]]
             ser.Phidget1048lastvalues = [-1]*4
@@ -9830,12 +9846,12 @@ class tgraphcanvas(FigureCanvas):
                     deviceType = ser.PhidgetIRSensor.getDeviceID()
                     ser.PhidgetIRSensor.close()
                     ser.phidget1045detached(serial,port,deviceType) # call detach handler to release from PhidgetManager
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             try:
                 if ser.PhidgetIRSensorIC is not None and ser.PhidgetIRSensorIC.getAttached():
                     ser.PhidgetIRSensorIC.close()
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             ser.PhidgetIRSensor = None
             ser.Phidget1045values = [] # async values of the one channel
@@ -9850,7 +9866,7 @@ class tgraphcanvas(FigureCanvas):
                     deviceType = ser.PhidgetBridgeSensor[0].getDeviceID()
                     ser.PhidgetBridgeSensor[0].close()
                     ser.phidget1046detached(serial,port,deviceType,0) # call detach handler to release from PhidgetManager
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             try:
                 if len(ser.PhidgetBridgeSensor) > 1 and ser.PhidgetBridgeSensor[1].getAttached():
@@ -9859,7 +9875,7 @@ class tgraphcanvas(FigureCanvas):
                     deviceType = ser.PhidgetBridgeSensor[1].getDeviceID()
                     ser.PhidgetBridgeSensor[1].close()
                     ser.phidget1046detached(serial,port,deviceType,1) # call detach handler to release from PhidgetManager
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             ser.Phidget1046values = [[],[],[],[]]
             ser.Phidget1046lastvalues = [-1]*4
@@ -9873,7 +9889,7 @@ class tgraphcanvas(FigureCanvas):
                     deviceType = ser.PhidgetIO[0].getDeviceID()
                     ser.PhidgetIO[0].close()
                     ser.phidget1018detached(serial,port,className,deviceType,0)
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             try:
                 if len(ser.PhidgetIO) > 1 and ser.PhidgetIO[1].getAttached():
@@ -9883,7 +9899,7 @@ class tgraphcanvas(FigureCanvas):
                     deviceType = ser.PhidgetIO[1].getDeviceID()
                     ser.PhidgetIO[1].close()
                     ser.phidget1018detached(serial,port,className,deviceType,1)
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             ser.PhidgetIO = None
             ser.PhidgetIOvalues = [[],[],[],[],[],[],[],[]]
@@ -9900,7 +9916,7 @@ class tgraphcanvas(FigureCanvas):
                 ser.YOCTOvalues = [[],[]]
                 ser.YOCTOlastvalues = [-1]*2
                 YAPI.FreeAPI()
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
     # close Phidget and and Yocto outputs
@@ -9963,7 +9979,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             try:
                 aw.soundpopSignal.emit()
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             self.OffMonitor()
 
@@ -9984,7 +10000,7 @@ class tgraphcanvas(FigureCanvas):
                 y_label = aw.qmc.delta_ax.set_ylabel("")
                 try:
                     y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
-                except: # set_in_layout not available in mpl<3.x
+                except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                     pass
 
             self.timeclock.start()   #set time to the current computer time, otherwise the recorded timestamps append to the time on START after ON which might be long!
@@ -9995,7 +10011,7 @@ class tgraphcanvas(FigureCanvas):
                 self.OnMonitor()
             try:
                 aw.eventactionx(aw.qmc.xextrabuttonactions[1],aw.qmc.xextrabuttonactionstrings[1])
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
 
             # update the roasts start time
@@ -10020,10 +10036,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_7.setEnabled(False)
             aw.button_18.setEnabled(True)
             aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_OFF"])
-            aw.shadow_18 = QGraphicsDropShadowEffect(self)
-            aw.shadow_18.setBlurRadius(20)
-            aw.shadow_18.setOffset(0,1)
-            aw.button_18.setGraphicsEffect(aw.shadow_18)
+            aw.button_18.setGraphicsEffect(aw.makeShadow())
             self.updateLCDtime()
             aw.lowerbuttondialog.setVisible(True)
             aw.applyStandardButtonVisibility()
@@ -10044,9 +10057,9 @@ class tgraphcanvas(FigureCanvas):
 
             aw.update_minieventline_visibility()
 
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def OffRecorder(self, autosave=True):
         try:
@@ -10057,10 +10070,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 aw.button_2.setStyleSheet(aw.pushbuttonstyles["STOP"])
             aw.button_2.setEnabled(True)
-            self.shadow_2 = QGraphicsDropShadowEffect(self)
-            self.shadow_2.setBlurRadius(20)
-            self.shadow_2.setOffset(0,1)
-            aw.button_2.setGraphicsEffect(self.shadow_2)
+            aw.button_2.setGraphicsEffect(aw.makeShadow())
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
             aw.button_7.setEnabled(True)
@@ -10074,12 +10084,12 @@ class tgraphcanvas(FigureCanvas):
             try:
                 if aw.clusterEventsFlag:
                     aw.clusterEvents()
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             if autosave and aw.qmc.autosaveflag and aw.qmc.autosavepath:
                 try:
                     aw.automaticsave()
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             aw.sendmessage(QApplication.translate("Message","Scope recording stopped", None))
             aw.button_2.setText(QApplication.translate("Button", "START",None))
@@ -10088,9 +10098,9 @@ class tgraphcanvas(FigureCanvas):
             aw.phasesLCDs.hide()
             aw.AUCLCD.hide()
             aw.hideEventsMinieditor()
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffRecorder() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffRecorder() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot()
     def toggleRecorderTigger(self):
@@ -10117,7 +10127,7 @@ class tgraphcanvas(FigureCanvas):
                         starts = settings.value("starts")
                     settings.setValue("starts",starts+1)
                     settings.sync()
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
                 self.OnRecorder()
         #turn STOP
@@ -10156,11 +10166,11 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             try:
                                 self.l_annotations[-1].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             try:
                                 self.l_annotations[-2].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 0 in self.l_annotations_dict:
@@ -10189,7 +10199,7 @@ class tgraphcanvas(FigureCanvas):
                         try:
                             if not aw.qmc.locktimex:
                                 aw.qmc.startofx = aw.qmc.chargemintime + self.timex[self.timeindex[0]] # we set the min x-axis limit to the CHARGE Min time
-                        except Exception:
+                        except Exception: # pylint: disable=broad-except
                             pass
 
                         self.xaxistosm(redraw=False) # need to fix uneven x-axis labels like -0:13
@@ -10217,14 +10227,14 @@ class tgraphcanvas(FigureCanvas):
                                     # note that EventRecordAction avoids to generate events were type and value matches to the previously recorded one
                                     aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,takeLock=False,doupdategraphics=False)
                                     # we don't take another lock in EventRecordAction as we already hold that lock!
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
             else:
                 message = QApplication.translate("Message","CHARGE: Scope is not recording", None)
                 aw.sendmessage(message)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markCharge() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markCharge() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -10247,7 +10257,7 @@ class tgraphcanvas(FigureCanvas):
                     bt = fmt%self.temp2[self.timeindex[0]] + aw.qmc.mode
                     message = QApplication.translate("Message","Roast time starts now 00:00 BT = {0}",None).format(bt)
                     aw.sendmessage(message)
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
                 if aw.qmc.roastpropertiesAutoOpenFlag:
                     aw.openPropertiesSignal.emit()
@@ -10274,9 +10284,9 @@ class tgraphcanvas(FigureCanvas):
                     message = QApplication.translate("Message","[TP] recorded at {0} BT = {1}", None).format(st,st2)
                     #set message at bottom
                     aw.sendmessage(message)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markTP() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markTP() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -10311,11 +10321,11 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == DE_str:
                             try:
                                 self.l_annotations[-1].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             try:
                                 self.l_annotations[-2].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 1 in self.l_annotations_dict:
@@ -10348,9 +10358,9 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     message = QApplication.translate("Message","DRY END: Scope is not recording", None)
                     aw.sendmessage(message)
-            except Exception as ex:
+            except Exception as ex: # pylint: disable=broad-except
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDryEnd() {0}").format(str(ex)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDryEnd() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
@@ -10381,7 +10391,7 @@ class tgraphcanvas(FigureCanvas):
                         message = QApplication.translate("Message","[DRY END] recorded at {0} BT = {1}", None).format(st,st2)
                         #set message at bottom
                         aw.sendmessage(message)
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     aw.onMarkMoveToNext(aw.button_19)
                     if self.autoDryIdx == 0:
@@ -10417,11 +10427,11 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             try:
                                 self.l_annotations[-1].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             try:
                                 self.l_annotations[-2].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 2 in self.l_annotations_dict:
@@ -10455,9 +10465,9 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     message = QApplication.translate("Message","FC START: Scope is not recording", None)
                     aw.sendmessage(message)
-            except Exception as ex:
+            except Exception as ex: # pylint: disable=broad-except
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark1Cstart() {0}").format(str(ex)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark1Cstart() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
@@ -10521,11 +10531,11 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             try:
                                 self.l_annotations[-1].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             try:
                                 self.l_annotations[-2].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 3 in self.l_annotations_dict:
@@ -10552,9 +10562,9 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     message = QApplication.translate("Message","FC END: Scope is not recording", None)
                     aw.sendmessage(message)
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark1Cend() {0}").format(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark1Cend() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
@@ -10620,11 +10630,11 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             try:
                                 self.l_annotations[-1].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             try:
                                 self.l_annotations[-2].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 4 in self.l_annotations_dict:
@@ -10653,9 +10663,9 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     message = QApplication.translate("Message","SC START: Scope is not recording", None)
                     aw.sendmessage(message)
-            except Exception as ex:
+            except Exception as ex: # pylint: disable=broad-except
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark2Cstart() {0}").format(str(ex)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark2Cstart() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
@@ -10693,11 +10703,11 @@ class tgraphcanvas(FigureCanvas):
                         try:
                             st1 = stringfromseconds(self.timex[self.timeindex[4]]-start)
                             st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                         message = QApplication.translate("Message","[SC START] recorded at {0} BT = {1}", None).format(st1,st2)
                         aw.sendmessage(message)
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     aw.onMarkMoveToNext(aw.button_5)
                     self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
@@ -10729,11 +10739,11 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             try:
                                 self.l_annotations[-1].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             try:
                                 self.l_annotations[-2].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 5 in self.l_annotations_dict:
@@ -10759,9 +10769,9 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     message = QApplication.translate("Message","SC END: Scope is not recording", None)
                     aw.sendmessage(message)
-            except Exception as ex:
+            except Exception as ex: # pylint: disable=broad-except
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark2Cend() {0}").format(str(ex)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark2Cend() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
@@ -10836,11 +10846,11 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             try:
                                 self.l_annotations[-1].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             try:
                                 self.l_annotations[-2].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 6 in self.l_annotations_dict:
@@ -10885,26 +10895,26 @@ class tgraphcanvas(FigureCanvas):
                         try:
                             # update ambient temperature if a ambient temperature source is configured and no value yet established
                             aw.qmc.updateAmbientTempFromPhidgetModulesOrCurve()
-                        except Exception:
+                        except Exception: # pylint: disable=broad-except
                             pass
     #PLUS
                         # only on first setting the DROP event (not set yet and no previous DROP undone) and if not in simulator modus, we upload to PLUS
                         if firstDROP and aw.qmc.autoDROPenabled and aw.plus_account is not None and not bool(aw.simulator):
                             try:
                                 aw.updatePlusStatus()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                                 # add to out-queue
                             try:
                                 plus.queue.addRoast()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                 else:
                     message = QApplication.translate("Message","DROP: Scope is not recording", None)
                     aw.sendmessage(message)
-            except Exception as ex:
+            except Exception as ex: # pylint: disable=broad-except
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDrop() {0}").format(str(ex)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDrop() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
@@ -10951,7 +10961,7 @@ class tgraphcanvas(FigureCanvas):
                             st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
                             message = QApplication.translate("Message","Roast ended at {0} BT = {1}", None).format(st1,st2)
                             aw.sendmessage(message)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                         # at DROP we stop the follow background on FujiPIDs and set the SV to 0
                         if aw.qmc.device == 0 and aw.fujipid.followBackground:
@@ -10959,7 +10969,7 @@ class tgraphcanvas(FigureCanvas):
                                 try:
                                     aw.fujipid.setsv(0,silent=True)
                                     aw.fujipid.sv = 0
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                         if aw.qmc.roastpropertiesAutoOpenDropFlag:
                             aw.openPropertiesSignal.emit()
@@ -10967,7 +10977,7 @@ class tgraphcanvas(FigureCanvas):
                         if not (self.autoDropIdx > 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]):
                             # only if not anyhow markDrop() is triggered from within updategraphic() which guarantees an immedate redraw
                             self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
 
     # trigger to be called by the markCoolSignal
@@ -10998,11 +11008,11 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             try:
                                 self.l_annotations[-1].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             try:
                                 self.l_annotations[-2].remove()
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 7 in self.l_annotations_dict:
@@ -11031,9 +11041,9 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     message = QApplication.translate("Message","COOL: Scope is not recording", None)
                     aw.sendmessage(message)
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markCoolEnd() {0}").format(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markCoolEnd() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
@@ -11098,7 +11108,7 @@ class tgraphcanvas(FigureCanvas):
                 app_settings.setValue("batchcounter",aw.qmc.batchcounter)
                 app_settings.setValue("batchsequence",aw.qmc.batchsequence)
                 app_settings.endGroup()
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             # decr. the batchcounter of the loaded app settings
             if aw.settingspath and aw.settingspath != "":
@@ -11112,7 +11122,7 @@ class tgraphcanvas(FigureCanvas):
                             settings.setValue("batchcounter",bc - 1)
                             settings.setValue("batchsequence",aw.qmc.batchsequence)
                     settings.endGroup()
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     aw.settingspath = ""
 
     def incBatchCounter(self):
@@ -11142,7 +11152,7 @@ class tgraphcanvas(FigureCanvas):
                 app_settings.setValue("batchsequence",aw.qmc.batchsequence)
                 app_settings.setValue("lastroastepoch",aw.qmc.lastroastepoch)
                 app_settings.endGroup()
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             # incr. the batchcounter of the loaded app settings
             if aw.settingspath and aw.settingspath != "":
@@ -11157,7 +11167,7 @@ class tgraphcanvas(FigureCanvas):
                             settings.setValue("batchsequence",aw.qmc.batchsequence)
                             settings.setValue("lastroastepoch",aw.qmc.lastroastepoch)
                     settings.endGroup()
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     aw.settingspath = ""
         else: # batch counter system inactive
             # set the batchcounter of the current profiles
@@ -11199,9 +11209,9 @@ class tgraphcanvas(FigureCanvas):
             else:
                 self.EventRecordAction(extraevent=extraevent,takeLock=takeLock,
                 doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " EventRecord() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " EventRecord() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time
@@ -11310,7 +11320,7 @@ class tgraphcanvas(FigureCanvas):
                                             fontproperties=fontprop_small)
                                 try:
                                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                except: # mpl before v3.0 do not have this set_in_layout() function
+                                except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                     pass
                             elif self.eventsGraphflag in [2,3,4] and etype < 4:
                                 # update lines data using the lists with new data
@@ -11391,7 +11401,7 @@ class tgraphcanvas(FigureCanvas):
 
                                     try:
                                         anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                    except: # mpl before v3.0 do not have this set_in_layout() function
+                                    except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                         pass
                         if doupdatebackground:
                             self.updateBackground() # call to canvas.draw() not needed as self.annotate does the (partial) redraw, but updateBackground() is needed
@@ -11409,7 +11419,7 @@ class tgraphcanvas(FigureCanvas):
                             aw.eNumberSpinBox.blockSignals(True)
                             try:
                                 aw.eNumberSpinBox.setValue(Nevents+1)
-                            except Exception:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             aw.eNumberSpinBox.blockSignals(False)
                             if aw.qmc.timeindex[0] > -1:
@@ -11422,11 +11432,11 @@ class tgraphcanvas(FigureCanvas):
                             aw.lineEvent.setText(self.specialeventsStrings[Nevents])
             else:
                 aw.sendmessage(QApplication.translate("Message","Timer is OFF", None))
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " EventRecordAction() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " EventRecordAction() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if takeLock and aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -11488,7 +11498,7 @@ class tgraphcanvas(FigureCanvas):
                                              fontsize=fontsize,fontproperties=fontprop_small,backgroundcolor=aw.qmc.palette["specialeventbox"])
                             try:
                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                            except: # mpl before v3.0 do not have this set_in_layout() function
+                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                 pass
                         #if Event Type-Bars flag
                         if self.eventsGraphflag == 1:
@@ -11510,7 +11520,7 @@ class tgraphcanvas(FigureCanvas):
                                                  fontproperties=fontprop_small,backgroundcolor=aw.qmc.palette["specialeventbox"])
                             try:
                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                            except: # mpl before v3.0 do not have this set_in_layout() function
+                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                 pass
                         if self.eventsGraphflag in [2,3,4]:
                             # update lines data using the lists with new data
@@ -11525,9 +11535,9 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " DeviceEventRecord() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " DeviceEventRecord() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -11570,7 +11580,7 @@ class tgraphcanvas(FigureCanvas):
                                  )
                     try:
                         self.met_annotate.set_in_layout(False) # remove suptitle from tight_layout calculation
-                    except: # set_in_layout not available in mpl<3.x
+                    except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                         pass
 
             if self.statisticsflags[3] and self.timeindex[0]>-1:
@@ -11598,7 +11608,7 @@ class tgraphcanvas(FigureCanvas):
                                 lcdformat = "%.0f"
                             temp1_values_max = max(temp1_values)
                             ETmax = lcdformat%temp1_values_max + aw.qmc.mode
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
 
                     FCperiod = None
@@ -11607,7 +11617,7 @@ class tgraphcanvas(FigureCanvas):
                             FCperiod = stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[2]])[1:]
                         elif self.timeindex[2] > 0 and self.timeindex[6] > 0:
                             FCperiod = stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])[1:]
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
 
                     ror = "%.1f"%(((self.temp2[self.timeindex[6]]-LP)/(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))*60.)
@@ -11657,9 +11667,9 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             msg += sep + str(aw.float2float(aw.qmc.weight[0],1)) + aw.qmc.weight[2]
                         if aw.qmc.weight[1]:
-                            msg += sep + str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
+                            msg += sep + str(-1*aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
                     if aw.qmc.volume[0] and aw.qmc.volume[1]:
-                            msg += sep + str(aw.float2float(aw.volume_increase(aw.qmc.volume[0],aw.qmc.volume[1]),1)) + "%"
+                        msg += sep + str(aw.float2float(aw.volume_increase(aw.qmc.volume[0],aw.qmc.volume[1]),1)) + "%"
                     if aw.qmc.whole_color and aw.qmc.ground_color:
                         msg += sep + u"#" + str(aw.qmc.whole_color) + u"/" +  str(aw.qmc.ground_color)
                     elif aw.qmc.ground_color:
@@ -11667,11 +11677,11 @@ class tgraphcanvas(FigureCanvas):
                     self.set_xlabel(msg)
             else:
                 self.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min","abbrev. of minutes")))
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " writecharacteristics() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " writecharacteristics() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # calculates self.statisticstimes values and returns dryEndIndex as well as the calcuated statisticstimes array of length 5
     def calcStatistics(self,TP_index):
@@ -11706,7 +11716,7 @@ class tgraphcanvas(FigureCanvas):
                 statisticstimes[3] = finishphasetime
                 statisticstimes[4] = coolphasetime
             return dryEndIndex, statisticstimes
-        except:
+        except Exception: # pylint: disable=broad-except
             return self.timeindex[1], statisticstimes
 
     # Writes information about the finished profile in the graph
@@ -11814,7 +11824,7 @@ class tgraphcanvas(FigureCanvas):
                         )
                     try:
                         text.set_in_layout(False)
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     if self.timeindex[2]: # only if FCs exists
                         text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticsupper,st2+ "  " + midphaseP+"%",color=self.palette["text"],ha="center",
@@ -11823,7 +11833,7 @@ class tgraphcanvas(FigureCanvas):
                             )
                         try:
                             text.set_in_layout(False)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                         text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticsupper,st3 + "  " + finishphaseP+ "%",color=self.palette["text"],ha="center",
 #                            fontproperties=statsprop
@@ -11831,7 +11841,7 @@ class tgraphcanvas(FigureCanvas):
                             )
                         try:
                             text.set_in_layout(False)
-                        except:
+                        except Exception:  # pylint: disable=broad-except
                             pass
                     if self.timeindex[7]: # only if COOL exists
                         text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]+self.statisticstimes[4]/2.,statisticsupper,st4,color=self.palette["text"],ha="center",
@@ -11840,7 +11850,7 @@ class tgraphcanvas(FigureCanvas):
                             )
                         try:
                             text.set_in_layout(False)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
 
                 st1 = st2 = st3 = st4 = ""
@@ -11869,7 +11879,7 @@ class tgraphcanvas(FigureCanvas):
                         fontsize="medium")
                     try:
                         text.set_in_layout(False)
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     if self.timeindex[2]: # only if FCs exists
                         text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticslower,st2,color=self.palette["text"],ha="center",
@@ -11878,7 +11888,7 @@ class tgraphcanvas(FigureCanvas):
                             )
                         try:
                             text.set_in_layout(False)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                         text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticslower,st3,color=self.palette["text"],ha="center",
                             #fontproperties=statsprop # fails be rendered in PDF exports on MPL v3.4.x
@@ -11886,7 +11896,7 @@ class tgraphcanvas(FigureCanvas):
                             )
                         try:
                             text.set_in_layout(False)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                     if self.timeindex[7]: # only if COOL exists
                         text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]+max(self.statisticstimes[4]/2.,self.statisticstimes[4]/3.),statisticslower,st4,color=self.palette["text"],ha="center",
@@ -11895,14 +11905,14 @@ class tgraphcanvas(FigureCanvas):
                             )
                         try:
                             text.set_in_layout(False)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
             self.writecharacteristics(TP_index,LP)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " writestatistics() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " writestatistics() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
     def convertHeat(self,value,fromUnit,toUnit=0):
@@ -12180,13 +12190,12 @@ class tgraphcanvas(FigureCanvas):
             energymetrics["KWH_batch_per_green_kg"] = kwh_batch_per_green_kg
             energymetrics["KWH_roast_per_green_kg"] = kwh_roast_per_green_kg
             
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " calcEnergyuse() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            return energymetrics,btu_list
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " calcEnergyuse() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+        return energymetrics,btu_list
         
     def measureFromprofile(self):
         coolEnergy = [0]*4
@@ -12212,13 +12221,12 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         factor = (load_pct / 100)
                     energy = self.loadratings[i] * factor * (duration / 3600) #* self.convertHeat(1,self.ratingunits[i],0)
-                except Exception as ex:
+                except Exception as ex: # pylint: disable=broad-except
                     #import traceback
                     #traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),exc_tb.tb_lineno)
-                finally:
-                    return energy
+                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+                return energy
 
             # if there is a DROP event use that for coolstart
             if self.timeindex[6] > 0:
@@ -12271,11 +12279,11 @@ class tgraphcanvas(FigureCanvas):
             heatDuration = self.timex[self.timeindex[0]]
             coolDuration = self.timex[-1] - self.timex[self.timeindex[6]]
             
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         return heatEnergy, coolEnergy, heatDuration, coolDuration
 
     #used in EventRecord()
@@ -12434,12 +12442,12 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:",None) + " univariateinfo() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:",None) + " univariateinfo() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " univariateinfo() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " univariateinfo() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
     def polyfit(self,xarray,yarray,deg,startindex,endindex,_=False,onDeltaAxis=False):
@@ -12467,7 +12475,7 @@ class tgraphcanvas(FigureCanvas):
                     warnings.simplefilter("ignore")
                     self.fig.canvas.draw()
                 return z
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 return None
         else:
             return None
@@ -12522,7 +12530,7 @@ class tgraphcanvas(FigureCanvas):
                     func = lambda x,a,b,c: a * numpy.log(b*x+c)
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    popt,_ = curve_fit(func, xa, yn)
+                    popt,_ = curve_fit(func, xa, yn) # pylint: disable=unbalanced-tuple-unpacking
                 #perr = numpy.sqrt(numpy.diag(pcov))
                 if plot:
                     xb = numpy.array(self.timex)
@@ -12540,11 +12548,11 @@ class tgraphcanvas(FigureCanvas):
                         res = "%.8f * t*t*t %s %.8f * t*t %s %.8f * t %s %.8f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2],("+" if popt[3] > 0 else ""),popt[3])
                     else:
                         res = "%.8f * log(%.8f * t %s %.8f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Error in lnRegression:",None) + " lnRegression() " + str(e),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Error in lnRegression:",None) + " lnRegression() " + str(e),getattr(exc_tb, 'tb_lineno', '?'))
             if power == 2:
                 fit = QApplication.translate("Label","x",None) +"\u00b2"
             elif power == 3:
@@ -12577,11 +12585,11 @@ class tgraphcanvas(FigureCanvas):
         except ValueError:
             aw.qmc.adderror(QApplication.translate("Error Message","Value Error:",None) + " univariate()")
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " univariate() " + str(e),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " univariate() " + str(e),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
     def drawinterp(self,mode):
@@ -12600,12 +12608,12 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:",None) + " drawinterp() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:",None) + " drawinterp() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " drawinterp() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " drawinterp() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
     # calculates the (interpolated) temperature from the given time/temp arrays at timepoint "seconds"
@@ -12765,13 +12773,13 @@ class tgraphcanvas(FigureCanvas):
             try:
                 # only show first line in
                 error = error.splitlines()[0]
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             if self.flagon: # don't send message here, but cache it and send it from updategraphics from within the GUI thread
                 self.temporary_error = error
             else:
                 aw.sendmessage(error)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         finally:
             if aw.qmc.errorsemaphore.available() < 1:
@@ -12830,11 +12838,11 @@ class tgraphcanvas(FigureCanvas):
                 f.write(repr(obj))
                 f.close()
                 aw.sendmessage(QApplication.translate("Message","Points saved", None))
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " savepoints() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " savepoints() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -12854,11 +12862,11 @@ class tgraphcanvas(FigureCanvas):
                 self.xaxistosm(redraw=False)
                 self.redrawdesigner()
                 aw.sendmessage(QApplication.translate("Message","Points loaded", None))
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadpoints() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadpoints() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
     #used to start designer from scratch (not from a loaded profile)
@@ -13000,7 +13008,7 @@ class tgraphcanvas(FigureCanvas):
                 btvals = func(timez).tolist()
                 func2 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
                 etvals = func2(timez).tolist()
-            except:
+            except Exception: # pylint: disable=broad-except
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception: redrawdesigner() Roast events may be out of order. Restting Designer.",None)))
                 self.reset_designer()
                 return
@@ -13269,11 +13277,11 @@ class tgraphcanvas(FigureCanvas):
                                   margin,stringfromseconds(finishphasetime),margin,finishphaseP,margin,finishroc,margin,etbt3,margin)
                         aw.sendmessage(string1+string2+string3,append=False)
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " on_motion() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " on_motion() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             self.unrarefy_designer()
             return
 
@@ -13288,9 +13296,9 @@ class tgraphcanvas(FigureCanvas):
             time_min_bt = timez[idx_min_bt]
             return min_bt, time_min_bt
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " findTPdes() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " findTPdes() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
     #this is used in on_motion() to try to prevent points crossing over points
@@ -13389,10 +13397,9 @@ class tgraphcanvas(FigureCanvas):
                 self.redrawdesigner()
                 return i
 
-
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addpoint() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addpoint() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
     #removes point
@@ -13428,9 +13435,9 @@ class tgraphcanvas(FigureCanvas):
 
             self.redrawdesigner()
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " removepoint() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " removepoint() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
     #finds a proper index location for a time that does not exists yet.
@@ -13510,19 +13517,19 @@ class tgraphcanvas(FigureCanvas):
                                 self.designer_create_sv_command,
                                 self.designer_create_ramp_command]
 
-                functioncall[self.reproducedesigner]()
+                functioncall[self.reproducedesigner]() # pylint: disable=not-callable
 
             self.redraw()
             aw.sendmessage(QApplication.translate("Message", "New profile created",None))
 
         except ValueError:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Value Error:",None) + " createFromDesigner()",exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Value Error:",None) + " createFromDesigner()",getattr(exc_tb, 'tb_lineno', '?'))
             return
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createFromDesigner() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createFromDesigner() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
     #activates mouse events
@@ -13774,7 +13781,7 @@ class tgraphcanvas(FigureCanvas):
         if self.ax2 is not None:
             try:
                 self.fig.delaxes(self.ax2)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         self.redraw(recomputeAllDeltas=False)
 
@@ -13806,7 +13813,7 @@ class tgraphcanvas(FigureCanvas):
             if self.ax2 is not None:
                 try:
                     self.fig.delaxes(self.ax2)
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor='None')
             
@@ -13814,7 +13821,7 @@ class tgraphcanvas(FigureCanvas):
             try:
                 ticks_loc = self.ax2.get_yticks()
                 self.ax2.yaxis.set_major_locator(ticker.FixedLocator(ticks_loc))
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             
             self.ax2.set_rmax(1.)
@@ -13911,7 +13918,7 @@ class tgraphcanvas(FigureCanvas):
                         fontproperties=fontprop)
                     try:
                         anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                    except: # mpl before v3.0 do not have this set_in_layout() function
+                    except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                         pass
                     count += 1
             with warnings.catch_warnings():
@@ -13920,12 +13927,12 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None) + " drawWheel() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None) + " drawWheel() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " drawWheel() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " drawWheel() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
     def makewheelcolorpattern(self):
@@ -14012,16 +14019,24 @@ class tgraphcanvas(FigureCanvas):
         else:
             #turn OFF
             self.crossmarker = False
-            self.fig.canvas.mpl_disconnect(self.crossmouseid)
-            self.fig.canvas.mpl_disconnect(self.onreleaseid)  #mouse cross lines measurement
+            if self.crossmouseid is not None:
+                try:
+                    self.fig.canvas.mpl_disconnect(self.crossmouseid)
+                except Exception:
+                    pass
+            if self.onreleaseid is not None:
+                try:
+                    self.fig.canvas.mpl_disconnect(self.onreleaseid)  #mouse cross lines measurement
+                except Exception:
+                    pass
             try:
                 aw.qmc.ax.lines.remove(self.l_horizontalcrossline)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             self.l_horizontalcrossline = None
             try:
                 aw.qmc.ax.lines.remove(self.l_verticalcrossline)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             self.l_verticalcrossline = None
             self.resetdeltalines()
@@ -14086,9 +14101,10 @@ def my_get_icon(name):
     if os.path.exists(p):
         return QIcon(p)
     else:
-        None
-
+        return None
+        
 def my_fedit(data, title="", comment="", icon=None, parent=None, apply=None):
+    del title, apply
     # Sorting for default labels (_lineXXX, _imageXXX).
     def cmp_key(label):
         match = re.match(r"(_line|_image)(\d+)", label)
@@ -14147,7 +14163,7 @@ def my_fedit(data, title="", comment="", icon=None, parent=None, apply=None):
                             else:
                                 translated_tpls.append(tpl)
                     l[0] = translated_tpls
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         def my_apply(data):
             try:
@@ -14171,15 +14187,14 @@ def my_fedit(data, title="", comment="", icon=None, parent=None, apply=None):
                 # Redraw
                 figure.canvas.draw()
                 if not (axes.get_xlim() == orig_xlim and axes.get_ylim() == orig_ylim):
-                    figure.canvas.toolbar.push_current()                                
-                        
-            except Exception:
+                    figure.canvas.toolbar.push_current()
+            except Exception: # pylint: disable=broad-except
                 pass
     return formlayout.fedit_org(data,QApplication.translate("Toolbar", 'Lines', None),comment,icon,parent,my_apply) #@UndefinedVariable
 
 #####
 
-class VMToolbar(NavigationToolbar):
+class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
     def __init__(self, plotCanvas, parent,white_icons=False):
         # toolitem entries of the form (text, tooltip_text, image_file, callback)
         self.toolitems = (
@@ -14210,7 +14225,7 @@ class VMToolbar(NavigationToolbar):
         if len(self.actions()) > 0:
             # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
             a = QAction(self._icon("qt4_editor_options.png"),QApplication.translate("Toolbar", 'Lines', None),self)
-            a.triggered.connect(self.edit_parameters)
+            a.triggered.connect(self.my_edit_parameters)
             a.setToolTip(QApplication.translate("Tooltip", 'Line styles', None))
             self.insertAction(self.actions()[-1],a)
 
@@ -14251,7 +14266,7 @@ class VMToolbar(NavigationToolbar):
         # monkey patch _formlayout
         try:
             formlayout.fedit_org #@UndefinedVariable
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             # not yet monkey patched
             formlayout.fedit_org = formlayout.fedit
             formlayout.fedit = my_fedit
@@ -14279,36 +14294,36 @@ class VMToolbar(NavigationToolbar):
         if aw.qmc.ai is not None:
             # we remember the axis ranges before the pan-zoom to detect if it was zoomed
             self.axis_ranges = self.getAxisRanges()
-        super(VMToolbar, self).press_pan(event)
+        super().press_pan(event)
 
     def release_pan(self, event):
         if aw.qmc.ai is not None and [round(r) for r in self.axis_ranges] != [round(r) for r in self.getAxisRanges()]:
             # only hide the background image if the axis ratio changed
             aw.qmc.ai.set_visible(False)
-        super(VMToolbar, self).release_pan(event)
+        super().release_pan(event)
 
     def release_zoom(self, event):
         if aw.qmc.ai is not None:
             aw.qmc.ai.set_visible(False)
-        super(VMToolbar, self).release_zoom(event)
+        super().release_zoom(event)
 
     def forward(self, *args):
         if aw.qmc.ai is not None:
             aw.qmc.ai.set_visible(False)  # whenever forward is pressed the image will be hidden
-        super(VMToolbar, self).forward(*args)
+        super().forward(*args)
 
     def back(self, *args):
         if aw.qmc.ai is not None:
-            if self._nav_stack._pos == 1:
+            if self._nav_stack._pos == 1: # pylint: disable=protected-access
                 aw.qmc.ai.set_visible(True)
-        super(VMToolbar, self).back(*args)
+        super().back(*args)
 
     def home(self, *args):
         """Restore the original view"""
         # show the background image again that was hidden on zoom-in
         if aw.qmc.ai is not None:
             aw.qmc.ai.set_visible(True)
-        super(VMToolbar, self).home(*args)
+        super().home(*args)
 
         # toggle zoom_follow if recording
         if aw.qmc.flagstart:
@@ -14322,7 +14337,7 @@ class VMToolbar(NavigationToolbar):
         if aw.qmc.zoom_follow:
             self.push_current()
 
-    def _icon(self, name, _=None):
+    def _icon(self, name):
         if aw is not None and name.startswith("plus"):
             basedir = os.path.join(aw.getResourcePath(),"Icons")
         else:
@@ -14347,11 +14362,11 @@ class VMToolbar(NavigationToolbar):
         if hasattr(pm, 'setDevicePixelRatio'):
             if mpl_version[0] > 2 and mpl_version[1] > 2:
                 if mpl_version[1] > 3:
-                    _setDevicePixelRatio(pm, _devicePixelRatioF(self))
+                    _setDevicePixelRatio(pm, _devicePixelRatioF(self)) # pylint: disable=protected-access
                 else:
-                    _setDevicePixelRatioF(pm, _devicePixelRatioF(self))
+                    _setDevicePixelRatioF(pm, _devicePixelRatioF(self)) # pylint: disable=protected-access
             else:
-                pm.setDevicePixelRatio(self.canvas._dpi_ratio)
+                pm.setDevicePixelRatio(self.canvas._dpi_ratio) # pylint: disable=protected-access
         return QIcon(pm)
         
     def recolorIcon(self, pixmap, color):
@@ -14366,7 +14381,7 @@ class VMToolbar(NavigationToolbar):
     def mouse_move(self, event):
         try:
             self._update_cursor(event) # not available in MPL v3.0.3 on Python3.5 for the RPi Stretch builds
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
         if event.inaxes and event.inaxes.get_navigate():
@@ -14426,7 +14441,7 @@ class VMToolbar(NavigationToolbar):
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def edit_parameters(self,_=False):
+    def my_edit_parameters(self,_=False):
         try:
             if not aw.qmc.designerflag: # deactivate figure_options in designer mode due to all kind of side effects
                 allaxes = self.canvas.figure.get_axes()
@@ -14439,27 +14454,19 @@ class VMToolbar(NavigationToolbar):
                         y_label = aw.qmc.ax.set_ylabel(aw.qmc.mode)
                         try:
                             y_label.set_in_layout(False) # remove x-axis labels from tight_layout calculation
-                        except: # set_in_layout not available in mpl<3.x
+                        except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                             pass
                         two_ax_mode = (aw.qmc.DeltaETflag or aw.qmc.DeltaBTflag or (aw.qmc.background and (aw.qmc.DeltaETBflag or aw.qmc.DeltaBTBflag))) and not aw.qmc.designerflag
                         if two_ax_mode and aw.qmc.delta_ax:
                             y_label = aw.qmc.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)))
                             try:
                                 y_label.set_in_layout(False) # remove x-axis labels from tight_layout calculation
-                            except: # set_in_layout not available in mpl<3.x
+                            except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                                 pass
 
                 axes = allaxes[0]
 
                 try:
-#                    # hack to work around an inconsistency in mpl (1.5.1, 2.0b3) that throws an index error on "steps-post" in figureoptions
-#                    steps_post_lines = []
-#                    with warnings.catch_warnings():
-#                        warnings.simplefilter('ignore')
-#                        for line in aw.qmc.ax.lines:
-#                            if line.get_drawstyle() == "steps-post":
-#                                steps_post_lines.append(line)
-#                                line.set_drawstyle("steps")
                     
                     with warnings.catch_warnings():
                         warnings.filterwarnings("ignore") # , category=numpy.VisibleDeprecationWarning)
@@ -14467,7 +14474,7 @@ class VMToolbar(NavigationToolbar):
 #                        for line in steps_post_lines:
 #                            line.set_drawstyle("steps-post")
                             
-                except Exception as e:
+                except Exception as e: # pylint: disable=broad-except
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     pass
@@ -14475,9 +14482,9 @@ class VMToolbar(NavigationToolbar):
 #                aw.fetchAxisLimits() # DON'T
                 # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
                 aw.qmc.redraw(recomputeAllDeltas=False)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " edit_parameters() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " edit_parameters() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 
@@ -14490,8 +14497,10 @@ class SampleThread(QThread):
     updategraphics = pyqtSignal()
 
     def __init__(self,parent = None):
-        super(SampleThread,self).__init__(parent)
+        super().__init__(parent)
         self.afterTP = False
+        self.decay_weights = None
+        self.temp_decay_weights = None
 
     # input filter
     # if temp (the actual reading) is outside of the interval [tmin,tmax] or
@@ -14555,11 +14564,11 @@ class SampleThread(QThread):
                     elif len(tempx) > 2 and tempx[-1] == tempx[-2] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2]
                         tempx[-1] = (tempx[-2] + temp) / 2.0
                 return temp
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " filterDropOuts() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " filterDropOuts() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return temp
 
     def sample_main_device(self,force=False):
@@ -14578,7 +14587,7 @@ class SampleThread(QThread):
                 tx = aw.qmc.timeclock.elapsed()/1000.
                 t1,t2 = aw.simulator.read((tx if aw.qmc.flagstart else 0))
             return tx,float(t1),float(t2)
-        except:
+        except Exception: # pylint: disable=broad-except
             tx = aw.qmc.timeclock.elapsed()/1000.
             return tx,-1.0,-1.0
 
@@ -14590,7 +14599,7 @@ class SampleThread(QThread):
                 tx = aw.qmc.timeclock.elapsed()/1000.
                 t1,t2 = aw.simulator.readextra(i,(tx if aw.qmc.flagstart else 0))
             return tx,float(t1),float(t2)
-        except:
+        except Exception: # pylint: disable=broad-except
             tx = aw.qmc.timeclock.elapsed()/1000.
             return tx,-1.0,-1.0
 
@@ -14612,7 +14621,7 @@ class SampleThread(QThread):
             temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
             try:
                 return numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:])  # len(decay_weights)>len(temp_trail_re)=l is possible
-            except:
+            except Exception: # pylint: disable=broad-except
                 # in case something goes very wrong we at least return the standard average over temp, this should always work as len(tx)=len(temp)
                 return numpy.average(tx,temp)
 
@@ -14690,7 +14699,7 @@ class SampleThread(QThread):
                 try:
                     if aw.qmc.extra_event_sampling_delay == 0 and aw.qmc.extrabuttonactions[2]:
                         aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
 
                 #if using a meter (thermocouple device)
@@ -14728,13 +14737,13 @@ class SampleThread(QThread):
                                     try:
                                         extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+3),RTsval=aw.qmc.RTextratemp1[i])
                                         aw.qmc.RTextratemp1[i] = extrat1
-                                    except:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                                 if len(aw.qmc.extramathexpression2) > i and aw.qmc.extramathexpression2[i] is not None and len(aw.qmc.extramathexpression2[i]):
                                     try:
                                         extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
                                         aw.qmc.RTextratemp2[i] = extrat2
-                                    except:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                                         
                                 et1_prev = et2_prev = None
@@ -14847,13 +14856,13 @@ class SampleThread(QThread):
                         try:
                             t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,tx,RTsname="Y1",RTsval=t1)
                             aw.qmc.RTtemp1 = t1
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                     if aw.qmc.BTfunction is not None and len(aw.qmc.BTfunction):
                         try:
                             t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,tx,RTsname="Y2",RTsval=t2)
                             aw.qmc.RTtemp2 = t2
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                     # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                     # modbus channel 1+2, respect input temperature scale setting
@@ -14915,7 +14924,6 @@ class SampleThread(QThread):
                     else:
                         dw2 = self.temp_decay_weights
                     # average smoothing
-                    d = aw.qmc.delay / 1000.
                     if len(sample_ctemp1) > 0:
                         st1 = self.decay_average(sample_ctimex1,sample_ctemp1,dw1)
                     else:
@@ -14942,7 +14950,6 @@ class SampleThread(QThread):
                         else:
                             dw2 = self.temp_decay_weights
                         # average smoothing
-                        d = aw.qmc.delay / 1000.
                         if len(sample_ctemp1) > 0:
                             sst1 = self.decay_average(sample_ctimex1,sample_ctemp1,dw1)
                         else:
@@ -14997,7 +15004,7 @@ class SampleThread(QThread):
                                         # using stable polyfit from numpy polyfit module
                                         LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
                                         aw.qmc.rateofchange1 = LS_fit[1]*60.
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                     # https://github.com/numpy/numpy/issues/16744
                                     # we fall back to the two point algo
@@ -15010,7 +15017,7 @@ class SampleThread(QThread):
                             if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction):
                                 try:
                                     aw.qmc.rateofchange1 = aw.qmc.eval_math_expression(aw.qmc.DeltaETfunction,tx,RTsname="R1",RTsval=aw.qmc.rateofchange1)
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                         # compute T2 RoR
                         if t2_final == -1 or len(sample_ctimex2)<2:  # we repeat the last RoR if underlying temperature dropped
@@ -15031,7 +15038,7 @@ class SampleThread(QThread):
                                         warnings.simplefilter('ignore')
                                         LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
                                         aw.qmc.rateofchange2 = LS_fit[1]*60.
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                     # https://github.com/numpy/numpy/issues/16744
                                     # we fall back to the two point algo
@@ -15044,7 +15051,7 @@ class SampleThread(QThread):
                             if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
                                 try:
                                     aw.qmc.rateofchange2 = aw.qmc.eval_math_expression(aw.qmc.DeltaBTfunction,tx,RTsname="R2",RTsval=aw.qmc.rateofchange2)
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
 
                         sample_unfiltereddelta1.append(aw.qmc.rateofchange1)
@@ -15127,14 +15134,14 @@ class SampleThread(QThread):
                                     (aw.qmc.mode == "F" and sample_temp2[tp] > 100 and sample_temp2[tp] < 300)): # only mark TP if not an error value!
                                     aw.qmc.autoTPIdx = 1
                                     aw.qmc.TPalarmtimeindex = tp
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                             try:
                                 # if 2:30min into the roast and TPalarmtimeindex alarmindex not yet set,
                                 # we place the TPalarmtimeindex at the current index to enable in airoasters without TP the autoDRY and autoFCs functions and activate the TP Phases LCDs
                                 if aw.qmc.TPalarmtimeindex is None and ((sample_timex[-1] - sample_timex[aw.qmc.timeindex[0]]) > 150):
                                     aw.qmc.TPalarmtimeindex = length_of_qmc_timex - 1
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                         # autodetect DROP event
                         # only if 8min into roast and BT>160C/320F
@@ -15163,7 +15170,7 @@ class SampleThread(QThread):
                     #process active quantifiers
                     try:
                         aw.process_active_quantifiers()
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         pass
 
                     #update SV on Arduino/TC4, Hottop, or MODBUS if in Ramp/Soak or Background Follow mode and PID is active
@@ -15192,7 +15199,7 @@ class SampleThread(QThread):
                             aw.updateAUC()
                             if aw.qmc.AUCguideFlag:
                                 aw.updateAUCguide()
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
 
                     #output ET, BT, ETB, BTB to output program
@@ -15213,7 +15220,7 @@ class SampleThread(QThread):
                                 '{0:.1f}'.format(sample_temp2[-1]),
                                 '{0:.1f}'.format(ETB),
                                 '{0:.1f}'.format(BTB)])
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
 
                     #check for each alarm that was not yet triggered
@@ -15316,7 +15323,7 @@ class SampleThread(QThread):
                                         (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit) or
                                         (alarm_idx != None and alarm_temp == alarm_limit)): # for relative IF_ALARMS we include the equality
                                     aw.qmc.temporaryalarmflag = i
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     finally:
                         if aw.qmc.alarmSemaphore.available() < 1:
@@ -15337,11 +15344,11 @@ class SampleThread(QThread):
                         if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0]+5 < len(sample_temp2) and self.checkTPalarmtime():
                             aw.qmc.autoTPIdx = 1
                             aw.qmc.TPalarmtimeindex = aw.findTP()
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " sample() {0}").format(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " sample() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
@@ -15364,7 +15371,7 @@ class SampleThread(QThread):
         try:
             aw.qmc.flagsamplingthreadrunning = True
             if sys.platform.startswith("darwin"):
-                pool = Foundation.NSAutoreleasePool.alloc().init()  # @UndefinedVariable
+                pool = Foundation.NSAutoreleasePool.alloc().init()  # @UndefinedVariable # pylint: disable=maybe-no-member
             self.afterTP = False
             if not aw.qmc.flagon:
                 return
@@ -15402,7 +15409,7 @@ class SampleThread(QThread):
                         if aw.ser.SP.isOpen():
                             aw.ser.closeport()
                         QApplication.processEvents()
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     self.quit()
                     break  #thread ends
@@ -15417,8 +15424,6 @@ class SampleThread(QThread):
 #########################################################################################################
 
 class Athreadserver(QWidget):
-    def __init__(self,parent = None):
-        super(Athreadserver,self).__init__(parent)
 
     def createSampleThread(self):
         if not aw.qmc.flagsamplingthreadrunning: # we only start a new sampling thread if none is running yet
@@ -15446,12 +15451,10 @@ class EventActionThread(QThread):
     def run(self):
         # as eventaction_internal is not running in the GUI thread we avoid doing graphic updates and run them instead after thread termination within
         # the GUI thread
-        aw.eventaction_internal(self.action,self.command,doupdategraphics=False,doupdatebackground=False)
+        aw.eventaction_internal(self.action,self.command)
 
 # applies comma2dot as fixup to automatically turn numbers like "1,2" into valid numbers like "1.0" and the empty entry into "0.0"
 class MyQDoubleValidator(QDoubleValidator):
-    def __init__(self, *args, **kwargs):
-        super(MyQDoubleValidator, self).__init__(*args, **kwargs)
     
     def fixup(self, input_value):
         if input_value is None or input_value == "":
@@ -15459,16 +15462,18 @@ class MyQDoubleValidator(QDoubleValidator):
         else:
             try:
                 return aw.comma2dot(input_value)
-            except:
+            except Exception: # pylint: disable=broad-except
                 return input
 
 ########################################################################################
 #################### MAIN APPLICATION WINDOW ###########################################
 ########################################################################################
 
-
+aw = None # assigned to the single instance of ApplicationWindow on creation
+artisanviewerFirstStart = False
+    
 class ApplicationWindow(QMainWindow):
-    global locale, app
+    global locale, app, artisanviewerFirstStart # pylint: disable=global-statement
 
     singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
     singleShotPhidgetsPulseOFFSerial = pyqtSignal(int,int,str,str)
@@ -15529,7 +15534,7 @@ class ApplicationWindow(QMainWindow):
                 self.locale = "en"
             else:
                 self.locale = locale
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.locale = "en"
 
         #############################  Define variables that need to exist before calling settingsload()
@@ -15540,7 +15545,7 @@ class ApplicationWindow(QMainWindow):
         self.recentThemeActs = []
         self.applicationDirectory =  QDir().current().absolutePath()
 
-        super(ApplicationWindow, self).__init__(parent)
+        super().__init__(parent)
         self.helpdialog = None
         
         self.setAcceptDrops(True) # enable drag-and-drop
@@ -15634,7 +15639,7 @@ class ApplicationWindow(QMainWindow):
         if settings.contains("dpi") and (not settings.contains("resetqsettings") or toInt(settings.value("resetqsettings",self.resetqsettings)) == 0):
             try:
                 self.dpi = toInt(settings.value("dpi",self.dpi))
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
         self.qmc = tgraphcanvas(self.main_widget,self.dpi)
@@ -17431,10 +17436,7 @@ class ApplicationWindow(QMainWindow):
         self.button_1.setFocusPolicy(Qt.NoFocus)
         self.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None))
         self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
-        self.shadow_1 = QGraphicsDropShadowEffect(self)
-        self.shadow_1.setBlurRadius(20)
-        self.shadow_1.setOffset(0,0.9)
-        self.button_1.setGraphicsEffect(self.shadow_1)
+        self.button_1.setGraphicsEffect(self.makeShadow())
         self.button_1.pressed.connect(self.button1Pressed)
         self.button_1.released.connect(self.button1Released)
         self.button_1.setCursor(QCursor(Qt.PointingHandCursor))
@@ -17448,10 +17450,7 @@ class ApplicationWindow(QMainWindow):
         self.button_2.setFocusPolicy(Qt.NoFocus)
         self.button_2.setToolTip(QApplication.translate("Tooltip", "Start recording", None))
         self.button_2.setStyleSheet(self.pushbuttonstyles["STOP"])
-        self.shadow_2 = QGraphicsDropShadowEffect(self)
-        self.shadow_2.setBlurRadius(20)
-        self.shadow_2.setOffset(0,0.9)
-        self.button_2.setGraphicsEffect(self.shadow_2)
+        self.button_2.setGraphicsEffect(self.makeShadow())
         self.button_2.pressed.connect(self.button2Pressed)
         self.button_2.released.connect(self.button2Released)
         self.button_2.setCursor(QCursor(Qt.PointingHandCursor))
@@ -17498,10 +17497,7 @@ class ApplicationWindow(QMainWindow):
         self.button_7 = QPushButton(QApplication.translate("Button", "RESET", None))
         self.button_7.setFocusPolicy(Qt.NoFocus)
         self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
-        self.shadow_7 = QGraphicsDropShadowEffect(self)
-        self.shadow_7.setBlurRadius(20)
-        self.shadow_7.setOffset(0,0.9)
-        self.button_7.setGraphicsEffect(self.shadow_7)
+        self.button_7.setGraphicsEffect(self.makeShadow())
         self.button_7.pressed.connect(self.button7Pressed)
         self.button_7.released.connect(self.button7Released)
         self.button_7.setCursor(QCursor(Qt.PointingHandCursor))
@@ -17531,10 +17527,7 @@ class ApplicationWindow(QMainWindow):
         self.button_10 = QPushButton(QApplication.translate("Button", "Control", None))
         self.button_10.setFocusPolicy(Qt.NoFocus)
         self.button_10.setStyleSheet(self.pushbuttonstyles["PID"])
-        self.shadow_10 = QGraphicsDropShadowEffect(self)
-        self.shadow_10.setBlurRadius(20)
-        self.shadow_10.setOffset(0,0.9)
-        self.button_10.setGraphicsEffect(self.shadow_10)
+        self.button_10.setGraphicsEffect(self.makeShadow())
         self.button_10.pressed.connect(self.button10Pressed)
         self.button_10.released.connect(self.button10Released)
         self.button_10.setCursor(QCursor(Qt.PointingHandCursor))
@@ -17610,6 +17603,7 @@ class ApplicationWindow(QMainWindow):
         self.button_18 = QPushButton(QApplication.translate("Button", "HUD", None))
         self.button_18.setFocusPolicy(Qt.NoFocus)
         self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])
+        self.button_18.setGraphicsEffect(self.makeShadow())
         self.button_18.setMinimumHeight(self.standard_button_height)
         self.button_18.setContentsMargins(0,0,0,0)
         self.button_18.clicked.connect(self.qmc.toggleHUD)
@@ -17835,6 +17829,7 @@ class ApplicationWindow(QMainWindow):
 
         #### CUSTOM events buttons
         self.buttonlist = []
+        self.buttonStates = []
         self.lastbuttonpressed = -1
         self.buttonlistmaxlen = 11
         self.buttonpalette_default_label = ""
@@ -18435,7 +18430,7 @@ class ApplicationWindow(QMainWindow):
                     self.setWindowTitle("{}{} - {} ({})".format(dirtySign,appTitle,__release_sponsor_name__,QApplication.translate("About","Release Sponsor",None)))
                 else:
                     self.setWindowTitle("{}{}".format(dirtySign,appTitle))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 
     def resetDonateCounter(self):
@@ -18467,7 +18462,7 @@ class ApplicationWindow(QMainWindow):
                 donate_message_box.setDefaultButton(QMessageBox.Ok)
                 donate_message_box.exec()
                 self.resetDonateCounter()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 
     @pyqtSlot(str)
@@ -18478,7 +18473,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.palette["canvas"] = c
             aw.updateCanvasColors()
             aw.qmc.redraw()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
     
     @pyqtSlot()
@@ -18489,7 +18484,7 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.palette.pop("canvas_alt")
                 aw.updateCanvasColors()
                 aw.qmc.redraw()
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
 
@@ -18515,7 +18510,7 @@ class ApplicationWindow(QMainWindow):
         try: # sip not supported on older PyQt versions (RPi!)
             if sip.isdeleted(dialog):
                 dialog = None
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         if dialog is None:
             dialog = HelpDlg(parent,self,title,content) # parent, application window, title, content
@@ -18529,10 +18524,10 @@ class ApplicationWindow(QMainWindow):
             try:
                 if not sip.isdeleted(dialog):
                     dialog.close()
-            except:
+            except Exception: # pylint: disable=broad-except
                 try:
                     dialog.close()
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
 
     # takes a fit from numpy.polyfit and renders it as string to be copied as symbolic formula
@@ -18567,7 +18562,7 @@ class ApplicationWindow(QMainWindow):
                         sign = "+"
             if sign == "-":
                 s = sign + s
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         return s
 
@@ -18575,7 +18570,7 @@ class ApplicationWindow(QMainWindow):
         if event.type() == QEvent.ApplicationPaletteChange:  # called if the palette changed (switch between dark and light mode on macOS)
             self.updateCanvasColors()
             return True
-        return super(ApplicationWindow, self).eventFilter(obj, event)
+        return super().eventFilter(obj, event)
 
     # search the given QTable table for a row with the given widget as cellWidget or item in column col or as a sub-widget contained in the layout of a widget in place
     # returns the row number if the widget was found or None
@@ -18599,7 +18594,7 @@ class ApplicationWindow(QMainWindow):
     def redraw_action(self):
         try:
             self.qmc.redraw(False,False)
-        except:
+        except Exception: # pylint: disable=broad-except
             # self.qmc might not be defined yet
             pass
 
@@ -18616,18 +18611,10 @@ class ApplicationWindow(QMainWindow):
         return validator
 
     def buttonPressed(self, button):
-        # shadow needs to be recreated each time?
-        self.strong_shadow = QGraphicsDropShadowEffect(self)
-        self.strong_shadow.setBlurRadius(30)
-        self.strong_shadow.setOffset(0,3)
-        button.setGraphicsEffect(self.strong_shadow)
+        button.setGraphicsEffect(self.makeShadow(strong=True))
 
     def buttonReleased(self,button):
-        # shadow needs to be recreated each time?
-        self.shadow = QGraphicsDropShadowEffect(self)
-        self.shadow.setBlurRadius(20)
-        self.shadow.setOffset(0,0.9)
-        button.setGraphicsEffect(self.shadow)
+        button.setGraphicsEffect(self.makeShadow())
 
     @pyqtSlot()
     def button1Pressed(self):
@@ -18684,11 +18671,11 @@ class ApplicationWindow(QMainWindow):
 #            rgb_tuple = tuple(int(rgb[i:i+2], 16)/255 for i in (1, 3 ,5))
             darker_rgb  = '#%02x%02x%02x' % (tuple([int(255 * (x * (1 - shade_factor))) for x in rgb_tuple]))
             lighter_rgb = '#%02x%02x%02x' % (tuple([int(255 * (x + (1 - x) * tint_factor)) for x in rgb_tuple]))
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createRGBGradient(): {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createRGBGradient(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             lighter_rgb = darker_rgb = "000000"
         return lighter_rgb,darker_rgb
 
@@ -18732,12 +18719,12 @@ class ApplicationWindow(QMainWindow):
         try:
             idx = self.extraLCD1.index(sender)
             self.setTare(2+idx*2)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             idx = self.extraLCD2.index(sender)
             self.setTare(2+idx*2 + 1)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     # set the tare values per channel (0: ET, 1:BT, 2:E1c0, 3:E1c1, 4:E1c0, 5:E1c1,...)
@@ -18824,7 +18811,7 @@ class ApplicationWindow(QMainWindow):
                     subscription_icon += ".png"
             if len(ntb.actions()) > 0:
                 a = ntb.actions()[0] # the plus action is the first one
-                a.setIcon(ntb._icon(plus_icon))
+                a.setIcon(ntb._icon(plus_icon)) # pylint: disable=protected-access
                 a.setToolTip(tooltip)
                 if len(ntb.actions()) > 1:
                     a = ntb.actions()[1] # the plus subscription action is the second one
@@ -18833,12 +18820,12 @@ class ApplicationWindow(QMainWindow):
                         a.setIcon(QIcon())
                     else:
                         a.setEnabled(True)
-                        a.setIcon(ntb._icon(subscription_icon))
-        except Exception as e:
+                        a.setIcon(ntb._icon(subscription_icon)) # pylint: disable=protected-access
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updatePlusStatus(): {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updatePlusStatus(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
 
@@ -19081,7 +19068,7 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.beansize_max = bd["screen_max"]
                     else:
                         self.qmc.beansize_max = 0
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
         aw.sendmessage(QApplication.translate("Message","Recent roast properties '{0}' set".format(aw.recentRoastLabel(rr))))
 
@@ -19106,11 +19093,11 @@ class ApplicationWindow(QMainWindow):
             rr = self.delRecentRoast(d["title"],d["weightIn"],d["weightUnit"])
             self.recentRoasts = [d] + rr[:self.maxRecentRoasts-1]
             self.updateNewMenuRecentRoasts()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addRecentRoast(): {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addRecentRoast(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def recentRoastLabel(self,rr):
         res = rr["title"] + " (" + "%g" % rr["weightIn"] +rr["weightUnit"]+")"
@@ -19130,7 +19117,7 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.background = not aw.qmc.hideBgafterprofileload
                         aw.qmc.timealign(redraw=False)
                         aw.qmc.redraw()
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
             if alt_modifier:
                 if self.qmc.flagon:
@@ -19173,13 +19160,13 @@ class ApplicationWindow(QMainWindow):
                 l1 = "<b>" + aw.qmc.extraname1[i] + "</b>"
                 try:
                     aw.extraLCDlabel1[i].setText(l1.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))
-                except:
+                except Exception: # pylint: disable=broad-except
                     aw.extraLCDlabel1[i].setText(l1)
             if i < len(aw.qmc.extraname2):
                 l2 = "<b>" + aw.qmc.extraname2[i] + "</b>"
                 try:
                     aw.extraLCDlabel2[i].setText(l2.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))
-                except:
+                except Exception: # pylint: disable=broad-except
                     aw.extraLCDlabel2[i].setText(l2)
         aw.settooltip()
 
@@ -19207,7 +19194,7 @@ class ApplicationWindow(QMainWindow):
                         a = QAction(self, visible=True, triggered=triggered)
                         a.setData((e[1],str(k)))
                         if k == resourceName:
-                            menu_title = tr(e[0]) # + "..."
+                            menu_title = str(e[0]) # + "..."
                         else:
                             menu_title = str(k) + " " + str(e[0])  # + "..."
                         menu_title = menu_title.replace('&','&&') # a & in a menu entry is not displayed, but "&&" is displayed as "&"                            
@@ -19279,7 +19266,7 @@ class ApplicationWindow(QMainWindow):
                         if res:
                             try:
                                 self.qmc.elevation = int(elevation)
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                         else:
                             self.sendmessage(QApplication.translate("Message","Action canceled",None))
@@ -19322,12 +19309,12 @@ class ApplicationWindow(QMainWindow):
                         current = 0
                         try:
                             current = [p[0] for p in ports].index(self.ser.comport)
-                        except Exception:
+                        except Exception: # pylint: disable=broad-except
                             pass
                         if self.qmc.device == 53: # Hottop 2k+
                             try:
                                 current = [p[0] for p in ports].index("FT230X Basic UART")
-                            except Exception:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                         port_name,res = QInputDialog.getItem(self,
                             QApplication.translate("Message", "Port Configuration",None),
@@ -19342,7 +19329,7 @@ class ApplicationWindow(QMainWindow):
                                     self.modbus.comport = ports[pos][0]
                                 else: # Fuji or HOTTOP
                                     self.ser.comport = ports[pos][0]
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                     if res:
                         if self.qmc.roastersize_setup == 0:
@@ -19581,11 +19568,11 @@ class ApplicationWindow(QMainWindow):
                     (QApplication.translate("Label","Event button",None)+" "+ aw.extraeventslabels[i], aw.extraeventbuttoncolor[i], " "+QApplication.translate("Label","its text",None), aw.extraeventbuttontextcolor[i]),
                 )
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " getcolorPairsToCheck() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " getcolorPairsToCheck() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
         return colorPairsToCheck
 
@@ -19613,16 +19600,18 @@ class ApplicationWindow(QMainWindow):
             c1_rgb = tuple(int(c1[i:i+2], 16) for i in (1, 3 ,5))
             c2_rgb = tuple(int(c2[i:i+2], 16) for i in (1, 3 ,5))
             cDiff = deltaE(c1_rgb, c2_rgb, input_space="sRGB255", uniform_space="CIELab")
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " colorDifference() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " colorDifference() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
         return cDiff
 
 
-    def checkColors(self,colorPairsToCheck=[],showMsg=True):
+    def checkColors(self,colorPairsToCheck=None,showMsg=True):
+        if colorPairsToCheck is None:
+            colorPairsToCheck = []
         val = -1
         try:
             for c in colorPairsToCheck:
@@ -19647,11 +19636,11 @@ class ApplicationWindow(QMainWindow):
 #                    print("checkColors", str(c[0]), "/", str(c[2]), "  Too similar", str(c[1]), str(c[3]), str(val)) #debugprint
 #                else: #debugprint
 #                    print("checkColors", str(c[0]), "/", str(c[2]), "  Okay", str(c[1]), str(c[3]), str(val))  #debugprint
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkColors() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkColors() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
         return val
 
@@ -19671,11 +19660,11 @@ class ApplicationWindow(QMainWindow):
             nc_greyscale_sRGB = numpy.clip(nc_greyscale_sRGB, 0, 255)
             nc_greyscale = "#{0:2x}{1:2x}{2:2x}".format(int(nc_greyscale_sRGB[0]),int(nc_greyscale_sRGB[1]),int(nc_greyscale_sRGB[2]))
             nc = str(QColor(nc_greyscale).name())
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " convertToGreyscale() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " convertToGreyscale() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return nc
 
     def labelBorW(self,backgroundcolor):
@@ -19741,7 +19730,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.delta_ax.yaxis.get_label().set_color(self.qmc.palette["ylabel"])
                 self.qmc.ax.xaxis.get_label().set_color(self.qmc.palette["xlabel"])
                 self.qmc.ax.yaxis.get_label().set_color(self.qmc.palette["ylabel"])
-        except: 
+        except Exception: # pylint: disable=broad-except 
             pass
 
         title_color = self.qmc.palette["title"]
@@ -19750,7 +19739,7 @@ class ApplicationWindow(QMainWindow):
         try:
             s = self.styleSheet()[12+len("background-color:"):]
             current_background_color = s[:s.index(";")]
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
         if str(canvas_color) == 'None':
@@ -19776,9 +19765,9 @@ class ApplicationWindow(QMainWindow):
                 if self.ntb.mode == MPL_Mode.ZOOM:
                     self.ntb.zoom() # ZOOM is active, we deactivate it before changing the ToolBar
             else:
-                if self.ntb._active == 'PAN':
+                if self.ntb._active == 'PAN': # pylint: disable=protected-access
                     self.ntb.pan() # PAN is active, we deactivate it before changing the ToolBar
-                if self.ntb._active == 'ZOOM':
+                if self.ntb._active == 'ZOOM': # pylint: disable=protected-access
                     self.ntb.zoom() # ZOOM is active, we deactivate it before changing the ToolBar
             self.removeToolBar(self.ntb)
 #            self.ntb.hide() # seems not to be necessary anymore with the removeToolBar() above
@@ -19949,11 +19938,11 @@ class ApplicationWindow(QMainWindow):
                         steps = int(round(steps/5))*5
                     auto_grid = max(2,steps)
                     aw.qmc.zgrid = auto_grid
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " autoAdjustAxis() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " autoAdjustAxis() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -20009,7 +19998,7 @@ class ApplicationWindow(QMainWindow):
                 return max(filter(None,visible_readings))
             else:
                 return 0
-        except:
+        except Exception: # pylint: disable=broad-except
             # if filtered list is empty, max fails and we return 0
             return 0
 
@@ -20052,7 +20041,7 @@ class ApplicationWindow(QMainWindow):
                 if aw.qmc.specialeventstype[i] == tp:
                     res_last = aw.qmc.specialeventsvalue[i]
                     break
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         return res_last
 
@@ -20230,7 +20219,7 @@ class ApplicationWindow(QMainWindow):
             label = QApplication.translate("Label", "AUC FCs",None)
         self.AUClabel.setText("<small><b>" + label + "</b></small>")
         if aw.LargePhasesLCDsFlag and aw.largePhasesLCDs_dialog:
-            aw.largePhasesLCDs_dialog.updateLabels([None,None,None,label])
+            aw.largePhasesLCDs_dialog.updatePhasesLabels([None,None,None,label])
         aw.updateAUCLCD()
 
     def colordialog(self,c,noButtons=False,parent=None): # c a QColor
@@ -20374,13 +20363,13 @@ class ApplicationWindow(QMainWindow):
                 if analysis_DeltaBT[i] is None:
                     try:
                         analysis_DeltaBT[i] = analysis_DeltaBT[i+1]
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         analysis_DeltaBT[i] = 0
             for i in range(len(analysis_DeltaBTB) - 1, -1, -1):
                 if analysis_DeltaBTB[i] is None:
                     try:
                         analysis_DeltaBTB[i] = analysis_DeltaBTB[i+1]
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         analysis_DeltaBTB[i] = 0
 
             np_bt = numpy.array(analysis_BT)
@@ -20419,7 +20408,7 @@ class ApplicationWindow(QMainWindow):
                         #we don't have an accurate value
                         #print(fcs_idx[0])
                         RoR_FCs_delta = float('nan')
-                except:
+                except Exception: # pylint: disable=broad-except
                     RoR_FCs_delta = float('nan')
 
                 #max and min difference between actual RoR and template RoR
@@ -20614,9 +20603,9 @@ class ApplicationWindow(QMainWindow):
             result['ror_max_delta'] = maxdelta
             result['ror_min_delta'] = mindelta
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " curveSimilatrity2(): {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " curveSimilatrity2(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return result
 
     # computes the similarity between BT and backgroundBT as well as ET and backgroundET
@@ -20663,7 +20652,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 # no DROP event registered
                 return None, None
-        except Exception:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             return None, None
@@ -20825,7 +20814,7 @@ class ApplicationWindow(QMainWindow):
 #                    elif locale == "ar":
 #                        mpl.rcParams['font.family'] = "TraditionalArabic"
 #                        self.mpl_fontproperties = mpl.font_manager.FontProperties()
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
         elif self.qmc.graphfont == 3: # WenQuanYi Zen Hei
             # font WenQuanYi selected
@@ -20986,9 +20975,9 @@ class ApplicationWindow(QMainWindow):
             if aw.LargePhasesLCDsFlag and aw.largePhasesLCDs_dialog:
                 aw.largePhasesLCDs_dialog.updateValues([None,None],[None,auc_value_str])
                 aw.largePhasesLCDs_dialog.updateAUCstyle(auc_style)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updateAUCLCD(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updateAUCLCD(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # returns multiple results on the current state of the phases:
     #  TP, TPlabel, DRY, DRY, FCs, FCslabel
@@ -21275,11 +21264,11 @@ class ApplicationWindow(QMainWindow):
                 DRY2FCslabel = ""
                 DRY =  "--:--"
                 FCs = "--:--"
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return TP,TPlabel,DRY,DRYlabel,FCs,FCslabel,TP2DRYlabel,DRY2FCslabel,TP2DRYframeTooltip,DRY2FCsframeTooltip,phasesLCDsTooltip
 
 
@@ -21334,15 +21323,15 @@ class ApplicationWindow(QMainWindow):
                             values1 = [TP, FCs] # TP and FCs phase LCDs
                             values2 = [DRY, None] # DRY phase and AUC LCDs
                             aw.largePhasesLCDs_dialog.updateValues(values1,values2)
-                            aw.largePhasesLCDs_dialog.updateLabels([TPlabel,DRYlabel,FCslabel,None])
-                    except:
+                            aw.largePhasesLCDs_dialog.updatePhasesLabels([TPlabel,DRYlabel,FCslabel,None])
+                    except Exception: # pylint: disable=broad-except
                         pass
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def makeLCDbox(self,label,lcd,lcdframe):
         LCDbox = QVBoxLayout()
@@ -21403,7 +21392,7 @@ class ApplicationWindow(QMainWindow):
                 aw.fujipid.setsv(self.sliderSV.value(),silent=True)
             else:
                 aw.pidcontrol.setSV(self.sliderSV.value(),False)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     # if setValue=False, the slider is only moved without a change signal being issued
@@ -21545,9 +21534,9 @@ class ApplicationWindow(QMainWindow):
                     cmd = self.eventslidercommands[n]
                     cmd = cmd.format(*(tuple([value]*cmd.count("{}"))))
                 self.eventaction(action,cmd) # cmd needs to be a string!
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fireslideraction() {0}").format(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fireslideraction() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def calcSliderSendValue(self,n):
         slider_value = self.eventslidervalues[n]
@@ -21624,6 +21613,16 @@ class ApplicationWindow(QMainWindow):
         self.slider3.blockSignals(False)
         self.slider4.blockSignals(False)
 
+    # creates a drop shadow effect
+    def makeShadow(self,strong=False):
+        shadow = QGraphicsDropShadowEffect(self)
+        if strong:
+            shadow.setBlurRadius(20)
+        else:
+            shadow.setBlurRadius(20)
+        shadow.setOffset(0,0.9)
+        return shadow
+
     def setLabelColor(self,label,color):
         label.setStyleSheet("QLabel { color: %s; }" % color.name())
 
@@ -21646,7 +21645,7 @@ class ApplicationWindow(QMainWindow):
                 # if logging is not on, we have to update the serial log here:
                 if not self.qmc.flagon and self.serial_dlg is not None:
                     self.updateSerialLogSignal.emit() # as addserial might be called from another (samplinig) thread we need to ensure that this is processed this within the GUI thread via a signal
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             finally:
                 if aw.qmc.seriallogsemaphore.available() < 1:
@@ -21658,7 +21657,7 @@ class ApplicationWindow(QMainWindow):
         #if HUD is ON when resizing application. No drawing should be done inside this handler
         if self.qmc.HUDflag:
             self.qmc.hudresizeflag = True
-        super(ApplicationWindow,self).resizeEvent(event)
+        super().resizeEvent(event)
 
     def setdpi(self,dpi,moveWindow=True):
         if aw:
@@ -21690,13 +21689,11 @@ class ApplicationWindow(QMainWindow):
             self.calibrateDelayAction.setEnabled(False)
 
     # relocate event actions, by skippig 3=MultipleEvent and 7=Call Program SliderAction
-    def eventactionx(self,a,cmd):
-        # split on an octothorpe '#' that is not inside parentheses '()'
-        cmd = re.split("\#(?![^\(]*\))",cmd)[0].strip()
+    def eventactionx(self, a: int, cmd: str):
         try:
             # we added "Multiple Events" at position 20 which has to be mapped to action 3
             self.eventaction((a if (a < 3) else (3 if (a == 20) else ((a + 2) if (a > 5) and (a < 21) else (a + 1)))), cmd)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets/Yocto IO);
@@ -21705,10 +21702,10 @@ class ApplicationWindow(QMainWindow):
     #         20= Artisan Command; 21= RC Command; 22= WebSocket Command
     def eventaction(self,action,cmd,parallel=True):
         # split on an octothorpe '#' that is not inside parentheses '()'
-        cmd = re.split("\#(?![^\(]*\))",cmd)[0].strip()
+        cmd = re.split(r"\#(?![^\(]*\))",cmd)[0].strip()
         if action:
             if not parallel:# or action==3: # subactions of multiple event actions, may crash if run in parallel, especially if they update the UI like button shape!
-                self.eventaction_internal(action,cmd,doupdategraphics=True,doupdatebackground=True)
+                self.eventaction_internal(action,cmd)
             else:
                 eventActionThread = EventActionThread(action,cmd)
                 eventActionThread.finished.connect(self.eventactionThreadDone_slot)
@@ -21735,7 +21732,7 @@ class ApplicationWindow(QMainWindow):
 #            self.qmc.updateBackground()
 #            self.qmc.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
-    def eventaction_internal(self,action,cmd,doupdategraphics=True,doupdatebackground=True):
+    def eventaction_internal(self,action,cmd):
         if action:
             try:
                 if aw.simulator and not action in [2,3,20]:  # 2 (Call Program) 3 (Multiple Event), 20 (Artisan Command)
@@ -21773,7 +21770,7 @@ class ApplicationWindow(QMainWindow):
                                 timex -= self.qmc.on_timex[self.qmc.timeindex[0]]
                             BT_subst = self.qmc.on_temp2[-1]
                             ET_subst = self.qmc.on_temp1[-1]
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     try:
                         if action == 22:
@@ -21785,7 +21782,7 @@ class ApplicationWindow(QMainWindow):
                             cmd_str = cmd_str.replace("{ETB}",str(ETB_subst))
                         else:
                             cmd_str = cmd_str.format(BT=BT_subst,ET=ET_subst,t=timex,BTB=BTB_subst,ETB=ETB_subst)
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
 
                 if action == 1:
@@ -21812,25 +21809,25 @@ class ApplicationWindow(QMainWindow):
 #                                QDesktopServices.openUrl(QUrl("file:///" + str(QApplication.applicationDirPath()) + "/" + cmd_str, QUrl.TolerantMode))
 #                            else: # on Darwin
 #                                QDesktopServices.openUrl(QUrl("file:///" + str(QApplication.applicationDirPath()) + "/../../../" + cmd_str, QUrl.TolerantMode))
-                    except Exception as e:
+                    except Exception as e: # pylint: disable=broad-except
                         _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " eventaction() {0}").format(str(e)),exc_tb.tb_lineno)
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " eventaction() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                 elif action == 3: # Multiple Event
                     cmd_list = cmd_str.split(",")
                     for i in range(len(cmd_list)):
                         cs = cmd_list[i]
                         if cs.startswith('sleep'):
                             try:
-                                cmds = eval(cs[len('sleep'):])
+                                cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
                                 if isinstance(cmds,float) or isinstance(cmds,int):
                                     # cmd has format "sleep(xx.yy)"
                                     libtime.sleep(cmds)
-                            except Exception:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                         else:
                             buttonnumber = int(cs)-1
                             if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
-                                self.recordextraevent(buttonnumber,parallel=False,updateButtons=False,doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
+                                self.recordextraevent(buttonnumber,parallel=False,updateButtons=False)
                 elif action == 4: # MODBUS Command
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
@@ -21845,25 +21842,25 @@ class ApplicationWindow(QMainWindow):
                                 #libtime.sleep(followupCmd) #this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec)
                             if cs.startswith('writem'):
                                 try:
-                                    cmds = eval(cs[len('writem'):])
+                                    cmds = eval(cs[len('writem'):])  # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 3:
                                         # cmd has format "writem(s,r,[v1,..,vn])"
                                         aw.modbus.writeRegisters(*cmds)
                                         followupCmd = 0.08
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith('sleep'):
                                 try:
-                                    cmds = eval(cs[len('sleep'):])
+                                    cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,float) or isinstance(cmds,int):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
                                         followupCmd = 0.08
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("writeBCD"):
                                 try:
-                                    cmds = eval(cs[len('writeBCD'):])
+                                    cmds = eval(cs[len('writeBCD'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple):
                                         if len(cmds) == 3 and not isinstance(cmds[0],list):
                                             # cmd has format "writeBCD(s,r,v)"
@@ -21880,11 +21877,11 @@ class ApplicationWindow(QMainWindow):
                                         # cmd has format "writeBCD([s,r,v])"
                                         aw.modbus.writeBCD(*cmds)
                                         followupCmd = 0.08
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith('writeWord'): # writing directly floats
                                 try:
-                                    cmds = eval(cs[len('writeWord'):])
+                                    cmds = eval(cs[len('writeWord'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple):
                                         if len(cmds) == 3 and not isinstance(cmds[0],list):
                                             # cmd has format "write(s,r,v)"
@@ -21901,11 +21898,11 @@ class ApplicationWindow(QMainWindow):
                                         # cmd has format "write([s,r,v])"
                                         aw.modbus.writeWord(*cmds)
                                         followupCmd = 0.08
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith('writeSingle'):
                                 try:
-                                    cmds = eval(cs[len('writeSingle'):])
+                                    cmds = eval(cs[len('writeSingle'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple):
                                         if len(cmds) == 3 and not isinstance(cmds[0],list):
                                             # cmd has format "writeSingle(s,r,v)"
@@ -21922,11 +21919,11 @@ class ApplicationWindow(QMainWindow):
                                         # cmd has format "writeSingle([s,r,v])"
                                         aw.modbus.writeSingleRegister(*cmds)
                                         followupCmd = 0.08
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith('write'):
                                 try:
-                                    cmds = eval(cs[len('write'):])
+                                    cmds = eval(cs[len('write'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple):
                                         if len(cmds) == 3 and not isinstance(cmds[0],list):
                                             # cmd has format "write(s,r,v)"
@@ -21943,11 +21940,11 @@ class ApplicationWindow(QMainWindow):
                                         # cmd has format "write([s,r,v])"
                                         aw.modbus.writeRegister(*cmds)
                                         followupCmd = 0.08
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith('mwrite'):
                                 try:
-                                    cmds = eval(cs[len('mwrite'):])
+                                    cmds = eval(cs[len('mwrite'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple):
                                         if len(cmds) == 4 and not isinstance(cmds[0],list):
                                             # cmd has format "mwrite(s,r,am,om)"
@@ -21971,40 +21968,40 @@ class ApplicationWindow(QMainWindow):
                                         # cmd has format "write([s,r,am,om])"
                                         aw.modbus.maskWriteRegister(*cmds)
                                         followupCmd = 0.08
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("wcoils"):
                                 try:
-                                    cmds = eval(cs[len('wcoils'):])
+                                    cmds = eval(cs[len('wcoils'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple):
                                         if len(cmds) == 3 and not isinstance(cmds[0],list):
                                             # cmd has format "wcoils(s,r,[<b>,..<b>])"
                                             aw.modbus.writeCoils(*cmds)
                                             followupCmd = 0.08
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("wcoil"):
                                 try:
-                                    cmds = eval(cs[len('wcoil'):])
+                                    cmds = eval(cs[len('wcoil'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 3:
                                         # cmd has format "wcoil(s,r,<b>)"
                                         aw.modbus.writeCoil(*cmds)
                                         followupCmd = 0.08
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("read"):
                                 try:
-                                    cmds = eval(cs[len('read'):])
+                                    cmds = eval(cs[len('read'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "read(s,r)"
                                         aw.modbus.lastReadResult = aw.modbus.readSingleRegister(*cmds,force=True)
                                         followupCmd = 0.03
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("button"):
                                 # cmd has format "button(<bool>)" # 0 or 1 or True or False
                                 try:
-                                    cmds = eval(cs[len('button'):])
+                                    cmds = eval(cs[len('button'):]) # pylint: disable=eval-used
                                     last = self.lastbuttonpressed
                                     if last != -1 and len(self.buttonlist)>last:
                                         #block resetting style of last button
@@ -22013,14 +22010,14 @@ class ApplicationWindow(QMainWindow):
                                             aw.setExtraEventButtonStyle(last, style="pressed")
                                         else:
                                             aw.setExtraEventButtonStyle(last, style="normal")
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                 elif action == 5: # DTA Command
                     try:
                         DTAvalue=cmd_str.split(':')[1]
                         DTAaddress=cmd_str.split(':')[0]
                         aw.dtapid.writeDTE(DTAvalue,DTAaddress)
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         pass
                 elif action == 6:  # IO Command
                     # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
@@ -22046,7 +22043,7 @@ class ApplicationWindow(QMainWindow):
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
-                            cs_a = re.findall("[0-9a-zA-Z-\.:]+", c)
+                            cs_a = re.findall(r"[0-9a-zA-Z-.:]+", c)
                             cs_len = len(cs_a)
 
                             if cs_a[0] == "set":
@@ -22095,7 +22092,7 @@ class ApplicationWindow(QMainWindow):
                                     sn = cs_a[3]
                                 else:
                                     sn = None
-                                if not aw.ser.phidgetVOUTsetVOUT(toInt(cs_a[1]), toFloat(eval(cs_a[2])),sn):
+                                if not aw.ser.phidgetVOUTsetVOUT(toInt(cs_a[1]), toFloat(eval(cs_a[2])),sn): # pylint: disable=eval-used
                                     aw.sendmessage(QApplication.translate("Message", "Failed to set VOUT(%s, %s)" % (cs_a[1], cs_a[2] ), None))
 
                             elif cs_a[0] == "accel" and cs_len > 2:
@@ -22103,21 +22100,21 @@ class ApplicationWindow(QMainWindow):
                                     sn = cs_a[3]
                                 else:
                                     sn = None
-                                aw.ser.phidgetDCMotorSetAcceleration(toInt(cs_a[1]), toFloat(eval(cs_a[2])),sn)
+                                aw.ser.phidgetDCMotorSetAcceleration(toInt(cs_a[1]), toFloat(eval(cs_a[2])),sn) # pylint: disable=eval-used
 
                             elif cs_a[0] == "vel" and cs_len > 2:
                                 if cs_len > 3:
                                     sn = cs_a[3]
                                 else:
                                     sn = None
-                                aw.ser.phidgetDCMotorSetVelocity(toInt(cs_a[1]), toFloat(eval(cs_a[2])),sn)
+                                aw.ser.phidgetDCMotorSetVelocity(toInt(cs_a[1]), toFloat(eval(cs_a[2])),sn) # pylint: disable=eval-used
 
                             elif cs_a[0] == "limit" and cs_len > 2:
                                 if cs_len > 3:
                                     sn = cs_a[3]
                                 else:
                                     sn = None
-                                aw.ser.phidgetDCMotorSetCurrentLimit(toInt(cs_a[1]), toFloat(eval(cs_a[2])),sn)
+                                aw.ser.phidgetDCMotorSetCurrentLimit(toInt(cs_a[1]), toFloat(eval(cs_a[2])),sn) # pylint: disable=eval-used
 
                             elif cs_a[0] == "slider" and cs_len == 3:
                                 v = toFloat(cs_a[2])
@@ -22144,11 +22141,11 @@ class ApplicationWindow(QMainWindow):
                                     self.setExtraEventButtonStyle(b, style="normal")
                             elif cs_a[0] == "sleep" and cs_len == 1: # in seconds
                                 try:
-                                    t = eval(cs_a[1])
+                                    t = eval(cs_a[1]) # pylint: disable=eval-used
                                     if isinstance(t,float) or isinstance(t,int):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(t)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
 
                             # Yoctopuce Relay Command Actions
@@ -22179,9 +22176,9 @@ class ApplicationWindow(QMainWindow):
                 elif action == 7: # slider call-program action
                     try:
                         self.call_prog_with_args(cmd_str)
-                    except Exception as e:
+                    except Exception as e: # pylint: disable=broad-except
                         _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " callProgram(): {0}").format(str(e)),exc_tb.tb_lineno)
+                        aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " callProgram(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                 elif action == 8: # HOTTOP Heater
                     setHottop(heater=int(cmd))
                 elif action == 9: # HOTTOP Main Fan
@@ -22193,52 +22190,52 @@ class ApplicationWindow(QMainWindow):
                             cs = c.strip()
                             if cs.startswith("heater"):
                                 try:
-                                    cmds = eval(cs[len('heater'):])
+                                    cmds = eval(cs[len('heater'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,int):
                                         setHottop(heater = min(max(cmds,0),100))
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("fan"):
                                 try:
-                                    cmds = eval(cs[len('fan'):])
+                                    cmds = eval(cs[len('fan'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,int):
                                         setHottop(main_fan = int(min(max(cmds,0),10) * 10))
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("motor"):
                                 try:
-                                    cmds = eval(cs[len('motor'):])
+                                    cmds = eval(cs[len('motor'):]) # pylint: disable=eval-used
                                     if cmds:
                                         setHottop(drum_motor=True)
                                     else:
                                         setHottop(drum_motor=False)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("solenoid"):
                                 try:
-                                    cmds = eval(cs[len('solenoid'):])
+                                    cmds = eval(cs[len('solenoid'):]) # pylint: disable=eval-used
                                     if cmds:
                                         setHottop(solenoid=True)
                                     else:
                                         setHottop(solenoid=False)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("stirrer"):
                                 try:
-                                    cmds = eval(cs[len('stirrer'):])
+                                    cmds = eval(cs[len('stirrer'):]) # pylint: disable=eval-used
                                     if cmds:
                                         setHottop(cooling_motor=True)
                                     else:
                                         setHottop(cooling_motor=False)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                 try:
-                                    cmds = eval(cs[len('sleep'):])
+                                    cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,float) or isinstance(cmds,int):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                 elif action == 11: # p-i-d, expects 3 float numbers separated by semicolon
                     if cmd_str:
@@ -22283,11 +22280,11 @@ class ApplicationWindow(QMainWindow):
                                         aw.modbus.sleepBetween(write=True)
                                     else:
                                         aw.modbus.sleepBetween(write=False)
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             if cs.startswith('write'):
                                 try:
-                                    cmds = eval(cs[len('write'):])
+                                    cmds = eval(cs[len('write'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple):
                                         if len(cmds) == 3 and not isinstance(cmds[0],list):
                                             # cmd has format "write(s,r,v)"
@@ -22307,7 +22304,7 @@ class ApplicationWindow(QMainWindow):
                                         command = aw.fujipid.message2send(cmds[0],6,cmds[1],cmds[2])
                                         aw.ser.sendFUJIcommand(command,8)
                                         followupCmd = 0.08
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                 elif action == 13: # PWM Command
                     # PHIDGET  <sn> : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
@@ -22335,15 +22332,15 @@ class ApplicationWindow(QMainWindow):
                                 if cs.startswith('out(') and len(cs)>7:
                                     cs_split = cs[4:-1].split(',')
                                     if len(cs_split) == 2:
-                                        aw.ser.phidgetOUTsetPWM(int(cs_split[0]),int(round(eval(cs_split[1]))))
+                                        aw.ser.phidgetOUTsetPWM(int(cs_split[0]),int(round(eval(cs_split[1])))) # pylint: disable=eval-used
                                     elif len(cs_split) == 3:
-                                        aw.ser.phidgetOUTsetPWM(int(cs_split[0]),int(round(eval(cs_split[1])),cs_split[2]))
+                                        aw.ser.phidgetOUTsetPWM(int(cs_split[0]),int(round(eval(cs_split[1])),cs_split[2])) # pylint: disable=eval-used
                                 elif cs.startswith('frequency(') and len(cs)>14:
                                     cs_split = cs[10:-1].split(',')
                                     if len(cs_split) == 2:
-                                        aw.ser.phidgetOUTsetPWMfrequency(int(cs_split[0]),float(eval(cs_split[1])))
+                                        aw.ser.phidgetOUTsetPWMfrequency(int(cs_split[0]),float(eval(cs_split[1]))) # pylint: disable=eval-used
                                     elif len(cs_split) == 3:
-                                        aw.ser.phidgetOUTsetPWMfrequency(int(cs_split[0]),float(eval(cs_split[1]),cs_split[2]))
+                                        aw.ser.phidgetOUTsetPWMfrequency(int(cs_split[0]),float(eval(cs_split[1]),cs_split[2])) # pylint: disable=eval-used
                                 elif cs.startswith('toggle(') and len(cs)>8:
                                     cs_split = cs[7:-1].split(',')
                                     if len(cs_split) == 1:
@@ -22353,9 +22350,9 @@ class ApplicationWindow(QMainWindow):
                                 elif cs.startswith('outhub(') and len(cs)>10:
                                     cs_split = cs[7:-1].split(',')
                                     if len(cs_split) == 2:
-                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),int(round(eval(cs_split[1]))))
+                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),int(round(eval(cs_split[1])))) # pylint: disable=eval-used
                                     elif len(cs_split) == 3:
-                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),int(round(eval(cs_split[1])),cs_split[2]))
+                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),int(round(eval(cs_split[1])),cs_split[2])) # pylint: disable=eval-used
                                 elif cs.startswith('togglehub(') and len(cs)>11:
                                     cs_split = cs[10:-1].split(',')
                                     if len(cs_split) == 1:
@@ -22375,7 +22372,7 @@ class ApplicationWindow(QMainWindow):
                                     elif len(cs_split) == 3:
                                         aw.ser.phidgetOUTpulsePWM(int(cs_split[0]),int(cs_split[1]),cs_split[2])
                                 elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
-                                    cmds = eval(cs[len('sleep'):])
+                                    cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,float) or isinstance(cmds,int):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
@@ -22388,43 +22385,42 @@ class ApplicationWindow(QMainWindow):
                                     try:
                                         cs_split = cs[len('enabled('):-1].split(',')
                                         if len(cs_split) > 2:
-                                            aw.ser.yoctoPWMenabled(int(cs_split[0]),bool(eval(cs_split[1])),cs_split[2])
+                                            aw.ser.yoctoPWMenabled(int(cs_split[0]),bool(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
                                         else:
-                                            aw.ser.yoctoPWMenabled(int(cs_split[0]),bool(eval(cs_split[1])))
-                                    except Exception:
+                                            aw.ser.yoctoPWMenabled(int(cs_split[0]),bool(eval(cs_split[1]))) # pylint: disable=eval-used
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                                 # freq(c,f[,sn])
                                 elif cs.startswith('freq') and cs.endswith(")") and len(cs)>8:
                                     try:
                                         cs_split = cs[len('freq('):-1].split(',')
                                         if len(cs_split) > 2:
-                                            aw.ser.yoctoPWMsetFrequency(int(cs_split[0]),int(eval(cs_split[1])),cs_split[2])
+                                            aw.ser.yoctoPWMsetFrequency(int(cs_split[0]),int(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
                                         else:
-                                            aw.ser.yoctoPWMsetFrequency(int(cs_split[0]),int(eval(cs_split[1])))
-                                    except Exception:
+                                            aw.ser.yoctoPWMsetFrequency(int(cs_split[0]),int(eval(cs_split[1]))) # pylint: disable=eval-used
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                                 # duty(c,d[,sn])
                                 elif cs.startswith('duty') and cs.endswith(")") and len(cs)>8:
                                     try:
                                         cs_split = cs[len('duty('):-1].split(',')
                                         if len(cs_split) > 2:
-                                            aw.ser.yoctoPWMsetDuty(int(cs_split[0]),float(eval(cs_split[1])),cs_split[2])
+                                            aw.ser.yoctoPWMsetDuty(int(cs_split[0]),float(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
                                         else:
-                                            aw.ser.yoctoPWMsetDuty(int(cs_split[0]),float(eval(cs_split[1])))
-                                    except Exception:
+                                            aw.ser.yoctoPWMsetDuty(int(cs_split[0]),float(eval(cs_split[1]))) # pylint: disable=eval-used
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                                 # move(c,d,t[,sn])
                                 elif cs.startswith('move') and cs.endswith(")") and len(cs)>10:
                                     try:
                                         cs_split = cs[len('move('):-1].split(',')
                                         if len(cs_split) > 3:
-                                            aw.ser.yoctoPWMmove(int(cs_split[0]),float(eval(cs_split[1])),int(cs_split[2]),cs_split[3])
+                                            aw.ser.yoctoPWMmove(int(cs_split[0]),float(eval(cs_split[1])),int(cs_split[2]),cs_split[3]) # pylint: disable=eval-used
                                         else:
-                                            aw.ser.yoctoPWMmove(int(cs_split[0]),float(eval(cs_split[1])),int(cs_split[2]))
-                                    except Exception:
+                                            aw.ser.yoctoPWMmove(int(cs_split[0]),float(eval(cs_split[1])),int(cs_split[2])) # pylint: disable=eval-used
+                                    except Exception: # pylint: disable=broad-except
                                         pass
-
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                 elif action == 14: # VOUT Command to drive Phidget/Yocto Output Modules
                     if cmd_str:
@@ -22436,10 +22432,10 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     cs_split = cs[4:-1].split(',')
                                     if len(cs_split) == 2:
-                                        aw.ser.phidgetVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1])))
+                                        aw.ser.phidgetVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1]))) # pylint: disable=eval-used
                                     elif len(cs_split) == 3:
-                                        aw.ser.phidgetVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1])),cs_split[2])
-                                except Exception:
+                                        aw.ser.phidgetVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
+                                except Exception:  # pylint: disable=broad-except
                                     pass
                             elif cs.startswith('range(') and len(cs)>7:
                                 try:
@@ -22448,17 +22444,17 @@ class ApplicationWindow(QMainWindow):
                                         aw.ser.phidgetVOUTsetRange(int(cs_split[0]),int(cs_split[1]))
                                     elif len(cs_split) == 3:
                                         aw.ser.phidgetVOUTsetRange(int(cs_split[0]),int(cs_split[1]),cs_split[2])
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # for YOCTOPUCE VOLTAGE OUT modules "vout(c,v[,sn])" with c the channel (1 or 2),v the voltage as float [0.0-10.0] and the optional sn either the modules serial number or its name
                             elif cs.startswith('vout(') and len(cs)>8:
                                 try:
                                     cs_split = cs[5:-1].split(',')
                                     if len(cs_split) > 2:
-                                        aw.ser.yoctoVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1])),cs_split[2])
+                                        aw.ser.yoctoVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
                                     else:
-                                        aw.ser.yoctoVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1])))
-                                except Exception:
+                                        aw.ser.yoctoVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1]))) # pylint: disable=eval-used
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # for YOCTOPUCE CURRENT OUT modules "cout(c[,sn])" with c the current as float [3.0-21.0] and the optional sn either the modules serial number or its name
                             elif cs.startswith('cout(') and len(cs)>6:
@@ -22466,18 +22462,18 @@ class ApplicationWindow(QMainWindow):
                                     #c = cs[5:-1]
                                     cs_split = cs[5:-1].split(',')
                                     if len(cs_split) > 1:
-                                        aw.ser.yoctoCOUTsetCOUT(float(eval(cs_split[0])),cs_split[1])
+                                        aw.ser.yoctoCOUTsetCOUT(float(eval(cs_split[0])),cs_split[1]) # pylint: disable=eval-used
                                     else:
-                                        aw.ser.yoctoCOUTsetCOUT(float(eval(cs_split[0])))
-                                except Exception:
+                                        aw.ser.yoctoCOUTsetCOUT(float(eval(cs_split[0]))) # pylint: disable=eval-used
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                 try:
-                                    cmds = eval(cs[len('sleep'):])
+                                    cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,float) or isinstance(cmds,int):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                 elif action == 15: # S7 Command
                     # getDBbool(<dbnumber>,<start>,<index>)
@@ -22500,50 +22496,50 @@ class ApplicationWindow(QMainWindow):
                             if cs.startswith("setDBint(") and len(cs) > 14:
                                 try:
                                     dbnr,s,v = cs[len("setDBint("):-1].split(',')
-                                    aw.s7.writeInt(5,int(dbnr),int(s),eval(v))
-                                except Exception:
+                                    aw.s7.writeInt(5,int(dbnr),int(s),eval(v)) # pylint: disable=eval-used
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("msetDBint(") and len(cs) > 16:
                                 try:
                                     dbnr,s,a,o,v = cs[len("msetDBint("):-1].split(',')
-                                    aw.s7.maskWriteInt(5,int(dbnr),int(s),int(a),int(o),eval(v))
-                                except Exception:
+                                    aw.s7.maskWriteInt(5,int(dbnr),int(s),int(a),int(o),eval(v)) # pylint: disable=eval-used
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("getDBint(") and len(cs) > 13:
                                 try:
                                     dbnr,s = cs[len("getDBint("):-1].split(',')
                                     aw.s7.lastReadResult = aw.s7.readInt(5,int(dbnr),int(s),force=True)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("setDBfloat(") and len(cs) > 16:
                                 try:
                                     dbnr,s,v = cs[len("setDBfloat("):-1].split(',')
-                                    aw.s7.writeFloat(5,int(dbnr),int(s),eval(v))
-                                except Exception:
+                                    aw.s7.writeFloat(5,int(dbnr),int(s),eval(v)) # pylint: disable=eval-used
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("getDBfloat(") and len(cs) > 14:
                                 try:
                                     dbnr,s = cs[len("getDBfloat("):-1].split(',')
                                     aw.s7.lastReadResult = aw.s7.readFloat(5,int(dbnr),int(s),force=True)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("setDBbool(") and len(cs) > 17:
                                 try:
                                     dbnr,s,i,v = cs[len("setDBbool("):-1].split(',')
-                                    aw.s7.writeBool(5,int(dbnr),int(s),int(i),eval(v))
-                                except Exception:
+                                    aw.s7.writeBool(5,int(dbnr),int(s),int(i),eval(v)) # pylint: disable=eval-used
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("getDBbool(") and len(cs) > 15:
                                 try:
                                     dbnr,s,i = cs[len("getDBbool("):-1].split(',')
                                     aw.s7.lastReadResult = aw.s7.readBool(5,int(dbnr),int(s),int(i),force=True)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                                     
                             elif cs.startswith("button"):
                                 # cmd has format "button(<bool>)" # 0 or 1 or True or False
                                 try:
-                                    cmds = eval(cs[len('button'):])
+                                    cmds = eval(cs[len('button'):]) # pylint: disable=eval-used
                                     last = self.lastbuttonpressed
                                     if last != -1 and len(self.buttonlist)>last:
                                         #block resetting style of last button
@@ -22552,15 +22548,15 @@ class ApplicationWindow(QMainWindow):
                                             aw.setExtraEventButtonStyle(last, style="pressed")
                                         else:
                                             aw.setExtraEventButtonStyle(last, style="normal")
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                 try:
-                                    cmds = eval(cs[len('sleep'):])
+                                    cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,float) or isinstance(cmds,int):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                 elif action == 16: # Aillio Heater
                     self.ser.R1.set_heater(int(cmd)/10)
@@ -22586,7 +22582,7 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         aw.qmc.silent_alarms = True
                                         aw.sendmessage(QApplication.translate("Message","Alarms off", None))
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # autoCHARGE(<bool>) enable/disable autoCHARGE
                             elif cs.startswith("autoCHARGE(") and cs.endswith(")"):
@@ -22598,7 +22594,7 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         aw.qmc.autoChargeFlag = False
                                         aw.sendmessage(QApplication.translate("Message","autoCHARGE off", None))
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # autoDROP(<bool>) enable/disable autoDROP
                             elif cs.startswith("autoDROP(") and cs.endswith(")"):
@@ -22610,25 +22606,25 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         aw.qmc.autoDropFlag = False
                                         aw.sendmessage(QApplication.translate("Message","autoDROP off", None))
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # sleep(<n>) sleep <n> seconds (might be a float like in "sleep(1.2)"
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                 try:
-                                    cmds = eval(cs[len('sleep'):])
+                                    cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,float) or isinstance(cmds,int):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # tare(<n>) tare channel <n> with 1 => ET, 2 => BT, 3 => E1c1, 4: E1c2,..
                             elif cs.startswith('tare') and cs.endswith(")"): # in seconds
                                 try:
-                                    cmds = eval(cs[len('tare'):])
+                                    cmds = eval(cs[len('tare'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,int):
                                         aw.setTare(cmds-1)
                                         self.sendmessage("Artisan Command: {}".format(cs))
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs == "PIDon":
                                 aw.pidcontrol.pidOn()
@@ -22649,7 +22645,7 @@ class ApplicationWindow(QMainWindow):
                                     elif value == 2:
                                         aw.pidcontrol.svMode = 2
                                         aw.sendmessage(QApplication.translate("Message","PID mode background", None))
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # playbackmode(<n>) with 0: off, 1: time, 2: BT, 3: ET
                             elif cs.startswith("playbackmode(") and cs.endswith(")"):
@@ -22671,7 +22667,7 @@ class ApplicationWindow(QMainWindow):
                                         aw.qmc.replayType = 2
                                         aw.qmc.backgroundPlaybackEvents = True
                                         aw.sendmessage(QApplication.translate("Message","playback by ET", None))
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # openProperties : open Roast Properties dialog
                             elif cs == "openProperties":
@@ -22682,58 +22678,58 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     # quoted string message
                                     values = cs[len("popup("):-1].split(',')
-                                    message = str(eval(values[0]))
+                                    message = str(eval(values[0])) # pylint: disable=eval-used
                                     timeout = 0
                                     if len(values)>1:
-                                        timeout = int(eval(values[1]))
+                                        timeout = int(eval(values[1])) # pylint: disable=eval-used
                                     self.qmc.showAlarmPopupSignal.emit(message,timeout)
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     # sequence of character message
                                     try:
                                         message = str(values[0])
                                         timeout = 0
                                         if len(values)>1:
-                                            timeout = int(eval(values[1]))
+                                            timeout = int(eval(values[1])) # pylint: disable=eval-used
                                         self.qmc.showAlarmPopupSignal.emit(message,timeout)
-                                    except:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                             # message(<m>) with <m> the message
                             elif cs.startswith("message(") and cs.endswith(")"):
                                 try:
-                                    message = str(eval(cs[len("message("):-1]))
+                                    message = str(eval(cs[len("message("):-1])) # pylint: disable=eval-used
                                     self.sendmessageSignal.emit(message,True,None)
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     try:
                                         message = cs[len("message("):-1]
                                         self.sendmessageSignal.emit(message,True,None)
-                                    except:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                             # setCanvasColor(<c>) with <c> the color in RGB-hex format like #ae12f7
                             elif cs.startswith("setCanvasColor(") and cs.endswith(")"):
                                 try:
-                                    color = str(eval(cs[len("setCanvasColor("):-1]))
+                                    color = str(eval(cs[len("setCanvasColor("):-1])) # pylint: disable=eval-used
                                     self.setCanvasColorSignal.emit(color)
                                     self.sendmessage("Artisan Command: {}".format(cs))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     try:
                                         color = cs[len("setCanvasColor("):-1].strip()
                                         self.setCanvasColorSignal.emit(color)
                                         self.sendmessage("Artisan Command: {}".format(cs))
-                                    except:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                             # resetCanvasColor()
                             elif cs == "resetCanvasColor":
                                 try:
                                     self.resetCanvasColorSignal.emit()
                                     self.sendmessage("Artisan Command: {}".format(cs))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # button(<e>) with <e> one of { ON, START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }
                             elif cs.startswith("button(") and cs.endswith(")"):
                                 try:
                                     try:
-                                        event = str(eval(cs[len("button("):-1])).strip()
-                                    except:
+                                        event = str(eval(cs[len("button("):-1])).strip() # pylint: disable=eval-used
+                                    except Exception: # pylint: disable=broad-except
                                         event = cs[len("button("):-1].strip()
                                     if event == "ON" and not self.qmc.flagon:
                                         self.qmc.toggleMonitorSignal.emit()
@@ -22760,7 +22756,7 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         return
                                     self.sendmessage("Artisan Command: {}".format(cs))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # p-i-d(<p>,<i>,<d>) with <p>, <i>, <d> numbers to set the p-i-d parameters
                             elif cs.startswith("p-i-d(") and cs.endswith(")"):
@@ -22795,24 +22791,24 @@ class ApplicationWindow(QMainWindow):
                                         else:
                                             self.pidcontrol.confPID(kp,ki,kd,pOnE=self.pidcontrol.pOnE)
                                             self.sendmessage("Artisan Command: {}".format(cs))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # pidSV(<n>) with <n> a number to be used as PID SV
                             elif cs.startswith("pidSV(") and cs.endswith(")"):
                                 try:
-                                    sv = max(0,int(eval(cs[len("pidSV("):-1]))) # we don't send SV < 0
+                                    sv = max(0,int(eval(cs[len("pidSV("):-1]))) # we don't send SV < 0 # pylint: disable=eval-used
                                     if self.qmc.device == 0 and sv != aw.fujipid.sv:
                                         self.fujipid.setsv(sv,silent=True)
                                         self.sendmessage("Artisan Command: {}".format(cs))
                                     elif sv != aw.pidcontrol.sv:
                                         self.pidcontrol.setSV(sv,init=False)
                                         self.sendmessage("Artisan Command: {}".format(cs))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # pidRS(<n>) with <n> a number to be used to select the PID RS pattern (1-based for the internal software PID)
                             elif cs.startswith("pidRS(") and cs.endswith(")"):
                                 try:
-                                    rs = int(eval(cs[len("pidRS("):-1]))
+                                    rs = int(eval(cs[len("pidRS("):-1])) # pylint: disable=eval-used
                                     if self.qmc.device == 0 or self.qmc.device == 26:
                                         if self.ser.controlETpid[0] == 0: # PXG
                                             pass
@@ -22824,15 +22820,15 @@ class ApplicationWindow(QMainWindow):
                                         if rs>0:
                                             self.pidcontrol.setRSpattern(rs-1)
                                             self.sendmessage("Artisan Command: {}".format(cs))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     # might be a label
                                     try:
-                                        label = str(eval(cs[len("pidRS("):-1]))
+                                        label = str(eval(cs[len("pidRS("):-1])) # pylint: disable=eval-used
                                         rs = self.pidcontrol.findRSset(label) # here rs is 0-based!!
                                         if rs is not None:
                                             self.pidcontrol.setRSpattern(rs)
                                             self.sendmessage("Artisan Command: {}".format(cs))
-                                    except:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                             # pidSource(<n>) with <n> 0: BT, 1: ET (Artisan internal software PID); <n> in {0,..,3} (Arduino PID)
                             elif cs.startswith("pidSource(") and cs.endswith(")"):
@@ -22844,7 +22840,7 @@ class ApplicationWindow(QMainWindow):
                                         kd = aw.pidcontrol.pidKd
                                         self.pidcontrol.confPID(kp,ki,kd,pOnE=self.pidcontrol.pOnE,source=source)
                                         self.sendmessage("Artisan Command: {}".format(cs))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # palette(<n>) with <n> a number between 0 and 9 or an existing palette label
                             elif cs.startswith("palette(") and cs.endswith(")"):
@@ -22852,30 +22848,30 @@ class ApplicationWindow(QMainWindow):
                                     p = min(9,max(0,int(cs[len("palette("):-1])))
                                     self.setbuttonsfromSignal.emit(p)
                                     self.sendmessage("Artisan Command: {}".format(cs))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     # might be a label
                                     try:
-                                        label = str(eval(cs[len("palette("):-1]))
+                                        label = str(eval(cs[len("palette("):-1])) # pylint: disable=eval-used
                                         p = self.findPalette(label)
                                         if p is not None:
                                             self.setbuttonsfromSignal.emit(p)
                                             self.sendmessage("Artisan Command: {}".format(cs))
-                                    except:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                             # loadBackground(<filepath>)
                             elif cs.startswith("loadBackground(") and cs.endswith(")"):
                                 try:
-                                    fp = str(eval(cs[len("loadBackground("):-1]))
+                                    fp = str(eval(cs[len("loadBackground("):-1])) # pylint: disable=eval-used
                                     self.loadBackgroundSignal.emit(fp)
                                     self.sendmessage("Artisan Command: {}".format(cs))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # clearBackground
                             elif cs == "clearBackground":
                                 try:
                                     self.clearBackgroundSignal.emit()
                                     self.sendmessage("Artisan Command: {}".format(cs))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # alarmset(<n>) with <n> a number between 0 and 9 or an existing alarmset label
                             elif cs.startswith("alarmset(") and cs.endswith(")"):
@@ -22883,24 +22879,24 @@ class ApplicationWindow(QMainWindow):
                                     p = min(9,max(0,int(cs[len("alarmset("):-1])))
                                     self.qmc.alarmsetSignal.emit(p)
                                     self.sendmessage("Artisan Command: {}".format(cs))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     # might be a label
                                     try:
-                                        label = str(eval(cs[len("alarmset("):-1]))
+                                        label = str(eval(cs[len("alarmset("):-1])) # pylint: disable=eval-used
                                         p = self.qmc.findAlarmSet(label)
                                         if p is not None:
                                             self.qmc.alarmsetSignal.emit(p)
                                             self.sendmessage("Artisan Command: {}".format(cs))
-                                    except:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                             # adjustSV(<n>) adds <n> to the current SV. Note that n can be negativex
                             elif cs.startswith("adjustSV(") and cs.endswith(")"):
                                 try:
-                                    sv_offset = int(eval(cs[len("adjustSV("):-1]))
+                                    sv_offset = int(eval(cs[len("adjustSV("):-1])) # pylint: disable=eval-used
                                     if self.qmc.device != 26: # not for DTA
                                         self.adjustSVSignal.emit(sv_offset)
                                         self.sendmessage("Artisan Command: {}".format(cs))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # moveBackground(<direction>,<step>) with <direction> one of up,down,left,right and <step> the length of the move
                             elif cs.startswith("moveBackground(") and cs.endswith(")"):
@@ -22909,23 +22905,23 @@ class ApplicationWindow(QMainWindow):
                                     if len(args) == 2:
                                         direction = args[0].lower()
                                         if len(direction)>3 and (direction[0]=='"' or direction[0]=="'") and (direction[-1]=='"' or direction[-1]=="'"):
-                                            direction = eval(direction)
+                                            direction = eval(direction) # pylint: disable=eval-used
                                         step = int(args[1])
                                         self.qmc.moveBackgroundSignal.emit(direction,step)
                                         self.sendmessage("Artisan Command: {}".format(cs))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # pidLookahead(<n>) adds <n> to the current SV. Note that n can be negativex
                             elif cs.startswith("pidLookahead(") and cs.endswith(")"):
                                 try:
-                                    lookahead = int(eval(cs[len("pidLookahead("):-1]))
+                                    lookahead = int(eval(cs[len("pidLookahead("):-1])) # pylint: disable=eval-used
                                     if self.qmc.device == 0 and self.fujipid and self.qmc.Controlbuttonflag: # FUJI PID
                                         self.fujipid.lookahead = lookahead
                                         self.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(self.fujipid.lookahead))
                                     elif (self.pidcontrol and self.qmc.Controlbuttonflag): # MODBUS hardware PID
                                         self.pidcontrol.svLookahead = lookahead
                                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(self.pidcontrol.svLookahead))
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                                                     
                 elif action == 21: # RC Command
@@ -22962,7 +22958,7 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         sn = None
                                     aw.ser.phidgetRCpulse(int(channel),int(min_pulse),int(max_pulse),sn)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("pos(") and len(cs) > 9:
                                 # pos(ch,min,max[,sn]) # sets min/max position
@@ -22975,7 +22971,7 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         sn = None
                                     aw.ser.phidgetRCpos(int(channel),float(min_pos),float(max_pos),sn)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("engaged(") and len(cs) > 11:
                                 # engaged(ch,state[,sn]) # engage channel
@@ -22988,7 +22984,7 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         sn = None
                                     aw.ser.phidgetRCengaged(int(channel),bool(int(state)),sn)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("set(") and len(cs) > 7:
                                 # set(ch,pos[,sn]) # set position
@@ -23000,8 +22996,8 @@ class ApplicationWindow(QMainWindow):
                                         sn = cs_split[n]
                                     else:
                                         sn = None
-                                    aw.ser.phidgetRCset(int(channel),float(eval(pos)),sn)
-                                except Exception:
+                                    aw.ser.phidgetRCset(int(channel),float(eval(pos)),sn) # pylint: disable=eval-used
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("ramp(") and len(cs) > 8:
                                 # ramp(ch,state) # set speed ramping state per channel
@@ -23014,7 +23010,7 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         sn = None
                                     aw.ser.phidgetRCspeedRamping(int(channel),bool(int(state)),sn)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("volt(") and len(cs) > 8:
                                 # volt(ch,v) # sets voltage
@@ -23027,7 +23023,7 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         sn = None
                                     aw.ser.phidgetRCvoltage(int(channel),float(volt),n)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("accel(") and len(cs) > 9:
                                 # accel(ch,accel) # sets acceleration
@@ -23040,7 +23036,7 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         sn = None
                                     aw.ser.phidgetRCaccel(int(channel),float(accel),sn)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("veloc(") and len(cs) > 9:
                                 # veloc(ch,veloc) # sets velocity
@@ -23053,15 +23049,15 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         sn = None
                                     aw.ser.phidgetRCveloc(int(channel),float(veloc),sn)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith('sleep('): # in seconds
                                 try:
-                                    cmds = eval(cs[len('sleep'):])
+                                    cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,float) or isinstance(cmds,int):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
 
                             # functions supporting the Yoctopuce RC module
@@ -23070,20 +23066,20 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     cs_split = cs[8:-1].split(',')
                                     c = int(cs_split[0])
-                                    b = bool(eval(cs_split[1]))
+                                    b = bool(eval(cs_split[1])) # pylint: disable=eval-used
                                     if len(cs_split) > 2:
                                         sn = cs_split[2]
                                         aw.ser.yoctoSERVOenabled(c,b,sn)
                                     else:
                                         aw.ser.yoctoSERVOenabled(c,b)
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # move(c,p[,t][,sn]) with c:int the channel, p:int the target position, the optional t the duration in ms, sn the optional modules serial number or logical name
                             elif cs.startswith('move(') and len(cs) > 8:
                                 try:
                                     cs_split = cs[5:-1].split(',')
                                     c = int(cs_split[0])
-                                    p = int(eval(cs_split[1]))
+                                    p = int(eval(cs_split[1])) # pylint: disable=eval-used
                                     if len(cs_split) > 2:
                                         try:
                                             t = int(cs_split[2])
@@ -23091,11 +23087,11 @@ class ApplicationWindow(QMainWindow):
                                                 aw.ser.yoctoSERVOmove(c,p,t,cs_split[3])
                                             else:
                                                 aw.ser.yoctoSERVOmove(c,p,t)
-                                        except:
+                                        except Exception: # pylint: disable=broad-except
                                             aw.ser.yoctoSERVOposition(c,p,cs_split[2])
                                     else:
                                         aw.ser.yoctoSERVOposition(c,p)
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # neutral(c,n[,sn]) with n an int [0..65000] in us, sn the modules serial number or logical name
                             elif cs.startswith('neutral(') and len(cs) > 11:
@@ -23108,7 +23104,7 @@ class ApplicationWindow(QMainWindow):
                                         aw.ser.yoctoSERVOneutral(c,n,sn)
                                     else:
                                         aw.ser.yoctoSERVOneutral(c,n)
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             # range(c,r[,sn]) with r an int in %, sn the modules serial number or logical name
                             elif cs.startswith('range(') and len(cs) > 8:
@@ -23121,7 +23117,7 @@ class ApplicationWindow(QMainWindow):
                                         aw.ser.yoctoSERVOrange(c,r,sn)
                                     else:
                                         aw.ser.yoctoSERVOrange(c,r)
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                 elif action == 22: # WebSocket Command
                     # send(<json>)
@@ -23134,30 +23130,30 @@ class ApplicationWindow(QMainWindow):
                             # send(<json>) : send <json> request to connected WebSocket
                             if cs.startswith('send') and cs.endswith(")"):
                                 try:
-                                    request = eval(cs[len('send('):-1])
+                                    request = eval(cs[len('send('):-1]) # pylint: disable=eval-used
                                     self.ws.send(request,block=False)
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                 try:
-                                    cmds = eval(cs[len('sleep'):])
+                                    cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,float) or isinstance(cmds,int):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("read"):
                                 try:
-                                    request = eval(cs[len('read'):])
+                                    request = eval(cs[len('read'):]) # pylint: disable=eval-used
                                     if isinstance(request,dict):
                                         # cmd has format "read(<requestJSON>)"
                                         aw.ws.lastReadResult = aw.ws.send(request)
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
                             elif cs.startswith("button"):
                                 # cmd has format "button(<bool>)" # 0 or 1 or True or False
                                 try:
-                                    cmds = eval(cs[len('button'):])
+                                    cmds = eval(cs[len('button'):]) # pylint: disable=eval-used
                                     last = self.lastbuttonpressed
                                     if last != -1 and len(self.buttonlist)>last:
                                         #block resetting style of last button
@@ -23166,9 +23162,9 @@ class ApplicationWindow(QMainWindow):
                                             aw.setExtraEventButtonStyle(last, style="pressed")
                                         else:
                                             aw.setExtraEventButtonStyle(last, style="normal")
-                                except Exception:
+                                except Exception: # pylint: disable=broad-except
                                     pass
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
     def calc_env(self):
@@ -23184,14 +23180,14 @@ class ApplicationWindow(QMainWindow):
                 try:
                     proc = subprocess.Popen(command, stdout = subprocess.PIPE)
                     for line in proc.stdout:
-                        (key, _, value) = line.partition("=")
+                        (k, _, value) = line.partition("=")
                         # don't copy PYTHONHOME nor PYTHONPATH if it points to the Artisan.app
-                        if not ((key in ['PYTHONHOME','PYTHONPATH']) and (("Artisan.app" in value) or "artisan" in value)):
-                            my_env[key] = value
+                        if not ((k in ['PYTHONHOME','PYTHONPATH']) and (("Artisan.app" in value) or "artisan" in value)):
+                            my_env[k] = value
                     proc.communicate()
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         return my_env
 
@@ -23219,7 +23215,10 @@ class ApplicationWindow(QMainWindow):
                     try:
                         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                     except AttributeError:
-                        startupinfo.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW  # @UndefinedVariable
+                        try:
+                            startupinfo.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW  # @UndefinedVariable # pylint: disable=maybe-no-member # pylint: disable=protected-access
+                        except AttributeError:
+                            pass
                     prg_file = str(qd.absolutePath())
 #                    CREATE_NEW_PROCESS_GROUP = 0x00000200
 #                    DETACHED_PROCESS = 0x00000008
@@ -23239,7 +23238,7 @@ class ApplicationWindow(QMainWindow):
                 QDir.setCurrent(current.absolutePath())
                 # alternative approach, that seems to fail on some Mac OS X versions:
                 #QProcess.startDetached(prg_file)
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
 
     def sliderpos(self,n):
@@ -23323,12 +23322,12 @@ class ApplicationWindow(QMainWindow):
     def recordextraevent_slot(self,_):
         try:
             self.recordextraevent(self.buttonlist.index(self.sender()))
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     #called from user configured event buttons
     #by default actions are processed in a parallel thread, but components of multiple button actions not to avoid crashes
-    def recordextraevent(self,ee,parallel=True,updateButtons=True,doupdategraphics=True,doupdatebackground=True):
+    def recordextraevent(self,ee,parallel=True,updateButtons=True):
         eventtype = self.extraeventstypes[ee]
         if updateButtons: # not if triggered from mutiplebutton actions:
             try:
@@ -23346,7 +23345,7 @@ class ApplicationWindow(QMainWindow):
                 # reset lastbuttonpressed
                 self.lastbuttonpressed = ee
 
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             finally:
                 if aw.qmc.eventactionsemaphore.available() < 1:
@@ -23356,7 +23355,7 @@ class ApplicationWindow(QMainWindow):
             if eventtype == 9: # an untyped event
                 # we just fire the action
                 # split on an octothorpe '#' that is not inside parentheses '()'
-                cmd = re.split("\#(?![^\(]*\))",self.extraeventsactionstrings[ee])[0].strip()
+                cmd = re.split(r"\#(?![^\(]*\))",self.extraeventsactionstrings[ee])[0].strip()
                 cmd = cmd.format(*(tuple([cmdvalue]*cmd.count("{}"))))
                 self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # and record the event
@@ -23386,7 +23385,7 @@ class ApplicationWindow(QMainWindow):
                     self.eventaction(self.extraeventsactions[ee],str(int(new_value)),parallel=parallel)
                 else:
                     # split on an octothorpe '#' that is not inside parentheses '()'
-                    cmd = re.split("\#(?![^\(]*\))",self.extraeventsactionstrings[ee])[0].strip()
+                    cmd = re.split(r"\#(?![^\(]*\))",self.extraeventsactionstrings[ee])[0].strip()
                     cmd = cmd.format(*(tuple([actionvalue]*cmd.count("{}"))))
                     self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # remember the new value as the last value set for this event
@@ -23401,7 +23400,7 @@ class ApplicationWindow(QMainWindow):
         else:
             # just issue the eventaction (no cmd substitution here)
             # split on an octothorpe '#' that is not inside parentheses '()'
-            cmd = re.split("\#(?![^\(]*\))",self.extraeventsactionstrings[ee])[0].strip()
+            cmd = re.split(r"\#(?![^\(]*\))",self.extraeventsactionstrings[ee])[0].strip()
             cmd = cmd.format(*(tuple([cmdvalue]*cmd.count("{}"))))
             self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
 
@@ -23426,7 +23425,7 @@ class ApplicationWindow(QMainWindow):
     def on_actionCut_triggered(self,_=False):
         try:
             app.activeWindow().focusWidget().cut()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 
     @pyqtSlot()
@@ -23434,7 +23433,7 @@ class ApplicationWindow(QMainWindow):
     def on_actionCopy_triggered(self,_=False):
         try:
             app.activeWindow().focusWidget().copy()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 
     @pyqtSlot()
@@ -23442,7 +23441,7 @@ class ApplicationWindow(QMainWindow):
     def on_actionPaste_triggered(self,_=False):
         try:
             app.activeWindow().focusWidget().paste()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 
     # clears the message line without appending to the message log
@@ -23452,7 +23451,7 @@ class ApplicationWindow(QMainWindow):
     # this should only be called from within the main GUI thread (and never from the sampling thread!)
     @pyqtSlot(str,bool,str)
     def sendmessage(self,message,append=True,style=None):
-        if isinstance(threading.current_thread(), threading._MainThread):
+        if isinstance(threading.current_thread(), threading._MainThread): # pylint: disable=protected-access
             # we are running in the main thread thus we can call sendmessage_internal via a QTimer to avoid redraw issues
             QTimer.singleShot(2,lambda : self.sendmessage_internal(message,append,style))
         else:
@@ -23479,7 +23478,7 @@ class ApplicationWindow(QMainWindow):
             self.messagelabel.setText(message)
             if repaint: # if repaint is executed in the main thread we receive "QWidget::repaint: Recursive repaint detected"
                 self.messagelabel.repaint()
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         finally:
             if aw.qmc.messagesemaphore.available() < 1:
@@ -23733,7 +23732,7 @@ class ApplicationWindow(QMainWindow):
                 l1 = "<b>" + aw.qmc.extraname1[i] + "</b>"
                 try:
                     aw.extraLCDlabel1[i].setText(l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
-                except:
+                except Exception: # pylint: disable=broad-except
                     aw.extraLCDlabel1[i].setText(l1)
                 self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
             aw.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius:4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
@@ -23742,7 +23741,7 @@ class ApplicationWindow(QMainWindow):
                 l2 = "<b>" + aw.qmc.extraname2[i] + "</b>"
                 try:
                     aw.extraLCDlabel2[i].setText(l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
-                except:
+                except Exception: # pylint: disable=broad-except
                     aw.extraLCDlabel2[i].setText(l2)
                 self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
             aw.extraLCD2[i].setStyleSheet("QLCDNumber { border-radius:4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
@@ -23952,30 +23951,30 @@ class ApplicationWindow(QMainWindow):
         if not self.processingKeyEvent:
             try:
                 self.processingKeyEvent = True
-                key = int(event.key())
+                k = int(event.key())
                 modifiers = event.modifiers()
-                #Note: Windows only - PyQt will sometimes, but not always, interpret a shortcut key as a menu key.  For that 
+                #Note: Windows only - PyQt will sometimes, but not always, interpret a shortcut k as a menu k.  For that 
                 #    reason only CTRL and CTRL+SHIFT modifier should be used with shortcut keys f,e,r,c,t,v, and h.
-                control_modifier = modifiers == Qt.ControlModifier # command/apple key on macOS, CONTROL on Windows
+                control_modifier = modifiers == Qt.ControlModifier # command/apple k on macOS, CONTROL on Windows
                 alt_modifier = modifiers == Qt.AltModifier # OPTION on macOS, ALT on Windows
                 control_alt_modifier = modifiers == (Qt.ControlModifier | Qt.AltModifier)
                 control_shift_modifier = modifiers == (Qt.ControlModifier | Qt.ShiftModifier)
                 #meta_modifier = modifiers == Qt.MetaModifier # Control on macOS, Meta on Windows
-                #uncomment next line to find the integer value of a key
-                #print(key)
+                #uncomment next line to find the integer value of a k
+                #print(k)
 
                 numberkeys = [48,49,50,51,52,53,54,55,56,57] # keycodes for number keys 0,1,...,9
 
-                if key == 70: # F SELECTS FULL SCREEN MODE
+                if k == 70: # F SELECTS FULL SCREEN MODE
                     aw.toggleFullscreen()
-                elif aw.buttonpalette_shortcuts and control_modifier and key in numberkeys: # palette switch via SHIFT-NUM-Keys
-                    self.setbuttonsfrom(numberkeys.index(key))
+                elif aw.buttonpalette_shortcuts and control_modifier and k in numberkeys: # palette switch via SHIFT-NUM-Keys
+                    self.setbuttonsfrom(numberkeys.index(k))
 
-                elif key == 73:                       #I (toggle foreground showfull flag)
+                elif k == 73:                       #I (toggle foreground showfull flag)
                     self.toggleForegroundShowfullFlag()
-                elif key == 79:                       #O (toggle background showfull flag)
+                elif k == 79:                       #O (toggle background showfull flag)
                     self.toggleBackroundShowfullFlag()
-                elif key == 72:                       #H
+                elif k == 72:                       #H
                     if not self.qmc.designerflag:
                         if alt_modifier and platf != 'Windows' or ((control_shift_modifier or control_alt_modifier) and platf == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
                             self.deleteBackground()
@@ -23983,32 +23982,32 @@ class ApplicationWindow(QMainWindow):
                                 self.autoAdjustAxis()
                             self.qmc.redraw()
                         else:
-                            self.filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext_alt=".alog")
-                            if len(self.filename) != 0:
+                            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext_alt=".alog")
+                            if len(filename) != 0:
                                 try:
                                     self.qmc.resetlinecountcaches()
-                                    self.loadbackground(self.filename)
-                                except:
+                                    self.loadbackground(filename)
+                                except Exception: # pylint: disable=broad-except
                                     pass
                                 self.qmc.background = True
                                 self.autoAdjustAxis()
                                 self.qmc.timealign(redraw=False)
                                 self.qmc.redraw()
-                elif key == 75:                       #K
+                elif k == 75:                       #K
                     if not aw.qmc.flagon:
                         if control_alt_modifier:
                             aw.clearResults()
                         elif control_modifier:
                             aw.analysisfitCurvesALL()
-                elif key == 76:                       #L
-                    self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Alarms",None),ext="*.alrm")
-                    if len(self.filename) == 0:
+                elif k == 76:                       #L
+                    filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Alarms",None),ext="*.alrm")
+                    if len(filename) == 0:
                         return
                     try:
-                        aw.loadAlarms(self.filename)
-                    except:
+                        aw.loadAlarms(filename)
+                    except Exception: # pylint: disable=broad-except
                         pass
-                elif key == 80:                       #P
+                elif k == 80:                       #P
                     # switch PID mode
                     if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
                         # toggle mode: manual => RS => background
@@ -24035,36 +24034,36 @@ class ApplicationWindow(QMainWindow):
                             aw.sendmessage(QApplication.translate("Message","PID Mode: Ramp/Soak", None))
                         elif  aw.pidcontrol.svMode == 2:
                             aw.sendmessage(QApplication.translate("Message","PID Mode: Background", None))
-                elif key == 45:                       #-
+                elif k == 45:                       #-
                     if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
                         aw.fujipid.lookahead = max(0,aw.fujipid.lookahead-1)
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.fujipid.lookahead))
                     elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # MODBUS hardware PID
                         aw.pidcontrol.svLookahead = max(0,aw.pidcontrol.svLookahead-1)
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.pidcontrol.svLookahead))
-                elif key == 43:                       #+
+                elif k == 43:                       #+
                     if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
                         aw.fujipid.lookahead = aw.fujipid.lookahead+1
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.fujipid.lookahead))
                     elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # MODBUS hardware PID
                         aw.pidcontrol.svLookahead = aw.pidcontrol.svLookahead+1
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.pidcontrol.svLookahead))
-                elif key == 32:                       #SELECTS ACTIVE BUTTON
+                elif k == 32:                       #SELECTS ACTIVE BUTTON
                     if self.keyboardmoveflag:
                         self.moveKbutton("space")
                     else:
                         self.qmc.EventRecord()
-                elif key == 16777220:                 #TURN ON/OFF KEYBOARD MOVES
+                elif k == 16777220:                 #TURN ON/OFF KEYBOARD MOVES
                     self.releaseminieditor()
                     self.moveKbutton("enter")
-                elif key == 16777216:                 #ESCAPE
+                elif k == 16777216:                 #ESCAPE
                     self.quickEventShortCut = None
                     aw.clearMessageLine()
                     macfullscreen = False
                     try:
                         if platf == 'Darwin' and app.allWindows()[0].visibility() == QWindow.FullScreen:
                             macfullscreen = True
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     if self.full_screen_mode_active or self.isFullScreen() or macfullscreen:
                         self.full_screen_mode_active = False
@@ -24074,7 +24073,7 @@ class ApplicationWindow(QMainWindow):
                         try:
                             if macfullscreen and platf == 'Darwin':
                                 app.allWindows()[0].setVisibility(QWindow.Windowed)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                     else:
                         #if designer ON
@@ -24094,80 +24093,80 @@ class ApplicationWindow(QMainWindow):
                             aw.showControls()
                         if self.minieventsflag:
                             self.releaseminieditor()
-                elif key == 16777234:               #MOVES CURRENT BUTTON LEFT
+                elif k == 16777234:               #MOVES CURRENT BUTTON LEFT
                     if self.keyboardmoveflag:
                         self.moveKbutton("left")
                     elif aw.qmc.background:
                         aw.qmc.movebackground("left",aw.qmc.backgroundmovespeed)
                         self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
                         aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
-                elif key == 16777236:               #MOVES CURRENT BUTTON RIGHT
+                elif k == 16777236:               #MOVES CURRENT BUTTON RIGHT
                     if self.keyboardmoveflag:
                         self.moveKbutton("right")
                     elif aw.qmc.background:
                         aw.qmc.movebackground("right",aw.qmc.backgroundmovespeed)
                         self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
                         aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
-                elif key == 16777235:               #UP
+                elif k == 16777235:               #UP
                     if aw.qmc.background:
                         aw.qmc.movebackground("up",aw.qmc.backgroundmovespeed)
                         self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
                         aw.qmc.redraw(recomputeAllDeltas=False,sampling=aw.qmc.flagon)
-                elif key == 16777237:               #DOWN
+                elif k == 16777237:               #DOWN
                     if aw.qmc.background:
                         aw.qmc.movebackground("down",aw.qmc.backgroundmovespeed)
                         self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
                         aw.qmc.redraw(recomputeAllDeltas=False,sampling=aw.qmc.flagon)
-                elif key == 65:                     #letter A (automatic save)
+                elif k == 65:                     #letter A (automatic save)
                     if not app.artisanviewerMode and self.qmc.flagon:
                         self.automaticsave()
-                elif key == 68:                     #letter D (toggle xy between temp and RoR scale)
+                elif k == 68:                     #letter D (toggle xy between temp and RoR scale)
                     self.qmc.fmt_data_RoR = not (self.qmc.fmt_data_RoR)
                     # force redraw crosslines if active
                     if aw.qmc.crossmarker:
                         try:
                             aw.ntb.mouse_move(mplLocationevent.lastevent)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
-                elif key == 67:                     #letter C (controls)
+                elif k == 67:                     #letter C (controls)
                     self.toggleControls()
-                elif key == 88:                     #letter X (readings)
+                elif k == 88:                     #letter X (readings)
                     if not app.artisanviewerMode:
                         self.toggleReadings()
-                elif key == 83:                     #letter S (sliders)
+                elif k == 83:                     #letter S (sliders)
                     if not app.artisanviewerMode:
                         self.toggleSliders()
-                elif key == 84 and not self.qmc.flagon:  #letter T (mouse cross)
+                elif k == 84 and not self.qmc.flagon:  #letter T (mouse cross)
                     self.qmc.togglecrosslines()
-                elif key == 81:  #letter q (quick entry of custom event 1)
+                elif k == 81:  #letter q (quick entry of custom event 1)
                     self.quickEventShortCut = (0,"")
                     aw.sendmessage("%s"%aw.qmc.etypes[0])
-                elif key == 87:  #letter w (quick entry of custom event 2)
+                elif k == 87:  #letter w (quick entry of custom event 2)
                     self.quickEventShortCut = (1,"")
                     aw.sendmessage("%s"%aw.qmc.etypes[1])
-                elif key == 69:  #letter e (quick entry of custom event 3)
+                elif k == 69:  #letter e (quick entry of custom event 3)
                     self.quickEventShortCut = (2,"")
                     aw.sendmessage("%s"%aw.qmc.etypes[2])
-                elif key == 82:  #letter r (quick entry of custom event 4)
+                elif k == 82:  #letter r (quick entry of custom event 4)
                     self.quickEventShortCut = (3,"")
                     aw.sendmessage("%s"%aw.qmc.etypes[3])
-                elif key == 86: #letter v (Set SV)
+                elif k == 86: #letter v (Set SV)
                     self.quickEventShortCut = (4,"")
                     aw.sendmessage("SV")
-                elif key == 66:  #letter b hides/shows extra rows of event buttons
+                elif k == 66:  #letter b hides/shows extra rows of event buttons
                     if not app.artisanviewerMode:
                         self.toggleextraeventrows()
-                elif key == 77:  #letter m hides/shows standard buttons row
+                elif k == 77:  #letter m hides/shows standard buttons row
                     if aw.qmc.flagstart:
                         self.standardButtonsVisibility()
                 #Extra event buttons palette. Numerical keys [0,1,2,3,4,5,6,7,8,9]
-                elif key > 47 and key < 58:
+                elif k > 47 and k < 58:
                     if not app.artisanviewerMode:
                         button = [48,49,50,51,52,53,54,55,56,57]
                         if self.quickEventShortCut:
                             # quick custom event entry
                             eventNr = self.quickEventShortCut[0]
-                            eventValueStr = self.quickEventShortCut[1] + str(button.index(key))
+                            eventValueStr = self.quickEventShortCut[1] + str(button.index(k))
                             if eventNr == 4:
                                 aw.sendmessage("SV %s"%(eventValueStr))
                             else:
@@ -24196,14 +24195,14 @@ class ApplicationWindow(QMainWindow):
 # now shift modifier is required to switch palettes via number keys
 #                       else:
 #                            if aw.buttonpalette_shortcuts:
-#                               self.setbuttonsfrom(button.index(key))
-                elif key == 58 and not aw.qmc.flagon: # key ";": screenshots only if not sampling!
+#                               self.setbuttonsfrom(button.index(k))
+                elif k == 58 and not aw.qmc.flagon: # k ";": screenshots only if not sampling!
                     self.desktopscreenshot()
-                elif key == 59 and not aw.qmc.flagon: # key ":": screenshots only if not sampling!
+                elif k == 59 and not aw.qmc.flagon: # k ":": screenshots only if not sampling!
                     self.applicationscreenshot()
                 else:
                     QWidget.keyPressEvent(self, event)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             finally:
                 self.processingKeyEvent = False
@@ -24325,7 +24324,7 @@ class ApplicationWindow(QMainWindow):
                         if aw.keyboardmoveindex == this_index:
                             break
                     aw.moveKbutton("right") # now to the next
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
     def moveKbutton(self,kcommand):
@@ -24393,7 +24392,7 @@ class ApplicationWindow(QMainWindow):
     def removeDisallowedFilenameChars(self,filename):
         validFilenameChars = "-_.() %s%s" % (libstring.ascii_letters, libstring.digits)
         cleanedFilename = s2a(unicodedata.normalize('NFKD', filename))
-        return ''.join(c for c in d(cleanedFilename) if c in validFilenameChars)
+        return ''.join(c for c in decodeLocal(cleanedFilename) if c in validFilenameChars)
 
 
     def generateFilename(self,prefix="",previewmode=0):
@@ -24417,7 +24416,7 @@ class ApplicationWindow(QMainWindow):
             #clean name
             filename = self.removeDisallowedFilenameChars(filename)
             filename = filename.strip()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         return filename
 
@@ -24433,7 +24432,7 @@ class ApplicationWindow(QMainWindow):
                 return fn
 
             #single, leading delimiter for the fields
-            self.fieldDelim = '~'  #note this value is hard coded in autosavefields
+            fieldDelim = '~'  #note this value is hard coded in autosavefields
             #delimiter for ON only
             onDelim = "'"
             #delimiter for OFF only
@@ -24600,23 +24599,23 @@ class ApplicationWindow(QMainWindow):
     
             _ignorecase = re.IGNORECASE  # @UndefinedVariable
             #text between single quotes ' will show only when recording or for preview recording
-            fn = re.sub(r"{}([^{}]+){}".format(onDelim,onDelim,onDelim),
-                r"\1",fn) if (previewmode==1 or (previewmode==0 and self.qmc.flagon)) else re.sub(r"{}([^{}]+){}".format(
-                    onDelim,onDelim,onDelim),r"",fn)
+            fn = re.sub(r"{od}([^{od}]+){od}".format(od=onDelim),
+                r"\1",fn) if (previewmode==1 or (previewmode==0 and self.qmc.flagon)) else re.sub(r"{od}([^{od}]+){od}".format(
+                    od=onDelim),r"",fn)
             #text between double quotes " will show only when flagon is False
-            fn = re.sub(r'{}([^{}]+){}'.format(offDelim,offDelim,offDelim),
-                r'\1',fn) if (previewmode==2 or (previewmode==0 and not self.qmc.flagon)) else re.sub(r'{}([^{}]+){}'.format(
-                    offDelim,offDelim,offDelim),r'',fn)
+            fn = re.sub(r'{od}([^{od}]+){od}'.format(od=offDelim),
+                r'\1',fn) if (previewmode==2 or (previewmode==0 and not self.qmc.flagon)) else re.sub(r'{od}([^{od}]+){od}'.format(
+                    od=offDelim),r'',fn)
             #replace the fields with content
             for i in range(len(fields)):
-                fn = re.sub(r"{}{}".format(self.fieldDelim, fields[i][0]), r"{}".format(str(fields[i][1])), fn, 0, _ignorecase)
+                fn = re.sub(r"{}{}".format(fieldDelim, fields[i][0]), r"{}".format(str(fields[i][1])), fn, 0, _ignorecase)
 
             #cleaning is performed in generateFilename()
             #fn = self.removeDisallowedFilenameChars(str(fn))
             #fn = fn.strip()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Error:",None) + " parseAutosaveprefix() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Error:",None) + " parseAutosaveprefix() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return fn
 
     #automatation of filename when saving a file through keyboard shortcut. Speeds things up for batch roasting.
@@ -24668,7 +24667,7 @@ class ApplicationWindow(QMainWindow):
                     # file might be autosaved but not uploaded to plus yet (no DROP registered). This needs to be indicated by a red plus icon
                     try:
                         aw.updatePlusStatus()
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
 
                     return filename
@@ -24677,9 +24676,9 @@ class ApplicationWindow(QMainWindow):
             elif interactive:
                 self.sendmessage(QApplication.translate("Message","Empty path or box unchecked in Autosave", None))
                 self.autosaveconf()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Error:",None) + " automaticsave() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Error:",None) + " automaticsave() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -24731,11 +24730,11 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.ax.plot(x,y,marker ="o",markersize=12,color ="yellow",linestyle="-",linewidth = 7,alpha=.4)
                     if not aw.qmc.flagstart:
                         self.qmc.fig.canvas.draw()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " changeEventNumber() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " changeEventNumber() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             self.eNumberSpinBox.setDisabled(False)
             self.eNumberSpinBox.setFocus()
@@ -24803,7 +24802,7 @@ class ApplicationWindow(QMainWindow):
                     for widget in QApplication.topLevelWidgets():
                         if isinstance(widget, ApplicationWindow):
                             widget.updateRecentFileActions()
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
         self.updateWindowTitle()
 
@@ -24876,7 +24875,7 @@ class ApplicationWindow(QMainWindow):
 #        try: # sip not supported on older PyQt versions (RPi!)
 #            sip.delete(dlg)
 #            #print(sip.isdeleted(dlg))
-#        except:
+#        except Exception: # pylint: disable=broad-except
 #            pass
         if res is None:
             return None
@@ -24976,11 +24975,11 @@ class ApplicationWindow(QMainWindow):
             else:
                 if fileName:
                     self.loadFile(fileName)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fileLoad() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fileLoad() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     #loads stored profiles. Called from file menu
     def loadFile(self,filename,quiet=False):
@@ -25032,7 +25031,7 @@ class ApplicationWindow(QMainWindow):
                     aw.updatePlusStatus()
                     if aw.plus_account is not None:
                         if plus.config.uuid_tag in obj:
-                            QTimer.singleShot(100,lambda : plus.sync.sync())
+                            QTimer.singleShot(100, plus.sync.sync)
 
                 #check colors
                 self.checkColors(self.getcolorPairsToCheck())
@@ -25041,7 +25040,7 @@ class ApplicationWindow(QMainWindow):
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " {0}: {1}").format(str(ex),str(filename))),exc_tb.tb_lineno
+            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " {0}: {1}").format(str(ex),str(filename)),getattr(exc_tb, 'tb_lineno', '?'))
             # remove file from the recent file list
             settings = QSettings()
             files = toStringList(settings.value('recentFileList'))
@@ -25057,12 +25056,12 @@ class ApplicationWindow(QMainWindow):
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None) + " fileload() {0}").format(str(ex)),exc_tb.tb_lineno)
-        except Exception as ex:
+            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None) + " fileload() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+        except Exception as ex: # pylint: disable=broad-except
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " loadFile() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " loadFile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if f:
                 f.close()
@@ -25114,7 +25113,7 @@ class ApplicationWindow(QMainWindow):
         else:
             self.qmc.alarmbeep = [0]*len(self.qmc.alarmflag)
         if "alarmstrings" in profile:
-            self.qmc.alarmstrings = [d(x) for x in profile["alarmstrings"]]
+            self.qmc.alarmstrings = [decodeLocal(x) for x in profile["alarmstrings"]]
         else:
             self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
         self.qmc.alarmstate = [-1]*len(self.qmc.alarmflag)  #-1 = not triggered; otherwise idx = triggered
@@ -25202,9 +25201,9 @@ class ApplicationWindow(QMainWindow):
                 return True
             else:
                 return False
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateSymbolicETBT(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateSymbolicETBT(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # returns True if data got updated, False otherwise
     def calcVirtualdevices(self,update=False):
@@ -25252,11 +25251,11 @@ class ApplicationWindow(QMainWindow):
             else:
                 return False
 
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " calcVirtualdevices() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " calcVirtualdevices() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # tries to load background from the given path, if that fails try to deref the given UUID
     # returns True on succees, Fail otherwise
@@ -25265,7 +25264,7 @@ class ApplicationWindow(QMainWindow):
             try:
                 self.loadbackground(filename)
                 return True
-            except:
+            except Exception: # pylint: disable=broad-except
                 return False
         elif UUID is not None:
             filepath = plus.register.getPath(UUID)
@@ -25273,7 +25272,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     self.loadbackground(filepath)
                     return True
-                except:
+                except Exception: # pylint: disable=broad-except
                     return False
             else:
                 return False
@@ -25292,7 +25291,7 @@ class ApplicationWindow(QMainWindow):
             return
         try:
             filename = os.path.expanduser(filename) # expand users home directory abbreviation
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         if os.path.isfile(filename):
             try:
@@ -25302,7 +25301,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.background = not self.qmc.hideBgafterprofileload
                 self.autoAdjustAxis()
                 self.qmc.timealign(redraw=True)
-            except:
+            except Exception: # pylint: disable=broad-except
                 self.deleteBackground() # delete a loaded background if any
 
     # Loads background profile
@@ -25347,8 +25346,8 @@ class ApplicationWindow(QMainWindow):
                             t1x[e] = [fromCtoF(t) for t in t1x[e]]
                             t2x[e] = [fromCtoF(t) for t in t2x[e]]
 
-                names1x = [d(x) for x in profile["extraname1"]]
-                names2x = [d(x) for x in profile["extraname2"]]
+                names1x = [decodeLocal(x) for x in profile["extraname1"]]
+                names2x = [decodeLocal(x) for x in profile["extraname2"]]
                 timex = profile["extratimex"]
                 self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB, self.qmc.temp1BX, self.qmc.temp2BX = t1,t2,tb,t1x,t2x
                 self.qmc.extratimexB = timex
@@ -25400,19 +25399,19 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundEvents = profile["specialevents"]
                 self.qmc.backgroundEtypes = profile["specialeventstype"]
                 self.qmc.backgroundEvalues = profile["specialeventsvalue"]
-                self.qmc.backgroundEStrings = [d(x) for x in profile["specialeventsStrings"]]
+                self.qmc.backgroundEStrings = [decodeLocal(x) for x in profile["specialeventsStrings"]]
                 self.qmc.backgroundFlavors = profile["flavors"]
-                self.qmc.titleB = d(profile["title"])
+                self.qmc.titleB = decodeLocal(profile["title"])
                                 
                 if "roastbatchnr" in profile:
                     try:
                         self.qmc.roastbatchnrB = int(profile["roastbatchnr"])
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     self.qmc.roastbatchprefixB = profile["roastbatchprefix"]
                     try:
                         self.qmc.roastbatchposB = profile["roastbatchpos"]
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                 else:
                     self.qmc.roastbatchnrB = 0
@@ -25467,14 +25466,14 @@ class ApplicationWindow(QMainWindow):
                     try:
                         self.qmc.TP_time_B = profile["computed"]["TP_time"]
                         self.qmc.TP_time_B_loaded = profile["computed"]["TP_time"]
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         if (self.qmc.extratimexB) > 0:
                             self.qmc.TP_time_B = 0
                         else:
                             self.qmc.TP_time_B = None
                     _,_,auc,_ = aw.ts(tp=aw.qmc.backgroundtime2index(self.qmc.TP_time_B),background=True)
                     aw.qmc.AUCbackground = auc
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
 
                 if not aw.curFile and len(self.qmc.timex) < 10: # if no foreground is loaded, autoadjustAxis
@@ -25494,17 +25493,17 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message", "Invalid artisan format",None))
         except IOError as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " loadbackground() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " loadbackground() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None) + " loadbackground() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None) + " loadbackground() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " loadbackground() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " loadbackground() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
         finally:
             if f:
@@ -25530,7 +25529,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     tm = QTime.fromString(header[11].split('Time:')[1])
                     self.qmc.roastdate = QDateTime(date,tm)
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     self.qmc.roastdate = QDateTime(date)
             else:
                 self.qmc.roastdate = QDateTime(date)
@@ -25612,11 +25611,11 @@ class ApplicationWindow(QMainWindow):
             self.qmc.fileDirtySignal.emit()
             aw.autoAdjustAxis()
             self.qmc.redraw()
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importCSV() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importCSV() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def addSerialPort(self):
         n = len(self.qmc.extradevices) - 1
@@ -25713,7 +25712,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.extratimex[l], self.qmc.extratemp2[l],color=self.qmc.extradevicecolor2[l],markersize=self.qmc.extramarkersizes2[l],marker=self.qmc.extramarkers2[l],linewidth=self.qmc.extralinewidths2[l],linestyle=self.qmc.extralinestyles2[l],drawstyle=self.qmc.extradrawstyles2[l],label=self.qmc.extraname2[l])[0])
 
             self.updateExtraLCDvisibility()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
@@ -25727,11 +25726,11 @@ class ApplicationWindow(QMainWindow):
             outfile.write('\n')
             outfile.close()
             return True
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportJSON() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportJSON() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
 
     def indent(self,elem, level=0):
@@ -25869,11 +25868,11 @@ class ApplicationWindow(QMainWindow):
             self.indent(tree)
             ET.ElementTree(tree).write(filename,encoding='utf-8', xml_declaration=True)
             return True
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #           import traceback
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportPilot() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportPilot() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
 
     #Write readings to RoastLogger CSV file
@@ -25947,11 +25946,11 @@ class ApplicationWindow(QMainWindow):
             outfile.write("\n")
             outfile.close()
             return True
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #           import traceback
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportRoastLogger() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportRoastLogger() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
         finally:
             outfile.close()
@@ -25971,11 +25970,11 @@ class ApplicationWindow(QMainWindow):
                 self.etypeComboBox.addItems(self.qmc.etypes)
                 aw.autoAdjustAxis()
                 self.qmc.redraw()
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importJSON() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importJSON() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def importRoastLogger(self,filename):
         self.resetExtraDevices()
@@ -25983,14 +25982,14 @@ class ApplicationWindow(QMainWindow):
         try:
             try:
                 self.importRoastLoggerEnc(filename,'utf-8')
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 self.importRoastLoggerEnc(filename,'latin1')
             aw.qmc.fileDirtySignal.emit()
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importRoastLogger() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importRoastLogger() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def resetExtraDevices(self):
         try:
@@ -26023,9 +26022,9 @@ class ApplicationWindow(QMainWindow):
             aw.extraser = []
             aw.extracomport,aw.extrabaudrate,aw.extrabytesize,aw.extraparity,aw.extrastopbits,aw.extratimeout = [],[],[],[],[],[]
             aw.qmc.resetlinecountcaches()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " resetExtraDevices(): {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " resetExtraDevices(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def importRoastLoggerEnc(self,filename,enc='utf-8'):
         roastlogger_action_section = ""
@@ -26064,12 +26063,12 @@ class ApplicationWindow(QMainWindow):
                 timex.append(float(stringtoseconds(fields[0])))
                 try:
                     t1 = float(fields[1])
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     t1 = -1
                 temp1.append(t1)
                 try:
                     t2 = float(fields[2])
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     t2 = -1
                 temp2.append(t2)
                 event = fields[3]
@@ -26104,11 +26103,11 @@ class ApplicationWindow(QMainWindow):
                 slider_fan = -1
                 try:
                     slider_power=aw.qmc.etypes.index("Power")
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
                 try:
                     slider_fan=aw.qmc.etypes.index("Fan")
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
                 #load only "Power" and "Fan" events
                 if slider_power != -1 and slider_fan != -1:
@@ -26258,13 +26257,13 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmaction.insert(3,0)    #POPUP
                                     aw.qmc.alarmbeep.insert(3,1)      #do beep for charge
                                     aw.qmc.alarmstrings.insert(3,QApplication.translate("Label","Charge the beans",None))
-                                break;
+                                break
                     else:
                         if slider_power == -1: error_msg += "Could not find slider named 'Power' "
                         if slider_fan == -1: error_msg += "Could not find slider named 'Fan' "
                         error_msg += "Please rename sliders in Config - Events menu"
 
-        except Exception:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             if roastlogger_action_section == "No actions loaded":
@@ -26386,11 +26385,11 @@ class ApplicationWindow(QMainWindow):
                 return True
             else:
                 return False
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportCSV() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportCSV() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
 
     #Write readings to Artisan Excel file
@@ -26545,8 +26544,8 @@ class ApplicationWindow(QMainWindow):
 
                         for j in range(6):
                             try:
-                                ws.cell(row=r+i, column=j+1).value = eval(fieldlist[j][1])
-                            except:
+                                ws.cell(row=r+i, column=j+1).value = eval(fieldlist[j][1]) # pylint: disable=eval-used
+                            except Exception: # pylint: disable=broad-except
                                 pass
 
                         for j in range(len(extratemps)):
@@ -26558,11 +26557,11 @@ class ApplicationWindow(QMainWindow):
                 return True
             else:
                 return False
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportExcel() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportExcel() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
 
     #Write object to file
@@ -26578,7 +26577,7 @@ class ApplicationWindow(QMainWindow):
             if obj is not None:
                 if plus.config.uuid_tag in obj:
                     plus.register.addPath(obj[plus.config.uuid_tag],fn)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     #Read object from file
@@ -26588,7 +26587,7 @@ class ApplicationWindow(QMainWindow):
             fn = str(filename)
             if os.path.exists(fn):
                 f = codecs.open(fn, 'rb', encoding='utf-8')
-                obj=ast.literal_eval(f.read())
+                obj=ast.literal_eval(f.read()) # pylint: disable=eval-used
                 f.close()
 
 #PLUS
@@ -26597,13 +26596,13 @@ class ApplicationWindow(QMainWindow):
                 if obj is not None:
                     if plus.config.uuid_tag in obj:
                         plus.register.addPath(obj[plus.config.uuid_tag],fn)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
             return obj
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " deserialize() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " deserialize() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return {}
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -26776,7 +26775,7 @@ class ApplicationWindow(QMainWindow):
                         profiledev = ''.join([str(profile["extradevices"]), str(profile["extraname1"]), str(profile["extraname2"]),
                                             str(profile["extramathexpression1"]), str(profile["extramathexpression2"]),
                                             ])
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         profiledev = ''
                     if settingdev != profiledev:
                         string = QApplication.translate("Message","To fully load this profile the extra device configuration needs to be modified.\n\nOverwrite your extra device definitions using the values from the profile?\n\nIt is advisable to save your current settings beforehand via menu Help >> Save Settings.",None)
@@ -26856,19 +26855,19 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.extractimex2 = [[]]*len(self.qmc.extratemp2)
                 # d) set other extra curve attribute lists
                 if "extraname1" in profile:
-                    self.qmc.extraname1 = [d(x) for x in profile["extraname1"]]
+                    self.qmc.extraname1 = [decodeLocal(x) for x in profile["extraname1"]]
                 if "extraname2" in profile:
-                    self.qmc.extraname2 = [d(x) for x in profile["extraname2"]]
+                    self.qmc.extraname2 = [decodeLocal(x) for x in profile["extraname2"]]
                 if "extramathexpression1" in profile:
-                    self.qmc.extramathexpression1 = [d(x) for x in profile["extramathexpression1"]]
+                    self.qmc.extramathexpression1 = [decodeLocal(x) for x in profile["extramathexpression1"]]
                 if "extramathexpression2" in profile:
-                    self.qmc.extramathexpression2 = [d(x) for x in profile["extramathexpression2"]]
+                    self.qmc.extramathexpression2 = [decodeLocal(x) for x in profile["extramathexpression2"]]
 
                 if updateRender:
                     if "extradevicecolor1" in profile:
-                        self.qmc.extradevicecolor1 = [d(x) for x in profile["extradevicecolor1"]]
+                        self.qmc.extradevicecolor1 = [decodeLocal(x) for x in profile["extradevicecolor1"]]
                     if "extradevicecolor2" in profile:
-                        self.qmc.extradevicecolor2 = [d(x) for x in profile["extradevicecolor2"]]
+                        self.qmc.extradevicecolor2 = [decodeLocal(x) for x in profile["extradevicecolor2"]]
 
                     if "extraLCDvisibility1" in profile:
                         self.extraLCDvisibility1 = profile["extraLCDvisibility1"]
@@ -26911,11 +26910,11 @@ class ApplicationWindow(QMainWindow):
                     else:
                         self.qmc.extramarkersizes2 = [self.qmc.markersize_default]*len(self.qmc.extratemp2)
                     if "extramarkers1" in profile:
-                        self.qmc.extramarkers1 = [d(x) for x in profile["extramarkers1"]]
+                        self.qmc.extramarkers1 = [decodeLocal(x) for x in profile["extramarkers1"]]
                     else:
                         self.qmc.extramarkers1 = [self.qmc.marker_default]*len(self.qmc.extratemp1)
                     if "extramarkers2" in profile:
-                        self.qmc.extramarkers2 = [d(x) for x in profile["extramarkers2"]]
+                        self.qmc.extramarkers2 = [decodeLocal(x) for x in profile["extramarkers2"]]
                     else:
                         self.qmc.extramarkers2 = [self.qmc.marker_default]*len(self.qmc.extratemp2)
                     if "extralinewidths1" in profile:
@@ -26927,19 +26926,19 @@ class ApplicationWindow(QMainWindow):
                     else:
                         self.qmc.extralinewidths2 = [self.qmc.extra_linewidth_default]*len(self.qmc.extratemp2)
                     if "extralinestyles1" in profile:
-                        self.qmc.extralinestyles1 = [d(x) for x in profile["extralinestyles1"]]
+                        self.qmc.extralinestyles1 = [decodeLocal(x) for x in profile["extralinestyles1"]]
                     else:
                         self.qmc.extralinestyles1 = [self.qmc.linestyle_default]*len(self.qmc.extratemp1)
                     if "extralinestyles2" in profile:
-                        self.qmc.extralinestyles2 = [d(x) for x in profile["extralinestyles2"]]
+                        self.qmc.extralinestyles2 = [decodeLocal(x) for x in profile["extralinestyles2"]]
                     else:
                         self.qmc.extralinestyles2 = [self.qmc.linestyle_default]*len(self.qmc.extratemp2)
                     if "extradrawstyles1" in profile:
-                        self.qmc.extradrawstyles1 = [d(x) for x in profile["extradrawstyles1"]]
+                        self.qmc.extradrawstyles1 = [decodeLocal(x) for x in profile["extradrawstyles1"]]
                     else:
                         self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp1)
                     if "extradrawstyles2" in profile:
-                        self.qmc.extradrawstyles2 = [d(x) for x in profile["extradrawstyles2"]]
+                        self.qmc.extradrawstyles2 = [decodeLocal(x) for x in profile["extradrawstyles2"]]
                     else:
                         self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp2)
 
@@ -26955,7 +26954,7 @@ class ApplicationWindow(QMainWindow):
             if "flavors" in profile:
                 self.qmc.flavors = [max(0,min(10,float(fl))) for fl in profile["flavors"]]
             if "flavorlabels" in profile:
-                self.qmc.flavorlabels = toStringList([d(x) for x in profile["flavorlabels"]])
+                self.qmc.flavorlabels = toStringList([decodeLocal(x) for x in profile["flavorlabels"]])
             if len(self.qmc.flavorlabels) > len(self.qmc.flavors):
                 # fill with default 5. values
                 self.qmc.flavors = self.qmc.flavors + [5.]*(len(self.qmc.flavorlabels)-len(self.qmc.flavors))
@@ -26969,24 +26968,24 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.qmc.flavoraspect = 1.
             if "title" in profile:
-                self.qmc.title = d(profile["title"])
+                self.qmc.title = decodeLocal(profile["title"])
             else:
                 self.qmc.title = QApplication.translate("Scope Title", "Roaster Scope",None)
 
 #PLUS
             if "plus_store" in profile:
-                self.qmc.plus_store = d(profile["plus_store"])
+                self.qmc.plus_store = decodeLocal(profile["plus_store"])
                 if "plus_store_label" in profile:
-                    self.qmc.plus_store_label = d(profile["plus_store_label"])
+                    self.qmc.plus_store_label = decodeLocal(profile["plus_store_label"])
                 else:
                     self.qmc.plus_store_label = None
             else:
                 self.qmc.plus_store = None
                 self.qmc.plus_store_label = None
             if "plus_coffee" in profile:
-                self.qmc.plus_coffee = d(profile["plus_coffee"])
+                self.qmc.plus_coffee = decodeLocal(profile["plus_coffee"])
                 if "plus_coffee_label" in profile:
-                    self.qmc.plus_coffee_label = d(profile["plus_coffee_label"])
+                    self.qmc.plus_coffee_label = decodeLocal(profile["plus_coffee_label"])
                 else:
                     self.qmc.plus_coffee_label = None
             else:
@@ -26996,27 +26995,27 @@ class ApplicationWindow(QMainWindow):
                 # we convert the blend specification from its list to its internal dictionary representation
                 self.qmc.plus_blend_spec = plus.stock.list2blend(profile["plus_blend_spec"])
                 if "plus_blend_label" in profile:
-                    self.qmc.plus_blend_label = d(profile["plus_blend_label"])
+                    self.qmc.plus_blend_label = decodeLocal(profile["plus_blend_label"])
                 else:
                     self.qmc.plus_blend_label = None
                 if "plus_blend_spec_labels" in profile:
-                    self.qmc.plus_blend_spec_labels = [d(l) for l in profile["plus_blend_spec_labels"]]
+                    self.qmc.plus_blend_spec_labels = [decodeLocal(l) for l in profile["plus_blend_spec_labels"]]
                 else:
                     self.qmc.plus_blend_spec_labels = None
             else:
                 self.qmc.plus_blend_spec = None
                 self.qmc.plus_blend_spec_labels = None
             if "plus_sync_record_hash" in profile:
-                self.qmc.plus_sync_record_hash = d(profile["plus_sync_record_hash"])
+                self.qmc.plus_sync_record_hash = decodeLocal(profile["plus_sync_record_hash"])
             else:
                 self.qmc.plus_sync_record_hash = None
 
             if "beans" in profile:
-                self.qmc.beans = d(profile["beans"])
+                self.qmc.beans = decodeLocal(profile["beans"])
             else:
                 self.qmc.beans = ""
             if "weight" in profile:
-                self.qmc.weight = [profile["weight"][0],profile["weight"][1],d(profile["weight"][2])]
+                self.qmc.weight = [profile["weight"][0],profile["weight"][1],decodeLocal(profile["weight"][2])]
             else:
                 self.qmc.weight = [0,0,"g"]
             if "volume" in profile:
@@ -27024,15 +27023,15 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.qmc.volume = [0,0,"l"]
             if "density" in profile:
-                self.qmc.density = [profile["density"][0],d(profile["density"][1]),profile["density"][2],d(profile["density"][3])]
+                self.qmc.density = [profile["density"][0],decodeLocal(profile["density"][1]),profile["density"][2],decodeLocal(profile["density"][3])]
             else:
                 self.qmc.density = [0,"g",1,"l"]
             if "density_roasted" in profile:
-                self.qmc.density_roasted = [profile["density_roasted"][0],d(profile["density_roasted"][1]),profile["density_roasted"][2],d(profile["density_roasted"][3])]
+                self.qmc.density_roasted = [profile["density_roasted"][0],decodeLocal(profile["density_roasted"][1]),profile["density_roasted"][2],decodeLocal(profile["density_roasted"][3])]
             else:
                 self.qmc.density_roasted = [0,"g",1,"l"]
             if "roastertype" in profile:
-                self.qmc.roastertype = d(profile["roastertype"])
+                self.qmc.roastertype = decodeLocal(profile["roastertype"])
             else:
                 self.qmc.roastertype = ""
             if "roastersize" in profile:
@@ -27044,22 +27043,22 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.qmc.roastersize = 0
             if "operator" in profile:
-                self.qmc.operator = d(profile["operator"])
+                self.qmc.operator = decodeLocal(profile["operator"])
             else:
                 self.qmc.operator = ""
             if "organization" in profile:
-                self.qmc.organization = d(profile["organization"])
+                self.qmc.organization = decodeLocal(profile["organization"])
             else:
                 self.qmc.organization = ""
             if "drumspeed" in profile:
-                self.qmc.drumspeed = d(profile["drumspeed"])
+                self.qmc.drumspeed = decodeLocal(profile["drumspeed"])
             else:
                 self.qmc.drumspeed = ""
             if "beansize" in profile:
                 # we map beansize in mm to beansize_max in 1/64"
                 try:
                     self.qmc.beansize_max = int(round(float(profile["beansize"]) * 0.0393701 * 61))
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             if "beansize_min" in profile:
                 self.qmc.beansize_min = float(profile["beansize_min"])
@@ -27103,56 +27102,56 @@ class ApplicationWindow(QMainWindow):
             # for compatibility with older profiles:
             if "roastdate" in profile:
                 try:
-                    date = QDate.fromString(d(profile["roastdate"]))
+                    date = QDate.fromString(decodeLocal(profile["roastdate"]))
                     if not date.isValid():
                         date = QDate.currentDate()
                     if "roasttime" in profile:
                         try:
-                            time = QTime.fromString(d(profile["roasttime"]))
+                            time = QTime.fromString(decodeLocal(profile["roasttime"]))
                             self.qmc.roastdate = QDateTime(date,time)
-                        except Exception:
+                        except Exception: # pylint: disable=broad-except
                             self.qmc.roastdate = QDateTime(date)
                     else:
                         self.qmc.roastdate = QDateTime(date)
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
             # the new dates have the locale independent isodate format:
             if "roastisodate" in profile:
                 try:
-                    date = QDate.fromString(d(profile["roastisodate"]),Qt.ISODate)
+                    date = QDate.fromString(decodeLocal(profile["roastisodate"]),Qt.ISODate)
                     if "roasttime" in profile:
                         try:
-                            time = QTime.fromString(d(profile["roasttime"]))
+                            time = QTime.fromString(decodeLocal(profile["roasttime"]))
                             self.qmc.roastdate = QDateTime(date,time)
-                        except Exception:
+                        except Exception: # pylint: disable=broad-except
                             self.qmc.roastdate = QDateTime(date)
                     else:
                         self.qmc.roastdate = QDateTime(date)
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
             if "roastepoch" in profile:
                 try:
 #                    self.qmc.roastdate = QDateTime.fromTime_t(profile["roastepoch"]) # deprecated
                     self.qmc.roastdate = QDateTime.fromSecsSinceEpoch(profile["roastepoch"])
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
             if "roastUUID" in profile:
-                self.qmc.roastUUID = d(profile["roastUUID"])
+                self.qmc.roastUUID = decodeLocal(profile["roastUUID"])
             else:
                 self.qmc.roastUUID = uuid.uuid4().hex # generate UUID
                 self.qmc.fileDirtySignal.emit()
             if "roastbatchnr" in profile:
                 try:
                     self.qmc.roastbatchnr = int(profile["roastbatchnr"])
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
                 try:
-                    self.qmc.roastbatchprefix = d(profile["roastbatchprefix"])
-                except:
+                    self.qmc.roastbatchprefix = decodeLocal(profile["roastbatchprefix"])
+                except Exception: # pylint: disable=broad-except
                     pass
                 try:
                     self.qmc.roastbatchpos = int(profile["roastbatchpos"])
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             if "specialevents" in profile:
                 self.qmc.specialevents = profile["specialevents"]
@@ -27167,18 +27166,18 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.qmc.specialeventsvalue = []
             if "specialeventsStrings" in profile:
-                self.qmc.specialeventsStrings = [d(x) for x in profile["specialeventsStrings"]]
+                self.qmc.specialeventsStrings = [decodeLocal(x) for x in profile["specialeventsStrings"]]
             else:
                 self.qmc.specialeventsStrings = []
             if "etypes" in profile:
-                self.qmc.etypes = [d(x) for x in profile["etypes"]]
+                self.qmc.etypes = [decodeLocal(x) for x in profile["etypes"]]
 
             if "roastingnotes" in profile:
-                self.qmc.roastingnotes = d(profile["roastingnotes"])
+                self.qmc.roastingnotes = decodeLocal(profile["roastingnotes"])
             else:
                 self.qmc.roastingnotes = ""
             if "cuppingnotes" in profile:
-                self.qmc.cuppingnotes = d(profile["cuppingnotes"])
+                self.qmc.cuppingnotes = decodeLocal(profile["cuppingnotes"])
             else:
                 self.qmc.cuppingnotes = ""
             if "timex" in profile:
@@ -27228,7 +27227,7 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.extratemp2[e] = [fromFtoC(t) for t in self.qmc.extratemp2[e]]
                 try:
                     aw.calcVirtualdevices(update=True)
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
                 if self.qmc.ambientTemp != 0:
                     self.qmc.ambientTemp = fromFtoC(self.qmc.ambientTemp)
@@ -27253,7 +27252,7 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.extratemp2[e] = [fromCtoF(t) for t in self.qmc.extratemp2[e]]
                 try:
                     aw.calcVirtualdevices(update=True)
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
                 if self.qmc.ambientTemp != 0:
                     self.qmc.ambientTemp = fromCtoF(self.qmc.ambientTemp)
@@ -27313,14 +27312,14 @@ class ApplicationWindow(QMainWindow):
                     pos = data_to_axis.transform(legendloc_pos_data)
                     self.qmc.legendloc_pos = (pos[0],pos[1])
                     self.qmc.legend = None
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
 
 # we load external programs only from app settings
 #            if "externalprogram" in profile:
-#                self.ser.externalprogram = d(profile["externalprogram"])
+#                self.ser.externalprogram = decodeLocal(profile["externalprogram"])
 #            if "externaloutprogram" in profile:
-#                self.ser.externaloutprogram = d(profile["externaloutprogram"])
+#                self.ser.externaloutprogram = decodeLocal(profile["externaloutprogram"])
             if "samplinginterval" in profile:
                 # derive aw.qmc.deltaBTsamples from aw.qmc.deltaBTspan and the sampling interval of the profile
                 self.qmc.profile_sampling_interval = profile["samplinginterval"]
@@ -27379,14 +27378,14 @@ class ApplicationWindow(QMainWindow):
             # reset linecount caches
             aw.qmc.resetlinecountcaches()
             # try to reload background profile
-            if (not quiet) and "backgroundpath" in profile and d(profile["backgroundpath"]) != "":
-                self.qmc.backgroundpath = d(profile["backgroundpath"])
+            if (not quiet) and "backgroundpath" in profile and decodeLocal(profile["backgroundpath"]) != "":
+                self.qmc.backgroundpath = decodeLocal(profile["backgroundpath"])
                 if os.path.isfile(self.qmc.backgroundpath):
                     try:
                         aw.loadbackground(self.qmc.backgroundpath)
                         aw.qmc.background = not aw.qmc.hideBgafterprofileload
                         aw.qmc.timealign(redraw=False) # there will be a later redraw triggered that also recomputes the deltas
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         self.deleteBackground() # delete a loaded background if any
                 elif "backgroundUUID" in profile and aw.qmc.backgroundUUID != profile["backgroundUUID"]:
                     # background file path moved, we try to resolve via the UUID cache
@@ -27398,7 +27397,7 @@ class ApplicationWindow(QMainWindow):
                             aw.qmc.timealign(redraw=False) # there will be a later redraw triggered that also recomputes the deltas
                             self.qmc.backgroundpath = background_path
                             aw.qmc.fileDirtySignal.emit() # as we updated the background path we force a profile save
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             self.deleteBackground() # delete a loaded background if any
                     else:
                         self.deleteBackground() # delete a loaded background if any
@@ -27406,12 +27405,12 @@ class ApplicationWindow(QMainWindow):
                     self.deleteBackground() # delete a loaded background if any
             aw.autoAdjustAxis()
             return True
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             # we don't report errors on settingsLoad
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(aw,QApplication.translate("Error Message", "Exception:",None) + " setProfile()",str(ex) + "@line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(aw,QApplication.translate("Error Message", "Exception:",None) + " setProfile()",str(ex) + "@line " + str(getattr(exc_tb, 'tb_lineno', '?')))
             return False
 
     def weightVolumeDigits(self,v):
@@ -27513,9 +27512,9 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["COOL_time"] = self.float2float(self.qmc.timex[self.qmc.timeindex[7]] - start)
                 computedProfile["COOL_ET"] = self.float2float(self.qmc.temp1[self.qmc.timeindex[7]])
                 computedProfile["COOL_BT"] = self.float2float(self.qmc.temp2[self.qmc.timeindex[7]])
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         ######### Phases #########
         try:
             # we calcuate the statistics here as the profile might not have yet been rendered and thus the statistics are not yet computed
@@ -27530,9 +27529,9 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["finishphasetime"] = aw.float2float(statisticstimes[3],3)
             if statisticstimes[4]:
                 computedProfile["coolphasetime"] = aw.float2float(statisticstimes[4],3)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         ######### RoR #########
         try:
             if TP_time_idx and DRY_time_idx:
@@ -27545,16 +27544,16 @@ class ApplicationWindow(QMainWindow):
                     computedProfile["total_ror"] = self.float2float(((computedProfile["DROP_BT"]-computedProfile["TP_BT"])/(computedProfile["DROP_time"]-computedProfile["TP_time"]))*60.)
                 if aw.qmc.timeindex[2] > 0 and aw.qmc.delta2:
                     computedProfile["fcs_ror"] = self.float2float(aw.qmc.delta2[aw.qmc.timeindex[2]])
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         ######### ETBTarea #########
         try:
             ts,tse,tsb,_ = aw.ts(self.qmc.timeindex[0],self.qmc.timeindex[6])
             computedProfile["total_ts"] = self.float2float(ts,0)
             computedProfile["total_ts_ET"] = self.float2float(tse,0)
             computedProfile["total_ts_BT"] = self.float2float(tsb,0)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         ######### AUC area #########
         try:
@@ -27579,22 +27578,22 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["AUCbegin"] = "FCs"
                 if aw.qmc.AUCbaseFlag:  # base AUC is taken from BT at AUCbegin event
                     computedProfile["AUCbase"] = computedProfile["FCs_BT"]
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             _,_,ts1b,_ = aw.ts(self.qmc.timeindex[0],DRY_time_idx)
             computedProfile["dry_phase_AUC"] = self.float2float(ts1b,0)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             _,_,ts2b,_ = aw.ts(DRY_time_idx,self.qmc.timeindex[2])
             computedProfile["mid_phase_AUC"] = self.float2float(ts2b,0)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             _,_,ts3b,_ = aw.ts(self.qmc.timeindex[2],self.qmc.timeindex[6])
             computedProfile["finish_phase_AUC"] = self.float2float(ts3b,0)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         ######### Weight, Volume, Loss, Gain, Density #########
         try:
@@ -27641,9 +27640,9 @@ class ApplicationWindow(QMainWindow):
                 setdensity = aw.qmc.density[0] /  aw.qmc.density[2]
                 setdensity = aw.convertWeight(aw.qmc.density[0],aw.qmc.weight_units.index(aw.qmc.density[1]),0) / aw.convertVolume(aw.qmc.density[2],aw.qmc.volume_units.index(aw.qmc.density[3]),0)
                 computedProfile["set_density"] = self.float2float(setdensity,1)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         ######### Humidity / Pressure #########
         try:
             if aw.qmc.moisture_greens != 0.0 and not math.isnan(aw.qmc.moisture_greens):
@@ -27656,9 +27655,9 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["ambient_pressure"] = self.float2float(aw.qmc.ambient_pressure)
             if aw.qmc.ambientTemp != 0.0 and not math.isnan(aw.qmc.ambientTemp):
                 computedProfile["ambient_temperature"] = self.float2float(aw.qmc.ambientTemp)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         ######### Similarity #########
         try:
             det,dbt = aw.curveSimilarity(aw.qmc.phases[1])
@@ -27666,7 +27665,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["det"] = det
             if dbt is not None and not math.isnan(dbt):
                 computedProfile["dbt"] = dbt
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         ######### Energy Use #########
         try:
@@ -27710,9 +27709,9 @@ class ApplicationWindow(QMainWindow):
             if "KWH_roast_per_green_kg" in energymetrics:
                 computedProfile["KWH_roast_per_green_kg"] = self.float2float(energymetrics["KWH_roast_per_green_kg"],1)
 
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         ######### RETURN #########
         return computedProfile
 
@@ -27724,8 +27723,8 @@ class ApplicationWindow(QMainWindow):
             profile["version"] = str(__version__)
             profile["revision"] = str(__revision__)
             profile["build"] = str(__build__)
-            os,os_version = self.get_os()
-            profile["artisan_os"] = os
+            os_name,os_version = self.get_os()
+            profile["artisan_os"] = os_name
             profile["artisan_os_version"] = os_version
             profile["mode"] = self.qmc.mode
             profile["viewerMode"] = self.app.artisanviewerMode
@@ -27783,19 +27782,19 @@ class ApplicationWindow(QMainWindow):
             # write roastdate that respects locale and potential cannot be read in under a different locale (just for compatibility to older versions)
             try:
                 profile["roastdate"] = encodeLocal(self.qmc.roastdate.date().toString())
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             # write ISO roast date
             try:
                 profile["roastisodate"] = encodeLocal(self.qmc.roastdate.date().toString(Qt.ISODate))
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             # write roast time
             try:
                 profile["roasttime"] = encodeLocal(self.qmc.roastdate.time().toString())
                 profile["roastepoch"] = int(QDateTimeToEpoch(self.qmc.roastdate))
                 profile["roasttzoffset"] = self.qmc.roasttzoffset
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             profile["roastbatchnr"] = self.qmc.roastbatchnr
             profile["roastbatchprefix"] = encodeLocal(self.qmc.roastbatchprefix)
@@ -27892,19 +27891,19 @@ class ApplicationWindow(QMainWindow):
                 ds = list(self.qmc.extradevices)
                 ds.insert(0,self.qmc.device)
                 profile["devices"] = [self.qmc.devices[d-1] for d in ds]
-            except Exception as ex:
+            except Exception as ex: # pylint: disable=broad-except
                 pass
             profile["elevation"] = self.qmc.elevation
             profile["computed"] = self.computedProfileInformation()
             # add positions of main event annotations and custom event flags
             profile["anno_positions"] = self.qmc.getAnnoPositions()
             profile["flag_positions"] = self.qmc.getFlagPositions()
-            if self.qmc.legend is not None and not isinstance(self.qmc.legend._loc, int):
+            if self.qmc.legend is not None and not isinstance(self.qmc.legend._loc, int): # pylint: disable=protected-access
                 # if a legend is currently drawn and has a custom position we save its position in data coordinates
                 try:
                     axis_to_data = self.qmc.ax.transAxes + self.qmc.ax.transData.inverted()
-                    profile["legendloc_pos"] = axis_to_data.transform(self.qmc.legend._loc).tolist()
-                except:
+                    profile["legendloc_pos"] = axis_to_data.transform(self.qmc.legend._loc).tolist() # pylint: disable=protected-access
+                except Exception: # pylint: disable=broad-except
                     pass
 
             # Energy Settings  
@@ -27925,15 +27924,15 @@ class ApplicationWindow(QMainWindow):
                 profile["coolingenergies"] = self.qmc.coolingenergies
                 profile["betweenbatch_after_preheat"] = self.qmc.betweenbatch_after_preheat
                 profile["electricEnergyMix"] = self.qmc.electricEnergyMix
-            except Exception as ex:
+            except Exception as ex: # pylint: disable=broad-except
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " getProfile(): {0}").format(str(ex)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " getProfile(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
             return profile
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " getProfile(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " getProfile(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return None
 
     @pyqtSlot()
@@ -28016,9 +28015,9 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
                 return False
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " filesave(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " filesave(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
 
     def fileExport(self,msg,ext,dumper):
@@ -28030,7 +28029,7 @@ class ApplicationWindow(QMainWindow):
                     self.sendmessage(QApplication.translate("Message","Readings exported", None))
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " fileExport(): {0}").format(str(ex)))
             return
 
@@ -28087,7 +28086,7 @@ class ApplicationWindow(QMainWindow):
                             dumper(fconv)
                         else:
                             aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + str(ext)))
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     i += 1
                     aw.qmc.fileCleanSignal.emit()
@@ -28169,20 +28168,20 @@ class ApplicationWindow(QMainWindow):
                             aw.qmc.reset(redraw=False,soundOn=False)
                             self.setProfile(f,self.deserialize(f),quiet=True)
                             self.qmc.redraw()
-                            self.image = aw.qmc.grab()
+                            image = aw.qmc.grab()
                             if filetype in ["JPEG","BMP","PNG"]:
                                 # transparences are not supported by those file types and are rendered in black by default.
-                                white_img = QPixmap(self.image.size())
+                                white_img = QPixmap(image.size())
                                 white_img.fill() # fills by default with Qt.white
                                 painter = QPainter(white_img)
-                                painter.drawPixmap(0,0,self.image.width(),self.image.height(),self.image)
-                                self.image = white_img
+                                painter.drawPixmap(0,0,image.width(),image.height(),self.image)
+                                image = white_img
                                 painter.end()
                                 del painter
-                            self.image.save(fconv,filetype)
+                            image.save(fconv,filetype)
                         else:
                             aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + str(fileext)))
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     i += 1
                     aw.qmc.fileCleanSignal.emit()
@@ -28228,7 +28227,7 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.fig.savefig(fconv,transparent=True,facecolor='none', edgecolor='none') # transparent=True is need to get the delta curves and legend drawn
                     else:
                         aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + str(ext)))
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
                 i += 1
                 aw.qmc.fileCleanSignal.emit()
@@ -28278,7 +28277,7 @@ class ApplicationWindow(QMainWindow):
                             aw.fileSave(fconv)
                         else:
                             aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname))
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     i += 1
                     aw.qmc.fileCleanSignal.emit()
@@ -28300,9 +28299,9 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message","Readings imported", None))
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " fileImport(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " fileImport(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def artisanURLextractor(self,url,_):
         import requests
@@ -28325,7 +28324,7 @@ class ApplicationWindow(QMainWindow):
     def urlImport(self,_=False):
         try:
             self.importExternalURL(self.artisanURLextractor,QApplication.translate("Message","Import Artisan URL", None))
-        except:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
@@ -28570,7 +28569,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("step100temp"):
                 try:
                     self.qmc.step100temp = int(settings.value("step100temp",self.qmc.step100temp))
-                except:
+                except Exception: # pylint: disable=broad-except
                     self.qmc.step100temp = None
             # Important - this must come after the code that restores phasesLCDmode
             # Done this way with two variables to maintain forward and backward compatibility with settings since adding LCD mode by phase.
@@ -29183,18 +29182,18 @@ class ApplicationWindow(QMainWindow):
 
             #restore pid settings
             settings.beginGroup("PXR")
-            for key in list(self.fujipid.PXR.keys()):
-                if type(self.fujipid.PXR[key][0]) == type(float()):
-                    self.fujipid.PXR[key][0] = toFloat(settings.value(key,self.fujipid.PXR[key][0]))
-                elif type(self.fujipid.PXR[key][0]) == type(int()):
-                    self.fujipid.PXR[key][0] = toInt(settings.value(key,self.fujipid.PXR[key][0]))
+            for k in list(self.fujipid.PXR.keys()):
+                if type(self.fujipid.PXR[k][0]) == type(float()):
+                    self.fujipid.PXR[k][0] = toFloat(settings.value(k,self.fujipid.PXR[k][0]))
+                elif type(self.fujipid.PXR[k][0]) == type(int()):
+                    self.fujipid.PXR[k][0] = toInt(settings.value(k,self.fujipid.PXR[k][0]))
             settings.endGroup()
             settings.beginGroup("PXG4")
-            for key in list(self.fujipid.PXG4.keys()):
-                if type(self.fujipid.PXG4[key][0]) == type(float()):
-                    self.fujipid.PXG4[key][0] = toFloat(settings.value(key,self.fujipid.PXG4[key][0]))
-                elif type(self.fujipid.PXG4[key][0]) == type(int()):
-                    self.fujipid.PXG4[key][0] = toInt(settings.value(key,self.fujipid.PXG4[key][0]))
+            for k in list(self.fujipid.PXG4.keys()):
+                if type(self.fujipid.PXG4[k][0]) == type(float()):
+                    self.fujipid.PXG4[k][0] = toFloat(settings.value(k,self.fujipid.PXG4[k][0]))
+                elif type(self.fujipid.PXG4[k][0]) == type(int()):
+                    self.fujipid.PXG4[k][0] = toInt(settings.value(k,self.fujipid.PXG4[k][0]))
 
             if self.fujipid.PXG4["selectsv"][0] < 1:
                 self.fujipid.PXG4["selectsv"][0] = 1
@@ -29205,11 +29204,11 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             if settings.contains("deltaDTA"):
                 settings.beginGroup("deltaDTA")
-                for key in list(self.dtapid.dtamem.keys()):
-                    if type(self.dtapid.dtamem[key][0]) == type(float()):
-                        self.dtapid.dtamem[key][0] = toFloat(settings.value(key,self.dtapid.dtamem[key][0]))
-                    elif type(self.dtapid.dtamem[key][0]) == type(int()):
-                        self.dtapid.dtamem[key][0] = toInt(settings.value(key,self.dtapid.dtamem[key][0]))
+                for k in list(self.dtapid.dtamem.keys()):
+                    if type(self.dtapid.dtamem[k][0]) == type(float()):
+                        self.dtapid.dtamem[k][0] = toFloat(settings.value(k,self.dtapid.dtamem[k][0]))
+                    elif type(self.dtapid.dtamem[k][0]) == type(int()):
+                        self.dtapid.dtamem[k][0] = toInt(settings.value(k,self.dtapid.dtamem[k][0]))
                 settings.endGroup()
             if settings.contains("filterDropOuts"):
                 self.qmc.filterDropOuts = bool(toBool(settings.value("filterDropOuts",self.qmc.filterDropOuts)))
@@ -29340,7 +29339,7 @@ class ApplicationWindow(QMainWindow):
                 #fixes Windows OS sometimes saving endofx as 0
                 if self.qmc.endofx < 60 or self.qmc.endofx > 1800:
                     self.qmc.endofx = 60
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             self.qmc.ylimit = min(toInt(settings.value("ymax",self.qmc.ylimit)),self.qmc.ylimit_max)
             self.qmc.ylimit_min = max(min(toInt(settings.value("ymin",self.qmc.ylimit_min)),self.qmc.ylimit),self.qmc.ylimit_min_max)
@@ -29885,7 +29884,7 @@ class ApplicationWindow(QMainWindow):
                     else:
                         self.recentRoasts = []
                     self.updateNewMenuRecentRoasts()
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
 
 #            #update axis limits
@@ -29911,12 +29910,12 @@ class ApplicationWindow(QMainWindow):
 
             res = True
 
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             res = False
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + "  settingsLoad()  @line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + "  settingsLoad()  @line " + str(getattr(exc_tb, 'tb_lineno', '?')))
 
 #--------------------------------
         try:
@@ -29934,7 +29933,7 @@ class ApplicationWindow(QMainWindow):
                     i = list(map(lambda x:x.lower(),available)).index(toString(settings.value("appearance")))
                     app.setStyle(available[i])
                     aw.appearance = available[i].lower()
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
 
             # set dpi
@@ -29944,7 +29943,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     if aw.dpi != toInt(settings.value("dpi",aw.dpi)):
                         aw.setdpi(toInt(settings.value("dpi",aw.dpi)),moveWindow=True)
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
 
             #restore geometry
@@ -29974,19 +29973,19 @@ class ApplicationWindow(QMainWindow):
             if filename is None and self.plus_account is not None:
                 try:
                     plus.controller.start(aw)
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             
             # this one has done here, if it is done on start of the section the slider title colors are not set correctly on Linux and macOS
             if "canvas" in aw.qmc.palette:
                 aw.updateCanvasColors()
 
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             res = False
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " settingsLoad()  @line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " settingsLoad()  @line " + str(getattr(exc_tb, 'tb_lineno', '?')))
         return res
 
     def startWebLCDs(self,force=False):
@@ -30014,11 +30013,11 @@ class ApplicationWindow(QMainWindow):
                     return False
             else:
                 return False
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startWebLCDs() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startWebLCDs() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             self.stopWebLCDs()
             self.WebLCDs = False
             return False
@@ -30028,7 +30027,7 @@ class ApplicationWindow(QMainWindow):
             from artisanlib.weblcds import stopWeb
             stopWeb()
             self.WebLCDs = False
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 
     def applyStandardButtonVisibility(self):
@@ -30247,11 +30246,11 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.etypes[1] = self.qmc.l_eventtype2dots.get_label()
                 self.qmc.etypes[2] = self.qmc.l_eventtype3dots.get_label()
                 self.qmc.etypes[3] = self.qmc.l_eventtype4dots.get_label()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             import traceback
             traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fetchCurveStyles() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fetchCurveStyles() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     #Saves the settings when closing application. See the oppposite settingsLoad()
     def closeEvent(self,event):
@@ -30275,9 +30274,9 @@ class ApplicationWindow(QMainWindow):
                     try:
                         lib,version = platform.libc_ver()
                         return "Linux","{} {}".format(lib,version)
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         return "",""
-        except:
+        except Exception: # pylint: disable=broad-except
             return "",""
     
     def get_locale(self):
@@ -30318,8 +30317,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("artisan_version",__version__)
             settings.setValue("artisan_revision",__revision__)
             settings.setValue("artisan_build",__build__)
-            os,os_version = self.get_os()
-            settings.setValue("artisan_os",os)
+            os_name,os_version = self.get_os()
+            settings.setValue("artisan_os",os_name)
             settings.setValue("artisan_os_version",os_version)
             settings.endGroup()
             #save device
@@ -30718,18 +30717,18 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue("RS_svDescriptions"+str(n),aw.pidcontrol.RS_svDescriptions[n])
             settings.endGroup()
             settings.beginGroup("PXR")
-            for key in list(self.fujipid.PXR.keys()):
-                settings.setValue(key,self.fujipid.PXR[key][0])
+            for k in list(self.fujipid.PXR.keys()):
+                settings.setValue(k,self.fujipid.PXR[k][0])
             settings.endGroup()
             settings.beginGroup("PXG4")
-            for key in list(self.fujipid.PXG4.keys()):
-                settings.setValue(key,self.fujipid.PXG4[key][0])
+            for k in list(self.fujipid.PXG4.keys()):
+                settings.setValue(k,self.fujipid.PXG4[k][0])
             settings.setValue("followBackground",self.fujipid.followBackground)
             settings.setValue("lookahead",self.fujipid.lookahead)
             settings.endGroup()
             settings.beginGroup("deltaDTA")
-            for key in list(self.dtapid.dtamem.keys()):
-                settings.setValue(key,self.dtapid.dtamem[key][0])
+            for k in list(self.dtapid.dtamem.keys()):
+                settings.setValue(k,self.dtapid.dtamem[k][0])
             settings.endGroup()
             settings.setValue("filterDropOuts",self.qmc.filterDropOuts)
             settings.setValue("dropSpikes",self.qmc.dropSpikes)
@@ -31110,7 +31109,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             try:
                 settings.setValue("appearance",aw.appearance)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             settings.setValue("dpi",aw.dpi)
 
@@ -31125,12 +31124,11 @@ class ApplicationWindow(QMainWindow):
             else:
                 settings.setValue("lastLoadedBackground","")
 
-
-        except Exception:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " closeEvent()  @line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " closeEvent()  @line " + str(getattr(exc_tb, 'tb_lineno', '?')))
 
     def closeEventSettings_theme(self, filename=None):
         try:
@@ -31169,11 +31167,11 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("gridalpha",self.qmc.gridalpha)
             settings.endGroup()
 
-        except Exception:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " closeEventSettings_theme()  @line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " closeEventSettings_theme()  @line " + str(getattr(exc_tb, 'tb_lineno', '?')))
 
     def updateExtraLCDvisibility(self):
         n = len(self.qmc.extradevices)
@@ -31184,7 +31182,7 @@ class ApplicationWindow(QMainWindow):
                         l1 = "<b>" + self.qmc.extraname1[i] + "</b>"
                         try:
                             l1 = l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3])
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             # substitution might fail if the label contains brackets like in "t{FCS}"
                             pass
                         self.extraLCDlabel1[i].setText(l1)
@@ -31198,7 +31196,7 @@ class ApplicationWindow(QMainWindow):
                         l2 = "<b>" + self.qmc.extraname2[i] + "</b>"
                         try:
                             l2 = l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3])
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             # substitution might fail if the label contains brackets like in "t{FCS}"
                             pass
                         self.extraLCDlabel2[i].setText(l2)
@@ -31255,11 +31253,11 @@ class ApplicationWindow(QMainWindow):
             self.ser.R1 = None
         try:
             self.closeserialports()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             aw.qmc.closePhidgetOUTPUTs()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         aw.qmc.stopPhidgetManager()
 
@@ -31279,7 +31277,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 aw.quitAction.setEnabled(True)
                 return False
-        except:
+        except Exception: # pylint: disable=broad-except
             aw.quitAction.setEnabled(True)
             return False
 
@@ -31292,7 +31290,7 @@ class ApplicationWindow(QMainWindow):
                 if aw.extraser[i].SP.isOpen():
                     aw.extraser[i].SP.close()
                     libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
         # close modbus port
         aw.modbus.disconnect()
@@ -31302,13 +31300,13 @@ class ApplicationWindow(QMainWindow):
         try:
             if aw.scale:
                 aw.scale.closeport()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         # close color meter port
         try:
             if aw.color:
                 aw.color.closeport()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 
     @pyqtSlot()
@@ -31376,7 +31374,7 @@ class ApplicationWindow(QMainWindow):
             data["roastdate"] = QDateTime(QDate.currentDate()) # we just take the local time
         try:
             res["datetime"] = data["roastdate"].toPyDateTime() # toMSecsSinceEpoch()
-        except:
+        except Exception: # pylint: disable=broad-except
             data["roastdate"] = QDateTime(QDate.currentDate()) # we just take the local time
         date = data["roastdate"].date()
         time = data["roastdate"].time()
@@ -31449,15 +31447,15 @@ class ApplicationWindow(QMainWindow):
         beans_html = ds["beans"]
         try:
             if "roastUUID" in data and data["roastUUID"] is not None and data["roastUUID"] != "":
-                uuid = data["roastUUID"]
-#                if plus.register.getPath(uuid):
-#                    title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
-                title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
-                if bool(plus.sync.getSync(uuid)):
-                    time_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(uuid),time_html)
+                roast_uuid = data["roastUUID"]
+#                if plus.register.getPath(roast_uuid):
+#                    title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(roast_uuid,title_html)
+                title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(roast_uuid,title_html)
+                if bool(plus.sync.getSync(roast_uuid)):
+                    time_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(roast_uuid),time_html)
                 if "plus_coffee" in data and data["plus_coffee"] is not None and data["plus_coffee"] != "":
                     beans_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.coffeeLink(data["plus_coffee"]),beans_html)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         return libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
             batch_num = ds["nr"],
@@ -31484,7 +31482,7 @@ class ApplicationWindow(QMainWindow):
         res = {}
         # id ("prefix+nr (sequence)")
         if "roastbatchprefix" in profile:
-            res["batchprefix"] = d(profile["roastbatchprefix"])
+            res["batchprefix"] = decodeLocal(profile["roastbatchprefix"])
         else:
             res["batchprefix"] = ""
         # batch number
@@ -31500,45 +31498,45 @@ class ApplicationWindow(QMainWindow):
             res["plus_coffee"] = profile["plus_coffee"]
         # title
         if "title" in profile:
-            res["title"] = d(profile["title"])
+            res["title"] = decodeLocal(profile["title"])
         else:
             res["title"] = ""
         # date and time
         res["roastdate"] = None
         if "roastdate" in profile:
             try:
-                date = QDate.fromString(d(profile["roastdate"]))
+                date = QDate.fromString(decodeLocal(profile["roastdate"]))
                 if "roasttime" in profile:
                     try:
-                        time = QTime.fromString(d(profile["roasttime"]))
+                        time = QTime.fromString(decodeLocal(profile["roasttime"]))
                         res["roastdate"] = QDateTime(date,time)
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         res["roastdate"] = QDateTime(date)
                 else:
                     res["roastdate"] = QDateTime(date)
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
         if "roastisodate" in profile:
             try:
-                date = QDate.fromString(d(profile["roastisodate"]), Qt.ISODate)
+                date = QDate.fromString(decodeLocal(profile["roastisodate"]), Qt.ISODate)
                 if "roasttime" in profile:
                     try:
-                        time = QTime.fromString(d(profile["roasttime"]))
+                        time = QTime.fromString(decodeLocal(profile["roasttime"]))
                         res["roastdate"] = QDateTime(date,time)
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         res["roastdate"] = QDateTime(date)
                 else:
                     res["roastdate"] = QDateTime(date)
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
         # beans
         if "beans" in profile:
-            res["beans"] = d(profile["beans"])
+            res["beans"] = decodeLocal(profile["beans"])
         else:
             res["beans"] = ""
         # weight
         if "weight" in profile:
-            res["weight"] = [profile["weight"][0],profile["weight"][1],d(profile["weight"][2])]
+            res["weight"] = [profile["weight"][0],profile["weight"][1],decodeLocal(profile["weight"][2])]
         if "whole_color" in profile:
             res["whole_color"] = profile["whole_color"]
         if "ground_color" in profile:
@@ -31571,7 +31569,7 @@ class ApplicationWindow(QMainWindow):
                 profiles = sorted(profiles,
                     key=lambda p: (QDateTime(QDate.fromString(p["roastisodate"], Qt.ISODate),QTime.fromString(p["roasttime"])).toMSecsSinceEpoch()
                          if "roastisodate" in p and "roasttime" in p else 0))
-                with open(self.getResourcePath() + 'report-template.htm', 'r') as myfile:
+                with open(self.getResourcePath() + 'report-template.htm', 'r', encoding='utf-8') as myfile:
                     HTML_REPORT_TEMPLATE=myfile.read()
                 entries = ""
                 total_in = 0
@@ -31628,9 +31626,9 @@ class ApplicationWindow(QMainWindow):
                 finally:
                     if f:
                         f.close()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " productionReport() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " productionReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -31643,7 +31641,7 @@ class ApplicationWindow(QMainWindow):
             # 1.get bounding box in axis cooridnates
             try:
                 rect_extents = aw.qmc.stats_summary_rect.get_bbox()
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
                 aw.sendmessage(QApplication.translate("Message","No statistics found", None))
                 return
             # 2. convert those to display coordinates
@@ -31666,9 +31664,9 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.fig.set_tight_layout(aw.qmc.tight_layout_params)
                 aw.sendmessage(QApplication.translate("Message","Statistics Saved",None))
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " saveStatistics() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " saveStatistics() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -31716,11 +31714,11 @@ class ApplicationWindow(QMainWindow):
                                 s2a(d["cuppingnotes"]),
                                 ])
                             c += 1
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                     # close file
                     outfile.close()
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
 
     def excel_date(self,date_time):
@@ -31798,7 +31796,7 @@ class ApplicationWindow(QMainWindow):
                             ws['F{0}'.format(c)].number_format = num_format
                             ws['G{0}'.format(c)] = avgFormat(c,"E","F")
                             ws['G{0}'.format(c)].number_format = '0.0%'
-                        except Exception as e:
+                        except Exception as e: # pylint: disable=broad-except
 #                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
                             pass
@@ -31817,12 +31815,11 @@ class ApplicationWindow(QMainWindow):
                         ws['G{0}'.format(c+1)].number_format = '0.0%'
                     wb.save(filename)
                     aw.sendmessage(QApplication.translate("Message","Excel Production Report exported to {0}", None).format(filename))
-                except Exception as e:
+                except Exception as e: # pylint: disable=broad-except
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " productionExcelReport() {0}").format(str(e)),exc_tb.tb_lineno)
-                    pass
+                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " productionExcelReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # extracts the following from a give profile dict in a new dict:
     #  . "temp_unit": string (temperature unit, F or C)
@@ -32102,7 +32099,13 @@ class ApplicationWindow(QMainWindow):
         ]
         return ranking_data_fields, field_index
 
-    def extendedRankingData2List(self,dsd=[],rd=[],pd=[],header=False):
+    def extendedRankingData2List(self,dsd=None,rd=None,pd=None,header=False):
+        if dsd is None:
+            dsd = []
+        if rd is None:
+            rd = []
+        if pd is None:
+            pd = []            
         res = []
         weight_unit = aw.qmc.weight[2]
         volume_unit = aw.qmc.volume[2]
@@ -32144,7 +32147,7 @@ class ApplicationWindow(QMainWindow):
                     elif src == 'prod' and fld in pd:
                         res_fld = pd[fld]
                     elif src == 'eval':
-                        res_fld = eval(fld)
+                        res_fld = eval(fld) # pylint: disable=eval-used
                         if res_fld == 'None' or res_fld == None:
                             res.append("")
                             continue
@@ -32196,17 +32199,17 @@ class ApplicationWindow(QMainWindow):
                     else:
                         res.append("")
             return res
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " extendedRankingData2List() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " extendedRankingData2List() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return []
 
-    def formatTemp(self,data,key,unit,units=True):
+    def formatTemp(self,data,k,unit,units=True):
         if aw.qmc.LCDdecimalplaces:
             fmt = '{0:.1f}'
         else:
             fmt = '{0:.0f}'
-        return (fmt.format(convertTemp(data[key],unit,aw.qmc.mode)) + (aw.qmc.mode if units else "") if key in data else "")
+        return (fmt.format(convertTemp(data[k],unit,aw.qmc.mode)) + (aw.qmc.mode if units else "") if k in data else "")
 
     def rankingData2htmlentry(self,production_data,ranking_data,plot_color=None):
         HTML_REPORT_TEMPLATE = """<tr>
@@ -32242,13 +32245,13 @@ class ApplicationWindow(QMainWindow):
         title_html = pd["title"]
         try:
             if "roastUUID" in production_data and production_data["roastUUID"] is not None:
-                uuid = production_data["roastUUID"]
-#                if plus.register.getPath(uuid):
-#                    title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
-                title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
-                if bool(plus.sync.getSync(uuid)):
-                    time_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(uuid),time_html)
-        except:
+                roast_uuid = production_data["roastUUID"]
+#                if plus.register.getPath(roast_uuid):
+#                    title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(roast_uuid,title_html)
+                title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(roast_uuid,title_html)
+                if bool(plus.sync.getSync(roast_uuid)):
+                    time_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(roast_uuid),time_html)
+        except Exception: # pylint: disable=broad-except
             pass
         weight_fmt = ('{0:.2f}' if aw.qmc.weight[2] in ["Kg", "lb", "oz"] else '{0:.0f}')
         return libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
@@ -32321,7 +32324,7 @@ class ApplicationWindow(QMainWindow):
                 profiles = sorted(profiles,
                     key=lambda p: (QDateTime(QDate.fromString(p["roastisodate"], Qt.ISODate),QTime.fromString(p["roasttime"])).toMSecsSinceEpoch()
                          if "roastisodate" in p and "roasttime" in p else 0))
-                with open(self.getResourcePath() + 'ranking-template.htm', 'r') as myfile:
+                with open(self.getResourcePath() + 'ranking-template.htm', 'r', encoding='utf-8') as myfile:
                     HTML_REPORT_TEMPLATE=myfile.read()
                 entries = ""
                 charges = 0
@@ -32362,7 +32365,7 @@ class ApplicationWindow(QMainWindow):
                 stemp_list = []
                 cl_list = []
                 max_profiles = 20
-                color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable
+                color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
                 # collect data
                 c = 1
                 foreground_profile_path = aw.curFile  # @UndefinedVariable
@@ -32379,16 +32382,16 @@ class ApplicationWindow(QMainWindow):
                     c += 1
                     try:
                         cl = next(color) # here to keep colors in sync with the pct graph colors
-                    except Exception as e:
-                        color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable
+                    except Exception as e: # pylint: disable=broad-except
+                        color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
                         cl = next(color)
                     try:
                         rd = self.profileRankingData(p)
-                    except Exception as e:
+                    except Exception as e: # pylint: disable=broad-except
 #                        import traceback
 #                        traceback.print_exc(file=sys.stdout)
                         _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                         continue
                     i = aw.convertWeight(pd["weight"][0],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
                     #o = aw.convertWeight(pd["weight"][1],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
@@ -32436,7 +32439,7 @@ class ApplicationWindow(QMainWindow):
                             BT_AUC += self.calcAUC(rtbt,p["timex"],p["temp2"],i)
                         BT_AUC = int(round(BT_AUC/60.))
                         rd["AUC"] = BT_AUC
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     # --
                     if "AUC" in rd:
@@ -32536,17 +32539,17 @@ class ApplicationWindow(QMainWindow):
                                         dlinewidth = self.qmc.BTdeltalinewidth
                                         dlinestyle = self.qmc.BTdeltalinestyle
                                     trans = self.qmc.delta_ax.transData
-                                    self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
+                                    self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
                                         sketch_params=None,path_effects=[],
                                         linewidth=dlinewidth,linestyle=dlinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl,alpha=0.7)
 
                             first_profile = False
 
-                        except Exception as e:
+                        except Exception as e: # pylint: disable=broad-except
 #                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
-                            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
+                            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
                 # draw BT curves on top of all others
                 for i in range(len(timex_list)):
@@ -32554,11 +32557,11 @@ class ApplicationWindow(QMainWindow):
                     timex = timex_list[i]
                     stemp = stemp_list[i]
                     cl = cl_list[i]
-                    self.l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
+                    l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
 #                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground=path_effects_color)],
                         sketch_params=None,path_effects=[],
                         linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
-                    handles.append(self.l_temp)
+                    handles.append(l_temp)
 
                 tmpdir = str(QDir.tempPath() + "/")
                 graph_image = ""
@@ -32579,7 +32582,7 @@ class ApplicationWindow(QMainWindow):
                                 if l:
                                     try:
                                         l.remove()
-                                    except:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                             for l in [
                                     aw.qmc.l_back1,
@@ -32592,7 +32595,7 @@ class ApplicationWindow(QMainWindow):
                                 if l:
                                     try:
                                         aw.qmc.ax.lines.remove(l)
-                                    except:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
                             for a in [
                                     aw.qmc.l_eventtype1dots,
@@ -32606,7 +32609,7 @@ class ApplicationWindow(QMainWindow):
                                 if a:
                                     try:
                                         aw.qmc.ax.lines.remove(a)
-                                    except:
+                                    except Exception: # pylint: disable=broad-except
                                         pass
 
                             # we also have to remove those extra event annotations if in combo mode
@@ -32615,9 +32618,9 @@ class ApplicationWindow(QMainWindow):
                                     if isinstance(child, matplotlib.text.Annotation):
                                         try:
                                             aw.qmc.ax.texts.remove(child)
-                                        except:
+                                        except Exception: # pylint: disable=broad-except
                                             pass
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass                            
                         # we only adjust the upper limit of the delta axis automatically
                         if self.qmc.autodeltaxBT:
@@ -32651,11 +32654,11 @@ class ApplicationWindow(QMainWindow):
                         # Remove and update the logo image
                         try:
                             aw.qmc.ai.remove()
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                         try:
                             self.qmc.placelogoimage()
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
 
                         # generate graph
@@ -32675,11 +32678,11 @@ class ApplicationWindow(QMainWindow):
                         graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
                         graph_image = "<img alt='roast graph' style=\"width:100%;\" src='" + graph_image + "'>"
 
-                    except Exception as e:
+                    except Exception as e: # pylint: disable=broad-except
 #                        import traceback
 #                        traceback.print_exc(file=sys.stdout)
                         _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
                 try:
                     # Create a roast phase visualization graph
@@ -32743,22 +32746,22 @@ class ApplicationWindow(QMainWindow):
 
                     # generate the bar graph
                     prop.set_size("small")
-                    color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable
+                    color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable # pylint: disable=maybe-no-member
                     label_chr_nr = 0
                     for p in profiles:
                         i -= 1
                         try:
                             cl = mcolors.to_hex(next(color)), '#00b950', '#ffb347', '#9f7960'
-                        except:
-                            color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable
+                        except Exception: # pylint: disable=broad-except
+                            color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable # pylint: disable=maybe-no-member
                             cl = mcolors.to_hex(next(color)), '#00b950', '#ffb347', '#9f7960'
                         try:
                             rd = self.profileRankingData(p)
-                        except Exception as e:
+                        except Exception as e: # pylint: disable=broad-except
 #                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
-                            aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
+                            aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                             i += 1   #avoid a blank line
                             continue
                         pd = self.profileProductionData(p)
@@ -32826,11 +32829,11 @@ class ApplicationWindow(QMainWindow):
                     graph_image_pct = graph_image_pct + "?dummy=" + str(int(libtime.time()))
                     graph_image_pct = "<img alt='roast graph pct' style=\"width: 95%;\" src='" + graph_image_pct + "'>"
 
-                except Exception as e:
+                except Exception as e: # pylint: disable=broad-except
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
+                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
                 try:
                     # redraw original graph
@@ -32839,7 +32842,7 @@ class ApplicationWindow(QMainWindow):
                     if aw.qmc.backgroundpath:
                         aw.loadbackground(aw.qmc.backgroundpath)
                     self.qmc.redraw(recomputeAllDeltas=False)
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
 
                 weight_fmt = ('{0:.2f}' if aw.qmc.weight[2] in ["Kg", "lb", "oz"] else '{0:.0f}')
@@ -32929,15 +32932,15 @@ class ApplicationWindow(QMainWindow):
                             rd = self.rankingData2string(self.profileRankingData(dsd),units=False)
                             extendedRankingData = self.extendedRankingData2List(dsd,rd,pd)
                             writer.writerow(extendedRankingData)
-                        except Exception as e:
+                        except Exception as e: # pylint: disable=broad-except
                             _, _, exc_tb = sys.exc_info()
 #                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
-                            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingCSVReport() {0}").format(str(e)),exc_tb.tb_lineno)
+                            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingCSVReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                     # close file
                     outfile.close()
                     aw.sendmessage(QApplication.translate("Message","CSV Ranking Report exported to {0}", None).format(filename))
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
 
     @pyqtSlot()
@@ -33021,7 +33024,7 @@ class ApplicationWindow(QMainWindow):
                                 elif src == 'prod' and fld in pd:
                                     res_fld = pd[fld]
                                 elif src == 'eval':
-                                    res_fld = eval(fld)
+                                    res_fld = eval(fld) # pylint: disable=eval-used
                                 else:
                                     continue
 
@@ -33086,11 +33089,11 @@ class ApplicationWindow(QMainWindow):
                                     elif typ == "bool":
                                         ws[cr] = str(conv_fld)
 
-                        except Exception as e:
+                        except Exception as e: # pylint: disable=broad-except
 #                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
-                            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),exc_tb.tb_lineno)
+                            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
                     # write trailer
                     if c > 1:
@@ -33156,11 +33159,11 @@ class ApplicationWindow(QMainWindow):
                 except IOError as x:
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " Err [{0}] Can not write to file, perhaps it is open in an application or is write protected?").format(x.errno))
                     QApplication.beep()
-                except Exception as e:
+                except Exception as e: # pylint: disable=broad-except
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),exc_tb.tb_lineno)
+                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
     @pyqtSlot()
@@ -33168,7 +33171,7 @@ class ApplicationWindow(QMainWindow):
     def htmlReport(self,_=False):
         try:
             rcParams['path.effects'] = []
-            with open(self.getResourcePath() + 'roast-template.htm', 'r') as myfile:
+            with open(self.getResourcePath() + 'roast-template.htm', 'r', encoding='utf-8') as myfile:
                 HTML_REPORT_TEMPLATE=myfile.read()
             beans_html = str(htmllib.escape(self.qmc.beans))
             if len(beans_html) > 43:
@@ -33304,9 +33307,9 @@ class ApplicationWindow(QMainWindow):
             else:
                 CO2 = "--"
             if "det" in cp:
-                cm = "%.1f/%.1f" % (cp["det"],cp["dbt"]) + uchr(176) + aw.qmc.mode
+                cm_tuple = "%.1f/%.1f" % (cp["det"],cp["dbt"]) + uchr(176) + aw.qmc.mode
             else:
-                cm = "--"
+                cm_tuple = "--"
             if aw.qmc.titleB is None or aw.qmc.titleB == "":
                 background_html = "--"
             else:
@@ -33396,7 +33399,7 @@ class ApplicationWindow(QMainWindow):
                 met_label=QApplication.translate("HTML Report Template", "MET:", None),
                 met=met,
                 cm_label=QApplication.translate("HTML Report Template", "CM:", None),
-                cm=cm,
+                cm_tuple=cm_tuple,
                 dry_phase_label=QApplication.translate("HTML Report Template", "Drying:", None),
                 dry_phase=dryphase,
                 mid_phase_label=QApplication.translate("HTML Report Template", "Maillard:", None),
@@ -33448,11 +33451,11 @@ class ApplicationWindow(QMainWindow):
                 if aw.logofilename != "":
                     aw.qmc.redraw(recomputeAllDeltas=False)
 
-        except Exception as e:
-#                import traceback
-#                traceback.print_exc(file=sys.stdout)
-                _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " htmlReport() {0}").format(str(e)),exc_tb.tb_lineno)
+        except Exception as e: # pylint: disable=broad-except
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " htmlReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # returns a string with all the activated roast attributes
     def roastattributes(self):
@@ -33515,7 +33518,7 @@ class ApplicationWindow(QMainWindow):
                         elif ("AUCbase" in cp):
                             dryphase += " [%d]"%(round(cp["AUCbase"]))
 #                    if "dryphaseeval" in cp:
-#                        dryphase += "<br>" + d(cp["dryphaseeval"])
+#                        dryphase += "<br>" + decodeLocal(cp["dryphaseeval"])
                 #midphase
                 if "midphasetime" in cp:
                     midphasetime = cp["midphasetime"]
@@ -33529,7 +33532,7 @@ class ApplicationWindow(QMainWindow):
                         elif ("AUCbase" in cp):
                             midphase += " [%d]"%(round(cp["AUCbase"]))
 #                    if "midphaseeval" in cp:
-#                        midphase += "<br>" + d(cp["midphaseeval"])
+#                        midphase += "<br>" + decodeLocal(cp["midphaseeval"])
                 #finishphase
                 if "finishphasetime" in cp:
                     finishphasetime = cp["finishphasetime"]
@@ -33543,13 +33546,13 @@ class ApplicationWindow(QMainWindow):
                         elif ("AUCbase" in cp):
                             finishphase += " [%d]"%(round(cp["AUCbase"]))
 #                    if "finishphaseeval" in cp:
-#                        finishphase += "<br>" + d(cp["finishphaseeval"])
+#                        finishphase += "<br>" + decodeLocal(cp["finishphaseeval"])
                 #coolphase
                 if "coolphasetime" in cp:
                     coolphasetime = cp["coolphasetime"]
                     coolphase = "%s (%d%%)"%(stringfromseconds(cp["coolphasetime"]),int(round(coolphasetime*100./totaltime)))
 #                    if "coolphaseeval" in cp:
-#                        coolphase += "<br>" + d(cp["coolphaseeval"])
+#                        coolphase += "<br>" + decodeLocal(cp["coolphaseeval"])
         return dryphase, midphase, finishphase, coolphase
 
     def event2html(self,cp,time_key,BT_key=None,prev_time_key=None):
@@ -33609,7 +33612,7 @@ class ApplicationWindow(QMainWindow):
                         deltas += formatString%self.qmc.delta1[sevents[i][0]]
                     else:
                         deltas += formatString%self.qmc.delta2[sevents[i][0]] + " / " + formatString%self.qmc.delta1[sevents[i][0]]
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
                 html += ("<tr>"+
                      "\n<td>" + str(i+1) + "</td><td>" +
@@ -33984,11 +33987,11 @@ class ApplicationWindow(QMainWindow):
                     ET += self.calcAUC(rtet,timex,temp1,i)
                     BT += self.calcAUC(rtbt,timex,temp2,i)
                     delta += self.calcAUC(rtbt,timex,temp1,i,temp2)
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ts() {0}").format(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ts() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return int(round(delta/60.)), int(round(ET/60.)), int(round(BT/60.)), AUCbegin_idx
 
     #Find rate of change of each phase. TP_index (by aw.findTP()) is the index of the TP and dryEndIndex that of the end of drying (by aw.findDryEnd())
@@ -34091,7 +34094,7 @@ class ApplicationWindow(QMainWindow):
         box = QMessageBox(self)
 
         #create a html QString
-        from scipy import __version__ as SCIPY_VERSION_STR
+        from scipy import __version__ as SCIPY_VERSION_STR # @UnresolvedImport
         from pymodbus import __version__ as PYMODBUS_VERSION_STR
         build = ""
         if __build__ != "0":
@@ -34104,12 +34107,12 @@ class ApplicationWindow(QMainWindow):
         try:
             phidgetlibversion = PhidgetDriver.getLibraryVersion()
             otherlibs += ", " + phidgetlibversion
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             yocto_version = YAPI.GetAPIVersion()
             otherlibs += ", Yoctopuce " + yocto_version
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         box.about(self,
                 QApplication.translate("About", "About",None),
@@ -34172,11 +34175,11 @@ class ApplicationWindow(QMainWindow):
             elif latest < __version__:
                 update_str = QApplication.translate("About", "You are using a beta continuous build.",None)
                 update_str += '<br/><br/>' + QApplication.translate("About", "You will see a notice here once a new official release is available.",None)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkUpdate() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkUpdate() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             update_str = QApplication.translate("About", "There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.",None)
 
         box = QMessageBox(self)
@@ -34290,7 +34293,7 @@ class ApplicationWindow(QMainWindow):
             self.modbus.host = str(dialog.modbus_hostEdit.text())
             try:
                 self.modbus.port = int(str(dialog.modbus_portEdit.text()))
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
 
             # WebSocket Setup
@@ -34373,7 +34376,7 @@ class ApplicationWindow(QMainWindow):
         try:
             sip.delete(dialog)
             #print(sip.isdeleted(dialog))
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         self.closeEventSettings() # save all app settings
 
@@ -34549,7 +34552,7 @@ class ApplicationWindow(QMainWindow):
                         for widget in QApplication.topLevelWidgets():
                             if isinstance(widget, ApplicationWindow):
                                 widget.updateRecentSettingActions()
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     # remove file from the recent file list
                     settings = QSettings()
                     files = toStringList(settings.value('recentSettingList'))
@@ -34563,11 +34566,11 @@ class ApplicationWindow(QMainWindow):
                             widget.updateRecentSettingActions()
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadSettings() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadSettings() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def updateRecentSettingActions(self):
         settings = QSettings()
@@ -34753,7 +34756,7 @@ class ApplicationWindow(QMainWindow):
                                 widget.updateRecentThemeActions()
                         self.themeMenu.clear()
                         self.populateThemeMenu()
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     # remove file from the recent file list
                     settings = QSettings()
                     files = toStringList(settings.value('recentThemeList'))
@@ -34769,11 +34772,11 @@ class ApplicationWindow(QMainWindow):
                     self.populateThemeMenu()
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadSettings_theme() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadSettings_theme() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
     @pyqtSlot()
@@ -34864,7 +34867,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     aw.loadWheel(aw.wheelpath)
                     self.wheeldialog.createdatatable()
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     aw.settingspath = ""
             aw.qmc.drawWheel()
 
@@ -34963,7 +34966,7 @@ class ApplicationWindow(QMainWindow):
                     self.deleteBackground()
             if foreground_profile_path or background_profile_path:
                 aw.qmc.redraw(recomputeAllDeltas=True)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -34988,7 +34991,7 @@ class ApplicationWindow(QMainWindow):
             if aw.qmc.ai:
                 try:
                     aw.qmc.ai.remove()
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             self.startdesigner()
 
@@ -35028,56 +35031,56 @@ class ApplicationWindow(QMainWindow):
             QMessageBox.information(aw,QApplication.translate("Message", "Alarm Config",None),
                                     QApplication.translate("Message", "Alarms are not available for device None",None))
 
-    def switchLanguageFlag(self,locale,value):
-        if locale == "en" or locale == "en_US":
+    def switchLanguageFlag(self,loc,value):
+        if loc == "en" or loc == "en_US":
             self.EnglishLanguage.setChecked(value)
-        elif locale == "ar":
+        elif loc == "ar":
             self.ArabicLanguage.setChecked(value)
-        elif locale == "de":
+        elif loc == "de":
             self.GermanLanguage.setChecked(value)
-        elif locale == "el":
+        elif loc == "el":
             self.GreekLanguage.setChecked(value)
-        elif locale == "es":
+        elif loc == "es":
             self.SpanishLanguage.setChecked(value)
-        elif locale == "fa":
+        elif loc == "fa":
             self.FarsiLanguage.setChecked(value)
-        elif locale == "fi":
+        elif loc == "fi":
             self.FinishLanguage.setChecked(value)
-        elif locale == "fr":
+        elif loc == "fr":
             self.FrenchLanguage.setChecked(value)
-        elif locale == "he":
+        elif loc == "he":
             self.HebrewLanguage.setChecked(value)
-        elif locale == "hu":
+        elif loc == "hu":
             self.HungarianLanguage.setChecked(value)
-        elif locale == "id":
+        elif loc == "id":
             self.IndonesianLanguage.setChecked(value)
-        elif locale == "it":
+        elif loc == "it":
             self.ItalianLanguage.setChecked(value)
-        elif locale == "ja":
+        elif loc == "ja":
             self.JapaneseLanguage.setChecked(value)
-        elif locale == "ko":
+        elif loc == "ko":
             self.KoreanLanguage.setChecked(value)
-        elif locale == "nl":
+        elif loc == "nl":
             self.DutchLanguage.setChecked(value)
-        elif locale == "no":
+        elif loc == "no":
             self.NorwegianLanguage.setChecked(value)
-        elif locale == "pt":
+        elif loc == "pt":
             self.PortugueseLanguage.setChecked(value)
-        elif locale == "pt_BR":
+        elif loc == "pt_BR":
             self.PortugueseBrasilLanguage.setChecked(value)
-        elif locale == "pl":
+        elif loc == "pl":
             self.PolishLanguage.setChecked(value)
-        elif locale == "ru":
+        elif loc == "ru":
             self.RussianLanguage.setChecked(value)
-        elif locale == "sv":
+        elif loc == "sv":
             self.SwedishLanguage.setChecked(value)
-        elif locale == "th":
+        elif loc == "th":
             self.ThaiLanguage.setChecked(value)
-        elif locale == "tr":
+        elif loc == "tr":
             self.TurkishLanguage.setChecked(value)
-        elif locale == "zh_CN":
+        elif loc == "zh_CN":
             self.ChineseChinaLanguage.setChecked(value)
-        elif locale == "zh_TW":
+        elif loc == "zh_TW":
             self.ChineseTaiwanLanguage.setChecked(value)
 
     @pyqtSlot()
@@ -35344,11 +35347,11 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " importK202(): {0}").format(str(ex)))
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importK202(): {0}").format(str(ex)))
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK202() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK202() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -35427,11 +35430,11 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " importK204(): {0}").format(str(ex)))
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importK204(): {0}").format(str(ex)))
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK204() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK204() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # normalize xml tags and attributs to lower case
     def normalize_tags(self,root):
@@ -35493,7 +35496,7 @@ class ApplicationWindow(QMainWindow):
                     try:
                         aw.qmc.weight[0] = float(chargestr.text)
                         aw.qmc.weight[2] = "Kg"
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
 
                 dischargestr = root.find("dischargingcapacity")
@@ -35501,7 +35504,7 @@ class ApplicationWindow(QMainWindow):
                     try:
                         aw.qmc.weight[1] = float(dischargestr.text)
                         aw.qmc.weight[2] = "Kg"
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
 
                 colorstr = root.find("coffeecolor")
@@ -35512,7 +35515,7 @@ class ApplicationWindow(QMainWindow):
                             try:
                                 c = int(e)
                                 break
-                            except:
+                            except Exception: # pylint: disable=broad-except
                                 pass
                     if c:
                         aw.qmc.ground_color = c
@@ -35623,19 +35626,19 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " importPilot(): {0}").format(str(ex)))
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importPilot(): {0}").format(str(ex)))
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.sendmessage(QApplication.translate("Message","Import Probat Pilot failed", None))
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importPilot() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importPilot() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importBullet(self,_=False):
         try:
             self.importExternal(extractProfileRoasTime,QApplication.translate("Message","Import Aillio RoasTime", None),"*.json")
-        except:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
@@ -35645,7 +35648,7 @@ class ApplicationWindow(QMainWindow):
     def importBulletURL(self,_=False):
         try:
             self.importExternalURL(extractProfileRoastWorld,QApplication.translate("Message","Import Aillio Roast.World URL", None))
-        except:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
@@ -35657,7 +35660,6 @@ class ApplicationWindow(QMainWindow):
                 url = self.ArtisanOpenURLDialog(msg=message)
             if url is None:
                 return
-            pass
             
             res = aw.qmc.reset(redraw=False,soundOn=False)
             if res:
@@ -35682,11 +35684,11 @@ class ApplicationWindow(QMainWindow):
                 message = QApplication.translate("Message","{0} imported", None).format(url.toString())
                 self.sendmessage(message)
 
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " {1} {0}").format(str(ex),message),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " {1} {0}").format(str(ex),message),getattr(exc_tb, 'tb_lineno', '?'))
 
     def importExternal(self,extractor,message,extension):
         try:
@@ -35718,11 +35720,11 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " {1}: {0}").format(str(ex),message))
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " {1}: {0}").format(str(ex),message))
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " {1} {0}").format(str(ex),message),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " {1} {0}").format(str(ex),message),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -35821,11 +35823,11 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " importHH506RA(): {0}").format(str(ex)))
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importHH506RA(): {0}").format(str(ex)))
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importHH506RA() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importHH506RA() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
 # not used any longer
 #    #checks or creates directory structure
@@ -36262,15 +36264,15 @@ class ApplicationWindow(QMainWindow):
 #            self.sendmessage(message)
         except IOError as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " loadWheel() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " loadWheel() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return
         except ValueError as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " loadWheel() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " loadWheel() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None) + " loadWheel() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None) + " loadWheel() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return
         finally:
             if f:
@@ -36433,7 +36435,7 @@ class ApplicationWindow(QMainWindow):
                 tip += QApplication.translate("Tooltip","<b>Documentation </b>= ", None) + self.extraeventsactionstrings[i] + "<br>"
                 tip += QApplication.translate("Tooltip","<b>Button# </b>= ", None) + str(i+1)
                 self.buttonlist[i].setToolTip(tip)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
     def update_extraeventbuttons_visibility(self):
@@ -36443,7 +36445,7 @@ class ApplicationWindow(QMainWindow):
                     self.buttonlist[i].setVisible(True)
                 else:
                     self.buttonlist[i].setVisible(False)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
     # returns the palette named label or None
@@ -36489,7 +36491,7 @@ class ApplicationWindow(QMainWindow):
         # added slider Bernoulli
         copy.append(self.eventsliderBernoulli[:])
         # palette label
-        copy.append(self.buttonpalette_label),
+        copy.append(self.buttonpalette_label)
         # quantifier actions
         copy.append(self.eventquantifieraction[:])
         # quantifier SVs
@@ -36608,7 +36610,7 @@ class ApplicationWindow(QMainWindow):
         return self.mapTree(tree,encodeLocal)
 
     def decodeTreeStrings(self,tree):
-        return self.mapTree(tree,d)
+        return self.mapTree(tree,decodeLocal)
 
     def mapTree(self,tree,f):
         if isinstance(tree,(list,tuple)):
@@ -36622,8 +36624,8 @@ class ApplicationWindow(QMainWindow):
         palette = {}
         #convert labels to unicode
         for i in range(len(pal)):
-            key = str(i)
-            palette[key] = self.encodeTreeStrings(pal[i])
+            k = str(i)
+            palette[k] = self.encodeTreeStrings(pal[i])
         palette["maxlen"] = maxlen
         try:
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Palettes",None),ext="*.apal")
@@ -36652,55 +36654,55 @@ class ApplicationWindow(QMainWindow):
                 palette = self.deserialize(filename)
                 buttonpalettemaxlen = list(map(int,palette["maxlen"]))
                 for i in range(10):  #10 palettes (0-9)
-                    key = str(i)
+                    k = str(i)
                     nextpalette = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], self.buttonpalette_default_label]
-                    palette[key] = self.decodeTreeStrings(palette[key])
-                    if len(palette[key]):
+                    palette[k] = self.decodeTreeStrings(palette[k])
+                    if len(palette[k]):
                         for x in range(9):
                             if x < 4:
                                 if x == 1:
-                                    nextpalette[x] = list(map(float,palette[key][x]))     #  type double
+                                    nextpalette[x] = list(map(float,palette[k][x]))     #  type double
                                 else:
-                                    nextpalette[x] = list(map(int,palette[key][x]))     #  type int
+                                    nextpalette[x] = list(map(int,palette[k][x]))     #  type int
                             else:
-                                nextpalette[x] = list(map(str,palette[key][x])) #  type unicode
+                                nextpalette[x] = list(map(str,palette[k][x])) #  type unicode
                         # read in extended palette data containing slider settings:
-                        if len(palette[key])>=14:
-                            nextpalette[9] = list(map(int,palette[key][9]))     #  type int
-                            nextpalette[10] = list(map(int,palette[key][10]))   #  type int
-                            nextpalette[11] = list(map(str,palette[key][11]))   #  type unicode
-                            nextpalette[12] = list(map(int,palette[key][12]))   #  type int
-                            nextpalette[13] = list(map(float,palette[key][13])) #  type double
+                        if len(palette[k])>=14:
+                            nextpalette[9] = list(map(int,palette[k][9]))     #  type int
+                            nextpalette[10] = list(map(int,palette[k][10]))   #  type int
+                            nextpalette[11] = list(map(str,palette[k][11]))   #  type unicode
+                            nextpalette[12] = list(map(int,palette[k][12]))   #  type int
+                            nextpalette[13] = list(map(float,palette[k][13])) #  type double
                         else:
                             for k in range(9,26):
                                 if len(pal[i]) == k+1:
                                     nextpalette[k] = pal[i][k]
                         
-                        if len(palette[key])>=21:
-                            nextpalette[14] = list(map(int,palette[key][14]))     #  type int
-                            nextpalette[15] = list(map(int,palette[key][15]))     #  type int
-                            nextpalette[16] = list(map(int,palette[key][16]))     #  type int
-                            nextpalette[17] = list(map(int,palette[key][17]))     #  type int
-                            nextpalette[18] = list(map(int,palette[key][18]))     #  type int
-                            nextpalette[19] = list(map(int,palette[key][19]))     #  type int
-                            nextpalette[20] = list(map(int,palette[key][20]))     #  type int
+                        if len(palette[k])>=21:
+                            nextpalette[14] = list(map(int,palette[k][14]))     #  type int
+                            nextpalette[15] = list(map(int,palette[k][15]))     #  type int
+                            nextpalette[16] = list(map(int,palette[k][16]))     #  type int
+                            nextpalette[17] = list(map(int,palette[k][17]))     #  type int
+                            nextpalette[18] = list(map(int,palette[k][18]))     #  type int
+                            nextpalette[19] = list(map(int,palette[k][19]))     #  type int
+                            nextpalette[20] = list(map(int,palette[k][20]))     #  type int
                         else:
                             for k in range(14,26):
                                 if len(pal[i]) == k+1:
                                     nextpalette[k] = pal[i][k]
 
-                        if len(palette[key])>=25:
-                            nextpalette[21] = list(map(int,palette[key][21]))     #  type int
-                            nextpalette[22] = list(map(int,palette[key][22]))     #  type int
-                            nextpalette[23] = list(map(str,palette[key][23]))     #  type unicode
-                            nextpalette[24] = list(map(int,palette[key][24]))     #  type int
+                        if len(palette[k])>=25:
+                            nextpalette[21] = list(map(int,palette[k][21]))     #  type int
+                            nextpalette[22] = list(map(int,palette[k][22]))     #  type int
+                            nextpalette[23] = list(map(str,palette[k][23]))     #  type unicode
+                            nextpalette[24] = list(map(int,palette[k][24]))     #  type int
                         else:
                             for k in range(21,26):
                                 if len(pal[i]) == k+1:
                                     nextpalette[k] = pal[i][k]
 
-                        if len(palette[key])==26:
-                            nextpalette[25] = str(palette[key][25])               #  type unicode
+                        if len(palette[k])==26:
+                            nextpalette[25] = str(palette[k][25])               #  type unicode
 
                     pal[i] = nextpalette[:]
                 return buttonpalettemaxlen
@@ -36712,11 +36714,11 @@ class ApplicationWindow(QMainWindow):
             self.sendmessage(message)
         except IOError as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " loadPalettes() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " loadPalettes() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return None
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None) + " loadPalettes() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None) + " loadPalettes() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return None
 
     def restorepaletteeventbuttons(self,pal):
@@ -36744,17 +36746,17 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.alarmstrings = alarms["alarmstrings"]
             try:
                 aw.qmc.alarmsetlabel = alarms["alarmsetlabel"]
-            except:
+            except Exception: # pylint: disable=broad-except
                 aw.qmc.alarmsetlabel = ""
             message =QApplication.translate("Message","Alarms loaded", None)
             self.sendmessage(message)
         except IOError as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " loadAlarms() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " loadAlarms() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None) + " loadAlarms() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None) + " loadAlarms() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
     @pyqtSlot()
@@ -36780,6 +36782,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def clearResults(self,_=False):
+        self.qmc.fig.canvas.mpl_disconnect(self.qmc.analyzer_connect_id)
         aw.qmc.redraw(recomputeAllDeltas=True)
 
     def analysisfitCurves(self, exp=-1):
@@ -36888,55 +36891,55 @@ class ApplicationWindow(QMainWindow):
                     analysis_endtime = droptimeB
 
             # curve fit results
-            self.cfr = {} #use dict to allow more flexible expansion
+            cfr = {} #use dict to allow more flexible expansion
 
             # background
             if exp == 4:
                 res = self.analysisGetResults(exp=4, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
-                self.cfr["equ_background"] = QApplication.translate("Label","Bkgnd",None)
-                self.cfr["dbt_background"] = res["mse_BT"]
-                self.cfr["dbdbt_background"] = res["mse_deltaBT"]
-                self.cfr["r2_deltabt_background"] = res["r2_deltaBT"]
-                self.cfr['ror_fcs_delta_background'] = res['ror_fcs_delta']
-                self.cfr['ror_max_delta_background'] = res['ror_max_delta']
-                self.cfr['ror_min_delta_background'] = res['ror_min_delta']
-                self.cfr['ror_maxmin_delta_background'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
+                cfr["equ_background"] = QApplication.translate("Label","Bkgnd",None)
+                cfr["dbt_background"] = res["mse_BT"]
+                cfr["dbdbt_background"] = res["mse_deltaBT"]
+                cfr["r2_deltabt_background"] = res["r2_deltaBT"]
+                cfr['ror_fcs_delta_background'] = res['ror_fcs_delta']
+                cfr['ror_max_delta_background'] = res['ror_max_delta']
+                cfr['ror_min_delta_background'] = res['ror_min_delta']
+                cfr['ror_maxmin_delta_background'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
                 progress.setValue(3)
             # ln() or all
             if exp == 0 or exp == -1:
                 res = self.analysisGetResults(exp=0, curvefit_starttime=curvefit_starttime_ln, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
-                self.cfr["equ_naturallog"] = res["equ"]
-                self.cfr["dbt_naturallog"] = res["mse_BT"]
-                self.cfr["dbdbt_naturallog"] = res["mse_deltaBT"]
-                self.cfr["r2_deltabt_naturallog"] = res["r2_deltaBT"]
-                self.cfr['ror_fcs_delta_naturallog'] = res['ror_fcs_delta']
-                self.cfr['ror_max_delta_naturallog'] = res['ror_max_delta']
-                self.cfr['ror_min_delta_naturallog'] = res['ror_min_delta']
-                self.cfr['ror_maxmin_delta_naturallog'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
+                cfr["equ_naturallog"] = res["equ"]
+                cfr["dbt_naturallog"] = res["mse_BT"]
+                cfr["dbdbt_naturallog"] = res["mse_deltaBT"]
+                cfr["r2_deltabt_naturallog"] = res["r2_deltaBT"]
+                cfr['ror_fcs_delta_naturallog'] = res['ror_fcs_delta']
+                cfr['ror_max_delta_naturallog'] = res['ror_max_delta']
+                cfr['ror_min_delta_naturallog'] = res['ror_min_delta']
+                cfr['ror_maxmin_delta_naturallog'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
                 progress.setValue(1 if exp == -1 else 3)
             # cubic or all
             if exp == 3 or exp == -1:
                 res = self.analysisGetResults(exp=3, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
-                self.cfr["equ_cubic"] = res["equ"]
-                self.cfr["dbt_cubic"] = res["mse_BT"]
-                self.cfr["dbdbt_cubic"] = res["mse_deltaBT"]
-                self.cfr["r2_deltabt_cubic"] = res["r2_deltaBT"]
-                self.cfr['ror_fcs_delta_cubic'] = res['ror_fcs_delta']
-                self.cfr['ror_max_delta_cubic'] = res['ror_max_delta']
-                self.cfr['ror_min_delta_cubic'] = res['ror_min_delta']
-                self.cfr['ror_maxmin_delta_cubic'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
+                cfr["equ_cubic"] = res["equ"]
+                cfr["dbt_cubic"] = res["mse_BT"]
+                cfr["dbdbt_cubic"] = res["mse_deltaBT"]
+                cfr["r2_deltabt_cubic"] = res["r2_deltaBT"]
+                cfr['ror_fcs_delta_cubic'] = res['ror_fcs_delta']
+                cfr['ror_max_delta_cubic'] = res['ror_max_delta']
+                cfr['ror_min_delta_cubic'] = res['ror_min_delta']
+                cfr['ror_maxmin_delta_cubic'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
                 progress.setValue(2 if exp == -1 else 3)
             # quadratic or all
             if exp == 2 or exp == -1:
                 res = self.analysisGetResults(exp=2, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
-                self.cfr["equ_quadratic"] = res["equ"]
-                self.cfr["dbt_quadratic"] = res["mse_BT"]
-                self.cfr["dbdbt_quadratic"] = res["mse_deltaBT"]
-                self.cfr["r2_deltabt_quadratic"] = res["r2_deltaBT"]
-                self.cfr['ror_fcs_delta_quadratic'] = res['ror_fcs_delta']
-                self.cfr['ror_max_delta_quadratic'] = res['ror_max_delta']
-                self.cfr['ror_min_delta_quadratic'] = res['ror_min_delta']
-                self.cfr['ror_maxmin_delta_quadratic'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
+                cfr["equ_quadratic"] = res["equ"]
+                cfr["dbt_quadratic"] = res["mse_BT"]
+                cfr["dbdbt_quadratic"] = res["mse_deltaBT"]
+                cfr["r2_deltabt_quadratic"] = res["r2_deltaBT"]
+                cfr['ror_fcs_delta_quadratic'] = res['ror_fcs_delta']
+                cfr['ror_max_delta_quadratic'] = res['ror_max_delta']
+                cfr['ror_min_delta_quadratic'] = res['ror_min_delta']
+                cfr['ror_maxmin_delta_quadratic'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
                 progress.setValue(3)
 
             # build the results table
@@ -36946,22 +36949,22 @@ class ApplicationWindow(QMainWindow):
                                QApplication.translate("Label","RoR",None) +  " \u0394 " + QApplication.translate("Label","@FCs",None),
                                QApplication.translate("Label","Max+/Max- RoR",None) + " \u0394"]
             tbl.float_format = "5.2"
-            if "equ_background" in self.cfr:
-                tbl.add_row([QApplication.translate("Label","Bkgnd",None), self.cfr["dbt_background"], self.cfr['ror_fcs_delta_background'], self.cfr['ror_maxmin_delta_background']])
-            if "equ_quadratic" in self.cfr:
-                tbl.add_row([QApplication.translate("Label","x",None) +"\u00b2", self.cfr["dbt_quadratic"], self.cfr['ror_fcs_delta_quadratic'], self.cfr['ror_maxmin_delta_quadratic']])
-            if "equ_cubic" in self.cfr:
-                tbl.add_row([QApplication.translate("Label","x",None) + "\u00b3", self.cfr["dbt_cubic"], self.cfr['ror_fcs_delta_cubic'], self.cfr['ror_maxmin_delta_cubic']])
-            if "equ_naturallog" in self.cfr:
-                tbl.add_row([QApplication.translate("Label","ln()",None), self.cfr["dbt_naturallog"], self.cfr['ror_fcs_delta_naturallog'], self.cfr['ror_maxmin_delta_naturallog']])
+            if "equ_background" in cfr and "dbt_background" in cfr and 'ror_fcs_delta_background' in cfr and 'ror_maxmin_delta_background' in cfr:
+                tbl.add_row([QApplication.translate("Label","Bkgnd",None), cfr["dbt_background"], cfr['ror_fcs_delta_background'], cfr['ror_maxmin_delta_background']])
+            if "equ_quadratic" in cfr and "dbt_quadratic" in cfr and 'ror_fcs_delta_quadratic' in cfr and 'ror_maxmin_delta_quadratic' in cfr:
+                tbl.add_row([QApplication.translate("Label","x",None) +"\u00b2", cfr["dbt_quadratic"], cfr['ror_fcs_delta_quadratic'], cfr['ror_maxmin_delta_quadratic']])
+            if "equ_cubic" in cfr and "dbt_cubic" in cfr and 'ror_fcs_delta_cubic' in cfr and 'ror_maxmin_delta_cubic' in cfr:
+                tbl.add_row([QApplication.translate("Label","x",None) + "\u00b3", cfr["dbt_cubic"], cfr['ror_fcs_delta_cubic'], cfr['ror_maxmin_delta_cubic']])
+            if "equ_naturallog" in cfr and "dbt_naturallog" in cfr and 'ror_fcs_delta_naturallog' in cfr and 'ror_maxmin_delta_naturallog' in cfr:
+                tbl.add_row([QApplication.translate("Label","ln()",None), cfr["dbt_naturallog"], cfr['ror_fcs_delta_naturallog'], cfr['ror_maxmin_delta_naturallog']])
             resultstr = "Curve Fit Analysis\n"
             resultstr += tbl.get_string(sortby="MSE BT")
 
-            self.cfr['segmentresultstr'] = res['segmentresultstr']
+            cfr['segmentresultstr'] = res['segmentresultstr']
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisfitCurves(): {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisfitCurves(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
         try:
             # convert back to Fahrenheit if the profile was converted to Celsius
@@ -36971,11 +36974,11 @@ class ApplicationWindow(QMainWindow):
 
             # create the results annotation and update the graph
             if len(resultstr) > 0:
-                self.analysisShowResults(resultstr, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+                self.analysisShowResults(cfr, resultstr, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisfitCurves(): {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisfitCurves(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
         progress.cancel()
         progress = None
@@ -37022,9 +37025,8 @@ class ApplicationWindow(QMainWindow):
             # if analyzer boxes are not available we call the standard picker
             return artist.contains(evt)
 
-    def analysisShowResults(self,resultstr="",redraw=True, curvefit_starttime=0, curvefit_endtime=0, analysis_starttime=0, analysis_endtime=0):
-        if redraw:
-            self.qmc.redraw(recomputeAllDeltas=True)
+    def analysisShowResults(self,cfr,resultstr,curvefit_starttime=0, curvefit_endtime=0, analysis_starttime=0, analysis_endtime=0):
+        self.qmc.redraw(recomputeAllDeltas=True)
         if len(resultstr) == 0:
             resultstr = self.qmc.analysisresultsstr
         else:
@@ -37063,22 +37065,22 @@ class ApplicationWindow(QMainWindow):
             a = aw.qmc.alpha["statsanalysisbkgnd"]
             fc = aw.qmc.palette["statsanalysisbkgnd"]
             tc = aw.labelBorW(fc)
-            segmentresultstr = self.cfr['segmentresultstr']
-            self.segmentresultsanno = self.qmc.ax.annotate(segmentresultstr, xy=self.qmc.segmentresultsloc, xycoords='axes fraction',
-                       ha="left", va="center",
-                       fontfamily='monospace',
-                       fontsize='x-small',
-                       color=tc,
-                       zorder=30,
-                       picker=False,
-                       bbox=dict(boxstyle="round", fc=fc, alpha=a))
-            try:
-                self.segmentresultsanno.set_in_layout(False) # remove from tight_layout calculation
-                self.segmentresultsanno.draggable(use_blit=True)
-                self.segmentresultsanno.set_picker(self.draggable_text_box_picker)
-            except: # set_in_layout not available in mpl<3.x
-                pass
-            self.segmentresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
+            if 'segmentresultstr' in cfr:
+                segmentresultstr = cfr['segmentresultstr']
+                self.segmentresultsanno = self.qmc.ax.annotate(segmentresultstr, xy=self.qmc.segmentresultsloc, xycoords='axes fraction',
+                           ha="left", va="center",
+                           fontfamily='monospace',
+                           fontsize='x-small',
+                           color=tc,
+                           zorder=30,
+                           picker=False,
+                           bbox=dict(boxstyle="round", fc=fc, alpha=a))
+                try:
+                    self.segmentresultsanno.set_in_layout(False) # remove from tight_layout calculation
+                    self.segmentresultsanno.draggable(use_blit=True)
+                    self.segmentresultsanno.set_picker(self.draggable_text_box_picker)
+                except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
+                    pass
 
             # create the analysis results annotation box
             a = aw.qmc.alpha["statsanalysisbkgnd"]
@@ -37096,14 +37098,14 @@ class ApplicationWindow(QMainWindow):
                 self.analysisresultsanno.set_in_layout(False) # remove from tight_layout calculation
                 self.analysisresultsanno.draggable(use_blit=True)
                 self.analysisresultsanno.set_picker(self.draggable_text_box_picker)
-            except: # set_in_layout not available in mpl<3.x
+            except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                 pass
-            self.analysisresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
+            self.qmc.analyzer_connect_id = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
             self.qmc.fig.canvas.draw()
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisShowResults(): {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisShowResults(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def analysisGetResults(self,exp=2, curvefit_starttime=0, curvefit_endtime=0, analysis_starttime=0, analysis_endtime=0):
 
@@ -37181,11 +37183,13 @@ class ApplicationWindow(QMainWindow):
             else:
                 RoR_start = -1
             aw.qmc.delta1, aw.qmc.delta2 = aw.qmc.recomputeDeltas(aw.qmc.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisRecomputeDeltas(): {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisRecomputeDeltas(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def setbackgroundequ(self,foreground=False, EQU=['',''],recomputeAllDeltas=False):
+    def setbackgroundequ(self,foreground=False, EQU=None,recomputeAllDeltas=False):
+        if EQU is None:
+            EQU = ['','']
         # Check for incompatible vars from in the equations
         incompatiblevars = ["P","F","$","#"]
         error = ""
@@ -37261,9 +37265,9 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.redraw(recomputeAllDeltas=recomputeAllDeltas)
                         aw.sendmessage(QApplication.translate("Message","B1 = [%s] ; B2 = [%s]"%(EQU[0],EQU[1]), None))
 
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setbackgroundequ(): {0}").format(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setbackgroundequ(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -37334,7 +37338,7 @@ class ApplicationWindow(QMainWindow):
                         self.sendmessage(QApplication.translate("Message","Simulator started @{}x", None).format(speed))
                     else:
                         self.sendmessage(QApplication.translate("Message","Invalid artisan format", None))
-            except:
+            except Exception: # pylint: disable=broad-except
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 pass
@@ -37383,11 +37387,11 @@ def excepthook(excType, excValue, tracebackobj):
         variables += "%s::%s:%s\n" % (frame.f_code.co_filename,
                                       frame.f_code.co_name,
                                       frame.f_lineno)
-        for key, value in frame.f_locals.items():
-            variables += "\t%20s = " % key
+        for k, value in frame.f_locals.items():
+            variables += "\t%20s = " % k
             try:
                 s = str(value)
-            except:
+            except Exception: # pylint: disable=broad-except
                 s = "<???>"
             variables += "%s\n" % s
     sections = [timeString, separator, errmsg]
@@ -37421,13 +37425,11 @@ if sys.platform.startswith("darwin"):
         def makeWindowControllers(self):
             pass
 
-def qt_message_handler(msg_type, msg_log_context, msg_string):
+def qt_message_handler(_msg_type, _msg_log_context, _msg_string):
     pass
 
 def main():
-    global aw
-    global app
-    global artisanviewerFirstStart
+    global aw, app, artisanviewerFirstStart # pylint: disable=global-statement
 
     # supress all Qt messages
     qInstallMessageHandler(qt_message_handler)
@@ -37435,7 +37437,6 @@ def main():
     # suppress all warnings
     warnings.filterwarnings('ignore')
 
-    artisanviewerFirstStart = False
     if app.artisanviewerMode:
         app.setApplicationName("ArtisanViewer")     #needed by QSettings() to store windows geometry in operating system
         viewersettings = QSettings()
@@ -37487,7 +37488,7 @@ def main():
                     app.sendMessage(argv_file)
                     sys.exit(0)
                 # otherwise if an artisan://roast url open it in this instance, if not a url do normal file processing
-                elif re.match("artisan\:\/\/roast",argv_file):
+                elif re.match(r"artisan://roast",argv_file):
                     url = QUrl()
                     url.setUrl(argv_file)
                     app.open_url(url)
@@ -37522,7 +37523,7 @@ def main():
             if aw.lastLoadedProfile:
                 try:
                     aw.loadFile(aw.lastLoadedProfile)
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             elif aw.logofilename != "":  #ensure background image aspect ratio is calculated
                 aw.qmc.reset(redraw=False, soundOn=False)
@@ -37535,13 +37536,13 @@ def main():
                         aw.qmc.redraw()
                     else:
                         aw.qmc.timealign(redraw=True,recompute=True)
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     aw.qmc.background = False
                     aw.qmc.backgroundprofile = None
             if not aw.lastLoadedBackground and not aw.lastLoadedProfile:
                 # redraw once to get geometry right
                 aw.qmc.redraw(False,sampling=False,smooth=aw.qmc.optimalSmoothing)
-    except Exception:
+    except Exception: # pylint: disable=broad-except
         pass
 
     # write gc debug messages to stdout
@@ -37551,7 +37552,7 @@ def main():
 #    if platf == 'Windows' and appFrozen():
 #        try:
 #            sys.stderr = sys.stdout
-#        except:
+#        except Exception: # pylint: disable=broad-except
 #            pass
 
     aw.qmc.startPhidgetManager()

@@ -590,7 +590,7 @@ def extractProfileCropsterXLS(file,_):
                 batch_number = int(id_tag_value[len(batch_prefix):])
                 res["roastbatchprefix"] = batch_prefix
                 res["roastbatchnr"] = batch_number
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         
         for (tag,pos,trans) in string_tag_labels_trans:
@@ -606,7 +606,7 @@ def extractProfileCropsterXLS(file,_):
                     value = row1[pos].value
                 if value is not None:
                     res[tag] = encodeLocal(value)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
         try:
@@ -629,7 +629,7 @@ def extractProfileCropsterXLS(file,_):
                     res["roasttime"] = encodeLocal(date.time().toString())
                     res["roastepoch"] = int(date.toTime_t())
                     res["roasttzoffset"] = libtime.timezone
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         
         try:
@@ -644,7 +644,7 @@ def extractProfileCropsterXLS(file,_):
                 ambient_tag_value = row1[27]
             if ambient_tag_value is not None:
                 res['ambientTemp'] = float(ambient_tag_value)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         
         try:
@@ -694,26 +694,26 @@ def extractProfileCropsterXLS(file,_):
                     if end_weight_unit_tag_value is not None:
                         idx = cropster_weight_units.index(end_weight_unit_tag_value)
                         weight[2] = artisan_weight_units[idx]
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
                 try:
                     if start_weight_unit_tag_value:
                         idx = cropster_weight_units.index(start_weight_unit_tag_value)
                         weight[2] = artisan_weight_units[idx]
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
                 try:
                     if start_weight_tag_value is not None:
                         weight[0] = start_weight_tag_value
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
                 try:
                     if end_weight_tag_value is not None:
                         weight[1] = end_weight_tag_value
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
                 res["weight"] = weight
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
     
     res["timex"] = []
@@ -740,7 +740,7 @@ def extractProfileCropsterXLS(file,_):
                         res["temp1"] = [-1]*len(res["timex"])
                         res["timeindex"] = [0,0,0,0,0,0,max(0,len(res["timex"])-1),0]
                 break
-    except:
+    except Exception: # pylint: disable=broad-except
         pass
     # ET
     try:
@@ -766,7 +766,7 @@ def extractProfileCropsterXLS(file,_):
                     break
             if ET_idx is not None:
                 break
-    except:
+    except Exception: # pylint: disable=broad-except
         pass
 
     # extra temperature curves (only if ET or BT and its corresponding timex was already parsed successfully)
@@ -850,7 +850,7 @@ def extractProfileCropsterXLS(file,_):
                                 res["extraname2"].append(encodeLocal(extra_curve_name))
                                 res["extratemp2"].append([t.value for t in temp[1:]])
                                 res["extramathexpression2"].append("")
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
         if "extraname1" in res and "extraname2" in res and len(res["extraname1"]) != len(res["extraname2"]):
             # we add an empty second extra channel if needed
@@ -864,7 +864,7 @@ def extractProfileCropsterXLS(file,_):
             COMMENTS_idx = 1
             try:
                 sheet_names.index("Comments")
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             COMMENTS_sh = book.sheet_by_index(COMMENTS_idx)
             gas_event = False # set to True if a Gas event exists
@@ -914,13 +914,13 @@ def extractProfileCropsterXLS(file,_):
                                         v = float(comment_value)
                                         v = v/10. + 1
                                         specialeventsvalue.append(v)
-                                    except:
+                                    except Exception: # pylint: disable=broad-except
                                         specialeventsvalue.append(0)
                                     if not ae and not ge and comment_type not in comment_trans:
                                         specialeventsStrings.append(encodeLocal(comment_type))
                                     else:
                                         specialeventsStrings.append(encodeLocal(comment_value))
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
             if len(specialevents) > 0:
                 res["specialevents"] = specialevents
@@ -939,8 +939,8 @@ def extractProfileCropsterXLS(file,_):
                         res["etypes"][0] = "Airflow"
                     if gas_event:
                         res["etypes"][3] = "Gas"
-        except:
-#            import traceback
+        except Exception: # pylint: disable=broad-except
+#           import traceback
 #           import sys
 #           traceback.print_exc(file=sys.stdout)
             pass

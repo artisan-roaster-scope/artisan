@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -47,7 +47,7 @@ class Simulator():
             for i in range(len(self.extratimex)):
                 if len(self.extratimex[i]) > 0:
                     self.extratimex[i] = self.extratimex[i] - self.extratimex[i][0]
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
     
     def read(self,tx):
@@ -60,7 +60,7 @@ class Simulator():
             else:
                 et = numpy.interp(tx,self.timex,self.temp1)
                 bt = numpy.interp(tx,self.timex,self.temp2)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         return et,bt
     
@@ -74,7 +74,7 @@ class Simulator():
             else:
                 t1 = numpy.interp(tx,self.extratimex[i],self.extratemp1[i])
                 t2 = numpy.interp(tx,self.extratimex[i],self.extratemp2[i])
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         return t2,t1
         

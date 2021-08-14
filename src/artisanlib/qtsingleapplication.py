@@ -22,10 +22,10 @@ class QtSingleApplication(QApplication):
     
         if sys.platform.startswith("darwin") and mp.current_process().name == "WebLCDs":
             import AppKit
-            info = AppKit.NSBundle.mainBundle().infoDictionary()  # @UndefinedVariable
+            info = AppKit.NSBundle.mainBundle().infoDictionary()  # @UndefinedVariable # pylint: disable=maybe-no-member
             info["LSBackgroundOnly"] = "1"
 
-        super(QtSingleApplication, self).__init__(*argv)
+        super().__init__(*argv)
         
         self._id = _id
         self._viewer_id = _viewer_id
@@ -106,7 +106,7 @@ class QtSingleApplication(QApplication):
     def sendMessage(self, msg):
         if not self._outStream:
             return False
-        self._outStream << msg << '\n'
+        self._outStream << msg << '\n' # pylint: disable=pointless-statement
         self._outStream.flush()
         return self._outSocket.waitForBytesWritten()
 

@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -46,7 +46,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialo
                              QGroupBox)
 try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
     from PyQt5 import sip # @UnusedImport
-except:
+except Exception: # pylint: disable=broad-except
     pass
 
 if sys.platform.startswith("darwin"):
@@ -64,7 +64,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         
         self.parent_dialog = parent
         # weightunit 0:g, 1:Kg  volumeunit 0:ml, 1:l
-        super(volumeCalculatorDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Volume Calculator",None))
 
@@ -98,6 +98,8 @@ class volumeCalculatorDlg(ArtisanDialog):
             self.update_scale_weight()
             self.parent_dialog.ble.weightChanged.connect(self.ble_weight_changed)
             self.parent_dialog.ble.deviceDisconnected.connect(self.ble_scan_failed)
+        # Scale Battery
+        self.scale_battery = self.parent_dialog.scale_battery
         
         # Unit Group
         unitvolumeLabel = QLabel("<b>" + QApplication.translate("Label","Unit", None) + "</b>")
@@ -316,7 +318,7 @@ class volumeCalculatorDlg(ArtisanDialog):
                 self.scaleWeight.setText("{0:.1f}g".format(self.scale_weight - self.tare))
             else:
                 self.scaleWeight.setText("")
-        except: # the dialog might have been closed already and thus the qlabel might not exist anymore
+        except Exception: # pylint: disable=broad-except # the dialog might have been closed already and thus the qlabel might not exist anymore
             pass
         
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
@@ -347,19 +349,19 @@ class volumeCalculatorDlg(ArtisanDialog):
     pyqtSlot(bool)
     def inWeight(self,_):
         QTimer.singleShot(1,lambda : self.widgetWeight(self.coffeeinweightEdit))
-        QTimer.singleShot(10,lambda : self.resetInVolume())
+        QTimer.singleShot(10,self.resetInVolume)
         QApplication.processEvents()
         
     pyqtSlot(bool)
     def outWeight(self,_):
         QTimer.singleShot(1,lambda : self.widgetWeight(self.coffeeoutweightEdit))
-        QTimer.singleShot(10,lambda : self.resetOutVolume())
+        QTimer.singleShot(10,self.resetOutVolume)
         QApplication.processEvents()
         
     def retrieveWeight(self):
         v = self.scale_weight
         if v is not None: # value received
-            # substruct tare
+            # subtract tare
             return v - self.tare
         else:
             return None
@@ -379,7 +381,7 @@ class volumeCalculatorDlg(ArtisanDialog):
             else:
                 self.inVolume = self.aw.convertVolume(self.aw.convertWeight(self.weightIn,self.weightunit,0) * float(self.aw.comma2dot(self.unitvolumeEdit.text())) / float(self.aw.comma2dot(self.coffeeinweightEdit.text())),5,self.volumeunit)
                 self.coffeeinvolume.setText("%g" % self.aw.float2floatWeightVolume(self.inVolume))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.inVolume = None
             self.coffeeinvolume.setText("")
 
@@ -393,7 +395,7 @@ class volumeCalculatorDlg(ArtisanDialog):
             else:
                 self.outVolume = self.aw.convertVolume(self.aw.convertWeight(self.weightOut,self.weightunit,0) * float(self.aw.comma2dot(str(self.unitvolumeEdit.text()))) / float(self.aw.comma2dot(str(self.coffeeoutweightEdit.text()))),5,self.volumeunit)
                 self.coffeeoutvolume.setText("%g" % self.aw.float2floatWeightVolume(self.outVolume))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.outVolume = None
             self.coffeeoutvolume.setText("")
 
@@ -415,7 +417,7 @@ class volumeCalculatorDlg(ArtisanDialog):
     def closeEvent(self,_):
         try:
             self.parent_dialog.volumedialog = None
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         if self.unitvolumeEdit.text() and self.unitvolumeEdit.text() != "":
             self.aw.qmc.volumeCalcUnit = float(self.aw.comma2dot(self.unitvolumeEdit.text()))
@@ -436,7 +438,7 @@ class volumeCalculatorDlg(ArtisanDialog):
 
 class tareDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None, tarePopup = None):
-        super(tareDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.parent = parent
         self.tarePopup = tarePopup
         self.setModal(True)
@@ -574,7 +576,7 @@ class tareDlg(ArtisanDialog):
 
 class RoastsComboBox(QComboBox):
     def __init__(self, parent = None, aw = None, selection = None):
-        super(RoastsComboBox, self).__init__(parent)
+        super().__init__(parent)
         self.aw = aw
         self.installEventFilter(self)
         self.selection = selection # just the roast title
@@ -596,17 +598,17 @@ class RoastsComboBox(QComboBox):
         if i >= 0:
             try:
                 self.edited = None # reset the user text editing
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
 
-    def eventFilter(self, obj, event):
+    def eventFilter(self, _obj, event):
 # the next prevents correct setSelection on Windows
 #        if event.type() == QEvent.FocusIn:
 #            self.setSelection(self.currentIndex())
         if event.type() == QEvent.MouseButtonPress:
             self.updateMenu()
 #            return True # stops processing # popup not drawn if this line is added
-#        return super(RoastsComboBox, self).eventFilter(obj, event) # this seems to slow down things on Windows and not necessary anyhow
+#        return super().eventFilter(obj, event) # this seems to slow down things on Windows and not necessary anyhow
         return False # cont processing
 
     # the first entry is always just the current text edit line
@@ -616,7 +618,7 @@ class RoastsComboBox(QComboBox):
             roasts = self.aw.recentRoastsMenuList()
             self.clear()
             self.addItems([self.edited] + roasts)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         self.blockSignals(False)
 
@@ -629,7 +631,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     readScaleSignal = pyqtSignal()
 
     def __init__(self, parent = None, aw = None, activeTab = 0):
-        super(editGraphDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))
         
@@ -658,6 +660,12 @@ class editGraphDlg(ArtisanResizeablDialog):
         
         self.org_weight = self.aw.qmc.weight[:]
         self.org_volume = self.aw.qmc.volume[:]
+        
+        self.setup_ui = None
+        
+        self.pus_amount_selected = None
+        
+        self.helpdialog = None # energy help dialog
         
         self.batcheditmode = False # a click to the batch label enables the batcheditmode
         
@@ -1458,11 +1466,11 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.ble.weightChanged.connect(self.ble_weight_changed)
                     self.ble.batteryChanged.connect(self.ble_battery_changed)
                     self.ble.scanDevices()
-                except:
+                except Exception:  # pylint: disable=broad-except
                     pass
             elif self.aw.scale.device in ["KERN NDE","Shore 930"]:
                 self.connectScaleSignal.connect(self.connectScaleLoop)
-                QTimer.singleShot(2,lambda : self.connectScaleSignal.emit())
+                QTimer.singleShot(2,lambda : self.connectScaleSignal.emit()) # pylint: disable= unnecessary-lambda
         
         propGrid.addWidget(volumelabel,2,0)
         propGrid.addWidget(self.volumeinedit,2,1,Qt.AlignRight)
@@ -1663,8 +1671,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                 else: # we are in ON mode, but not connected, we connect which triggers a stock update if successful
                     plus.controller.connect(interactive=False)
                 if plus.controller.is_connected():
-                    QTimer.singleShot(1500,lambda : self.populatePlusCoffeeBlendCombos())
-        except:
+                    QTimer.singleShot(1500,self.populatePlusCoffeeBlendCombos)
+        except Exception:  # pylint: disable=broad-except
             pass
         if platform.system() == 'Windows':
             self.dialogbuttons.button(QDialogButtonBox.Ok)
@@ -1734,11 +1742,11 @@ class editGraphDlg(ArtisanResizeablDialog):
     
     @pyqtSlot()
     def readScaleLoop(self):
-        QTimer.singleShot(1000,lambda : self.readScale())
+        QTimer.singleShot(1000,self.readScale)
     
     @pyqtSlot()
     def connectScaleLoop(self):
-        QTimer.singleShot(2000,lambda : self.connectScale())
+        QTimer.singleShot(2000,self.connectScale)
         
     def connectScale(self):
         if self.disconnecting:
@@ -1747,7 +1755,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             res = self.aw.scale.connect(error=False)
             if res:
                 self.readScaleSignal.connect(self.readScaleLoop)
-                QTimer.singleShot(2,lambda : self.readScaleSignal.emit())
+                QTimer.singleShot(2,lambda : self.readScaleSignal.emit()) # pylint: disable= unnecessary-lambda
             else:
                 self.connectScaleSignal.emit()
 
@@ -1781,7 +1789,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.scale_battery = None
         self.scaleWeight.setText("")
         if self.ble is not None:
-            QTimer.singleShot(200,lambda : self.ble.scanDevices())
+            QTimer.singleShot(200, self.ble.scanDevices)
 
     def ble_weight_changed(self,w):
         if w is not None:
@@ -1799,7 +1807,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             tare_idx = self.tareComboBox.currentIndex() - 3
             if tare_idx > -1:
                 tare = self.aw.qmc.container_weights[tare_idx]
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         if self.scale_weight is not None and tare is not None:
             v = self.scale_weight - tare # weight in g
@@ -1857,7 +1865,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             if line and len(line)>0 and self.plus_store_selected is not None and self.plus_store_selected_label is not None:
                 line = line + '  (<a href="{0}"{2}>{1}</a>)'.format(plus.util.storeLink(self.plus_store_selected),self.plus_store_selected_label,dark_mode_link_color)
             self.plus_selected_line.setText(line)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
     
     @pyqtSlot()
@@ -1885,7 +1893,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_stores_combo.setEnabled(b)
             self.plus_coffees_combo.setEnabled(b)
             self.plus_blends_combo.setEnabled(b)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     # storeIndex is the index of the selected entry in the popup
@@ -1906,7 +1914,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     else:
                         self.plusStoreslabel.setVisible(True)
                         self.plus_stores_combo.setVisible(True)
-                except:
+                except Exception:  # pylint: disable=broad-except
                     pass
                 self.plus_stores_combo.blockSignals(True)       
                 self.plus_stores_combo.clear()
@@ -2017,7 +2025,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
             self.markPlusCoffeeFields(mark_coffee_fields)
             self.updatePlusSelectedLine() 
-        except:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass     
@@ -2091,14 +2099,14 @@ class editGraphDlg(ArtisanResizeablDialog):
             try:
                 if "moisture" in blend_dict and blend_dict["moisture"] is not None:
                     moisture_txt = "%g" % blend_dict["moisture"]
-            except:
+            except Exception:  # pylint: disable=broad-except
                 pass
             self.moisture_greens_edit.setText(moisture_txt)
             density_txt = "0"
             try:
                 if "density" in blend_dict and blend_dict["density"] is not None:
                     density_txt = "%g" % self.aw.float2float(blend_dict["density"])
-            except:
+            except Exception:  # pylint: disable=broad-except
                 pass
             self.bean_density_in_edit.setText(density_txt)
             screen_size_min = "0"
@@ -2108,7 +2116,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     screen_size_min = str(int(blend_dict["screen_min"]))
                 if "screen_max" in blend_dict and blend_dict["screen_max"] is not None:
                     screen_size_max = str(int(blend_dict["screen_max"]))
-            except:
+            except Exception:  # pylint: disable=broad-except
                 pass
             self.bean_size_min_edit.setText(screen_size_min)
             self.bean_size_max_edit.setText(screen_size_max)
@@ -2119,7 +2127,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.moistureEdited()
             self.modified_density_in_text = keep_modified_density
             self.modified_moisture_greens_text = keep_modified_moisture
-        except:
+        except Exception:  # pylint: disable=broad-except
             pass
         
     # if current title is equal to default title or prev_coffee/blend_label, we set title from selected label
@@ -2133,14 +2141,14 @@ class editGraphDlg(ArtisanResizeablDialog):
             try:
                 if "moisture" in cd and cd["moisture"] is not None:
                     moisture_txt = "%g" % cd["moisture"]
-            except:
+            except Exception:  # pylint: disable=broad-except
                 pass
             self.moisture_greens_edit.setText(moisture_txt)
             density_txt = "0"
             try:
                 if "density" in cd and cd["density"] is not None:
                     density_txt = "%g" % self.aw.float2float(cd["density"])
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             self.bean_density_in_edit.setText(density_txt)
             screen_size_min = "0"
@@ -2152,7 +2160,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                         screen_size_min = str(int(screen["min"]))
                     if "max" in screen and screen["max"] is not None:
                         screen_size_max = str(int(screen["max"]))
-            except:
+            except Exception:  # pylint: disable=broad-except
                 pass
             self.bean_size_min_edit.setText(screen_size_min)
             self.bean_size_max_edit.setText(screen_size_max)
@@ -2162,7 +2170,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.moistureEdited()
             self.modified_density_in_text = keep_modified_density
             self.modified_moisture_greens_text = keep_modified_moisture
-        except:
+        except Exception:  # pylint: disable=broad-except
             pass
         
     def defaultCoffeeData(self):
@@ -2384,7 +2392,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 if "plus_blend_spec" in rr:
                     self.plus_blend_selected_label = rr["plus_blend_label"]
                     self.plus_blend_selected_spec = rr["plus_blend_spec"]
-                    if "plus_blend_spec_labels":
+                    if "plus_blend_spec_labels" in rr:
                         self.plus_blend_selected_spec_labels = rr["plus_blend_spec_labels"]
                 else:
                     self.plus_blend_selected_label = None
@@ -2402,13 +2410,13 @@ class editGraphDlg(ArtisanResizeablDialog):
                             plus.stock.getBlendId(b) == self.plus_blend_selected_spec["hr_id"] and
                             plus.stock.getBlendStockDict(b)["location_hr_id"] == self.plus_store_selected)
                         self.blendSelectionChanged(pos_in_blends+1)
-                    except:
+                    except Exception:  # pylint: disable=broad-except
                         self.updatePlusSelectedLine()
                 else:
                     # blend replacements not applied
                     self.updatePlusSelectedLine()
             
-            self.aw.sendmessage(QApplication.translate("Message","Recent roast properties '{0}' set".format(self.aw.recentRoastLabel(rr),None)))
+            self.aw.sendmessage(QApplication.translate("Message","Recent roast properties '{0}' set".format(self.aw.recentRoastLabel(rr)),None))
         self.recentRoastEnabled()
     
     @pyqtSlot("QString")
@@ -2424,7 +2432,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 self.addRecentButton.setEnabled(False)
                 self.delRecentButton.setEnabled(False)
-        except:
+        except Exception: # pylint: disable=broad-except
             self.addRecentButton.setEnabled(False)
             self.delRecentButton.setEnabled(False)
         
@@ -2435,7 +2443,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             weightIn = float(self.aw.comma2dot(self.weightinedit.text()))
             weightUnit = self.unitsComboBox.currentText()
             self.aw.recentRoasts = self.aw.delRecentRoast(title,weightIn,weightUnit)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
     
     @pyqtSlot(bool)
@@ -2513,11 +2521,11 @@ class editGraphDlg(ArtisanResizeablDialog):
                     groundColor
                     )
                 self.aw.addRecentRoast(rr)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addRecentRoast(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addRecentRoast(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # triggered if dialog is closed via its windows close box
     # and called from accept if dialog is closed via OK
@@ -2528,11 +2536,11 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.ble.batteryChanged.disconnect()
                 self.ble.weightChanged.disconnect()
                 self.ble.deviceDisconnected.disconnect()
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             try:
                 self.ble.disconnectDevice()
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         settings = QSettings()
         #save window geometry
@@ -2550,11 +2558,11 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.ble.batteryChanged.disconnect()
                 self.ble.weightChanged.disconnect()
                 self.ble.deviceDisconnected.disconnect()
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             try:
                 self.ble.disconnectDevice()
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         settings = QSettings()
         #save window geometry
@@ -2633,7 +2641,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             # weight unit changed, we update the selected blend in plus mode
             if self.plus_blends_combo.currentIndex() > 0:
                 self.blendSelectionChanged(self.plus_blends_combo.currentIndex())
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     @pyqtSlot(int)
@@ -2671,12 +2679,11 @@ class editGraphDlg(ArtisanResizeablDialog):
     
     
     def initEnergyTab(self):
+        # pylint: disable=attribute-defined-outside-init
         if not self.tabInitialized[4]:
             # fill Energy tab
             self.energy_ui = EnergyWidget.Ui_EnergyWidget()
             self.energy_ui.setupUi(self.C5Widget)
-            
-            self.helpdialog = None
             
             self.btu_list = []
             
@@ -3176,7 +3183,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     def updateMetricsLabel(self):
         try:
-            metrics,self.btu_list = self.aw.qmc.calcEnergyuse(self.weightinedit.text())
+            metrics,self.btu_list = self.aw.qmc.calcEnergyuse(self.weightinedit.text()) # pylint: disable=attribute-defined-outside-init
             if len(metrics) > 0 and metrics["BTU_batch"] > 0:
                 energy_unit = self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup]
                 #
@@ -3253,9 +3260,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 
                 self.energy_ui.CO2perKgCoffeeLabel.setText("")
         
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updateMetricsLabel() {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updateMetricsLabel() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def formatLoadLabel(self,tag,label=""):
         if len(label) > 0:
@@ -3543,7 +3550,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             r = self.scalefloat(toFloat(self.aw.comma2dot(str(s))))
             if not r == '0':
                 res = str(r)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         return res
 
@@ -3562,7 +3569,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     res = "100%"
                 elif not r == 0:
                     res = str(r) + '%'
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         return res
 
@@ -3575,7 +3582,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 # percentage values are stored as a negative decimal
                 res = -self.aw.float2float(toFloat(s.strip('%'))/100,2)
-        except:
+        except Exception: # pylint: disable=broad-except
             res = 0
         return res
 
@@ -3695,18 +3702,18 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def volumeCalculatorTimer(self,_):
-        QTimer.singleShot(1,lambda : self.volumeCalculator())
+        QTimer.singleShot(1, self.volumeCalculator)
 
     def volumeCalculator(self):
         weightin = None
         weightout = None
         try:
             weightin = float(self.aw.comma2dot(self.weightinedit.text()))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             weightout = float(self.aw.comma2dot(self.weightoutedit.text()))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         k = 1.
         if weightin is not None:
@@ -3722,7 +3729,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             tare_idx = self.tareComboBox.currentIndex() - 3
             if tare_idx > -1:
                 tare = self.aw.qmc.container_weights[tare_idx]
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.volumedialog = volumeCalculatorDlg(self,self.aw,
             weightIn=weightin,
@@ -3749,7 +3756,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             tare_idx = self.tareComboBox.currentIndex() - 3
             if tare_idx > -1:
                 tare = self.aw.qmc.container_weights[tare_idx]
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         #w,d,m = self.aw.scale.readWeight(self.scale_weight) # read value from scale in 'g'
         w,d,m = self.scale_weight,-1,-1
@@ -3759,7 +3766,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             current_w = 0
             try:
                 current_w = float(self.aw.comma2dot(weight_edit.text()))
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             if overwrite:
                 new_w = w
@@ -3824,7 +3831,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             try:
                 en1 = en1.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3])
                 en2 = en2.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3])
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             columns.append(en1)
             columns.append(en2)
@@ -3859,10 +3866,10 @@ class editGraphDlg(ArtisanResizeablDialog):
                     if self.aw.qmc.DeltaETfunction is not None and len(self.aw.qmc.DeltaETfunction):
                         try:
                             rateofchange1 = self.aw.qmc.eval_math_expression(self.aw.qmc.DeltaETfunction,self.aw.qmc.timex[i],RTsname="R1",RTsval=rateofchange1)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                     deltaET_str = "%.1f"%(rateofchange1)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             deltaET = QTableWidgetItem(deltaET_str)
             deltaBT_str = "--"
@@ -3872,10 +3879,10 @@ class editGraphDlg(ArtisanResizeablDialog):
                     if self.aw.qmc.DeltaBTfunction is not None and len(self.aw.qmc.DeltaBTfunction):
                         try:
                             rateofchange2 = self.aw.qmc.eval_math_expression(self.aw.qmc.DeltaBTfunction,self.aw.qmc.timex[i],RTsname="R2",RTsval=rateofchange2)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             pass
                     deltaBT_str = "%.1f"%(rateofchange2)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             deltaBT = QTableWidgetItem(deltaBT_str)
             
@@ -3993,7 +4000,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     etline.setAlignment(Qt.AlignRight)
                     try:
                         ettemp = fmtstr%(self.aw.qmc.temp1[self.aw.qmc.specialevents[i]]) + self.aw.qmc.mode
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     etline.setText(ettemp)
                         
@@ -4018,7 +4025,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     
                     try:
                         stringline = QLineEdit(self.aw.qmc.specialeventsStrings[i])
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         stringline = QLineEdit("")
                     #add widgets to the table
                     self.eventtable.setCellWidget(i,0,timeline)
@@ -4042,6 +4049,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.eventtable.setColumnWidth(2,65)
                 self.eventtable.setColumnWidth(5,55)
                 # header.setSectionResizeMode(QHeaderView.Stretch)
+            except Exception: # pylint: disable=broad-except
+                pass
             finally:
                 if self.aw.qmc.samplingsemaphore.available() < 1:
                     self.aw.qmc.samplingsemaphore.release(1)
@@ -4067,8 +4076,10 @@ class editGraphDlg(ArtisanResizeablDialog):
                         self.aw.qmc.specialeventstype[i] = etype.currentIndex()
                         evalue = self.eventtable.cellWidget(i,5).text()
                         self.aw.qmc.specialeventsvalue[i] = self.aw.qmc.str2eventsvalue(str(evalue))
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
+            except Exception: # pylint: disable=broad-except
+                pass
             finally:
                 if self.aw.qmc.samplingsemaphore.available() < 1:
                     self.aw.qmc.samplingsemaphore.release(1)
@@ -4160,6 +4171,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.aw.qmc.specialeventstype = []
                 self.aw.qmc.specialeventsStrings = []
                 self.aw.qmc.specialeventsvalue = []
+        except Exception:  # pylint: disable=broad-except
+            pass
         finally:
             if self.aw.qmc.samplingsemaphore.available() < 1:
                 self.aw.qmc.samplingsemaphore.release(1)
@@ -4308,7 +4321,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         weightIn = 0.0
         try:
             weightIn = float(self.aw.comma2dot(self.weightinedit.text()))
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         if self.plus_amount_selected is not None:
             try:
@@ -4316,7 +4329,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 wc = self.aw.convertWeight(weightIn,self.aw.qmc.weight_units.index(self.unitsComboBox.currentText()),self.aw.qmc.weight_units.index("Kg"))
                 if wc > self.plus_amount_selected:
                     enough = False
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         if self.plus_amount_replace_selected is not None:
             try:
@@ -4324,7 +4337,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 wc = self.aw.convertWeight(weightIn,self.aw.qmc.weight_units.index(self.unitsComboBox.currentText()),self.aw.qmc.weight_units.index("Kg"))
                 if wc <= self.plus_amount_replace_selected:
                     enough_replacement = True
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         if enough:
             self.weightinedit.setStyleSheet("")
@@ -4361,7 +4374,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         try:
             if self.bean_density_out_edit.text() != "" and float(self.aw.comma2dot(self.bean_density_out_edit.text())) != 0.0:
                 percent = self.aw.weight_loss(float(self.aw.comma2dot(str(self.bean_density_in_edit.text()))),float(self.aw.comma2dot(str(self.bean_density_out_edit.text()))))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         if percent <= 0:
             self.densitypercentlabel.setText("")
@@ -4375,7 +4388,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             m_roasted = float(self.aw.comma2dot(str(self.moisture_roasted_edit.text())))
             if m_roasted != 0.0:
                 percent = float(self.aw.comma2dot(str(self.moisture_greens_edit.text()))) - m_roasted
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         if percent <= 0:
             self.moisturepercentlabel.setText("")
@@ -4388,7 +4401,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         try:
             if self.weightoutedit.text() != "" and float(self.aw.comma2dot(self.weightoutedit.text())) != 0.0:
                 percent = self.aw.weight_loss(float(self.aw.comma2dot(self.weightinedit.text())),float(self.aw.comma2dot(self.weightoutedit.text())))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         if percent > 0:
             percentstring =  "-%.1f" %(percent) + "%"
@@ -4405,7 +4418,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         try:
             if self.volumeoutedit.text() != "" and float(self.aw.comma2dot(self.volumeoutedit.text())) != 0.0:
                 percent = self.aw.volume_increase(float(self.aw.comma2dot(self.volumeinedit.text())),float(self.aw.comma2dot(self.volumeoutedit.text())))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         if percent == 0:
             self.volumepercentlabel.setText("")
@@ -4437,7 +4450,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     weight_idx = self.aw.qmc.weight_units.index(self.unitsComboBox.currentText())
                     weightout = self.aw.convertWeight(weightout,weight_idx,0)
                     dout = (weightout / volumeout)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         return din,dout
 
@@ -4460,12 +4473,12 @@ class editGraphDlg(ArtisanResizeablDialog):
         try:
             if self.weightpercentlabel.text() and self.weightpercentlabel.text() != "":
                 wloss = abs(float(self.aw.comma2dot(self.weightpercentlabel.text()).split("%")[0]))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             if self.moisturepercentlabel.text() and self.moisturepercentlabel.text() != "":
                 mloss = abs(float(self.aw.comma2dot(self.moisturepercentlabel.text()).split("%")[0]))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         if mloss != 0. and wloss != 0.:
             return mloss, self.aw.float2float(max(min(wloss - mloss,100),0))
@@ -4664,34 +4677,34 @@ class editGraphDlg(ArtisanResizeablDialog):
         #update weight
         try:
             self.aw.qmc.weight[0] = float(self.aw.comma2dot(str(self.weightinedit.text())))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.weight[0] = 0
         try:
             self.aw.qmc.weight[1] = float(self.aw.comma2dot(str(self.weightoutedit.text())))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.weight[1] = 0
         self.aw.qmc.weight[2] = self.unitsComboBox.currentText()
         #update volume
         try:
             self.aw.qmc.volume[0] = float(self.aw.comma2dot(str(self.volumeinedit.text())))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.volume[0] = 0
         try:
             self.aw.qmc.volume[1] = float(self.aw.comma2dot(str(self.volumeoutedit.text())))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.volume[1] = 0
         self.aw.qmc.volume[2] = self.volumeUnitsComboBox.currentText()
         #update density
         try:
             self.aw.qmc.density[0] = float(self.aw.comma2dot(str(self.bean_density_in_edit.text())))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.density[0] = 0
         self.aw.qmc.density[1] = "g"
         self.aw.qmc.density[2] = 1
         self.aw.qmc.density[3] = "l"
         try:
             self.aw.qmc.density_roasted[0] = float(self.aw.comma2dot(str(self.bean_density_out_edit.text())))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.density_roasted[0] = 0
         self.aw.qmc.density_roasted[1] = "g"
         self.aw.qmc.density_roasted[2] = 1
@@ -4699,11 +4712,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         #update bean size
         try:
             self.aw.qmc.beansize_min = int(str(self.bean_size_min_edit.text()))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.beansize_min = 0
         try:
             self.aw.qmc.beansize_max = int(str(self.bean_size_max_edit.text()))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.beansize_max = 0
         #update roastflags
         self.aw.qmc.heavyFC_flag = self.heavyFC.isChecked()
@@ -4719,44 +4732,44 @@ class editGraphDlg(ArtisanResizeablDialog):
         #update color
         try:
             self.aw.qmc.whole_color = int(str(self.whole_color_edit.text()))
-        except:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.whole_color = 0
         try:
             self.aw.qmc.ground_color = int(str(self.ground_color_edit.text()))
-        except:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.ground_color = 0
         self.aw.qmc.color_system_idx = self.colorSystemComboBox.currentIndex()
         #update beans temperature
         try:
             self.aw.qmc.greens_temp = float(self.aw.comma2dot(str(self.greens_temp_edit.text())))
-        except:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.greens_temp = 0.
         #update greens moisture
         try:
             self.aw.qmc.moisture_greens = float(self.aw.comma2dot(str(self.moisture_greens_edit.text())))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.moisture_greens = 0.
         #update roasted moisture
         try:
             self.aw.qmc.moisture_roasted = float(self.aw.comma2dot(str(self.moisture_roasted_edit.text())))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.moisture_roasted = 0.
         #update ambient temperature
         try:
             self.aw.qmc.ambientTemp = float(self.aw.comma2dot(self.ambientedit.text()))
             if math.isnan(self.aw.qmc.ambientTemp):
                 self.aw.qmc.ambientTemp = 0.0
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.ambientTemp = 0.0
         #update ambient humidity
         try:
             self.aw.qmc.ambient_humidity = float(self.aw.comma2dot(str(self.ambient_humidity_edit.text())))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.ambient_humidity = 0
         #update ambient pressure
         try:
             self.aw.qmc.ambient_pressure = float(self.aw.comma2dot(str(self.pressureedit.text())))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.aw.qmc.ambient_pressure = 0
         if self.tabInitialized[5]:
             #update setup
@@ -4791,7 +4804,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.aw.qmc.background = not self.aw.qmc.hideBgafterprofileload
                 self.aw.qmc.timealign(redraw=False)
                 self.aw.qmc.redraw()
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         elif ((not self.aw.qmc.flagon) or
             (self.aw.qmc.specialevents != self.org_specialevents) or
@@ -4911,7 +4924,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         try: # sip not supported on older PyQt versions (RPi!)
             sip.delete(dialog)
             #print(sip.isdeleted(dialog))
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         return res
         
@@ -4921,7 +4934,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
 class EnergyMeasuringDialog(ArtisanDialog):
     def __init__(self, parent = None):
-        super(EnergyMeasuringDialog,self).__init__(parent)
+        super().__init__(parent)
         self.ui = MeasureDialog.Ui_setMeasureDialog()
         self.ui.setupUi(self)
         self.setWindowTitle(QApplication.translate("Form Caption","Set Measure from Profile",None))

@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -105,22 +105,22 @@ class AillioR1:
             if self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE):
                 try:
                     self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE)
-                except Exception:
+                except Exception as e:
                     self.usbhandle = None
-                    raise IOError("unable to detach kernel driver")
+                    raise IOError("unable to detach kernel driver") from e
         try:
             config = self.usbhandle.get_active_configuration()
             if config.bConfigurationValue != self.AILLIO_CONFIGURATION:
                 self.usbhandle.set_configuration(configuration=self.AILLIO_CONFIGURATION)
-        except Exception:
+        except Exception as e:
             self.usbhandle = None
-            raise IOError("unable to configure")
+            raise IOError("unable to configure") from e
 
         try:
             usb.util.claim_interface(self.usbhandle, self.AILLIO_INTERFACE)
-        except Exception:
+        except Exception as e:
             self.usbhandle = None
-            raise IOError("unable to claim interface")
+            raise IOError("unable to claim interface") from e
         self.__sendcmd(self.AILLIO_CMD_INFO1)
         reply = self.__readreply(32)
         sn = unpack('h', reply[0:2])[0]
@@ -144,7 +144,7 @@ class AillioR1:
                 usb.util.release_interface(self.usbhandle,
                                            self.AILLIO_INTERFACE)
                 usb.util.dispose_resources(self.usbhandle)
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             self.usbhandle = None
 
@@ -271,7 +271,7 @@ class AillioR1:
                 state1 = self.__readreply(64)
                 self.__sendcmd(self.AILLIO_CMD_STATUS2)
                 state2 = self.__readreply(64)
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             if p.poll():
                 cmd = p.recv()
@@ -379,7 +379,7 @@ def extractProfileBulletDict(data,aw):
             if "dateTime" in data:
                 try:
                     dateQt = QDateTime.fromString(data["dateTime"],Qt.ISODate) # RFC 3339 date time
-                except:
+                except Exception: # pylint: disable=broad-except
                     dateQt = QDateTime.fromMSecsSinceEpoch (data["dateTime"])
                 if dateQt.isValid():
                     res["roastdate"] = encodeLocal(dateQt.date().toString())
@@ -387,18 +387,18 @@ def extractProfileBulletDict(data,aw):
                     res["roasttime"] = encodeLocal(dateQt.time().toString())
                     res["roastepoch"] = int(dateQt.toTime_t())
                     res["roasttzoffset"] = time.timezone
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             res["title"] = data["beanName"]
-        except:
+        except Exception: # pylint: disable=broad-except
             pass            
         if "roastName" in data:
             res["title"] = data["roastName"]
         try:
             if "roastNumber" in data:
                 res["roastbatchnr"] = int(data["roastNumber"])
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         if "beanName" in data:
             res["beans"] = data["beanName"]
@@ -416,18 +416,18 @@ def extractProfileBulletDict(data,aw):
                 if "weightRoasted" in data:
                     wroasted = float(data["weightRoasted"])
                 res["weight"] = [wgreen,wroasted,aw.qmc.weight_units[wunit]]
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             if "agtron" in data:
                 res["ground_color"] = int(round(data["agtron"]))
                 res["color_system"] = "Agtron"
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             if "roastMasterName" in data:
                 res["operator"] = data["roastMasterName"]
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         res["roastertype"] = "Aillio Bullet R1"
             
@@ -489,7 +489,7 @@ def extractProfileBulletDict(data,aw):
                 # RoastTime seems to interpret all index values 1 based, while Artisan takes the 0 based approach. We substruct 1
                 if idx > 1:
                     timeindex[i] = max(min(idx - 1,len(tx)-1),0)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
         if "roastEndIndex" in data:
@@ -520,9 +520,9 @@ def extractProfileBulletDict(data,aw):
                             specialeventsvalue.append(v)
                             specialeventsStrings.append("")
                             last = v
-        except:
-            pass        
-        
+        except Exception: # pylint: disable=broad-except
+            pass
+
         # extract events from newer JSON format
         try:
             for action in data["actions"]["actionTimeList"]:
@@ -538,7 +538,7 @@ def extractProfileBulletDict(data,aw):
                 specialeventstype.append(event_type)
                 specialeventsvalue.append(value)
                 specialeventsStrings.append(str(value))
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         if len(specialevents) > 0:
             res["specialevents"] = specialevents
@@ -589,7 +589,7 @@ def extractProfileBulletDict(data,aw):
             res["extradrawstyles2"] = ['default']
 
         return res
-    except:
+    except Exception: # pylint: disable=broad-except
 #        import traceback
 #        import sys
 #        traceback.print_exc(file=sys.stdout)
@@ -609,7 +609,7 @@ def extractProfileRoastWorld(url,aw):
             b = tree.xpath("//div[*='Bean']/*/a/text()")
             if b:
                 res["beans"] = b[0]
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
     return res
 
@@ -618,7 +618,6 @@ def extractProfileRoasTime(file,aw):
     data = json.load(infile)
     infile.close()
     return extractProfileBulletDict(data,aw)
-
 
 if __name__ == "__main__":
     R1 = AillioR1(debug=True)

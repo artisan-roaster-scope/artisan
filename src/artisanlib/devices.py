@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -38,7 +38,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBo
 
 class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None, aw = None, activeTab = 0):
-        super(DeviceAssignmentDlg,self).__init__(parent,aw)
+        super().__init__(parent,aw)
         self.setWindowTitle(QApplication.translate("Form Caption","Device Assignment", None))
         self.setModal(True)
 
@@ -184,21 +184,21 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             selected_device_index = 0
             try:
                 selected_device_index = self.sorted_devices.index(self.aw.qmc.devices[self.aw.qmc.device - 1])
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             self.devicetypeComboBox.setCurrentIndex(selected_device_index)
         try:
             self.arduinoETComboBox.setCurrentIndex(arduinoChannels.index(self.aw.ser.arduinoETChannel))
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             self.arduinoBTComboBox.setCurrentIndex(arduinoChannels.index(self.aw.ser.arduinoBTChannel))
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         arduinoATLabel =QLabel(QApplication.translate("Label", "AT Channel",None))
         
         arduinoTemperatures = ["None","T1","T2","T3","T4","T5","T6"]
-        self.arduinoATComboBox = QComboBox()        
+        self.arduinoATComboBox = QComboBox()
         self.arduinoATComboBox.addItems(arduinoTemperatures)
         self.arduinoATComboBox.setCurrentIndex(arduinoTemperatures.index(self.aw.ser.arduinoATChannel))
         self.showControlButton = QCheckBox(QApplication.translate("CheckBox", "PID Firmware",None))
@@ -285,7 +285,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 model.appendRow(item)
             try:
                 changeTriggersCombo.setCurrentIndex(self.aw.qmc.phidget1048_changeTriggersValues.index(self.aw.qmc.phidget1048_changeTriggers[i-1]))
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             
             changeTriggersCombo.setMinimumContentsLength(3)
@@ -309,7 +309,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 model.appendRow(item)
             try:
                 probeTypeCombo.setCurrentIndex(self.aw.qmc.phidget1048_types[i-1]-1)
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
                 
             probeTypeCombo.setMinimumContentsLength(0)
@@ -324,7 +324,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             rowLabel = QLabel(str(i-1))
             phidgetBox1048.addWidget(rowLabel,0,i)
      
-        self.dataRateCombo1048 = QComboBox()             
+        self.dataRateCombo1048 = QComboBox()
         self.dataRateCombo1048.setFocusPolicy(Qt.NoFocus)
         model = self.dataRateCombo1048.model()
         dataRateItems = self.createItems(self.aw.qmc.phidget_dataRatesStrings)
@@ -332,7 +332,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             model.appendRow(item)
         try:
             self.dataRateCombo1048.setCurrentIndex(self.aw.qmc.phidget_dataRatesValues.index(self.aw.qmc.phidget1048_dataRate))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.dataRateCombo1048.setMinimumContentsLength(5)
         self.dataRateCombo1048.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
@@ -376,7 +376,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             model.appendRow(item)
         try:
             self.changeTriggerCombos1045.setCurrentIndex(self.aw.qmc.phidget1045_changeTriggersValues.index(self.aw.qmc.phidget1045_changeTrigger))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
             
         #self.changeTriggerCombos1045.setMaximumSize(65,100)
@@ -402,7 +402,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             model.appendRow(item)
         try:
             self.dataRateCombo1045.setCurrentIndex(self.aw.qmc.phidget_dataRatesValues.index(self.aw.qmc.phidget1045_dataRate))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.dataRateCombo1045.setMinimumContentsLength(5)
         self.dataRateCombo1045.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
@@ -450,7 +450,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 model.appendRow(item)
             try:
                 gainCombo.setCurrentIndex(self.aw.qmc.phidget1046_gain[i-1] - 1)
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
           
             gainCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
@@ -470,7 +470,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 model.appendRow(item)
             try:
                 formulaCombo.setCurrentIndex(self.aw.qmc.phidget1046_formula[i-1])
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
 
             formulaCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
@@ -500,7 +500,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             model.appendRow(item)
         try:
             self.dataRateCombo1046.setCurrentIndex(self.aw.qmc.phidget_dataRatesValues.index(self.aw.qmc.phidget1046_dataRate))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass                
         self.dataRateCombo1046.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
         self.dataRateCombo1046.setMinimumContentsLength(5)
@@ -547,7 +547,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             model.appendRow(item)
         try:
             self.formulaCombo1200.setCurrentIndex(self.aw.qmc.phidget1200_formula)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.formulaCombo1200.setMinimumContentsLength(5)
         width = self.formulaCombo1200.minimumSizeHint().width()
@@ -562,7 +562,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             model.appendRow(item)
         try:
             self.wireCombo1200.setCurrentIndex(self.aw.qmc.phidget1200_wire)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.wireCombo1200.setMinimumContentsLength(5)
         width = self.wireCombo1200.minimumSizeHint().width()
@@ -582,7 +582,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             model.appendRow(item)
         try:
             self.changeTriggerCombo1200.setCurrentIndex(self.aw.qmc.phidget1200_changeTriggersValues.index(self.aw.qmc.phidget1200_changeTrigger))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.changeTriggerCombo1200.setMinimumContentsLength(4)
         width = self.changeTriggerCombo1200.minimumSizeHint().width()
@@ -598,7 +598,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             model.appendRow(item)
         try:
             self.rateCombo1200.setCurrentIndex(self.aw.qmc.phidget1200_dataRatesValues.index(self.aw.qmc.phidget1200_dataRate))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.rateCombo1200.setMinimumContentsLength(3)
         width = self.rateCombo1200.minimumSizeHint().width()
@@ -614,7 +614,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             model.appendRow(item)
         try:
             self.formulaCombo1200_2.setCurrentIndex(self.aw.qmc.phidget1200_2_formula)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.formulaCombo1200_2.setMinimumContentsLength(5)
         width = self.formulaCombo1200_2.minimumSizeHint().width()
@@ -629,7 +629,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             model.appendRow(item)
         try:
             self.wireCombo1200_2.setCurrentIndex(self.aw.qmc.phidget1200_2_wire)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.wireCombo1200_2.setMinimumContentsLength(5)
         width = self.wireCombo1200_2.minimumSizeHint().width()
@@ -649,7 +649,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             model.appendRow(item)
         try:
             self.changeTriggerCombo1200_2.setCurrentIndex(self.aw.qmc.phidget1200_changeTriggersValues.index(self.aw.qmc.phidget1200_2_changeTrigger))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.changeTriggerCombo1200_2.setMinimumContentsLength(4)
         width = self.changeTriggerCombo1200_2.minimumSizeHint().width()
@@ -665,7 +665,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             model.appendRow(item)
         try:
             self.rateCombo1200_2.setCurrentIndex(self.aw.qmc.phidget1200_dataRatesValues.index(self.aw.qmc.phidget1200_2_dataRate))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.rateCombo1200_2.setMinimumContentsLength(3)
         width = self.rateCombo1200_2.minimumSizeHint().width()
@@ -813,7 +813,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 model.appendRow(item)
             try:
                 dataRatesCombo.setCurrentIndex(self.aw.qmc.phidget_dataRatesValues.index(self.aw.qmc.phidget1018_dataRates[i-1]))
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
 
             dataRatesCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
@@ -836,7 +836,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 model.appendRow(item)
             try:
                 changeTriggersCombo.setCurrentIndex((self.aw.qmc.phidget1018_changeTriggersValues.index(self.aw.qmc.phidget1018_changeTriggers[i-1])))
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
 
             changeTriggersCombo.setMinimumContentsLength(5)
@@ -845,10 +845,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             changeTriggersCombo.setMinimumWidth(width)
             if platform.system() == 'Darwin':
                 changeTriggersCombo.setMaximumWidth(width)
-            
+
             self.changeTriggerCombos.append(changeTriggersCombo)
             phidgetBox1018.addWidget(changeTriggersCombo,3,i)
-                        
+
             asyncFlag = QCheckBox()
             asyncFlag.setFocusPolicy(Qt.NoFocus)
             asyncFlag.setChecked(True)
@@ -866,7 +866,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
             rowLabel = QLabel(str(i-1))
             phidgetBox1018.addWidget(rowLabel,0,i)
-           
+
         asyncLabel = QLabel(QApplication.translate("Label","Async", None))
         dataRateLabel = QLabel(QApplication.translate("Label","Rate", None))
         changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None))
@@ -971,10 +971,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         model = self.yoctoDataRateCombo.model()
         dataRateItems = self.createItems(self.aw.qmc.YOCTO_dataRatesStrings)
         for item in dataRateItems:
-                model.appendRow(item)
+            model.appendRow(item)
         try:
             self.yoctoDataRateCombo.setCurrentIndex(self.aw.qmc.YOCTO_dataRatesValues.index(self.aw.qmc.YOCTO_dataRate))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.yoctoDataRateCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
         self.yoctoDataRateCombo.setMinimumContentsLength(5)
@@ -1011,21 +1011,21 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         try:
             self.temperatureDeviceCombo.setCurrentIndex(self.aw.qmc.ambient_temperature_device)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         self.humidityDeviceCombo = QComboBox()
         self.humidityDeviceCombo.setFocusPolicy(Qt.NoFocus)
         self.humidityDeviceCombo.addItems(self.aw.qmc.humiditydevicefunctionlist)
         try:
             self.humidityDeviceCombo.setCurrentIndex(self.aw.qmc.ambient_humidity_device)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         self.pressureDeviceCombo = QComboBox()
         self.pressureDeviceCombo.setFocusPolicy(Qt.NoFocus)
         self.pressureDeviceCombo.addItems(self.aw.qmc.pressuredevicefunctionlist)
         try:
             self.pressureDeviceCombo.setCurrentIndex(self.aw.qmc.ambient_pressure_device)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         self.elevationSpinBox = QSpinBox()
         self.elevationSpinBox.setAlignment(Qt.AlignRight)
@@ -1119,7 +1119,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.updateETBTButton.setFocusPolicy(Qt.NoFocus)
         self.updateETBTButton.setToolTip(QApplication.translate("Tooltip","Recaclulates ET and BT and updates their values in the profile",None))
         self.updateETBTButton.clicked.connect(self.updateETBTinprofile)
-        
+
         adjustmentHelp = QHBoxLayout()
         adjustmentHelp.addWidget(self.updateETBTButton)
         adjustmentHelp.addStretch()
@@ -1252,7 +1252,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             else:
                 # enable ChangeTrigger selection
                 self.changeTriggerCombos1048[i].setEnabled(True)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     @pyqtSlot(int)
@@ -1272,7 +1272,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         else:
             # enable ChangeTrigger selection
             self.changeTriggerCombo1200.setEnabled(True)
-            
+
     @pyqtSlot(int)
     def asyncFlagStateChanged1200_2(self,x):
         if x == 0:
@@ -1281,7 +1281,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         else:
             # enable ChangeTrigger selection
             self.changeTriggerCombo1200_2.setEnabled(True)
-     
+
     @pyqtSlot(int)
     def asyncFlagStateChanged(self,x):
         try:
@@ -1292,7 +1292,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             else:
                 # enable ChangeTrigger and if that is 0 also DataRate selection
                 self.changeTriggerCombos[i].setEnabled(True)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     def createItems(self,strs):
@@ -1309,7 +1309,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         else:
             self.aw.qmc.PIDbuttonflag = False
         self.aw.showControlButton()
-    
+
     @pyqtSlot(int)
     def showControlbuttonToggle(self,i):
         if i:
@@ -1317,7 +1317,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         else:
             self.aw.qmc.Controlbuttonflag = False
         self.aw.showControlButton()
-            
+
     def createDeviceTable(self):
         try:
             columns = 15
@@ -1325,7 +1325,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 # rows have been already established
                 # save the current columnWidth to reset them afte table creation
                 self.aw.qmc.devicetablecolumnwidths = [self.devicetable.columnWidth(c) for c in range(self.devicetable.columnCount())]
-            
+
             nddevices = len(self.aw.qmc.extradevices)
             #self.devicetable.clear() # this crashes Ubuntu 16.04
 #            if nddevices != 0:
@@ -1373,7 +1373,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                             if dev_name[0] == "+":
                                 dev_name = dev_name[1:]
                             typeComboBox.setCurrentIndex(devices.index(dev_name))
-                        except Exception:
+                        except Exception: # pylint: disable=broad-except
                             pass
                         color1Button = QPushButton(self.aw.qmc.extradevicecolor1[i])
                         color1Button.setFocusPolicy(Qt.NoFocus)
@@ -1455,7 +1455,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         self.devicetable.setCellWidget(i,12,Delta2ComboBox)
                         self.devicetable.setCellWidget(i,13,Fill1SpinBox)
                         self.devicetable.setCellWidget(i,14,Fill2SpinBox)
-                    except Exception as e:
+                    except Exception as e: # pylint: disable=broad-except
 #                        import traceback
 #                        traceback.print_exc(file=sys.stdout)
                         pass
@@ -1467,11 +1467,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 for i in range(len(self.aw.qmc.devicetablecolumnwidths)):
                     try:
                         self.devicetable.setColumnWidth(i,self.aw.qmc.devicetablecolumnwidths[i])
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createDeviceTable(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createDeviceTable(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def copyDeviceTabletoClipboard(self,_=False):
@@ -1540,7 +1540,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.programedit.setText('"' + fileName + '"')
             else:
                 self.programedit.setText(fileName)
-    
+
     @pyqtSlot(bool)
     def loadoutprogramname(self,_):
         fileName = self.aw.ArtisanOpenFileDialog()
@@ -1576,9 +1576,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.enableDisableAddDeleteButtons()
             self.aw.qmc.resetlinecountcaches()
             self.aw.qmc.redraw(recomputeAllDeltas=False)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " adddevice(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " adddevice(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def deldevice(self,_):
@@ -1593,9 +1593,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.updateExtraLCDvisibility()
             self.aw.qmc.resetlinecountcaches()
             self.enableDisableAddDeleteButtons()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " deldevice(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " deldevice(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def resetextradevices(self,_):
@@ -1607,9 +1607,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.enableDisableAddDeleteButtons()
             #redraw
             self.aw.qmc.redraw(recomputeAllDeltas=False)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " resetextradevices(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " resetextradevices(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def delextradevice(self,x):
         try:
@@ -1635,7 +1635,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.extramarkers2.pop(x)
             self.aw.qmc.extramarkersizes1.pop(x)
             self.aw.qmc.extramarkersizes2.pop(x)
-            
+
             # visible curves before this one
             before1 = before2 = 0
             for j in range(x):
@@ -1647,7 +1647,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.aw.qmc.extratemp1lines.pop(before1)
             if self.aw.extraCurveVisibility2[x]:
                 self.aw.qmc.extratemp2lines.pop(before2)
-            
+
             self.aw.extraLCDvisibility1.pop(x)
             self.aw.extraLCDvisibility1.append(True) # keep length constant (self.aw.nLCDS)
             self.aw.extraLCDvisibility2.pop(x)
@@ -1691,11 +1691,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.createDeviceTable()
             self.aw.qmc.resetlinecountcaches()
             self.aw.qmc.redraw(recomputeAllDeltas=False)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "delextradevice(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "delextradevice(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def savedevicetable(self,redraw=True):
         try:
@@ -1708,10 +1708,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 mexpr2edit = self.devicetable.cellWidget(i,6)
                 try:
                     self.aw.qmc.extradevices[i] = self.aw.qmc.devices.index(str(typecombobox.currentText())) + 1
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     try: # might be a +device
                         self.aw.qmc.extradevices[i] = self.aw.qmc.devices.index("+" + str(typecombobox.currentText())) + 1
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         self.aw.qmc.extradevices[i] = 0
                 if name1edit:
                     self.aw.qmc.extraname1[i] = name1edit.text()
@@ -1725,12 +1725,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 l1 = "<b>" + self.aw.qmc.extraname1[i] + "</b>"
                 try:
                     self.aw.extraLCDlabel1[i].setText(l1.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3]))
-                except:
+                except Exception: # pylint: disable=broad-except
                     self.aw.extraLCDlabel1[i].setText(l1)
                 l2 = "<b>" + self.aw.qmc.extraname2[i] + "</b>"
                 try:
                     self.aw.extraLCDlabel2[i].setText(l2.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3]))
-                except:
+                except Exception: # pylint: disable=broad-except
                     self.aw.extraLCDlabel2[i].setText(l2)
                 if mexpr2edit:
                     self.aw.qmc.extramathexpression1[i] = mexpr1edit.text()
@@ -1743,23 +1743,23 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             #update legend with new curves
             if redraw:
                 self.aw.qmc.redraw(recomputeAllDeltas=False)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "savedevicetable(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "savedevicetable(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def updateVirtualdevicesinprofile_clicked(self,_):
         self.updateVirtualdevicesinprofile(redraw=True)
-        
+
     def updateVirtualdevicesinprofile(self,redraw=True):
         try:
             self.savedevicetable(redraw=False)
             if self.aw.calcVirtualdevices(update=True):
                 if redraw:
                     self.aw.qmc.redraw(recomputeAllDeltas=False)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateVirtualdevicesinprofile(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateVirtualdevicesinprofile(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def updateETBTinprofile(self,_):
@@ -1802,9 +1802,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.sendmessage(QApplication.translate("Message", "Symbolic values were not updated.",None))
             else:
                 self.aw.sendmessage(QApplication.translate("Message", "Nothing here to process.",None))
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateETBTinprofile(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateETBTinprofile(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(int)
     def updateLCDvisibility1(self,x):
@@ -1898,10 +1898,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.devicetable.cellWidget(i,2).setText(colorname)
                     self.aw.checkColors([(self.aw.qmc.extraname2[i], self.aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Background",None), self.aw.qmc.palette['background'])])
                     self.aw.checkColors([(self.aw.qmc.extraname2[i], self.aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Legend bkgnd",None),self.aw.qmc.palette['background'])])
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setextracolor(): {0}").format(str(e)),exc_tb.tb_lineno)
-
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setextracolor(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def close(self):
         self.closeHelp()
@@ -1920,7 +1919,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def okEvent(self):
         try:
-        
             self.aw.qmc.device_logging = self.deviceLoggingFlag.isChecked()
             
             #save any extra devices here
@@ -2787,7 +2785,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.BTcurve = self.BTcurve.isChecked()
             self.aw.qmc.ETlcd = self.ETlcd.isChecked()
             self.aw.qmc.BTlcd = self.BTlcd.isChecked()
-            
+
             swap = self.swaplcds.isChecked()
             # swap BT/ET lcds on leaving the dialog
             if self.aw.qmc.swaplcds != swap:
@@ -2799,7 +2797,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.qmc.swaplcds = swap
                     self.aw.largeLCDs_dialog.reLayout()
             self.aw.qmc.swaplcds = swap
-            
+
             # close all ports to force a reopen
             self.aw.qmc.disconnectProbes()
             
@@ -2810,16 +2808,16 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.YOCTO_async[0] = self.yoctoAyncChanFlag.isChecked()
             self.aw.qmc.YOCTO_async[1] = self.yoctoAyncChanFlag.isChecked() # flag for channel 1 is ignored and only that of channel 0 is respected for both channels
             self.aw.qmc.YOCTO_dataRate = self.aw.qmc.YOCTO_dataRatesValues[self.yoctoDataRateCombo.currentIndex()]
-            
+
             # Ambient confifgurations
             self.aw.qmc.ambient_temperature_device = self.temperatureDeviceCombo.currentIndex()
             self.aw.qmc.ambient_humidity_device = self.humidityDeviceCombo.currentIndex()
             self.aw.qmc.ambient_pressure_device = self.pressureDeviceCombo.currentIndex()
             try:
                 self.aw.qmc.elevation = int(self.elevationSpinBox.value())
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
-            
+
             # Phidget configurations
             for i in range(4):
                 self.aw.qmc.phidget1048_types[i] = self.probeTypeCombos[i].currentIndex()+1
@@ -2856,7 +2854,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.phidgetRemoteOnlyFlag = self.phidgetBoxRemoteOnlyFlag.isChecked()
             try:
                 self.aw.qmc.phidgetPort = int(self.phidgetPort.text())
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             for i in range(8):
                 self.aw.qmc.phidget1018_async[i] = self.asyncCheckBoxes[i].isChecked()
@@ -2873,13 +2871,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.aw.largePIDLCDs_dialog.updateVisiblitiesPID()
             if self.aw.largeExtraLCDs_dialog:
                 self.aw.largeExtraLCDs_dialog.reLayout() # names, styles and visibilties might have changed
-            
+
             # restart PhidgetManager
             try:
                 self.aw.qmc.restartPhidgetManager()
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
-            
+
             self.aw.qmc.redraw(recomputeAllDeltas=False)
             self.aw.sendmessage(message)
             #open serial conf Dialog
@@ -2888,9 +2886,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if not(self.aw.qmc.device in self.aw.qmc.nonSerialDevices):
                 self.aw.setcommport()
             self.close()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " device accept(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " device accept(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def showExtradevHelp(self):
@@ -2922,4 +2920,3 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     @pyqtSlot(int)
     def tabSwitched(self,_):
         self.closeHelp()
-        

@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -27,7 +27,7 @@ from artisanlib.widgets import MyQComboBox
 
 class ArtisanDialog(QDialog):
     def __init__(self, parent=None, aw = None):
-        super(ArtisanDialog,self).__init__(parent)
+        super().__init__(parent)
         self.aw = aw # the Artisan application window
         
         # IMPORTANT NOTE: if dialog items have to be access after it has been closed, this Qt.WA_DeleteOnClose attribute 
@@ -64,7 +64,7 @@ class ArtisanDialog(QDialog):
         cancelAction = QAction(self, triggered=lambda _:self.dialogbuttons.rejected.emit())
         try:
             cancelAction.setShortcut(QKeySequence.Cancel)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         self.dialogbuttons.button(QDialogButtonBox.Cancel).addActions([cancelAction])
     
@@ -88,11 +88,11 @@ class ArtisanDialog(QDialog):
         if key == 16777216 or (key == 87 and modifiers == Qt.ControlModifier): #ESCAPE or CMD-W
             self.close()
         else:
-            super(ArtisanDialog, self).keyPressEvent(event)
+            super().keyPressEvent(event)
 
 class ArtisanResizeablDialog(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
-        super(ArtisanResizeablDialog,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         if str(platform.system()) == 'Windows':
             windowFlags = self.windowFlags()
             windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
@@ -100,7 +100,7 @@ class ArtisanResizeablDialog(ArtisanDialog):
 
 class ArtisanMessageBox(QMessageBox):
     def __init__(self, parent = None, title=None, text=None, timeout=0, modal=True):
-        super(ArtisanMessageBox, self).__init__(parent)
+        super().__init__(parent)
         self.setWindowTitle(title)
         self.setText(text)
         self.setModal(modal)
@@ -122,7 +122,7 @@ class ArtisanMessageBox(QMessageBox):
 
 class HelpDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None, title = "", content = ""):
-        super(HelpDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setWindowTitle(title) 
         self.setModal(False)
         
@@ -159,7 +159,7 @@ class HelpDlg(ArtisanDialog):
 
 class ArtisanInputDialog(ArtisanDialog):
     def __init__(self, parent = None, aw = None, title="",label=""):
-        super(ArtisanInputDialog,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         
         self.url = ""
         
@@ -196,8 +196,8 @@ class ArtisanInputDialog(ArtisanDialog):
             self.inputLine.setText(urls[0].toString())
 
 class ArtisanComboBoxDialog(ArtisanDialog):
-    def __init__(self, parent = None, aw = None, title="",label="",choices=[],default=-1):
-        super(ArtisanComboBoxDialog,self).__init__(parent, aw)
+    def __init__(self, parent = None, aw = None, title="",label="",choices=None,default=-1):
+        super().__init__(parent, aw)
         
         self.idx = None
         
@@ -205,7 +205,8 @@ class ArtisanComboBoxDialog(ArtisanDialog):
         self.setModal(True)
         label = QLabel(label)
         self.comboBox = MyQComboBox()
-        self.comboBox.addItems(choices)
+        if choices is not None:
+            self.comboBox.addItems(choices)
         self.comboBox.setCurrentIndex(default)
         layout = QVBoxLayout()
         layout.addWidget(label)

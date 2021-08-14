@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -32,7 +32,7 @@ from PyQt5.QtWidgets import (QApplication, QLabel,
 
 class designerconfigDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
-        super(designerconfigDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setWindowTitle(QApplication.translate("Form Caption","Designer Config",None))
         self.setModal(True)
         #landmarks
@@ -450,8 +450,8 @@ class designerconfigDlg(ArtisanDialog):
         for i in range(len(strings)):
             if len(str(strings[i])) < 5:
                 return i
-        else:
-            return 1000
+            else:
+                return 1000
 
     #supporting function for settimes()
     @pyqtSlot(bool)
@@ -478,7 +478,7 @@ class designerconfigDlg(ArtisanDialog):
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue("DesignerPosition",self.frameGeometry().topLeft())
-        super(designerconfigDlg,self).accept()
+        super().accept()
 
     #reset
     @pyqtSlot(bool)
@@ -602,9 +602,12 @@ class designerconfigDlg(ArtisanDialog):
             self.aw.qmc.redrawdesigner()
 
 class pointDlg(ArtisanDialog):
-    def __init__(self,parent = None, aw = None, values = [0,0]):
-        super(pointDlg,self).__init__(parent, aw)
-        self.values = values
+    def __init__(self,parent = None, aw = None, values = None):
+        super().__init__(parent, aw)
+        if values is None:
+            values = [0,0]
+        else:
+            self.values = values
         self.setWindowTitle(QApplication.translate("Form Caption","Add Point",None))
         self.tempEdit = QLineEdit(str(int(round(self.values[1]))))
         self.tempEdit.setValidator(QIntValidator(0, 999, self.tempEdit))

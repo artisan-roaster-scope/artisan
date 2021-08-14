@@ -7,20 +7,17 @@ from PyQt5.QtCore import Qt
 ##########################################################################
 
 class QRImage(qrcode.image.base.BaseImage):
-    def __init__(self, border, width, box_size):
-        self.border = border
-        self.width = width
-        self.box_size = box_size
-        size = (width + border * 2) * box_size
-        self._image = QImage(
-            size, size, QImage.Format_RGB16)
-        self._image.fill(Qt.white)
+
+    def new_image(self, **_kwargs):
+        img = QImage(self.pixel_size, self.pixel_size, QImage.Format_RGB16)
+        img.fill(Qt.white)
+        return img
 
     def pixmap(self):
-        return QPixmap.fromImage(self._image)
+        return QPixmap.fromImage(self.get_image())
 
     def drawrect(self, row, col):
-        painter = QPainter(self._image)
+        painter = QPainter(self.get_image())
         painter.fillRect(
             (col + self.border) * self.box_size,
             (row + self.border) * self.box_size,
@@ -29,7 +26,12 @@ class QRImage(qrcode.image.base.BaseImage):
 
     def save(self, stream, kind=None):
         pass
+    
+    def process(self):
+        pass
 
+    def drawrect_context(self, row, col, active, context):
+        pass
 
 def QRlabel(url_str):
     qr = qrcode.QRCode(

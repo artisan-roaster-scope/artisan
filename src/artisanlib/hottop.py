@@ -61,14 +61,14 @@ def openport(p):
     try:
         if not p.isOpen():
             p.open()
-    except Exception:
+    except Exception: # pylint: disable=broad-except
         pass
         
 def closeport(p):
     try:
         if p == None and p.isOpen():
             p.close()
-    except Exception:
+    except Exception: # pylint: disable=broad-except
         pass
         
 def gettemperatures(p,retry=True):
@@ -114,29 +114,22 @@ def gettemperatures(p,retry=True):
                     DRUM_MOTOR = hex2int(r[17])
                     COOLING_MOTOR = hex2int(r[18])
                     CHAFF_TRAY = hex2int(r[19])
-    except Exception:
+    except Exception: # pylint: disable=broad-except
         pass
     return BT, ET, HEATER, FAN, MAIN_FAN, SOLENOID, DRUM_MOTOR, COOLING_MOTOR, CHAFF_TRAY
 
 def doWork(interval, comport, baudrate, bytesize, parity, stopbits, timeout,
         aBT, aET, aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
         aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aCONTROL):
+    global SP # pylint: disable=global-statement
     SP = serial.Serial()
     # configure serial port
-    if serial.VERSION.split(".")[0].strip() == "2":
-        SP.setPort(comport)
-        SP.setBaudrate(baudrate)
-        SP.setByteSize(bytesize)
-        SP.setParity(parity)
-        SP.setStopbits(stopbits)
-        SP.setTimeout(timeout)
-    else:
-        SP.port = comport
-        SP.baudrate = baudrate
-        SP.bytesize = bytesize
-        SP.parity = parity
-        SP.stopbits = stopbits
-        SP.timeout = timeout    
+    SP.port = comport
+    SP.baudrate = baudrate
+    SP.bytesize = bytesize
+    SP.parity = parity
+    SP.stopbits = stopbits
+    SP.timeout = timeout    
     while True:
         # logging part
         BT, ET, HEATER, FAN, MAIN_FAN, SOLENOID, DRUM_MOTOR, COOLING_MOTOR, CHAFF_TRAY = gettemperatures(SP)
@@ -199,7 +192,7 @@ def sendControl(p,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOT
             #p.flushOutput() # deprecated in v3
             p.reset_output_buffer()
             p.write(cmd) 
-    except Exception:
+    except Exception: # pylint: disable=broad-except
 #        import traceback
 #        import sys
 #        traceback.print_exc(file=sys.stdout)
@@ -286,7 +279,7 @@ def setHottop(heater=None,fan=None,main_fan=None,solenoid=None,drum_motor=None,c
 # interval has to be smaller than 1 (= 1sec)
 def startHottop(interval=1,comport="COM4",baudrate=115200,bytesize=8,parity='N',stopbits=1,timeout=0.5):
     global process, xCONTROL, xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
-        xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR
+        xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR # pylint: disable=global-statement
     try:
         if process:
             return False
@@ -318,16 +311,16 @@ def startHottop(interval=1,comport="COM4",baudrate=115200,bytesize=8,parity='N',
                 xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xCONTROL))
             process.start()
             return True
-    except:
+    except Exception: # pylint: disable=broad-except
         return False
 
 def stopHottop():
-    global process
+    global process # pylint: disable=global-statement
     if process:
         process.terminate()
         process.join()
         process = None
 
 def isHottopLoopRunning():
-    global process
+    global process # pylint: disable=global-statement
     return bool(process)

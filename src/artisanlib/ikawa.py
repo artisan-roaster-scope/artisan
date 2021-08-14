@@ -22,7 +22,7 @@ def extractProfileIkawaCSV(file,_):
 
     # set profile date from the file name if it has the format "IKAWA yyyy-mm-dd hhmmss.csv"
     filename = os.path.basename(file)
-    p = re.compile('IKAWA \d{4,4}-\d{2,2}-\d{2,2} \d{6,6}.csv')
+    p = re.compile(r'IKAWA \d{4,4}-\d{2,2}-\d{2,2} \d{6,6}.csv')
     if p.match(filename):
         s = filename[6:-4] # the extracted date time string
         date = QDateTime.fromString(s,"yyyy-MM-dd HHmmss")
@@ -125,7 +125,7 @@ def extractProfileIkawaCSV(file,_):
                         specialeventsStrings.append("{}".format(fan) + "%")
                 else:
                     fan_last = None
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         if "heater power (%)" in item or "heater" in item:
             try:
@@ -155,7 +155,7 @@ def extractProfileIkawaCSV(file,_):
                         specialeventsStrings.append("{}".format(heater) + "%")
                 else:
                     heater_last = None
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
     csvFile.close()
     

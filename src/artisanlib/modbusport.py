@@ -16,12 +16,13 @@
 # AUTHOR
 # Marko Luther, 2019
 
+import sys
 import time
 
 from PyQt5.QtCore import QSemaphore
 from PyQt5.QtWidgets import QApplication
 
-from artisanlib.util import * #@UnusedWildImport
+from artisanlib.util import stringp
 
 def convert_to_bcd(decimal):
     ''' Converts a decimal value to a bcd value
@@ -53,7 +54,6 @@ def convert_from_bcd(bcd):
     return decimal
 
 def getBinaryPayloadBuilder(byteorderLittle=True,wordorderLittle=False):
-    import pymodbus.version as pymodbus_version
     from pymodbus.constants import Endian
     from pymodbus.payload import BinaryPayloadBuilder
     if byteorderLittle: 
@@ -64,15 +64,9 @@ def getBinaryPayloadBuilder(byteorderLittle=True,wordorderLittle=False):
         wordorder = Endian.Little
     else:
         wordorder = Endian.Big
-    if pymodbus_version.version.major > 1 or (pymodbus_version.version.major == 1 and pymodbus_version.version.minor > 3):
-        # pymodbus v1.4 and newer
-        return BinaryPayloadBuilder(byteorder=byteorder, wordorder=wordorder)
-    else:
-        # pymodbus v1.3 and older
-        return BinaryPayloadBuilder(endian=byteorder)
+    return BinaryPayloadBuilder(byteorder=byteorder, wordorder=wordorder)
 
 def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,wordorderLittle=False):
-    import pymodbus.version as pymodbus_version
     from pymodbus.constants import Endian
     from pymodbus.payload import BinaryPayloadDecoder
     if byteorderLittle:
@@ -83,12 +77,7 @@ def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,wordorde
         wordorder = Endian.Little
     else:
         wordorder = Endian.Big
-    if pymodbus_version.version.major > 1 or (pymodbus_version.version.major == 1 and pymodbus_version.version.minor > 3):
-        # pymodbus v1.4 and newer
-        return BinaryPayloadDecoder.fromRegisters(registers, byteorder=byteorder, wordorder=wordorder) 
-    else:
-        # pymodbus v1.3 and older
-        return BinaryPayloadDecoder.fromRegisters(registers, endian=byteorder)
+    return BinaryPayloadDecoder.fromRegisters(registers, byteorder=byteorder, wordorder=wordorder)
 
 
 ###########################################################################################
@@ -192,7 +181,7 @@ class modbusport(object):
     def disconnect(self):
         try:
             self.master.close()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.master = None
     
@@ -248,7 +237,7 @@ class modbusport(object):
                                 timeout=0.3, #self.timeout
                                 )
                         self.readRetries = 0
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         self.master = ModbusTcpClient(
                                 host=self.host, 
                                 port=self.port,
@@ -266,7 +255,7 @@ class modbusport(object):
                             timeout=0.2, #self.timeout
                             )
                         self.readRetries = 0
-                    except: # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
+                    except Exception: # pylint: disable=broad-except # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
                         self.master = ModbusUdpClient(
                             host=self.host, 
                             port=self.port,
@@ -293,9 +282,9 @@ class modbusport(object):
                 time.sleep(.5) # avoid possible hickups on startup
                 if self.isConnected() != None:
                     self.aw.sendmessage(QApplication.translate("Message", "Connected via MODBUS", None))
-            except Exception as ex:
+            except Exception as ex: # pylint: disable=broad-except
                 _, _, exc_tb = sys.exc_info()
-                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " connect() {0}").format(str(ex)),exc_tb.tb_lineno)
+                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " connect() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
     
 ########## MODBUS optimizer for fetching register data in batches
 
@@ -370,7 +359,7 @@ class modbusport(object):
                                     res = self.master.read_holding_registers(register,count,unit=slave)
                                 elif code == 4:
                                     res = self.master.read_input_registers(register,count,unit=slave)
-                            except Exception:
+                            except Exception: # pylint: disable=broad-except
                                 res = None
                             if res is None or res.isError(): # requires pymodbus v1.5.1
                                 if retry > 0:
@@ -413,12 +402,12 @@ class modbusport(object):
                                 self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
                             self.cacheReadings(code,slave,register,res.registers)
 
-        except Exception: # as ex:
+        except Exception: # pylint: disable=broad-except
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            _, _, exc_tb = sys.exc_info()
-#            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
+#            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readSingleRegister() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
             self.commError = True
         finally:
@@ -435,13 +424,13 @@ class modbusport(object):
             self.connect()
             self.master.write_coils(int(register),list(values),unit=int(slave))
             time.sleep(.3) # avoid possible hickups on startup
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
-                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeCoils() {0}").format(str(ex)),exc_tb.tb_lineno)
+                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeCoils() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)    
@@ -454,11 +443,11 @@ class modbusport(object):
             self.connect()
             self.master.write_coil(int(register),value,unit=int(slave))
             time.sleep(.3) # avoid possible hickups on startup
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
-                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeCoil() {0}").format(str(ex)),exc_tb.tb_lineno)
+                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeCoil() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -485,14 +474,14 @@ class modbusport(object):
             self.connect()
             self.master.write_register(int(register),int(round(value)),unit=int(slave))
             time.sleep(.03) # avoid possible hickups on startup
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            _logger.debug("writeSingleRegister exception: %s" % str(ex))
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
-                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
+                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeSingleRegister() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -507,13 +496,13 @@ class modbusport(object):
             self.connect()
             self.master.mask_write_register(int(register),int(and_mask),int(or_mask),unit=int(slave))
             time.sleep(.03)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             import traceback
             traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
-                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeMask() {0}").format(str(ex)),exc_tb.tb_lineno)
+                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeMask() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -534,11 +523,11 @@ class modbusport(object):
             self.connect()
             self.master.write_registers(int(register),values,unit=int(slave))
             time.sleep(.03)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
-                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeRegisters() {0}").format(str(ex)),exc_tb.tb_lineno)
+                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeRegisters() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -557,11 +546,11 @@ class modbusport(object):
             payload = builder.build() # .tolist()
             self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
             time.sleep(.03)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
-                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeWord() {0}").format(str(ex)),exc_tb.tb_lineno)
+                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeWord() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -578,11 +567,11 @@ class modbusport(object):
             payload = builder.build() # .tolist()
             self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
             time.sleep(.03)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
-                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeWord() {0}").format(str(ex)),exc_tb.tb_lineno)
+                self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeWord() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -627,12 +616,12 @@ class modbusport(object):
                     self.commError = False
                     self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
                 return r
-        except Exception: # as ex:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
 #            _, _, exc_tb = sys.exc_info()
-#            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
+#            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readFloat() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
         finally:
@@ -708,12 +697,12 @@ class modbusport(object):
                     self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
                 time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
                 return convert_from_bcd(r)
-        except Exception: # as ex:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
 #            _, _, exc_tb = sys.exc_info()
-#            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readBCD() {0}").format(str(ex)),exc_tb.tb_lineno)
+#            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readBCD() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
             self.commError = True
@@ -762,7 +751,7 @@ class modbusport(object):
                 res = self.master.read_input_registers(int(register),1,unit=int(slave))
             else: # code==3
                 res = self.master.read_holding_registers(int(register),1,unit=int(slave))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             res = None
         if res is not None and not res.isError(): # requires pymodbus v1.5.1
             if code in [1,2]:
@@ -814,7 +803,7 @@ class modbusport(object):
                             res = self.master.read_input_registers(int(register),1,unit=int(slave))
                         else: # code==3
                             res = self.master.read_holding_registers(int(register),1,unit=int(slave))
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         res = None
                     if res is None or res.isError(): # requires pymodbus v1.5.1
                         if retry > 0:
@@ -840,12 +829,12 @@ class modbusport(object):
                         self.commError = False
                         self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
                     return r
-        except Exception: # as ex:
+        except Exception: # pylint: disable=broad-except
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            _, _, exc_tb = sys.exc_info()
-#            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
+#            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readSingleRegister() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
             self.commError = True
@@ -920,12 +909,12 @@ class modbusport(object):
                     self.commError = False
                     self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
                 return r
-        except Exception: # as ex:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
 #            _, _, exc_tb = sys.exc_info()
-#            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
+#            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readFloat() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
         finally:
@@ -991,7 +980,7 @@ class modbusport(object):
                             res = self.master.read_holding_registers(int(register),1,unit=int(slave))
                         else:
                             res = self.master.read_input_registers(int(register),1,unit=int(slave))
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         res = None
                     if res is None or res.isError(): # requires pymodbus v1.5.1
                         if retry > 0:
@@ -1008,12 +997,12 @@ class modbusport(object):
                     self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
                 time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
                 return convert_from_bcd(r)
-        except Exception: # as ex:
+        except Exception: # pylint: disable=broad-except
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            _, _, exc_tb = sys.exc_info()
-#            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readBCDint() {0}").format(str(ex)),exc_tb.tb_lineno)
+#            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readBCDint() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
             self.commError = True

@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -36,7 +36,7 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QH
 
 class EventsDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None, aw = None, activeTab = 0):
-        super(EventsDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         
         self.app = QCoreApplication.instance()
         
@@ -49,6 +49,7 @@ class EventsDlg(ArtisanResizeablDialog):
         settings = QSettings()
         if settings.contains("EventsGeometry"):
             self.restoreGeometry(settings.value("EventsGeometry"))
+        
         self.storeState()
 
         ## TAB 7
@@ -1100,7 +1101,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.SAMPLINGbuttonActionInterval.setMaximumWidth(70)
         try:
             self.SAMPLINGbuttonActionInterval.setCurrentIndex(self.sampling_delays.index(self.aw.qmc.extra_event_sampling_delay))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         self.RESETbuttonLabel = QLabel(QApplication.translate("Label", "RESET", None))
         self.RESETbuttonActionType = QComboBox()
@@ -1893,15 +1894,15 @@ class EventsDlg(ArtisanResizeablDialog):
     def localSetbuttonsfrom(self,pindex):
         copy = self.aw.buttonpalette[pindex][:]
         if len(copy):
-            self.extraeventstypes = copy[0][:]
-            self.extraeventsvalues = copy[1][:]
-            self.extraeventsactions = copy[2][:]
-            self.extraeventsvisibility = copy[3][:]
-            self.extraeventsactionstrings = copy[4][:]
-            self.extraeventslabels = copy[5][:]
-            self.extraeventsdescriptions = copy[6][:]
-            self.extraeventbuttoncolor = copy[7][:]
-            self.extraeventbuttontextcolor = copy[8][:]
+            self.extraeventstypes = copy[0][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventsvalues = copy[1][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventsactions = copy[2][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventsvisibility = copy[3][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventsactionstrings = copy[4][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventslabels = copy[5][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventsdescriptions = copy[6][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventbuttoncolor = copy[7][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventbuttontextcolor = copy[8][:] # pylint: disable=attribute-defined-outside-init
             # added slider settings
             if len(copy)>9 and len(copy[9]) == 4:
                 self.aw.eventslidervisibilities = copy[9][:]
@@ -1929,11 +1930,11 @@ class EventsDlg(ArtisanResizeablDialog):
             else:
                 self.aw.eventquantifieractive = [0,0,0,0]
             if len(copy)>15 and len(copy[15]) == 4:
-                self.eventquantifiersource = copy[15][:]
+                self.aw.eventquantifiersource = copy[15][:]
             else:
                 self.aw.eventquantifiersource = [0,0,0,0]
             if len(copy)>16 and len(copy[16]) == 4:
-                self.eventquantifiermin = copy[16][:]
+                self.aw.eventquantifiermin = copy[16][:]
             else:
                 self.aw.eventquantifiermin = [0,0,0,0]
             if len(copy)>17 and len(copy[17]) == 4:
@@ -2299,7 +2300,7 @@ class EventsDlg(ArtisanResizeablDialog):
         for i in range(len(self.aw.eventbuttontablecolumnwidths)):
             try:
                 self.eventbuttontable.setColumnWidth(i,self.aw.eventbuttontablecolumnwidths[i])
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
 
     @pyqtSlot(bool)
@@ -2536,7 +2537,7 @@ class EventsDlg(ArtisanResizeablDialog):
                 self.eventbuttontable.cellWidget(x,6).currentIndexChanged.disconnect() # visibility combo
                 self.eventbuttontable.cellWidget(x,7).clicked.disconnect() # color button
                 self.eventbuttontable.cellWidget(x,8).clicked.disconnect() # color text button
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
     @pyqtSlot(bool)
@@ -2578,7 +2579,7 @@ class EventsDlg(ArtisanResizeablDialog):
         try:
             if type(QApplication.focusWidget()) == QLineEdit:
                 QApplication.focusWidget().editingFinished.emit()
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 
         bindex = len(self.extraeventstypes)
@@ -2609,7 +2610,7 @@ class EventsDlg(ArtisanResizeablDialog):
                 event_buttoncolor = self.extraeventbuttoncolor[selected_idx]
                 event_textcolor = self.extraeventbuttontextcolor[selected_idx]
                 event_label = self.extraeventslabels[selected_idx]
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
 
         if bindex >= 0:
@@ -2995,7 +2996,7 @@ class EventsDlg(ArtisanResizeablDialog):
             self.aw.qmc.extrabuttonactionstrings[2] = self.SAMPLINGbuttonActionString.text()
             try:
                 self.aw.qmc.extra_event_sampling_delay = self.sampling_delays[self.SAMPLINGbuttonActionInterval.currentIndex()]
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
             self.aw.qmc.xextrabuttonactionstrings[0] = self.RESETbuttonActionString.text()
             self.aw.qmc.xextrabuttonactionstrings[1] = self.STARTbuttonActionString.text()
@@ -3046,11 +3047,11 @@ class EventsDlg(ArtisanResizeablDialog):
             #save special event annotations
             self.saveAnnotationsSettings()
             self.aw.closeEventSettings()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updatetypes(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updatetypes(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def closeEvent(self,_):
         self.closeHelp()
@@ -3092,7 +3093,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
 class customEventDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None, time_idx=0,description="",event_type=4,value=0):
-        super(customEventDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         if time_idx != 0:
             event_time = self.aw.qmc.timex[time_idx]
             if self.aw.qmc.timeindex[0] > -1:
@@ -3143,4 +3144,4 @@ class customEventDlg(ArtisanDialog):
         evalue = self.valueEdit.text()
         self.value = self.aw.qmc.str2eventsvalue(str(evalue))
         self.type = self.typeCombo.currentIndex()
-        super(customEventDlg,self).accept()
+        super().accept()

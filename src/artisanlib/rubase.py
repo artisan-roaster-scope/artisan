@@ -3,16 +3,11 @@
 # ABOUT
 # RUBASE CSV Roast Profile importer for Artisan
 
-import time as libtime
 import os
 import io
 import csv
-import re
-            
-from PyQt5.QtCore import QDateTime,Qt
-from PyQt5.QtWidgets import QApplication
 
-from artisanlib.util import encodeLocal
+from PyQt5.QtWidgets import QApplication
 
 # returns a dict containing all profile information contained in the given Rubase CSV file
 def extractProfileRubaseCSV(file,aw):
@@ -66,7 +61,7 @@ def extractProfileRubaseCSV(file,aw):
         et = -1
         try:
             et = float(item['ET'])
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         temp1.append(et)
         
@@ -76,42 +71,42 @@ def extractProfileRubaseCSV(file,aw):
             # after 2min we mark DRY if not auto adjusted
             if timeindex[1] == 0 and i>60 and (not aw.qmc.phasesbuttonflag) and bt >= aw.qmc.phases[1]:
                 timeindex[1] = max(0,i)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         temp2.append(bt)
         
         heater = -1
         try:
             heater = float(item['Heater'])
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         extra1.append(heater)
 
         fan = -1
         try:
             fan = float(item['Fan'])
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         extra2.append(fan)
 
         humidity = -1
         try:
             humidity = float(item['Humidity'])
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         extra3.append(humidity)
 
         pressure = -1
         try:
             pressure = float(item['Pressure'])
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         extra4.append(pressure)
 
         drum = -1
         try:
             drum = float(item['Drum'])
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         extra5.append(drum)
         
@@ -142,7 +137,7 @@ def extractProfileRubaseCSV(file,aw):
                         specialeventsStrings.append("{}".format(float(item["Fan"])) + "%")
                 else:
                     fan_last = None
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         if "Heater" in item:
             try:
@@ -169,7 +164,7 @@ def extractProfileRubaseCSV(file,aw):
                         specialeventsStrings.append("{}".format(float(item["Heater"])) + "%")
                 else:
                     heater_last = None
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         i = i + 1
     csvFile.close()
@@ -187,12 +182,12 @@ def extractProfileRubaseCSV(file,aw):
     # mark FCs
     try:
         timeindex[2] = max(0,int(header_row[19]))
-    except:
+    except Exception: # pylint: disable=broad-except
         pass
     # mark SCs
     try:
         timeindex[4] = max(0,int(header_row[21]))
-    except:
+    except Exception: # pylint: disable=broad-except
         pass
 # not sure if index 23 holds the correct data
 #    # mark DROP

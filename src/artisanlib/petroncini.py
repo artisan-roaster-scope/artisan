@@ -70,8 +70,8 @@ def extractProfilePetronciniCSV(file,_):
                 date = QDate(int(item['Year']),int(item['Month']),int(item['Day']))
                 time = QTime(int(item['Hour']),int(item['Minute']),int(item['Second']))
                 roast_date = QDateTime(date,time)
-            except:
-                passs
+            except Exception:  # pylint: disable=broad-except
+                pass
         #
         if 'Outlet Temperature' in item:
             temp1.append(float(item['Outlet Temperature']))
@@ -122,7 +122,7 @@ def extractProfilePetronciniCSV(file,_):
                         specialeventsStrings.append(item["power"] + "%")
                 else:
                     power_last = None
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 pass
 
     csvFile.close()
@@ -157,7 +157,7 @@ def extractProfilePetronciniCSV(file,_):
         res["specialeventstype"] = specialeventstype
         res["specialeventsvalue"] = specialeventsvalue
         res["specialeventsStrings"] = specialeventsStrings
-        if power_event or speed_event:
+        if power_event:
             # first set etypes to defaults
             res["etypes"] = [QApplication.translate("ComboBox", "Air",None),
                              QApplication.translate("ComboBox", "Drum",None),

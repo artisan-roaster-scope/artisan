@@ -97,7 +97,7 @@ fetch_max_blocks=false
 [Sliders]
 ModeTempSliders=C
 eventslidercoarse=0, 0, 0, 0
-eventslidersflags=0, 0, 0
+eventslidersflags=0, 1, 1
 eventslidertemp=0, 0, 0, 0
 slideractions=2, 2, 0, 2
 slidercommands="write([1,1,{}])", "write([10,1,{}])", , "write([2,53,{}])"

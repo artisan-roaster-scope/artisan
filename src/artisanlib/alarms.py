@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -20,22 +20,22 @@ import os
 import sys
 import prettytable
 
-from artisanlib.util import deltaLabelUTF8#, stringfromseconds, stringtoseconds
+from artisanlib.util import deltaLabelUTF8
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import (MyQComboBox, MyTableWidgetItemNumber, MyTableWidgetItemQCheckBox,
                                 MyTableWidgetItemQComboBox, MyTableWidgetItemQLineEdit, MyTableWidgetItemQTime)
 
 from help import alarms_help
 
-from PyQt5.QtCore import (Qt, pyqtSlot, QSettings)#, QRegularExpression)
-from PyQt5.QtGui import QColor, QIntValidator#, QRegularExpressionValidator
+from PyQt5.QtCore import (Qt, pyqtSlot, QSettings)
+from PyQt5.QtGui import QColor, QIntValidator
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox,
             QTableWidget, QHBoxLayout, QVBoxLayout, QCheckBox, QPushButton, QSizePolicy, QSpinBox,
             QTableWidgetSelectionRange, QTimeEdit, QTabWidget, QGridLayout, QGroupBox)
 
 class AlarmDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None, aw = None, activeTab = 0):
-        super(AlarmDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Alarms",None))
         self.helpdialog = None
@@ -376,7 +376,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         if len(selected) > 0:
             self.savealarms() # we first "save" the alarmtable to be able to pick up the values of the selected row
             selected_idx = selected[0].topRow()
-            selected_idx = int(self.alarmtable.item(selected_idx,0).text()) -1 # we derref the rows number that might be different per sorting order
+            selected_idx = int(self.alarmtable.item(selected_idx,0).text()) -1 # we deref the rows number that might be different per sorting order
             try:
                 alarm_flag = self.aw.qmc.alarmflag[selected_idx]
                 alarm_guard = self.aw.qmc.alarmguard[selected_idx]
@@ -390,7 +390,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                 alarm_action = self.aw.qmc.alarmaction[selected_idx]
                 alarm_beep = self.aw.qmc.alarmbeep[selected_idx]
                 alarm_string= self.aw.qmc.alarmstrings[selected_idx]
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         self.aw.qmc.alarmflag.append(alarm_flag)
         self.aw.qmc.alarmguard.append(alarm_guard)
@@ -428,7 +428,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             for i in range(len(self.aw.qmc.alarmtablecolumnwidths)):
                 try:
                     self.alarmtable.setColumnWidth(i,self.aw.qmc.alarmtablecolumnwidths[i])
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             self.alarmtable.setSortingEnabled(True)
         else:
@@ -478,7 +478,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                     alarm_action = self.aw.qmc.alarmaction[selected_row]
                     alarm_beep = self.aw.qmc.alarmbeep[selected_row]
                     alarm_string= self.aw.qmc.alarmstrings[selected_row]
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass  
                 self.aw.qmc.alarmflag.insert(selected_row,alarm_flag)
                 self.aw.qmc.alarmguard.insert(selected_row,alarm_guard)
@@ -516,14 +516,14 @@ class AlarmDlg(ArtisanResizeablDialog):
                     guard = self.alarmtable.cellWidget(i,2)
                     try:
                         guard_value = int(str(guard.text())) - 1
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         guard_value = -1
                     if guard_value >= selected_row:
                         guard.setText(str(guard_value+2))
                     nguard = self.alarmtable.cellWidget(i,3)
                     try:
                         nguard_value = int(str(nguard.text())) - 1
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         nguard_value = -1
                     if nguard_value >= selected_row:
                         nguard.setText(str(nguard_value+2))
@@ -570,14 +570,14 @@ class AlarmDlg(ArtisanResizeablDialog):
                     guard = self.alarmtable.cellWidget(i,2)
                     try:
                         guard_value = int(str(guard.text())) - 1
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         guard_value = -1
                     if guard_value >= selected_row:
                         guard.setText(str(guard_value))
                     nguard = self.alarmtable.cellWidget(i,3)
                     try:
                         nguard_value = int(str(nguard.text())) - 1
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         nguard_value = -1
                     if nguard_value >= selected_row:
                         nguard.setText(str(nguard_value))
@@ -644,12 +644,12 @@ class AlarmDlg(ArtisanResizeablDialog):
                 if self.aw.qmc.alarmsource[i] + 3 >= len(aitems):
                     self.aw.qmc.alarmsource[i] = 1 # BT
             self.createalarmtable()
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             self.aw.sendmessage(QApplication.translate("Message","Error loading alarm file", None))
-            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importalarmsJSON() {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importalarmsJSON() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def exportalarms(self,_):
@@ -676,9 +676,9 @@ class AlarmDlg(ArtisanResizeablDialog):
             outfile.write('\n')
             outfile.close()
             return True
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " exportalarmsJSON(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " exportalarmsJSON(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
 
     @pyqtSlot()
@@ -733,7 +733,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                 guard = self.alarmtable.cellWidget(i,2)
                 try:
                     guard_value = int(str(guard.text())) - 1
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     guard_value = -1
                 if guard_value > -1 and guard_value < nalarms:
                     self.aw.qmc.alarmguard[i] = guard_value
@@ -742,7 +742,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                 negguard = self.alarmtable.cellWidget(i,3)
                 try:
                     negguard_value = int(str(negguard.text())) - 1
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     negguard_value = -1
                 if negguard_value > -1 and negguard_value < nalarms:
                     self.aw.qmc.alarmnegguard[i] = negguard_value
@@ -762,7 +762,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                 temp = self.alarmtable.cellWidget(i,8)
                 try:
                     self.aw.qmc.alarmtemperature[i] = float(self.aw.comma2dot(str(temp.text())))
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     self.aw.qmc.alarmtemperature[i] = 0.0
                 action = self.alarmtable.cellWidget(i,9)
                 self.aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
@@ -772,9 +772,9 @@ class AlarmDlg(ArtisanResizeablDialog):
                     self.aw.qmc.alarmbeep[i] = int(beep.isChecked())
                 description = self.alarmtable.cellWidget(i,11)
                 self.aw.qmc.alarmstrings[i] = description.text()
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " savealarms(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " savealarms(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             
     def buildAlarmSourceList(self):
         extra_names = []
@@ -897,7 +897,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         beepLayout = QHBoxLayout()
         beepLayout.addStretch()
         beepLayout.addWidget(beepComboBox)
-        beepLayout.addSpacing(6);        
+        beepLayout.addSpacing(6)
         beepLayout.addStretch()
         beepLayout.setContentsMargins(0,0,0,0)
         beepLayout.setSpacing(0)
@@ -943,7 +943,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                     if self.aw.qmc.alarmstate[i] != -1:
                         #self.alarmtable.setItem(i,j,QTableWidgetItem())
                         self.alarmtable.item(i,j).setBackground(QColor(191, 191, 191))
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
 
     def createalarmtable(self):
@@ -986,15 +986,15 @@ class AlarmDlg(ArtisanResizeablDialog):
                     if i == 6:
                         w = max(80,w)
                     self.alarmtable.setColumnWidth(i,w)
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             self.markNotEnabledAlarmRows()
             self.alarmtable.setSortingEnabled(True)
             self.alarmtable.sortItems(0)
             
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " createalarmtable() {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " createalarmtable() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def copyAlarmTabletoClipboard(self,_=False):

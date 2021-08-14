@@ -1,4 +1,3 @@
-import imp
 import platform
 import sys
 import codecs
@@ -13,7 +12,7 @@ if platform.system() == 'Linux':
 else:
     deltaLabelUTF8 = "\u0394\u2009" # u("\u03B4") # prefix for non HTML Qt Widgets like QPushbuttons
 deltaLabelBigPrefix = "<big><b>&Delta;</b></big>&thinsp;<big><b>" # same as above for big/bold use cases
-deltaLabelMathPrefix = "$\Delta\/$"  # prefix for labels in matplibgraphs to compose DeltaET/BT by prepending this prefix to ET/BT labels
+deltaLabelMathPrefix = r"$\Delta\/$"  # prefix for labels in matplibgraphs to compose DeltaET/BT by prepending this prefix to ET/BT labels
 
 def appFrozen():
     ib = False
@@ -26,12 +25,13 @@ def appFrozen():
         elif platf == "Windows":
             ib = (hasattr(sys, "frozen") or # new py2exe
                 hasattr(sys, "importers") # old py2exe
-                or imp.is_frozen("__main__")) # tools/freeze
+#                or imp.is_frozen("__main__")) # tools/freeze
+                )
         elif platf == "Linux":
             if getattr(sys, 'frozen', False):
                 # The application is frozen
                 ib = True
-    except Exception:
+    except Exception: # pylint: disable=broad-except
         pass
     return ib
 
@@ -47,7 +47,7 @@ def uchr(x):
 # the historical u() needed for Python2/Qt4 got eliminated or replaced by str()
 #def u(x): # convert to unicode string
 #    return str(x)
-def d(x):
+def decodeLocal(x):
     if x is not None:
         return codecs.unicode_escape_decode(x)[0]
     else:
@@ -164,7 +164,7 @@ def toInt(x):
     else:
         try:
             return int(round(float(x)))
-        except:
+        except Exception: # pylint: disable=broad-except
             return 0
 def toString(x):
     return str(x)
@@ -179,7 +179,7 @@ def toFloat(x):
     else:
         try:
             return float(x)
-        except:
+        except Exception: # pylint: disable=broad-except
             return 0.
 def toBool(x):
     if x is None:
@@ -217,9 +217,9 @@ def fill_gaps(l):
             if e == -1 and last_val == -1:
                 # a prefix of -1 will be replaced by the first value in l that is not -1
                 s = -1
-                for e in l:
-                    if e != -1:
-                        s = e
+                for ee in l:
+                    if ee != -1:
+                        s = ee
                         break
                 res.append(s)
                 last_val = s

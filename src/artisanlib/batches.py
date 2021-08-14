@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -24,7 +24,7 @@ from PyQt5.QtWidgets import (QApplication, QLabel, QHBoxLayout, QVBoxLayout, QCh
 
 class batchDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
-        super(batchDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Batch", None))
         self.prefixEdit = QLineEdit(self.aw.qmc.batchprefix)
@@ -128,4 +128,4 @@ class batchDlg(ArtisanDialog):
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue("BatchPosition",self.frameGeometry().topLeft())
-        super(batchDlg,self).close()
+        super().close()

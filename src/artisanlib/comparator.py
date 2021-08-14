@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -27,7 +27,7 @@ if sys.platform.startswith("darwin"):
     # import module to detect if OS X dark mode is active or not
     import darkdetect # @UnresolvedImport
 
-from artisanlib.util import deltaLabelUTF8, d, stringfromseconds, appFrozen, fromFtoC, fromCtoF, fill_gaps
+from artisanlib.util import deltaLabelUTF8, decodeLocal, stringfromseconds, appFrozen, fromFtoC, fromCtoF, fill_gaps
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
@@ -110,7 +110,7 @@ class RoastProfile():
         #
         # fill profile data:
         if "roastUUID" in profile:
-            self.UUID = d(profile["roastUUID"])
+            self.UUID = profile["roastUUID"]
         if "timex" in profile:
             self.timex = profile["timex"]
         if "temp1" in profile:
@@ -150,7 +150,7 @@ class RoastProfile():
                         self.timeindex[i] = self.aw.qmc.timearray2index(self.timex,times[i])
                     else:
                         self.timeindex[i] = 0
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             ###########      END OLD PROFILE FORMAT
             
@@ -158,7 +158,7 @@ class RoastProfile():
         if "mode" in profile:
             m = str(profile["mode"])
         else:
-            m = self.qmc.mode
+            m = self.aw.qmc.mode
         if "ambientTemp" in profile:
             self.ambientTemp = profile["ambientTemp"]
         else:
@@ -175,11 +175,11 @@ class RoastProfile():
             self.temp2 = [fromCtoF(t) for t in self.temp2]
             self.ambientTemp = fromCtoF(self.ambientTemp)
         if "title" in profile:
-            self.title = d(profile["title"])
+            self.title = decodeLocal(profile["title"])
         if "roastbatchnr" in profile and profile["roastbatchnr"] != 0:
             try:
-                self.label = d(profile["roastbatchprefix"]) + str(int(profile["roastbatchnr"]))[:10]
-            except:
+                self.label = decodeLocal(profile["roastbatchprefix"]) + str(int(profile["roastbatchnr"]))[:10]
+            except Exception: # pylint: disable=broad-except
                 pass
         self.specialevents = None
         self.specialeventstype = None
@@ -194,45 +194,45 @@ class RoastProfile():
         self.metadata = {}
         if "roastdate" in profile:
             try:
-                date = QDate.fromString(d(profile["roastdate"]))
+                date = QDate.fromString(decodeLocal(profile["roastdate"]))
                 if not date.isValid():
                     date = QDate.currentDate()
                 if "roasttime" in profile:
                     try:
-                        time = QTime.fromString(d(profile["roasttime"]))
+                        time = QTime.fromString(decodeLocal(profile["roasttime"]))
                         self.metadata["roastdate"] = QDateTime(date,time)
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         self.metadata["roastdate"] = QDateTime(date)
                 else:
                     self.metadata["roastdate"] = QDateTime(date)
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
         # the new dates have the locale independent isodate format:
         if "roastisodate" in profile:
             try:
-                date = QDate.fromString(d(profile["roastisodate"]),Qt.ISODate)
+                date = QDate.fromString(decodeLocal(profile["roastisodate"]),Qt.ISODate)
                 if "roasttime" in profile:
                     try:
-                        time = QTime.fromString(d(profile["roasttime"]))
+                        time = QTime.fromString(decodeLocal(profile["roasttime"]))
                         self.metadata["roastdate"] = QDateTime(date,time)
-                    except Exception:
+                    except Exception: # pylint: disable=broad-except
                         self.metadata["roastdate"] = QDateTime(date)
                 else:
                     self.metadata["roastdate"] = QDateTime(date)
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
         if "roastepoch" in profile:
             try:
                 self.metadata["roastdate"] = QDateTime.fromTime_t(profile["roastepoch"])
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
         if "beans" in profile:
-            self.metadata["beans"] = d(profile["beans"])
+            self.metadata["beans"] = decodeLocal(profile["beans"])
         if "weight" in profile and profile["weight"][0] != 0.0:
             w = profile["weight"][0]
-            if d(profile["weight"][2]) != "g":
+            if decodeLocal(profile["weight"][2]) != "g":
                 w = self.aw.float2float(w,1)
-            self.metadata["weight"] = "%g%s"%(w,d(profile["weight"][2]))
+            self.metadata["weight"] = "%g%s"%(w,decodeLocal(profile["weight"][2]))
         if "moisture_greens" in profile and profile["moisture_greens"] != 0.0:
             self.metadata["moisture_greens"] = profile["moisture_greens"]
         if "ambientTemp" in profile:
@@ -250,9 +250,9 @@ class RoastProfile():
                 profile["computed"]["AUC"] != 0:
             self.metadata["AUC"] = "%sC*min" % profile["computed"]["AUC"]
         if "roastingnotes" in profile:
-            self.metadata["roastingnotes"] = d(profile["roastingnotes"])
+            self.metadata["roastingnotes"] = decodeLocal(profile["roastingnotes"])
         if "cuppingnotes" in profile:
-            self.metadata["cuppingnotes"] = d(profile["cuppingnotes"])       
+            self.metadata["cuppingnotes"] = decodeLocal(profile["cuppingnotes"])       
         # TP time in time since DROP
         if "computed" in profile and profile["computed"] is not None and "TP_time" in profile["computed"]:
             self.TP = profile["computed"]["TP_time"]
@@ -292,13 +292,13 @@ class RoastProfile():
         if len(self.delta1) > 0:
             try:
                 self.max_DeltaET = max(filter(None,self.delta1))
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         self.max_DeltaBT = 1
         if len(self.delta2) > 0:
             try:
                 self.max_DeltaBT = max(filter(None,self.delta2))
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         self.events1 = []
         self.events2 = []
@@ -347,7 +347,7 @@ class RoastProfile():
                             self.E3.append((etime,evalue))
                         elif etype == 3:
                             self.E4.append((etime,evalue))
-                except:
+                except Exception: # pylint: disable=broad-except
                     pass
             # add a last event at DROP/END to extend the lines to the end of roast
             end = (self.timex[-1] if self.timeindex[6] == 0 else self.timex[self.timeindex[6]])
@@ -363,13 +363,13 @@ class RoastProfile():
     def startTime(self):
         try:
             return self.timex[self.startTimeIdx]
-        except:
+        except Exception: # pylint: disable=broad-except
             return 0
     
     def endTime(self):
         try:
             return self.timex[self.endTimeIdx]
-        except:
+        except Exception: # pylint: disable=broad-except
             return self.timex[-1]
     
     def setVisible(self,b):
@@ -495,20 +495,20 @@ class RoastProfile():
         # an artist transformation is supplied with data in data coordinates and should return data in display coordinates
         # ax.transData : transforms from data to display coordinates
         # transforms.Affine2D().translate() : applies its transformation
-        return transforms.Affine2D().translate(-offset,0) + self.aw.qmc.ax.transData
+        return transforms.Affine2D().translate(-offset,0) + self.aw.qmc.ax.transData # pylint: disable=invalid-unary-operand-type
     
     # returns the time transformation for the delta curves
     def getDeltaTrans(self,offset=None):
         if offset is None:
             offset = self.timeoffset
-        return transforms.Affine2D().translate(-offset,0) + self.aw.qmc.delta_ax.transData
+        return transforms.Affine2D().translate(-offset,0) + self.aw.qmc.delta_ax.transData # pylint: disable=invalid-unary-operand-type
     
     def undraw(self):
         for l in [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2,self.l_mainEvents1,self.l_mainEvents2,
                 self.l_events1,self.l_events2,self.l_events3,self.l_events4]:
             try:
                 l.remove()
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
         self.l_temp1 = None
         self.l_temp2 = None
@@ -639,9 +639,6 @@ class RoastProfile():
 
 class CompareTableWidget(QTableWidget):
     deleteKeyPressed = pyqtSignal()
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def keyPressEvent(self, event):
         if event.key() in [Qt.Key_Delete,Qt.Key_Backspace]:
@@ -669,7 +666,7 @@ class CompareTableWidget(QTableWidget):
 
 class roastCompareDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None, foreground = None, background = None):
-        super(roastCompareDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         
         if platform.system() == 'Darwin':
             self.setAttribute(Qt.WA_MacAlwaysShowToolWindow)
@@ -680,7 +677,7 @@ class roastCompareDlg(ArtisanDialog):
         self.background = background
         self.setWindowTitle(QApplication.translate("Form Caption","Comparator",None))
         self.maxentries = 10 # maxium number of profiles to be compared
-        self.basecolors = list(cm.tab10(numpy.linspace(0,1,10)))  # @UndefinedVariable
+        self.basecolors = list(cm.tab10(numpy.linspace(0,1,10)))  # @UndefinedVariable # pylint: disable=maybe-no-member
         self.profiles = []
         self.label_number = 0
         # align line
@@ -986,7 +983,7 @@ class roastCompareDlg(ArtisanDialog):
                 else:
                     loc = self.legendloc_pos
             else:
-                loc = self.legend._loc
+                loc = self.legend._loc # pylint: disable=protected-access
             handles = []
             labels = []
             for p in self.profiles:
@@ -1008,11 +1005,11 @@ class roastCompareDlg(ArtisanDialog):
                     fancybox=True,prop=prop,shadow=False,frameon=True)
                 try:
                     self.legend.set_in_layout(False) # remove legend from tight_layout calculation
-                except: # set_in_layout not available in mpl<3.x
+                except Exception: # set_in_layout not available in mpl<3.x # pylint: disable=broad-except
                     pass
                 try:
                     self.legend.set_draggable(state=True,use_blit=True)  #,update='bbox')
-                except: # not available in mpl<3.x
+                except Exception: # not available in mpl<3.x # pylint: disable=broad-except
                     self.legend.draggable(state=True) # for mpl 2.x
                 frame = self.legend.get_frame()
                 frame.set_facecolor(self.aw.qmc.palette["legendbg"])
@@ -1130,7 +1127,7 @@ class roastCompareDlg(ArtisanDialog):
                     if tooltip != "":
                         tooltip += "\n"
                     tooltip += profile.metadata["cuppingnotes"].strip()
-            except:
+            except Exception: # pylint: disable=broad-except
 #                import traceback
 #                import sys
 #                traceback.print_exc(file=sys.stdout)
@@ -1176,9 +1173,9 @@ class roastCompareDlg(ArtisanDialog):
             self.profileTable.horizontalScrollBar().setEnabled(False)
             self.profileTable.setAutoScroll(False) # disable scrolling to selected cell
 
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " createProfileTable() {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " createProfileTable() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
     
     ### SLOTS
     
@@ -1210,9 +1207,9 @@ class roastCompareDlg(ArtisanDialog):
                 self.profileTable.selectAll()
     
     @pyqtSlot(int,int,int)
-    def sectionMoved(self,logicalIndex, oldVisualIndex, newVisualIndex):
+    def sectionMoved(self,_logicalIndex, _oldVisualIndex, _newVisualIndex):
         self.updateAlignMenu()
-        self.realign(updateDeltaAxis=False)
+        self.realign()
         self.updateZorders()
         self.repaint()
     
@@ -1270,7 +1267,7 @@ class roastCompareDlg(ArtisanDialog):
         app = QCoreApplication.instance()
         fileURL = QUrl.fromLocalFile(self.profiles[i].filepath)
         if platform.system() == "Windows" and not app.artisanviewerMode:
-            self.aw.app.sendMessage2ArtisanInstance(fileURL.toString(),app._viewer_id)
+            self.aw.app.sendMessage2ArtisanInstance(fileURL.toString(),app._viewer_id) # pylint: disable=protected-access
         else:
             QDesktopServices.openUrl(fileURL)
 
@@ -1361,7 +1358,7 @@ class roastCompareDlg(ArtisanDialog):
     
     # align all profiles to the first one w.r.t. to the event self.aw.qmc.compareAlignEvent
     #   0:CHARGE, 1:TP, 2:DRY, 3:FCs, 4:FCe, 5:SCs, 6:SCe, 7:DROP
-    def realign(self,updateDeltaAxis=True):
+    def realign(self):
         if len(self.profiles) > 0:
             profiles = self.getProfilesVisualOrder()
             # align top profile to its CHARGE event or first reading to 00:00
@@ -1435,7 +1432,6 @@ class roastCompareDlg(ArtisanDialog):
     
     def addProfile(self,filename,active):
         try:
-            self.profiles
             if len(self.profiles) < self.maxentries and not any(filename == p.filepath for p in self.profiles):
                 f = QFile(filename)
                 if not f.open(QFile.ReadOnly):
@@ -1459,7 +1455,7 @@ class roastCompareDlg(ArtisanDialog):
                     # add profile to the table
                     self.profileTable.setRowCount(len(self.profiles))
                     self.setProfileTableRow(len(self.profiles)-1)
-        except:
+        except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass

@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -29,7 +29,7 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout, 
 
 class backgroundDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None, aw = None, activeTab = 0):
-        super(backgroundDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setWindowTitle(QApplication.translate("Form Caption","Profile Background", None))
         self.setModal(True)
         
@@ -334,7 +334,7 @@ class backgroundDlg(ArtisanResizeablDialog):
                 self.aw.copy_cells_to_clipboard(self.datatable)
                 self.aw.sendmessage(QApplication.translate("Message","Data table copied to clipboard",None))
         else:
-            super(backgroundDlg,self).keyPressEvent(event)
+            super().keyPressEvent(event)
 
     @pyqtSlot()
     def accept(self):
@@ -351,10 +351,10 @@ class backgroundDlg(ArtisanResizeablDialog):
     def getColorIdx(self,c):
         try:
             return self.defaultcolorsmapped.index(c)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             try:
                 return self.colors.index(c) + 5
-            except Exception: 
+            except Exception:  # pylint: disable=broad-except
                 return 0
 
     @pyqtSlot(int)

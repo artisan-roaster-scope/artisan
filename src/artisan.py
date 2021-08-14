@@ -22,42 +22,42 @@ try:
     if system() == 'Darwin':
         os.environ["QT_MAC_WANTS_LAYER"] = "1" # some widgets under PyQt 5.15.1 on macOS seem not to update properly without this (see the discussion on the pyqt mailing list from 15.6.2020 "Widgets are not updated - is this a bug?")
     if pyqtversion < 6:
-        from PyQt5.QtWidgets import QApplication  # @UnusedImport
-        from PyQt5.QtCore import Qt  # @UnusedImport
+        from PyQt5.QtWidgets import QApplication  # @UnusedImport  # pylint: disable=import-error
+        from PyQt5.QtCore import Qt  # @UnusedImport # pylint: disable=import-error
     else:
-        from PyQt6.QtWidgets import QApplication
-        from PyQt6.QtCore import Qt
+        from PyQt6.QtWidgets import QApplication  # @UnresolvedImport # pylint: disable=import-error @Reimport
+        from PyQt6.QtCore import Qt     # @Reimport # @UnresolvedImport # pylint: disable=import-error
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
 #    os.environ["QT_SCALE_FACTOR"] = "1"
-except:
+except Exception: # pylint: disable=broad-except
     pass
 
 try:
     # PyQt new exit scheme (default from 5.14 on)
     if pyqtversion < 6:
-        from PyQt5.QtCore import pyqt5_enable_new_onexit_scheme  # @UnresolvedImport @UnusedImport
+        from PyQt5.QtCore import pyqt5_enable_new_onexit_scheme  # @UnresolvedImport @UnusedImport  # pylint: disable=import-error
     else:
-        from PyQt6.QtCore import pyqt5_enable_new_onexit_scheme  # @UnresolvedImport
+        from PyQt6.QtCore import pyqt5_enable_new_onexit_scheme  # @Reimport # @UnresolvedImport  # pylint: disable=import-error
     pyqt5_enable_new_onexit_scheme(True)
-except:
+except Exception: # pylint: disable=broad-except
     pass
         
 # on Qt5, the platform plugin cocoa/windows is not found in the plugin directory (dispite the qt.conf file) if we do not
 # extend the libraryPath accordingly
 if system() == 'Darwin':
     try:
-        if str(sys.frozen) == "macosx_app":
+        if str(sys.frozen) == "macosx_app": # pylint: disable=maybe-no-member
             if pyqtversion < 6:
-                from PyQt5.QtWidgets import QApplication # @Reimport  @UnusedImport
+                from PyQt5.QtWidgets import QApplication  # @UnresolvedImport # @Reimport  @UnusedImport  # pylint: disable=import-error
             else:
-                from PyQt6.QtWidgets import QApplication # @Reimport
+                from PyQt6.QtWidgets import QApplication # @UnresolvedImport # @Reimport  # pylint: disable=import-error
             #QApplication.addLibraryPath(os.path.dirname(os.path.abspath(__file__)) + "/qt_plugins/")
 
             libpath = os.path.dirname(sys.executable) # Contents/MacOS
             plugins_path = os.path.abspath(os.path.join(libpath,"../PlugIns/"))
             QApplication.addLibraryPath(plugins_path)
-    except Exception:
+    except Exception: # pylint: disable=broad-except
         pass
 elif system().startswith("Windows"):
     try:
@@ -66,9 +66,9 @@ elif system().startswith("Windows"):
 #            or imp.is_frozen("__main__")) # tools/freeze
              or getattr(sys, 'frozen', False)) # tools/freeze
         if pyqtversion < 6:
-            from PyQt5.QtWidgets import QApplication # @Reimport   @UnusedImport
+            from PyQt5.QtWidgets import QApplication  # @UnresolvedImport # @Reimport   @UnusedImport  # pylint: disable=import-error
         else:
-            from PyQt6.QtWidgets import QApplication # @Reimport 
+            from PyQt6.QtWidgets import QApplication  # @UnresolvedImport # @Reimport  # pylint: disable=import-error
         if ib:
             QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), "plugins"))            
         else:
@@ -76,25 +76,24 @@ elif system().startswith("Windows"):
             #gives error in python 3.4: could not find or load the Qt platform plugin "windows"
             QApplication.addLibraryPath(site.getsitepackages()[1] + "\\PyQt5\\plugins")
 
-    except Exception:
+    except Exception: # pylint: disable=broad-except
         pass
 else: # Linux
     try:
         ib = getattr(sys, 'frozen', False)
         if pyqtversion < 6:
-            from PyQt5.QtWidgets import QApplication # @Reimport @UnusedImport
+            from PyQt5.QtWidgets import QApplication  # @UnresolvedImport # @Reimport @UnusedImport  # pylint: disable=import-error
         else:
-            from PyQt6.QtWidgets import QApplication # @Reimport
+            from PyQt6.QtWidgets import QApplication  # @UnresolvedImport # @Reimport # pylint: disable=import-error
         if ib:
             QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "Resources/qt_plugins"))            
         else:
             import site # @Reimport
             QApplication.addLibraryPath(os.path.dirname(site.getsitepackages()[0]) + "/PyQt5/qt_plugins")
-    except Exception:
+    except Exception: # pylint: disable=broad-except
         pass
 
 from artisanlib import main, command_utility
-#import numpy # @UnusedImport # what this for!?
 from multiprocessing import freeze_support
 
 if system() == "Windows" and (hasattr(sys, "frozen") # new py2exe
@@ -111,12 +110,6 @@ if __name__ == '__main__':
     # Manange Commands that does not need to start the whole Application
     if command_utility.handleCommands() == True:
         freeze_support()
-        if os.environ.get('TRAVIS'):
-            # Hack to exit inside Travis CI
-            # Ideally we would use pytest-qt.
-            import threading
-            t = threading.Timer(30, lambda: os._exit(0))
-            t.start()
         main.main()
 
 

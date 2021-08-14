@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -29,7 +29,7 @@ from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox
 
 class WindowsDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
-        super(WindowsDlg,self).__init__(parent, aw)
+        super().__init__(parent, aw)
         self.setWindowTitle(QApplication.translate("Form Caption","Axes",None))
         self.setModal(True)
         xlimitLabel = QLabel(QApplication.translate("Label", "Max",None))
@@ -161,7 +161,7 @@ class WindowsDlg(ArtisanDialog):
         self.timeconversion = [0,60,120,180,240,300,600,1800,3600]
         try:
             self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(self.aw.qmc.xgrid))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.xaxislencombobox.setCurrentIndex(0)
         self.xaxislencombobox.currentIndexChanged.connect(self.xaxislenloc)
         self.timeGridCheckBox = QCheckBox(QApplication.translate("CheckBox","Time",None))
@@ -536,7 +536,7 @@ class WindowsDlg(ArtisanDialog):
                     limits_changed = True
                 self.aw.qmc.ylimit = yl
                 self.aw.qmc.ylimit_min = yl_min
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             zl = int(str(self.zlimitEdit.text()))
@@ -546,7 +546,7 @@ class WindowsDlg(ArtisanDialog):
             if zl > zl_min:
                 self.aw.qmc.zlimit = zl
                 self.aw.qmc.zlimit_min = zl_min
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
             
         if limits_changed and self.aw.qmc.crossmarker == True:
@@ -586,7 +586,7 @@ class WindowsDlg(ArtisanDialog):
                 self.aw.qmc.step100temp = None
             else:
                 self.aw.qmc.step100temp = int(step100)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         
         resettime = stringtoseconds(str(self.resetEdit.text()))
@@ -614,7 +614,7 @@ class WindowsDlg(ArtisanDialog):
         settings = QSettings()
         settings.setValue("AxisPosition",self.frameGeometry().topLeft())
         self.aw.closeEventSettings()
-        super(WindowsDlg,self).close()
+        super().close()
 
     @pyqtSlot(bool)
     def reset(self,_):
@@ -625,7 +625,7 @@ class WindowsDlg(ArtisanDialog):
         self.xlimitEdit_min.setText(stringfromseconds(self.aw.qmc.startofx_default))
         try:
             self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(self.aw.qmc.xgrid_default))
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             self.xaxislencombobox.setCurrentIndex(1)
         if self.aw.qmc.mode == "F":
             self.ygridSpinBox.setValue(self.aw.qmc.ygrid_F_default)

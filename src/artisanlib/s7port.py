@@ -7,7 +7,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -196,8 +196,8 @@ class s7port(object):
             elif PIDmultiplier == 2:
                 multiplier = 100.
             self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_p_register,p*multiplier)
-            self.writeInt(self.PID_area-1,self.PID_area,self.PID_db_nr,self.PID_i_register,i*multiplier)
-            self.writeInt(self.PID_area-1,self.PID_area,self.PID_db_nr,self.PID_d_register,d*multiplier)
+            self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_i_register,i*multiplier)
+            self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_d_register,d*multiplier)
         
     def setTarget(self,sv,SVmultiplier):
         if self.PID_area:
@@ -233,11 +233,11 @@ class s7port(object):
 #            pass
         try:
             self.plc.disconnect()
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         try:
             self.plc.destroy()
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
         self.plc = None
         self.is_connected = False
@@ -269,18 +269,18 @@ class s7port(object):
         if not self.isConnected():
             try:
                 if self.plc is None:
-                    from artisanlib.s7client import S7Client
+                    from artisanlib.s7client import S7Client # pylint: disable=reimported 
                     self.plc = S7Client()
                 else:
                     self.plc.disconnect()
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass
             with suppress_stdout_stderr():
                 time.sleep(0.2)
                 try:
                     self.plc.connect(self.host,self.rack,self.slot,self.port)
                     time.sleep(0.2)
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
             
             if self.isConnected():
@@ -291,7 +291,7 @@ class s7port(object):
             else:
                 self.disconnect()
                 time.sleep(0.3)
-                from artisanlib.s7client import S7Client
+                from artisanlib.s7client import S7Client # pylint: disable=reimported
                 self.plc = S7Client()
                 # we try a second time
                 with suppress_stdout_stderr():
@@ -342,7 +342,7 @@ class s7port(object):
         try:
             for i,v in enumerate(results):
                 self.readingsCache[area][db_nr][register+i] = v
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
 
     def readActiveRegisters(self):
@@ -373,7 +373,7 @@ class s7port(object):
                                 self.waitToEnsureMinTimeBetweenRequests()
                                 try:
                                     res = self.plc.read_area(self.areas[area],db_nr,register,count)
-                                except:
+                                except Exception: # pylint: disable=broad-except
                                     res = None
                                 if res is None:
                                     if retry > 0:
@@ -391,14 +391,14 @@ class s7port(object):
                             #note: logged chars should be unicode not binary
                             if self.aw.seriallogflag:
                                 self.aw.addserial("S7 read_area({},{},{},{})".format(area,db_nr,register,count))
-        except Exception as e: # as ex:
+        except Exception as e: # pylint: disable=broad-except
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            _, _, exc_tb = sys.exc_info()
-#            self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
+#            self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readSingleRegister() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror(QApplication.translate("Error Message","readActiveRegisters() S7 Communication Error",None) + ": " + str(e),exc_tb.tb_lineno)
+            self.aw.qmc.adderror(QApplication.translate("Error Message","readActiveRegisters() S7 Communication Error",None) + ": " + str(e),getattr(exc_tb, 'tb_lineno', '?'))
             if self.aw.seriallogflag:
                 self.aw.addserial("S7 readActiveRegisters() => S7 Communication Error: {}".format(str(e)))
             self.commError = True
@@ -423,10 +423,10 @@ class s7port(object):
             else:
                 self.commError = True
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed",None))
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             if self.aw.qmc.flagon:
                 _, _, exc_tb = sys.exc_info()
-                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeFloat: " + str(e),exc_tb.tb_lineno)
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeFloat: " + str(e),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -447,10 +447,10 @@ class s7port(object):
             else:
                 self.commError = True
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed",None))
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             if self.aw.qmc.flagon:
                 _, _, exc_tb = sys.exc_info()
-                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeInt: " + str(e),exc_tb.tb_lineno)
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeInt: " + str(e),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -472,10 +472,10 @@ class s7port(object):
             else:
                 self.commError = True
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed",None))
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             if self.aw.qmc.flagon:
                 _, _, exc_tb = sys.exc_info()
-                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " maskWriteInt: " + str(e),exc_tb.tb_lineno)
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " maskWriteInt: " + str(e),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -496,10 +496,10 @@ class s7port(object):
             else:
                 self.commError = True
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed",None))
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             if self.aw.qmc.flagon:
                 _, _, exc_tb = sys.exc_info()
-                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeBool: " + str(e),exc_tb.tb_lineno)
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeBool: " + str(e),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -536,7 +536,7 @@ class s7port(object):
                         try:
                             with suppress_stdout_stderr():
                                 res = self.plc.read_area(self.areas[area],dbnumber,start,4)
-                        except:
+                        except Exception: # pylint: disable=broad-except
                             res = None
                         if res is None:
                             if retry > 0:
@@ -558,10 +558,10 @@ class s7port(object):
                 else:
                     self.commError = True  
                     self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed",None))
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             if self.aw.qmc.flagon:
                 _, _, exc_tb = sys.exc_info()
-                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readFloat({},{},{},{}): {}".format(area,dbnumber,start,force,str(e)),exc_tb.tb_lineno)
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readFloat({},{},{},{}): {}".format(area,dbnumber,start,force,str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                 if self.aw.seriallogflag:
                     self.aw.addserial("S7 readFloat({},{},{},{}) => S7 Communication Error: {}".format(area,dbnumber,start,force,str(e)))
             self.commError = True
@@ -583,7 +583,7 @@ class s7port(object):
                 return self.get_real(res,0)
             else:
                 return
-        except:
+        except Exception: # pylint: disable=broad-except
             return
                 
     # if force the readings cache is ignored and fresh readings are requested
@@ -613,7 +613,7 @@ class s7port(object):
                         try:
                             with suppress_stdout_stderr():
                                 res = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                        except Exception:
+                        except Exception: # pylint: disable=broad-except
                             res = None
                         if res is None:
                             if retry > 0:
@@ -635,13 +635,13 @@ class s7port(object):
                 else:
                     self.commError = True  
                     self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed",None))
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            _, _, exc_tb = sys.exc_info()        
             if self.aw.qmc.flagon:
                 _, _, exc_tb = sys.exc_info()
-                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readInt({},{},{},{}): {}".format(area,dbnumber,start,force,str(e)),exc_tb.tb_lineno)
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readInt({},{},{},{}): {}".format(area,dbnumber,start,force,str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                 if self.aw.seriallogflag:
                     self.aw.addserial("S7 readInt({},{},{},{}) => S7 Communication Error: {}".format(area,dbnumber,start,force,str(e)))
             self.commError = True
@@ -664,7 +664,7 @@ class s7port(object):
                 return self.get_int(res,0)
             else:
                 return
-        except:
+        except Exception: # pylint: disable=broad-except
             return
 
     # if force the readings cache is ignored and fresh readings are requested
@@ -692,7 +692,7 @@ class s7port(object):
                         try:
                             with suppress_stdout_stderr():
                                 res = self.plc.read_area(self.areas[area],dbnumber,start,1)                            
-                        except Exception:
+                        except Exception: # pylint: disable=broad-except
                             res = None
                         if res is None:
                             if retry > 0:
@@ -714,10 +714,10 @@ class s7port(object):
                 else:
                     self.commError = True
                     self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed",None))
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             if self.aw.qmc.flagon:
                 _, _, exc_tb = sys.exc_info()
-                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readBool({},{},{},{},{}): {}".format(area,dbnumber,start,index,force,str(e)),exc_tb.tb_lineno)
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readBool({},{},{},{},{}): {}".format(area,dbnumber,start,index,force,str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                 if self.aw.seriallogflag:
                     self.aw.addserial("S7 readBool({},{},{},{},{}) => S7 Communication Error: {}".format(area,dbnumber,start,index,force,str(e)))
             self.commError = True
