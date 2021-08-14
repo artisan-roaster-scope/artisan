@@ -6,6 +6,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
 
     steps:
     - uses: actions/checkout@v2
@@ -21,5 +22,5 @@ jobs:
         pip install -r src/requirements-linux.txt
     - name: Analysing the code with pylint
       run: |
-        find src/artisanlib -name '*.py' -exec pylint --disable=C --disable=R {} \;
-        find src/plus -name '*.py' -exec pylint --disable=C --disable=R {} \;
+        find src/artisanlib -name '*.py' -exec pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt5 {} \;
+        find src/plus -name '*.py' -exec pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt5 {} \;
