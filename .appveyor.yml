@@ -42,7 +42,7 @@ for:
     fast_finish: false
 
   environment:
-    PYTHON: "C:\\Python39-x64"
+    PYTHON: "C:\\Python38-x64"
     UPLOADTOOL_BODY:
       "WARNING: pre-release builds may not work. Use at your own risk."
 
