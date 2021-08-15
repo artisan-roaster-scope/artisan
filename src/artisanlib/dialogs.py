@@ -68,7 +68,8 @@ class ArtisanDialog(QDialog):
             pass
         self.dialogbuttons.button(QDialogButtonBox.Cancel).addActions([cancelAction])
     
-    def setButtonTranslations(self,btn,txt,trans):
+    @staticmethod
+    def setButtonTranslations(btn, txt, trans):
         current_trans = btn.text()
         if txt == current_trans:
             # if standard qtbase tanslations fail, revert to artisan translations
@@ -184,7 +185,8 @@ class ArtisanInputDialog(ArtisanDialog):
         self.url = self.inputLine.text()
         QDialog.accept(self)
     
-    def dragEnterEvent(self, event):
+    @staticmethod
+    def dragEnterEvent(event):
         if event.mimeData().hasUrls():
             event.accept()
         else:

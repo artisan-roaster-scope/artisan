@@ -764,10 +764,9 @@ class PID_DlgControl(ArtisanDialog):
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             import io
-            infile = io.open(filename, 'r', encoding='utf-8')
             from json import load as json_load
-            rampsoaks = json_load(infile)
-            infile.close()
+            with io.open(filename, 'r', encoding='utf-8') as infile:
+                rampsoaks = json_load(infile)
             if "svLabel" in rampsoaks:
                 self.aw.pidcontrol.svLabel = rampsoaks["svLabel"]
             else:
@@ -807,11 +806,10 @@ class PID_DlgControl(ArtisanDialog):
             rampsoaks["svBeeps"] = self.aw.pidcontrol.svBeeps
             rampsoaks["svDescriptions"] = self.aw.pidcontrol.svDescriptions
             rampsoaks["mode"] = self.aw.qmc.mode
-            outfile = open(filename, 'w')
             from json import dump as json_dump
-            json_dump(rampsoaks, outfile, ensure_ascii=True)
-            outfile.write('\n')
-            outfile.close()
+            with open(filename, 'w') as outfile:
+                json_dump(rampsoaks, outfile, ensure_ascii=True)
+                outfile.write('\n')
             self.aw.qmc.rsfile = filename
             self.rsfile.setText(self.aw.qmc.rsfile) 
             return True
@@ -1732,7 +1730,7 @@ class PXRpidDlgControl(PXpidDlgControl):
                             QMessageBox.Yes|QMessageBox.Cancel)
         if reply == QMessageBox.Cancel:
             return 0
-        elif reply == QMessageBox.Yes:
+        if reply == QMessageBox.Yes:
             return 1
 
     @pyqtSlot(bool)
@@ -1751,7 +1749,7 @@ class PXRpidDlgControl(PXpidDlgControl):
             if check == 0:
                 self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak operation cancelled",None), 5000)
                 return
-            elif check == -1:
+            if check == -1:
                 self.status.showMessage(QApplication.translate("StatusBar","No RX data",None), 5000)
             self.status.showMessage(QApplication.translate("StatusBar","RS ON",None),500)
             #0 = 1-4
@@ -1826,10 +1824,9 @@ class PXRpidDlgControl(PXpidDlgControl):
             pcommand= self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,self.aw.fujipid.PXR["p"][1],1)
             p = self.aw.fujipid.readoneword(pcommand)/10.
         if p == -1 :
-            return -1
-        else:
-            self.pedit.setText(str(int(p)))
-            self.aw.fujipid.PXR["p"][0] = p
+            return
+        self.pedit.setText(str(int(p)))
+        self.aw.fujipid.PXR["p"][0] = p
         #i is int range 0-3200
         if self.aw.ser.useModbusPort:
             reg = self.aw.modbus.address2register(self.aw.fujipid.PXR["i"][1],3)
@@ -1838,10 +1835,9 @@ class PXRpidDlgControl(PXpidDlgControl):
             icommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,self.aw.fujipid.PXR["i"][1],1)
             i = self.aw.fujipid.readoneword(icommand)/10.
         if i == -1:
-            return -1
-        else:
-            self.iedit.setText(str(int(i)))
-            self.aw.fujipid.PXR["i"][0] = i
+            return
+        self.iedit.setText(str(int(i)))
+        self.aw.fujipid.PXR["i"][0] = i
         if self.aw.ser.useModbusPort:
             reg = self.aw.modbus.address2register(self.aw.fujipid.PXR["d"][1],3)
             d = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)/10.
@@ -1849,10 +1845,9 @@ class PXRpidDlgControl(PXpidDlgControl):
             dcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,self.aw.fujipid.PXR["d"][1],1)
             d = self.aw.fujipid.readoneword(dcommand)/10.
         if d == -1:
-            return -1
-        else:
-            self.dedit.setText(str(int(d)))
-            self.aw.fujipid.PXR["d"][0] = d
+            return
+        self.dedit.setText(str(int(d)))
+        self.aw.fujipid.PXR["d"][0] = d
             
         self.status.showMessage(QApplication.translate("StatusBar","Finished reading pid values",None),5000)
 
@@ -2619,10 +2614,9 @@ class PXG4pidDlgControl(PXpidDlgControl):
     def loadPIDJSON(self,filename):
         try:
             import io
-            infile = io.open(filename, 'r', encoding='utf-8')
             from json import load as json_load
-            pids = json_load(infile)
-            infile.close()
+            with io.open(filename, 'r', encoding='utf-8') as infile:
+                pids = json_load(infile)
             # load set values
             setvalues = pids["setvalues"]
             for i in range(7):
@@ -2735,11 +2729,10 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 segments[rampkey] = stringfromseconds(self.aw.fujipid.PXG4[rampkey][0])
                 segments[soakkey] = stringfromseconds(self.aw.fujipid.PXG4[soakkey][0])
             pids["segments"] = segments
-            outfile = open(filename, 'w')
             from json import dump as json_dump
-            json_dump(pids, outfile, ensure_ascii=True)
-            outfile.write('\n')
-            outfile.close()
+            with open(filename, 'w') as outfile:
+                json_dump(pids, outfile, ensure_ascii=True)
+                outfile.write('\n')
             return True
         except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
@@ -3625,7 +3618,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                             QMessageBox.Yes|QMessageBox.Cancel)
         if reply == QMessageBox.Cancel:
             return 0
-        elif reply == QMessageBox.Yes:
+        if reply == QMessageBox.Yes:
             return 1
 
     @pyqtSlot(bool)
@@ -3646,7 +3639,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             if check == 0:
                 self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak operation cancelled",None), 5000)
                 return
-            elif check == -1:
+            if check == -1:
                 self.status.showMessage(QApplication.translate("StatusBar","No RX data",None), 5000)
             self.status.showMessage(QApplication.translate("StatusBar","RS ON",None),500)
             selectedmode = self.patternComboBox.currentIndex()
@@ -3787,8 +3780,8 @@ class PXG4pidDlgControl(PXpidDlgControl):
                             QMessageBox.Yes|QMessageBox.Cancel)
         if reply == QMessageBox.Cancel:
             self.status.showMessage(QApplication.translate("StatusBar","Autotune cancelled",None),5000)
-            return 0
-        elif reply == QMessageBox.Yes:
+            return
+        if reply == QMessageBox.Yes:
             if self.aw.ser.useModbusPort:
                 reg = self.aw.modbus.address2register(reg_dict["autotuning"][1],6)
                 self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,flag)

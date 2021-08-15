@@ -32,132 +32,131 @@ def extractProfileIkawaCSV(file,_):
         res["roastepoch"] = int(date.toTime_t())
         res["roasttzoffset"] = libtime.timezone
 
-    csvFile = io.open(file, 'r', newline="",encoding='utf-8')
-    data = csv.reader(csvFile,delimiter=',')
-    #read file header
-    header = next(data)
-    
-    fan = None # holds last processed fan event value
-    fan_last = None # holds the fan event value before the last one
-    heater = None # holds last processed heater event value
-    heater_last = None # holds the heater event value before the last one
-    fan_event = False # set to True if a fan event exists
-    heater_event = False # set to True if a heater event exists
-    specialevents = []
-    specialeventstype = []
-    specialeventsvalue = []
-    specialeventsStrings = []
-    timex = []
-    temp1 = []
-    temp2 = []
-    extra1 = []
-    extra2 = []
-    timeindex = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
-    i = 0
-    for row in data:
-        i = i + 1
-        items = list(zip(header, row))
-        item = {}
-        for (name, value) in items:
-            item[name] = value.strip()
-        # take i as time in seconds
-        timex.append(i)
-        if 'inlet temp' in item:
-            temp1.append(float(item['inlet temp']))
-        elif 'temp below' in item:
-            temp1.append(float(item['temp below']))
-        else:
-            temp1.append(-1)
-        # we map IKAWA Exhaust to BT as main events like CHARGE and DROP are marked on BT in Artisan
-        if 'exaust temp' in item:
-            temp2.append(float(item['exaust temp']))
-        elif 'temp above' in item:
-            temp2.append(float(item['temp above']))
-        else:
-            temp2.append(-1)
-        # mark CHARGE
-        if not timeindex[0] > -1 and 'state' in item and item['state'] == 'doser open':
-            timeindex[0] = max(0,i)
-        # mark DROP
-        if timeindex[6] == 0 and 'state' in item and item['state'] == 'cooling':
-            timeindex[6] = max(0,i)
-        # add SET and RPM
-        if 'temp set' in item:
-            extra1.append(float(item['temp set']))
-        elif 'setpoint' in item:
-            extra1.append(float(item['setpoint']))
-        else:
-            extra1.append(-1)
-        if 'fan speed (RPM)' in item:
-            rpm = float(item['fan speed (RPM)'])
-            extra2.append(rpm/100)
-        elif 'fan speed' in item:
-            rpm = float(item['fan speed'])
-            extra2.append(rpm/100)
-        else:
-            extra2.append(-1)
+    with io.open(file, 'r', newline="",encoding='utf-8') as csvFile:
+        data = csv.reader(csvFile,delimiter=',')
+        #read file header
+        header = next(data)
         
-        if "fan set (%)" in item or "fan set" in item:
-            try:
-                if "fan set (%)" in item:
-                    v = float(item["fan set (%)"])
-                elif "fan set" in item:
-                    v = float(item["fan set"])
-                if v != fan:
-                    # fan value changed
-                    if v == fan_last:
-                        # just a fluctuation, we remove the last added fan value again
-                        fan_last_idx = next(i for i in reversed(range(len(specialeventstype))) if specialeventstype[i] == 0)
-                        del specialeventsvalue[fan_last_idx]
-                        del specialevents[fan_last_idx]
-                        del specialeventstype[fan_last_idx]
-                        del specialeventsStrings[fan_last_idx]
-                        fan = fan_last
+        fan = None # holds last processed fan event value
+        fan_last = None # holds the fan event value before the last one
+        heater = None # holds last processed heater event value
+        heater_last = None # holds the heater event value before the last one
+        fan_event = False # set to True if a fan event exists
+        heater_event = False # set to True if a heater event exists
+        specialevents = []
+        specialeventstype = []
+        specialeventsvalue = []
+        specialeventsStrings = []
+        timex = []
+        temp1 = []
+        temp2 = []
+        extra1 = []
+        extra2 = []
+        timeindex = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+        i = 0
+        for row in data:
+            i = i + 1
+            items = list(zip(header, row))
+            item = {}
+            for (name, value) in items:
+                item[name] = value.strip()
+            # take i as time in seconds
+            timex.append(i)
+            if 'inlet temp' in item:
+                temp1.append(float(item['inlet temp']))
+            elif 'temp below' in item:
+                temp1.append(float(item['temp below']))
+            else:
+                temp1.append(-1)
+            # we map IKAWA Exhaust to BT as main events like CHARGE and DROP are marked on BT in Artisan
+            if 'exaust temp' in item:
+                temp2.append(float(item['exaust temp']))
+            elif 'temp above' in item:
+                temp2.append(float(item['temp above']))
+            else:
+                temp2.append(-1)
+            # mark CHARGE
+            if not timeindex[0] > -1 and 'state' in item and item['state'] == 'doser open':
+                timeindex[0] = max(0,i)
+            # mark DROP
+            if timeindex[6] == 0 and 'state' in item and item['state'] == 'cooling':
+                timeindex[6] = max(0,i)
+            # add SET and RPM
+            if 'temp set' in item:
+                extra1.append(float(item['temp set']))
+            elif 'setpoint' in item:
+                extra1.append(float(item['setpoint']))
+            else:
+                extra1.append(-1)
+            if 'fan speed (RPM)' in item:
+                rpm = float(item['fan speed (RPM)'])
+                extra2.append(rpm/100)
+            elif 'fan speed' in item:
+                rpm = float(item['fan speed'])
+                extra2.append(rpm/100)
+            else:
+                extra2.append(-1)
+            
+            if "fan set (%)" in item or "fan set" in item:
+                try:
+                    if "fan set (%)" in item:
+                        v = float(item["fan set (%)"])
+                    elif "fan set" in item:
+                        v = float(item["fan set"])
+                    if v != fan:
+                        # fan value changed
+                        if v == fan_last:
+                            # just a fluctuation, we remove the last added fan value again
+                            fan_last_idx = next(i for i in reversed(range(len(specialeventstype))) if specialeventstype[i] == 0)
+                            del specialeventsvalue[fan_last_idx]
+                            del specialevents[fan_last_idx]
+                            del specialeventstype[fan_last_idx]
+                            del specialeventsStrings[fan_last_idx]
+                            fan = fan_last
+                            fan_last = None
+                        else:
+                            fan_last = fan
+                            fan = v
+                            fan_event = True
+                            v = v/10. + 1
+                            specialeventsvalue.append(v)
+                            specialevents.append(i)
+                            specialeventstype.append(0)
+                            specialeventsStrings.append("{}".format(fan) + "%")
+                    else:
                         fan_last = None
+                except Exception: # pylint: disable=broad-except
+                    pass
+            if "heater power (%)" in item or "heater" in item:
+                try:
+                    if "heater power (%)" in item:
+                        v = float(item["heater power (%)"])
+                    elif "heater" in item:
+                        v = float(item["heater"])
+                    if v != heater:
+                        # heater value changed
+                        if v == heater_last:
+                            # just a fluctuation, we remove the last added heater value again
+                            heater_last_idx = next(i for i in reversed(range(len(specialeventstype))) if specialeventstype[i] == 3)
+                            del specialeventsvalue[heater_last_idx]
+                            del specialevents[heater_last_idx]
+                            del specialeventstype[heater_last_idx]
+                            del specialeventsStrings[heater_last_idx]
+                            heater = heater_last
+                            heater_last = None
+                        else:
+                            heater_last = heater
+                            heater = v
+                            heater_event = True
+                            v = v/10. + 1
+                            specialeventsvalue.append(v)
+                            specialevents.append(i)
+                            specialeventstype.append(3)
+                            specialeventsStrings.append("{}".format(heater) + "%")
                     else:
-                        fan_last = fan
-                        fan = v
-                        fan_event = True
-                        v = v/10. + 1
-                        specialeventsvalue.append(v)
-                        specialevents.append(i)
-                        specialeventstype.append(0)
-                        specialeventsStrings.append("{}".format(fan) + "%")
-                else:
-                    fan_last = None
-            except Exception: # pylint: disable=broad-except
-                pass
-        if "heater power (%)" in item or "heater" in item:
-            try:
-                if "heater power (%)" in item:
-                    v = float(item["heater power (%)"])
-                elif "heater" in item:
-                    v = float(item["heater"])
-                if v != heater:
-                    # heater value changed
-                    if v == heater_last:
-                        # just a fluctuation, we remove the last added heater value again
-                        heater_last_idx = next(i for i in reversed(range(len(specialeventstype))) if specialeventstype[i] == 3)
-                        del specialeventsvalue[heater_last_idx]
-                        del specialevents[heater_last_idx]
-                        del specialeventstype[heater_last_idx]
-                        del specialeventsStrings[heater_last_idx]
-                        heater = heater_last
                         heater_last = None
-                    else:
-                        heater_last = heater
-                        heater = v
-                        heater_event = True
-                        v = v/10. + 1
-                        specialeventsvalue.append(v)
-                        specialevents.append(i)
-                        specialeventstype.append(3)
-                        specialeventsStrings.append("{}".format(heater) + "%")
-                else:
-                    heater_last = None
-            except Exception: # pylint: disable=broad-except
-                pass
-    csvFile.close()
+                except Exception: # pylint: disable=broad-except
+                    pass
     
     res["mode"] = 'C'
             

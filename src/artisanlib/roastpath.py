@@ -53,7 +53,7 @@ def extractProfileRoastPathHTML(url,_):
                         res["operator"] = meta
                     elif m == "Coffee":
                         coffee = meta
-                        if title == "" or title == "Roast":
+                        if title in ["", "Roast"]:
                             res["title"] = coffee
                     elif m == "Notes":
                         res["roastingnotes"] = meta

@@ -22,7 +22,7 @@ import time
 import numpy
 
 # expects a function control that takes a value from [<outMin>,<outMax>] to control the heater as called on each update()
-class PID(object):
+class PID():
     def __init__(self, control=lambda _: _, p=2.0, i=0.03, d=0.0):
         self.outMin = 0 # minimum output value
         self.outMax = 100 # maximum output value

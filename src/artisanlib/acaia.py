@@ -138,70 +138,65 @@ class AcaiaBLE():
     def parseWeightEvent(self,payload):
         if len(payload) < self.EVENT_WEIGHT_LEN:
             return -1
-        else:
-            # first 4 bytes encode the weight as unsigned long
-            value = ((payload[3] & 0xff) << 24) + \
-                ((payload[2] & 0xff) << 16) + ((payload[1] & 0xff) << 8) + (payload[0] & 0xff)
-            
-            unit = payload[4]
+        # first 4 bytes encode the weight as unsigned long
+        value = ((payload[3] & 0xff) << 24) + \
+            ((payload[2] & 0xff) << 16) + ((payload[1] & 0xff) << 8) + (payload[0] & 0xff)
+        
+        unit = payload[4]
 
-            if unit == 1:
-                value /= 10
-            elif unit == 2:
-                value /= 100
-            elif unit == 3:
-                value /= 1000
-            elif unit == 4:
-                value /= 10000
-            
-            # convert received weight data to g
-            if self.unit == 1: # kg
-                value = value * 1000
-            elif self.unit == 5: # lbs
-                value = value * 28.3495
-            
-            #stable = (payload[5] & 0x01) != 0x01
-            
-            # if 2nd bit of payload[5] is set, the reading is negative
-            if (payload[5] & 0x02) == 0x02:
-                value *= -1
+        if unit == 1:
+            value /= 10
+        elif unit == 2:
+            value /= 100
+        elif unit == 3:
+            value /= 1000
+        elif unit == 4:
+            value /= 10000
+        
+        # convert received weight data to g
+        if self.unit == 1: # kg
+            value = value * 1000
+        elif self.unit == 5: # lbs
+            value = value * 28.3495
+        
+        #stable = (payload[5] & 0x01) != 0x01
+        
+        # if 2nd bit of payload[5] is set, the reading is negative
+        if (payload[5] & 0x02) == 0x02:
+            value *= -1
 
-            # if value is fresh and reading is stable
-            if value != self.weight: # and stable:
-                self.weight = value
-            
-            return self.EVENT_WEIGHT_LEN
+        # if value is fresh and reading is stable
+        if value != self.weight: # and stable:
+            self.weight = value
+        
+        return self.EVENT_WEIGHT_LEN
     
     def parseBatteryEvent(self,payload):
         if len(payload) < self.EVENT_BATTERY_LEN:
             return -1
-        else:
-            b = payload[0]
-            if 0 <= b <= 100:
-                self.battery = int(payload[0])
-                #print("bat","{}%".format(self.battery))
-            return self.EVENT_BATTERY_LEN
+        b = payload[0]
+        if 0 <= b <= 100:
+            self.battery = int(payload[0])
+            #print("bat","{}%".format(self.battery))
+        return self.EVENT_BATTERY_LEN
     
     def parseTimerEvent(self,payload):
         if len(payload) < self.EVENT_TIMER_LEN:
             return -1
-        else:
 #            print("minutes",payload[0])
 #            print("seconds",payload[1])
 #            print("mseconds",payload[2])
-            return self.EVENT_TIMER_LEN
+        return self.EVENT_TIMER_LEN
     
     def parseAckEvent(self,payload):
         if len(payload) < self.EVENT_ACK_LEN:
             return -1
-        else:
-            return self.EVENT_ACK_LEN
+        return self.EVENT_ACK_LEN
     
     def parseKeyEvent(self,payload):
         if len(payload) < self.EVENT_KEY_LEN:
             return -1
-        else:
-            return self.EVENT_KEY_LEN
+        return self.EVENT_KEY_LEN
 
     def parseScaleEvent(self,payload):
         if payload and len(payload) > 0:
@@ -222,10 +217,8 @@ class AcaiaBLE():
                 return -1
             if val < 0:
                 return -1
-            else:
-                return val + 1
-        else:
-            return -1
+            return val + 1
+        return -1
 
     def parseScaleEvents(self,payload):
         if payload and len(payload) > 0:
@@ -270,7 +263,7 @@ class AcaiaBLE():
             self.msgType = data[2]
             # we now expect a data package belonging to this header
             return None, None
-        elif self.msgType is None and len(data)>3 and data[0] == self.HEADER1 and data[1] == self.HEADER2:
+        if self.msgType is None and len(data)>3 and data[0] == self.HEADER1 and data[1] == self.HEADER2:
             # a complete package containing header and payload
             self.msgType = data[2]
             data = data[3:]
@@ -285,22 +278,21 @@ class AcaiaBLE():
             if msgCRC != self.crc(data[:-2]):
 #                print("CRC check failed")
                 return None, None
+            offset = 0
+            if self.msgType in [self.MSG_STATUS, self.MSG_EVENT, self.MSG_INFO]:
+                l = data[0]
+                if l == 0:
+                    l = 1
+                offset = 1
+            elif self.msgType == self.MSG_SYSTEM:
+                l = 2
+                return None, None # we ignore system messages
             else:
-                offset = 0
-                if self.msgType in [self.MSG_STATUS, self.MSG_EVENT, self.MSG_INFO]:
-                    l = data[0]
-                    if l == 0:
-                        l = 1
-                    offset = 1
-                elif self.msgType == self.MSG_SYSTEM:
-                    l = 2
-                    return None, None # we ignore system messages
-                else:
-                    l = 2
-                if len(data) < (l + 2):
-#                    print("Invalid data length")
-                    return None, None
-                self.parseScaleData(write,self.msgType,data[offset:offset+l-1])
+                l = 2
+            if len(data) < (l + 2):
+#                   print("Invalid data length")
+                return None, None
+            self.parseScaleData(write,self.msgType,data[offset:offset+l-1])
             self.msgType = None # message consumed completely
             
         if old_weight == self.weight:

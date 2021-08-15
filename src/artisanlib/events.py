@@ -1844,7 +1844,7 @@ class EventsDlg(ArtisanResizeablDialog):
     def transferbuttonsto(self,pindex=None):
         if pindex is None:
             pindex = self.transferpalettecombobox.currentIndex()
-        if pindex >= 0 and pindex < 10:
+        if 0 <= pindex < 10:
             copy = []
             copy.append(self.extraeventstypes[:])
             copy.append(self.extraeventsvalues[:])
@@ -1991,13 +1991,12 @@ class EventsDlg(ArtisanResizeablDialog):
             self.aw.buttonlistmaxlen = self.aw.buttonpalettemaxlen[pindex]
             
             return 1  #success
-        else:
-            return 0  #failed
+        return 0  #failed
 
     @pyqtSlot(bool)
     def setbuttonsfrom(self,_):
         pindex = self.transferpalettecombobox.currentIndex()
-        if pindex >= 0 and pindex < 10:
+        if 0 <= pindex < 10:
             answer = self.localSetbuttonsfrom(pindex)
             if answer:
                 self.nbuttonsSpinBox.setValue(self.aw.buttonlistmaxlen)
@@ -2256,7 +2255,7 @@ class EventsDlg(ArtisanResizeablDialog):
             self.colorButton.clicked.connect(self.setbuttoncolor)
             label = self.extraeventslabels[i][:]
             et = self.extraeventstypes[i]
-            if et > 4 and et < 9:
+            if 4 < et < 9:
                 et = et - 5
             if et < 4:
                 label = label.replace("\\t",self.aw.qmc.etypes[et])
@@ -2414,7 +2413,7 @@ class EventsDlg(ArtisanResizeablDialog):
     
             if i < len(self.extraeventslabels):
                 et = self.extraeventstypes[i]
-                if et > 4 and et < 9:
+                if 4 < et < 9:
                     et = et - 5
                 self.extraeventslabels[i] = label
                 if et < 4:
@@ -2451,7 +2450,7 @@ class EventsDlg(ArtisanResizeablDialog):
     
             if i < len(self.extraeventslabels):
                 et = self.extraeventstypes[i]
-                if et > 4 and et < 9:
+                if 4 < et < 9:
                     et = et - 5
                 self.extraeventslabels[i] = label
                 if et < 4:

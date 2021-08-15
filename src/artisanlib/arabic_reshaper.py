@@ -140,14 +140,12 @@ ARABIC_GLYPHS_LIST = [
 def get_reshaped_glyph(target, location):
     if target in ARABIC_GLYPHS:
         return ARABIC_GLYPHS[target][location]
-    else:
-        return target
+    return target
         
 def get_glyph_type(target):
     if target in ARABIC_GLYPHS:
         return ARABIC_GLYPHS[target][5]
-    else:
-        return 2
+    return 2
         
 def is_haraka(target):
     return target in HARAKAT

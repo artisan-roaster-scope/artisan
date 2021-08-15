@@ -50,7 +50,7 @@ except Exception: # pylint: disable=broad-except
     pass
 
 if sys.platform.startswith("darwin"):
-    import darkdetect # @UnresolvedImport
+    import darkdetect # @UnresolvedImport # pylint: disable=import-error
 
 
 ########################################################################################
@@ -363,8 +363,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         if v is not None: # value received
             # subtract tare
             return v - self.tare
-        else:
-            return None
+        return None
 
     @pyqtSlot()
     def resetVolume(self):
@@ -2304,7 +2303,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     # recentRoast activated from within RoastProperties dialog
     def recentRoastActivated(self,n):
         # note, the first item is the edited text!
-        if n > 0 and n <= len(self.aw.recentRoasts):
+        if 0 < n <= len(self.aw.recentRoasts):
             rr = self.aw.recentRoasts[n-1]
             if "title" in rr and rr["title"] is not None:
                 self.titleedit.textEdited(rr["title"])
@@ -2599,7 +2598,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.reject()
 
     # calcs volume (in ml) from density (in g/l) and weight (in g)
-    def calc_volume(self,density,weight):
+    @staticmethod
+    def calc_volume(density, weight):
         return (1./density) * weight * 1000
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
@@ -3264,11 +3264,11 @@ class editGraphDlg(ArtisanResizeablDialog):
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updateMetricsLabel() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def formatLoadLabel(self,tag,label=""):
+    @staticmethod
+    def formatLoadLabel(tag, label=""):
         if len(label) > 0:
             return label
-        else:
-            return "{} {}".format(QApplication.translate("Label","Load",None),tag)
+        return "{} {}".format(QApplication.translate("Label","Load",None),tag)
     
     def formatLoadUnitLabel(self,unit):
         return "({})".format(self.aw.qmc.energyunits[unit])
@@ -3516,7 +3516,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         
     ######
 
-    def scalefloat(self,num):
+    @staticmethod
+    def scalefloat(num):
         n = toFloat(num)
         if n == 0:
             res = "0"
@@ -3530,14 +3531,16 @@ class editGraphDlg(ArtisanResizeablDialog):
             res = "{:.2f}".format(n).rstrip('0').rstrip('.')
         return res
 
-    def validateText2Seconds(self,s):
+    @staticmethod
+    def validateText2Seconds(s):
         if len(s) > 0:
             res = stringtoseconds(s)
         else:
             res = 0
         return res
 
-    def validateSeconds2Text(self,seconds):
+    @staticmethod
+    def validateSeconds2Text(seconds):
         if seconds > 0:
             res = stringfromseconds(seconds)
         else:
@@ -3688,7 +3691,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def scanWholeColor(self,_):
         v = self.aw.color.readColor()
         if v is not None and v > -1:
-            if v >= 0 and v <= 250:
+            if 0 <= v <= 250:
                 self.aw.qmc.whole_color = v
                 self.whole_color_edit.setText(str(v))
 
@@ -4277,7 +4280,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.sendmessage(message)
     
     # mark widget w if b holds otherwise unmark it
-    def markWidget(self,w,b):
+    @staticmethod
+    def markWidget(w,b):
         if b:
             if sys.platform.startswith("darwin") and darkdetect.isDark() and appFrozen():
                 w.setStyleSheet("""QLineEdit { background-color: #ad0427;  }""")
@@ -4482,8 +4486,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             pass
         if mloss != 0. and wloss != 0.:
             return mloss, self.aw.float2float(max(min(wloss - mloss,100),0))
-        else:
-            return 0., 0.
+        return 0., 0.
 
     def calculated_organic_loss(self):
         self.moisture_percent()

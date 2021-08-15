@@ -8,7 +8,7 @@ import sys
 
 
 # Define a context manager to suppress stdout and stderr.
-class suppress_stdout_stderr(object):
+class suppress_stdout_stderr():
     '''
     A context manager for doing a "deep suppression" of stdout and stderr in 
     Python, i.e. will suppress all print, even if the print originates in a 

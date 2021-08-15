@@ -246,8 +246,7 @@ class PhidgetManager():
                 else:
                     port = None
                 return p.getDeviceSerialNumber(), port
-            else:
-                return None, None
+            return None, None
         except Exception: # pylint: disable=broad-except
             return None, None
         finally:

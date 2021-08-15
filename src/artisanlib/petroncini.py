@@ -32,100 +32,98 @@ def extractProfilePetronciniCSV(file,_):
 
     res["samplinginterval"] = 1.0
 
-    csvFile = io.open(file, 'r', newline="",encoding='utf-8')
-    data = csv.reader(csvFile,delimiter=';')
-    #read file header
-    next(data) # skip "Export path"
-    next(data) # skip path
-    header = [i.strip() for i in next(data)]
+    with io.open(file, 'r', newline="",encoding='utf-8') as csvFile:
+        data = csv.reader(csvFile,delimiter=';')
+        #read file header
+        next(data) # skip "Export path"
+        next(data) # skip path
+        header = [i.strip() for i in next(data)]
+        
+        roast_date = None
+        power = None # holds last processed heater event value
+        power_last = None # holds the heater event value before the last one
+        power_event = False # set to True if a heater event exists
+        specialevents = []
+        specialeventstype = []
+        specialeventsvalue = []
+        specialeventsStrings = []
+        timex = []
+        temp1 = [] # outlet temperature as ET
+        temp2 = [] # bean temperature
+        extra1 = [] # inlet temperature
+        extra2 = [] # burner percentage
+        timeindex = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+        i = 0
+        for row in data:
+            if row == []:
+                continue
+            i = i + 1
+            items = list(zip(header, row))
+            item = {}
+            for (name, value) in items:
+                item[name] = value.strip()
+            # take i as time in seconds
+            timex.append(i)
+            # extract roast_date
+            if roast_date is None and 'Year' in item and 'Month' in item and 'Day' in item and 'Hour' in item and 'Minute' in item and 'Second' in item:
+                try:
+                    date = QDate(int(item['Year']),int(item['Month']),int(item['Day']))
+                    time = QTime(int(item['Hour']),int(item['Minute']),int(item['Second']))
+                    roast_date = QDateTime(date,time)
+                except Exception:  # pylint: disable=broad-except
+                    pass
+            #
+            if 'Outlet Temperature' in item:
+                temp1.append(float(item['Outlet Temperature']))
+            else:
+                temp1.append(-1)
+            if 'Beans Temperature' in item:
+                temp2.append(float(item['Beans Temperature'].replace(",",".")))
+            else:
+                temp2.append(-1)
+            # mark CHARGE
+            if not timeindex[0] > -1:
+                timeindex[0] = i
+            # mark DROP
+            if timeindex[0] > -1 and i>0:
+                timeindex[6] = i-1
+            # add ror, power, speed and pressure
+            if 'Inlet Temperature' in item:
+                extra1.append(float(item['Inlet Temperature']))
+            else:
+                extra1.append(-1)
+            if 'Burner Percentage' in item:
+                extra2.append(float(item['Burner Percentage']))
+            else:
+                extra2.append(-1)
     
-    roast_date = None
-    power = None # holds last processed heater event value
-    power_last = None # holds the heater event value before the last one
-    power_event = False # set to True if a heater event exists
-    specialevents = []
-    specialeventstype = []
-    specialeventsvalue = []
-    specialeventsStrings = []
-    timex = []
-    temp1 = [] # outlet temperature as ET
-    temp2 = [] # bean temperature
-    extra1 = [] # inlet temperature
-    extra2 = [] # burner percentage
-    timeindex = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
-    i = 0
-    for row in data:
-        if row == []:
-            continue
-        i = i + 1
-        items = list(zip(header, row))
-        item = {}
-        for (name, value) in items:
-            item[name] = value.strip()
-        # take i as time in seconds
-        timex.append(i)
-        # extract roast_date
-        if roast_date is None and 'Year' in item and 'Month' in item and 'Day' in item and 'Hour' in item and 'Minute' in item and 'Second' in item:
-            try:
-                date = QDate(int(item['Year']),int(item['Month']),int(item['Day']))
-                time = QTime(int(item['Hour']),int(item['Minute']),int(item['Second']))
-                roast_date = QDateTime(date,time)
-            except Exception:  # pylint: disable=broad-except
-                pass
-        #
-        if 'Outlet Temperature' in item:
-            temp1.append(float(item['Outlet Temperature']))
-        else:
-            temp1.append(-1)
-        if 'Beans Temperature' in item:
-            temp2.append(float(item['Beans Temperature'].replace(",",".")))
-        else:
-            temp2.append(-1)
-        # mark CHARGE
-        if not timeindex[0] > -1:
-            timeindex[0] = i
-        # mark DROP
-        if timeindex[0] > -1 and i>0:
-            timeindex[6] = i-1
-        # add ror, power, speed and pressure
-        if 'Inlet Temperature' in item:
-            extra1.append(float(item['Inlet Temperature']))
-        else:
-            extra1.append(-1)
-        if 'Burner Percentage' in item:
-            extra2.append(float(item['Burner Percentage']))
-        else:
-            extra2.append(-1)
-
-        if "Burner Percentage" in item:
-            try:
-                v = float(item["Burner Percentage"])
-                if v != power:
-                    # power value changed
-                    if v == power_last:
-                        # just a fluctuation, we remove the last added power value again
-                        power_last_idx = next(i for i in reversed(range(len(specialeventstype))) if specialeventstype[i] == 3)
-                        del specialeventsvalue[power_last_idx]
-                        del specialevents[power_last_idx]
-                        del specialeventstype[power_last_idx]
-                        del specialeventsStrings[power_last_idx]
-                        power = power_last
-                        power_last = None
+            if "Burner Percentage" in item:
+                try:
+                    v = float(item["Burner Percentage"])
+                    if v != power:
+                        # power value changed
+                        if v == power_last:
+                            # just a fluctuation, we remove the last added power value again
+                            power_last_idx = next(i for i in reversed(range(len(specialeventstype))) if specialeventstype[i] == 3)
+                            del specialeventsvalue[power_last_idx]
+                            del specialevents[power_last_idx]
+                            del specialeventstype[power_last_idx]
+                            del specialeventsStrings[power_last_idx]
+                            power = power_last
+                            power_last = None
+                        else:
+                            power_last = power
+                            power = v
+                            power_event = True
+                            v = v/10. + 1
+                            specialeventsvalue.append(v)
+                            specialevents.append(i)
+                            specialeventstype.append(3)
+                            specialeventsStrings.append(item["power"] + "%")
                     else:
-                        power_last = power
-                        power = v
-                        power_event = True
-                        v = v/10. + 1
-                        specialeventsvalue.append(v)
-                        specialevents.append(i)
-                        specialeventstype.append(3)
-                        specialeventsStrings.append(item["power"] + "%")
-                else:
-                    power_last = None
-            except Exception:  # pylint: disable=broad-except
-                pass
-
-    csvFile.close()
+                        power_last = None
+                except Exception:  # pylint: disable=broad-except
+                    pass
             
     res["timex"] = timex
     res["temp1"] = replace_duplicates(temp1)

@@ -186,14 +186,12 @@ class profileTransformatorDlg(ArtisanDialog):
     def forgroundOffset(self):
         if self.aw.qmc.timeindex[0] == -1:
             return 0
-        else:
-            return self.org_timex[self.aw.qmc.timeindex[0]]
+        return self.org_timex[self.aw.qmc.timeindex[0]]
     
     def backgroundOffset(self):
         if self.aw.qmc.timeindexB[0] != -1 and len(self.aw.qmc.timeB) > self.aw.qmc.timeindexB[0]:
             return self.aw.qmc.timeB[self.aw.qmc.timeindexB[0]]
-        else:
-            return 0
+        return 0
     
     def clearPhasesTargetTimes(self):
         for i in range(3):
@@ -725,7 +723,8 @@ class profileTransformatorDlg(ArtisanDialog):
     # a target element of None is skipped and pervious and next segements are joined
     # the lists of sources and targets are expected to be of the same length
     # the length of the result list is the same as that of the sources and targets
-    def calcDiscretefits(self,sources,targets):
+    @staticmethod
+    def calcDiscretefits(sources,targets):
         if len(sources) != len(targets):
             return [None]*len(sources)
         fits = [None]*len(sources)
@@ -795,8 +794,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.aw.qmc.timex = self.org_timex[:]
                 self.aw.qmc.extratimex = copy.deepcopy(self.org_extratimex)
                 return False
-            else:
-                self.targetTimes = self.getTargetPhasesTimes()
+            self.targetTimes = self.getTargetPhasesTimes()
         # calculate the offset of 00:00
         offset = self.forgroundOffset()
         # apply either the discrete or the polyfit mappings
@@ -870,16 +868,15 @@ class profileTransformatorDlg(ArtisanDialog):
                     fit = numpy.poly1d(fits[j]) # fit to be applied
                     self.aw.qmc.temp2.append(fit(tp))
             return True
-        else:
-            # polyfit mappings
-            with warnings.catch_warnings():
-                warnings.filterwarnings('error')
-                try:
-                    fit = numpy.poly1d(self.calcTempPolyfit())
-                    if fit is not None:
-                        self.aw.qmc.temp2 = [(-1 if (temp is None) or (temp == -1) else fit(temp)) for temp in self.org_temp2]
-                except numpy.RankWarning:
-                    pass
+        # polyfit mappings
+        with warnings.catch_warnings():
+            warnings.filterwarnings('error')
+            try:
+                fit = numpy.poly1d(self.calcTempPolyfit())
+                if fit is not None:
+                    self.aw.qmc.temp2 = [(-1 if (temp is None) or (temp == -1) else fit(temp)) for temp in self.org_temp2]
+            except numpy.RankWarning:
+                pass
         return True
     
     # tables

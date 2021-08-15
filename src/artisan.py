@@ -25,7 +25,7 @@ try:
         from PyQt5.QtWidgets import QApplication  # @UnusedImport  # pylint: disable=import-error
         from PyQt5.QtCore import Qt  # @UnusedImport # pylint: disable=import-error
     else:
-        from PyQt6.QtWidgets import QApplication  # @UnresolvedImport # pylint: disable=import-error @Reimport
+        from PyQt6.QtWidgets import QApplication  # @UnresolvedImport @Reimport # pylint: disable=import-error
         from PyQt6.QtCore import Qt     # @Reimport # @UnresolvedImport # pylint: disable=import-error
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)

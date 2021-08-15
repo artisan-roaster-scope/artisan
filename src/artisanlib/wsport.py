@@ -28,7 +28,7 @@ import random
 from PyQt5.QtWidgets import QApplication
 
 
-class wsport(object):
+class wsport():
     def __init__(self,aw):
         self.aw = aw
         
@@ -283,8 +283,7 @@ class wsport(object):
             del self.pending_events[message_id]
             if not isinstance(v,threading.Event):
                 return v
-            else:
-                return None
+            return None
         return res
     
     # takes a request as dict to be send as JSON
@@ -308,18 +307,15 @@ class wsport(object):
                         if self.aw.seriallogflag:
                             self.aw.addserial("wsport send() received: {}".format(message_id))
                         return self.getRequestResponse(message_id)
-                    else:
-                        if self.aw.seriallogflag:
-                            self.aw.addserial("wsport send() timeout: {}".format(message_id))
-                        self.removeRequestResponse(message_id)
-                        return None # timeout
-                else:
-                    self.ws.send(json_req)
                     if self.aw.seriallogflag:
-                        self.aw.addserial("wsport send() non-blocking: {}".format(json_req))
-                    return None
-            else:
+                        self.aw.addserial("wsport send() timeout: {}".format(message_id))
+                    self.removeRequestResponse(message_id)
+                    return None # timeout
+                self.ws.send(json_req)
+                if self.aw.seriallogflag:
+                    self.aw.addserial("wsport send() non-blocking: {}".format(json_req))
                 return None
+            return None
         except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " wsport:send() {0}").format(str(e)),exc_tb.tb_lineno)

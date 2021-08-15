@@ -258,7 +258,7 @@ class AlarmDlg(ArtisanResizeablDialog):
     @pyqtSlot(bool)
     def setAlarmSet(self,_):
         i = self.transferalarmsetcombobox.currentIndex()
-        if i >= 0 and i < len(self.aw.qmc.alarmsets):
+        if 0 <= i < len(self.aw.qmc.alarmsets):
             self.aw.qmc.alarmsetlabel = self.transferalarmesetcurrentset.text()
             self.transferalarmesetcurrentset.setText(self.aw.qmc.alarmsetlabel)
             # we clear the alarmsfile as we overwrite here from an alarmset
@@ -284,7 +284,7 @@ class AlarmDlg(ArtisanResizeablDialog):
     @pyqtSlot(bool)
     def setAlarmTable(self,_):
         i = self.transferalarmsetcombobox.currentIndex()
-        if i >= 0 and i < len(self.aw.qmc.alarmsets):
+        if 0 <= i < len(self.aw.qmc.alarmsets):
             self.aw.qmc.selectAlarmSet(i)
             self.transferalarmesetcurrentset.setText(self.aw.qmc.alarmsetlabel)
             self.transferalarmsetcombobox.setCurrentIndex(-1)
@@ -611,10 +611,9 @@ class AlarmDlg(ArtisanResizeablDialog):
             _,ext = os.path.splitext(filename)
             if ext == ".alrm":
                 import io
-                infile = io.open(filename, 'r', encoding='utf-8')
                 from json import load as json_load
-                alarms = json_load(infile)
-                infile.close()
+                with io.open(filename, 'r', encoding='utf-8') as infile:
+                    alarms = json_load(infile)
                 self.aw.qmc.alarmsfile = filename
                 self.alarmsfile.setText(self.aw.qmc.alarmsfile)
                 self.aw.qmc.alarmflag = alarms["alarmflags"]
@@ -670,11 +669,10 @@ class AlarmDlg(ArtisanResizeablDialog):
             alarms["alarmactions"] = self.aw.qmc.alarmaction
             alarms["alarmbeep"] = self.aw.qmc.alarmbeep
             alarms["alarmstrings"] = list(self.aw.qmc.alarmstrings)
-            outfile = open(filename, 'w')
             from json import dump as json_dump
-            json_dump(alarms, outfile, ensure_ascii=True)
-            outfile.write('\n')
-            outfile.close()
+            with open(filename, 'w') as outfile:
+                json_dump(alarms, outfile, ensure_ascii=True)
+                outfile.write('\n')
             return True
         except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
@@ -735,7 +733,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                     guard_value = int(str(guard.text())) - 1
                 except Exception: # pylint: disable=broad-except
                     guard_value = -1
-                if guard_value > -1 and guard_value < nalarms:
+                if -1 < guard_value < nalarms:
                     self.aw.qmc.alarmguard[i] = guard_value
                 else:
                     self.aw.qmc.alarmguard[i] = -1
@@ -744,7 +742,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                     negguard_value = int(str(negguard.text())) - 1
                 except Exception: # pylint: disable=broad-except
                     negguard_value = -1
-                if negguard_value > -1 and negguard_value < nalarms:
+                if -1 < negguard_value < nalarms:
                     self.aw.qmc.alarmnegguard[i] = negguard_value
                 else:
                     self.aw.qmc.alarmnegguard[i] = -1

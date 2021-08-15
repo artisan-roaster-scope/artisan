@@ -76,6 +76,16 @@ class AillioR1:
         self.worker_thread_run = True
         self.roast_number = -1
         self.fan_rpm = 0
+        
+        self.parent_pipe = None
+        self.child_pipe = None
+        self.irt = 0
+        self.pcbt = 0
+        self.coil_fan = 0
+        self.coil_fan2 = 0
+        self.pht = 0
+        self.minutes = 0
+        self.seconds = 0
 
     def __del__(self):
         if not self.simulated:
@@ -217,8 +227,7 @@ class AillioR1:
         d = abs(h - value)
         if d <= 0:
             return
-        if d > 9:
-            d = 9
+        d = min(d,9)
         if h > value:
             for _ in range(d):
                 self.parent_pipe.send(self.AILLIO_CMD_HEATER_DECR)
@@ -238,8 +247,7 @@ class AillioR1:
         d = abs(f - value)
         if d <= 0:
             return
-        if d > 11:
-            d = 11
+        d = min(d,11)
         if f > value:
             for _ in range(0, d):
                 self.parent_pipe.send(self.AILLIO_CMD_FAN_DECR)
@@ -614,9 +622,8 @@ def extractProfileRoastWorld(url,aw):
     return res
 
 def extractProfileRoasTime(file,aw):
-    infile = io.open(file, 'r', encoding='utf-8')
-    data = json.load(infile)
-    infile.close()
+    with io.open(file, 'r', encoding='utf-8') as infile:
+        data = json.load(infile)
     return extractProfileBulletDict(data,aw)
 
 if __name__ == "__main__":

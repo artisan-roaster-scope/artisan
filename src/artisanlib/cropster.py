@@ -774,7 +774,7 @@ def extractProfileCropsterXLS(file,_):
         channel = 1 # toggle between channel 1 and 2 to be filled with extra temperature curve data
         for CT_idx,sn in enumerate(sheet_names):
             sn = sn.strip()
-            if CT_idx != BT_idx and CT_idx != ET_idx: # all but temp and non-temp curves but for the already processed ET and BT curves
+            if CT_idx not in (BT_idx, ET_idx): # all but temp and non-temp curves but for the already processed ET and BT curves
                 if sn in extra_temp_curve_trans:
                     temp_curve = True
                 elif sn in extra_nontemp_curve_trans:

@@ -38,8 +38,7 @@ def appFrozen():
 def decs2string(x):
     if len(x) > 0:
         return bytes(x)
-    else:
-        return b""
+    return b""
 def stringp(x):
     return isinstance(x, str)
 def uchr(x):
@@ -50,18 +49,15 @@ def uchr(x):
 def decodeLocal(x):
     if x is not None:
         return codecs.unicode_escape_decode(x)[0]
-    else:
-        return None
+    return None
 def encodeLocal(x):
     if x is not None:
         return codecs.unicode_escape_encode(str(x))[0].decode("utf8")
-    else:
-        return None
+    return None
 def hex2int(h1,h2=None):
     if h2 is not None:
         return int(h1*256 + h2)
-    else:
-        return int(h1)
+    return int(h1)
 def str2cmd(s):
     return bytes(s,"ascii")
 def cmd2str(c):
@@ -76,12 +72,10 @@ def stringfromseconds(seconds_raw, leadingzero=True):
     if seconds >= 0:
         if leadingzero:
             return "%02d:%02d"% divmod(seconds, 60)
-        else:
-            return ("%2d:%02d"% divmod(seconds, 60)).strip()
-    else:
-        #usually the timex[timeindex[0]] is alreday taken away in seconds before calling stringfromseconds()
-        negtime = abs(seconds)
-        return "-%02d:%02d"% divmod(negtime, 60)
+        return ("%2d:%02d"% divmod(seconds, 60)).strip()
+    #usually the timex[timeindex[0]] is alreday taken away in seconds before calling stringfromseconds()
+    negtime = abs(seconds)
+    return "-%02d:%02d"% divmod(negtime, 60)
 
 #Converts a string into a seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
 #accepted formats: "00:00","-00:00"
@@ -89,67 +83,55 @@ def stringtoseconds(string):
     timeparts = string.split(":")
     if len(timeparts) != 2:
         return -1
-    else:
-        if timeparts[0][0] != "-":  #if number is positive
-            seconds = int(timeparts[1])
-            seconds += int(timeparts[0])*60
-            return seconds
-        else:
-            seconds = int(timeparts[0])*60
-            seconds -= int(timeparts[1])
-            return seconds    #return negative number
+    if timeparts[0][0] != "-":  #if number is positive
+        seconds = int(timeparts[1])
+        seconds += int(timeparts[0])*60
+        return seconds
+    seconds = int(timeparts[0])*60
+    seconds -= int(timeparts[1])
+    return seconds    #return negative number
 
 def fromFtoC(Ffloat):
     if Ffloat in [-1,None]:
         return Ffloat
-    else:
-        return (Ffloat-32.0)*(5.0/9.0)
+    return (Ffloat-32.0)*(5.0/9.0)
 
 def fromCtoF(Cfloat):
     if Cfloat in [-1,None]:
         return Cfloat
-    else:
-        return (Cfloat*9.0/5.0)+32.0
+    return (Cfloat*9.0/5.0)+32.0
         
 def RoRfromCtoF(CRoR):
     if CRoR in [-1,None]:
         return CRoR
-    else:
-        return (CRoR*9.0/5.0)
+    return (CRoR*9.0/5.0)
 
 def RoRfromFtoC(FRoR):
     if FRoR in [-1,None]:
         return FRoR
-    else:
-        return FRoR*(5.0/9.0)
+    return FRoR*(5.0/9.0)
 
 def convertRoR(r,source_unit,target_unit):
     if source_unit == "C":
         if target_unit == "C":
             return r
-        else:
-            return RoRfromCtoF(r)
-    elif source_unit == "F":
+        return RoRfromCtoF(r)
+    if source_unit == "F":
         if target_unit == "F":
             return r
-        else:
-            return RoRfromFtoC(r)
-    else:
-        return r
+        return RoRfromFtoC(r)
+    return r
         
 def convertTemp(t,source_unit,target_unit):
     if source_unit == "C":
         if target_unit == "C":
             return t
-        else:
-            return fromCtoF(t)
-    elif source_unit == "F":
+        return fromCtoF(t)
+    if source_unit == "F":
         if target_unit == "F":
             return t
-        else:
-            return fromFtoC(t)
-    else:
-        return t
+        return fromFtoC(t)
+    return t
 
 
 def path2url(path):
@@ -161,42 +143,35 @@ def path2url(path):
 def toInt(x):
     if x is None:
         return 0
-    else:
-        try:
-            return int(round(float(x)))
-        except Exception: # pylint: disable=broad-except
-            return 0
+    try:
+        return int(round(float(x)))
+    except Exception: # pylint: disable=broad-except
+        return 0
 def toString(x):
     return str(x)
 def toList(x):
     if x is None:
         return []
-    else:
-        return list(x)
+    return list(x)
 def toFloat(x):
     if x is None:
         return 0.
-    else:
-        try:
-            return float(x)
-        except Exception: # pylint: disable=broad-except
-            return 0.
+    try:
+        return float(x)
+    except Exception: # pylint: disable=broad-except
+        return 0.
 def toBool(x):
     if x is None:
         return False
-    else:
-        if isinstance(x,str):
-            if x in ["false","False"]:
-                return False
-            else:
-                return True
-        else:
-            return bool(x)
+    if isinstance(x,str):
+        if x in ["false","False"]:
+            return False
+        return True
+    return bool(x)
 def toStringList(x):
     if x:
         return [str(s) for s in x]
-    else:
-        return []
+    return []
 def toMap(x):
     return x
 def removeAll(l,s):
@@ -235,13 +210,12 @@ def fill_gaps(l):
                     # no further valid values, we append the tail
                     res.extend(l[i:])
                     return res
-                else:
-                    # compute intermediate values
-                    step = (next_val - last_val) / (j-i+1.)
-                    for _ in range(j-i):
-                        last_val = last_val + step
-                        res.append(last_val)
-                    skip = next_idx
+                # compute intermediate values
+                step = (next_val - last_val) / (j-i+1.)
+                for _ in range(j-i):
+                    last_val = last_val + step
+                    res.append(last_val)
+                skip = next_idx
             else:
                 res.append(e)
                 last_val = e

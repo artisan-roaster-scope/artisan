@@ -139,8 +139,7 @@ class LargeLCDs(ArtisanDialog):
                 newLayoutNr = self.layoutNr
             else:
                 newLayoutNr = n
-            if newLayoutNr < 0:
-                newLayoutNr = 0
+            newLayoutNr = max(newLayoutNr, 0)
             # release old layout
             if self.layout():
                 QWidget().setLayout(self.layout())
@@ -171,13 +170,15 @@ class LargeLCDs(ArtisanDialog):
         lcd.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.aw.lcdpaletteF[s],self.aw.lcdpaletteB[s]))
         return lcd
     
-    def makeLabel(self,name):
+    @staticmethod
+    def makeLabel(name):
         label = MyQLabel(name)
         label.setTextFormat(Qt.RichText)
         label.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
         return label
     
-    def makeLCDframe(self,lcdUpper,lcd,lcdLower):
+    @staticmethod
+    def makeLCDframe(lcdUpper,lcd,lcdLower):
         lcdlayout = QVBoxLayout()
         lcdlayout.addWidget(lcdUpper,1)
         lcdlayout.addWidget(lcd,5)
@@ -430,8 +431,7 @@ class LargeMainLCDs(LargeLCDs):
                 newLayoutNr = self.layoutNr
             else:
                 newLayoutNr = n
-            if newLayoutNr < 0:
-                newLayoutNr = 0
+            newLayoutNr = max(newLayoutNr,0)
             # release old layout
             if self.layout():
                 QWidget().setLayout(self.layout())
@@ -655,12 +655,12 @@ class LargePhasesLCDs(LargeLCDs):
         self.chooseLayout(self.width(),self.height())
         self.setWindowTitle(UIconst.TOOLKIT_MENU_PHASES_LCDS)
     
-    def formatLabel(self,l):
+    @staticmethod
+    def formatLabel(l):
         if l is None:
             return None
-        else:
-            label_fmt = "<b>{}</b>"
-            return label_fmt.format(l)
+        label_fmt = "<b>{}</b>"
+        return label_fmt.format(l)
 
     def makeLCDs(self):
         self.lcds1styles = ["sv","sv"]

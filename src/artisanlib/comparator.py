@@ -19,13 +19,12 @@
 import sys
 import platform
 import numpy
-import matplotlib.ticker as ticker
-import matplotlib.transforms as transforms
+from matplotlib import ticker, transforms
 import matplotlib.patheffects as PathEffects
 from matplotlib import rcParams
 if sys.platform.startswith("darwin"):
     # import module to detect if OS X dark mode is active or not
-    import darkdetect # @UnresolvedImport
+    import darkdetect # @UnresolvedImport # pylint: disable=import-error
 
 from artisanlib.util import deltaLabelUTF8, decodeLocal, stringfromseconds, appFrozen, fromFtoC, fromCtoF, fill_gaps
 from artisanlib.suppress_errors import suppress_stdout_stderr
@@ -654,15 +653,13 @@ class CompareTableWidget(QTableWidget):
                 selectedRows.append(item.row())
         if selectedRows == []:
             return self.getLastRow()
-        else:
-            return selectedRows
+        return selectedRows
     
     def getLastRow(self):
         rows = self.rowCount()
         if rows > 0:
             return [rows-1]
-        else:
-            return []
+        return []
 
 class roastCompareDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None, foreground = None, background = None):
@@ -797,7 +794,8 @@ class roastCompareDlg(ArtisanDialog):
         if settings.contains("CompareGeometry"):
             self.restoreGeometry(settings.value("CompareGeometry"))
     
-    def dragEnterEvent(self, event):
+    @staticmethod
+    def dragEnterEvent(event):
         if event.mimeData().hasUrls():
             event.accept()
         else:

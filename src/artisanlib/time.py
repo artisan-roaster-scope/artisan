@@ -17,7 +17,7 @@
 import time
 
 # higher resultion time signal (at least on Mac OS X)
-class ArtisanTime(object):
+class ArtisanTime():
 
     __slots__ = ['clock','base']
     

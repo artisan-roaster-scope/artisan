@@ -109,12 +109,8 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
         url = "http://127.0.0.1:" + str(port) + "/status"
         r = rget(url,timeout=2)
         
-        if r.status_code == 200:
-            return True
-        else:
-            return False
-    else:
-        return False
+        return bool(r.status_code == 200)
+    return False
     
 def stopWeb():
     global wsocks, process # pylint: disable=global-statement
@@ -168,14 +164,13 @@ def handle_websocket():
                 except Exception: # pylint: disable=broad-except
                     pass
                 break
-            else:
-                message = wsock.receive()
-                if message is None:
-                    try:
-                        wsocks.remove(wsock)
-                    except Exception: # pylint: disable=broad-except
-                        pass
-                    break
+            message = wsock.receive()
+            if message is None:
+                try:
+                    wsocks.remove(wsock)
+                except Exception: # pylint: disable=broad-except
+                    pass
+                break
         except Exception: # pylint: disable=broad-except
             try:
                 wsocks.remove(wsock)

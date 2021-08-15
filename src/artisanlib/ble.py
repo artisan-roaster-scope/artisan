@@ -218,12 +218,12 @@ class BleInterface(QtCore.QObject):
         else:
             self.connectCurrentDevice()
 
-    def deviceHasService(self,device,service_uuid):
+    @staticmethod
+    def deviceHasService(device, service_uuid):
         if device is None:
             return False
-        else:
-            services = device.serviceUuids()
-            return services and len(services)>0 and service_uuid in services[0]
+        services = device.serviceUuids()
+        return services and len(services)>0 and service_uuid in services[0]
 
     @QtCore.pyqtSlot("QBluetoothDeviceInfo")
     def addDevice(self, device):

@@ -31,6 +31,7 @@ class MyQComboBox(QComboBox):
     def wheelEvent(self, *args, **kwargs):
         if self.hasFocus():
             return QComboBox.wheelEvent(self, *args, **kwargs)
+        return None
 
 class MyQDoubleSpinBox(QDoubleSpinBox):
     def __init__(self, *args, **kwargs):
@@ -40,6 +41,7 @@ class MyQDoubleSpinBox(QDoubleSpinBox):
     def wheelEvent(self, *args, **kwargs):
         if self.hasFocus():
             return QDoubleSpinBox.wheelEvent(self, *args, **kwargs)
+        return None
             
     # we re-direct the mouse double-click event to the standard mouse press event and add
     # the (at least in PyQt 5.12.2/5.12.3) missing mouse release event
@@ -66,13 +68,12 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem):
         if len(a) == 5 and len(b) == 5 and a[2] == ":" and b[2] == ":":
             # we compare times
             return stringtoseconds(a) < stringtoseconds(b)
-        else:
-            try:
-                # if those are numbers
-                return int(a) < int(b)
-            except Exception: # pylint: disable=broad-except
-                # else we do a string compare
-                return a < b
+        try:
+            # if those are numbers
+            return int(a) < int(b)
+        except Exception: # pylint: disable=broad-except
+            # else we do a string compare
+            return a < b
 
 class MyTableWidgetItemQTime(QTableWidgetItem):
     __slots__ = ['sortKey'] # save some memory by using slots

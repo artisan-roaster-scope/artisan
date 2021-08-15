@@ -1295,7 +1295,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         except Exception: # pylint: disable=broad-except
             pass
 
-    def createItems(self,strs):
+    @staticmethod
+    def createItems(strs):
         items = []
         for i in range(len(strs)):
             item = QStandardItem(strs[i])
@@ -1588,7 +1589,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             selected = self.devicetable.selectedRanges()
             if len(selected) > 0:
                 bindex = selected[0].topRow()
-            if bindex >= 0 and bindex < len(self.aw.qmc.extradevices):
+            if 0 <= bindex < len(self.aw.qmc.extradevices):
                 self.delextradevice(bindex)
             self.aw.updateExtraLCDvisibility()
             self.aw.qmc.resetlinecountcaches()

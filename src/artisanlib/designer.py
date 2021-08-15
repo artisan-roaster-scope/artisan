@@ -450,8 +450,7 @@ class designerconfigDlg(ArtisanDialog):
         for i in range(len(strings)):
             if len(str(strings[i])) < 5:
                 return i
-            else:
-                return 1000
+            return 1000
 
     #supporting function for settimes()
     @pyqtSlot(bool)

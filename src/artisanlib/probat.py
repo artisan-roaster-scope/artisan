@@ -37,7 +37,8 @@ class ProbatMiddleware():
 
     # discover the Probat Middleware within the local area network via a broadcast message and
     # returns IP and port of its endpoint
-    def discover(self):
+    @staticmethod
+    def discover():
         s = socket(AF_INET, SOCK_DGRAM) #create UDP socket
         s.bind(('', 0))
         s.setsockopt(SOL_SOCKET, SO_BROADCAST, 1) #this is a broadcast socket
@@ -48,8 +49,9 @@ class ProbatMiddleware():
         port = data.decode('ascii')
         ip = addr[0]
         return ip, port
-        
-    def getHeaders(self):
+    
+    @staticmethod
+    def getHeaders():
         headers = {"user-agent": "Artisan"}
         headers["Accept-Encoding"] = "deflate, compress, gzip" # identity should not be in here!
         return headers
@@ -101,8 +103,6 @@ class ProbatMiddleware():
     def getRoasterURL(self):
         if self.probat_middleware_endpoint is not None and self.isConnected():
             return self.probat_middleware_endpoint + GET_DATA.format(id=self.probat_middleware_ID)
-        else:
-            return None
     
     def getRoasterName(self):
         return self.probat_middleware_name

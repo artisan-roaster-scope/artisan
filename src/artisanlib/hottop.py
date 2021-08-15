@@ -54,8 +54,7 @@ xSET_COOLING_MOTOR = None
 def hex2int(h1,h2=None):
     if h2:
         return int(h1*256 + h2)
-    else:
-        return int(h1)
+    return int(h1)
         
 def openport(p):
     try:
@@ -202,10 +201,9 @@ def sendControl(p,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOT
 def newValue(set_value,get_value):
     if set_value != -1:
         return set_value
-    elif get_value != -1:
+    if get_value != -1:
         return get_value
-    else:
-        return 0
+    return 0
 
 def HOTTOPcontrol(aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
         aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR):
@@ -223,7 +221,7 @@ def HOTTOPcontrol(aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOT
     cmd[16] = newValue(aSET_SOLENOID.value,aSOLENOID.value)
     cmd[17] = newValue(aSET_DRUM_MOTOR.value,aDRUM_MOTOR.value)
     cmd[18] = newValue(aSET_COOLING_MOTOR.value,aCOOLING_MOTOR.value)
-    cmd[35] = sum([b for b in cmd[:35]]) & 0xFF # checksum
+    cmd[35] = sum(list(cmd[:35])) & 0xFF # checksum
     return bytes(cmd)
 
 
@@ -235,15 +233,13 @@ def takeHottopControl():
     if xCONTROL:
         xCONTROL.value = True
         return True
-    else:
-        return False
+    return False
     
 def releaseHottopControl():
     if xCONTROL and xBT.value < BTleaveControl:
         xCONTROL.value = False
         return True
-    else:
-        return False
+    return False
 
 # BT/ET : double
 # heater : int(0-100)
@@ -252,8 +248,7 @@ def releaseHottopControl():
 def getHottop():
     if xBT != None and xET != None and xHEATER != None and xMAIN_FAN != None:
         return xBT.value, xET.value, xHEATER.value, xMAIN_FAN.value * 10
-    else:
-        return -1, -1, 0, 0
+    return -1, -1, 0, 0
 
 
 # heater : int(0-100)
@@ -283,34 +278,33 @@ def startHottop(interval=1,comport="COM4",baudrate=115200,bytesize=8,parity='N',
     try:
         if process:
             return False
-        else:
-            stopHottop() # we stop an already running process to ensure that only one is running
-            lock = mp.Lock()
-            xCONTROL = Value(c_bool, False, lock=lock)
-            # variables to read from the Hottop
-            xBT = Value(c_double, -1.0, lock=lock)
-            xET = Value(c_double, -1.0, lock=lock)
-            xHEATER = Value('i', -1, lock=lock)
-            xFAN = Value('i', -1, lock=lock)
-            xMAIN_FAN = Value('i', -1, lock=lock)
-            xSOLENOID = Value(c_bool, False, lock=lock)
-            xDRUM_MOTOR = Value(c_bool, False, lock=lock)
-            xCOOLING_MOTOR = Value(c_bool, False, lock=lock)
-            xCHAFF_TRAY = Value(c_bool, False, lock=lock)
-            # set variables to write to the Hottop
-            xSET_HEATER = Value('i', -1, lock=lock)
-            xSET_FAN = Value('i', -1, lock=lock)
-            xSET_MAIN_FAN = Value('i', -1, lock=lock)
-            xSET_SOLENOID = Value('i', -1, lock=lock)
-            xSET_DRUM_MOTOR = Value('i', -1, lock=lock)
-            xSET_COOLING_MOTOR = Value('i', -1, lock=lock)
-            # variables to write to the Hottop
-            
-            process = mp.Process(target=doWork, args=(interval,comport,baudrate,bytesize,parity,stopbits,timeout,
-                xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
-                xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xCONTROL))
-            process.start()
-            return True
+        stopHottop() # we stop an already running process to ensure that only one is running
+        lock = mp.Lock()
+        xCONTROL = Value(c_bool, False, lock=lock)
+        # variables to read from the Hottop
+        xBT = Value(c_double, -1.0, lock=lock)
+        xET = Value(c_double, -1.0, lock=lock)
+        xHEATER = Value('i', -1, lock=lock)
+        xFAN = Value('i', -1, lock=lock)
+        xMAIN_FAN = Value('i', -1, lock=lock)
+        xSOLENOID = Value(c_bool, False, lock=lock)
+        xDRUM_MOTOR = Value(c_bool, False, lock=lock)
+        xCOOLING_MOTOR = Value(c_bool, False, lock=lock)
+        xCHAFF_TRAY = Value(c_bool, False, lock=lock)
+        # set variables to write to the Hottop
+        xSET_HEATER = Value('i', -1, lock=lock)
+        xSET_FAN = Value('i', -1, lock=lock)
+        xSET_MAIN_FAN = Value('i', -1, lock=lock)
+        xSET_SOLENOID = Value('i', -1, lock=lock)
+        xSET_DRUM_MOTOR = Value('i', -1, lock=lock)
+        xSET_COOLING_MOTOR = Value('i', -1, lock=lock)
+        # variables to write to the Hottop
+        
+        process = mp.Process(target=doWork, args=(interval,comport,baudrate,bytesize,parity,stopbits,timeout,
+            xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
+            xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xCONTROL))
+        process.start()
+        return True
     except Exception: # pylint: disable=broad-except
         return False
 

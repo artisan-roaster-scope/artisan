@@ -206,7 +206,7 @@ class nonedevDlg(QDialog):
 ##################### SERIAL PORT #########################################################
 ###########################################################################################
 
-class serialport(object):
+class serialport():
     """ this class handles the communications with all the devices"""
 
     __slots__ = ['aw', 'platf', 'comport','baudrate','bytesize','parity','stopbits','timeout','SP','COMsemaphore','commavailable',\
@@ -464,6 +464,7 @@ class serialport(object):
 
 #####################  FUNCTIONS  ############################
     ######### functions used by Fuji PIDs
+    # returns command binstring on success as returned from device or "0" on failure
     def sendFUJIcommand(self,binstring,nbytes):
         try:
             ###  lock resources ##
@@ -493,6 +494,7 @@ class serialport(object):
                             errorcode = QApplication.translate("Error Message","F80h Error",None) + " 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n coil numbers or resistor numbers."
                             errorcode += (QApplication.translate("Error Message","Exception:",None) + " SendFUJIcommand() 3 Illegal Data Value for unit {0}").format(ord(binstring[0]))
                             self.aw.qmc.adderror(errorcode)
+                        return r
                     else:
                         #Check crc16
                         crcRx =  hex2int(r[-1],r[-2])
@@ -636,6 +638,7 @@ class serialport(object):
                         #if CRCreceived == CRCcalculated:
                         t1 = float(int(r[7:11], 16))*0.1    #convert ascii string from bytes 8-11 (4 bytes) to a float
                         return t1
+                    return -1
 ##                        else:
 ##                            self.aw.qmc.adderror(QApplication.translate("Error Message","DTAtemperature(): Data corruption. Check wiring",None))            
 ##                            if len(self.aw.qmc.timex) > 2:
@@ -657,12 +660,14 @@ class serialport(object):
                     if len(self.aw.qmc.timex) > 2:
                         return self.aw.qmc.temp1[-1]
                     else:
-                        return -1.
+                        return -1
+            return -1
         except Exception: # pylint: disable=broad-except
             error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.sendDTAcommand()"
             timez = str(QDateTime.currentDateTime().toString("hh:mm:ss.zzz"))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror(timez + " " + error,getattr(exc_tb, 'tb_lineno', '?'))
+            return -1
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -1702,7 +1707,8 @@ class serialport(object):
         except Exception: # pylint: disable=broad-except
             pass
 
-    def binary(self, n, digits=8):
+    @staticmethod
+    def binary(n, digits=8):
         return "{0:0>{1}}".format(bin(n)[2:], digits)
 
     #similar to Omega HH806
@@ -1760,17 +1766,11 @@ class serialport(object):
 
                         #return original T1 T2
                         if(r[index+11] == 9 or r[index+11] == 65): # 9="\x09" 65="\x41"
-                            temp = s2
-                            s2 = s1
-                            s1 = temp
+                            s1, s2 = s2, s1
                         elif(r[index+11] == 10): # 10="\x0a"
-                            temp = s2
-                            s2 = s2-s1
-                            s1 = temp
+                            s1, s2 = s2, s2-s1
                         elif(r[index+11] == 138): # 138="\x8a"
-                            temp = s2
-                            s2 = s2+s1
-                            s1 = temp
+                            s1 = s2, s1 + s2
                         elif(r[index+11] == 66 or r[index+11] == 194):  # 66="\x42" and 194="\xc2"
                             s1 = s2
                             s2 = -1
@@ -2000,7 +2000,6 @@ class serialport(object):
         except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH806Winit() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-            return -1,-1
         finally:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
@@ -2031,8 +2030,8 @@ class serialport(object):
                             r2 = hex2int(r[19],r[20])/10.
                             #GOOD
                             return r1,r2
-                #BAD
-                return -1.,-1.
+            #BAD
+            return -1.,-1.
         except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH806Wtemperature() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -2194,7 +2193,6 @@ class serialport(object):
             self.closeport()
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH506RAGetID() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-            return -1,-1
         finally:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
@@ -2653,7 +2651,8 @@ class serialport(object):
                 self.Phidget1045semaphore.release(1)
           
     # applies given emissivity to the IR temperature value assuming the given ambient temperature
-    def IRtemp(self,emissivity,temp,ambient):
+    @staticmethod
+    def IRtemp(emissivity, temp,ambient):
         return (temp - ambient) * emissivity + ambient
 
     def configure1045(self):
@@ -3166,21 +3165,24 @@ class serialport(object):
     # via a Wheatstone Bridge build from 1K ohm resistors
     # http://en.wikipedia.org/wiki/Wheatstone_bridge
     # Note: the 1046 returns the bridge value in mV/V
-    def R_RTD_WS(self,bv):
+    @staticmethod
+    def R_RTD_WS(bv):
         return (1000 * (1000 - 2 * bv))/(1000 + 2 * bv)
     
     # takes a bridge value in mV/V and returns the resistance of the corresponding RTD, assuming the RTD is connected
     # via a Voltage Divider build from 1K ohm resistors
     # http://en.wikipedia.org/wiki/Voltage_divider
     # Note: the 1046 returns the bridge value in mV/V
-    def R_RTD_DIV(self,bv):
+    @staticmethod
+    def R_RTD_DIV(bv):
         return (2000 * bv) / (1000 - bv)
         
     # this formula results from a direct mathematical linearization of the Callendar-Van Dusen equation
     # see Analog Devices Application Note AN-709 http://www.analog.com/static/imported-files/application_notes/AN709_0.pdf
     # Wikipedia http://en.wikipedia.org/wiki/Resistance_thermometer
     #  or http://www.abmh.de
-    def rRTD2PT100temp(self,R_RTD):
+    @staticmethod
+    def rRTD2PT100temp(R_RTD):
         Z1 = -3.9083e-03
         Z2 = 1.76e-05
         Z3 = -2.31e-08
@@ -3427,7 +3429,8 @@ class serialport(object):
             return -1,-1
 
     # takes a string of the form "<serial>[:<hubport>]" or None and returns serial and hubport numbers
-    def serialString2serialPort(self,serial):
+    @staticmethod
+    def serialString2serialPort(serial):
         if serial is None:
             return None, None
         else:
@@ -3445,7 +3448,8 @@ class serialport(object):
             return s,p
             
     # takes serial and hubport as integers and returns the composed serial string
-    def serialPort2serialString(self,serial,port):
+    @staticmethod
+    def serialPort2serialString(serial, port):
         if serial is None and port is None:
             return None
         elif port is None:
@@ -4936,7 +4940,7 @@ class serialport(object):
                 return probe1, probe2
             elif retry:
                 libtime.sleep(0.1)
-                self.PHIDGET1018values(deviceType,mode,API,False)
+                return self.PHIDGET1018values(deviceType,mode,API,False)
             else:
                 return -1,-1
         except Exception as ex: # pylint: disable=broad-except
@@ -5481,7 +5485,7 @@ class serialport(object):
                     # data is given in F, we convert it back to C
                     t1 = fromFtoC(t1)
                     t2 = fromFtoC(t2)
-                return t1, t2
+            return t1, t2
         except Exception as e: # pylint: disable=broad-except
             # self.closeport() # closing the port on error is to serve as the Arduino needs time to restart and has to be reinitialized!
             _, _, exc_tb = sys.exc_info()
@@ -5495,7 +5499,8 @@ class serialport(object):
                 self.aw.addserial("ArduinoTC4: " + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.2f, %.2f, %.2f, %.2f, %.2f, %.2f"%(t1,t2,self.aw.qmc.extraArduinoT1,self.aw.qmc.extraArduinoT2,self.aw.qmc.extraArduinoT3,self.aw.qmc.extraArduinoT4))
 
 
-    def TEVA18Bconvert(self, seg):
+    @staticmethod
+    def TEVA18Bconvert(seg):
         if seg == 0x7D:
             return 0
         elif seg == 0x05:
@@ -5820,7 +5825,7 @@ class serialport(object):
 #############  Extra Serial Ports #######################################
 #########################################################################
 
-class extraserialport(object):
+class extraserialport():
     def __init__(self, aw):
         self.aw = aw
         
@@ -5874,10 +5879,7 @@ class extraserialport(object):
         if self.SP is not None:
             try:
                 self.openport()
-                if self.SP.isOpen():
-                    return True
-                else:
-                    return False
+                return bool(self.SP.isOpen())
             except Exception as e:  # pylint: disable=broad-except
                 if error:
                     _, _, exc_tb = sys.exc_info()
@@ -5961,7 +5963,7 @@ class scaleport(extraserialport):
                         sa = v.decode('ascii').split('\r\n')
                         if len(sa) == 2:
                             return int(sa[0].replace(" ", "")),-1,-1
-                        return -1, -1, -1
+            return -1, -1, -1
         except Exception:  # pylint: disable=broad-except
             return -1, -1, -1
 
@@ -6001,9 +6003,7 @@ class scaleport(extraserialport):
                             return -1,-1,toFloat(m[0])
                         else:
                             return -1,-1,-1
-
-                    else:
-                        return -1,-1,-1
+            return -1,-1,-1
         except Exception:  # pylint: disable=broad-except
             return -1,-1,-1
 
@@ -6069,7 +6069,6 @@ class colorport(extraserialport):
                         return n
                     elif retry > 0:
                         return self.readTonino(retry-1)
-                    else:
-                        return -1
+            return -1
         except Exception:  # pylint: disable=broad-except
             return -1
