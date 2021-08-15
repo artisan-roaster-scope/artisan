@@ -47,9 +47,15 @@ import re
 import textwrap
 import natsort
 import gc
+import csv
+import io
+import zipfile
+import tempfile
+import traceback
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 from urllib import parse
+from json import load as json_load
 
 from unidecode import unidecode
 
@@ -90,7 +96,6 @@ except Exception: # pylint: disable=broad-except
 #    import syslog
 #    syslog.openlog("artisan")
 #    syslog.syslog(syslog.LOG_ALERT, str(e))
-#    import traceback
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
 
@@ -306,7 +311,6 @@ class Artisan(QtSingleApplication):
                     if query.hasQueryItem("url"):
                         QTimer.singleShot(5,lambda: aw.importExternalURL(aw.artisanURLextractor,url=QUrl(query.queryItemValue("url"))))
                 except Exception: # pylint: disable=broad-except
-#                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     pass
             elif url.scheme() == "file":
@@ -2607,7 +2611,7 @@ class tgraphcanvas(FigureCanvas):
                 except Exception: # pylint: disable=broad-except
                     pass
         res = aw.qmc.ambientTempSourceAvg()
-        if res is not None and (isinstance(res, float) or isinstance(res, int)) and not math.isnan(res):
+        if res is not None and (isinstance(res, (float,int))) and not math.isnan(res):
             aw.qmc.ambientTemp = aw.float2float(float(res))
 
     def updateAmbientTemp(self):
@@ -2895,7 +2899,6 @@ class tgraphcanvas(FigureCanvas):
                             self.starteventmessagetimer()
                             break
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onpick() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -2928,7 +2931,6 @@ class tgraphcanvas(FigureCanvas):
                 corners = aw.qmc.ax.transAxes.inverted().transform(aw.segmentresultsanno.get_bbox_patch().get_extents())
                 aw.qmc.segmentresultsloc = (corners[0][0], corners[0][1] + (corners[1][1] - corners[0][1])/2)
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onclick() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -3042,7 +3044,6 @@ class tgraphcanvas(FigureCanvas):
                         menu.triggered.connect(self.event_popup_action)
                         menu.popup(QCursor.pos())
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onclick() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -3140,6 +3141,7 @@ class tgraphcanvas(FigureCanvas):
 
     # note that partial values might be given here (time might update, but not the values)
     @pyqtSlot(str,str,str)
+    # pylint: disable=no-self-use
     def updateLargeLCDs(self, bt, et, time):
         try:
             if aw.largeLCDs_dialog is not None:
@@ -3151,6 +3153,7 @@ class tgraphcanvas(FigureCanvas):
             pass
 
     @pyqtSlot(str,str)
+    # pylint: disable=no-self-use
     def setTimerLargeLCDcolor(self, fc, bc):
         try:
             if aw.largeLCDs_dialog is not None:
@@ -3158,7 +3161,8 @@ class tgraphcanvas(FigureCanvas):
         except Exception: # pylint: disable=broad-except
             pass
     
-    @pyqtSlot(str,int)    
+    @pyqtSlot(str,int)   
+    # pylint: disable=no-self-use
     def showAlarmPopup(self, message, timeout):
         # alarm popup message with <aw.qmc.alarm_popup_timout>sec timeout
         amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),message,timeout=timeout,modal=False)
@@ -3168,6 +3172,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.updateWebLCDs(alertText=message,alertTimeout=timeout)
 
     @pyqtSlot(str,str)
+    # pylint: disable=no-self-use
     def updateLargeLCDsReadings(self, bt, et):
         try:
             if aw.largeLCDs_dialog is not None:
@@ -3176,6 +3181,7 @@ class tgraphcanvas(FigureCanvas):
             pass
 
     @pyqtSlot(str)
+    # pylint: disable=no-self-use
     def updateLargeLCDsTime(self, time):
         try:
             if aw.largeLCDs_dialog is not None:
@@ -3674,7 +3680,6 @@ class tgraphcanvas(FigureCanvas):
                     self.setalarm(i)
 
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -3802,7 +3807,6 @@ class tgraphcanvas(FigureCanvas):
             elif redraw and force: # only on aligning with CHARGE we redraw even if nothing is moved to redraw the time axis
                 self.updateBackground()
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " timealign() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -5028,7 +5032,6 @@ class tgraphcanvas(FigureCanvas):
                     return res
 
             except Exception as e: # pylint: disable=broad-except
-#                import traceback
 #                traceback.print_exc(file=sys.stdout)
 
                 #if plotter
@@ -5279,7 +5282,6 @@ class tgraphcanvas(FigureCanvas):
                 self.clearLCDs()
 
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " clearMeasurements() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -5579,7 +5581,6 @@ class tgraphcanvas(FigureCanvas):
                     aw.updatePlusStatus()
 
             except Exception as ex: # pylint: disable=broad-except
-#                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " reset() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -5660,7 +5661,6 @@ class tgraphcanvas(FigureCanvas):
             else:
                 return y
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " smooth() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -6035,7 +6035,6 @@ class tgraphcanvas(FigureCanvas):
                         except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                             pass
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " place_annotations() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -6254,7 +6253,6 @@ class tgraphcanvas(FigureCanvas):
 
             return delta1, delta2
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " recomputeDeltas() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -6309,7 +6307,6 @@ class tgraphcanvas(FigureCanvas):
                 poly = Polygon(verts, facecolor=self.palette["aucarea"], edgecolor='0.5', alpha=0.3)
                 self.ax.add_patch(poly)
         except Exception: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
 
@@ -7047,7 +7044,6 @@ class tgraphcanvas(FigureCanvas):
                                             except Exception: # pylint: disable=broad-except
                                                 pass
                                     except Exception as ex: # pylint: disable=broad-except
-#                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
                                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -7084,7 +7080,6 @@ class tgraphcanvas(FigureCanvas):
                                             except Exception: # pylint: disable=broad-except
                                                 pass
                                     except Exception as ex: # pylint: disable=broad-except
-#                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
                                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -7121,7 +7116,6 @@ class tgraphcanvas(FigureCanvas):
                                             except Exception: # pylint: disable=broad-except
                                                 pass
                                     except Exception as ex: # pylint: disable=broad-except
-#                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
                                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -7158,7 +7152,6 @@ class tgraphcanvas(FigureCanvas):
                                             except Exception: # pylint: disable=broad-except
                                                 pass
                                     except Exception as ex: # pylint: disable=broad-except
-#                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
                                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -7333,7 +7326,6 @@ class tgraphcanvas(FigureCanvas):
                             aw.qmc.l_background_annotations.extend(self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timeindex,TP_time=self.TP_time_B,TP_time_loaded=self.TP_time_B_loaded, draggable=False))
                         except Exception: # pylint: disable=broad-except
                             pass
-#                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
 
                     #show the analysis results if they exist
@@ -7555,7 +7547,6 @@ class tgraphcanvas(FigureCanvas):
                                         except Exception: # pylint: disable=broad-except
                                             pass
                                 except Exception as ex: # pylint: disable=broad-except
-#                                    import traceback
 #                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -7595,7 +7586,6 @@ class tgraphcanvas(FigureCanvas):
                                             pass
 
                                 except Exception as ex: # pylint: disable=broad-except
-#                                    import traceback
 #                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -7634,7 +7624,6 @@ class tgraphcanvas(FigureCanvas):
                                         except Exception: # pylint: disable=broad-except
                                             pass
                                 except Exception as ex: # pylint: disable=broad-except
-#                                    import traceback
 #                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -7673,7 +7662,6 @@ class tgraphcanvas(FigureCanvas):
                                         except Exception: # pylint: disable=broad-except
                                             pass
                                 except Exception as ex: # pylint: disable=broad-except
-#                                    import traceback
 #                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -8183,7 +8171,6 @@ class tgraphcanvas(FigureCanvas):
                     pass
 
             except Exception as ex: # pylint: disable=broad-except
-#                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -9272,7 +9259,6 @@ class tgraphcanvas(FigureCanvas):
             #self.fig.canvas.draw()
             self.fig.canvas.draw_idle()
         except Exception:  # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
 
@@ -11365,7 +11351,6 @@ class tgraphcanvas(FigureCanvas):
             else:
                 aw.sendmessage(QApplication.translate("Message","Timer is OFF", None))
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " EventRecordAction() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -11610,7 +11595,6 @@ class tgraphcanvas(FigureCanvas):
             else:
                 self.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min","abbrev. of minutes")))
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " writecharacteristics() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -11841,7 +11825,6 @@ class tgraphcanvas(FigureCanvas):
                             pass
             self.writecharacteristics(TP_index,LP)
         except Exception as ex: # pylint: disable=broad-except
-            #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " writestatistics() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -12123,7 +12106,6 @@ class tgraphcanvas(FigureCanvas):
             energymetrics["KWH_roast_per_green_kg"] = kwh_roast_per_green_kg
             
         except Exception as ex: # pylint: disable=broad-except
-            #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " calcEnergyuse() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -12154,7 +12136,6 @@ class tgraphcanvas(FigureCanvas):
                         factor = (load_pct / 100)
                     energy = self.loadratings[i] * factor * (duration / 3600) #* self.convertHeat(1,self.ratingunits[i],0)
                 except Exception as ex: # pylint: disable=broad-except
-                    #import traceback
                     #traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -12212,7 +12193,6 @@ class tgraphcanvas(FigureCanvas):
             coolDuration = self.timex[-1] - self.timex[self.timeindex[6]]
             
         except Exception as ex: # pylint: disable=broad-except
-            #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -12482,7 +12462,6 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         res = "%.8f * log(%.8f * t %s %.8f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Error in lnRegression:",None) + " lnRegression() " + str(e),getattr(exc_tb, 'tb_lineno', '?'))
@@ -12519,7 +12498,6 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror(QApplication.translate("Error Message","Value Error:",None) + " univariate()")
 
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " univariate() " + str(e),getattr(exc_tb, 'tb_lineno', '?'))
@@ -12769,12 +12747,10 @@ class tgraphcanvas(FigureCanvas):
                 obj["temp1"] = self.temp1
                 obj["temp2"] = self.temp2
                 obj["timeindex"] = self.timeindex
-                f = codecs.open(filename, 'w+', encoding='utf-8')
-                f.write(repr(obj))
-                f.close()
+                with codecs.open(filename, 'w+', encoding='utf-8') as f:
+                    f.write(repr(obj))
                 aw.sendmessage(QApplication.translate("Message","Points saved", None))
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " savepoints() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -12786,9 +12762,8 @@ class tgraphcanvas(FigureCanvas):
             filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message", "Load Points",None),ext="*.adsg")
             obj = None
             if os.path.exists(filename):
-                f = codecs.open(filename, 'rb', encoding='utf-8')
-                obj=ast.literal_eval(f.read())
-                f.close()
+                with codecs.open(filename, 'rb', encoding='utf-8') as f:
+                    obj=ast.literal_eval(f.read())
             if obj and "timex" in obj and "temp1" in obj and "temp2" in obj:
                 self.timex = obj["timex"]
                 self.temp1 = obj["temp1"]
@@ -12798,7 +12773,6 @@ class tgraphcanvas(FigureCanvas):
                 self.redrawdesigner()
                 aw.sendmessage(QApplication.translate("Message","Points loaded", None))
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadpoints() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -13213,7 +13187,6 @@ class tgraphcanvas(FigureCanvas):
                         aw.sendmessage(string1+string2+string3,append=False)
 
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " on_motion() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -13497,7 +13470,7 @@ class tgraphcanvas(FigureCanvas):
     #launches designer config Window
     @pyqtSlot()
     @pyqtSlot(bool)
-    def desconfig(self, _=False):
+    def desconfig(self, _=False): # pylint: disable=no-self-use
         dialog = designerconfigDlg(aw,aw)
         dialog.show()
 
@@ -14031,7 +14004,7 @@ class tgraphcanvas(FigureCanvas):
             utf8_string = str(s)
             if self.locale.startswith("de"):
                 for k in self.umlaute_dict.keys():
-                    utf8_string = utf8_string.replace(k, umlaute_dict[k])
+                    utf8_string = utf8_string.replace(k, self.umlaute_dict[k])
             return unidecode(utf8_string)
 
 
@@ -14361,10 +14334,12 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             self.set_message(self.mode)
 
 #PLUS
-    def plus(self):
+    @staticmethod
+    def plus():
         plus.controller.toggle(aw)
 
-    def subscription(self):
+    @staticmethod
+    def subscription():
         remaining_days = max(0,(aw.plus_paidUntil.date() - datetime.datetime.now().date()).days)
         if remaining_days == 1:
             days = QApplication.translate("Plus","1 day left",None)
@@ -14425,7 +14400,6 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 #                            line.set_drawstyle("steps-post")
                             
                 except Exception as e: # pylint: disable=broad-except
-#                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     pass
                 aw.fetchCurveStyles()
@@ -14435,7 +14409,6 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " edit_parameters() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
 
 
@@ -14515,7 +14488,6 @@ class SampleThread(QThread):
                         tempx[-1] = (tempx[-2] + temp) / 2.0
                 return temp
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " filterDropOuts() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -15295,7 +15267,6 @@ class SampleThread(QThread):
                             aw.qmc.autoTPIdx = 1
                             aw.qmc.TPalarmtimeindex = aw.findTP()
             except Exception as e: # pylint: disable=broad-except
-#                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " sample() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -16246,7 +16217,7 @@ class ApplicationWindow(QMainWindow):
         self.EnglishLanguage.setCheckable(True)
         self.EnglishLanguage.triggered.connect(self.changelocale_en)
         self.languageMenu.addAction(self.EnglishLanguage)
-        if self.locale == "en" or locale == "en_US":
+        if self.locale in ["en", "en_US"]:
             self.EnglishLanguage.setChecked(True)
 
         self.SpanishLanguage = QAction(UIconst.CONF_MENU_SPANISH,self)
@@ -18615,7 +18586,6 @@ class ApplicationWindow(QMainWindow):
             darker_rgb  = '#%02x%02x%02x' % (tuple([int(255 * (x * (1 - shade_factor))) for x in rgb_tuple]))
             lighter_rgb = '#%02x%02x%02x' % (tuple([int(255 * (x + (1 - x) * tint_factor)) for x in rgb_tuple]))
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createRGBGradient(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -18765,7 +18735,6 @@ class ApplicationWindow(QMainWindow):
                         a.setEnabled(True)
                         a.setIcon(ntb._icon(subscription_icon)) # pylint: disable=protected-access
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updatePlusStatus(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -19037,7 +19006,6 @@ class ApplicationWindow(QMainWindow):
             self.recentRoasts = [d] + rr[:self.maxRecentRoasts-1]
             self.updateNewMenuRecentRoasts()
         except Exception as e: # pylint: disable=broad-except
-            #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addRecentRoast(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -19512,7 +19480,6 @@ class ApplicationWindow(QMainWindow):
                 )
 
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " getcolorPairsToCheck() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -19544,7 +19511,6 @@ class ApplicationWindow(QMainWindow):
             c2_rgb = tuple(int(c2[i:i+2], 16) for i in (1, 3 ,5))
             cDiff = deltaE(c1_rgb, c2_rgb, input_space="sRGB255", uniform_space="CIELab")
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " colorDifference() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -19580,7 +19546,6 @@ class ApplicationWindow(QMainWindow):
 #                else: #debugprint
 #                    print("checkColors", str(c[0]), "/", str(c[2]), "  Okay", str(c[1]), str(c[3]), str(val))  #debugprint
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkColors() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -19604,7 +19569,6 @@ class ApplicationWindow(QMainWindow):
             nc_greyscale = "#{0:2x}{1:2x}{2:2x}".format(int(nc_greyscale_sRGB[0]),int(nc_greyscale_sRGB[1]),int(nc_greyscale_sRGB[2]))
             nc = str(QColor(nc_greyscale).name())
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " convertToGreyscale() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -19882,7 +19846,6 @@ class ApplicationWindow(QMainWindow):
                     auto_grid = max(2,steps)
                     aw.qmc.zgrid = auto_grid
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " autoAdjustAxis() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -20596,7 +20559,6 @@ class ApplicationWindow(QMainWindow):
                 # no DROP event registered
                 return None, None
         except Exception: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             return None, None
 
@@ -21207,7 +21169,6 @@ class ApplicationWindow(QMainWindow):
                 DRY =  "--:--"
                 FCs = "--:--"
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -21270,7 +21231,6 @@ class ApplicationWindow(QMainWindow):
                         pass
 
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -22084,7 +22044,7 @@ class ApplicationWindow(QMainWindow):
                             elif cs_a[0] == "sleep" and cs_len == 1: # in seconds
                                 try:
                                     t = eval(cs_a[1]) # pylint: disable=eval-used
-                                    if isinstance(t,float) or isinstance(t,int):
+                                    if isinstance(t,(float,int)):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(t)
                                 except Exception: # pylint: disable=broad-except
@@ -22174,7 +22134,7 @@ class ApplicationWindow(QMainWindow):
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                 try:
                                     cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
-                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                    if isinstance(cmds,(float,int)):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
                                 except Exception: # pylint: disable=broad-except
@@ -22315,7 +22275,7 @@ class ApplicationWindow(QMainWindow):
                                         aw.ser.phidgetOUTpulsePWM(int(cs_split[0]),int(cs_split[1]),cs_split[2])
                                 elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                     cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
-                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                    if isinstance(cmds,(float,int)):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
 
@@ -22495,7 +22455,7 @@ class ApplicationWindow(QMainWindow):
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                 try:
                                     cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
-                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                    if isinstance(cmds,(float,int)):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
                                 except Exception: # pylint: disable=broad-except
@@ -22554,7 +22514,7 @@ class ApplicationWindow(QMainWindow):
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                 try:
                                     cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
-                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                    if isinstance(cmds,(float,int)):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
                                 except Exception: # pylint: disable=broad-except
@@ -22996,7 +22956,7 @@ class ApplicationWindow(QMainWindow):
                             elif cs.startswith('sleep('): # in seconds
                                 try:
                                     cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
-                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                    if isinstance(cmds,(float,int)):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
                                 except Exception: # pylint: disable=broad-except
@@ -23079,7 +23039,7 @@ class ApplicationWindow(QMainWindow):
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                 try:
                                     cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
-                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                    if isinstance(cmds,(float,int)):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
                                 except Exception: # pylint: disable=broad-except
@@ -23120,13 +23080,13 @@ class ApplicationWindow(QMainWindow):
             if platf in ['Darwin', 'Linux']:
                 command = ['bash', '-c', 'source ~/.bash_profile ~/.bash_login ~/.profile 2>/dev/null && env']
                 try:
-                    proc = subprocess.Popen(command, stdout = subprocess.PIPE)
-                    for line in proc.stdout:
-                        (k, _, value) = line.partition("=")
-                        # don't copy PYTHONHOME nor PYTHONPATH if it points to the Artisan.app
-                        if not ((k in ['PYTHONHOME','PYTHONPATH']) and (("Artisan.app" in value) or "artisan" in value)):
-                            my_env[k] = value
-                    proc.communicate()
+                    with subprocess.Popen(command, stdout = subprocess.PIPE) as proc:
+                        for line in proc.stdout:
+                            (k, _, value) = line.partition("=")
+                            # don't copy PYTHONHOME nor PYTHONPATH if it points to the Artisan.app
+                            if not ((k in ['PYTHONHOME','PYTHONPATH']) and (("Artisan.app" in value) or "artisan" in value)):
+                                my_env[k] = value
+                        proc.communicate()
                 except Exception: # pylint: disable=broad-except
                     pass
         except Exception: # pylint: disable=broad-except
@@ -24673,7 +24633,6 @@ class ApplicationWindow(QMainWindow):
                     if not aw.qmc.flagstart:
                         self.qmc.fig.canvas.draw()
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " changeEventNumber() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -24918,7 +24877,6 @@ class ApplicationWindow(QMainWindow):
                 if fileName:
                     self.loadFile(fileName)
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fileLoad() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -24979,7 +24937,6 @@ class ApplicationWindow(QMainWindow):
                 self.checkColors(self.getcolorPairsToCheck())
         
         except IOError as ex:
-            #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " {0}: {1}").format(str(ex),str(filename)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -24995,12 +24952,10 @@ class ApplicationWindow(QMainWindow):
                 if isinstance(widget, ApplicationWindow):
                     widget.updateRecentFileActions()
         except ValueError as ex:
-            #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None) + " fileload() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         except Exception as ex: # pylint: disable=broad-except
-            #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " loadFile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25194,7 +25149,6 @@ class ApplicationWindow(QMainWindow):
                 return False
 
         except Exception as ex: # pylint: disable=broad-except
-            #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " calcVirtualdevices() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25460,69 +25414,66 @@ class ApplicationWindow(QMainWindow):
     #read Artisan CSV
     def importCSV(self,filename):
         try:
-            import io
-            import csv
-            csvFile = io.open(filename, 'r', newline="",encoding='utf-8')
-            data = csv.reader(csvFile,delimiter='\t')
-            #read file header
-            header = next(data)
-            date = QDate.fromString(header[0].split('Date:')[1],"dd'.'MM'.'yyyy")
-            if len(header) > 11:
-                try:
-                    tm = QTime.fromString(header[11].split('Time:')[1])
-                    self.qmc.roastdate = QDateTime(date,tm)
-                except Exception: # pylint: disable=broad-except
-                    self.qmc.roastdate = QDateTime(date)
-            else:
-                self.qmc.roastdate = QDateTime(date)
-            self.qmc.roastepoch = QDateTimeToEpoch(self.qmc.roastdate)
-            self.qmc.roasttzoffset = 0
-            unit = header[1].split('Unit:')[1]
-            #set temperature mode
-            if unit == "F" and self.qmc.mode == "C":
-                self.qmc.fahrenheitMode()
-            if unit == "C" and self.qmc.mode == "F":
-                self.qmc.celsiusMode()
-            #read column headers
-            fields = next(data)
-            extra_fields = fields[5:] # colums after 'Event'
-            # add devices if needed
-            for i in range(max(0,(len(extra_fields) // 2) - len(self.qmc.extradevices))):
-                self.addDevice()
-            # set extra device names # NOTE: eventuelly we want to set/change the names only for devices that were just added in the line above!?
-            for i in range(len(extra_fields)):
-                if i % 2 == 1:
-                    # odd
-                    self.qmc.extraname2[int(i/2)] = extra_fields[i]
+            with io.open(filename, 'r', newline="",encoding='utf-8') as csvFile:
+                data = csv.reader(csvFile,delimiter='\t')
+                #read file header
+                header = next(data)
+                date = QDate.fromString(header[0].split('Date:')[1],"dd'.'MM'.'yyyy")
+                if len(header) > 11:
+                    try:
+                        tm = QTime.fromString(header[11].split('Time:')[1])
+                        self.qmc.roastdate = QDateTime(date,tm)
+                    except Exception: # pylint: disable=broad-except
+                        self.qmc.roastdate = QDateTime(date)
                 else:
-                    # even
-                    self.qmc.extraname1[int(i/2)] = extra_fields[i]
-            #read data
-            last_time = None
-
-            i = 0
-            for row in data:
-                i = i + 1
-                items = list(zip(fields, row))
-                item = {}
-                for (name, value) in items:
-                    item[name] = value.strip()
-                #add one measurement
-                timez = float(stringtoseconds(item['Time1']))
-                if not last_time or last_time < timez:
-                    self.qmc.timex.append(timez)
-                    self.qmc.temp1.append(float(item['ET']))
-                    self.qmc.temp2.append(float(item['BT']))
-                    for j in range(len(extra_fields)):
-                        if j % 2 == 1:
-                            # odd
-                            self.qmc.extratemp2[int(j/2)].append(float(item[extra_fields[j]]))
-                        else:
-                            # even
-                            self.qmc.extratimex[int(j/2)].append(timez)
-                            self.qmc.extratemp1[int(j/2)].append(float(item[extra_fields[j]]))
-                last_time = timez
-            csvFile.close()
+                    self.qmc.roastdate = QDateTime(date)
+                self.qmc.roastepoch = QDateTimeToEpoch(self.qmc.roastdate)
+                self.qmc.roasttzoffset = 0
+                unit = header[1].split('Unit:')[1]
+                #set temperature mode
+                if unit == "F" and self.qmc.mode == "C":
+                    self.qmc.fahrenheitMode()
+                if unit == "C" and self.qmc.mode == "F":
+                    self.qmc.celsiusMode()
+                #read column headers
+                fields = next(data)
+                extra_fields = fields[5:] # colums after 'Event'
+                # add devices if needed
+                for i in range(max(0,(len(extra_fields) // 2) - len(self.qmc.extradevices))):
+                    self.addDevice()
+                # set extra device names # NOTE: eventuelly we want to set/change the names only for devices that were just added in the line above!?
+                for i in range(len(extra_fields)):
+                    if i % 2 == 1:
+                        # odd
+                        self.qmc.extraname2[int(i/2)] = extra_fields[i]
+                    else:
+                        # even
+                        self.qmc.extraname1[int(i/2)] = extra_fields[i]
+                #read data
+                last_time = None
+    
+                i = 0
+                for row in data:
+                    i = i + 1
+                    items = list(zip(fields, row))
+                    item = {}
+                    for (name, value) in items:
+                        item[name] = value.strip()
+                    #add one measurement
+                    timez = float(stringtoseconds(item['Time1']))
+                    if not last_time or last_time < timez:
+                        self.qmc.timex.append(timez)
+                        self.qmc.temp1.append(float(item['ET']))
+                        self.qmc.temp2.append(float(item['BT']))
+                        for j in range(len(extra_fields)):
+                            if j % 2 == 1:
+                                # odd
+                                self.qmc.extratemp2[int(j/2)].append(float(item[extra_fields[j]]))
+                            else:
+                                # even
+                                self.qmc.extratimex[int(j/2)].append(timez)
+                                self.qmc.extratemp1[int(j/2)].append(float(item[extra_fields[j]]))
+                    last_time = timez
             #set events
             CHARGE = stringtoseconds(header[2].split('CHARGE:')[1])
             if CHARGE > 0:
@@ -25554,7 +25505,6 @@ class ApplicationWindow(QMainWindow):
             aw.autoAdjustAxis()
             self.qmc.redraw()
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importCSV() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25655,21 +25605,18 @@ class ApplicationWindow(QMainWindow):
 
             self.updateExtraLCDvisibility()
         except Exception: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
 
     #Write readings to Artisan JSON file
     def exportJSON(self,filename):
         try:
-            outfile = open(filename, 'w')
-            from json import dump as json_dump
-            json_dump(self.getProfile(), outfile, ensure_ascii=True)
-            outfile.write('\n')
-            outfile.close()
+            with open(filename, 'w') as outfile:
+                from json import dump as json_dump
+                json_dump(self.getProfile(), outfile, ensure_ascii=True)
+                outfile.write('\n')
             return True
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportJSON() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25811,7 +25758,6 @@ class ApplicationWindow(QMainWindow):
             ET.ElementTree(tree).write(filename,encoding='utf-8', xml_declaration=True)
             return True
         except Exception as ex: # pylint: disable=broad-except
-#           import traceback
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportPilot() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25819,77 +25765,74 @@ class ApplicationWindow(QMainWindow):
 
     #Write readings to RoastLogger CSV file
     def exportRoastLogger(self,filename):
-        outfile = open(filename, 'w')
         try:
-            outfile.write("Log created at 09:00:00 "+ self.qmc.roastdate.date().toString("dd'/'MM'/'yyyy") + "\n")
-            outfile.write("Use Options|Set template for new log to modify this template.\n")
-            outfile.write("------------------------------------------------------\n")
-            outfile.write("Bean/Blend name:\n")
-            outfile.write("\n")
-            outfile.write("Profile description:\n")
-            outfile.write("\n")
-            outfile.write("Roast notes:\n")
-            outfile.write("\n")
-            outfile.write("Cupping results:\n")
-            outfile.write("\n")
-            outfile.write("Roast Logger Copyright ? T. R. Coxon (GreenBean TMC).\n")
-            outfile.write("Roast started at 09:00:00 " + self.qmc.roastdate.date().toString("dd'/'MM'/'yyyy") + "\n")
-            if len(self.qmc.timex) > 0:
-                CHARGE = aw.qmc.timex[aw.qmc.timeindex[0]]
-            else:
-                CHARGE = 0
-            import csv
-            writer= csv.writer(outfile,delimiter=',')
-            writer.writerow(["Elapsed time "," T1 "," T2 "," Event type"])
-            for i in range(len(aw.qmc.timex)):
-                if i == aw.qmc.timeindex[0]:
-                    kind = "Beans loaded"
-                elif i!=0 and i == aw.qmc.timeindex[2]:
-                    kind = "First crack start"
-                elif i!=0 and i == aw.qmc.timeindex[3]:
-                    kind = "First crack end"
-                elif i!=0 and i == aw.qmc.timeindex[4]:
-                    kind = "Second crack start"
-                elif i!=0 and i == aw.qmc.timeindex[6]:
-                    kind = "Beans ejected"
+            with open(filename, 'w') as outfile:
+                outfile.write("Log created at 09:00:00 "+ self.qmc.roastdate.date().toString("dd'/'MM'/'yyyy") + "\n")
+                outfile.write("Use Options|Set template for new log to modify this template.\n")
+                outfile.write("------------------------------------------------------\n")
+                outfile.write("Bean/Blend name:\n")
+                outfile.write("\n")
+                outfile.write("Profile description:\n")
+                outfile.write("\n")
+                outfile.write("Roast notes:\n")
+                outfile.write("\n")
+                outfile.write("Cupping results:\n")
+                outfile.write("\n")
+                outfile.write("Roast Logger Copyright ? T. R. Coxon (GreenBean TMC).\n")
+                outfile.write("Roast started at 09:00:00 " + self.qmc.roastdate.date().toString("dd'/'MM'/'yyyy") + "\n")
+                if len(self.qmc.timex) > 0:
+                    CHARGE = aw.qmc.timex[aw.qmc.timeindex[0]]
                 else:
-                    kind = "timer"
-                writer.writerow([stringfromseconds(aw.qmc.timex[i]-CHARGE),"%.1f"%float(aw.qmc.temp2[i]),"%.1f"%float(aw.qmc.temp1[i]),kind])
-            outfile.write("\n")
-            outfile.write("@actionT1Table\n")
-            outfile.write("120|null|30\n")
-            outfile.write("178|65|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("\n")
-            outfile.write("@actionSecsFCTable\n")
-            outfile.write("60|50|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("null|null|null\n")
-            outfile.write("\n")
-            outfile.write("@actionResetTable\n")
-            outfile.write("100|0\n")
-            outfile.write("\n")
-            outfile.write("@loadBeansTable\n")
-            outfile.write("146\n")
-            outfile.write("\n")
-            outfile.close()
+                    CHARGE = 0
+                writer= csv.writer(outfile,delimiter=',')
+                writer.writerow(["Elapsed time "," T1 "," T2 "," Event type"])
+                for i in range(len(aw.qmc.timex)):
+                    if i == aw.qmc.timeindex[0]:
+                        kind = "Beans loaded"
+                    elif i!=0 and i == aw.qmc.timeindex[2]:
+                        kind = "First crack start"
+                    elif i!=0 and i == aw.qmc.timeindex[3]:
+                        kind = "First crack end"
+                    elif i!=0 and i == aw.qmc.timeindex[4]:
+                        kind = "Second crack start"
+                    elif i!=0 and i == aw.qmc.timeindex[6]:
+                        kind = "Beans ejected"
+                    else:
+                        kind = "timer"
+                    writer.writerow([stringfromseconds(aw.qmc.timex[i]-CHARGE),"%.1f"%float(aw.qmc.temp2[i]),"%.1f"%float(aw.qmc.temp1[i]),kind])
+                outfile.write("\n")
+                outfile.write("@actionT1Table\n")
+                outfile.write("120|null|30\n")
+                outfile.write("178|65|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("\n")
+                outfile.write("@actionSecsFCTable\n")
+                outfile.write("60|50|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("null|null|null\n")
+                outfile.write("\n")
+                outfile.write("@actionResetTable\n")
+                outfile.write("100|0\n")
+                outfile.write("\n")
+                outfile.write("@loadBeansTable\n")
+                outfile.write("146\n")
+                outfile.write("\n")
             return True
         except Exception as ex: # pylint: disable=broad-except
-#           import traceback
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportRoastLogger() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25899,12 +25842,9 @@ class ApplicationWindow(QMainWindow):
 
     def importJSON(self,filename):
         try:
-            import io
-            infile = io.open(filename, 'r', encoding='utf-8')
-            from json import load as json_load
-            obj = json_load(infile)
-            res = self.setProfile(filename,obj)
-            infile.close()
+            with io.open(filename, 'r', encoding='utf-8') as infile:
+                obj = json_load(infile)
+                res = self.setProfile(filename,obj)
             if res:
                 self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
                 #update etypes combo box
@@ -25913,7 +25853,6 @@ class ApplicationWindow(QMainWindow):
                 aw.autoAdjustAxis()
                 self.qmc.redraw()
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importJSON() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25928,7 +25867,6 @@ class ApplicationWindow(QMainWindow):
                 self.importRoastLoggerEnc(filename,'latin1')
             aw.qmc.fileDirtySignal.emit()
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importRoastLogger() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25971,257 +25909,253 @@ class ApplicationWindow(QMainWindow):
     def importRoastLoggerEnc(self,filename,enc='utf-8'):
         roastlogger_action_section = ""
         # use io.open instead of open to have encoding support on Python 2
-        import io
-        infile = io.open(filename, 'r', encoding=enc)
-        obj = {}
-        obj["mode"] = "C"
-        obj["title"] = str(QFileInfo(filename).fileName())
-        import csv
-        obj["roastdate"] = encodeLocal(QDate.currentDate().toString())
-        # read roastdate from file
-        while True:
-            l = infile.readline()
-            if l.startswith("Roast started at "):
-                #extract roast date
-                roastdate = QDateTime(QDate.fromString(l.split(" ")[-1][0:10],"dd'/'MM'/'yyyy"))
-                if not roastdate.isNull():
-                    obj["roastdate"] = encodeLocal(roastdate.date().toString())
-                break
-            if l == '':
-                break
-        timeindex = [-1,0,0,0,0,0,0,0]
-        timex = []
-        temp1 = []
-        temp2 = []
-        data = csv.reader(infile,delimiter=',')
-        #read file header
-        next(data) # we do not use the labels
-        #header = list(map(lambda s:s.strip(),next(data)))
-        while True:
-            fields = next(data)
-            if len(fields) == 0:
-                break
-            else:
-                timex.append(float(stringtoseconds(fields[0])))
-                try:
-                    t1 = float(fields[1])
-                except Exception: # pylint: disable=broad-except
-                    t1 = -1
-                temp1.append(t1)
-                try:
-                    t2 = float(fields[2])
-                except Exception: # pylint: disable=broad-except
-                    t2 = -1
-                temp2.append(t2)
-                event = fields[3]
-                if event == "Beans loaded":
-                    timeindex[0] = max(-1,len(timex) - 1)
-                elif event == "First crack start":
-                    timeindex[2] = max(0,len(timex) - 1)
-                elif event == "First crack end":
-                    timeindex[3] = max(0,len(timex) - 1)
-                elif event == "Second crack start":
-                    timeindex[4] = max(0,len(timex) - 1)
-                elif event == "Beans ejected":
-                    timeindex[6] = max(0,len(timex) - 1)
-        obj["timeindex"] = timeindex
-        obj["timex"] = timex
-        obj["temp1"] = temp2
-        obj["temp2"] = temp1
-        
-        if len(obj["timex"]) > 2:
-            obj["samplinginterval"] = (obj["timex"][-1] - obj["timex"][0])/(len(obj["timex"] - 1))
-
-        res = self.setProfile(filename,obj)
-
-        try:
-            error_msg = ""
-            if aw.qmc.loadalarmsfromprofile:
-                aw.qmc.alarmsfile = filename
-                roastlogger_action_section = "No actions loaded"
-
-                #Find sliders - exact names of the sliders must be defined
-                slider_power = -1
-                slider_fan = -1
-                try:
-                    slider_power=aw.qmc.etypes.index("Power")
-                except Exception: # pylint: disable=broad-except
-                    pass
-                try:
-                    slider_fan=aw.qmc.etypes.index("Fan")
-                except Exception: # pylint: disable=broad-except
-                    pass
-                #load only "Power" and "Fan" events
-                if slider_power != -1 and slider_fan != -1:
-                    data_action = csv.reader(infile,delimiter='|')
-
-                    aw.qmc.alarmsetlabel = ""
-                    aw.qmc.alarmflag = []
-                    aw.qmc.alarmguard = []
-                    aw.qmc.alarmnegguard = []
-                    aw.qmc.alarmtime = []
-                    aw.qmc.alarmoffset = []
-                    aw.qmc.alarmcond = []
-                    aw.qmc.alarmstate = []
-                    aw.qmc.alarmsource = []
-                    aw.qmc.alarmtemperature = []
-                    aw.qmc.alarmaction = []
-                    aw.qmc.alarmbeep = []
-                    aw.qmc.alarmstrings = []
-
-                    while True:
-                        fields_action = next(data_action)
-                        if len(fields_action) == 0:
-                            pass
-                        elif len(fields_action) == 1 and fields_action[0].startswith("@"):
-                            roastlogger_action_section=fields_action[0]
+        with io.open(filename, 'r', encoding=enc) as infile:
+            obj = {}
+            obj["mode"] = "C"
+            obj["title"] = str(QFileInfo(filename).fileName())
+            obj["roastdate"] = encodeLocal(QDate.currentDate().toString())
+            # read roastdate from file
+            while True:
+                l = infile.readline()
+                if l.startswith("Roast started at "):
+                    #extract roast date
+                    roastdate = QDateTime(QDate.fromString(l.split(" ")[-1][0:10],"dd'/'MM'/'yyyy"))
+                    if not roastdate.isNull():
+                        obj["roastdate"] = encodeLocal(roastdate.date().toString())
+                    break
+                if l == '':
+                    break
+            timeindex = [-1,0,0,0,0,0,0,0]
+            timex = []
+            temp1 = []
+            temp2 = []
+            data = csv.reader(infile,delimiter=',')
+            #read file header
+            next(data) # we do not use the labels
+            #header = list(map(lambda s:s.strip(),next(data)))
+            while True:
+                fields = next(data)
+                if len(fields) == 0:
+                    break
+                else:
+                    timex.append(float(stringtoseconds(fields[0])))
+                    try:
+                        t1 = float(fields[1])
+                    except Exception: # pylint: disable=broad-except
+                        t1 = -1
+                    temp1.append(t1)
+                    try:
+                        t2 = float(fields[2])
+                    except Exception: # pylint: disable=broad-except
+                        t2 = -1
+                    temp2.append(t2)
+                    event = fields[3]
+                    if event == "Beans loaded":
+                        timeindex[0] = max(-1,len(timex) - 1)
+                    elif event == "First crack start":
+                        timeindex[2] = max(0,len(timex) - 1)
+                    elif event == "First crack end":
+                        timeindex[3] = max(0,len(timex) - 1)
+                    elif event == "Second crack start":
+                        timeindex[4] = max(0,len(timex) - 1)
+                    elif event == "Beans ejected":
+                        timeindex[6] = max(0,len(timex) - 1)
+            obj["timeindex"] = timeindex
+            obj["timex"] = timex
+            obj["temp1"] = temp2
+            obj["temp2"] = temp1
+            
+            if len(obj["timex"]) > 2:
+                obj["samplinginterval"] = (obj["timex"][-1] - obj["timex"][0])/(len(obj["timex"] - 1))
+    
+            res = self.setProfile(filename,obj)
+    
+            try:
+                error_msg = ""
+                if aw.qmc.loadalarmsfromprofile:
+                    aw.qmc.alarmsfile = filename
+                    roastlogger_action_section = "No actions loaded"
+    
+                    #Find sliders - exact names of the sliders must be defined
+                    slider_power = -1
+                    slider_fan = -1
+                    try:
+                        slider_power=aw.qmc.etypes.index("Power")
+                    except Exception: # pylint: disable=broad-except
+                        pass
+                    try:
+                        slider_fan=aw.qmc.etypes.index("Fan")
+                    except Exception: # pylint: disable=broad-except
+                        pass
+                    #load only "Power" and "Fan" events
+                    if slider_power != -1 and slider_fan != -1:
+                        data_action = csv.reader(infile,delimiter='|')
+    
+                        aw.qmc.alarmsetlabel = ""
+                        aw.qmc.alarmflag = []
+                        aw.qmc.alarmguard = []
+                        aw.qmc.alarmnegguard = []
+                        aw.qmc.alarmtime = []
+                        aw.qmc.alarmoffset = []
+                        aw.qmc.alarmcond = []
+                        aw.qmc.alarmstate = []
+                        aw.qmc.alarmsource = []
+                        aw.qmc.alarmtemperature = []
+                        aw.qmc.alarmaction = []
+                        aw.qmc.alarmbeep = []
+                        aw.qmc.alarmstrings = []
+    
+                        while True:
+                            fields_action = next(data_action)
+                            if len(fields_action) == 0:
+                                pass
+                            elif len(fields_action) == 1 and fields_action[0].startswith("@"):
+                                roastlogger_action_section=fields_action[0]
+                            else:
+                                #process items in the section
+                                if roastlogger_action_section.startswith("@actionT1Table"):
+                                    if len(fields_action) == 3 and fields_action[0] != "null":
+                                        #add temp alarm - POWER
+                                        aw.qmc.alarmflag.append(1)
+                                        aw.qmc.alarmguard.append(-1)
+                                        aw.qmc.alarmnegguard.append(-1)
+                                        aw.qmc.alarmtime.append(8)        #after TP
+                                        aw.qmc.alarmoffset.append(0)
+                                        aw.qmc.alarmcond.append(1)
+                                        aw.qmc.alarmstate.append(-1)
+                                        aw.qmc.alarmsource.append(1)    #BT
+                                        aw.qmc.alarmtemperature.append(float(fields_action[0]))
+                                        aw.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
+                                        aw.qmc.alarmbeep.append(0)
+                                        aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[1],None))
+    
+                                        #add temp alarm - FAN
+                                        aw.qmc.alarmflag.append(1)
+                                        aw.qmc.alarmguard.append(-1)
+                                        aw.qmc.alarmnegguard.append(-1)
+                                        aw.qmc.alarmtime.append(8)        #after TP
+                                        aw.qmc.alarmoffset.append(0)
+                                        aw.qmc.alarmcond.append(1)
+                                        aw.qmc.alarmstate.append(-1)
+                                        aw.qmc.alarmsource.append(1)    #BT
+                                        aw.qmc.alarmtemperature.append(int(fields_action[0]))
+                                        aw.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
+                                        aw.qmc.alarmbeep.append(0)
+                                        aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[2],None))
+    
+                                elif roastlogger_action_section.startswith("@actionSecsFCTable"):
+                                    if len(fields_action) == 3 and fields_action[0] != "null":
+    
+                                        #add time alarm - POWER
+                                        aw.qmc.alarmflag.append(1)
+                                        aw.qmc.alarmguard.append(-1)
+                                        aw.qmc.alarmnegguard.append(-1)
+                                        aw.qmc.alarmtime.append(2)        #after FC
+                                        aw.qmc.alarmoffset.append(int(fields_action[0]))
+                                        aw.qmc.alarmcond.append(1)
+                                        aw.qmc.alarmstate.append(-1)
+                                        aw.qmc.alarmsource.append(-3)       #no source - this is time alarm
+                                        aw.qmc.alarmtemperature.append(0)
+                                        aw.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
+                                        aw.qmc.alarmbeep.append(0)
+                                        aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[1],None))
+    
+                                        #add time alarm - FAN
+                                        aw.qmc.alarmflag.append(1)
+                                        aw.qmc.alarmguard.append(-1)
+                                        aw.qmc.alarmnegguard.append(-1)
+                                        aw.qmc.alarmtime.append(2)        #after FC
+                                        aw.qmc.alarmoffset.append(int(fields_action[0]))
+                                        aw.qmc.alarmcond.append(1)
+                                        aw.qmc.alarmstate.append(-1)
+                                        aw.qmc.alarmsource.append(-3)       #no source - this is time alarm
+                                        aw.qmc.alarmtemperature.append(0)
+                                        aw.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
+                                        aw.qmc.alarmbeep.append(0)
+                                        aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[2],None))
+    
+                                elif roastlogger_action_section.startswith("@actionResetTable"):
+                                    if len(fields_action) == 2 and fields_action[0] != "null":
+    
+                                        #add temp alarm - POWER
+                                        aw.qmc.alarmflag.insert(0,1)
+                                        aw.qmc.alarmguard.insert(0,-1)
+                                        aw.qmc.alarmnegguard.insert(0,-1)
+                                        aw.qmc.alarmtime.insert(0,9)        #after ON
+                                        aw.qmc.alarmoffset.insert(0,0)
+                                        aw.qmc.alarmcond.insert(0,1)
+                                        aw.qmc.alarmstate.insert(0,-1)
+                                        aw.qmc.alarmsource.insert(0,1)    #BT
+                                        aw.qmc.alarmtemperature.insert(0,0)
+                                        aw.qmc.alarmaction.insert(0,3+slider_power)    #SLIDER POWER
+                                        aw.qmc.alarmbeep.insert(0,0)
+                                        aw.qmc.alarmstrings.insert(0,QApplication.translate("Label",fields_action[0],None))
+    
+                                        #add temp alarm - FAN
+                                        aw.qmc.alarmflag.insert(0,1)
+                                        aw.qmc.alarmguard.insert(0,-1)
+                                        aw.qmc.alarmnegguard.insert(0,-1)
+                                        aw.qmc.alarmtime.insert(0,9)        #after ON
+                                        aw.qmc.alarmoffset.insert(0,0)
+                                        aw.qmc.alarmcond.insert(0,1)
+                                        aw.qmc.alarmstate.insert(0,-1)
+                                        aw.qmc.alarmsource.insert(0,1)    #BT
+                                        aw.qmc.alarmtemperature.insert(0,0)
+                                        aw.qmc.alarmaction.insert(0,3+slider_fan)    #SLIDER POWER
+                                        aw.qmc.alarmbeep.insert(0,0)
+                                        aw.qmc.alarmstrings.insert(0,QApplication.translate("Label",fields_action[1],None))
+    
+                                elif roastlogger_action_section.startswith("@loadBeansTable"):
+                                    if len(fields_action) == 1 and fields_action[0] != "null":
+    
+                                        #add START TRIGGER - 10 DEG before charge temp
+                                        aw.qmc.alarmflag.insert(2,1)
+                                        aw.qmc.alarmguard.insert(2,-1)
+                                        aw.qmc.alarmnegguard.insert(2,-1)
+                                        aw.qmc.alarmtime.insert(0,9)        #after ON
+                                        aw.qmc.alarmoffset.insert(2,0)
+                                        aw.qmc.alarmcond.insert(2,1)
+                                        aw.qmc.alarmstate.insert(2,-1)
+                                        aw.qmc.alarmsource.insert(2,1)    #BT
+                                        aw.qmc.alarmtemperature.insert(2,float(fields_action[0])-10)
+                                        aw.qmc.alarmaction.insert(2,7)    #inititate 7 (START)
+                                        aw.qmc.alarmbeep.insert(2,0)
+                                        aw.qmc.alarmstrings.insert(2,QApplication.translate("Label","Start recording",None))
+    
+                                        #add CHARGE alarm
+                                        aw.qmc.alarmflag.insert(3,1)
+                                        aw.qmc.alarmguard.insert(3,-1)
+                                        aw.qmc.alarmnegguard.insert(3,-1)
+                                        aw.qmc.alarmtime.insert(3,-1)        #after START
+                                        aw.qmc.alarmoffset.insert(3,0)
+                                        aw.qmc.alarmcond.insert(3,1)
+                                        aw.qmc.alarmstate.insert(3,-1)
+                                        aw.qmc.alarmsource.insert(3,1)    #BT
+                                        aw.qmc.alarmtemperature.insert(3,float(fields_action[0]))
+                                        aw.qmc.alarmaction.insert(3,0)    #POPUP
+                                        aw.qmc.alarmbeep.insert(3,1)      #do beep for charge
+                                        aw.qmc.alarmstrings.insert(3,QApplication.translate("Label","Charge the beans",None))
+                                    break
                         else:
-                            #process items in the section
-                            if roastlogger_action_section.startswith("@actionT1Table"):
-                                if len(fields_action) == 3 and fields_action[0] != "null":
-                                    #add temp alarm - POWER
-                                    aw.qmc.alarmflag.append(1)
-                                    aw.qmc.alarmguard.append(-1)
-                                    aw.qmc.alarmnegguard.append(-1)
-                                    aw.qmc.alarmtime.append(8)        #after TP
-                                    aw.qmc.alarmoffset.append(0)
-                                    aw.qmc.alarmcond.append(1)
-                                    aw.qmc.alarmstate.append(-1)
-                                    aw.qmc.alarmsource.append(1)    #BT
-                                    aw.qmc.alarmtemperature.append(float(fields_action[0]))
-                                    aw.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
-                                    aw.qmc.alarmbeep.append(0)
-                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[1],None))
+                            if slider_power == -1: error_msg += "Could not find slider named 'Power' "
+                            if slider_fan == -1: error_msg += "Could not find slider named 'Fan' "
+                            error_msg += "Please rename sliders in Config - Events menu"
 
-                                    #add temp alarm - FAN
-                                    aw.qmc.alarmflag.append(1)
-                                    aw.qmc.alarmguard.append(-1)
-                                    aw.qmc.alarmnegguard.append(-1)
-                                    aw.qmc.alarmtime.append(8)        #after TP
-                                    aw.qmc.alarmoffset.append(0)
-                                    aw.qmc.alarmcond.append(1)
-                                    aw.qmc.alarmstate.append(-1)
-                                    aw.qmc.alarmsource.append(1)    #BT
-                                    aw.qmc.alarmtemperature.append(int(fields_action[0]))
-                                    aw.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
-                                    aw.qmc.alarmbeep.append(0)
-                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[2],None))
-
-                            elif roastlogger_action_section.startswith("@actionSecsFCTable"):
-                                if len(fields_action) == 3 and fields_action[0] != "null":
-
-                                    #add time alarm - POWER
-                                    aw.qmc.alarmflag.append(1)
-                                    aw.qmc.alarmguard.append(-1)
-                                    aw.qmc.alarmnegguard.append(-1)
-                                    aw.qmc.alarmtime.append(2)        #after FC
-                                    aw.qmc.alarmoffset.append(int(fields_action[0]))
-                                    aw.qmc.alarmcond.append(1)
-                                    aw.qmc.alarmstate.append(-1)
-                                    aw.qmc.alarmsource.append(-3)       #no source - this is time alarm
-                                    aw.qmc.alarmtemperature.append(0)
-                                    aw.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
-                                    aw.qmc.alarmbeep.append(0)
-                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[1],None))
-
-                                    #add time alarm - FAN
-                                    aw.qmc.alarmflag.append(1)
-                                    aw.qmc.alarmguard.append(-1)
-                                    aw.qmc.alarmnegguard.append(-1)
-                                    aw.qmc.alarmtime.append(2)        #after FC
-                                    aw.qmc.alarmoffset.append(int(fields_action[0]))
-                                    aw.qmc.alarmcond.append(1)
-                                    aw.qmc.alarmstate.append(-1)
-                                    aw.qmc.alarmsource.append(-3)       #no source - this is time alarm
-                                    aw.qmc.alarmtemperature.append(0)
-                                    aw.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
-                                    aw.qmc.alarmbeep.append(0)
-                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[2],None))
-
-                            elif roastlogger_action_section.startswith("@actionResetTable"):
-                                if len(fields_action) == 2 and fields_action[0] != "null":
-
-                                    #add temp alarm - POWER
-                                    aw.qmc.alarmflag.insert(0,1)
-                                    aw.qmc.alarmguard.insert(0,-1)
-                                    aw.qmc.alarmnegguard.insert(0,-1)
-                                    aw.qmc.alarmtime.insert(0,9)        #after ON
-                                    aw.qmc.alarmoffset.insert(0,0)
-                                    aw.qmc.alarmcond.insert(0,1)
-                                    aw.qmc.alarmstate.insert(0,-1)
-                                    aw.qmc.alarmsource.insert(0,1)    #BT
-                                    aw.qmc.alarmtemperature.insert(0,0)
-                                    aw.qmc.alarmaction.insert(0,3+slider_power)    #SLIDER POWER
-                                    aw.qmc.alarmbeep.insert(0,0)
-                                    aw.qmc.alarmstrings.insert(0,QApplication.translate("Label",fields_action[0],None))
-
-                                    #add temp alarm - FAN
-                                    aw.qmc.alarmflag.insert(0,1)
-                                    aw.qmc.alarmguard.insert(0,-1)
-                                    aw.qmc.alarmnegguard.insert(0,-1)
-                                    aw.qmc.alarmtime.insert(0,9)        #after ON
-                                    aw.qmc.alarmoffset.insert(0,0)
-                                    aw.qmc.alarmcond.insert(0,1)
-                                    aw.qmc.alarmstate.insert(0,-1)
-                                    aw.qmc.alarmsource.insert(0,1)    #BT
-                                    aw.qmc.alarmtemperature.insert(0,0)
-                                    aw.qmc.alarmaction.insert(0,3+slider_fan)    #SLIDER POWER
-                                    aw.qmc.alarmbeep.insert(0,0)
-                                    aw.qmc.alarmstrings.insert(0,QApplication.translate("Label",fields_action[1],None))
-
-                            elif roastlogger_action_section.startswith("@loadBeansTable"):
-                                if len(fields_action) == 1 and fields_action[0] != "null":
-
-                                    #add START TRIGGER - 10 DEG before charge temp
-                                    aw.qmc.alarmflag.insert(2,1)
-                                    aw.qmc.alarmguard.insert(2,-1)
-                                    aw.qmc.alarmnegguard.insert(2,-1)
-                                    aw.qmc.alarmtime.insert(0,9)        #after ON
-                                    aw.qmc.alarmoffset.insert(2,0)
-                                    aw.qmc.alarmcond.insert(2,1)
-                                    aw.qmc.alarmstate.insert(2,-1)
-                                    aw.qmc.alarmsource.insert(2,1)    #BT
-                                    aw.qmc.alarmtemperature.insert(2,float(fields_action[0])-10)
-                                    aw.qmc.alarmaction.insert(2,7)    #inititate 7 (START)
-                                    aw.qmc.alarmbeep.insert(2,0)
-                                    aw.qmc.alarmstrings.insert(2,QApplication.translate("Label","Start recording",None))
-
-                                    #add CHARGE alarm
-                                    aw.qmc.alarmflag.insert(3,1)
-                                    aw.qmc.alarmguard.insert(3,-1)
-                                    aw.qmc.alarmnegguard.insert(3,-1)
-                                    aw.qmc.alarmtime.insert(3,-1)        #after START
-                                    aw.qmc.alarmoffset.insert(3,0)
-                                    aw.qmc.alarmcond.insert(3,1)
-                                    aw.qmc.alarmstate.insert(3,-1)
-                                    aw.qmc.alarmsource.insert(3,1)    #BT
-                                    aw.qmc.alarmtemperature.insert(3,float(fields_action[0]))
-                                    aw.qmc.alarmaction.insert(3,0)    #POPUP
-                                    aw.qmc.alarmbeep.insert(3,1)      #do beep for charge
-                                    aw.qmc.alarmstrings.insert(3,QApplication.translate("Label","Charge the beans",None))
-                                break
-                    else:
-                        if slider_power == -1: error_msg += "Could not find slider named 'Power' "
-                        if slider_fan == -1: error_msg += "Could not find slider named 'Fan' "
-                        error_msg += "Please rename sliders in Config - Events menu"
-
-        except Exception: # pylint: disable=broad-except
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-            if roastlogger_action_section == "No actions loaded":
-                error_msg += "Roastlogger file does not contain actions.  Alarms will not be loaded."
-            else:
-                error_msg += "Roastlogger actions are not complete. Last loaded section is '" + roastlogger_action_section + "'"
-
-        finally:
-            infile.close()
-            if res:
-                aw.autoAdjustAxis()
-                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
-                self.qmc.redraw()
-
-        if error_msg:
-            aw.qmc.adderror(QApplication.translate("Error Message","Roastlogger log file exception: " + error_msg,None))
+            except Exception: # pylint: disable=broad-except
+    #            traceback.print_exc(file=sys.stdout)
+                if roastlogger_action_section == "No actions loaded":
+                    error_msg += "Roastlogger file does not contain actions.  Alarms will not be loaded."
+                else:
+                    error_msg += "Roastlogger actions are not complete. Last loaded section is '" + roastlogger_action_section + "'"
+    
+            finally:
+                if res:
+                    aw.autoAdjustAxis()
+                    self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+                    self.qmc.redraw()
+    
+            if error_msg != "":
+                aw.qmc.adderror(QApplication.translate("Error Message","Roastlogger log file exception: " + error_msg,None))
 
     #Write readings to Artisan csv file
     def exportCSV(self,filename):
@@ -26277,58 +26211,53 @@ class ApplicationWindow(QMainWindow):
                     [DROP, "Drop",False],
                     [COOL, "COOL",False],
                     ]
-                import csv
-                import io
-                outfile = io.open(filename, 'w',newline="",encoding='utf8')
-
-                writer= csv.writer(outfile,delimiter='\t')
-                writer.writerow([
-                    "Date:" + self.qmc.roastdate.date().toString("dd'.'MM'.'yyyy"),
-                    "Unit:" + self.qmc.mode,
-                    "CHARGE:" + self.eventtime2string(CHARGE),
-                    "TP:" + self.eventtime2string(TP),
-                    "DRYe:" + self.eventtime2string(DRYe),
-                    "FCs:" + self.eventtime2string(FCs),
-                    "FCe:" + self.eventtime2string(FCe),
-                    "SCs:" + self.eventtime2string(SCs),
-                    "SCe:" + self.eventtime2string(SCe),
-                    "DROP:" + self.eventtime2string(DROP),
-                    "COOL:" + self.eventtime2string(COOL),
-                    "Time:" + self.qmc.roastdate.time().toString()[:-3]])
-                row = (['Time1','Time2','ET','BT','Event'] + freduce(lambda x,y: x + [str(y[0]),str(y[1])], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[]))
-                writer.writerow(row)
-                last_time = None
-                for i in range(len(self.qmc.timex)):
-                    if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
-                        time2 = "%02d:%02d"% divmod(self.qmc.timex[i] - CHARGE, 60)
-                    else:
-                        time2 = ""
-                    event = ""
-                    for e in range(len(events)):
-                        if not events[e][2] and int(round(self.qmc.timex[i])) == int(round(events[e][0])):
-                            event = events[e][1]
-                            events[e][2] = True
-                            break
-                    time1 = "%02d:%02d"% divmod(self.qmc.timex[i],60)
-                    if not last_time or last_time != time1:
-                        extratemps = []
-                        for j in range(len(self.qmc.extradevices)):
-                            if j < len(self.qmc.extratemp1) and i < len(self.qmc.extratemp1[j]):
-                                extratemps.append(str(self.qmc.extratemp1[j][i]))
-                            else:
-                                extratemps.append("-1")
-                            if j < len(self.qmc.extratemp2) and i < len(self.qmc.extratemp2[j]):
-                                extratemps.append(str(self.qmc.extratemp2[j][i]))
-                            else:
-                                extratemps.append("-1")
-                        writer.writerow([str(time1),str(time2),str(self.qmc.temp1[i]),str(self.qmc.temp2[i]),str(event)] + extratemps)
-                    last_time = time1
-                outfile.close()
+                with io.open(filename, 'w',newline="",encoding='utf8') as outfile:
+                    writer= csv.writer(outfile,delimiter='\t')
+                    writer.writerow([
+                        "Date:" + self.qmc.roastdate.date().toString("dd'.'MM'.'yyyy"),
+                        "Unit:" + self.qmc.mode,
+                        "CHARGE:" + self.eventtime2string(CHARGE),
+                        "TP:" + self.eventtime2string(TP),
+                        "DRYe:" + self.eventtime2string(DRYe),
+                        "FCs:" + self.eventtime2string(FCs),
+                        "FCe:" + self.eventtime2string(FCe),
+                        "SCs:" + self.eventtime2string(SCs),
+                        "SCe:" + self.eventtime2string(SCe),
+                        "DROP:" + self.eventtime2string(DROP),
+                        "COOL:" + self.eventtime2string(COOL),
+                        "Time:" + self.qmc.roastdate.time().toString()[:-3]])
+                    row = (['Time1','Time2','ET','BT','Event'] + freduce(lambda x,y: x + [str(y[0]),str(y[1])], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[]))
+                    writer.writerow(row)
+                    last_time = None
+                    for i in range(len(self.qmc.timex)):
+                        if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
+                            time2 = "%02d:%02d"% divmod(self.qmc.timex[i] - CHARGE, 60)
+                        else:
+                            time2 = ""
+                        event = ""
+                        for e in range(len(events)):
+                            if not events[e][2] and int(round(self.qmc.timex[i])) == int(round(events[e][0])):
+                                event = events[e][1]
+                                events[e][2] = True
+                                break
+                        time1 = "%02d:%02d"% divmod(self.qmc.timex[i],60)
+                        if not last_time or last_time != time1:
+                            extratemps = []
+                            for j in range(len(self.qmc.extradevices)):
+                                if j < len(self.qmc.extratemp1) and i < len(self.qmc.extratemp1[j]):
+                                    extratemps.append(str(self.qmc.extratemp1[j][i]))
+                                else:
+                                    extratemps.append("-1")
+                                if j < len(self.qmc.extratemp2) and i < len(self.qmc.extratemp2[j]):
+                                    extratemps.append(str(self.qmc.extratemp2[j][i]))
+                                else:
+                                    extratemps.append("-1")
+                            writer.writerow([str(time1),str(time2),str(self.qmc.temp1[i]),str(self.qmc.temp2[i]),str(event)] + extratemps)
+                        last_time = time1
                 return True
             else:
                 return False
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportCSV() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -26377,17 +26306,17 @@ class ApplicationWindow(QMainWindow):
                     COOL = self.qmc.timex[self.qmc.timeindex[7]]
                 else:
                     COOL = 0
-#                events = [
-#                    [CHARGE,"Charge",False],
-#                    [TP,"TP",False],
-#                    [DRYe,"Dry End",False],
-#                    [FCs,"FCs",False],
-#                    [FCe,"FCe",False],
-#                    [SCs,"SCs",False],
-#                    [SCe,"SCe",False],
-#                    [DROP, "Drop",False],
-#                    [COOL, "COOL",False],
-#                    ]
+                events = [
+                    [CHARGE,"Charge",False],
+                    [TP,"TP",False],
+                    [DRYe,"Dry End",False],
+                    [FCs,"FCs",False],
+                    [FCe,"FCe",False],
+                    [SCs,"SCs",False],
+                    [SCe,"SCe",False],
+                    [DROP, "Drop",False],
+                    [COOL, "COOL",False],
+                    ]
 
                 from openpyxl import Workbook
                 from openpyxl.styles import Font,Alignment # , Fill # ML: not used
@@ -26449,27 +26378,27 @@ class ApplicationWindow(QMainWindow):
 
                 last_time = None
                 for i in range(len(self.qmc.timex)):
-#                    if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
-#                        time2 = "%02d:%02d"% divmod(self.qmc.timex[i] - CHARGE, 60) #@UnusedVariable
-#                    else:
-#                        time2 = "" #@UnusedVariable
-#                    event = ""     #@UnusedVariable
-#                    for e in range(len(events)):
-#                        if not events[e][2] and int(round(self.qmc.timex[i])) == int(round(events[e][0])):
-#                            event = events[e][1] #@UnusedVariable
-#                            events[e][2] = True
-#                            break
-#                    if i in aw.qmc.specialevents:
+                    if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
+                        time2 = "%02d:%02d"% divmod(self.qmc.timex[i] - CHARGE, 60) #@UnusedVariable # pylint: disable=unused-variable
+                    else:
+                        time2 = "" #@UnusedVariable #@UnusedVariable # pylint: disable=unused-variable
+                    event = ""     #@UnusedVariable #@UnusedVariable # pylint: disable=unused-variable
+                    for e in range(len(events)):
+                        if not events[e][2] and int(round(self.qmc.timex[i])) == int(round(events[e][0])):
+                            event = events[e][1] #@UnusedVariable #@UnusedVariable # pylint: disable=unused-variable
+                            events[e][2] = True
+                            break
+                    if i in aw.qmc.specialevents:
 #                        a = [k for k, j in enumerate(aw.qmc.specialevents) if j == i]
-#                        for n,m in enumerate(aw.qmc.specialevents):
-#                            if m == i:
-#                                if len(event) > 0:
-#                                    event += ","
+                        for n,m in enumerate(aw.qmc.specialevents):
+                            if m == i:
+                                if len(event) > 0:
+                                    event += ","
                                 #if aw.qmc.specialeventstype[n] == 4:       # only export the event Description for -- type events
-#                                if len(aw.qmc.specialeventsStrings[n]) > 0: # always export the event Description if it exist
-#                                    event += aw.qmc.specialeventsStrings[n]
-#                                else:
-#                                    event += aw.qmc.etypesf(aw.qmc.specialeventstype[n])[0] + aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[n])
+                                if len(aw.qmc.specialeventsStrings[n]) > 0: # always export the event Description if it exist
+                                    event += aw.qmc.specialeventsStrings[n]
+                                else:
+                                    event += aw.qmc.etypesf(aw.qmc.specialeventstype[n])[0] + aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[n])
 
                     time1 = "%02d:%02d"% divmod(self.qmc.timex[i],60)
                     if not last_time or last_time != time1:
@@ -26499,20 +26428,17 @@ class ApplicationWindow(QMainWindow):
                 return True
             else:
                 return False
-        except Exception as ex: # pylint: disable=broad-except
-#            import traceback
+        except Exception as ex:
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportExcel() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportExcel() {0}").format(str(ex)),exc_tb.tb_lineno)
             return False
 
     #Write object to file
     def serialize(self,filename,obj):
         fn = str(filename)
-        f = codecs.open(fn, 'w+', encoding='utf-8')
-        f.write(repr(obj))
-        f.close()
-
+        with codecs.open(fn, 'w+', encoding='utf-8') as f:
+            f.write(repr(obj))
 #PLUS
         # fill plus UUID register
         try:
@@ -26528,10 +26454,8 @@ class ApplicationWindow(QMainWindow):
             obj = None
             fn = str(filename)
             if os.path.exists(fn):
-                f = codecs.open(fn, 'rb', encoding='utf-8')
-                obj=ast.literal_eval(f.read()) # pylint: disable=eval-used
-                f.close()
-
+                with codecs.open(fn, 'rb', encoding='utf-8') as f:
+                    obj=ast.literal_eval(f.read()) # pylint: disable=eval-used
 #PLUS
             # fill plus UUID register
             try:
@@ -26546,7 +26470,6 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " deserialize() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return {}
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
 
     def ensureCorrectExtraDeviceListLenght(self):
@@ -27348,7 +27271,6 @@ class ApplicationWindow(QMainWindow):
             aw.autoAdjustAxis()
             return True
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             # we don't report errors on settingsLoad
             _, _, exc_tb = sys.exc_info()
@@ -28267,7 +28189,6 @@ class ApplicationWindow(QMainWindow):
         try:
             self.importExternalURL(self.artisanURLextractor,QApplication.translate("Message","Import Artisan URL", None))
         except Exception: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
     
@@ -29854,7 +29775,6 @@ class ApplicationWindow(QMainWindow):
 
         except Exception: # pylint: disable=broad-except
             res = False
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + "  settingsLoad()  @line " + str(getattr(exc_tb, 'tb_lineno', '?')))
@@ -29924,7 +29844,6 @@ class ApplicationWindow(QMainWindow):
 
         except Exception: # pylint: disable=broad-except
             res = False
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(self,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " settingsLoad()  @line " + str(getattr(exc_tb, 'tb_lineno', '?')))
@@ -29956,7 +29875,6 @@ class ApplicationWindow(QMainWindow):
             else:
                 return False
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startWebLCDs() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -30189,8 +30107,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.etypes[2] = self.qmc.l_eventtype3dots.get_label()
                 self.qmc.etypes[3] = self.qmc.l_eventtype4dots.get_label()
         except Exception as e: # pylint: disable=broad-except
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fetchCurveStyles() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -31064,7 +30981,6 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue("lastLoadedBackground","")
 
         except Exception: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " closeEvent()  @line " + str(getattr(exc_tb, 'tb_lineno', '?')))
@@ -31107,7 +31023,6 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
 
         except Exception: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " closeEventSettings_theme()  @line " + str(getattr(exc_tb, 'tb_lineno', '?')))
@@ -31550,10 +31465,9 @@ class ApplicationWindow(QMainWindow):
                         os.remove(filename)
                     except OSError:
                         pass
-                    f = codecs.open(filename, 'w', encoding='utf-8')
-                    for i in range(len(html)):
-                        f.write(html[i])
-                    f.close()
+                    with codecs.open(filename, 'w', encoding='utf-8') as f:
+                        for i in range(len(html)):
+                            f.write(html[i])
                     if platf == 'Darwin':
                         full_path = "file://" + filename # Safari refuses to load the javascript lib (sorttable) otherwise
                     else:
@@ -31618,45 +31532,42 @@ class ApplicationWindow(QMainWindow):
             if filename:
                 try:
                     # write header
-                    import csv
-                    outfile = open(filename, 'w',newline="")
-                    writer= csv.writer(outfile,delimiter='\t')
-                    writer.writerow(["batch","time","profile","beans","in (g)","out (g)","loss (%)","date","time",
-                        "in ({})".format(aw.qmc.weight[2].lower()),"out ({})".format(aw.qmc.weight[2].lower()),
-                        "whole color", "ground color", "color system", "machine", "capacity (kg)", "beansize min", "beansize max", "roasting notes", "cupping notes"])
-                    # write data
-                    c = 1
-                    for p in profiles:
-                        try:
-                            d = self.productionData2string(self.profileProductionData(self.deserialize(p)),units=False)
-                            dt = QDateTime.fromMSecsSinceEpoch(int(round(d["datetime"].timestamp()*1000)))
-                            writer.writerow([
-                                s2a(d["id"]),
-                                s2a(d["time"]),
-                                s2a(d["title"]),
-                                s2a(d["beans"]),
-                                '{0:.0f}'.format(d["weight_in_num"]),
-                                '{0:.0f}'.format(d["weight_out_num"]),
-                                '{0:.1f}'.format(d["weight_loss_num"]),
-                                s2a(dt.date().toString(Qt.SystemLocaleShortDate)),
-                                s2a(dt.time().toString(Qt.SystemLocaleShortDate)),
-                                s2a(d["weight_in"]),
-                                s2a(d["weight_out"]),
-                                d["whole_color"],
-                                d["ground_color"],
-                                s2a(d["color_system"]),
-                                s2a(d["roastertype"]),
-                                d["roastersize"],
-                                d["beansize_min"],
-                                d["beansize_max"],
-                                s2a(d["roastingnotes"]),
-                                s2a(d["cuppingnotes"]),
-                                ])
-                            c += 1
-                        except Exception: # pylint: disable=broad-except
-                            pass
-                    # close file
-                    outfile.close()
+                    with open(filename, 'w',newline="") as outfile:
+                        writer= csv.writer(outfile,delimiter='\t')
+                        writer.writerow(["batch","time","profile","beans","in (g)","out (g)","loss (%)","date","time",
+                            "in ({})".format(aw.qmc.weight[2].lower()),"out ({})".format(aw.qmc.weight[2].lower()),
+                            "whole color", "ground color", "color system", "machine", "capacity (kg)", "beansize min", "beansize max", "roasting notes", "cupping notes"])
+                        # write data
+                        c = 1
+                        for p in profiles:
+                            try:
+                                d = self.productionData2string(self.profileProductionData(self.deserialize(p)),units=False)
+                                dt = QDateTime.fromMSecsSinceEpoch(int(round(d["datetime"].timestamp()*1000)))
+                                writer.writerow([
+                                    s2a(d["id"]),
+                                    s2a(d["time"]),
+                                    s2a(d["title"]),
+                                    s2a(d["beans"]),
+                                    '{0:.0f}'.format(d["weight_in_num"]),
+                                    '{0:.0f}'.format(d["weight_out_num"]),
+                                    '{0:.1f}'.format(d["weight_loss_num"]),
+                                    s2a(dt.date().toString(Qt.SystemLocaleShortDate)),
+                                    s2a(dt.time().toString(Qt.SystemLocaleShortDate)),
+                                    s2a(d["weight_in"]),
+                                    s2a(d["weight_out"]),
+                                    d["whole_color"],
+                                    d["ground_color"],
+                                    s2a(d["color_system"]),
+                                    s2a(d["roastertype"]),
+                                    d["roastersize"],
+                                    d["beansize_min"],
+                                    d["beansize_max"],
+                                    s2a(d["roastingnotes"]),
+                                    s2a(d["cuppingnotes"]),
+                                    ])
+                                c += 1
+                            except Exception: # pylint: disable=broad-except
+                                pass
                 except Exception: # pylint: disable=broad-except
                     pass
 
@@ -31736,7 +31647,6 @@ class ApplicationWindow(QMainWindow):
                             ws['G{0}'.format(c)] = avgFormat(c,"E","F")
                             ws['G{0}'.format(c)].number_format = '0.0%'
                         except Exception as e: # pylint: disable=broad-except
-#                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
                             pass
                     # write trailer
@@ -31755,7 +31665,6 @@ class ApplicationWindow(QMainWindow):
                     wb.save(filename)
                     aw.sendmessage(QApplication.translate("Message","Excel Production Report exported to {0}", None).format(filename))
                 except Exception as e: # pylint: disable=broad-except
-#                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " productionExcelReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -32232,20 +32141,18 @@ class ApplicationWindow(QMainWindow):
         )
 
     def reportFiles(self):
-        import zipfile
-        import tempfile
         # get profile filenames
         selected_files = self.ArtisanOpenFilesDialog(ext="*.alog *.zip")      # added zip files
         files = []
         for f in selected_files:
             if zipfile.is_zipfile(f):
-                zf = zipfile.ZipFile(f)
-                ziptmpdir = tempfile.mkdtemp()
-                zf.extractall(ziptmpdir)
-                for n in zf.namelist():
-                    nf = os.path.join(ziptmpdir,n)
-                    if os.path.splitext(nf)[1] == ".alog":
-                        files.append(nf)
+                with zipfile.ZipFile(f) as zf:
+                    ziptmpdir = tempfile.mkdtemp()
+                    zf.extractall(ziptmpdir)
+                    for n in zf.namelist():
+                        nf = os.path.join(ziptmpdir,n)
+                        if os.path.splitext(nf)[1] == ".alog":
+                            files.append(nf)
             else: # a normal *.alog file
                 files.append(f)
         return files
@@ -32327,7 +32234,6 @@ class ApplicationWindow(QMainWindow):
                     try:
                         rd = self.profileRankingData(p)
                     except Exception as e: # pylint: disable=broad-except
-#                        import traceback
 #                        traceback.print_exc(file=sys.stdout)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -32485,7 +32391,6 @@ class ApplicationWindow(QMainWindow):
                             first_profile = False
 
                         except Exception as e: # pylint: disable=broad-except
-#                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -32618,7 +32523,6 @@ class ApplicationWindow(QMainWindow):
                         graph_image = "<img alt='roast graph' style=\"width:100%;\" src='" + graph_image + "'>"
 
                     except Exception as e: # pylint: disable=broad-except
-#                        import traceback
 #                        traceback.print_exc(file=sys.stdout)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -32697,7 +32601,6 @@ class ApplicationWindow(QMainWindow):
                         try:
                             rd = self.profileRankingData(p)
                         except Exception as e: # pylint: disable=broad-except
-#                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -32766,7 +32669,6 @@ class ApplicationWindow(QMainWindow):
                     graph_image_pct = "<img alt='roast graph pct' style=\"width: 95%;\" src='" + graph_image_pct + "'>"
 
                 except Exception as e: # pylint: disable=broad-except
-#                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -32812,17 +32714,15 @@ class ApplicationWindow(QMainWindow):
                     graph_image=graph_image,
                     graph_image_pct=graph_image_pct
                 )
-                f = None
                 try:
                     filename = str(QDir(tmpdir).filePath("RankingReport.html"))
                     try:
                         os.remove(filename)
                     except OSError:
                         pass
-                    f = codecs.open(filename, 'w', encoding='utf-8')
-                    for i in range(len(html)):
-                        f.write(html[i])
-                    f.close()
+                    with codecs.open(filename, 'w', encoding='utf-8') as f:
+                        for i in range(len(html)):
+                            f.write(html[i])
                     if platf == 'Darwin':
                         full_path = "file://" + filename # Safari refuses to load the javascript lib (sorttable) otherwise
                     else:
@@ -32831,20 +32731,16 @@ class ApplicationWindow(QMainWindow):
 
                 except IOError as e:
                     aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " rankingReport() {0}").format(str(e)))
-                finally:
-                    if f:
-                        f.close()
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def rankingCSVReport(self,_=False):        # get profile filenames
+    def rankingCSVReport(self,_=False): # get profile filenames
         profiles = self.reportFiles()
         if profiles and len(profiles) > 0:
             # select file
             filename = self.ArtisanSaveFileDialog(msg="Export CSV",ext="*.csv")
             if filename:
                 try:
-                    import csv
                     # open file
                     try:
                         outfile = open(filename, 'w',newline="")
@@ -32870,7 +32766,6 @@ class ApplicationWindow(QMainWindow):
                             writer.writerow(extendedRankingData)
                         except Exception as e: # pylint: disable=broad-except
                             _, _, exc_tb = sys.exc_info()
-#                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingCSVReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                     # close file
@@ -33026,7 +32921,6 @@ class ApplicationWindow(QMainWindow):
                                         ws[cr] = str(conv_fld)
 
                         except Exception as e: # pylint: disable=broad-except
-#                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -33096,7 +32990,6 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " Err [{0}] Can not write to file, perhaps it is open in an application or is write protected?").format(x.errno))
                     QApplication.beep()
                 except Exception as e: # pylint: disable=broad-except
-#                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -33368,10 +33261,9 @@ class ApplicationWindow(QMainWindow):
                     os.remove(filename)
                 except OSError:
                     pass
-                f = codecs.open(filename, 'w', encoding='utf-8')
-                for i in range(len(html)):
-                    f.write(html[i])
-                f.close()
+                with codecs.open(filename, 'w', encoding='utf-8') as f:
+                    for i in range(len(html)):
+                        f.write(html[i])
                 if platf == 'Darwin':
                     full_path = "file://" + filename # Safari refuses to load the javascript lib (sorttable) otherwise
                 else:
@@ -33388,7 +33280,6 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.redraw(recomputeAllDeltas=False)
 
         except Exception as e: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " htmlReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -33924,7 +33815,6 @@ class ApplicationWindow(QMainWindow):
                     BT += self.calcAUC(rtbt,timex,temp2,i)
                     delta += self.calcAUC(rtbt,timex,temp1,i,temp2)
             except Exception as e: # pylint: disable=broad-except
-#                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ts() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -34112,7 +34002,6 @@ class ApplicationWindow(QMainWindow):
                 update_str = QApplication.translate("About", "You are using a beta continuous build.",None)
                 update_str += '<br/><br/>' + QApplication.translate("About", "You will see a notice here once a new official release is available.",None)
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkUpdate() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -34503,7 +34392,6 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadSettings() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -34709,7 +34597,6 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadSettings_theme() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -34904,7 +34791,6 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.redraw(recomputeAllDeltas=True)
         except Exception: # pylint: disable=broad-except
             pass
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
 
     @pyqtSlot()
@@ -35231,45 +35117,42 @@ class ApplicationWindow(QMainWindow):
                 f = QFile(filename)
                 if not f.open(QIODevice.ReadOnly):
                     raise IOError(str(f.errorString()))
-                import csv
-                import io
-                csvFile = io.open(filename, 'r', encoding='utf-8')
-                csvReader = csv.DictReader(csvFile,["Date","Time","T1","T1unit","T2","T2unit"],delimiter='\t')
-                zero_t = None
-                roastdate = None
-                unit = None
-                for item in csvReader:
-                    try:
-                        #set date
-                        if not roastdate:
-                            roastdate = QDateTime(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
-                            self.qmc.roastdate = roastdate
-                            self.qmc.roastepoch = QDateTimeToEpoch(self.qmc.roastdate)
-                            self.qmc.roasttzoffset = 0
-                        #set zero
-                        if not zero_t:
-                            date = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
-                            zero = QDateTime()
-                            zero.setDate(date)
-                            zero.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-                            zero_t = QDateTimeToEpoch(zero)
-                        #set temperature mode
-                        if not unit:
-                            unit = item['T1unit']
-                            if unit == "F" and self.qmc.mode == "C":
-                                self.qmc.fahrenheitMode()
-                            if unit == "C" and self.qmc.mode == "F":
-                                self.qmc.celsiusMode()
-                        #add one measurement
-                        dt = QDateTime()
-                        dt.setDate(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
-                        dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-                        self.qmc.timex.append(float(QDateTimeToEpoch(dt) - zero_t))
-                        self.qmc.temp1.append(float(item['T1'].replace(',','.')))
-                        self.qmc.temp2.append(float(item['T2'].replace(',','.')))
-                    except ValueError:
-                        pass
-                csvFile.close()
+                with io.open(filename, 'r', encoding='utf-8') as csvFile:
+                    csvReader = csv.DictReader(csvFile,["Date","Time","T1","T1unit","T2","T2unit"],delimiter='\t')
+                    zero_t = None
+                    roastdate = None
+                    unit = None
+                    for item in csvReader:
+                        try:
+                            #set date
+                            if not roastdate:
+                                roastdate = QDateTime(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
+                                self.qmc.roastdate = roastdate
+                                self.qmc.roastepoch = QDateTimeToEpoch(self.qmc.roastdate)
+                                self.qmc.roasttzoffset = 0
+                            #set zero
+                            if not zero_t:
+                                date = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
+                                zero = QDateTime()
+                                zero.setDate(date)
+                                zero.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                                zero_t = QDateTimeToEpoch(zero)
+                            #set temperature mode
+                            if not unit:
+                                unit = item['T1unit']
+                                if unit == "F" and self.qmc.mode == "C":
+                                    self.qmc.fahrenheitMode()
+                                if unit == "C" and self.qmc.mode == "F":
+                                    self.qmc.celsiusMode()
+                            #add one measurement
+                            dt = QDateTime()
+                            dt.setDate(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
+                            dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                            self.qmc.timex.append(float(QDateTimeToEpoch(dt) - zero_t))
+                            self.qmc.temp1.append(float(item['T1'].replace(',','.')))
+                            self.qmc.temp2.append(float(item['T2'].replace(',','.')))
+                        except ValueError:
+                            pass
                 #swap temperature curves if needed such that BT is the lower and ET the upper one
                 if (freduce(lambda x,y:x + y, self.qmc.temp2)) > freduce(lambda x,y:x + y, self.qmc.temp1):
                     tmp = self.qmc.temp1
@@ -35284,7 +35167,6 @@ class ApplicationWindow(QMainWindow):
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importK202(): {0}").format(str(ex)))
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK202() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -35300,59 +35182,56 @@ class ApplicationWindow(QMainWindow):
                 f = QFile(filename)
                 if not f.open(QIODevice.ReadOnly):
                     raise IOError(str(f.errorString()))
-                import csv
-                import io
-                csvFile = io.open(filename, 'r', encoding='utf-8')
-                csvReader = csv.DictReader(csvFile,["Date","Time","T1","T2","T3","T4"],delimiter='\t')
-                zero_t = None
-                roastdate = None
-                # we add an extra device if needed
-                if len(self.qmc.extradevices) == 0:
-                    self.addDevice()
-                for item in csvReader:
-                    try:
-                        #set date
-                        if not roastdate:
-                            roastdate = QDateTime(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
-                            self.qmc.roastdate = roastdate
-                            self.qmc.roastepoch = QDateTimeToEpoch(self.qmc.roastdate)
-                            self.qmc.roasttzoffset = 0
-                        #set zero
-                        if not zero_t:
-                            date = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
-                            zero = QDateTime()
-                            zero.setDate(date)
-                            zero.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-                            zero_t = QDateTimeToEpoch(zero)
-    # The K204 export does not contain a trace of the temperature mode.
-    # We have to assume here that the mode was set correctly before the import.
-                        #add one measurement
-                        dt = QDateTime()
-                        dt.setDate(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
-                        dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-                        tx = float(QDateTimeToEpoch(dt) - zero_t)
-                        self.qmc.timex.append(tx)
-                        t1 = float(item['T1'].replace(',','.'))
-                        if t1 > 800 or t1 < 0.0:
-                            t1 = 0.0
-                        self.qmc.temp1.append(t1)
-                        t2 = float(item['T2'].replace(',','.'))
-                        if t2 > 800 or t2 < 0.0:
-                            t2 = 0.0
-                        self.qmc.temp2.append(t2)
-                        if len(self.qmc.extradevices) > 0:
-                            self.qmc.extratimex[0].append(tx)
-                            t3 = float(item['T3'].replace(',','.'))
-                            if t3 > 800 or t3 < 0.0:
-                                t3 = 0.0
-                            self.qmc.extratemp1[0].append(t3)
-                            t4 = float(item['T4'].replace(',','.'))
-                            if t4 > 800 or t4 < 0.0:
+                with io.open(filename, 'r', encoding='utf-8') as csvFile:
+                    csvReader = csv.DictReader(csvFile,["Date","Time","T1","T2","T3","T4"],delimiter='\t')
+                    zero_t = None
+                    roastdate = None
+                    # we add an extra device if needed
+                    if len(self.qmc.extradevices) == 0:
+                        self.addDevice()
+                    for item in csvReader:
+                        try:
+                            #set date
+                            if not roastdate:
+                                roastdate = QDateTime(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
+                                self.qmc.roastdate = roastdate
+                                self.qmc.roastepoch = QDateTimeToEpoch(self.qmc.roastdate)
+                                self.qmc.roasttzoffset = 0
+                            #set zero
+                            if not zero_t:
+                                date = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
+                                zero = QDateTime()
+                                zero.setDate(date)
+                                zero.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                                zero_t = QDateTimeToEpoch(zero)
+        # The K204 export does not contain a trace of the temperature mode.
+        # We have to assume here that the mode was set correctly before the import.
+                            #add one measurement
+                            dt = QDateTime()
+                            dt.setDate(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
+                            dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                            tx = float(QDateTimeToEpoch(dt) - zero_t)
+                            self.qmc.timex.append(tx)
+                            t1 = float(item['T1'].replace(',','.'))
+                            if t1 > 800 or t1 < 0.0:
+                                t1 = 0.0
+                            self.qmc.temp1.append(t1)
+                            t2 = float(item['T2'].replace(',','.'))
+                            if t2 > 800 or t2 < 0.0:
                                 t2 = 0.0
-                            self.qmc.extratemp2[0].append(t4)
-                    except ValueError:
-                        pass
-                csvFile.close()
+                            self.qmc.temp2.append(t2)
+                            if len(self.qmc.extradevices) > 0:
+                                self.qmc.extratimex[0].append(tx)
+                                t3 = float(item['T3'].replace(',','.'))
+                                if t3 > 800 or t3 < 0.0:
+                                    t3 = 0.0
+                                self.qmc.extratemp1[0].append(t3)
+                                t4 = float(item['T4'].replace(',','.'))
+                                if t4 > 800 or t4 < 0.0:
+                                    t2 = 0.0
+                                self.qmc.extratemp2[0].append(t4)
+                        except ValueError:
+                            pass
                 #swap temperature curves if needed such that BT is the lower and ET the upper one
                 if (freduce(lambda x,y:x + y, self.qmc.temp2)) > freduce(lambda x,y:x + y, self.qmc.temp1):
                     tmp = self.qmc.temp1
@@ -35367,7 +35246,6 @@ class ApplicationWindow(QMainWindow):
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importK204(): {0}").format(str(ex)))
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK204() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -35563,7 +35441,6 @@ class ApplicationWindow(QMainWindow):
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importPilot(): {0}").format(str(ex)))
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.sendmessage(QApplication.translate("Message","Import Probat Pilot failed", None))
@@ -35575,7 +35452,6 @@ class ApplicationWindow(QMainWindow):
         try:
             self.importExternal(extractProfileRoasTime,QApplication.translate("Message","Import Aillio RoasTime", None),"*.json")
         except Exception: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
 
@@ -35585,7 +35461,6 @@ class ApplicationWindow(QMainWindow):
         try:
             self.importExternalURL(extractProfileRoastWorld,QApplication.translate("Message","Import Aillio Roast.World URL", None))
         except Exception: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
     
@@ -35621,7 +35496,6 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(message)
 
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " {1} {0}").format(str(ex),message),getattr(exc_tb, 'tb_lineno', '?'))
@@ -35657,7 +35531,6 @@ class ApplicationWindow(QMainWindow):
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " {1}: {0}").format(str(ex),message))
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " {1} {0}").format(str(ex),message),getattr(exc_tb, 'tb_lineno', '?'))
@@ -35708,44 +35581,41 @@ class ApplicationWindow(QMainWindow):
                 f = QFile(filename)
                 if not f.open(QIODevice.ReadOnly):
                     raise IOError(str(f.errorString()))
-                import csv
-                import io
-                csvFile = io.open(filename, 'r', encoding='utf-8')
-                data = csv.reader(csvFile,delimiter='\t')
-                #read file header
-                header = next(data)
-                zero = QDateTime()
-                date = QDateTime(QDate.fromString(header[0].split('Date:')[1],"yyyy'/'MM'/'dd"))
-                self.qmc.roastdate = date
-                self.qmc.roastepoch = QDateTimeToEpoch(self.qmc.roastdate)
-                self.qmc.roasttzoffset = 0
-                zero.setDate(date)
-                zero.setTime(QTime.fromString(header[1].split('Time:')[1],"hh':'mm':'ss"))
-                zero_t = QDateTimeToEpoch(zero)
-                #read column headers
-                fields = next(data)
-                unit = None
-                #read data
-                for row in data:
-                    items = list(zip(fields, row))
-                    item = {}
-                    for (name, value) in items:
-                        item[name] = value.strip()
-                    #set temperature mode
-                    if not unit:
-                        unit = item['Unit']
-                        if unit == "F" and self.qmc.mode == "C":
-                            self.qmc.fahrenheitMode()
-                        if unit == "C" and self.qmc.mode == "F":
-                            self.qmc.celsiusMode()
-                    #add one measurement
-                    dt = QDateTime()
-                    dt.setDate(QDate.fromString(item['Date'],"yyyy'/'MM'/'dd"))
-                    dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-                    self.qmc.timex.append(float(QDateTimeToEpoch(dt) - zero_t))
-                    self.qmc.temp1.append(float(item['T1']))
-                    self.qmc.temp2.append(float(item['T2']))
-                csvFile.close()
+                with io.open(filename, 'r', encoding='utf-8') as csvFile:
+                    data = csv.reader(csvFile,delimiter='\t')
+                    #read file header
+                    header = next(data)
+                    zero = QDateTime()
+                    date = QDateTime(QDate.fromString(header[0].split('Date:')[1],"yyyy'/'MM'/'dd"))
+                    self.qmc.roastdate = date
+                    self.qmc.roastepoch = QDateTimeToEpoch(self.qmc.roastdate)
+                    self.qmc.roasttzoffset = 0
+                    zero.setDate(date)
+                    zero.setTime(QTime.fromString(header[1].split('Time:')[1],"hh':'mm':'ss"))
+                    zero_t = QDateTimeToEpoch(zero)
+                    #read column headers
+                    fields = next(data)
+                    unit = None
+                    #read data
+                    for row in data:
+                        items = list(zip(fields, row))
+                        item = {}
+                        for (name, value) in items:
+                            item[name] = value.strip()
+                        #set temperature mode
+                        if not unit:
+                            unit = item['Unit']
+                            if unit == "F" and self.qmc.mode == "C":
+                                self.qmc.fahrenheitMode()
+                            if unit == "C" and self.qmc.mode == "F":
+                                self.qmc.celsiusMode()
+                        #add one measurement
+                        dt = QDateTime()
+                        dt.setDate(QDate.fromString(item['Date'],"yyyy'/'MM'/'dd"))
+                        dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                        self.qmc.timex.append(float(QDateTimeToEpoch(dt) - zero_t))
+                        self.qmc.temp1.append(float(item['T1']))
+                        self.qmc.temp2.append(float(item['T2']))
                 #swap temperature curves if needed such that BT is the lower and ET the upper one
                 if (freduce(lambda x,y:x + y, self.qmc.temp2)) > freduce(lambda x,y:x + y, self.qmc.temp1):
                     tmp = self.qmc.temp1
@@ -35760,7 +35630,6 @@ class ApplicationWindow(QMainWindow):
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importHH506RA(): {0}").format(str(ex)))
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importHH506RA() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -36115,8 +35984,7 @@ class ApplicationWindow(QMainWindow):
             Tradius = 300
             p.setOpacity(0.5)
             g = QRadialGradient(Wwidth/2, Wheight/2, ETradius)
-            beanbright =  100 - ETradius
-            if beanbright < 0: beanbright = 0
+            beanbright =  max(100 - ETradius,0)
             g.setColorAt(0.0, QColor(240,255,beanbright))  #bean center
             g.setColorAt(.5, Qt.yellow)
             g.setColorAt(.8, Qt.red)
@@ -36664,11 +36532,8 @@ class ApplicationWindow(QMainWindow):
 
     def loadAlarms(self,filename):
         try:
-            import io
-            infile = io.open(filename, 'r', encoding='utf-8')
-            from json import load as json_load
-            alarms = json_load(infile)
-            infile.close()
+            with io.open(filename, 'r', encoding='utf-8') as infile:
+                alarms = json_load(infile)
             aw.qmc.alarmflag = alarms["alarmflags"]
             aw.qmc.alarmguard = alarms["alarmguards"]
             aw.qmc.alarmnegguard = alarms["alarmnegguards"]
@@ -37275,7 +37140,6 @@ class ApplicationWindow(QMainWindow):
                     else:
                         self.sendmessage(QApplication.translate("Message","Invalid artisan format", None))
             except Exception: # pylint: disable=broad-except
-#                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 pass
             self.simulatorAction.setChecked(bool(self.simulator))
@@ -37304,10 +37168,8 @@ def excepthook(excType, excValue, tracebackobj):
     versionInfo= "Version: " + str(__version__) + ", revision: " + str(__revision__) + "\n"
     timeString = libtime.strftime("%Y-%m-%d, %H:%M:%S")
 
-    import io
     tbinfofile = io.StringIO()
 
-    import traceback
     traceback.print_tb(tracebackobj, None, tbinfofile)
     tbinfofile.seek(0)
     tbinfo = tbinfofile.read()
@@ -37335,11 +37197,10 @@ def excepthook(excType, excValue, tracebackobj):
     detailedmsg = '\n'.join([tbinfo, separator, variables])
     aw.qmc.adderror("Error: " + detailedmsg)
     try:
-        f = open(logFile, "w", encoding='utf-8')
-        f.write(msg)
-        f.write(detailedmsg)
-        f.write(versionInfo)
-        f.close()
+        with open(logFile, "w", encoding='utf-8') as f:
+            f.write(msg)
+            f.write(detailedmsg)
+            f.write(versionInfo)
     except IOError:
         pass
     errorbox = QMessageBox()
@@ -37365,7 +37226,7 @@ def qt_message_handler(_msg_type, _msg_log_context, _msg_string):
     pass
 
 
-def initialize_locale(app):
+def initialize_locale(my_app):
     if QSettings().contains('resetqsettings') and not toInt(QSettings().value('resetqsettings')):
         locale = toString(QSettings().value('locale'))
         if locale is None or locale == "en_US":
@@ -37430,28 +37291,28 @@ def initialize_locale(app):
     #load Qt default translations from QLibrary
     qtTranslator = QTranslator()
     if qtTranslator.load("qtbase_" + locale, QLibraryInfo.location(QLibraryInfo.TranslationsPath)):
-        app.installTranslator(qtTranslator)
+        my_app.installTranslator(qtTranslator)
     #find Qt default translations in Unix binaries
     elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "/translations"):
-        app.installTranslator(qtTranslator)
+        my_app.installTranslator(qtTranslator)
     #find Qt default translations in Mac binary
     elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "/../translations"):
-        app.installTranslator(qtTranslator)
+        my_app.installTranslator(qtTranslator)
     # qtbase_ translations added to the Artisan source as they are not in the official Qt builds
     elif qtTranslator.load("qtbase_" + locale, "translations"):
-        app.installTranslator(qtTranslator)
+        my_app.installTranslator(qtTranslator)
 
     #load Artisan translations
     appTranslator = QTranslator()
     #find application translations in source folder
     if appTranslator.load("artisan_" + locale, "translations"):
-        app.installTranslator(appTranslator)
+        my_app.installTranslator(appTranslator)
     #find application translations in Unix binaries
     elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/translations"):
-        app.installTranslator(appTranslator)
+        my_app.installTranslator(appTranslator)
     #find application translations in Mac binary
     elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/../translations"):
-        app.installTranslator(appTranslator)
+        my_app.installTranslator(appTranslator)
 
     return locale
 
