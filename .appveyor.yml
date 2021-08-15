@@ -42,7 +42,7 @@ for:
     fast_finish: false
 
   environment:
-    PYTHON: "C:\\Python38-x64"
+    PYTHON: "C:\\Python39-x64"
     UPLOADTOOL_BODY:
       "WARNING: pre-release builds may not work. Use at your own risk."
 
@@ -113,7 +113,7 @@ for:
 
   environment:
     ARTISAN_OS: osx
-    PYTHON: ~/venv3.8
+    PYTHON: ~/venv3.9
     language: generic
     HOMEBREW_NO_INSTALL_CLEANUP: 1
     HOMEBREW_NO_ANALYTICS: 1
@@ -152,7 +152,7 @@ for:
 
   environment:
     ARTISAN_OS: linux
-    PYTHON: $HOME/venv3.8
+    PYTHON: $HOME/venv3.9
 
   install:
     - echo "Linux Install"
@@ -190,7 +190,7 @@ for:
 
   environment:
     ARTISAN_OS: rpi
-    PYTHON: $HOME/venv3.8
+    PYTHON: $HOME/venv3.9
 
   install:
     - echo "RPI Install"

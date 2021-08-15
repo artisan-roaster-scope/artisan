@@ -313,7 +313,7 @@ def getHeaders(
         + ")"
     }
     try:
-        locale = config.app_window.get_locale()
+        locale = config.app_window.locale
         if locale is not None and locale != "":
             locale = locale.lower().replace("_", "-")
             headers["Accept-Language"] = locale
