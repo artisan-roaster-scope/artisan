@@ -641,26 +641,6 @@ elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() +
 elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/../translations"):
     app.installTranslator(appTranslator)
 
-umlaute_dict = {
-   uchr(228): 'ae',  # U+00E4   \xc3\xa4
-   uchr(246): 'oe',  # U+00F6   \xc3\xb6
-   uchr(252): 'ue',  # U+00FC   \xc3\xbc
-   uchr(196): 'Ae',  # U+00C4   \xc3\x84
-   uchr(214): 'Oe',  # U+00D6   \xc3\x96
-   uchr(220): 'Ue',  # U+00DC   \xc3\x9c
-   uchr(223): 'ss',  # U+00DF   \xc3\x9f
-}
-
-def toASCII(s):
-    if s is None:
-        return None
-    else:
-        utf8_string = str(s)
-        if locale.startswith("de"):
-            for k in umlaute_dict.keys():
-                utf8_string = utf8_string.replace(k, umlaute_dict[k])
-        return unidecode(utf8_string)
-
 def QDateTimeToEpoch(dt):
     try:
         return dt.toSecsSinceEpoch() # intoduced in Qt5.8, not available on RPi Stretch unning Qt5.7.1, returns 64bit uint
@@ -767,6 +747,15 @@ class tgraphcanvas(FigureCanvas):
     alarmsetSignal = pyqtSignal(int)
     moveBackgroundSignal = pyqtSignal(str,int)
     eventRecordSignal = pyqtSignal(int)
+    umlaute_dict = {
+       uchr(228): 'ae',  # U+00E4   \xc3\xa4
+       uchr(246): 'oe',  # U+00F6   \xc3\xb6
+       uchr(252): 'ue',  # U+00FC   \xc3\xbc
+       uchr(196): 'Ae',  # U+00C4   \xc3\x84
+       uchr(214): 'Oe',  # U+00D6   \xc3\x96
+       uchr(220): 'Ue',  # U+00DC   \xc3\x9c
+       uchr(223): 'ss',  # U+00DF   \xc3\x9f
+    }
 
     def __init__(self,parent,dpi):
 
@@ -5949,7 +5938,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
                         if aw.qmc.graphfont == 1:
-                            st1 = toASCII(st1)
+                            st1 = self.__to_ascii(st1)
 #                        e = 15
                         e = 0
                         a = 1.
@@ -6078,7 +6067,7 @@ class tgraphcanvas(FigureCanvas):
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[tx],stemp[tidx],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None),stringfromseconds(timex[tidx]-t0,False))
                     if aw.qmc.graphfont == 1:
-                        st1 = toASCII(st1)
+                        st1 = self.__to_ascii(st1)
                     if timeindex2:
                         a = aw.qmc.backgroundalpha
                     else:
@@ -6425,7 +6414,7 @@ class tgraphcanvas(FigureCanvas):
         backgroundtitle = backgroundtitle.strip()
         if backgroundtitle != "":
             if aw.qmc.graphfont in [1,9]: # if selected font is Humor we translate the unicode title into pure ascii
-                backgroundtitle = toASCII(backgroundtitle)
+                backgroundtitle = self.__to_ascii(backgroundtitle)
             backgroundtitle = "\n" + aw.qmc.abbrevString(backgroundtitle,30)
             
         st_artist = self.fig.suptitle(backgroundtitle,
@@ -6460,7 +6449,7 @@ class tgraphcanvas(FigureCanvas):
             title = "{}{} {}".format(bprefix,str(bnr),title)
             
         if self.graphfont in [1,9]: # if selected font is Humor or Dijkstra we translate the unicode title into pure ascii
-            title = toASCII(title)
+            title = self.__to_ascii(title)
         
 #        fontprop_xlarge = aw.mpl_fontproperties.copy()
 #        fontprop_xlarge.set_size("xx-large")
@@ -8172,7 +8161,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         ncol = int(math.ceil(len(self.handles)))
                     if aw.qmc.graphfont == 1:
-                        self.labels = [toASCII(l) for l in self.labels]
+                        self.labels = [self.__to_ascii(l) for l in self.labels]
                     if self.legend is None:
                         if self.legendloc_pos is None:
                             loc = self.legendloc # a position selected in the axis dialog
@@ -14085,6 +14074,17 @@ class tgraphcanvas(FigureCanvas):
             finally:
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
+
+    def __to_ascii(self, s):
+        if s is None:
+            return None
+        else:
+            utf8_string = str(s)
+            if locale.startswith("de"):
+                for k in self.umlaute_dict.keys():
+                    utf8_string = utf8_string.replace(k, umlaute_dict[k])
+            return unidecode(utf8_string)
+
 
 #######################################################################################
 #######################  END OF MAIN APPLICATION   ####################################
