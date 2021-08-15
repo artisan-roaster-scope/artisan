@@ -28,7 +28,7 @@ from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtWidgets import QApplication
 from plus import config, util, roast, connection, sync, controller
 from requests.exceptions import ConnectionError as RequestsConnectionError
-from typing import Any
+from typing import Any, Dict
 import persistqueue
 import threading
 import time
@@ -266,7 +266,7 @@ def full_roast_in_queue(roast_id: str) -> bool:
 
 # returns true if the given roast_record r is a full record containing all
 # information (incl. the roast date) and not only an update
-def is_full_roast_record(r: dict[str, Any]) -> bool:
+def is_full_roast_record(r: Dict[str, Any]) -> bool:
     return "date" in r and r["date"] and "amount" in r and "roast_id" in r
 
 

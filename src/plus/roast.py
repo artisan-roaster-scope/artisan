@@ -24,14 +24,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from plus import config, util
-from typing import Any, Optional
+from typing import Any, Optional, Dict
 import hashlib
 
 
 # given a profile dictionary extract key parameters to populate a Roast element
-def getTemplate(bp: dict[str, Any]) -> dict[str, Any]:
+def getTemplate(bp: Dict[str, Any]) -> Dict[str, Any]:
     config.logger.debug("roast:getTemplate()")
-    d: dict[str, Any] = {}
+    d: Dict[str, Any] = {}
     try:
         aw = config.app_window
 
@@ -241,7 +241,7 @@ def trimBlendSpec(blend_spec):
         return None
 
 
-def getRoast() -> dict[str, Any]:
+def getRoast() -> Dict[str, Any]:
     d = {}
     try:
         config.logger.debug("roast:getRoast()")
@@ -452,11 +452,11 @@ sync_record_attributes: list[str] = (
 # returns the current plus record and a hash over the plus record
 # if applied, r is assumed to contain the complete roast data as returned
 # by roast.getRoast()
-def getSyncRecord(r: Optional[dict[str, Any]] = None) -> tuple[dict[str, Any], str]:
+def getSyncRecord(r: Optional[Dict[str, Any]] = None) -> tuple[Dict[str, Any], str]:
     try:
         config.logger.info("roast:getSyncRecord()")
         m = hashlib.sha256()
-        d: dict[str, Any] = {}
+        d: Dict[str, Any] = {}
         if r is None:
             r = getRoast()
         # we take only the value of attributes to be synced back

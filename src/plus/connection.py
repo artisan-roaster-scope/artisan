@@ -26,7 +26,8 @@
 from PyQt5.QtCore import QSemaphore
 from artisanlib import __version__
 from typing import Any
-from typing import Optional
+from typing import Optional, Dict
+
 import datetime
 import gzip
 import json
@@ -300,8 +301,7 @@ def authentify() -> bool:
 
 
 def getHeaders(
-    authorized: bool = True, decompress: bool = True
-) -> dict[str, str]:
+    authorized: bool = True, decompress: bool = True) -> Dict[str, str]:
     os, os_version = config.app_window.get_os()  # @UndefinedVariable
     headers = {
         "user-agent": "Artisan/"
@@ -330,14 +330,14 @@ def getHeaders(
     return headers
 
 
-def sendData(url: str, data: dict[Any, Any], verb: str) -> Any:
+def sendData(url: str, data: Dict[Any, Any], verb: str) -> Any:
     if verb == "POST":
         return postData(url, data)
     return putData(url, data)
 
 
 # TODO: implement!
-def putData(url: str, data: dict[Any, Any]) -> Any:
+def putData(url: str, data: Dict[Any, Any]) -> Any:
     del url, data
 
 
@@ -391,7 +391,6 @@ def postData(
             config.logger.debug(
                 "connection: -> time %s", r.elapsed.total_seconds()
             )
-    print(r, type(r))
     return r
 
 
