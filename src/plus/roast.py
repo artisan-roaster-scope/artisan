@@ -24,7 +24,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from plus import config, util
-from typing import Any, Optional, Dict
+from typing import Any, Optional, Dict, List
 import hashlib
 
 
@@ -391,7 +391,7 @@ def getRoast() -> Dict[str, Any]:
 
 # the following data items are suppressed from the roast record if they have 0
 # values to avoid sending just tags with zeros:
-sync_record_zero_supressed_attributes: list[str] = [
+sync_record_zero_supressed_attributes: List[str] = [
     "density_roasted",
     "batch_number",
     "batch_pos",
@@ -424,7 +424,7 @@ sync_record_zero_supressed_attributes: list[str] = [
     "CO2_batch",
 ]
 
-sync_record_empty_string_supressed_attributes: list[str] = [
+sync_record_empty_string_supressed_attributes: List[str] = [
     "label",
     "batch_prefix",
     "color_system",
@@ -432,7 +432,7 @@ sync_record_empty_string_supressed_attributes: list[str] = [
     "notes",
 ]
 
-sync_record_non_supressed_attributes: list[str] = [
+sync_record_non_supressed_attributes: List[str] = [
     "roast_id",
     "location",
     "coffee",
@@ -442,7 +442,7 @@ sync_record_non_supressed_attributes: list[str] = [
 ]
 
 # all roast record attributes that participate in the sync process
-sync_record_attributes: list[str] = (
+sync_record_attributes: List[str] = (
     sync_record_non_supressed_attributes
     + sync_record_zero_supressed_attributes
     + sync_record_empty_string_supressed_attributes
