@@ -32,10 +32,10 @@ class wsport(object):
     def __init__(self,aw):
         self.aw = aw
         
-        # connects to "getattr(exc_tb, 'tb_lineno', '?')://<host>:<port>/<path>"
+        # connects to "ws://<host>:<port>/<path>"
         self.host = '127.0.0.1' # the TCP host
         self.port = 80          # the TCP port
-        self.path = "WebSocket" # the getattr(exc_tb, 'tb_lineno', '?') path
+        self.path = "WebSocket" # the ws path
         self.machineID = 0
         
         self.lastReadResult = 0 # this is set by eventaction following some custom button/slider Modbus actions with "read" command
@@ -95,22 +95,22 @@ class wsport(object):
         if message is not None:
             j = json.loads(message)
             if self.aw.seriallogflag:
-                self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port onMessage(): {}".format(j))
+                self.aw.addserial("wsport onMessage(): {}".format(j))
             if self.id_node in j:
                 self.setRequestResponse(j[self.id_node],j)
             elif self.pushMessage_node != ""  and self.pushMessage_node in j:
                 pushMessage = j[self.pushMessage_node]
                 if self.aw.seriallogflag:
-                    self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port pushMessage {} received".format(pushMessage))
+                    self.aw.addserial("wsport pushMessage {} received".format(pushMessage))
                 if self.charge_message != "" and pushMessage == self.charge_message:
                     if self.aw.seriallogflag:
-                        self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port CHARGE message received")
+                        self.aw.addserial("wsport CHARGE message received")
                     delay = 0 # in ms
                     if self.STARTonCHARGE and not self.aw.qmc.flagstart:
                         # turn recording on
                         self.aw.qmc.toggleRecorderSignal.emit()
                         if self.aw.seriallogflag:
-                            self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port toggleRecorder signal sent")
+                            self.aw.addserial("wsport toggleRecorder signal sent")
                     if self.aw.qmc.timeindex[0] == -1:
                         if self.aw.qmc.flagstart:
                             # markCHARGE without delay
@@ -120,57 +120,57 @@ class wsport(object):
                             delay = self.aw.qmc.delay * 2 # we delay the markCharge action by 2 sampling periods
                         self.aw.qmc.markChargeSignal.emit(delay)
                         if self.aw.seriallogflag:
-                            self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port markCHARGE() with delay={} signal sent".format(delay))
+                            self.aw.addserial("wsport markCHARGE() with delay={} signal sent".format(delay))
                 elif self.drop_message != "" and pushMessage == self.drop_message:
                     if self.aw.seriallogflag:
-                        self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port message: DROP")
+                        self.aw.addserial("wsport message: DROP")
                     if self.aw.qmc.flagstart and self.aw.qmc.timeindex[6] == 0:
                         # markDROP
                         self.aw.qmc.markDropSignal.emit()
                         if self.aw.seriallogflag:
-                            self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port markDROP signal sent")
+                            self.aw.addserial("wsport markDROP signal sent")
                     if self.OFFonDROP and self.aw.qmc.flagstart:
                         # turn Recorder off after two sampling periods
                         delay = self.aw.qmc.delay * 2 # we delay the turning OFF action by 2 sampling periods
                         time.sleep(delay)
                         self.aw.qmc.toggleMonitorSignal.emit()
                         if self.aw.seriallogflag:
-                            self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port toggleMonitor signal sent")
+                            self.aw.addserial("wsport toggleMonitor signal sent")
                 elif self.addEvent_message != "" and pushMessage == self.addEvent_message:
                     if self.aw.qmc.flagstart and self.data_node in j:
                         data = j[self.data_node]
                         if self.event_node in data:
                             if self.aw.seriallogflag:
-                                self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port message: addEvent({}) received".format(data[self.event_node]))
+                                self.aw.addserial("wsport message: addEvent({}) received".format(data[self.event_node]))
                             if self.aw.qmc.timeindex[1] == 0 and data[self.event_node] == self.DRY_node:
                                 # addEvent(DRY) received
                                 if self.aw.seriallogflag:
-                                    self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port message: addEvent(DRY) processed")
+                                    self.aw.addserial("wsport message: addEvent(DRY) processed")
                                 self.aw.qmc.markDRYSignal.emit()
                             elif self.aw.qmc.timeindex[2] == 0 and data[self.event_node] == self.FCs_node:
                                 # addEvent(FCs) received
                                 if self.aw.seriallogflag:
-                                    self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port message: addEvent(FCs) processed")
+                                    self.aw.addserial("wsport message: addEvent(FCs) processed")
                                 self.aw.qmc.markFCsSignal.emit()
                             elif self.aw.qmc.timeindex[3] == 0 and data[self.event_node] == self.FCe_node:
                                 # addEvent(FCe) received
                                 if self.aw.seriallogflag:
-                                    self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port message: addEvent(FCe) processed")
+                                    self.aw.addserial("wsport message: addEvent(FCe) processed")
                                 self.aw.qmc.markFCeSignal.emit()
                             elif self.aw.qmc.timeindex[4] == 0 and data[self.event_node] == self.SCs_node:
                                 # addEvent(SCs) received
                                 if self.aw.seriallogflag:
-                                    self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port message: addEvent(SCs) processed")
+                                    self.aw.addserial("wsport message: addEvent(SCs) processed")
                                 self.aw.qmc.markSCsSignal.emit()
                             elif self.aw.qmc.timeindex[5] == 0 and data[self.event_node] == self.SCe_node:
                                 # addEvent(SCe) received
                                 if self.aw.seriallogflag:
-                                    self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port message: addEvent(SCe) processed")
+                                    self.aw.addserial("wsport message: addEvent(SCe) processed")
                                 self.aw.qmc.markSCeSignal.emit()
                         elif self.aw.seriallogflag:
-                            self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port message: addEvent({})".format(data))
+                            self.aw.addserial("wsport message: addEvent({})".format(data))
                     elif self.aw.seriallogflag:
-                        self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port message: addEvent() received and ignored. Not recording.")
+                        self.aw.addserial("wsport message: addEvent() received and ignored. Not recording.")
                 
                 # set burner: { "pushMessage": "setBurnerCapacity", "data": { "burnercapacity": 51 } }
                 # name of current roast set: {"pushMessage": "setRoastingProcessName", "data": { "name": "Test roast 123" }}
@@ -180,32 +180,32 @@ class wsport(object):
     def onError(self, _, err):
         self.aw.qmc.adderror(QApplication.translate("Error Message","WebSocket connection failed: {}",None).format(err))
         if self.aw.seriallogflag:
-            self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port onError(): {}".format(err))
+            self.aw.addserial("wsport onError(): {}".format(err))
 
     def onClose(self, _):
         self.aw.sendmessage(QApplication.translate("Message","WebSocket disconnected", None))
         if self.aw.seriallogflag:
-            self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port onClose()")
+            self.aw.addserial("wsport onClose()")
     
     def onOpen(self, _):
         self.open_event.set() # unblock the connect action
         self.aw.sendmessage(QApplication.translate("Message","WebSocket connected", None))
         if self.aw.seriallogflag:
-            self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port onOpen()")
+            self.aw.addserial("wsport onOpen()")
     
     def onPing(self, _):
         if self.aw.seriallogflag:
-            self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port onPing()")
+            self.aw.addserial("wsport onPing()")
     
     def onPong(self, _):
         if self.aw.seriallogflag:
-            self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port onPong()")
+            self.aw.addserial("wsport onPong()")
     
     def create(self):
         while self.active:
             try:
                 if self.aw.seriallogflag:
-                    self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port create()")
+                    self.aw.addserial("wsport create()")
                 websocket.setdefaulttimeout(self.connect_timeout)
                 #websocket.enableTrace(True)
                 self.ws = websocket.WebSocketApp("ws://{}:{}/{}".format(self.host,self.port,self.path),
@@ -223,7 +223,7 @@ class wsport(object):
             except Exception as e: # pylint: disable=broad-except
                 self.aw.qmc.adderror(QApplication.translate("Error Message","WebSocket connection failed: {}",None).format(e))
                 if self.aw.seriallogflag:
-                    self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port create() error: {}".format(e))
+                    self.aw.addserial("wsport create() error: {}".format(e))
             time.sleep(self.reconnect_interval)
             if self.active:
                 self.aw.sendmessage(QApplication.translate("Error Message","Reconnecting WebSocket",None))
@@ -232,7 +232,7 @@ class wsport(object):
     def connect(self):
         if not self.is_connected():
             if self.aw.seriallogflag:
-                self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port connect()")
+                self.aw.addserial("wsport connect()")
             self.active = True
             self.wst = threading.Thread(target=self.create)
             self.open_event = threading.Event()
@@ -248,7 +248,7 @@ class wsport(object):
     def disconnect(self):
         if self.is_connected():
             if self.aw.seriallogflag:
-                self.aw.addserial("getattr(exc_tb, 'tb_lineno', '?')port disconnect()")
+                self.aw.addserial("wsport disconnect()")
             self.active = False
             self.ws.close()
             self.ws = None
