@@ -24,7 +24,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from plus import config, util
-from typing import Any, Optional, Dict, List
+from typing import Any, Optional, Dict, List, Tuple
 import hashlib
 
 
@@ -452,7 +452,7 @@ sync_record_attributes: List[str] = (
 # returns the current plus record and a hash over the plus record
 # if applied, r is assumed to contain the complete roast data as returned
 # by roast.getRoast()
-def getSyncRecord(r: Optional[Dict[str, Any]] = None) -> tuple[Dict[str, Any], str]:
+def getSyncRecord(r: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], str]:
     try:
         config.logger.info("roast:getSyncRecord()")
         m = hashlib.sha256()
