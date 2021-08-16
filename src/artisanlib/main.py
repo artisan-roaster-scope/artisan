@@ -15391,7 +15391,6 @@ class MyQDoubleValidator(QDoubleValidator):
 ########################################################################################
 
 aw = None # assigned to the single instance of ApplicationWindow on creation
-artisanviewerFirstStart = False
 
 class ApplicationWindow(QMainWindow):
     global app # pylint: disable=global-statement
@@ -15413,10 +15412,11 @@ class ApplicationWindow(QMainWindow):
     updateSerialLogSignal = pyqtSignal()
     fireslideractionSignal = pyqtSignal(int)
 
-    def __init__(self, parent = None, *, locale):
+    def __init__(self, parent = None, *, locale, artisanviewer_first_start):
 
         self.locale = locale
         self.app = app
+        self.artisanviewer_first_start = artisanviewer_first_start
         self.superusermode = False
 
 #PLUS
@@ -18286,7 +18286,7 @@ class ApplicationWindow(QMainWindow):
             QMessageBox.information(aw,QApplication.translate("Message","One time message about loading settings at start-up", None),string)
 
         # provide information message to user about ArtisanViewer the first time it is started
-        if artisanviewerFirstStart:
+        if self.artisanviewer_first_start:
             string =  QApplication.translate("Message","Welcome to the ArtisanViewer!", None).format(__version__) + "\n\n"
             string += QApplication.translate("Message","This is a one time message to introduce you to the ArtisanViewer.", None) + "\n\n"
             string += QApplication.translate("Message","The ArtisanViewer opens whenever a copy of Artisan is already running.", None) + "\n\n"
@@ -37318,8 +37318,9 @@ def initialize_locale(my_app):
 
 
 def main():
-    global aw, app, artisanviewerFirstStart # pylint: disable=global-statement
+    global aw, app # pylint: disable=global-statement
 
+    artisanviewer_first_start = False
     locale = initialize_locale(app)
 
     # supress all Qt messages
@@ -37332,12 +37333,15 @@ def main():
         app.setApplicationName("ArtisanViewer")     #needed by QSettings() to store windows geometry in operating system
         viewersettings = QSettings()
         if not viewersettings.contains("Mode"):
-            artisanviewerFirstStart = True
+            artisanviewer_first_start = True
         del viewersettings
 
     aw = None # this is to ensure that the variable aw is already defined during application initialization
 
-    aw = ApplicationWindow(locale=locale)
+    aw = ApplicationWindow(
+        locale=locale,
+        artisanviewer_first_start=artisanviewer_first_start
+    )
 
     app.setActivationWindow(aw,activateOnMessage=False) # set the activation window for the QtSingleApplication
 
