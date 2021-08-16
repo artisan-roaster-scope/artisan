@@ -15,3 +15,9 @@ src/.project
 src/.pydevproject
 src/artisan-mac-2.4.5-beta.dmg
 src/artisan-mac-2.4.5.dmg
+
+.coverage
+simple.log
+artisan_plus.log
+outbox/
+*flycheck_*.py
