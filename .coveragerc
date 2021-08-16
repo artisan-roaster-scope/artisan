@@ -1,0 +1,9 @@
+[run]
+omit =
+     env/*
+     src/test/*
+
+[report]
+omit =
+     env/*
+     src/test/*
