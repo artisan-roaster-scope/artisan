@@ -936,14 +936,18 @@ class roastCompareDlg(ArtisanDialog):
         self.aw.qmc.ax.patch.set_visible(True)
         self.aw.qmc.delta_ax.set_ylabel(self.aw.qmc.mode + self.aw.arabicReshape(QApplication.translate("Label", "/min", None)),color = self.aw.qmc.palette["ylabel"],fontproperties=fontprop_large)
         self.aw.qmc.delta_ax.set_ylim(self.aw.qmc.zlimit_min,self.aw.qmc.zlimit)
-        self.aw.qmc.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.aw.qmc.zgrid))
-        self.aw.qmc.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-        for i in self.aw.qmc.delta_ax.get_yticklines():
-            i.set_markersize(10)
-        for i in self.aw.qmc.delta_ax.yaxis.get_minorticklines():
-            i.set_markersize(5)
-        for label in self.aw.qmc.delta_ax.get_yticklabels() :
-            label.set_fontproperties(prop)
+        if self.aw.qmc.zgrid > 0:
+            self.aw.qmc.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.aw.qmc.zgrid))
+            self.aw.qmc.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+            for i in self.aw.qmc.delta_ax.get_yticklines():
+                i.set_markersize(10)
+            for i in self.aw.qmc.delta_ax.yaxis.get_minorticklines():
+                i.set_markersize(5)
+            for label in self.aw.qmc.delta_ax.get_yticklabels() :
+                label.set_fontproperties(prop)
+        else:
+            self.aw.qmc.delta_ax.yaxis.set_major_locator(ticker.NullLocator())
+            self.aw.qmc.delta_ax.yaxis.set_minor_locator(ticker.NullLocator())
 
         # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
         self.aw.qmc.delta_ax.fmt_ydata = self.aw.qmc.fmt_data
@@ -954,13 +958,22 @@ class roastCompareDlg(ArtisanDialog):
         self.aw.qmc.ax.spines['left'].set_color("0.40")
         self.aw.qmc.ax.spines['right'].set_color("0.40")
 
-        self.aw.qmc.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.aw.qmc.ygrid))
-        self.aw.qmc.ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-        for i in self.aw.qmc.ax.get_yticklines():
-            i.set_markersize(10)
-        for i in self.aw.qmc.ax.yaxis.get_minorticklines():
-            i.set_markersize(5)
-
+        if self.aw.qmc.ygrid > 0:
+            self.aw.qmc.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.aw.qmc.ygrid))
+            self.aw.qmc.ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+            for i in self.aw.qmc.ax.get_yticklines():
+                i.set_markersize(10)
+            for i in self.aw.qmc.ax.yaxis.get_minorticklines():
+                i.set_markersize(5)
+        else:
+            self.aw.qmc.ax.yaxis.set_major_locator(ticker.NullLocator())
+            self.aw.qmc.ax.yaxis.set_minor_locator(ticker.NullLocator())
+        
+        if self.aw.qmc.xgrid <= 0:
+            self.aw.qmc.ax.xaxis.set_major_locator(ticker.NullLocator())
+            self.aw.qmc.ax.xaxis.set_minor_locator(ticker.NullLocator())
+            
+            
         #update X ticks, labels, and colors
         self.aw.qmc.xaxistosm()
     

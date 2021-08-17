@@ -31,26 +31,12 @@ from artisanlib import __version__
 import platform
 import threading
 
-# import keyring.backends.file
-# import keyring.backends.Gnome
-# import keyring.backends.Google
-# import keyring.backends.pyfs
-# import keyring.backends.kwallet
-# import keyring.backends.multi
-
-if platform.system().startswith("Windows") or platform.system() == "Darwin":
-    import keyring.backends.fail  # @UnusedImport
-
-    try:
-        import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
-
-        keyring.set_keyring(keyring.backends.macOS.Keyring())
-    except Exception:  # pylint: disable=broad-except
-        import keyring.backends.OS_X  # @UnusedImport @UnresolvedImport
-
-        keyring.set_keyring(keyring.backends.OS_X.Keyring())
-    import keyring.backends.SecretService  # @UnusedImport
+if platform.system().startswith("Windows"):
     import keyring.backends.Windows  # @UnusedImport
+elif platform.system() == "Darwin":
+    import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
+else:
+    import keyring.backends.SecretService  # @UnusedImport
 import keyring  # @Reimport # imported last to make py2app work
 
 from plus import config, connection, stock, queue, sync, roast, util

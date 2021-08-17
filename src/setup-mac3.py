@@ -210,7 +210,7 @@ OPTIONS = {
 #                    'QtHelp','QtMultimedia',
 #                    'QtOpenGL','QtScript','QtScriptTools',
 #                    'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
-    'packages': ['yoctopuce','gevent','openpyxl','numpy','scipy','certifi', 
+    'packages': ['yoctopuce','gevent','openpyxl','numpy','scipy','certifi',
         'matplotlib','PIL', 'lxml', 'snap7'], # MPL and PIL added for mpl v3.3.x
     'optimize':  2,
     'compressed': True,

@@ -23,6 +23,7 @@ import os
 import sys
 
 from snap7.types import Areas
+from snap7.util import get_bool, set_bool, get_int, set_int, get_real, set_real
 
 import artisanlib.util
 from artisanlib.suppress_errors import suppress_stdout_stderr
@@ -110,85 +111,6 @@ class s7port():
         if elapsed < self.min_time_between_requests:
             time.sleep(self.min_time_between_requests - elapsed)
         self.last_request_timestamp = time.time()
-    
-
-################
-# conversion methods copied from s7:util.py
-
-    @staticmethod
-    def get_bool(_bytearray, byte_index, bool_index):
-        """
-        Get the boolean value from location in bytearray
-        """
-        index_value = 1 << bool_index
-        byte_value = _bytearray[byte_index]
-        current_value = byte_value & index_value
-        return current_value == index_value
-    
-    @staticmethod
-    def set_bool(_bytearray, byte_index, bool_index, value):
-        """
-        Set boolean value on location in bytearray
-        """
-        assert value in [0, 1, True, False]
-        current_value = s7port.get_bool(_bytearray, byte_index, bool_index)
-        index_value = 1 << bool_index
-    
-        # check if bool already has correct value
-        if current_value == value:
-            return
-    
-        if value:
-            # make sure index_v is IN current byte
-            _bytearray[byte_index] += index_value
-        else:
-            # make sure index_v is NOT in current byte
-            _bytearray[byte_index] -= index_value
-
-    @staticmethod
-    def set_int(_bytearray, byte_index, _int):
-        """
-        Set value in bytearray to int
-        """
-        # make sure were dealing with an int
-        _int = int(_int)
-        _bytes = struct.unpack('2B', struct.pack('>h', _int))
-        _bytearray[byte_index:byte_index + 2] = _bytes
-    
-    @staticmethod
-    def get_int(_bytearray, byte_index):
-        """
-        Get int value from bytearray.
-    
-        int are represented in two bytes
-        """
-        data = _bytearray[byte_index:byte_index + 2]
-        data[1] = data[1] & 0xFF # added to fix a conversion problem: see https://github.com/gijzelaerr/python-snap7/issues/101
-        value = struct.unpack('>h', struct.pack('2B', *data))[0]
-        return value
-    
-    @staticmethod
-    def set_real(_bytearray, byte_index, real):
-        """
-        Set Real value
-    
-        make 4 byte data from real
-    
-        """
-        real = float(real)
-        real = struct.pack('>f', real)
-        _bytes = struct.unpack('4B', real)
-        for i, b in enumerate(_bytes):
-            _bytearray[byte_index + i] = b
-    
-    @staticmethod
-    def get_real(_bytearray, byte_index):
-        """
-        Get real value. create float from 4 bytes
-        """
-        x = _bytearray[byte_index:byte_index + 4]
-        real = struct.unpack('>f', struct.pack('4B', *x))[0]
-        return real
         
 ################
 
@@ -421,7 +343,7 @@ class s7port():
             if self.isConnected():
                 with suppress_stdout_stderr():
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
-                    self.set_real(ba, 0, float(value))
+                    set_real(ba, 0, float(value))
                     self.waitToEnsureMinTimeBetweenRequests()
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:
@@ -445,7 +367,7 @@ class s7port():
             if self.isConnected():
                 with suppress_stdout_stderr():
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                    self.set_int(ba, 0, int(round(value)))
+                    set_int(ba, 0, int(round(value)))
                     self.waitToEnsureMinTimeBetweenRequests()
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:
@@ -470,7 +392,7 @@ class s7port():
                 with suppress_stdout_stderr():
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
                     new_val = (int(round(value)) & and_mask) | (or_mask & (and_mask ^ 0xFFFF))
-                    self.set_int(ba, 0, int(new_val))
+                    set_int(ba, 0, int(new_val))
                     self.waitToEnsureMinTimeBetweenRequests()
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:
@@ -494,7 +416,7 @@ class s7port():
             if self.isConnected():
                 with suppress_stdout_stderr():
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,1)
-                    self.set_bool(ba, 0, int(index), bool(value))
+                    set_bool(ba, 0, int(index), bool(value))
                     self.waitToEnsureMinTimeBetweenRequests()
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:
@@ -526,7 +448,7 @@ class s7port():
                     self.readingsCache[area][dbnumber][start+1],
                     self.readingsCache[area][dbnumber][start+2],
                     self.readingsCache[area][dbnumber][start+3]])
-                r = self.get_real(res,0)
+                r = get_real(res,0)
                 if self.aw.seriallogflag and not self.commError:
                     self.aw.addserial("S7 readFloat_cached({},{},{},{}) => {}".format(area,dbnumber,start,force,r))
                 return r
@@ -553,7 +475,7 @@ class s7port():
                 if self.commError: # we clear the previous error and send a message
                     self.commError = False
                     self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
-                r = self.get_real(res,0)
+                r = get_real(res,0)
                 if self.aw.seriallogflag:
                     self.aw.addserial("S7 readFloat({},{},{},{}) => {}".format(area,dbnumber,start,force,r))
                 return r
@@ -583,7 +505,7 @@ class s7port():
                 self.waitToEnsureMinTimeBetweenRequests()
                 with suppress_stdout_stderr():
                     res = self.plc.read_area(self.areas[area],dbnumber,start,4)
-                return self.get_real(res,0)
+                return get_real(res,0)
             return None
         except Exception: # pylint: disable=broad-except
             return None
@@ -601,7 +523,7 @@ class s7port():
                 res = bytearray([
                     self.readingsCache[area][dbnumber][start],
                     self.readingsCache[area][dbnumber][start+1]])
-                r = self.get_int(res,0)
+                r = get_int(res,0)
                 if self.aw.seriallogflag:
                     self.aw.addserial("S7 readInt_cached({},{},{},{}) => {}".format(area,dbnumber,start,force,r))
                 return r
@@ -628,7 +550,7 @@ class s7port():
                 if self.commError: # we clear the previous error and send a message
                     self.commError = False
                     self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
-                r = self.get_int(res,0)
+                r = get_int(res,0)
                 if self.aw.seriallogflag:
                     self.aw.addserial("S7 readInt({},{},{},{}) => {}".format(area,dbnumber,start,force,r))
                 return r
@@ -662,7 +584,7 @@ class s7port():
                 with suppress_stdout_stderr():
                     self.waitToEnsureMinTimeBetweenRequests()
                     res = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                return self.get_int(res,0)
+                return get_int(res,0)
             return None
         except Exception: # pylint: disable=broad-except
             return None
@@ -678,7 +600,7 @@ class s7port():
                 # cache hit
                 res = bytearray([
                     self.readingsCache[area][dbnumber][start]])
-                r = self.get_bool(res,0,index)
+                r = get_bool(res,0,index)
                 if self.aw.seriallogflag:
                     self.aw.addserial("S7 readBool_cached({},{},{},{},{}) => {}".format(area,dbnumber,start,index,force,r))
                 return r
@@ -705,7 +627,7 @@ class s7port():
                 if self.commError: # we clear the previous error and send a message
                     self.commError = False
                     self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
-                r = self.get_bool(res,0,index)
+                r = get_bool(res,0,index)
                 if self.aw.seriallogflag:
                     self.aw.addserial("S7 readBool({},{},{},{},{}) => {}".format(area,dbnumber,start,index,force,r))
                 return r

@@ -35,22 +35,12 @@ import platform
 import requests
 import sys
 
-# import keyring.backends.file
-# import keyring.backends.Gnome
-# import keyring.backends.Google
-# import keyring.backends.pyfs
-# import keyring.backends.kwallet
-# import keyring.backends.multi
-
-if platform.system().startswith("Windows") or platform.system() == "Darwin":
-    import keyring.backends.fail  # @UnusedImport
-
-    try:
-        import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
-    except Exception:  # pylint: disable=broad-except
-        import keyring.backends.OS_X  # @UnusedImport @UnresolvedImport
-    import keyring.backends.SecretService  # @UnusedImport
+if platform.system().startswith("Windows"):
     import keyring.backends.Windows  # @UnusedImport
+elif platform.system() == "Darwin":
+    import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
+else:
+    import keyring.backends.SecretService  # @UnusedImport
 import keyring  # @Reimport # imported last to make py2app work
 
 from plus import config, account, util
@@ -126,28 +116,20 @@ def clearCredentials(remove_from_keychain: bool = True) -> None:
         if token_semaphore.available() < 1:
             token_semaphore.release(1)
 
-
 def setKeyring() -> None:
     try:
         # HACK set keyring backend explicitly
         if platform.system().startswith("Windows"):
-            import keyring  # @Reimport # pylint: disable=redefined-outer-name
-
             keyring.set_keyring(
                 keyring.backends.Windows.WinVaultKeyring()
             )  # @UndefinedVariable
         elif platform.system() == "Darwin":
-            import keyring  # @Reimport
-
             try:
                 keyring.set_keyring(keyring.backends.macOS.Keyring())
             except Exception:  # pylint: disable=broad-except
                 keyring.set_keyring(keyring.backends.OS_X.Keyring())
         else:  # Linux
             try:
-                import keyring.backends.SecretService  # @Reimport
-                import keyring  # @Reimport
-
                 keyring.set_keyring(keyring.backends.SecretService.Keyring())
             except Exception as e:  # pylint: disable=broad-except
                 _, _, exc_tb = sys.exc_info()

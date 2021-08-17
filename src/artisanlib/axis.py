@@ -178,7 +178,7 @@ class WindowsDlg(ArtisanDialog):
         self.ygridSpinBox.setSingleStep(5)
         self.ygridSpinBox.setValue(self.aw.qmc.ygrid)
         self.ygridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.ygridSpinBox.valueChanged.connect(self.changeygrid)
+        self.ygridSpinBox.editingFinished.connect(self.changeygrid)
         self.ygridSpinBox.setMaximumWidth(60)
         zgridlabel = QLabel(QApplication.translate("Label", "Step",None))
         self.zgridSpinBox = QSpinBox()
@@ -186,7 +186,7 @@ class WindowsDlg(ArtisanDialog):
         self.zgridSpinBox.setSingleStep(1)
         self.zgridSpinBox.setValue(self.aw.qmc.zgrid)
         self.zgridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.zgridSpinBox.valueChanged.connect(self.changezgrid)
+        self.zgridSpinBox.editingFinished.connect(self.changezgrid)
         self.zgridSpinBox.setMaximumWidth(60)
         
         self.autodeltaxLabel = QLabel(QApplication.translate("CheckBox", "Auto",None))
@@ -499,21 +499,21 @@ class WindowsDlg(ArtisanDialog):
         self.aw.qmc.xaxistosm(redraw=False)
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
-    @pyqtSlot(int)
-    def changeygrid(self,_):
+    @pyqtSlot()
+    def changeygrid(self):
         self.aw.qmc.ygrid = self.ygridSpinBox.value()
-        self.ygridSpinBox.setDisabled(True)
+#        self.ygridSpinBox.setDisabled(True)
         self.aw.qmc.redraw(recomputeAllDeltas=False)
-        self.ygridSpinBox.setDisabled(False)
-        self.ygridSpinBox.setFocus()
+#        self.ygridSpinBox.setDisabled(False)
+#        self.ygridSpinBox.setFocus()
 
-    @pyqtSlot(int)
-    def changezgrid(self,_):
+    @pyqtSlot()
+    def changezgrid(self):
         self.aw.qmc.zgrid = self.zgridSpinBox.value()
-        self.zgridSpinBox.setDisabled(True)
+#        self.zgridSpinBox.setDisabled(True)
         self.aw.qmc.redraw(recomputeAllDeltas=False)
-        self.zgridSpinBox.setDisabled(False)
-        self.zgridSpinBox.setFocus()
+#        self.zgridSpinBox.setDisabled(False)
+#        self.zgridSpinBox.setFocus()
 
     # exit dialog with OK
     @pyqtSlot()
