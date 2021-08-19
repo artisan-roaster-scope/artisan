@@ -37,5 +37,9 @@ jobs:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         set -o pipefail
-        find src/artisanlib -name '*.py' -exec pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt5 {} | reviewdog -efm="%f:%l:%c: %m" -reporter=github-pr-review \;
-        find src/plus -name '*.py' -exec pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt5 {} | reviewdog -efm="%f:%l:%c: %m" -reporter=github-pr-review \;
+        for i in $(find src/artisanlib -name '*.py'); do
+          pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt5 i | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
+        done
+        for i in $(find src/plus -name '*.py'); do
+          pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt5 i | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
+        done
