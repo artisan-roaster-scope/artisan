@@ -25,7 +25,17 @@ jobs:
         pip install pylint
         pip install -r src/requirements.txt
         pip install -r src/requirements-linux.txt
-    - name: Analysing the code with pylint
+    - name: Set up reviewdog
       run: |
-        find src/artisanlib -name '*.py' -exec pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt5 {} \;
-        find src/plus -name '*.py' -exec pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt5 {} \;
+        mkdir -p "$HOME/bin"
+        curl -sfL \
+          https://github.com/reviewdog/reviewdog/raw/master/install.sh | \
+            sh -s -- -b "$HOME/bin"
+        echo "$HOME/bin" >> $GITHUB_PATH
+    - name: Analysing the code with pylint
+      env:
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        set -o pipefail
+        find src/artisanlib -name '*.py' -exec pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt5 {} | reviewdog -efm="%f:%l:%c: %m" -reporter=github-pr-review \;
+        find src/plus -name '*.py' -exec pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt5 {} | reviewdog -efm="%f:%l:%c: %m" -reporter=github-pr-review \;

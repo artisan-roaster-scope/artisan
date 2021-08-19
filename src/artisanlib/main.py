@@ -114,7 +114,7 @@ if pyqtversion < 6:
     from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport @UnusedImport
                               qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport @UnusedImport
                               QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnusedImport
-    from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @UnusedImport # pylint: disable:unused-import
+    from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @UnusedImport # pylint: disable=unused-import
     
     try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
         from PyQt5 import sip # @UnusedImport
@@ -190,7 +190,7 @@ import matplotlib.backends.qt_editor._formlayout as formlayout
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
     if str(platform.system()).startswith("Windows"):
-        import win_inet_pton # @UnresolvedImport @UnusedImport # pylint: disable=import-error  # pylint: disable:unused-import
+        import win_inet_pton # @UnresolvedImport @UnusedImport # pylint: disable=import-error,unused-import
 except Exception: # pylint: disable=broad-except
     pass
 
@@ -496,7 +496,7 @@ app.setApplicationName("Artisan")                                       #needed 
 app.setOrganizationName("artisan-scope")                                #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system
 #app.setOrganizationName("YourQuest")                                   #needed by QSettings() to store windows geometry in operating system
-#app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
+#app.setOrganizationDomain("p.code.google.com")                         #needed by QSettings() to store windows geometry in operating system
 
 if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
@@ -32720,8 +32720,8 @@ class ApplicationWindow(QMainWindow):
                 try:
                     # open file
                     from openpyxl import Workbook
-                    from openpyxl.utils.cell import get_column_letter,column_index_from_string  # @UnusedImport
-                    from openpyxl.styles import Font, Fill, Alignment # @UnusedImport
+                    from openpyxl.utils.cell import get_column_letter,column_index_from_string  # @UnusedImport # pylint: disable=unused-import
+                    from openpyxl.styles import Font, Fill, Alignment # @UnusedImport # pylint: disable=unused-import
                     wb = Workbook()
                     ws = wb.active # wb.create_sheet()
                     ws.title = QApplication.translate("HTML Report Template", "Ranking Report",None)
@@ -37140,7 +37140,7 @@ sys.excepthook = excepthook
 # the following avoids the "No document could be created" dialog and the Console message
 # "The Artisan Profile type doesn't map to any NSDocumentClass." on startup (since pyobjc-core 3.1.1)
 if sys.platform.startswith("darwin"):
-    from Cocoa import NSDocument  # @UnresolvedImport # pylint: disable:import-error
+    from Cocoa import NSDocument  # @UnresolvedImport # pylint: disable=import-error
     class Document(NSDocument): # pylint: disable= too-few-public-methods
 #        def windowNibName(self):
 #            return None #"Document"
@@ -37195,7 +37195,7 @@ def initialize_locale(my_app):
 
     if len(locale) == 0:
         if platform.system() == 'Darwin':
-            from Cocoa import NSUserDefaults # @UnresolvedImport # pylint: disable:import-error
+            from Cocoa import NSUserDefaults # @UnresolvedImport # pylint: disable=import-error
             defs = NSUserDefaults.standardUserDefaults()
             langs = defs.objectForKey_("AppleLanguages")
             if langs.objectAtIndex_(0)[:3] == "zh_" or langs.objectAtIndex_(0)[:3] == "pt_":

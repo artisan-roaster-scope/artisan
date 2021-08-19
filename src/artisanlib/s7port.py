@@ -18,7 +18,7 @@
 
 import time
 import platform
-import struct
+import math
 import os
 import sys
 
