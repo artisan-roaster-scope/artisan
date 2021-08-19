@@ -18,7 +18,6 @@
 
 import time
 import platform
-import math
 import os
 import sys
 

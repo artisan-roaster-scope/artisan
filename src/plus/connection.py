@@ -317,7 +317,7 @@ def sendData(url: str, data: Dict[Any, Any], verb: str) -> Any:
     return putData(url, data)
 
 
-# TODO: implement!
+# TODO: implement! # pylint: disable=fixme
 def putData(url: str, data: Dict[Any, Any]) -> Any:
     del url, data
 

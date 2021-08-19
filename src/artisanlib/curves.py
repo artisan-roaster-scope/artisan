@@ -1825,7 +1825,7 @@ class HUDDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotterb() syntax: {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    # TODO: maybe remove the plotterprogram feature completely as it can be dangerous due to the eval/exce 
+    # TODO: maybe remove the plotterprogram feature completely as it can be dangerous due to the eval/exce  # pylint: disable=fixme
     def plotterprogram(self, program):
         try:
             #remove enclosing brackets {}
@@ -1833,7 +1833,7 @@ class HUDDlg(ArtisanDialog):
             
             #"if 2 > 1: a = \"OXXX\"; print a"
             p = compile(program,"a","exec")
-            exec(p)
+            exec(p) # # pylint: disable=exec-used
         except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotterprogram(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -2147,7 +2147,7 @@ class HUDDlg(ArtisanDialog):
         else:
             self.collectCurves()
 
-    # TODO: add background curves temp1B, temp2B, timeB, delta1B, delta2B (could be of different size!)
+    # TODO: add background curves temp1B, temp2B, timeB, delta1B, delta2B (could be of different size!) # pylint: disable=fixme
     def collectCurves(self):
         idx = 0
         self.curves = []

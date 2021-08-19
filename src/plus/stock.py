@@ -500,7 +500,7 @@ def getCoffees(weight_unit_idx, store=None):
                                         amount = s["amount"]
                                         if (
                                             amount > stock_epsilon
-                                        ):  # TODO: check here the machines
+                                        ):  # TODO: check here the machines # pylint: disable=fixme
                                             # capacity limits
                                             # add location only if this coffee
                                             # is available in several locations
@@ -1390,7 +1390,7 @@ def getBlends(weight_unit_idx, store=None):
                             max_replacement_amount = 0
                         if res_sd is not None and (
                             amount > 0 or max_replacement_amount > 0
-                        ):  # TODO: check here with machines capacity
+                        ):  # TODO: check here with machines capacity # pylint: disable=fixme
                             # add location only if this coffee is available
                             # in several locations
                             if store or location_label == "":

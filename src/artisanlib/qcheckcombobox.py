@@ -134,8 +134,8 @@ class CheckComboBox(QComboBox):
 
             menuoption.menuHasCheckableItems = True
             menuoption.tabWidth = 0
-            # TODO: self.displayText(QVariant, QLocale)
-            # TODO: Why is this not a QStyledItemDelegate?
+            # TODO: self.displayText(QVariant, QLocale) # pylint: disable=fixme
+            # TODO: Why is this not a QStyledItemDelegate? # pylint: disable=fixme
             display = index.data(Qt.DisplayRole)
             if isinstance(display, str):
                 menuoption.text = display
@@ -255,7 +255,7 @@ class CheckComboBox(QComboBox):
                 self.update()
                 self.flagChanged.emit(index.row(),state != Qt.Unchecked)
                 return True
-            # TODO: handle Qt.Key_Enter, Key_Return?
+            # TODO: handle Qt.Key_Enter, Key_Return? # pylint: disable=fixme
 
         return super().eventFilter(obj, event)
 
