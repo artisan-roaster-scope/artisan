@@ -36,5 +36,5 @@ jobs:
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt5 plus | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
-        pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt5 artisanlib | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
+        pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt5 src/plus | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
+        pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt5 src/artisanlib | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
