@@ -29,7 +29,6 @@ from artisanlib import __revision__
 from artisanlib import __version__
 import platform
 import threading
-import time # unnecessary import for testing plint action
 
 if platform.system().startswith("Windows"):
     import keyring.backends.Windows  # @UnusedImport

@@ -9,7 +9,9 @@ Visual scope for coffee roasters
 [![Pre-release](https://img.shields.io/github/release-pre/artisan-roaster-scope/artisan.svg)](https://github.com/artisan-roaster-scope/artisan/releases/continuous)
 ![Github All Releases](https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/total.svg)
 ![License](https://img.shields.io/github/license/artisan-roaster-scope/artisan.svg)
-[![reviewdog](https://github.com/artisan-roaster-scope/artisan/workflows/reviewdog/badge.svg?branch=master&event=push)](https://github.com/artisan-roaster-scope/artisan/actions?query=workflow%3Areviewdog+event%3Apush+branch%3Amaster)
+[![pylint](https://github.com/artisan-roaster-scope/artisan/workflows/pylint/badge.svg?branch=master&event=push)](https://github.com/artisan-roaster-scope/artisan/actions?query=workflow%pylint+event%3Apush+branch%3Amaster)
+
+![pylint](https://github.com/artisan-roaster-scope/artisan/actions/workflows/pylint.yaml/badge.svg?branch=master&event=push)
 
 
 *WARNING: pre-release builds may not work.  Use at your own risk.*
