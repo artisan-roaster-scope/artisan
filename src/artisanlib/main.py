@@ -114,7 +114,7 @@ if pyqtversion < 6:
     from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport @UnusedImport
                               qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport @UnusedImport
                               QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnusedImport
-    from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @UnusedImport
+    from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @UnusedImport # pylint: disable:unused-import
     
     try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
         from PyQt5 import sip # @UnusedImport
@@ -139,7 +139,7 @@ else:
     from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @Reimport @UnusedImport @UnresolvedImport # pylint: disable=import-error
     
     try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
-        from PyQt6 import sip # @Reimport @UnusedImport @UnresolvedImport
+        from PyQt6 import sip # @Reimport @UnusedImport @UnresolvedImport # pylint: disable=import-error
     except Exception: # pylint: disable=broad-except
         pass
 
@@ -155,7 +155,7 @@ if mpl_version[0] > 2 and mpl_version[1] > 2:
     if mpl_version[1] > 3:
         from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatio # @UnresolvedImport @UnusedImport
     else:
-        from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatioF # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error
+        from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatioF # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error,no-name-in-module
     from matplotlib.backend_bases import _Mode as MPL_Mode  # @UnresolvedImport
 
 
@@ -190,7 +190,7 @@ import matplotlib.backends.qt_editor._formlayout as formlayout
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
     if str(platform.system()).startswith("Windows"):
-        import win_inet_pton # @UnresolvedImport @UnusedImport # pylint: disable=import-error
+        import win_inet_pton # @UnresolvedImport @UnusedImport # pylint: disable=import-error  # pylint: disable:unused-import
 except Exception: # pylint: disable=broad-except
     pass
 
@@ -518,36 +518,38 @@ if sys.platform.startswith("darwin"):
     # import module to detect if OS X dark mode is active or not
     import darkdetect # @UnresolvedImport # pylint: disable=import-error
     # to establish a thread pool on OS X
-    import objc  # @UnresolvedImport @UnusedImport # pylint: disable=import-error
+    import objc  # @UnresolvedImport @UnusedImport # pylint: disable=import-error,unused-import
     import Foundation  # @UnresolvedImport  # pylint: disable=import-error
 #   list_ports module patched for P3k from new pyserial GitHub repository
 
 # to make py2exe happy with scipy >0.11 (adding hidden imports)
 def __dependencies_for_freezing():
-    from scipy.sparse.csgraph import _validation # @UnresolvedImport @UnusedImport
-    from scipy.special import _ufuncs_cxx # @UnresolvedImport @UnusedImport
-    from scipy import integrate # @UnresolvedImport @UnusedImport  # pylint: disable=import-error
-    from scipy import interpolate # @UnresolvedImport @UnusedImport  # pylint: disable=import-error
-#    from scipy.optimize import curve_fit # @UnresolvedImport @UnusedImport
+    # @UnresolvedImport @UnusedImport @Reimport
+    # pylint: disable=import-error,no-name-in-module,unused-import
+    from scipy.sparse.csgraph import _validation
+    from scipy.special import _ufuncs_cxx
+    from scipy import integrate 
+    from scipy import interpolate
+#    from scipy.optimize import curve_fit
     # to make bbfreeze on Linux and py2exe on Win/Py3 happy with scipy > 0.17.0
-    import scipy.linalg.cython_blas # @UnresolvedImport @UnusedImport # pylint: disable=import-error
-    import scipy.linalg.cython_lapack # @UnresolvedImport @UnusedImport # pylint: disable=import-error
-    import scipy.special.cython_special # @UnresolvedImport @UnusedImport # pylint: disable=import-error
+    import scipy.linalg.cython_blas
+    import scipy.linalg.cython_lapack
+    import scipy.special.cython_special
 
-    import appdirs # @UnresolvedImport @UnusedImport # pylint: disable=import-error
-    import packaging # @UnresolvedImport @UnusedImport # pylint: disable=import-error
-    import packaging.version # @UnresolvedImport @UnusedImport # pylint: disable=import-error
-    import packaging.specifiers # @UnresolvedImport @UnusedImport # pylint: disable=import-error
-    import packaging.markers # @UnresolvedImport @UnusedImport # pylint: disable=import-error
-    import packaging.requirements # @UnresolvedImport @UnusedImport # pylint: disable=import-error
+    import appdirs # @UnresolvedImport
+    import packaging # @UnresolvedImport
+    import packaging.version
+    import packaging.specifiers
+    import packaging.markers
+    import packaging.requirements
 
-    import PyQt5.QtSvg  # @UnusedImport # pylint: disable=import-error
+    import PyQt5.QtSvg  # @UnusedImport
     import PyQt5.QtXml  # @UnusedImport
-    import PyQt5.QtDBus # needed for QT5 builds  # @UnusedImport
-    import PyQt5.QtPrintSupport # needed for by platform plugin libqcocoa  # @UnusedImport
+    import PyQt5.QtDBus # needed for QT5 builds
+    import PyQt5.QtPrintSupport # needed for by platform plugin libqcocoa
 
     # for gevent bundling
-    from gevent import signal as gevent_signal, core, resolver_thread, resolver_ares, socket, threadpool, thread, threading as gevent_threading, select, subprocess as gevent_subprocess, pywsgi, server, hub # @UnusedImport @Reimport
+    from gevent import signal as gevent_signal, core, resolver_thread, resolver_ares, socket, threadpool, thread, threading as gevent_threading, select, subprocess as gevent_subprocess, pywsgi, server, hub
 
 del __dependencies_for_freezing
 
@@ -31518,11 +31520,9 @@ class ApplicationWindow(QMainWindow):
             if filename:
                 try:
                     # open file
-                    from openpyxl import Workbook
-                    #from openpyxl.compat import range  # @UnusedImport
-                    #from openpyxl.cell import get_column_letter
-                    from openpyxl.utils.cell import get_column_letter  # @UnusedImport
-                    from openpyxl.styles import Font, Fill  # @UnusedImport
+                    from openpyxl import Workbook # pylint: disable=unused-import
+                    from openpyxl.utils.cell import get_column_letter  # @UnusedImport # pylint: disable=unused-import
+                    from openpyxl.styles import Font, Fill  # @UnusedImport # pylint: disable=unused-import
                     wb = Workbook()
                     ws = wb.active # wb.create_sheet()
                     ws.title = QApplication.translate("HTML Report Template", "Production Report",None)
@@ -37140,7 +37140,7 @@ sys.excepthook = excepthook
 # the following avoids the "No document could be created" dialog and the Console message
 # "The Artisan Profile type doesn't map to any NSDocumentClass." on startup (since pyobjc-core 3.1.1)
 if sys.platform.startswith("darwin"):
-    from Cocoa import NSDocument  # @UnresolvedImport
+    from Cocoa import NSDocument  # @UnresolvedImport # pylint: disable:import-error
     class Document(NSDocument): # pylint: disable= too-few-public-methods
 #        def windowNibName(self):
 #            return None #"Document"
@@ -37195,7 +37195,7 @@ def initialize_locale(my_app):
 
     if len(locale) == 0:
         if platform.system() == 'Darwin':
-            from Cocoa import NSUserDefaults # @UnresolvedImport
+            from Cocoa import NSUserDefaults # @UnresolvedImport # pylint: disable:import-error
             defs = NSUserDefaults.standardUserDefaults()
             langs = defs.objectForKey_("AppleLanguages")
             if langs.objectAtIndex_(0)[:3] == "zh_" or langs.objectAtIndex_(0)[:3] == "pt_":
