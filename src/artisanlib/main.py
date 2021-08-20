@@ -548,97 +548,6 @@ def __dependencies_for_freezing():
 
 del __dependencies_for_freezing
 
-def initialize_locale(my_app) -> str:
-    if QSettings().contains('resetqsettings') and not toInt(QSettings().value('resetqsettings')):
-        locale = toString(QSettings().value('locale'))
-        if locale is None or locale == "en_US":
-            locale = "en"
-    else:
-        locale = ""
-
-    supported_languages = [
-        "ar",
-        "da",
-        "de",
-        "el",
-        "en",
-        "es",
-        "fa",
-        "fi",
-        "fr",
-        "gd",
-        "he",
-        "hu",
-        "id",
-        "it",
-        "ja",
-        "ko",
-        "lv",
-        "nl",
-        "no",
-        "pt",
-        "pt_BR",
-        "pl",
-        "ru",
-        "sk",
-        "sv",
-        "th",
-        "tr",
-        "vi",
-        "zh",
-        "zh_CN",
-        "zh_TW",
-    ]
-
-    if len(locale) == 0:
-        if platform.system() == 'Darwin':
-            from Cocoa import NSUserDefaults # @UnresolvedImport # pylint: disable=import-error
-            defs = NSUserDefaults.standardUserDefaults()
-            langs = defs.objectForKey_("AppleLanguages")
-            if langs.objectAtIndex_(0)[:3] == "zh_" or langs.objectAtIndex_(0)[:3] == "pt_":
-                locale = langs.objectAtIndex_(0)[:5]
-            else:
-                locale = langs.objectAtIndex_(0)[:2]
-        else:
-            if QLocale.system().name()[:2] == "zh_" or QLocale.system().name()[:2] == "pt_":
-                locale = QLocale.system().name()[:5]
-            else:
-                locale = QLocale.system().name()[:2]
-        if locale in supported_languages:
-            QSettings().setValue('locale', locale)
-
-    if locale is None or len(locale) == 0:
-        locale = "en"
-
-    #load Qt default translations from QLibrary
-    qtTranslator = QTranslator()
-    if qtTranslator.load("qtbase_" + locale, QLibraryInfo.location(QLibraryInfo.TranslationsPath)):
-        my_app.installTranslator(qtTranslator)
-    #find Qt default translations in Unix binaries
-    elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "/translations"):
-        my_app.installTranslator(qtTranslator)
-    #find Qt default translations in Mac binary
-    elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "/../translations"):
-        my_app.installTranslator(qtTranslator)
-    # qtbase_ translations added to the Artisan source as they are not in the official Qt builds
-    elif qtTranslator.load("qtbase_" + locale, "translations"):
-        my_app.installTranslator(qtTranslator)
-
-    #load Artisan translations
-    appTranslator = QTranslator()
-    #find application translations in source folder
-    if appTranslator.load("artisan_" + locale, "translations"):
-        my_app.installTranslator(appTranslator)
-    #find application translations in Unix binaries
-    elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/translations"):
-        my_app.installTranslator(appTranslator)
-    #find application translations in Mac binary
-    elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/../translations"):
-        my_app.installTranslator(appTranslator)
-
-    return locale
-initialize_locale(app)
-
 def QDateTimeToEpoch(dt):
     try:
         return dt.toSecsSinceEpoch() # intoduced in Qt5.8, not available on RPi Stretch unning Qt5.7.1, returns 64bit uint
@@ -37236,7 +37145,95 @@ def qt_message_handler(_msg_type, _msg_log_context, _msg_string):
     pass
 
 
+def initialize_locale(my_app) -> str:
+    if QSettings().contains('resetqsettings') and not toInt(QSettings().value('resetqsettings')):
+        locale = toString(QSettings().value('locale'))
+        if locale is None or locale == "en_US":
+            locale = "en"
+    else:
+        locale = ""
 
+    supported_languages = [
+        "ar",
+        "da",
+        "de",
+        "el",
+        "en",
+        "es",
+        "fa",
+        "fi",
+        "fr",
+        "gd",
+        "he",
+        "hu",
+        "id",
+        "it",
+        "ja",
+        "ko",
+        "lv",
+        "nl",
+        "no",
+        "pt",
+        "pt_BR",
+        "pl",
+        "ru",
+        "sk",
+        "sv",
+        "th",
+        "tr",
+        "vi",
+        "zh",
+        "zh_CN",
+        "zh_TW",
+    ]
+
+    if len(locale) == 0:
+        if platform.system() == 'Darwin':
+            from Cocoa import NSUserDefaults # @UnresolvedImport # pylint: disable=import-error
+            defs = NSUserDefaults.standardUserDefaults()
+            langs = defs.objectForKey_("AppleLanguages")
+            if langs.objectAtIndex_(0)[:3] == "zh_" or langs.objectAtIndex_(0)[:3] == "pt_":
+                locale = langs.objectAtIndex_(0)[:5]
+            else:
+                locale = langs.objectAtIndex_(0)[:2]
+        else:
+            if QLocale.system().name()[:2] == "zh_" or QLocale.system().name()[:2] == "pt_":
+                locale = QLocale.system().name()[:5]
+            else:
+                locale = QLocale.system().name()[:2]
+        if locale in supported_languages:
+            QSettings().setValue('locale', locale)
+
+    if locale is None or len(locale) == 0:
+        locale = "en"
+
+    #load Qt default translations from QLibrary
+    qtTranslator = QTranslator()
+    if qtTranslator.load("qtbase_" + locale, QLibraryInfo.location(QLibraryInfo.TranslationsPath)):
+        my_app.installTranslator(qtTranslator)
+    #find Qt default translations in Unix binaries
+    elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "/translations"):
+        my_app.installTranslator(qtTranslator)
+    #find Qt default translations in Mac binary
+    elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "/../translations"):
+        my_app.installTranslator(qtTranslator)
+    # qtbase_ translations added to the Artisan source as they are not in the official Qt builds
+    elif qtTranslator.load("qtbase_" + locale, "translations"):
+        my_app.installTranslator(qtTranslator)
+
+    #load Artisan translations
+    appTranslator = QTranslator()
+    #find application translations in source folder
+    if appTranslator.load("artisan_" + locale, "translations"):
+        my_app.installTranslator(appTranslator)
+    #find application translations in Unix binaries
+    elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/translations"):
+        my_app.installTranslator(appTranslator)
+    #find application translations in Mac binary
+    elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/../translations"):
+        my_app.installTranslator(appTranslator)
+
+    return locale
 
 def main():
     global aw, app, artisanviewerFirstStart # pylint: disable=global-statement
