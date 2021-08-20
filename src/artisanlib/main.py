@@ -508,9 +508,6 @@ if platf == 'Windows':
 #    except Exception as e: # pylint: disable=broad-except
 #        pass
 
-
-
-
 # platform dependent imports:
 if sys.platform.startswith("darwin"):
     # control app napping on OS X >= 10.9
@@ -518,41 +515,129 @@ if sys.platform.startswith("darwin"):
     # import module to detect if OS X dark mode is active or not
     import darkdetect # @UnresolvedImport # pylint: disable=import-error
     # to establish a thread pool on OS X
-    import objc  # @UnresolvedImport @UnusedImport # pylint: disable=import-error,unused-import
+    import objc  # @UnresolvedImport @UnusedImport # pylint: disable=import-error
     import Foundation  # @UnresolvedImport  # pylint: disable=import-error
 #   list_ports module patched for P3k from new pyserial GitHub repository
 
-# to make py2exe happy with scipy >0.11 (adding hidden imports)
 def __dependencies_for_freezing():
-    # @UnresolvedImport @UnusedImport @Reimport
     # pylint: disable=import-error,no-name-in-module,unused-import
-    from scipy.sparse.csgraph import _validation
-    from scipy.special import _ufuncs_cxx
-    from scipy import integrate 
-    from scipy import interpolate
-#    from scipy.optimize import curve_fit
+    from scipy.sparse.csgraph import _validation # @UnresolvedImport @UnusedImport
+    from scipy.special import _ufuncs_cxx # @UnresolvedImport @UnusedImport
+    from scipy import integrate # @UnresolvedImport @UnusedImport
+    from scipy import interpolate # @UnresolvedImport @UnusedImport
+#    from scipy.optimize import curve_fit # @UnresolvedImport @UnusedImport
     # to make bbfreeze on Linux and py2exe on Win/Py3 happy with scipy > 0.17.0
-    import scipy.linalg.cython_blas
-    import scipy.linalg.cython_lapack
-    import scipy.special.cython_special
+    import scipy.linalg.cython_blas # @UnresolvedImport @UnusedImport
+    import scipy.linalg.cython_lapack # @UnresolvedImport @UnusedImport
+    import scipy.special.cython_special # @UnresolvedImport @UnusedImport
 
-    import appdirs # @UnresolvedImport
-    import packaging # @UnresolvedImport
-    import packaging.version
-    import packaging.specifiers
-    import packaging.markers
-    import packaging.requirements
+    import appdirs # @UnresolvedImport @UnusedImport
+    import packaging # @UnresolvedImport @UnusedImport
+    import packaging.version # @UnresolvedImport @UnusedImport
+    import packaging.specifiers # @UnresolvedImport @UnusedImport
+    import packaging.markers # @UnresolvedImport @UnusedImport
+    import packaging.requirements # @UnresolvedImport @UnusedImport
 
     import PyQt5.QtSvg  # @UnusedImport
     import PyQt5.QtXml  # @UnusedImport
-    import PyQt5.QtDBus # needed for QT5 builds
-    import PyQt5.QtPrintSupport # needed for by platform plugin libqcocoa
+    import PyQt5.QtDBus # needed for QT5 builds  # @UnusedImport
+    import PyQt5.QtPrintSupport # needed for by platform plugin libqcocoa  # @UnusedImport
 
     # for gevent bundling
-    from gevent import signal as gevent_signal, core, resolver_thread, resolver_ares, socket, threadpool, thread, threading as gevent_threading, select, subprocess as gevent_subprocess, pywsgi, server, hub
+    from gevent import signal as gevent_signal, core, resolver_thread, resolver_ares, socket, threadpool, thread, threading as gevent_threading, select, subprocess as gevent_subprocess, pywsgi, server, hub # @UnusedImport @Reimport
 
 del __dependencies_for_freezing
 
+def initialize_locale(my_app) -> str:
+    if QSettings().contains('resetqsettings') and not toInt(QSettings().value('resetqsettings')):
+        locale = toString(QSettings().value('locale'))
+        if locale is None or locale == "en_US":
+            locale = "en"
+    else:
+        locale = ""
+
+    supported_languages = [
+        "ar",
+        "da",
+        "de",
+        "el",
+        "en",
+        "es",
+        "fa",
+        "fi",
+        "fr",
+        "gd",
+        "he",
+        "hu",
+        "id",
+        "it",
+        "ja",
+        "ko",
+        "lv",
+        "nl",
+        "no",
+        "pt",
+        "pt_BR",
+        "pl",
+        "ru",
+        "sk",
+        "sv",
+        "th",
+        "tr",
+        "vi",
+        "zh",
+        "zh_CN",
+        "zh_TW",
+    ]
+
+    if len(locale) == 0:
+        if platform.system() == 'Darwin':
+            from Cocoa import NSUserDefaults # @UnresolvedImport # pylint: disable=import-error
+            defs = NSUserDefaults.standardUserDefaults()
+            langs = defs.objectForKey_("AppleLanguages")
+            if langs.objectAtIndex_(0)[:3] == "zh_" or langs.objectAtIndex_(0)[:3] == "pt_":
+                locale = langs.objectAtIndex_(0)[:5]
+            else:
+                locale = langs.objectAtIndex_(0)[:2]
+        else:
+            if QLocale.system().name()[:2] == "zh_" or QLocale.system().name()[:2] == "pt_":
+                locale = QLocale.system().name()[:5]
+            else:
+                locale = QLocale.system().name()[:2]
+        if locale in supported_languages:
+            QSettings().setValue('locale', locale)
+
+    if locale is None or len(locale) == 0:
+        locale = "en"
+
+    #load Qt default translations from QLibrary
+    qtTranslator = QTranslator()
+    if qtTranslator.load("qtbase_" + locale, QLibraryInfo.location(QLibraryInfo.TranslationsPath)):
+        my_app.installTranslator(qtTranslator)
+    #find Qt default translations in Unix binaries
+    elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "/translations"):
+        my_app.installTranslator(qtTranslator)
+    #find Qt default translations in Mac binary
+    elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "/../translations"):
+        my_app.installTranslator(qtTranslator)
+    # qtbase_ translations added to the Artisan source as they are not in the official Qt builds
+    elif qtTranslator.load("qtbase_" + locale, "translations"):
+        my_app.installTranslator(qtTranslator)
+
+    #load Artisan translations
+    appTranslator = QTranslator()
+    #find application translations in source folder
+    if appTranslator.load("artisan_" + locale, "translations"):
+        my_app.installTranslator(appTranslator)
+    #find application translations in Unix binaries
+    elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/translations"):
+        my_app.installTranslator(appTranslator)
+    #find application translations in Mac binary
+    elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/../translations"):
+        my_app.installTranslator(appTranslator)
+
+    return locale
+initialize_locale(app)
 
 def QDateTimeToEpoch(dt):
     try:
@@ -673,7 +758,7 @@ class tgraphcanvas(FigureCanvas):
     def __init__(self, parent, dpi, *, locale):
 
         #default palette of colors
-        self.locale = locale
+        self.locale_str = locale
         self.alpha = {"analysismask":0.4,"statsanalysisbkgnd":1.0,"legendbg":0.4}
         self.palette = {"background":'#FFFFFF',"grid":'#E5E5E5',"ylabel":'#808080',"xlabel":'#808080',"title":'#0C6AA6',
                         "rect1":'#E5E5E5',"rect2":'#B2B2B2',"rect3":'#E5E5E5',"rect4":'#BDE0EE',"rect5":'#D3D3D3',
@@ -8472,7 +8557,7 @@ class tgraphcanvas(FigureCanvas):
             # build roast of the day string
             if aw.qmc.roastbatchnr != None and aw.qmc.roastbatchnr != 0 and aw.qmc.roastbatchpos != None and aw.qmc.roastbatchpos != 0:
                 roastoftheday = '\n' + str(aw.qmc.roastbatchpos)
-                if self.locale == "en":
+                if self.locale_str == "en":
                     if aw.qmc.roastbatchpos > 3:
                         roastoftheday += 'th'
                     elif aw.qmc.roastbatchpos == 3:
@@ -11496,7 +11581,7 @@ class tgraphcanvas(FigureCanvas):
                     det,dbt = aw.curveSimilarity(aw.qmc.phases[1]) # we analyze from DRY-END as specified in the phases dialog to DROP
 
                     #end temperature
-                    if self.locale == "ar":
+                    if self.locale_str == "ar":
                         strline = ("C*min{2}=" + aw.arabicReshape(QApplication.translate("Label", "AUC", None)) \
                                     + " " + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min", None)) \
                                     + "{1}=" + aw.arabicReshape(QApplication.translate("Label", "RoR", None)) \
@@ -13942,7 +14027,7 @@ class tgraphcanvas(FigureCanvas):
         if s is None:
             return None
         utf8_string = str(s)
-        if self.locale.startswith("de"):
+        if self.locale_str.startswith("de"):
             for k in self.umlaute_dict.keys():
                 utf8_string = utf8_string.replace(k, self.umlaute_dict[k])
         return unidecode(utf8_string)
@@ -15347,7 +15432,7 @@ class ApplicationWindow(QMainWindow):
 
     def __init__(self, parent = None, *, locale):
 
-        self.locale = locale
+        self.locale_str = locale
         self.app = app
         self.superusermode = False
 
@@ -16128,196 +16213,196 @@ class ApplicationWindow(QMainWindow):
         self.ArabicLanguage.setCheckable(True)
         self.ArabicLanguage.triggered.connect(self.changelocale_ar)
         self.languageMenu.addAction(self.ArabicLanguage)
-        if self.locale == "ar":
+        if self.locale_str == "ar":
             self.ArabicLanguage.setChecked(True)
 
         self.DanishLanguage = QAction(UIconst.CONF_MENU_DANISH,self)
         self.DanishLanguage.setCheckable(True)
         self.DanishLanguage.triggered.connect(self.changelocale_da)
         self.languageMenu.addAction(self.DanishLanguage)
-        if self.locale == "da":
+        if self.locale_str == "da":
             self.DanishLanguage.setChecked(True)
 
         self.GermanLanguage = QAction(UIconst.CONF_MENU_GERMAN,self)
         self.GermanLanguage.setCheckable(True)
         self.GermanLanguage.triggered.connect(self.changelocale_de)
         self.languageMenu.addAction(self.GermanLanguage)
-        if self.locale == "de":
+        if self.locale_str == "de":
             self.GermanLanguage.setChecked(True)
 
         self.EnglishLanguage = QAction(UIconst.CONF_MENU_ENGLISH,self)
         self.EnglishLanguage.setCheckable(True)
         self.EnglishLanguage.triggered.connect(self.changelocale_en)
         self.languageMenu.addAction(self.EnglishLanguage)
-        if self.locale in ["en", "en_US"]:
+        if self.locale_str in ["en", "en_US"]:
             self.EnglishLanguage.setChecked(True)
 
         self.SpanishLanguage = QAction(UIconst.CONF_MENU_SPANISH,self)
         self.SpanishLanguage.setCheckable(True)
         self.SpanishLanguage.triggered.connect(self.changelocale_es)
         self.languageMenu.addAction(self.SpanishLanguage)
-        if self.locale == "es":
+        if self.locale_str == "es":
             self.SpanishLanguage.setChecked(True)
 
         self.FarsiLanguage = QAction(UIconst.CONF_MENU_FARSI,self)
         self.FarsiLanguage.setCheckable(True)
         self.FarsiLanguage.triggered.connect(self.changelocale_fa)
         self.languageMenu.addAction(self.FarsiLanguage)
-        if self.locale == "fa":
+        if self.locale_str == "fa":
             self.FarsiLanguage.setChecked(True)
 
         self.FrenchLanguage = QAction(UIconst.CONF_MENU_FRENCH,self)
         self.FrenchLanguage.setCheckable(True)
         self.FrenchLanguage.triggered.connect(self.changelocale_fr)
         self.languageMenu.addAction(self.FrenchLanguage)
-        if self.locale == "fr":
+        if self.locale_str == "fr":
             self.FrenchLanguage.setChecked(True)
         
         self.GaelicLanguage = QAction(UIconst.CONF_MENU_SCOTTISH_GAELIC,self)
         self.GaelicLanguage.setCheckable(True)
         self.GaelicLanguage.triggered.connect(self.changelocale_gd)
         self.languageMenu.addAction(self.GaelicLanguage)
-        if self.locale == "gd":
+        if self.locale_str == "gd":
             self.GaelicLanguage.setChecked(True)
 
         self.GreekLanguage = QAction(UIconst.CONF_MENU_GREEK,self)
         self.GreekLanguage.setCheckable(True)
         self.GreekLanguage.triggered.connect(self.changelocale_el)
         self.languageMenu.addAction(self.GreekLanguage)
-        if self.locale == "el":
+        if self.locale_str == "el":
             self.GreekLanguage.setChecked(True)
 
         self.HebrewLanguage = QAction(UIconst.CONF_MENU_HEBREW,self)
         self.HebrewLanguage.setCheckable(True)
         self.HebrewLanguage.triggered.connect(self.changelocale_he)
         self.languageMenu.addAction(self.HebrewLanguage)
-        if self.locale == "he":
+        if self.locale_str == "he":
             self.HebrewLanguage.setChecked(True)
 
         self.IndonesianLanguage = QAction(UIconst.CONF_MENU_INDONESIAN,self)
         self.IndonesianLanguage.setCheckable(True)
         self.IndonesianLanguage.triggered.connect(self.changelocale_id)
         self.languageMenu.addAction(self.IndonesianLanguage)
-        if self.locale == "id":
+        if self.locale_str == "id":
             self.IndonesianLanguage.setChecked(True)
 
         self.ItalianLanguage = QAction(UIconst.CONF_MENU_ITALIAN,self)
         self.ItalianLanguage.setCheckable(True)
         self.ItalianLanguage.triggered.connect(self.changelocale_it)
         self.languageMenu.addAction(self.ItalianLanguage)
-        if self.locale == "it":
+        if self.locale_str == "it":
             self.ItalianLanguage.setChecked(True)
 
         self.JapaneseLanguage = QAction(UIconst.CONF_MENU_JAPANESE,self)
         self.JapaneseLanguage.setCheckable(True)
         self.JapaneseLanguage.triggered.connect(self.changelocale_ja)
         self.languageMenu.addAction(self.JapaneseLanguage)
-        if self.locale == "ja":
+        if self.locale_str == "ja":
             self.JapaneseLanguage.setChecked(True)
 
         self.KoreanLanguage = QAction(UIconst.CONF_MENU_KOREAN,self)
         self.KoreanLanguage.setCheckable(True)
         self.KoreanLanguage.triggered.connect(self.changelocale_ko)
         self.languageMenu.addAction(self.KoreanLanguage)
-        if self.locale == "ko":
+        if self.locale_str == "ko":
             self.KoreanLanguage.setChecked(True)
 
         self.LatvianLanguage = QAction(UIconst.CONF_MENU_LATVIAN,self)
         self.LatvianLanguage.setCheckable(True)
         self.LatvianLanguage.triggered.connect(self.changelocale_lv)
         self.languageMenu.addAction(self.LatvianLanguage)
-        if self.locale == "lv":
+        if self.locale_str == "lv":
             self.LatvianLanguage.setChecked(True)
 
         self.HungarianLanguage = QAction(UIconst.CONF_MENU_HUNGARIAN,self)
         self.HungarianLanguage.setCheckable(True)
         self.HungarianLanguage.triggered.connect(self.changelocale_hu)
         self.languageMenu.addAction(self.HungarianLanguage)
-        if self.locale == "hu":
+        if self.locale_str == "hu":
             self.HungarianLanguage.setChecked(True)
 
         self.DutchLanguage = QAction(UIconst.CONF_MENU_DUTCH,self)
         self.DutchLanguage.setCheckable(True)
         self.DutchLanguage.triggered.connect(self.changelocale_nl)
         self.languageMenu.addAction(self.DutchLanguage)
-        if self.locale == "nl":
+        if self.locale_str == "nl":
             self.DutchLanguage.setChecked(True)
 
         self.NorwegianLanguage = QAction(UIconst.CONF_MENU_NORWEGIAN,self)
         self.NorwegianLanguage.setCheckable(True)
         self.NorwegianLanguage.triggered.connect(self.changelocale_no)
         self.languageMenu.addAction(self.NorwegianLanguage)
-        if self.locale == "no":
+        if self.locale_str == "no":
             self.NorwegianLanguage.setChecked(True)
 
         self.PolishLanguage = QAction(UIconst.CONF_MENU_POLISH,self)
         self.PolishLanguage.setCheckable(True)
         self.PolishLanguage.triggered.connect(self.changelocale_pl)
         self.languageMenu.addAction(self.PolishLanguage)
-        if self.locale == "pl":
+        if self.locale_str == "pl":
             self.PolishLanguage.setChecked(True)
 
         self.PortugueseLanguage = QAction(UIconst.CONF_MENU_PORTUGUESE,self)
         self.PortugueseLanguage.setCheckable(True)
         self.PortugueseLanguage.triggered.connect(self.changelocale_pt)
         self.languageMenu.addAction(self.PortugueseLanguage)
-        if self.locale == "pt":
+        if self.locale_str == "pt":
             self.PortugueseLanguage.setChecked(True)
 
         self.PortugueseBrasilLanguage = QAction(UIconst.CONF_MENU_BRASIL,self)
         self.PortugueseBrasilLanguage.setCheckable(True)
         self.PortugueseBrasilLanguage.triggered.connect(self.changelocale_pt_BR)
         self.languageMenu.addAction(self.PortugueseBrasilLanguage)
-        if self.locale == "pt_BR":
+        if self.locale_str == "pt_BR":
             self.PortugueseBrasilLanguage.setChecked(True)
 
         self.RussianLanguage = QAction(UIconst.CONF_MENU_RUSSIAN,self)
         self.RussianLanguage.setCheckable(True)
         self.RussianLanguage.triggered.connect(self.changelocale_ru)
         self.languageMenu.addAction(self.RussianLanguage)
-        if self.locale == "ru":
+        if self.locale_str == "ru":
             self.RussianLanguage.setChecked(True)
 
         self.SlovakLanguage = QAction(UIconst.CONF_MENU_SLOVAK,self)
         self.SlovakLanguage.setCheckable(True)
         self.SlovakLanguage.triggered.connect(self.changelocale_sk)
         self.languageMenu.addAction(self.SlovakLanguage)
-        if self.locale == "sk":
+        if self.locale_str == "sk":
             self.SlovakLanguage.setChecked(True)
 
         self.FinishLanguage = QAction(UIconst.CONF_MENU_FINISH,self)
         self.FinishLanguage.setCheckable(True)
         self.FinishLanguage.triggered.connect(self.changelocale_fi)
         self.languageMenu.addAction(self.FinishLanguage)
-        if self.locale == "fi":
+        if self.locale_str == "fi":
             self.FinishLanguage.setChecked(True)
 
         self.SwedishLanguage = QAction(UIconst.CONF_MENU_SWEDISH,self)
         self.SwedishLanguage.setCheckable(True)
         self.SwedishLanguage.triggered.connect(self.changelocale_sv)
         self.languageMenu.addAction(self.SwedishLanguage)
-        if self.locale == "sv":
+        if self.locale_str == "sv":
             self.SwedishLanguage.setChecked(True)
 
         self.ThaiLanguage = QAction(UIconst.CONF_MENU_THAI,self)
         self.ThaiLanguage.setCheckable(True)
         self.ThaiLanguage.triggered.connect(self.changelocale_th)
         self.languageMenu.addAction(self.ThaiLanguage)
-        if self.locale == "th":
+        if self.locale_str == "th":
             self.ThaiLanguage.setChecked(True)
 
         self.TurkishLanguage = QAction(UIconst.CONF_MENU_TURKISH,self)
         self.TurkishLanguage.setCheckable(True)
         self.TurkishLanguage.triggered.connect(self.changelocale_tr)
         self.languageMenu.addAction(self.TurkishLanguage)
-        if self.locale == "tr":
+        if self.locale_str == "tr":
             self.TurkishLanguage.setChecked(True)
 
         self.VietnameseLanguage = QAction(UIconst.CONF_MENU_VIETNAMESE,self)
         self.VietnameseLanguage.setCheckable(True)
         self.VietnameseLanguage.triggered.connect(self.changelocale_vi)
         self.languageMenu.addAction(self.VietnameseLanguage)
-        if self.locale == "vi":
+        if self.locale_str == "vi":
             self.VietnameseLanguage.setChecked(True)
 
         # simplified Chinese
@@ -16325,7 +16410,7 @@ class ApplicationWindow(QMainWindow):
         self.ChineseChinaLanguage.setCheckable(True)
         self.ChineseChinaLanguage.triggered.connect(self.changelocale_zh_CN)
         self.languageMenu.addAction(self.ChineseChinaLanguage)
-        if self.locale == "zh_CN":
+        if self.locale_str == "zh_CN":
             self.ChineseChinaLanguage.setChecked(True)
 
         # traditional Chinese
@@ -16333,7 +16418,7 @@ class ApplicationWindow(QMainWindow):
         self.ChineseTaiwanLanguage.setCheckable(True)
         self.ChineseTaiwanLanguage.triggered.connect(self.changelocale_zh_TW)
         self.languageMenu.addAction(self.ChineseTaiwanLanguage)
-        if self.locale == "zh_TW":
+        if self.locale_str == "zh_TW":
             self.ChineseTaiwanLanguage.setChecked(True)
 
 
@@ -20634,30 +20719,30 @@ class ApplicationWindow(QMainWindow):
                     mpl.rcParams['font.family'] = "Arial Unicode MS"
                     self.mpl_fontproperties = mpl.font_manager.FontProperties()
                 elif platf == "Linux":
-                    if self.locale == "ar":
+                    if self.locale_str == "ar":
                         mpl.rcParams['font.family'] = ["DejaVu Sans","DejaVu Sans Mono","Times New Roman"]
-                    elif self.locale == "ja":
+                    elif self.locale_str == "ja":
                         mpl.rcParams['font.family'] = ["TakaoPGothic"]
-                    elif self.locale == "el":
+                    elif self.locale_str == "el":
                         mpl.rcParams['font.family'] = ["DejaVu Sans","DejaVu Sans Mono"]
-                    elif self.locale == "zh_CN":
+                    elif self.locale_str == "zh_CN":
                         mpl.rcParams['font.family'] = ["NanumGothic","DejaVu Sans Mono"]
-                    elif self.locale == "zh_TW":
+                    elif self.locale_str == "zh_TW":
                         mpl.rcParams['font.family'] = ["NanumGothic","DejaVu Sans Mono"]
                     self.mpl_fontproperties = mpl.font_manager.FontProperties()
                 else: # Windows:
                     mpl.rcParams['font.family'] = ["Microsoft Sans Serif", "Arial"] # works for Greek and Arabic
                     self.mpl_fontproperties = mpl.font_manager.FontProperties()
                     # for asian languages on Windows we have to set the parameters directly to *.ttc fonts (mpl supports only *.ttf)
-                    if self.locale == "ja":
+                    if self.locale_str == "ja":
                         aw.set_mpl_fontproperties("C:\\Windows\\Fonts\\MSGOTHIC.ttc")
-                    elif self.locale == "zh_CN":
+                    elif self.locale_str == "zh_CN":
                         aw.set_mpl_fontproperties("C:\\Windows\\Fonts\\simsun.ttc")
-                    elif self.locale == "zh_TW":
+                    elif self.locale_str == "zh_TW":
                         aw.set_mpl_fontproperties("C:\\Windows\\Fonts\\mingliu.ttc")
-                    elif self.locale == "ko":
+                    elif self.locale_str == "ko":
                         aw.set_mpl_fontproperties("C:\\Windows\\Fonts\\batang.ttc")
-#                    elif self.locale == "ar":
+#                    elif self.locale_str == "ar":
 #                        mpl.rcParams['font.family'] = "TraditionalArabic"
 #                        self.mpl_fontproperties = mpl.font_manager.FontProperties()
             except Exception: # pylint: disable=broad-except
@@ -20723,7 +20808,7 @@ class ApplicationWindow(QMainWindow):
     # if s is a QString with one {0} placeholder and a is an argument, the argument is reversed, and then the wohle string result is reversed
     # if it contains any arabic characters
     def arabicReshape(self,s,a=None):
-        if self.locale == "ar":
+        if self.locale_str == "ar":
             st = str(s)
             if artisanlib.arabic_reshaper.has_arabic_letters(st):
                 if a:
@@ -20732,7 +20817,7 @@ class ApplicationWindow(QMainWindow):
             if a:
                 return s.format(a)
             return s
-        if self.locale == "he":
+        if self.locale_str == "he":
             if a:
                 return s[::-1].format(a[::-1])
             return s[::-1]
@@ -27532,7 +27617,7 @@ class ApplicationWindow(QMainWindow):
             profile["flavorstartangle"] = self.qmc.flavorstartangle
             profile["flavoraspect"] = self.qmc.flavoraspect
             profile["title"] = encodeLocal(self.qmc.title)
-            profile["locale"] = self.locale
+            profile["locale"] = self.locale_str
 
 #PLUS
             if self.qmc.plus_store is not None:
@@ -34986,13 +35071,13 @@ class ApplicationWindow(QMainWindow):
         self.changelocale("zh_TW")
 
     def changelocale(self,languagelocale):
-        if self.locale != languagelocale:
+        if self.locale_str != languagelocale:
             string = QApplication.translate("Message","Switching the language needs a restart. Restart now?", None)
             reply = QMessageBox.warning(aw,QApplication.translate("Message","Restart", None),string,
                               QMessageBox.Cancel | QMessageBox.Yes)
             if reply == QMessageBox.Yes:
                 # switch old flag off
-                self.switchLanguageFlag(self.locale,False)
+                self.switchLanguageFlag(self.locale_str, False)
                 # check if etypes are unmodified by user and in that case, remove etypes from settings to avoid overwriting of translations:
                 # switch new flag on
                 self.switchLanguageFlag(languagelocale,True)
@@ -37151,101 +37236,12 @@ def qt_message_handler(_msg_type, _msg_log_context, _msg_string):
     pass
 
 
-def initialize_locale(my_app):
-    if QSettings().contains('resetqsettings') and not toInt(QSettings().value('resetqsettings')):
-        locale = toString(QSettings().value('locale'))
-        if locale is None or locale == "en_US":
-            locale = "en"
-    else:
-        locale = ""
-
-    supported_languages = [
-        "ar",
-        "da",
-        "de",
-        "el",
-        "en",
-        "es",
-        "fa",
-        "fi",
-        "fr",
-        "gd",
-        "he",
-        "hu",
-        "id",
-        "it",
-        "ja",
-        "ko",
-        "lv",
-        "nl",
-        "no",
-        "pt",
-        "pt_BR",
-        "pl",
-        "ru",
-        "sk",
-        "sv",
-        "th",
-        "tr",
-        "vi",
-        "zh",
-        "zh_CN",
-        "zh_TW",
-    ]
-
-    if len(locale) == 0:
-        if platform.system() == 'Darwin':
-            from Cocoa import NSUserDefaults # @UnresolvedImport # pylint: disable=import-error
-            defs = NSUserDefaults.standardUserDefaults()
-            langs = defs.objectForKey_("AppleLanguages")
-            if langs.objectAtIndex_(0)[:3] == "zh_" or langs.objectAtIndex_(0)[:3] == "pt_":
-                locale = langs.objectAtIndex_(0)[:5]
-            else:
-                locale = langs.objectAtIndex_(0)[:2]
-        else:
-            if QLocale.system().name()[:2] == "zh_" or QLocale.system().name()[:2] == "pt_":
-                locale = QLocale.system().name()[:5]
-            else:
-                locale = QLocale.system().name()[:2]
-        if locale in supported_languages:
-            QSettings().setValue('locale', locale)
-
-    if locale is None or len(locale) == 0:
-        locale = "en"
-
-    #load Qt default translations from QLibrary
-    qtTranslator = QTranslator()
-    if qtTranslator.load("qtbase_" + locale, QLibraryInfo.location(QLibraryInfo.TranslationsPath)):
-        my_app.installTranslator(qtTranslator)
-    #find Qt default translations in Unix binaries
-    elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "/translations"):
-        my_app.installTranslator(qtTranslator)
-    #find Qt default translations in Mac binary
-    elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "/../translations"):
-        my_app.installTranslator(qtTranslator)
-    # qtbase_ translations added to the Artisan source as they are not in the official Qt builds
-    elif qtTranslator.load("qtbase_" + locale, "translations"):
-        my_app.installTranslator(qtTranslator)
-
-    #load Artisan translations
-    appTranslator = QTranslator()
-    #find application translations in source folder
-    if appTranslator.load("artisan_" + locale, "translations"):
-        my_app.installTranslator(appTranslator)
-    #find application translations in Unix binaries
-    elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/translations"):
-        my_app.installTranslator(appTranslator)
-    #find application translations in Mac binary
-    elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/../translations"):
-        my_app.installTranslator(appTranslator)
-
-    return locale
 
 
 def main():
     global aw, app, artisanviewerFirstStart # pylint: disable=global-statement
 
-    locale = initialize_locale(app)
+    locale_str:str = initialize_locale(app)
 
     # supress all Qt messages
     qInstallMessageHandler(qt_message_handler)
@@ -37262,7 +37258,7 @@ def main():
 
     aw = None # this is to ensure that the variable aw is already defined during application initialization
 
-    aw = ApplicationWindow(locale=locale)
+    aw = ApplicationWindow(locale=locale_str)
 
     app.setActivationWindow(aw,activateOnMessage=False) # set the activation window for the QtSingleApplication
 
@@ -37271,7 +37267,7 @@ def main():
     if sys.platform.startswith("darwin"):
         appnope.nope()
 
-    if locale in ["ar","he","fa"]:
+    if locale_str in ["ar","he","fa"]:
         QApplication.setLayoutDirection(Qt.RightToLeft)
     else:
         QApplication.setLayoutDirection(Qt.LeftToRight)

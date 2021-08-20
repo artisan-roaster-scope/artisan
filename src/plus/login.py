@@ -72,7 +72,7 @@ class Login(ArtisanDialog):
         self.linkResetPassword.setOpenExternalLinks(True)
 
         self.dialogbuttons = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
         )
         self.setButtonTranslations(
             self.dialogbuttons.button(QDialogButtonBox.Ok),
@@ -85,8 +85,8 @@ class Login(ArtisanDialog):
             QApplication.translate("Button", "Cancel", None),
         )
 
-        self.dialogbuttons.accepted.connect(self.setCredentials)
-        self.dialogbuttons.rejected.connect(self.reject)
+        self.dialogbuttons.accepted.connect(self.setCredentials) # type: ignore
+        self.dialogbuttons.rejected.connect(self.reject) # type: ignore
         self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(False)
         self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(True)
         # add additional CMD-. shortcut to close the dialog
@@ -94,7 +94,8 @@ class Login(ArtisanDialog):
             QKeySequence("Ctrl+.")
         )
         # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self, triggered=self.reject)
+        cancelAction = QAction(self)
+        cancelAction.triggered.connect(self.reject) # type: ignore
         try:
             cancelAction.setShortcut(QKeySequence.Cancel)
         except Exception:  # pylint: disable=broad-except
@@ -113,17 +114,17 @@ class Login(ArtisanDialog):
         self.textName.setPlaceholderText(
             QApplication.translate("Plus", "Email", None)
         )
-        self.textName.textChanged.connect(self.textChanged)
+        self.textName.textChanged.connect(self.textChanged)  # type: ignore
         if email is not None:
             self.textName.setText(email)
 
-        self.textPass.textChanged.connect(self.textChanged)
+        self.textPass.textChanged.connect(self.textChanged)  # type: ignore
 
         self.rememberCheckbox = QCheckBox(
             QApplication.translate("Plus", "Remember", None)
         )
         self.rememberCheckbox.setChecked(self.remember)
-        self.rememberCheckbox.stateChanged.connect(self.rememberCheckChanged)
+        self.rememberCheckbox.stateChanged.connect(self.rememberCheckChanged)  # type: ignore
 
         credentialsLayout = QVBoxLayout(self)
         credentialsLayout.addWidget(self.textName)
@@ -153,7 +154,7 @@ class Login(ArtisanDialog):
         layout.setSpacing(5)
 
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocusPolicy(
-            Qt.StrongFocus
+            Qt.StrongFocus   # type: ignore
         )
 
         if saved_password is not None:
@@ -167,6 +168,7 @@ class Login(ArtisanDialog):
 
     @pyqtSlot()
     def reject(self):
+        print("reject")
         self.login = self.textName.text()
         super().reject()
 
@@ -212,8 +214,8 @@ def plus_login(
 ):
     ld = Login(window, email, saved_password, remember_credentials)
     ld.setWindowTitle("plus")
-    ld.setWindowFlags(Qt.Sheet)
-    ld.setAttribute(Qt.WA_DeleteOnClose, True)
+    ld.setWindowFlags(Qt.Sheet)   # type: ignore
+    ld.setAttribute(Qt.WA_DeleteOnClose, True)   # type: ignore
     res = ld.exec_()
     if ld.login is not None:
         login_processed = ld.login.strip()

@@ -126,7 +126,7 @@ def setKeyring() -> None:
             try:
                 keyring.set_keyring(keyring.backends.macOS.Keyring())
             except Exception:  # pylint: disable=broad-except
-                keyring.set_keyring(keyring.backends.OS_X.Keyring())
+                keyring.set_keyring(keyring.backends.OS_X.Keyring())   # type: ignore
         else:  # Linux
             try:
                 keyring.set_keyring(keyring.backends.SecretService.Keyring())
@@ -294,8 +294,9 @@ def getHeaders(
         + ")"
     }
     try:
-        locale = config.app_window.locale
+        locale = config.app_window.locale_str
         if locale is not None and locale != "":
+            assert locale is str
             locale = locale.lower().replace("_", "-")
             headers["Accept-Language"] = locale
     except Exception:  # pylint: disable=broad-except

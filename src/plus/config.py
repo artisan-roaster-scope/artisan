@@ -151,12 +151,13 @@ except Exception:  # pylint: disable=broad-except
 
 # Runtime variables
 
-app_window = None  # handle to the main Artisan application window
+from PyQt5.QtWidgets import QMainWindow
+app_window : QMainWindow # = None  # handle to the main Artisan application window
 #   if set, app_window.plus_login holds the current login account if any and
 #   app_window.updatePlusIcon() is a function that updates the toolbar
 #   plus service connection indicator icon
 connected = False  # connection status
-passwd = None
+passwd : Optional[str] = None
 # the session token
 token: Optional[str] = None
 # login nickname assigned on login with session token

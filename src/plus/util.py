@@ -139,6 +139,7 @@ def getGMToffset():
 def fromFtoC(Ffloat: Optional[float]) -> Optional[float]:
     if Ffloat in [-1, None]:
         return Ffloat
+    assert Ffloat is not None
     return (Ffloat - 32.0) * (5.0 / 9.0)
 
 
@@ -153,6 +154,7 @@ def temp2C(temp: Optional[float]) -> Optional[float]:
 def RoRfromFtoC(Ffloat: Optional[float]) -> Optional[float]:
     if Ffloat in [-1, None]:
         return Ffloat
+    assert Ffloat is not None
     return Ffloat * (5.0 / 9.0)
 
 
@@ -332,11 +334,12 @@ def add2dict(dict_source, key_source, dict_target, key_target):
         dict_target[key_target] = dict_source[key_source]
 
 
-def getLanguage() -> Optional[str]:
+def getLanguage() -> str:
     if (
         config.app_window is not None
         and config.app_window.plus_account is not None
     ):
+        assert config.app_window.plus_language is str
         return config.app_window.plus_language
     return "en"
 

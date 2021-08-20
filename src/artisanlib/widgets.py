@@ -123,7 +123,6 @@ class MyTableWidgetItemQComboBox(QTableWidgetItem):
 
 # QLabel that automatically resizes its text font
 class MyQLabel(QLabel):
-    __slots__ = [] # save some memory by using slots
     def __init__(self, *args, **kargs):
         super().__init__(*args, **kargs)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Ignored,QSizePolicy.Ignored))
@@ -178,7 +177,6 @@ class ClickableQLabel(QLabel):
             self.right_clicked.emit()
 
 class ClickableQGroupBox(QGroupBox):
-    clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
 
