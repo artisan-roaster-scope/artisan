@@ -515,7 +515,7 @@ if sys.platform.startswith("darwin"):
     # import module to detect if OS X dark mode is active or not
     import darkdetect # @UnresolvedImport # pylint: disable=import-error
     # to establish a thread pool on OS X
-    import objc  # @UnresolvedImport @UnusedImport # pylint: disable=import-error
+    import objc  # @UnresolvedImport @UnusedImport # pylint: disable=import-error,unused-import
     import Foundation  # @UnresolvedImport  # pylint: disable=import-error
 #   list_ports module patched for P3k from new pyserial GitHub repository
 
