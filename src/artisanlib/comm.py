@@ -1044,8 +1044,9 @@ class serialport():
             self.R1 = AillioR1()
         tx = self.aw.qmc.timeclock.elapsed()/1000.
         try:
-            if self.aw.qmc.batchcounter != -1:
-                self.aw.qmc.batchcounter = self.R1.get_roast_number()
+            #removed batchcounter to address issue #667
+            #if self.aw.qmc.batchcounter != -1:
+            #    self.aw.qmc.batchcounter = self.R1.get_roast_number()
             self.aw.qmc.R1_BT = self.R1.get_bt()
             self.aw.qmc.R1_DT = self.R1.get_dt()
             self.aw.qmc.R1_DRUM = self.R1.get_drum() * 10
