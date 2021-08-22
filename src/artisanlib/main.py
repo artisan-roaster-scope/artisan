@@ -8501,7 +8501,7 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.ambientTemp not in [None,0] or aw.qmc.ambient_humidity not in [None,0] or aw.qmc.ambient_pressure not in [None,0]:
                     statstr += skipline
                     if aw.qmc.ambientTemp not in [None,0]:
-                        statstr += str(int(aw.qmc.ambientTemp)) + u'\u00b0' + aw.qmc.mode + '  '
+                        statstr += str(int(aw.qmc.ambientTemp)) + '\u00b0' + aw.qmc.mode + '  '
                     if aw.qmc.ambient_humidity not in [None,0]:
                         statstr +=  str(int(aw.qmc.ambient_humidity)) + '%  '
                     if aw.qmc.ambient_pressure not in [None,0]:
@@ -11517,7 +11517,7 @@ class tgraphcanvas(FigureCanvas):
                             strline = strline + "   " + QApplication.translate("Label", "FC", None) + "=%smin" % FCperiod
                     self.set_xlabel(strline)
                 else:
-                    sep = u"   "
+                    sep = "   "
                     msg = aw.qmc.roastdate.date().toString(Qt.SystemLocaleShortDate)
                     tm = aw.qmc.roastdate.time().toString()[:-3]
                     if tm != "00:00":
@@ -11534,9 +11534,9 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.volume[0] and aw.qmc.volume[1]:
                         msg += sep + str(aw.float2float(aw.volume_increase(aw.qmc.volume[0],aw.qmc.volume[1]),1)) + "%"
                     if aw.qmc.whole_color and aw.qmc.ground_color:
-                        msg += sep + u"#" + str(aw.qmc.whole_color) + u"/" +  str(aw.qmc.ground_color)
+                        msg += sep + "#" + str(aw.qmc.whole_color) + "/" +  str(aw.qmc.ground_color)
                     elif aw.qmc.ground_color:
-                        msg += sep + u"#" + str(aw.qmc.ground_color)
+                        msg += sep + "#" + str(aw.qmc.ground_color)
                     self.set_xlabel(msg)
             else:
                 self.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min","abbrev. of minutes")))
@@ -14331,7 +14331,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 #                        for line in steps_post_lines:
 #                            line.set_drawstyle("steps-post")
                             
-                except Exception as e: # pylint: disable=broad-except
+                except Exception: # pylint: disable=broad-except
 #                    traceback.print_exc(file=sys.stdout)
                     pass
                 aw.fetchCurveStyles()
@@ -18713,7 +18713,7 @@ class ApplicationWindow(QMainWindow):
             modifiers = QApplication.keyboardModifiers()
             if modifiers == Qt.AltModifier:  #alt click
                 tbl = prettytable.PrettyTable()
-                re_strip = re.compile(u'[\u2009]')  #thin space is not read properly by prettytable
+                re_strip = re.compile('[\u2009]')  #thin space is not read properly by prettytable
                 fields = []
                 if adjustment & 1:
                     fields.append(" ")
@@ -25465,9 +25465,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:n-1]
             self.qmc.extradevicecolor2.append("black")
             self.qmc.extraname1 = self.qmc.extraname1[:n-1]
-            self.qmc.extraname1.append(u"Extra 1")
+            self.qmc.extraname1.append("Extra 1")
             self.qmc.extraname2 = self.qmc.extraname2[:n-1]
-            self.qmc.extraname2.append(u"Extra 2")
+            self.qmc.extraname2.append("Extra 2")
             self.qmc.extramathexpression1 = self.qmc.extramathexpression1[:n-1]
             self.qmc.extramathexpression1.append("")
             self.qmc.extramathexpression2 = self.qmc.extramathexpression2[:n-1]
@@ -25541,7 +25541,7 @@ class ApplicationWindow(QMainWindow):
     #Write readings to Artisan JSON file
     def exportJSON(self,filename):
         try:
-            with open(filename, 'w') as outfile:
+            with open(filename, 'w', encoding='utf-8') as outfile:
                 from json import dump as json_dump
                 json_dump(self.getProfile(), outfile, ensure_ascii=True)
                 outfile.write('\n')
@@ -25696,7 +25696,7 @@ class ApplicationWindow(QMainWindow):
     #Write readings to RoastLogger CSV file
     def exportRoastLogger(self,filename):
         try:
-            with open(filename, 'w') as outfile:
+            with open(filename, 'w', encoding='utf-8') as outfile:
                 outfile.write("Log created at 09:00:00 "+ self.qmc.roastdate.date().toString("dd'/'MM'/'yyyy") + "\n")
                 outfile.write("Use Options|Set template for new log to modify this template.\n")
                 outfile.write("------------------------------------------------------\n")
@@ -26404,9 +26404,9 @@ class ApplicationWindow(QMainWindow):
 
     def ensureCorrectExtraDeviceListLenght(self):
         self.qmc.extraname1 = self.qmc.extraname1[:len(self.qmc.extradevices)]
-        self.qmc.extraname1 = self.qmc.extraname1 + [u"Extra 1"]*max(0,len(self.qmc.extradevices)-len(self.qmc.extraname1))
+        self.qmc.extraname1 = self.qmc.extraname1 + ["Extra 1"]*max(0,len(self.qmc.extradevices)-len(self.qmc.extraname1))
         self.qmc.extraname2 = self.qmc.extraname2[:len(self.qmc.extradevices)]
-        self.qmc.extraname2 = self.qmc.extraname2 + [u"Extra 2"]*max(0,len(self.qmc.extradevices)-len(self.qmc.extraname2))
+        self.qmc.extraname2 = self.qmc.extraname2 + ["Extra 2"]*max(0,len(self.qmc.extradevices)-len(self.qmc.extraname2))
         self.qmc.extramathexpression1 = self.qmc.extramathexpression1[:len(self.qmc.extradevices)]
         self.qmc.extramathexpression1 = self.qmc.extramathexpression1 + [""]*max(0,len(self.qmc.extradevices)-len(self.qmc.extramathexpression1))
         self.qmc.extramathexpression2 = self.qmc.extramathexpression2[:len(self.qmc.extradevices)]
@@ -27683,7 +27683,7 @@ class ApplicationWindow(QMainWindow):
                 ds = list(self.qmc.extradevices)
                 ds.insert(0,self.qmc.device)
                 profile["devices"] = [self.qmc.devices[d-1] for d in ds]
-            except Exception as ex: # pylint: disable=broad-except
+            except Exception: # pylint: disable=broad-except
                 pass
             profile["elevation"] = self.qmc.elevation
             profile["computed"] = self.computedProfileInformation()
@@ -31421,7 +31421,7 @@ class ApplicationWindow(QMainWindow):
             # 1.get bounding box in axis cooridnates
             try:
                 rect_extents = aw.qmc.stats_summary_rect.get_bbox()
-            except Exception as e: # pylint: disable=broad-except
+            except Exception: # pylint: disable=broad-except
                 aw.sendmessage(QApplication.translate("Message","No statistics found", None))
                 return
             # 2. convert those to display coordinates
@@ -31459,7 +31459,7 @@ class ApplicationWindow(QMainWindow):
             if filename:
                 try:
                     # write header
-                    with open(filename, 'w',newline="") as outfile:
+                    with open(filename, 'w',newline="", encoding='utf-8') as outfile:
                         writer= csv.writer(outfile,delimiter='\t')
                         writer.writerow(["batch","time","profile","beans","in (g)","out (g)","loss (%)","date","time",
                             "in ({})".format(aw.qmc.weight[2].lower()),"out ({})".format(aw.qmc.weight[2].lower()),
@@ -31572,7 +31572,7 @@ class ApplicationWindow(QMainWindow):
                             ws['F{0}'.format(c)].number_format = num_format
                             ws['G{0}'.format(c)] = avgFormat(c,"E","F")
                             ws['G{0}'.format(c)].number_format = '0.0%'
-                        except Exception as e: # pylint: disable=broad-except
+                        except Exception: # pylint: disable=broad-except
 #                            traceback.print_exc(file=sys.stdout)
                             pass
                     # write trailer
@@ -32156,7 +32156,7 @@ class ApplicationWindow(QMainWindow):
                     c += 1
                     try:
                         cl = next(color) # here to keep colors in sync with the pct graph colors
-                    except Exception as e: # pylint: disable=broad-except
+                    except Exception: # pylint: disable=broad-except
                         color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
                         cl = next(color)
                     try:
@@ -32671,7 +32671,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     # open file
                     try:
-                        outfile = open(filename, 'w',newline="") # pylint: disable=consider-using-with
+                        outfile = open(filename, 'w',newline="", encoding='utf-8') # pylint: disable=consider-using-with
                     except IOError as x:
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " Err [{0}] Can not write to file, perhaps it is open in an application or is write protected?").format(x.errno))
                         QApplication.beep()
