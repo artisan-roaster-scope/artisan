@@ -495,7 +495,7 @@ def sendLog() -> None:
         os.remove(tmpfile)
     except OSError:
         pass
-    with open(tmpfile, "w") as outfile:
+    with open(tmpfile, "w", encoding='utf-8') as outfile:
         gen = generator.Generator(outfile)
         gen.flatten(message)
     QDesktopServices.openUrl(QUrl.fromLocalFile(tmpfile))
