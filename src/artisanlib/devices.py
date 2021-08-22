@@ -1456,7 +1456,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         self.devicetable.setCellWidget(i,12,Delta2ComboBox)
                         self.devicetable.setCellWidget(i,13,Fill1SpinBox)
                         self.devicetable.setCellWidget(i,14,Fill2SpinBox)
-                    except Exception as e: # pylint: disable=broad-except
+                    except Exception: # pylint: disable=broad-except
 #                        import traceback
 #                        traceback.print_exc(file=sys.stdout)
                         pass
@@ -1483,7 +1483,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if modifiers == Qt.AltModifier:  #alt click
             tbl = prettytable.PrettyTable()
             fields = []
-            re_strip = re.compile(u'[\u2009]')  #thin space is not read properly by prettytable
+            re_strip = re.compile('[\u2009]')  #thin space is not read properly by prettytable
             for c in range(ncols):
                 fields.append(re_strip.sub('',self.devicetable.horizontalHeaderItem(c).text()))
             tbl.field_names = fields

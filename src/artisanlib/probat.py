@@ -103,6 +103,7 @@ class ProbatMiddleware():
     def getRoasterURL(self):
         if self.probat_middleware_endpoint is not None and self.isConnected():
             return self.probat_middleware_endpoint + GET_DATA.format(id=self.probat_middleware_ID)
+        return None
     
     def getRoasterName(self):
         return self.probat_middleware_name

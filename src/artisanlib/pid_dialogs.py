@@ -807,7 +807,7 @@ class PID_DlgControl(ArtisanDialog):
             rampsoaks["svDescriptions"] = self.aw.pidcontrol.svDescriptions
             rampsoaks["mode"] = self.aw.qmc.mode
             from json import dump as json_dump
-            with open(filename, 'w') as outfile:
+            with open(filename, 'w', encoding='utf-8') as outfile:
                 json_dump(rampsoaks, outfile, ensure_ascii=True)
                 outfile.write('\n')
             self.aw.qmc.rsfile = filename
@@ -2730,7 +2730,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 segments[soakkey] = stringfromseconds(self.aw.fujipid.PXG4[soakkey][0])
             pids["segments"] = segments
             from json import dump as json_dump
-            with open(filename, 'w') as outfile:
+            with open(filename, 'w', encoding='utf-8') as outfile:
                 json_dump(pids, outfile, ensure_ascii=True)
                 outfile.write('\n')
             return True

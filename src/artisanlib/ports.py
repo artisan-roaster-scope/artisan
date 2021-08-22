@@ -404,8 +404,8 @@ class PortComboBox(QComboBox):
             import serial.tools.list_ports
             comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
             if platform.system() == 'Darwin':
-                self.ports = list([p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync',
-                    '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem',"/dev/cu.Bluetooth-Incoming-Port","/dev/tty.Bluetooth-Incoming-Port"])])
+                self.ports = list([p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync', # pylint: disable=consider-using-generator
+                    '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem',"/dev/cu.Bluetooth-Incoming-Port","/dev/tty.Bluetooth-Incoming-Port"])]) # pylint: disable=consider-using-generator
             else:
                 self.ports = list(comports)
             if self.selection not in [p[0] for p in self.ports]:

@@ -916,11 +916,11 @@ class HUDDlg(ArtisanDialog):
         self.expresult = QLineEdit()
         self.expresult.setReadOnly(True)
         self.expresult.setStyleSheet("background-color:'lightgrey';")
-        self.expradiobutton1 = QRadioButton(u"x\xb2")
+        self.expradiobutton1 = QRadioButton("x\xb2")
         self.expradiobutton1.setChecked(True)
         self.expradiobutton1.power = self.exppower = 2
         self.expradiobutton1.toggled.connect(self.expradiobuttonClicked)
-        self.expradiobutton2 = QRadioButton(u"x\xb3")
+        self.expradiobutton2 = QRadioButton("x\xb3")
         self.expradiobutton2.power = 3
         self.expradiobutton2.toggled.connect(self.expradiobuttonClicked)
         self.exptimeoffsetLabel = QLabel(QApplication.translate("Label", "Offset seconds from CHARGE", None))

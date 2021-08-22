@@ -670,7 +670,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             alarms["alarmbeep"] = self.aw.qmc.alarmbeep
             alarms["alarmstrings"] = list(self.aw.qmc.alarmstrings)
             from json import dump as json_dump
-            with open(filename, 'w') as outfile:
+            with open(filename, 'w', encoding='utf-8') as outfile:
                 json_dump(alarms, outfile, ensure_ascii=True)
                 outfile.write('\n')
             return True

@@ -286,7 +286,7 @@ class s7port():
                             sequences = [[registers[0],registers[-1]]]
                         else:
                             # split in successive sequences
-                            gaps = [[s, e] for s, e in zip(registers, registers[1:]) if s+1 < e]
+                            gaps = [[s, e] for s, e in zip(registers, registers[1:]) if s+1 < e] # pylint: disable=used-before-assignment
                             edges = iter(registers[:1] + sum(gaps, []) + registers[-1:])
                             sequences = list(zip(edges, edges)) # list of pairs of the form (start-register,end-register)
                         for seq in sequences:

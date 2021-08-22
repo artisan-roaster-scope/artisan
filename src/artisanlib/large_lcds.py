@@ -191,7 +191,7 @@ class LargeLCDs(ArtisanDialog):
         return frame
         
     # to be implemented in subclasses
-    def makeLCDs(self):
+    def makeLCDs(self): # pylint: disable=no-self-use
         return None
 
     def updateVisibilities(self,l1,l2):

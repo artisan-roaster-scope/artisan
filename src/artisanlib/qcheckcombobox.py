@@ -37,7 +37,7 @@ class CheckComboBox(QComboBox):
         delegate used by the QComboBox). Used to style the popup like a
         list view (e.g windows style).
         """
-        def isSeparator(self, index):
+        def isSeparator(self, index): # pylint: disable=no-self-use
             return str(index.data(Qt.AccessibleDescriptionRole)) == "separator"
 
         def paint(self, painter, option, index):
@@ -66,7 +66,7 @@ class CheckComboBox(QComboBox):
         delegate used by the QComboBox). Used to style the popup like a
         menu. (e.g osx aqua style).
         """
-        def isSeparator(self, index):
+        def isSeparator(self, index): # pylint: disable=no-self-use
             return str(index.data(Qt.AccessibleDescriptionRole)) == "separator"
 
         def paint(self, painter, option, index):
@@ -334,7 +334,7 @@ class CheckComboBox(QComboBox):
         """
         return self.__placeholderText
 
-    def wheelEvent(self, event):
+    def wheelEvent(self, event): # pylint: disable=no-self-use
         """Reimplemented."""
         event.ignore()
 
