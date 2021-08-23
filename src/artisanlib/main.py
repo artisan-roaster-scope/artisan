@@ -14507,8 +14507,8 @@ class SampleThread(QThread):
     # we can assume within the processing of sample() that flagon=True
     def sample(self):
         ##### (try to) lock resources  #########
-#        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,100) # we try to catch a lock for 100ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
-        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,200) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+#        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
         if gotlock:
             try:
                 # duplicate system state flag flagstart locally and only refer to this copy within this function to make it behaving uniquely (either append or overwrite mode)
