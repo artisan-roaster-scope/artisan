@@ -209,7 +209,7 @@ class modbusport():
                         retry_on_empty=False,
                         retry_on_invalid=False,
                         reset_socket=self.reset_socket,
-                        timeout=self.timeout)
+                        timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
                     self.readRetries = 0
                 elif self.type == 2: # Serial Binary
                     from pymodbus.client.sync import ModbusSerialClient # @Reimport
@@ -223,7 +223,7 @@ class modbusport():
                         retry_on_empty=False,
                         retry_on_invalid=False,
                         reset_socket=self.reset_socket,
-                        timeout=self.timeout) 
+                        timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
                     self.readRetries = 0 
                 elif self.type == 3: # TCP
                     from pymodbus.client.sync import ModbusTcpClient
@@ -235,7 +235,7 @@ class modbusport():
                                 retry_on_invalid=False, # only supported for serial clients in v2.5.2
                                 reset_socket=self.reset_socket,
                                 retries=1,
-                                timeout=0.3, #self.timeout
+                                timeout=min((self.aw.qmc.delay/2000), 0.2) # the timeout should not be larger than half of the sampling interval
                                 )
                         self.readRetries = 0
                     except Exception: # pylint: disable=broad-except
@@ -253,7 +253,7 @@ class modbusport():
                             retry_on_invalid=False, # only supported for serial clients in v2.5.2
                             reset_socket=self.reset_socket,
                             retries=1,
-                            timeout=0.2, #self.timeout
+                            timeout=min((self.aw.qmc.delay/2000), 0.2) # the timeout should not be larger than half of the sampling interval
                             )
                         self.readRetries = 0
                     except Exception: # pylint: disable=broad-except # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
@@ -274,7 +274,7 @@ class modbusport():
                         retry_on_invalid=False, # by default False
                         reset_socket=self.reset_socket,
                         strict=False, # settings this to False disables the inter char timeout restriction
-                        timeout=self.timeout)
+                        timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
 #                    self.master.inter_char_timeout = 0.05
                     self.readRetries = 0
                 self.master.connect()
