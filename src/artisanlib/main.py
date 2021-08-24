@@ -519,34 +519,34 @@ if sys.platform.startswith("darwin"):
     import Foundation  # @UnresolvedImport  # pylint: disable=import-error
 #   list_ports module patched for P3k from new pyserial GitHub repository
 
-def __dependencies_for_freezing():
-    # pylint: disable=import-error,no-name-in-module,unused-import
-    from scipy.sparse.csgraph import _validation # @UnresolvedImport @UnusedImport
-    from scipy.special import _ufuncs_cxx # @UnresolvedImport @UnusedImport
-    from scipy import integrate # @UnresolvedImport @UnusedImport
-    from scipy import interpolate # @UnresolvedImport @UnusedImport
-#    from scipy.optimize import curve_fit # @UnresolvedImport @UnusedImport
-    # to make bbfreeze on Linux and py2exe on Win/Py3 happy with scipy > 0.17.0
-    import scipy.linalg.cython_blas # @UnresolvedImport @UnusedImport
-    import scipy.linalg.cython_lapack # @UnresolvedImport @UnusedImport
-    import scipy.special.cython_special # @UnresolvedImport @UnusedImport
-
-    import appdirs # @UnresolvedImport @UnusedImport
-    import packaging # @UnresolvedImport @UnusedImport
-    import packaging.version # @UnresolvedImport @UnusedImport
-    import packaging.specifiers # @UnresolvedImport @UnusedImport
-    import packaging.markers # @UnresolvedImport @UnusedImport
-    import packaging.requirements # @UnresolvedImport @UnusedImport
-
-    import PyQt5.QtSvg  # @UnusedImport
-    import PyQt5.QtXml  # @UnusedImport
-    import PyQt5.QtDBus # needed for QT5 builds  # @UnusedImport
-    import PyQt5.QtPrintSupport # needed for by platform plugin libqcocoa  # @UnusedImport
-
-    # for gevent bundling
-    from gevent import signal as gevent_signal, core, resolver_thread, resolver_ares, socket, threadpool, thread, threading as gevent_threading, select, subprocess as gevent_subprocess, pywsgi, server, hub # @UnusedImport @Reimport
-
-del __dependencies_for_freezing
+#def __dependencies_for_freezing():
+#    # pylint: disable=import-error,no-name-in-module,unused-import
+#    from scipy.sparse.csgraph import _validation # @UnresolvedImport @UnusedImport
+#    from scipy.special import _ufuncs_cxx # @UnresolvedImport @UnusedImport
+#    from scipy import integrate # @UnresolvedImport @UnusedImport
+#    from scipy import interpolate # @UnresolvedImport @UnusedImport
+##    from scipy.optimize import curve_fit # @UnresolvedImport @UnusedImport
+#    # to make bbfreeze on Linux and py2exe on Win/Py3 happy with scipy > 0.17.0
+#    import scipy.linalg.cython_blas # @UnresolvedImport @UnusedImport
+#    import scipy.linalg.cython_lapack # @UnresolvedImport @UnusedImport
+#    import scipy.special.cython_special # @UnresolvedImport @UnusedImport
+#
+#    import appdirs # @UnresolvedImport @UnusedImport
+#    import packaging # @UnresolvedImport @UnusedImport
+#    import packaging.version # @UnresolvedImport @UnusedImport
+#    import packaging.specifiers # @UnresolvedImport @UnusedImport
+#    import packaging.markers # @UnresolvedImport @UnusedImport
+#    import packaging.requirements # @UnresolvedImport @UnusedImport
+#
+#    import PyQt5.QtSvg  # @UnusedImport
+#    import PyQt5.QtXml  # @UnusedImport
+#    import PyQt5.QtDBus # needed for QT5 builds  # @UnusedImport
+#    import PyQt5.QtPrintSupport # needed for by platform plugin libqcocoa  # @UnusedImport
+#
+#    # for gevent bundling
+#    from gevent import signal as gevent_signal, core, resolver_thread, resolver_ares, socket, threadpool, thread, threading as gevent_threading, select, subprocess as gevent_subprocess, pywsgi, server, hub # @UnusedImport @Reimport
+#
+#del __dependencies_for_freezing
 
 def QDateTimeToEpoch(dt):
     try:
