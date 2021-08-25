@@ -37263,12 +37263,12 @@ def initialize_locale(my_app) -> str:
     elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/../translations"):
         my_app.installTranslator(appTranslator)
 
-    return locale
+    return locale, appTranslator, qtTranslator
 
 def main():
     global aw, app, artisanviewerFirstStart # pylint: disable=global-statement
 
-    locale_str:str = initialize_locale(app)
+    locale_str, appTranslator, qtTranslator = initialize_locale(app)
 
     # supress all Qt messages
     qInstallMessageHandler(qt_message_handler)
