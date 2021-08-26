@@ -94,7 +94,7 @@ class s7port():
         ]
         
         self.last_request_timestamp = time.time()
-        self.min_time_between_requests = 0.03
+        self.min_time_between_requests = 0.04
         
         self.is_connected = False # local cache of the connection state
         
@@ -341,6 +341,7 @@ class s7port():
             self.connect()
             if self.isConnected():
                 with suppress_stdout_stderr():
+                    self.waitToEnsureMinTimeBetweenRequests()
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
                     set_real(ba, 0, float(value))
                     self.waitToEnsureMinTimeBetweenRequests()
@@ -365,6 +366,7 @@ class s7port():
             self.connect()
             if self.isConnected():
                 with suppress_stdout_stderr():
+                    self.waitToEnsureMinTimeBetweenRequests()
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
                     set_int(ba, 0, int(round(value)))
                     self.waitToEnsureMinTimeBetweenRequests()
@@ -389,6 +391,7 @@ class s7port():
             self.connect()
             if self.isConnected():
                 with suppress_stdout_stderr():
+                    self.waitToEnsureMinTimeBetweenRequests()
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
                     new_val = (int(round(value)) & and_mask) | (or_mask & (and_mask ^ 0xFFFF))
                     set_int(ba, 0, int(new_val))
@@ -414,6 +417,7 @@ class s7port():
             self.connect()
             if self.isConnected():
                 with suppress_stdout_stderr():
+                    self.waitToEnsureMinTimeBetweenRequests()
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,1)
                     set_bool(ba, 0, int(index), bool(value))
                     self.waitToEnsureMinTimeBetweenRequests()

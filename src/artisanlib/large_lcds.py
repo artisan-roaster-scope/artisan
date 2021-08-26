@@ -16,7 +16,6 @@
 # AUTHOR
 # Marko Luther, 2020
 
-from const import UIconst
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQLabel
 
@@ -328,7 +327,7 @@ class LargeMainLCDs(LargeLCDs):
         else:
             self.resize(200,100)
         self.chooseLayout(self.width(),self.height())
-        self.setWindowTitle(UIconst.TOOLKIT_MENU_LCDS)
+        self.setWindowTitle(QApplication.translate("Menu", "Main LCDs", None))
     
     def updateVisiblitiesETBT(self):
         self.updateVisibilities([self.aw.qmc.ETlcd],[self.aw.qmc.BTlcd])
@@ -475,7 +474,7 @@ class LargeDeltaLCDs(LargeLCDs):
             self.restoreGeometry(settings.value("DeltaLCDGeometry"))
         else:
             self.resize(100,200)
-        self.setWindowTitle(UIconst.TOOLKIT_MENU_DELTA_LCDS)
+        self.setWindowTitle(QApplication.translate("Menu", "Delta LCDs", None))
         self.chooseLayout(self.width(),self.height())
     
     def makeLCDs(self):
@@ -522,7 +521,7 @@ class LargePIDLCDs(LargeLCDs):
             self.restoreGeometry(settings.value("PIDLCDGeometry"))
         else:
             self.resize(100,200)
-        self.setWindowTitle(UIconst.TOOLKIT_MENU_PID_LCDS)
+        self.setWindowTitle(QApplication.translate("Menu", "PID LCDs", None))
         self.chooseLayout(self.width(),self.height())
     
     def makeLCDs(self):
@@ -569,7 +568,7 @@ class LargeExtraLCDs(LargeLCDs):
         else:
             self.resize(100,200)
         self.chooseLayout(self.width(),self.height())
-        self.setWindowTitle(UIconst.TOOLKIT_MENU_EXTRA_LCDS)
+        self.setWindowTitle(QApplication.translate("Menu", "Extra LCDs", None))
     
     def makeLCDs(self):
         self.lcds1 = []
@@ -653,7 +652,7 @@ class LargePhasesLCDs(LargeLCDs):
         else:
             self.resize(100,200)
         self.chooseLayout(self.width(),self.height())
-        self.setWindowTitle(UIconst.TOOLKIT_MENU_PHASES_LCDS)
+        self.setWindowTitle(QApplication.translate("Menu", "Phases LCDs", None))
     
     @staticmethod
     def formatLabel(l):

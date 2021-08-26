@@ -1,6 +1,8 @@
 [General]
 Delay=2000
 roastertype_setup=TRINITAS T2
+dropDuplicates=true
+dropDuplicatesLimit=0.1
 
 [Device]
 id=29
