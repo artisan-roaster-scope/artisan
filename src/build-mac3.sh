@@ -8,7 +8,7 @@ set -e  # reduced logging
 if [ ! -z $APPVEYOR ]; then
     # Appveyor CI builds
     echo "NOTICE: Appveyor build"
-    export PYTHON=/Users/appveyor/venv3.9.1
+    export PYTHON=/Users/appveyor/venv3.9.6
     export PYTHONBIN=$PYTHON/bin
     export PYTHONPATH=$PYTHON/lib/python3.9
     export PYTHON_V=3.9
@@ -67,7 +67,10 @@ fi
 
 # translations
 echo "************* 1 **************"
-$PYLUPDATE artisan.pro
+
+if [ -f "$PYLUPDATE" ]; then
+    $PYLUPDATE artisan.pro
+fi
 
 # there is no full Qt installation on Travis, thus don't run  lrelease
 if [ -z $APPVEYOR ]; then
