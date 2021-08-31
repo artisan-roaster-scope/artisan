@@ -809,10 +809,6 @@ class tgraphcanvas(FigureCanvas):
         self.delay = self.default_delay
         self.min_delay = 500 # 1000
 
-        # oversampling flag
-        self.oversampling = False
-        self.oversampling_min_delay = 1000 # in contrast to what the user dialog says (3000) we enable oversampling already with 1s
-
         # extra event sampling interval in miliseconds. If 0, then extra sampling commands are sent "in sync" with the standard sampling commands
         self.extra_event_sampling_delay = 0 # sync, 0.5s, 1.0s, 1.5s,.., 5s => 0, 500, 1000, 1500, ..
 
@@ -14450,14 +14446,11 @@ class SampleThread(QThread):
             return temp
 
     @staticmethod
-    def sample_main_device(force=False):
+    def sample_main_device():
         #read time, ET (t1) and BT (t2) TEMPERATURE
         try:
             if aw.simulator is None:
-                if aw.qmc.device in [29,79]: # for MODBUS and S7 main devices we switch off the optimizer on second call during oversampling
-                    tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device](force=force)
-                else:
-                    tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]() # not that not all device functions feature the force parameter!!
+                tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]() # Note that not all device functions feature the force parameter!!
                 if aw.qmc.swapETBT:
                     return tx,float(t2),float(t1)
                 return tx,float(t1),float(t2)
@@ -14692,40 +14685,6 @@ class SampleThread(QThread):
                                 errormessage = "ERROR: extra devices lengths don't match: %s"%string
                                 errormessage += "\nPlease Reset: Extra devices"
                             raise Exception(errormessage)
-                    timeAfterExtra = libtime.perf_counter() # the time the data of all extra devices was received
-                    if aw.qmc.oversampling and aw.qmc.delay >= aw.qmc.oversampling_min_delay:
-                        # let's do the oversampling thing and take a second reading from the main device
-                        sampling_interval = aw.qmc.delay/1000.
-                        gone = timeAfterExtra - timeBeforeETBT
-                        # only do it if there is enough time to do the ET/BT sampling (which takes etbt_time)
-                        # and only half of the sampling interval is gone
-                        if (sampling_interval - gone) > etbt_time and gone < (sampling_interval / 2.0):
-                            # place the second ET/BT sampling in the middle of the sampling interval
-                            stime = max(0.3,(sampling_interval / 4.0) - gone) # placing the second sample in the middle blocks too long!
-#                            stime = max(0,0.3 - gone) # we want the second main sample minimally 100ms after the first
-                            libtime.sleep(stime)
-                            timeBeforeETBT2 = libtime.perf_counter() # the time before sending the 2nd request to the main device
-                            tx_2,t1_2,t2_2 = self.sample_main_device(force=True) # we force fetching of new reaedings from S7 and MODBUS main devices and avoid the refilling of the optimizer cache
-                            timeAfterETBT2 = libtime.perf_counter() # the time after sending the 2nd request to the main device
-                            if t1 != -1 and t2 != -1 and t1_2 != -1 and t2_2 != -1:
-                                t2 = (t2 + t2_2) / 2.0
-                                t1 = (t1 + t1_2) / 2.0
-                                etbt_time_total = timeAfterETBT2 - timeBeforeETBT
-                                tx = tx_org + (etbt_time_total / 2.0) # we take the average between before and after
-                            elif t1 == -1 and t2 == -1 and t1_2 != -1 and t2_2 != -1: # only the second pair is valid, take that one
-                                t2 = t2_2
-                                t1 = t1_2
-                                etbt_time_2nd = timeAfterETBT2 - timeBeforeETBT2
-                                tx = tx_2 + (etbt_time_2nd / 2.0) # we take the average between before and after
-                            else: # use new values only to fix reading errors of the initial set of values
-                                if t1 == -1:
-                                    t1 = t1_2
-                                elif t1_2 != -1:
-                                    t1 = (t1 + t1_2) / 2.0
-                                if t2 == -1:
-                                    t2 = t2_2
-                                elif t2_2 != -1:
-                                    t2 = (t2 + t2_2) / 2.0
 
                     ####### all values retrieved
 
@@ -16080,12 +16039,6 @@ class ApplicationWindow(QMainWindow):
         self.calibrateDelayAction = QAction(QApplication.translate("Menu", "Sampling...", None), self)
         self.calibrateDelayAction.triggered.connect(self.calibratedelay)
         self.ConfMenu.addAction(self.calibrateDelayAction)
-
-        self.oversamplingAction = QAction(QApplication.translate("Menu", "Oversampling", None), self)
-        self.oversamplingAction.triggered.connect(self.oversampling)
-        self.oversamplingAction.setCheckable(True)
-        self.oversamplingAction.setChecked(self.qmc.oversampling)
-        self.ConfMenu.addAction(self.oversamplingAction)
 
         self.ConfMenu.addSeparator()
 
@@ -23791,7 +23744,6 @@ class ApplicationWindow(QMainWindow):
 #            self.deviceAction.setEnabled(False)
 #            self.commportAction.setEnabled(False)
             self.calibrateDelayAction.setEnabled(False)
-            self.oversamplingAction.setEnabled(False)
             self.saveAsSettingsAction.setEnabled(False)
 #            self.resetAction.setEnabled(False)
             self.machineMenu.setEnabled(False)
@@ -27707,7 +27659,6 @@ class ApplicationWindow(QMainWindow):
                 profile["backgroundUUID"] = self.qmc.backgroundUUID
             #write only:
             profile["samplinginterval"] = self.qmc.profile_sampling_interval
-            profile["oversampling"] = self.qmc.oversampling
             profile["svLabel"] = aw.pidcontrol.svLabel
             profile["svValues"] = aw.pidcontrol.svValues
             profile["svRamps"] = aw.pidcontrol.svRamps
@@ -28505,10 +28456,6 @@ class ApplicationWindow(QMainWindow):
             else:
                 #self.qmc.delay = self.qmc.default_delay
                 pass
-            # restore oversampling
-            if settings.contains("Oversampling"):
-                self.qmc.oversampling = bool(toBool(settings.value("Oversampling",self.qmc.oversampling)))
-                aw.oversamplingAction.setChecked(aw.qmc.oversampling)
             # restore keepON flag
             if settings.contains("KeepON"):
                 self.qmc.flagKeepON = bool(toBool(settings.value("KeepON",self.qmc.flagKeepON)))
@@ -30274,8 +30221,6 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("AmbientTempSource",aw.qmc.ambientTempSource)
             #save delay (sampling interval)
             settings.setValue("Delay",self.qmc.delay)
-            # save oversampling
-            settings.setValue("Oversampling",self.qmc.oversampling)
             # save keepON flag
             settings.setValue("KeepON",self.qmc.flagKeepON)
             settings.setValue("flagOpenCompleted",self.qmc.flagOpenCompleted)
@@ -33993,15 +33938,6 @@ class ApplicationWindow(QMainWindow):
                 "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt))[0]
         if fileName:
             imag.save(fileName, fmt)
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def oversampling(self,_=False):
-        aw.qmc.oversampling = not aw.qmc.oversampling
-        aw.oversamplingAction.setChecked(aw.qmc.oversampling)
-        if aw.qmc.oversampling and self.qmc.delay < aw.qmc.oversampling_min_delay:
-            QMessageBox.warning(aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message",
-            "Oversampling is only active with a sampling interval equal or larger than 3s.",None))
 
     @pyqtSlot()
     @pyqtSlot(bool)
