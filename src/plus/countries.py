@@ -22,7 +22,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5.QtWidgets import QApplication
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
 QApplication.translate("Countries", "Afghanistan", None)
 QApplication.translate("Countries", "Aland Islands", None)

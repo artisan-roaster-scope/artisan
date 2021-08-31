@@ -22,19 +22,36 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5.QtWidgets import (
-    QApplication,
-    QCheckBox,
-    QGroupBox,
-    QHBoxLayout,
-    QVBoxLayout,
-    QLabel,
-    QLineEdit,
-    QDialogButtonBox,
-    QAction,
-)
-from PyQt5.QtCore import Qt, pyqtSlot
-from PyQt5.QtGui import QKeySequence
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtWidgets import (
+        QApplication, # @UnusedImport @Reimport  @UnresolvedImport
+        QCheckBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QGroupBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QHBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
+        QVBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
+        QLabel, # @UnusedImport @Reimport  @UnresolvedImport
+        QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
+        QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
+    )
+    from PyQt6.QtCore import Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QKeySequence, QAction # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtWidgets import (
+        QApplication, # @UnusedImport @Reimport  @UnresolvedImport
+        QCheckBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QGroupBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QHBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
+        QVBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
+        QLabel, # @UnusedImport @Reimport  @UnresolvedImport
+        QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
+        QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QAction, # @UnusedImport @Reimport  @UnresolvedImport
+    )
+    from PyQt5.QtCore import Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QKeySequence # @UnusedImport @Reimport  @UnresolvedImport
+
 from artisanlib.dialogs import ArtisanDialog
 from plus import config
 from typing import Optional
@@ -72,40 +89,40 @@ class Login(ArtisanDialog):
         self.linkResetPassword.setOpenExternalLinks(True)
 
         self.dialogbuttons = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         )
         self.setButtonTranslations(
-            self.dialogbuttons.button(QDialogButtonBox.Ok),
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok),
             "OK",
             QApplication.translate("Button", "OK", None),
         )
         self.setButtonTranslations(
-            self.dialogbuttons.button(QDialogButtonBox.Cancel),
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel),
             "Cancel",
             QApplication.translate("Button", "Cancel", None),
         )
 
         self.dialogbuttons.accepted.connect(self.setCredentials) # type: ignore
         self.dialogbuttons.rejected.connect(self.reject) # type: ignore
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(False)
-        self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(True)
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setDefault(True)
         # add additional CMD-. shortcut to close the dialog
-        self.dialogbuttons.button(QDialogButtonBox.Cancel).setShortcut(
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setShortcut(
             QKeySequence("Ctrl+.")
         )
         # add additional CMD-W shortcut to close this dialog
         cancelAction = QAction(self)
         cancelAction.triggered.connect(self.reject) # type: ignore
         try:
-            cancelAction.setShortcut(QKeySequence.Cancel)
+            cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
         except Exception:  # pylint: disable=broad-except
             pass
-        self.dialogbuttons.button(QDialogButtonBox.Cancel).addActions(
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).addActions(
             [cancelAction]
         )
 
         self.textPass = QLineEdit(self)
-        self.textPass.setEchoMode(QLineEdit.Password)
+        self.textPass.setEchoMode(QLineEdit.EchoMode.Password)
         self.textPass.setPlaceholderText(
             QApplication.translate("Plus", "Password", None)
         )
@@ -153,22 +170,21 @@ class Login(ArtisanDialog):
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(5)
 
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocusPolicy(
-            Qt.StrongFocus   # type: ignore
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocusPolicy(
+            Qt.FocusPolicy.StrongFocus   # type: ignore
         )
 
         if saved_password is not None:
             self.passwd = saved_password
             self.textPass.setText(self.passwd)
-            self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setDefault(
                 False
             )
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setDefault(True)
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(True)
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setDefault(True)
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
 
     @pyqtSlot()
     def reject(self):
-        print("reject")
         self.login = self.textName.text()
         super().reject()
 
@@ -189,15 +205,15 @@ class Login(ArtisanDialog):
     @pyqtSlot(str)
     def textChanged(self, _):
         if self.isInputReasonable():
-            self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setDefault(
                 False
             )
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setDefault(True)
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(True)
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setDefault(True)
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
         else:
-            self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(True)
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setDefault(False)
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(False)
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setDefault(True)
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setDefault(False)
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
 
     @pyqtSlot()
     def setCredentials(self):
@@ -214,9 +230,9 @@ def plus_login(
 ):
     ld = Login(window, email, saved_password, remember_credentials)
     ld.setWindowTitle("plus")
-    ld.setWindowFlags(Qt.Sheet)   # type: ignore
-    ld.setAttribute(Qt.WA_DeleteOnClose, True)   # type: ignore
-    res = ld.exec_()
+    ld.setWindowFlags(Qt.WindowType.Sheet)   # type: ignore
+    ld.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)   # type: ignore
+    res = ld.exec()
     if ld.login is not None:
         login_processed = ld.login.strip()
     else:

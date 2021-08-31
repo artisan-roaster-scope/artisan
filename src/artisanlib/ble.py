@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # BLE support for Artisan
 
@@ -16,8 +16,14 @@
 # AUTHOR
 # Marko Luther, 2019
 
-from PyQt5 import QtCore
-from PyQt5 import QtBluetooth
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6 import QtCore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6 import QtBluetooth # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5 import QtCore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5 import QtBluetooth # @UnusedImport @Reimport  @UnresolvedImport
 
 
 class BleInterface(QtCore.QObject):
@@ -261,7 +267,7 @@ def main():
     acaia = AcaiaBLE()
     ble = BleInterface(acaia.SERVICE_UUID,acaia.CHAR_UUID,acaia.processData,acaia.sendHeartbeat,acaia.sendStop,acaia.reset)
     ble.scanDevices()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 if __name__ == '__main__':
     main()

@@ -1,6 +1,16 @@
+# -*- coding: utf-8 -*-
+#
+
 import qrcode
-from PyQt5.QtGui import QImage, QPixmap,QPainter
-from PyQt5.QtCore import Qt
+
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtGui import QImage, QPixmap,QPainter # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import Qt # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtGui import QImage, QPixmap,QPainter # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt # @UnusedImport @Reimport  @UnresolvedImport
 
 ##########################################################################
 #####################     QR Image   #####################################
@@ -9,8 +19,8 @@ from PyQt5.QtCore import Qt
 class QRImage(qrcode.image.base.BaseImage):
 
     def new_image(self, **_kwargs):
-        img = QImage(self.pixel_size, self.pixel_size, QImage.Format_RGB16)
-        img.fill(Qt.white)
+        img = QImage(self.pixel_size, self.pixel_size, QImage.Format.Format_RGB16)
+        img.fill(Qt.GlobalColor.white)
         return img
 
     def pixmap(self):
@@ -22,7 +32,7 @@ class QRImage(qrcode.image.base.BaseImage):
             (col + self.border) * self.box_size,
             (row + self.border) * self.box_size,
             self.box_size, self.box_size,
-            Qt.black)
+            Qt.GlobalColor.black)
 
     def save(self, stream, kind=None):
         pass

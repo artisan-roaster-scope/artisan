@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+## -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Curves Dialog
 
@@ -31,12 +31,22 @@ from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQDoubleSpinBox
 from help import symbolic_help
 
-from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication, QRegularExpression)
-from PyQt5.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap)
-from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-                             QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,
-                             QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView,
-                             QTableWidget, QTableWidgetItem)
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication, QRegularExpression) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QTableWidgetItem) # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication, QRegularExpression) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QTableWidgetItem) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 ########################################################################################
@@ -62,7 +72,7 @@ class equDataDlg(ArtisanDialog):
 
         self.copydataTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
         self.copydataTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
-        self.copydataTableButton.setFocusPolicy(Qt.NoFocus)
+        self.copydataTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.copydataTableButton.setMaximumSize(self.copydataTableButton.sizeHint())
         self.copydataTableButton.setMinimumSize(self.copydataTableButton.minimumSizeHint())
         self.copydataTableButton.clicked.connect(self.copyDataTabletoClipboard)
@@ -73,7 +83,7 @@ class equDataDlg(ArtisanDialog):
         self.precisionSpinBox.setRange(1,6)
         self.precisionSpinBox.setSingleStep(1)
         self.precisionSpinBox.setValue(self.dataprecisionval)
-        self.precisionSpinBox.setAlignment(Qt.AlignLeft)
+        self.precisionSpinBox.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.precisionSpinBox.setMaximumWidth(50)
         self.precisionSpinBox.valueChanged.connect(self.changeprecision)
 
@@ -130,19 +140,19 @@ class equDataDlg(ArtisanDialog):
             self.datatable.setColumnCount(len(columns))
             self.datatable.setHorizontalHeaderLabels(columns)
             self.datatable.setAlternatingRowColors(True)
-            self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
-            self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
-            self.datatable.setSelectionMode(QTableWidget.SingleSelection)
+            self.datatable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+            self.datatable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+            self.datatable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
             self.datatable.setShowGrid(True)
-            self.datatable.verticalHeader().setSectionResizeMode(2)
+            self.datatable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
             
             for i in range(ndata):
     
                 t = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%self.aw.qmc.timex[i])
-                t.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                t.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
                 
                 time = QTableWidgetItem(stringfromseconds(self.aw.qmc.timex[i]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]]))
-                time.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                time.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
     
                 if len(self.aw.qmc.plotterequationresults[0]) and len(self.aw.qmc.plotterequationresults[0]) > i:
                     P1 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%self.aw.qmc.plotterequationresults[0][i])
@@ -190,15 +200,15 @@ class equDataDlg(ArtisanDialog):
                     P9 = QTableWidgetItem("NA")
                     P9.setBackground(QColor('lightgrey'))
                                     
-                P1.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                P2.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                P3.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                P4.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                P5.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                P6.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                P7.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                P8.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                P9.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                P1.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+                P2.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+                P3.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+                P4.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+                P5.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+                P6.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+                P7.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+                P8.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+                P9.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
     
                 self.datatable.setItem(i,0,t)
                 self.datatable.setItem(i,1,time)
@@ -213,12 +223,12 @@ class equDataDlg(ArtisanDialog):
                 self.datatable.setItem(i,10,P9)
     
             header = self.datatable.horizontalHeader()
-            header.setSectionResizeMode(0, QHeaderView.Fixed)
-            header.setSectionResizeMode(1, QHeaderView.Fixed)
-            header.setSectionResizeMode(2, QHeaderView.Fixed)
-            header.setSectionResizeMode(3, QHeaderView.Fixed)
-            header.setSectionResizeMode(4, QHeaderView.Fixed)
-            header.setSectionResizeMode(len(columns) - 1, QHeaderView.Stretch)
+            header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
+            header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
+            header.setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
+            header.setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
+            header.setSectionResizeMode(4, QHeaderView.ResizeMode.Fixed)
+            header.setSectionResizeMode(len(columns) - 1, QHeaderView.ResizeMode.Stretch)
             self.datatable.resizeColumnsToContents()
         except Exception: # pylint: disable=broad-except
 #            import traceback
@@ -231,7 +241,7 @@ class equDataDlg(ArtisanDialog):
         ncols = self.datatable.columnCount() - 1 #there is a dummy column at the end on the right
         clipboard = ""
         modifiers = QApplication.keyboardModifiers()
-        if modifiers == Qt.AltModifier:  #alt click
+        if modifiers == Qt.KeyboardModifier.AltModifier:  #alt click
             tbl = prettytable.PrettyTable()
             fields = []
             for c in range(ncols):
@@ -305,27 +315,27 @@ class HUDDlg(ArtisanDialog):
         
         self.showHUDbutton = QCheckBox(QApplication.translate("Label", "HUD Button", None))
         self.showHUDbutton.setChecked(self.aw.qmc.HUDbuttonflag)
-        self.showHUDbutton.setFocusPolicy(Qt.NoFocus)
+        self.showHUDbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.showHUDbutton.stateChanged.connect(self.showHUDbuttonToggle)
         ETLabel = QLabel(QApplication.translate("Label", "ET Target 1",None))
-        ETLabel.setAlignment(Qt.AlignRight)
+        ETLabel.setAlignment(Qt.AlignmentFlag.AlignRight)
         BTLabel = QLabel(QApplication.translate("Label", "BT Target 1",None))
-        BTLabel.setAlignment(Qt.AlignRight)        
+        BTLabel.setAlignment(Qt.AlignmentFlag.AlignRight)        
         ET2Label = QLabel(QApplication.translate("Label", "ET Target 2",None))
-        ET2Label.setAlignment(Qt.AlignRight)
+        ET2Label.setAlignment(Qt.AlignmentFlag.AlignRight)
         BT2Label = QLabel(QApplication.translate("Label", "BT Target 2",None))
-        BT2Label.setAlignment(Qt.AlignRight)        
+        BT2Label.setAlignment(Qt.AlignmentFlag.AlignRight)        
         modeLabel = QLabel(QApplication.translate("Label", "Mode",None))
-        modeLabel.setAlignment(Qt.AlignRight)
+        modeLabel.setAlignment(Qt.AlignmentFlag.AlignRight)
         ETPIDLabel = QLabel(QApplication.translate("Label", "ET p-i-d 1",None))
         #delta ET
         self.DeltaET = QCheckBox()
-        self.DeltaET.setFocusPolicy(Qt.NoFocus)
+        self.DeltaET.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.DeltaET.setChecked(self.aw.qmc.DeltaETflag)
         DeltaETlabel = QLabel(deltaLabelUTF8 + QApplication.translate("Label", "ET",None))
         #delta BT
         self.DeltaBT = QCheckBox()
-        self.DeltaBT.setFocusPolicy(Qt.NoFocus)
+        self.DeltaBT.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.DeltaBT.setChecked(self.aw.qmc.DeltaBTflag)
         DeltaBTlabel = QLabel(deltaLabelUTF8 + QApplication.translate("Label", "BT",None))
         filterlabel = QLabel(QApplication.translate("Label", "Smoothing",None))
@@ -333,13 +343,13 @@ class HUDDlg(ArtisanDialog):
         self.DeltaETfilter = QSpinBox()
         self.DeltaETfilter.setSingleStep(1)
         self.DeltaETfilter.setRange(0,40)
-        self.DeltaETfilter.setAlignment(Qt.AlignRight)
+        self.DeltaETfilter.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.DeltaETfilter.setValue(self.aw.qmc.deltaETfilter/2)
         self.DeltaETfilter.editingFinished.connect(self.changeDeltaETfilter)
         self.DeltaBTfilter = QSpinBox()
         self.DeltaBTfilter.setSingleStep(1)
         self.DeltaBTfilter.setRange(0,40)
-        self.DeltaBTfilter.setAlignment(Qt.AlignRight)
+        self.DeltaBTfilter.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.DeltaBTfilter.setValue(self.aw.qmc.deltaBTfilter/2)
         self.DeltaBTfilter.editingFinished.connect(self.changeDeltaBTfilter)
 
@@ -359,24 +369,24 @@ class HUDDlg(ArtisanDialog):
         self.Filter = QSpinBox()
         self.Filter.setSingleStep(1)
         self.Filter.setRange(0,40)
-        self.Filter.setAlignment(Qt.AlignRight)
+        self.Filter.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Filter.setValue(self.aw.qmc.curvefilter/2)
         self.Filter.editingFinished.connect(self.changeFilter)
         #filterspikes
         self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Smooth Spikes",None))
         self.FilterSpikes.setChecked(self.aw.qmc.filterDropOuts)
         self.FilterSpikes.stateChanged.connect(self.changeDropFilter)
-        self.FilterSpikes.setFocusPolicy(Qt.NoFocus)
+        self.FilterSpikes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         #dropduplicates
         self.DropDuplicates = QCheckBox(QApplication.translate("CheckBox", "Interpolate Duplicates",None))
         self.DropDuplicates.setChecked(self.aw.qmc.dropDuplicates)
         self.DropDuplicates.stateChanged.connect(self.changeDuplicatesFilter)
-        self.DropDuplicates.setFocusPolicy(Qt.NoFocus)
+        self.DropDuplicates.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.DropDuplicatesLimit = MyQDoubleSpinBox()
         self.DropDuplicatesLimit.setDecimals(2)
         self.DropDuplicatesLimit.setSingleStep(0.1)
         self.DropDuplicatesLimit.setRange(0.,1.)
-        self.DropDuplicatesLimit.setAlignment(Qt.AlignRight)
+        self.DropDuplicatesLimit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.DropDuplicatesLimit.setMinimumWidth(30)
         self.DropDuplicatesLimit.setValue(self.aw.qmc.dropDuplicatesLimit)
         if self.aw.qmc.mode == "F":
@@ -388,34 +398,34 @@ class HUDDlg(ArtisanDialog):
         self.ShowFull = QCheckBox(QApplication.translate("CheckBox", "Show Full",None))
         self.ShowFull.setChecked(self.aw.qmc.foregroundShowFullflag)
         self.ShowFull.stateChanged.connect(self.changeShowFullFilter)
-        self.ShowFull.setFocusPolicy(Qt.NoFocus)
+        self.ShowFull.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         
         #dropspikes
         self.DropSpikes = QCheckBox(QApplication.translate("CheckBox", "Drop Spikes",None))
         self.DropSpikes.setChecked(self.aw.qmc.dropSpikes)
         self.DropSpikes.stateChanged.connect(self.changeSpikeFilter)
-        self.DropSpikes.setFocusPolicy(Qt.NoFocus)
+        self.DropSpikes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         #min-max-limits
         self.MinMaxLimits = QCheckBox(QApplication.translate("CheckBox", "Limits",None))
         self.MinMaxLimits.setChecked(self.aw.qmc.minmaxLimits)
         self.MinMaxLimits.stateChanged.connect(self.changeMinMaxLimits)
-        self.MinMaxLimits.setFocusPolicy(Qt.NoFocus)
+        self.MinMaxLimits.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         #swapETBT flag
         self.swapETBT = QCheckBox(QApplication.translate("Label", "ET", None) + " <-> " + QApplication.translate("Label", "BT", None))
         self.swapETBT.setChecked(self.aw.qmc.swapETBT)
-        self.swapETBT.setFocusPolicy(Qt.NoFocus)
+        self.swapETBT.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.swapETBT.stateChanged.connect(self.changeSwapETBT)
         #limits
         minlabel = QLabel(QApplication.translate("Label", "min","abbrev of minimum"))
         maxlabel = QLabel(QApplication.translate("Label", "max",None))
         self.minLimit = QSpinBox()
         self.minLimit.setRange(0,1000)    #(min,max)
-        self.minLimit.setAlignment(Qt.AlignRight)
+        self.minLimit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.minLimit.setMinimumWidth(80)
         self.minLimit.setValue(self.aw.qmc.filterDropOut_tmin)
         self.maxLimit = QSpinBox()
         self.maxLimit.setRange(0,1000)
-        self.maxLimit.setAlignment(Qt.AlignRight)
+        self.maxLimit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.maxLimit.setMinimumWidth(80)
         self.maxLimit.setValue(self.aw.qmc.filterDropOut_tmax)
         #show projection
@@ -454,27 +464,27 @@ class HUDDlg(ArtisanDialog):
                                     QApplication.translate("ComboBox","thermal",None)])
         self.modeComboBox.setCurrentIndex(self.aw.HUDfunction)
         self.ETlineEdit = QLineEdit(str(self.aw.qmc.ETtarget))
-        self.ETlineEdit.setAlignment(Qt.AlignRight)
+        self.ETlineEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.BTlineEdit = QLineEdit(str(self.aw.qmc.BTtarget))
-        self.BTlineEdit.setAlignment(Qt.AlignRight)
+        self.BTlineEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.ETlineEdit.setValidator(QIntValidator(0, 1000, self.ETlineEdit))
         self.BTlineEdit.setValidator(QIntValidator(0, 1000, self.BTlineEdit))
         self.ETlineEdit.setMaximumWidth(60)
         self.BTlineEdit.setMaximumWidth(60)
         self.ET2lineEdit = QLineEdit(str(self.aw.qmc.ET2target))
-        self.ET2lineEdit.setAlignment(Qt.AlignRight)
+        self.ET2lineEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.BT2lineEdit = QLineEdit(str(self.aw.qmc.BT2target))
-        self.BT2lineEdit.setAlignment(Qt.AlignRight)
+        self.BT2lineEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.ET2lineEdit.setValidator(QIntValidator(0, 1000, self.ET2lineEdit))
         self.BT2lineEdit.setValidator(QIntValidator(0, 1000, self.BT2lineEdit))
         self.ET2lineEdit.setMaximumWidth(60)
         self.BT2lineEdit.setMaximumWidth(60)
         self.ETpidP = QLineEdit(str(self.aw.qmc.hudETpid[0]))
-        self.ETpidP.setAlignment(Qt.AlignRight)
+        self.ETpidP.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.ETpidI = QLineEdit(str(self.aw.qmc.hudETpid[1]))
-        self.ETpidI.setAlignment(Qt.AlignRight)
+        self.ETpidI.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.ETpidD = QLineEdit(str(self.aw.qmc.hudETpid[2]))
-        self.ETpidD.setAlignment(Qt.AlignRight)
+        self.ETpidD.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.ETpidP.setValidator(QIntValidator(0, 1000, self.ETpidP))
         self.ETpidI.setValidator(QIntValidator(0, 1000, self.ETpidI))
         self.ETpidD.setValidator(QIntValidator(0, 1000, self.ETpidD))
@@ -512,11 +522,11 @@ class HUDDlg(ArtisanDialog):
         rorBoxLayout.addWidget(self.projectCheck)
         rorBoxLayout.addWidget(self.projectionmodeComboBox)
         self.DeltaETlcd = QCheckBox()
-        self.DeltaETlcd.setFocusPolicy(Qt.NoFocus)
+        self.DeltaETlcd.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.DeltaETlcd.setChecked(self.aw.qmc.DeltaETlcdflag)
         DeltaETlcdLabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "ET",None))
         self.DeltaBTlcd = QCheckBox()
-        self.DeltaBTlcd.setFocusPolicy(Qt.NoFocus)
+        self.DeltaBTlcd.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.DeltaBTlcd.setChecked(self.aw.qmc.DeltaBTlcdflag)
         self.swapdeltalcds = QCheckBox(QApplication.translate("CheckBox", "Swap",None))
         self.swapdeltalcds.setChecked(self.aw.qmc.swapdeltalcds)
@@ -536,8 +546,8 @@ class HUDDlg(ArtisanDialog):
         DeltaETfilterLabel = QLabel(deltaLabelUTF8 + QApplication.translate("Label", "ET",None))
         DeltaBTfilterLabel = QLabel(deltaLabelUTF8 + QApplication.translate("Label", "BT",None))
         sensitivityGrid = QGridLayout()
-        sensitivityGrid.addWidget(DeltaETfilterLabel,0,1,Qt.AlignHCenter)
-        sensitivityGrid.addWidget(DeltaBTfilterLabel,0,2,Qt.AlignHCenter)
+        sensitivityGrid.addWidget(DeltaETfilterLabel,0,1,Qt.AlignmentFlag.AlignHCenter)
+        sensitivityGrid.addWidget(DeltaBTfilterLabel,0,2,Qt.AlignmentFlag.AlignHCenter)
         sensitivityGrid.addWidget(deltaSpanLabel,1,0)
         sensitivityGrid.addWidget(self.deltaETspan,1,1)
         sensitivityGrid.addWidget(self.deltaBTspan,1,2)
@@ -631,17 +641,17 @@ class HUDDlg(ArtisanDialog):
         #swapETBT flag
         self.rorFilter = QCheckBox(QApplication.translate("CheckBox", "Limits",None))
         self.rorFilter.setChecked(self.aw.qmc.RoRlimitFlag)
-        self.rorFilter.setFocusPolicy(Qt.NoFocus)
+        self.rorFilter.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         rorminlabel = QLabel(QApplication.translate("Label", "min","abbrev of minimum"))
         rormaxlabel = QLabel(QApplication.translate("Label", "max",None))
         self.rorminLimit = QSpinBox()
         self.rorminLimit.setRange(-999,999)    #(min,max)
-        self.rorminLimit.setAlignment(Qt.AlignRight)
+        self.rorminLimit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.rorminLimit.setMinimumWidth(80)
         self.rorminLimit.setValue(self.aw.qmc.RoRlimitm)
         self.rormaxLimit = QSpinBox()
         self.rormaxLimit.setRange(-999,999)
-        self.rormaxLimit.setAlignment(Qt.AlignRight)
+        self.rormaxLimit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.rormaxLimit.setMinimumWidth(80)
         self.rormaxLimit.setValue(self.aw.qmc.RoRlimit)
         if self.aw.qmc.mode == "F":
@@ -669,7 +679,7 @@ class HUDDlg(ArtisanDialog):
         self.PathEffects = QSpinBox()
         self.PathEffects.setSingleStep(1)
         self.PathEffects.setRange(0,5)
-        self.PathEffects.setAlignment(Qt.AlignRight)
+        self.PathEffects.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.PathEffects.setValue(self.aw.qmc.patheffects)
         self.PathEffects.editingFinished.connect(self.changePathEffects)
         pathEffectsLayout = QHBoxLayout()
@@ -757,31 +767,31 @@ class HUDDlg(ArtisanDialog):
         self.equedit9.setSelection (0,0)
 
         color1Button = QPushButton(QApplication.translate("Button","Color",None))
-        color1Button.setFocusPolicy(Qt.NoFocus)
+        color1Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         color1Button.clicked.connect(self.setcurvecolor0)
         color2Button = QPushButton(QApplication.translate("Button","Color",None))
-        color2Button.setFocusPolicy(Qt.NoFocus)
+        color2Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         color2Button.clicked.connect(self.setcurvecolor1)
         color3Button = QPushButton(QApplication.translate("Button","Color",None))
-        color3Button.setFocusPolicy(Qt.NoFocus)
+        color3Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         color3Button.clicked.connect(self.setcurvecolor2)
         color4Button = QPushButton(QApplication.translate("Button","Color",None))
-        color4Button.setFocusPolicy(Qt.NoFocus)
+        color4Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         color4Button.clicked.connect(self.setcurvecolor3)
         color5Button = QPushButton(QApplication.translate("Button","Color",None))
-        color5Button.setFocusPolicy(Qt.NoFocus)
+        color5Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         color5Button.clicked.connect(self.setcurvecolor4)
         color6Button = QPushButton(QApplication.translate("Button","Color",None))
-        color6Button.setFocusPolicy(Qt.NoFocus)
+        color6Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         color6Button.clicked.connect(self.setcurvecolor5)
         color7Button = QPushButton(QApplication.translate("Button","Color",None))
-        color7Button.setFocusPolicy(Qt.NoFocus)
+        color7Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         color7Button.clicked.connect(self.setcurvecolor6)
         color8Button = QPushButton(QApplication.translate("Button","Color",None))
-        color8Button.setFocusPolicy(Qt.NoFocus)
+        color8Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         color8Button.clicked.connect(self.setcurvecolor7)
         color9Button = QPushButton(QApplication.translate("Button","Color",None))
-        color9Button.setFocusPolicy(Qt.NoFocus)
+        color9Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         color9Button.clicked.connect(self.setcurvecolor8)
         self.equc1colorlabel = QLabel("  ")
         self.equc2colorlabel = QLabel("  ")
@@ -803,24 +813,24 @@ class HUDDlg(ArtisanDialog):
         self.equc9colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[8])
 
         equdrawbutton = QPushButton(QApplication.translate("Button","Plot",None))
-        equdrawbutton.setFocusPolicy(Qt.NoFocus)
+        equdrawbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         equdrawbutton.clicked.connect(self.plotequ)
         equshowtablebutton = QPushButton(QApplication.translate("Button","Data",None))
-        equshowtablebutton.setFocusPolicy(Qt.NoFocus)
+        equshowtablebutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         equshowtablebutton.setToolTip(QApplication.translate("Tooltip","Shows data table of plots",None))
         equshowtablebutton.clicked.connect(self.equshowtable)
         self.equbackgroundbutton = QPushButton(QApplication.translate("Button","Background",None))
-        self.equbackgroundbutton.setFocusPolicy(Qt.NoFocus)
+        self.equbackgroundbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.equbackgroundbutton.clicked.connect(self.setbackgroundequ1_slot)
         self.equvdevicebutton = QPushButton()       
         self.update_equbuttons()
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
-        saveImgButton.setFocusPolicy(Qt.NoFocus)
+        saveImgButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
         saveImgButton.clicked.connect(self.aw.resizeImg_0_1)
         helpcurveDialogButton = QDialogButtonBox()
-        helpcurveButton = helpcurveDialogButton.addButton(QDialogButtonBox.Help)
-        helpcurveButton.setFocusPolicy(Qt.NoFocus)
+        helpcurveButton = helpcurveDialogButton.addButton(QDialogButtonBox.StandardButton.Help)
+        helpcurveButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.setButtonTranslations(helpcurveButton,"Help",QApplication.translate("Button","Help", None))
         helpcurveButton.clicked.connect(self.showSymbolicHelp)
         curve1Layout = QGridLayout()
@@ -883,7 +893,7 @@ class HUDDlg(ArtisanDialog):
         tab2Layout.addStretch()
         ##### TAB 3
         self.interpCheck = QCheckBox(QApplication.translate("CheckBox","Show",None))
-        self.interpCheck.setFocusPolicy(Qt.NoFocus)
+        self.interpCheck.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.interpCheck.stateChanged.connect(self.interpolation) #toggle
         self.interpComboBox = QComboBox()
         self.interpComboBox.setMaximumWidth(100)
@@ -892,26 +902,26 @@ class HUDDlg(ArtisanDialog):
                                       QApplication.translate("ComboBox","cubic",None),
                                       QApplication.translate("ComboBox","nearest",None)])
         self.interpComboBox.setToolTip(QApplication.translate("Tooltip", "linear: linear interpolation\ncubic: 3rd order spline interpolation\nnearest: y value of the nearest point", None))
-        self.interpComboBox.setFocusPolicy(Qt.NoFocus)
+        self.interpComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.interpComboBox.currentIndexChanged.connect(self.changeInterpolationMode)
 #         'linear'  : linear interpolation
 #         'cubic'   : 3rd order spline interpolation
 #         'nearest' : take the y value of the nearest point
         self.univarCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None))
-        self.univarCheck.setFocusPolicy(Qt.NoFocus)
+        self.univarCheck.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.univarCheck.stateChanged.connect(self.univar) #toggle
         univarButton = QPushButton(QApplication.translate("Button","Info",None))
-        univarButton.setFocusPolicy(Qt.NoFocus)
+        univarButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         univarButton.setMaximumSize(univarButton.sizeHint())
         univarButton.setMinimumSize(univarButton.minimumSizeHint())
         self.lnvarCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None))
-        self.lnvarCheck.setFocusPolicy(Qt.NoFocus)
+        self.lnvarCheck.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lnvarCheck.stateChanged.connect(self.lnvar) #toggle
         self.lnresult = QLineEdit()
         self.lnresult.setReadOnly(True)
         self.lnresult.setStyleSheet("background-color:'lightgrey';")
         self.expvarCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None))
-        self.expvarCheck.setFocusPolicy(Qt.NoFocus)
+        self.expvarCheck.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.expvarCheck.stateChanged.connect(self.expvar) #toggle
         self.expresult = QLineEdit()
         self.expresult.setReadOnly(True)
@@ -935,7 +945,7 @@ class HUDDlg(ArtisanDialog):
         width = self.analyzecombobox.minimumSizeHint().width()
         self.analyzecombobox.setMinimumWidth(width)
         self.analyzecombobox.setToolTip(QApplication.translate("Tooltip", "Choose the start point of analysis interval of interest", None))
-        self.analyzecombobox.setFocusPolicy(Qt.NoFocus)
+        self.analyzecombobox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.analyzecombobox.setCurrentIndex(self.aw.qmc.analysisstartchoice)
         self.analyzecombobox.currentIndexChanged.connect(self.changeAnalyzecombobox)
         self.analyzetimeoffsetLabel = QLabel(QApplication.translate("Label", "Custom offset seconds from CHARGE", None))
@@ -967,7 +977,7 @@ class HUDDlg(ArtisanDialog):
         width = self.curvefitcombobox.minimumSizeHint().width()
         self.curvefitcombobox.setMinimumWidth(width)
         self.curvefitcombobox.setToolTip(QApplication.translate("Tooltip", "Choose the start point of curve fitting", None))
-        self.curvefitcombobox.setFocusPolicy(Qt.NoFocus)
+        self.curvefitcombobox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.curvefitcombobox.setCurrentIndex(self.aw.qmc.curvefitstartchoice)
         self.curvefitcombobox.currentIndexChanged.connect(self.changeCurvefitcombobox)
         self.curvefittimeoffsetLabel = QLabel(QApplication.translate("Label", "Custom offset seconds from CHARGE", None))
@@ -981,16 +991,16 @@ class HUDDlg(ArtisanDialog):
         else:
             self.curvefittimeoffset.setEnabled(True)
         self.bkgndButton = QPushButton(QApplication.translate("Button","Create Background Curve",None))
-        self.bkgndButton.setFocusPolicy(Qt.NoFocus)
+        self.bkgndButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.bkgndButton.setMaximumSize(self.bkgndButton.sizeHint())
         self.bkgndButton.setMinimumSize(self.bkgndButton.minimumSizeHint())
         self.bkgndButton.clicked.connect(self.fittoBackground)
         self.bkgndButton.setEnabled(False)
         polyfitdeglabel = QLabel(QApplication.translate("Label","deg",None))
         self.polyfitdeg = QSpinBox()
-        self.polyfitdeg.setFocusPolicy(Qt.NoFocus)
+        self.polyfitdeg.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.polyfitdeg.setRange(1,4)
-        self.polyfitdeg.setAlignment(Qt.AlignRight)
+        self.polyfitdeg.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.polyfitdeg.setMinimumWidth(20)
         # build list of available curves
         self.curves = []
@@ -1000,7 +1010,7 @@ class HUDDlg(ArtisanDialog):
         self.c2ComboBox = QComboBox()
         univarButton.clicked.connect(self.showunivarinfo)
         self.polyfitCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None))
-        self.polyfitCheck.setFocusPolicy(Qt.NoFocus)
+        self.polyfitCheck.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.polyfitCheck.clicked.connect(self.polyfit) #toggle
         self.result = QLineEdit()
         self.result.setReadOnly(True)
@@ -1009,14 +1019,14 @@ class HUDDlg(ArtisanDialog):
         endlabel = QLabel(QApplication.translate("Label", "End",None))
         self.startEdit = QLineEdit()
         self.startEdit.setMaximumWidth(60)
-        self.startEdit.setAlignment(Qt.AlignRight)
+        self.startEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.endEdit = QLineEdit()
         self.endEdit.setMaximumWidth(60)
-        self.endEdit.setAlignment(Qt.AlignRight)
+        self.endEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.polyfitRoR = False
         self.polyfitRoRflag = QCheckBox(deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis",None))
         self.polyfitRoRflag.setChecked(self.polyfitRoR)
-        self.polyfitRoRflag.setFocusPolicy(Qt.NoFocus)
+        self.polyfitRoRflag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.polyfitRoRflag.stateChanged.connect(self.polyfitRoRflagChanged)
         regextime = QRegularExpression(r"^[0-5][0-9]:[0-5][0-9]$")
         self.startEdit.setValidator(QRegularExpressionValidator(regextime,self))
@@ -1164,7 +1174,7 @@ class HUDDlg(ArtisanDialog):
         self.styleComboBox = QComboBox()
         available = list(map(str, list(QStyleFactory.keys())))
         self.styleComboBox.addItems(available)
-        self.styleComboBox.setFocusPolicy(Qt.NoFocus)
+        self.styleComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         try:
             #pylint: disable=E1102
             self.styleComboBox.setCurrentIndex(list(map(lambda x:x.lower(),available)).index(self.aw.appearance.lower()))
@@ -1175,13 +1185,13 @@ class HUDDlg(ArtisanDialog):
         self.resolutionSpinBox.setRange(40,300)
         self.resolutionSpinBox.setSingleStep(5)
         self.resolutionSpinBox.setValue(self.aw.dpi)
-        self.resolutionSpinBox.setFocusPolicy(Qt.NoFocus)
+        self.resolutionSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         resButton = QPushButton(QApplication.translate("Button","Set",None))
-        resButton.setFocusPolicy(Qt.NoFocus)
+        resButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         resButton.clicked.connect(lambda _:self.changedpi())
         self.soundCheck = QCheckBox(QApplication.translate("CheckBox", "Beep",None))
         self.soundCheck.setChecked(self.aw.soundflag) 
-        self.soundCheck.setFocusPolicy(Qt.NoFocus)
+        self.soundCheck.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.soundCheck.stateChanged.connect(self.soundset) #toggle
         appLayout1 = QHBoxLayout()
         appLayout1.addLayout(pathEffectsLayout)
@@ -1221,10 +1231,10 @@ class HUDDlg(ArtisanDialog):
         self.WebLCDsURL.setOpenExternalLinks(True)
         self.WebLCDsFlag = QCheckBox()
         self.WebLCDsFlag.setChecked(self.aw.WebLCDs)
-        self.WebLCDsFlag.setFocusPolicy(Qt.NoFocus)
+        self.WebLCDsFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.WebLCDsPortLabel = QLabel(QApplication.translate("Label", "Port", None))
         self.WebLCDsPort = QLineEdit(str(self.aw.WebLCDsPort))
-        self.WebLCDsPort.setAlignment(Qt.AlignRight)
+        self.WebLCDsPort.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.WebLCDsPort.setValidator(QRegularExpressionValidator(QRegularExpression(r"^[0-9]{1,4}$"),self))
         self.WebLCDsPort.setMaximumWidth(45)
         self.QRpic = QLabel() # the QLabel holding the QR code image
@@ -1240,7 +1250,7 @@ class HUDDlg(ArtisanDialog):
             self.QRpic.setPixmap(QPixmap())
         self.WebLCDsAlerts = QCheckBox(QApplication.translate("CheckBox", "Alarm Popups",None))
         self.WebLCDsAlerts.setChecked(self.aw.WebLCDsAlerts)
-        self.WebLCDsAlerts.setFocusPolicy(Qt.NoFocus)
+        self.WebLCDsAlerts.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         if not self.aw.WebLCDs:
             self.WebLCDsAlerts.setDisabled(True)
         self.WebLCDsAlerts.stateChanged.connect(self.toggleWebLCDsAlerts) #toggle
@@ -1287,7 +1297,7 @@ class HUDDlg(ArtisanDialog):
         self.logopathedit = QLineEdit(self.aw.qmc.backgroundpath)
         self.logopathedit.setStyleSheet("background-color:'lightgrey';")
         self.logopathedit.setReadOnly(True)
-        self.logopathedit.setFocusPolicy(Qt.NoFocus)
+        self.logopathedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.logopathedit.setText(self.aw.logofilename)
         logoalphalabel = QLabel(QApplication.translate("Label","Opacity", None))
         self.logoalpha = MyQDoubleSpinBox()
@@ -1296,16 +1306,16 @@ class HUDDlg(ArtisanDialog):
         self.logoalpha.setRange(0.,10.)
         self.logoalpha.setValue(self.aw.logoimgalpha)
         self.logoalpha.setMinimumWidth(50)
-        self.logoalpha.setAlignment(Qt.AlignRight)
+        self.logoalpha.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.logoalpha.editingFinished.connect(self.changelogoalpha)
         logoshowCheck = QCheckBox(QApplication.translate("CheckBox", "Hide Image During Roast",None))
         logoshowCheck.setChecked(self.aw.logoimgflag)
-        logoshowCheck.setFocusPolicy(Qt.NoFocus)
+        logoshowCheck.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         logoshowCheck.stateChanged.connect(self.changelogoshowCheck)
         loadButton = QPushButton(QApplication.translate("Button","Load", None))
-        loadButton.setFocusPolicy(Qt.NoFocus)
+        loadButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         delButton = QPushButton(QApplication.translate("Button","Delete", None))
-        delButton.setFocusPolicy(Qt.NoFocus)
+        delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         loadButton.clicked.connect(self.logofileload)
         delButton.clicked.connect(self.logofiledelete)
         logofileLayout = QHBoxLayout()
@@ -1396,7 +1406,7 @@ class HUDDlg(ArtisanDialog):
         self.c1ComboBox.currentIndexChanged.connect(self.polyfitcurveschanged)
         self.c2ComboBox.currentIndexChanged.connect(self.polyfitcurveschanged)
         if platform.system() != 'Windows':
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
             
         settings = QSettings()
         if settings.contains("CurvesPosition"):
@@ -1404,7 +1414,7 @@ class HUDDlg(ArtisanDialog):
         
         self.TabWidget.setCurrentIndex(activeTab)
         
-        Slayout.setSizeConstraint(QLayout.SetFixedSize)
+        Slayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
     @pyqtSlot(bool)
     def fittoBackground(self,_):
@@ -1637,7 +1647,7 @@ class HUDDlg(ArtisanDialog):
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setcurvecolor(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def update_equbuttons(self):
-        self.equvdevicebutton.setFocusPolicy(Qt.NoFocus)
+        self.equvdevicebutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         if len(self.aw.qmc.timex) < 2: # empty profile
             self.equvdevicebutton.setEnabled(True)
             self.equvdevicebutton.setText(QApplication.translate("Button","ET/BT",None))
@@ -1687,7 +1697,7 @@ class HUDDlg(ArtisanDialog):
             if error:
                 string = QApplication.translate("Message","Incompatible variables found in %s"%error, None)
                 QMessageBox.warning(self,QApplication.translate("Message","Assignment problem", None),string,
-                                    QMessageBox.Discard)
+                                    QMessageBox.StandardButton.Discard)
                 
             else:
                 for e in range(2):
@@ -2469,7 +2479,6 @@ class HUDDlg(ArtisanDialog):
         
         self.aw.setFonts(False)
         self.aw.qmc.resetlinecountcaches()
-        self.aw.qmc.resetdeltalines()
         self.aw.qmc.resetlines()
         self.aw.qmc.updateDeltaSamples()
         self.aw.qmc.redraw(recomputeAllDeltas=True)
@@ -2548,7 +2557,6 @@ class HUDDlg(ArtisanDialog):
         string = QApplication.translate("Message","[ET target 1 = {0}] [BT target 1 = {1}] [ET target 2 = {2}] [BT target 2 = {3}]", None).format(str(self.aw.qmc.ETtarget),str(self.aw.qmc.BTtarget),str(self.aw.qmc.ET2target),str(self.aw.qmc.BT2target))
         self.aw.sendmessage(string)
         self.aw.qmc.resetlinecountcaches()
-        self.aw.qmc.resetdeltalines()
         self.aw.qmc.resetlines()
         self.aw.qmc.redraw(recomputeAllDeltas=True)
         self.aw.closeEventSettings()

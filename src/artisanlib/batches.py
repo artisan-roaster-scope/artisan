@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Batches Dialog
 
@@ -18,9 +18,16 @@
 
 from artisanlib.dialogs import ArtisanDialog
 
-from PyQt5.QtCore import Qt, pyqtSlot, QSettings
-from PyQt5.QtWidgets import (QApplication, QLabel, QHBoxLayout, QVBoxLayout, QCheckBox,
-                             QDialogButtonBox, QGridLayout, QLineEdit, QSpinBox, QLayout)
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import Qt, pyqtSlot, QSettings # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QLabel, QHBoxLayout, QVBoxLayout, QCheckBox, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QDialogButtonBox, QGridLayout, QLineEdit, QSpinBox, QLayout) # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import Qt, pyqtSlot, QSettings # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QLabel, QHBoxLayout, QVBoxLayout, QCheckBox, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QDialogButtonBox, QGridLayout, QLineEdit, QSpinBox, QLayout) # @UnusedImport @Reimport  @UnresolvedImport
 
 class batchDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
@@ -32,7 +39,7 @@ class batchDlg(ArtisanDialog):
         self.counterSpinBox = QSpinBox()
         self.counterSpinBox.setRange(0,999999)
         self.counterSpinBox.setSingleStep(1)
-        self.counterSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.counterSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         batchchecklabel = QLabel(QApplication.translate("CheckBox","Batch Counter", None))
         self.batchcheckbox = QCheckBox()
         self.batchcheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF batch counter",None))
@@ -41,10 +48,10 @@ class batchDlg(ArtisanDialog):
         else:
             self.batchcheckbox.setChecked(False)
         prefixlabel = QLabel()
-        prefixlabel.setAlignment(Qt.Alignment(Qt.AlignVCenter | Qt.AlignRight))
+        prefixlabel.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
         prefixlabel.setText(QApplication.translate("Label", "Prefix",None))
         counterlabel = QLabel()
-        counterlabel.setAlignment(Qt.Alignment(Qt.AlignVCenter | Qt.AlignRight))
+        counterlabel.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
         counterlabel.setText(QApplication.translate("Label", "Counter",None))
         descrLabel = QLabel("<i>" + QApplication.translate("Message", "Next batch: counter+1",None) + "</i>")
         
@@ -76,14 +83,14 @@ class batchDlg(ArtisanDialog):
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
         batchlayout = QGridLayout()
-        batchlayout.addWidget(self.batchcheckbox,0,0,Qt.AlignRight)
+        batchlayout.addWidget(self.batchcheckbox,0,0,Qt.AlignmentFlag.AlignRight)
         batchlayout.addWidget(batchchecklabel,0,1)
         batchlayout.addWidget(prefixlabel,1,0)
         batchlayout.addWidget(self.prefixEdit,1,1)
         batchlayout.addWidget(counterlabel,2,0)
         batchlayout.addWidget(self.counterSpinBox,2,1)
         batchlayout.addWidget(descrLabel,3,0,1,3)
-        batchlayout.addWidget(self.neverOverwriteCheckbox,4,0,Qt.AlignRight)
+        batchlayout.addWidget(self.neverOverwriteCheckbox,4,0,Qt.AlignmentFlag.AlignRight)
         batchlayout.addWidget(neverOverwriteCounterlabel,4,1)
         
         mainLayout = QVBoxLayout()
@@ -92,13 +99,13 @@ class batchDlg(ArtisanDialog):
         mainLayout.addSpacing(10)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
 
         settings = QSettings()
         if settings.contains("BatchPosition"):
             self.move(settings.value("BatchPosition"))
         
-        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
+        mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
     @pyqtSlot(int)
     def toggleCounterFlag(self,_):

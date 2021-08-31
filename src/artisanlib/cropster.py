@@ -1,12 +1,19 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Cropster XLS Roast Profile importer for Artisan
 
 import time as libtime
 import xlrd
-from PyQt5.QtCore import QDateTime, Qt
-from PyQt5.QtWidgets import QApplication
+
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
 
@@ -625,9 +632,9 @@ def extractProfileCropsterXLS(file,_):
                 date = QDateTime(*date_tuple)
                 if date.isValid():
                     res["roastdate"] = encodeLocal(date.date().toString())
-                    res["roastisodate"] = encodeLocal(date.date().toString(Qt.ISODate))
+                    res["roastisodate"] = encodeLocal(date.date().toString(Qt.DateFormat.ISODate))
                     res["roasttime"] = encodeLocal(date.time().toString())
-                    res["roastepoch"] = int(date.toTime_t())
+                    res["roastepoch"] = int(date.toSecsSinceEpoch())
                     res["roasttzoffset"] = libtime.timezone
         except Exception: # pylint: disable=broad-except
             pass

@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Roast Comparator
 
@@ -35,11 +35,20 @@ from artisanlib.qcheckcombobox import CheckComboBox
 with suppress_stdout_stderr():
     from matplotlib import cm
 
-from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl, 
-    QCoreApplication, QFileInfo, QDate, QTime, QDateTime)
-from PyQt5.QtGui import (QColor, QDesktopServices)
-from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, 
-    QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox)
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl,  # @UnusedImport @Reimport  @UnresolvedImport
+        QCoreApplication, QFileInfo, QDate, QTime, QDateTime) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import (QColor, QDesktopServices) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton,  # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox) # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl,  # @UnusedImport @Reimport  @UnresolvedImport
+        QCoreApplication, QFileInfo, QDate, QTime, QDateTime) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import (QColor, QDesktopServices) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton,  # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 class RoastProfile():
@@ -209,7 +218,7 @@ class RoastProfile():
         # the new dates have the locale independent isodate format:
         if "roastisodate" in profile:
             try:
-                date = QDate.fromString(decodeLocal(profile["roastisodate"]),Qt.ISODate)
+                date = QDate.fromString(decodeLocal(profile["roastisodate"]),Qt.DateFormat.ISODate)
                 if "roasttime" in profile:
                     try:
                         time = QTime.fromString(decodeLocal(profile["roasttime"]))
@@ -222,7 +231,7 @@ class RoastProfile():
                 pass
         if "roastepoch" in profile:
             try:
-                self.metadata["roastdate"] = QDateTime.fromTime_t(profile["roastepoch"])
+                self.metadata["roastdate"] = QDateTime.fromSecsSinceEpoch(profile["roastepoch"])
             except Exception: # pylint: disable=broad-except
                 pass
         if "beans" in profile:
@@ -640,7 +649,7 @@ class CompareTableWidget(QTableWidget):
     deleteKeyPressed = pyqtSignal()
 
     def keyPressEvent(self, event):
-        if event.key() in [Qt.Key_Delete,Qt.Key_Backspace]:
+        if event.key() in [Qt.Key.Key_Delete,Qt.Key.Key_Backspace]:
             self.deleteKeyPressed.emit()
         else:
             super().keyPressEvent(event)
@@ -666,7 +675,7 @@ class roastCompareDlg(ArtisanDialog):
         super().__init__(parent, aw)
         
         if platform.system() == 'Darwin':
-            self.setAttribute(Qt.WA_MacAlwaysShowToolWindow)
+            self.setAttribute(Qt.WidgetAttribute.WA_MacAlwaysShowToolWindow)
         
         self.setAcceptDrops(True)
         
@@ -688,9 +697,9 @@ class roastCompareDlg(ArtisanDialog):
         # buttons
         self.addButton = QPushButton(QApplication.translate("Button","Add",None))
         self.addButton.clicked.connect(self.add)
-        self.addButton.setFocusPolicy(Qt.NoFocus)
+        self.addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.deleteButton = QPushButton(QApplication.translate("Button","Delete",None))
-        self.deleteButton.setFocusPolicy(Qt.NoFocus)
+        self.deleteButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.deleteButton.clicked.connect(self.delete)
         # configurations
         alignLabel = QLabel(QApplication.translate("Label","Align",None))
@@ -705,7 +714,7 @@ class roastCompareDlg(ArtisanDialog):
             QApplication.translate("Label","DROP", None),
             ]
         self.alignComboBox = MyQComboBox()
-        self.alignComboBox.setFocusPolicy(Qt.NoFocus)
+        self.alignComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.alignComboBox.addItems(self.alignnames)
         self.alignComboBox.setCurrentIndex(self.aw.qmc.compareAlignEvent)
         self.alignComboBox.currentIndexChanged.connect(self.changeAlignEventidx)
@@ -713,32 +722,32 @@ class roastCompareDlg(ArtisanDialog):
         self.etypes = self.aw.qmc.etypes[:-1]
         self.etypes.insert(0,"")
         self.eventsComboBox = MyQComboBox()
-        self.eventsComboBox.setFocusPolicy(Qt.NoFocus)
-        self.eventsComboBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.eventsComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.eventsComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
         self.eventsComboBox.addItems(self.etypes)
-        self.eventsComboBox.setSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum)
+        self.eventsComboBox.setSizePolicy(QSizePolicy.Policy.Maximum,QSizePolicy.Policy.Maximum)
         self.eventsComboBox.setCurrentIndex(self.aw.qmc.compareEvents)
         self.eventsComboBox.currentIndexChanged.connect(self.changeEventsidx)
         #
         self.cb = CheckComboBox(placeholderText="")
-        self.cb.setFocusPolicy(Qt.NoFocus)
+        self.cb.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.model = self.cb.model()
         self.cb.addItem(QApplication.translate("Label","ET",None))
         self.model.item(0).setCheckable(True)
-        self.cb.setItemCheckState(0,(Qt.Checked if self.aw.qmc.compareET else Qt.Unchecked))
+        self.cb.setItemCheckState(0,(Qt.CheckState.Checked if self.aw.qmc.compareET else Qt.CheckState.Unchecked))
         self.cb.addItem(QApplication.translate("Label","BT",None))
         self.model.item(1).setCheckable(True)
-        self.cb.setItemCheckState(1,(Qt.Checked if self.aw.qmc.compareBT else Qt.Unchecked))
+        self.cb.setItemCheckState(1,(Qt.CheckState.Checked if self.aw.qmc.compareBT else Qt.CheckState.Unchecked))
         self.cb.addItem(deltaLabelUTF8 + QApplication.translate("Label","ET",None))
         self.model.item(2).setCheckable(True)
-        self.cb.setItemCheckState(2,(Qt.Checked if self.aw.qmc.compareDeltaET else Qt.Unchecked))
+        self.cb.setItemCheckState(2,(Qt.CheckState.Checked if self.aw.qmc.compareDeltaET else Qt.CheckState.Unchecked))
         self.cb.addItem(deltaLabelUTF8 + QApplication.translate("Label","BT",None))
         self.model.item(3).setCheckable(True)
-        self.cb.setItemCheckState(3,(Qt.Checked if self.aw.qmc.compareDeltaBT else Qt.Unchecked))
+        self.cb.setItemCheckState(3,(Qt.CheckState.Checked if self.aw.qmc.compareDeltaBT else Qt.CheckState.Unchecked))
         self.cb.insertSeparator(4)
         self.cb.addItem(QApplication.translate("CheckBox","Events",None))
         self.model.item(5).setCheckable(True)
-        self.cb.setItemCheckState(5,(Qt.Checked if self.aw.qmc.compareMainEvents else Qt.Unchecked))
+        self.cb.setItemCheckState(5,(Qt.CheckState.Checked if self.aw.qmc.compareMainEvents else Qt.CheckState.Unchecked))
         self.cb.flagChanged.connect(self.flagChanged)
         
         settings1Layout = QHBoxLayout()
@@ -772,9 +781,9 @@ class roastCompareDlg(ArtisanDialog):
         self.setLayout(mainLayout)
         
         windowFlags = self.windowFlags()
-        windowFlags |= Qt.Tool
+        windowFlags |= Qt.WindowType.Tool
         if platform.system() == 'Windows':
-            windowFlags |= Qt.WindowMinimizeButtonHint  # Add minimize  button
+            windowFlags |= Qt.WindowType.WindowMinimizeButtonHint  # Add minimize  button
         self.setWindowFlags(windowFlags)
         
         self.redraw()
@@ -807,7 +816,7 @@ class roastCompareDlg(ArtisanDialog):
             res = []
             for url in urls:
                 if url.scheme() == "file":
-                    filename = url.toString(QUrl.PreferLocalFile)
+                    filename = url.toString(QUrl.UrlFormattingOption.PreferLocalFile)
                     qfile = QFileInfo(filename)
                     file_suffix = qfile.suffix()
                     if file_suffix == "alog":
@@ -1060,7 +1069,7 @@ class roastCompareDlg(ArtisanDialog):
         c = QColor.fromRgbF(*profile.color)
         color = QTableWidgetItem()
         color.setBackground(c)
-        color.setFlags(Qt.ItemIsEnabled) # do not change background color on row selection of the color items
+        color.setFlags(Qt.ItemFlag.ItemIsEnabled) # do not change background color on row selection of the color items
         self.profileTable.setItem(i,0,color)
         flag = QCheckBox()
         flag.setChecked(profile.visible)
@@ -1068,7 +1077,7 @@ class roastCompareDlg(ArtisanDialog):
         flagWidget = QWidget()
         flagLayout = QHBoxLayout(flagWidget)
         flagLayout.addWidget(flag)
-        flagLayout.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+        flagLayout.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
         flagLayout.setContentsMargins(0,0,0,0)
         self.profileTable.setCellWidget(i,1,flagWidget)
         title_item = QTableWidgetItem(profile.title)
@@ -1151,11 +1160,11 @@ class roastCompareDlg(ArtisanDialog):
             self.profileTable.setTabKeyNavigation(True)
             self.profileTable.setColumnCount(3)
             self.profileTable.setAlternatingRowColors(True)
-#            self.profileTable.setEditTriggers(QTableWidget.NoEditTriggers) # we allow the editing/renaming of items
-            self.profileTable.setSelectionBehavior(QTableWidget.SelectRows)
-            self.profileTable.setSelectionMode(QTableWidget.MultiSelection)
+#            self.profileTable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers) # we allow the editing/renaming of items
+            self.profileTable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+            self.profileTable.setSelectionMode(QTableWidget.SelectionMode.MultiSelection)
             self.profileTable.setShowGrid(False)
-            self.profileTable.verticalHeader().setSectionResizeMode(2)
+            self.profileTable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
 #            self.profileTable.horizontalHeader().setVisible(False)
             self.profileTable.setHorizontalHeaderLabels(["",
                                                          QApplication.translate("Label","ON",None),
@@ -1165,7 +1174,7 @@ class roastCompareDlg(ArtisanDialog):
             self.profileTable.setSortingEnabled(False)
             
             self.profileTable.verticalHeader().setSectionsMovable(True)
-            self.profileTable.verticalHeader().setDragDropMode(QTableWidget.InternalMove)
+            self.profileTable.verticalHeader().setDragDropMode(QTableWidget.DragDropMode.InternalMove)
             self.profileTable.verticalHeader().sectionMoved.connect(self.sectionMoved)
             self.profileTable.verticalHeader().sectionDoubleClicked.connect(self.tableSectionClicked)
             
@@ -1176,11 +1185,11 @@ class roastCompareDlg(ArtisanDialog):
             header.setStretchLastSection(True)
             header.setMinimumSectionSize(10)       # color column size
             self.profileTable.setColumnWidth(0,10) # color column size
-            header.setSectionResizeMode(0, QHeaderView.Fixed)
-            header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-            header.setSectionResizeMode(2, QHeaderView.Stretch)
+            header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
+            header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+            header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
             
-            self.profileTable.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            self.profileTable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
             self.profileTable.horizontalScrollBar().setEnabled(False)
             self.profileTable.setAutoScroll(False) # disable scrolling to selected cell
 
@@ -1304,11 +1313,11 @@ class roastCompareDlg(ArtisanDialog):
             dmax = 0
             for rp in self.profiles:
                 if rp.visible and rp.aligned:
-                    if (self.cb.itemCheckState(2) == Qt.Checked and self.aw.qmc.autodeltaxET) or \
-                        (self.cb.itemCheckState(2) == Qt.Checked and self.cb.itemCheckState(3) != Qt.Checked and self.aw.qmc.autodeltaxBT): # DeltaET
+                    if (self.cb.itemCheckState(2) == Qt.CheckState.Checked and self.aw.qmc.autodeltaxET) or \
+                        (self.cb.itemCheckState(2) == Qt.CheckState.Checked and self.cb.itemCheckState(3) != Qt.CheckState.Checked and self.aw.qmc.autodeltaxBT): # DeltaET
                         dmax = max(dmax,rp.max_DeltaET)
-                    if (self.cb.itemCheckState(3) == Qt.Checked and self.aw.qmc.autodeltaxBT) or \
-                        (self.cb.itemCheckState(3) == Qt.Checked and self.cb.itemCheckState(2) != Qt.Checked and self.aw.qmc.autodeltaxET) : # DeltaBT
+                    if (self.cb.itemCheckState(3) == Qt.CheckState.Checked and self.aw.qmc.autodeltaxBT) or \
+                        (self.cb.itemCheckState(3) == Qt.CheckState.Checked and self.cb.itemCheckState(2) != Qt.CheckState.Checked and self.aw.qmc.autodeltaxET) : # DeltaBT
                         dmax = max(dmax,rp.max_DeltaBT)
             if dmax > 0:
                 self.aw.qmc.delta_ax.set_ylim(top=dmax) # we only autoadjust the upper limit
@@ -1328,11 +1337,11 @@ class roastCompareDlg(ArtisanDialog):
     def updateVisibilities(self):
         for p in self.profiles:
             p.setVisibilities([
-                self.cb.itemCheckState(0) == Qt.Checked, # ET
-                self.cb.itemCheckState(1) == Qt.Checked, # BT
-                self.cb.itemCheckState(2) == Qt.Checked, # DeltaET
-                self.cb.itemCheckState(3) == Qt.Checked, # DeltaBT
-                self.cb.itemCheckState(5) == Qt.Checked, # Main events
+                self.cb.itemCheckState(0) == Qt.CheckState.Checked, # ET
+                self.cb.itemCheckState(1) == Qt.CheckState.Checked, # BT
+                self.cb.itemCheckState(2) == Qt.CheckState.Checked, # DeltaET
+                self.cb.itemCheckState(3) == Qt.CheckState.Checked, # DeltaBT
+                self.cb.itemCheckState(5) == Qt.CheckState.Checked, # Main events
                 ],self.aw.qmc.compareEvents)
 
     def updateAlignMenu(self):
@@ -1351,11 +1360,11 @@ class roastCompareDlg(ArtisanDialog):
             if w is not None:
                 if p.aligned:
                     if sys.platform.startswith("darwin") and darkdetect.isDark() and appFrozen():
-                        w.setForeground(Qt.white)
+                        w.setForeground(Qt.GlobalColor.white)
                     else:
-                        w.setForeground(Qt.black)
+                        w.setForeground(Qt.GlobalColor.black)
                 else:
-                    w.setForeground(Qt.lightGray)
+                    w.setForeground(Qt.GlobalColor.lightGray)
     
     def updateProfileTableColors(self):
         for i,p in enumerate(self.profiles):
@@ -1445,7 +1454,7 @@ class roastCompareDlg(ArtisanDialog):
         try:
             if len(self.profiles) < self.maxentries and not any(filename == p.filepath for p in self.profiles):
                 f = QFile(filename)
-                if not f.open(QFile.ReadOnly):
+                if not f.open(QFile.OpenModeFlag.ReadOnly):
                     raise IOError(f.errorString())
                 stream = QTextStream(f)
                 firstChar = stream.read(1)

@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Dialogs
 
@@ -18,10 +18,18 @@
 
 import platform
 
-from PyQt5.QtCore import Qt, QSettings, pyqtSlot
-from PyQt5.QtWidgets import (QApplication, QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit,
-            QHBoxLayout, QVBoxLayout, QLabel, QLineEdit)
-from PyQt5.QtGui import QKeySequence
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import Qt, QSettings, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QDialog, QMessageBox, QDialogButtonBox, QTextEdit,  # @UnusedImport @Reimport  @UnresolvedImport
+                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit)  # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QKeySequence, QAction  # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import Qt, QSettings, pyqtSlot  # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit,  # @UnusedImport @Reimport  @UnresolvedImport
+                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit)  # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QKeySequence  # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.widgets import MyQComboBox
 
@@ -30,43 +38,43 @@ class ArtisanDialog(QDialog):
         super().__init__(parent)
         self.aw = aw # the Artisan application window
         
-        # IMPORTANT NOTE: if dialog items have to be access after it has been closed, this Qt.WA_DeleteOnClose attribute 
+        # IMPORTANT NOTE: if dialog items have to be access after it has been closed, this Qt.WidgetAttribute.WA_DeleteOnClose attribute 
         # has to be set to False explicitly in its initializer (like in comportDlg) to avoid the early GC and one might
         # want to use a dialog.deleteLater() call to explicitly have the dialog and its widgets GCe
         # or rather use sip.delete(dialog) if the GC via .deleteLater() is prevented by a link to a parent object (parent not None)
-        self.setAttribute(Qt.WA_DeleteOnClose, True)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
 
 #        if platf == 'Windows':
 # setting those Windows flags could be the reason for some instabilities on Windows
 #            windowFlags = self.windowFlags()
-#        #windowFlags &= ~Qt.WindowContextHelpButtonHint # remove help button
-#        #windowFlags &= ~Qt.WindowMaximizeButtonHint # remove maximise button
-#        #windowFlags &= ~Qt.WindowMinMaxButtonsHint  # remove min/max combo
-#        #windowFlags |= Qt.WindowMinimizeButtonHint  # Add minimize  button
-#        windowFlags |= Qt.WindowSystemMenuHint  # Adds a window system menu, and possibly a close button
-#            windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
+#        #windowFlags &= ~Qt.WindowType.WindowContextHelpButtonHint # remove help button
+#        #windowFlags &= ~Qt.WindowType.WindowMaximizeButtonHint # remove maximise button
+#        #windowFlags &= ~Qt.WindowType.WindowMinMaxButtonsHint  # remove min/max combo
+#        #windowFlags |= Qt.WindowType.WindowMinimizeButtonHint  # Add minimize  button
+#        windowFlags |= Qt.WindowType.WindowSystemMenuHint  # Adds a window system menu, and possibly a close button
+#            windowFlags |= Qt.WindowType.WindowMinMaxButtonsHint  # add min/max combo
 #            self.setWindowFlags(windowFlags)
 
         # configure standard dialog buttons
-        self.dialogbuttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel,Qt.Horizontal)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setDefault(True)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setAutoDefault(True)
-        self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(False)
-        self.dialogbuttons.button(QDialogButtonBox.Cancel).setAutoDefault(False)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocusPolicy(Qt.StrongFocus) # to add to tab focus switch
+        self.dialogbuttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel,Qt.Orientation.Horizontal)
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setDefault(True)
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setAutoDefault(True)
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setDefault(False)
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setAutoDefault(False)
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocusPolicy(Qt.FocusPolicy.StrongFocus) # to add to tab focus switch
         for btn,txt,trans in [
-            (self.dialogbuttons.button(QDialogButtonBox.Ok),"OK", QApplication.translate("Button","OK", None)),
-            (self.dialogbuttons.button(QDialogButtonBox.Cancel),"Cancel",QApplication.translate("Button","Cancel", None))]:
+            (self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok),"OK", QApplication.translate("Button","OK", None)),
+            (self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel),"Cancel",QApplication.translate("Button","Cancel", None))]:
             self.setButtonTranslations(btn,txt,trans)
         # add additional CMD-. shortcut to close the dialog
-        self.dialogbuttons.button(QDialogButtonBox.Cancel).setShortcut(QKeySequence("Ctrl+."))
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog (ESC on Mac OS X)
         cancelAction = QAction(self, triggered=lambda _:self.dialogbuttons.rejected.emit())
         try:
-            cancelAction.setShortcut(QKeySequence.Cancel)
+            cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
         except Exception: # pylint: disable=broad-except
             pass
-        self.dialogbuttons.button(QDialogButtonBox.Cancel).addActions([cancelAction])
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).addActions([cancelAction])
     
     @staticmethod
     def setButtonTranslations(btn, txt, trans):
@@ -86,7 +94,7 @@ class ArtisanDialog(QDialog):
         #print(key)
         #modifiers = QApplication.keyboardModifiers()
         modifiers = event.modifiers()
-        if key == 16777216 or (key == 87 and modifiers == Qt.ControlModifier): #ESCAPE or CMD-W
+        if key == 16777216 or (key == 87 and modifiers == Qt.KeyboardModifier.ControlModifier): #ESCAPE or CMD-W
             self.close()
         else:
             super().keyPressEvent(event)
@@ -96,7 +104,7 @@ class ArtisanResizeablDialog(ArtisanDialog):
         super().__init__(parent, aw)
         if str(platform.system()) == 'Windows':
             windowFlags = self.windowFlags()
-            windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
+            windowFlags |= Qt.WindowType.WindowMinMaxButtonsHint  # add min/max combo
             self.setWindowFlags(windowFlags)
 
 class ArtisanMessageBox(QMessageBox):
@@ -105,9 +113,9 @@ class ArtisanMessageBox(QMessageBox):
         self.setWindowTitle(title)
         self.setText(text)
         self.setModal(modal)
-        self.setIcon(QMessageBox.Information)
-        self.setStandardButtons(QMessageBox.Ok)
-        self.setDefaultButton(QMessageBox.Ok)
+        self.setIcon(QMessageBox.Icon.Information)
+        self.setStandardButtons(QMessageBox.StandardButton.Ok)
+        self.setDefaultButton(QMessageBox.StandardButton.Ok)
         self.timeout = timeout # configured timeout, defaults to 0 (no timeout)
         self.currentTime = 0 # counts seconds after timer start
         
@@ -136,7 +144,7 @@ class HelpDlg(ArtisanDialog):
         phelp.setReadOnly(True)
 
         # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
+        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
         self.dialogbuttons.accepted.connect(self.close)
 
         homeLabel = QLabel()
@@ -151,7 +159,7 @@ class HelpDlg(ArtisanDialog):
         hLayout.addWidget(phelp)
         hLayout.addLayout(buttonLayout)
         self.setLayout(hLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
 
     def closeEvent(self, _):
         settings = QSettings()
@@ -178,7 +186,7 @@ class ArtisanInputDialog(ArtisanDialog):
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.rejected.connect(self.reject)
         self.dialogbuttons.accepted.connect(self.accept)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
     
     @pyqtSlot()
     def accept(self):
@@ -219,7 +227,7 @@ class ArtisanComboBoxDialog(ArtisanDialog):
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.rejected.connect(self.reject)
         self.dialogbuttons.accepted.connect(self.accept)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
     
     @pyqtSlot()
     def accept(self):

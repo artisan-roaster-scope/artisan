@@ -22,8 +22,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5.QtCore import QSemaphore, QTimer
-from PyQt5.QtWidgets import QApplication
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+
 from pathlib import Path
 from plus import config, util, connection, controller, roast
 import dbm

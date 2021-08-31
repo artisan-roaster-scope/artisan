@@ -167,10 +167,6 @@ DATA_FILES = [
     ("../Resources", [r"includes/Icons"]),
   ]
 
-if os.environ['ARTISAN_LEGACY_BUILD'] == "true":
-    # we remove Qt components that are not available on legacy Qt installations
-    DATA_FILES = [e for e in DATA_FILES if not "qt_plugins/styles" in e[0] and not "qt_plugins/platformthemes" in e[0]]
-
 with open('Info.plist', 'r+b') as fp:
     plist = plistlib.load(fp)
     plist['CFBundleDisplayName'] = 'Artisan'
@@ -396,10 +392,6 @@ for root, dirs, files in os.walk('.'):
                     os.remove(os.path.join(r,fl))                
             
 os.chdir('..')
-if os.environ['ARTISAN_LEGACY_BUILD'] == "true":
-    subprocess.check_call(r"rm -f artisan-mac-" + VERSION + r"-legacy.dmg",shell = True)
-    subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'-legacy.dmg -volname "artisan legacy" -fs HFS+ -srcfolder "dist"',shell = True)
-else:
-    subprocess.check_call(r"rm -f artisan-mac-" + VERSION + r".dmg",shell = True)
-    subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "artisan" -fs HFS+ -srcfolder "dist"',shell = True)
+subprocess.check_call(r"rm -f artisan-mac-" + VERSION + r".dmg",shell = True)
+subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "artisan" -fs HFS+ -srcfolder "dist"',shell = True)
 # otool -L dist/Artisan.app/Contents/MacOS/Artisan

@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # S7 support for Artisan
 
@@ -27,8 +27,14 @@ from snap7.util import get_bool, set_bool, get_int, set_int, get_real, set_real
 import artisanlib.util
 from artisanlib.suppress_errors import suppress_stdout_stderr
 
-from PyQt5.QtCore import QSemaphore
-from PyQt5.QtWidgets import QApplication
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
 
 class s7port():

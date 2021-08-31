@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+#
+
 '''
 Source: https://github.com/IARI/alsa_jack_gui
 Author: https://github.com/IARI
@@ -9,10 +12,17 @@ Notes: Modified for PyQt5; further modified to remove blocking sockets remaining
 import sys
 import multiprocessing as mp
 
-from PyQt5.QtCore import pyqtSignal, QTextStream, Qt, pyqtSlot
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtNetwork import QLocalSocket, QLocalServer
 
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import pyqtSignal, QTextStream, Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import pyqtSignal, QTextStream, Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @Reimport  @UnresolvedImport
 
 
 class QtSingleApplication(QApplication):
@@ -45,14 +55,20 @@ class QtSingleApplication(QApplication):
             if self._isRunning:
                 # Yes, there is.
                 self._outStream = QTextStream(self._outSocket)
-                self._outStream.setCodec('UTF-8')
+                try:
+                    self._outStream.setCodec('UTF-8') # setCodec not avaiable in PyQt6, but UTF-8 the default encoding
+                except Exception: # pylint: disable=broad-except
+                    pass
                 # Is there another viewer running?
                 self._outSocketViewer = QLocalSocket()
                 self._outSocketViewer.connectToServer(self._viewer_id)
                 self._isRunningViewer = self._outSocketViewer.waitForConnected(-1)
                 if self._isRunningViewer:
                     self._outStreamViewer = QTextStream(self._outSocketViewer)
-                    self._outStreamViewer.setCodec('UTF-8')
+                    try:
+                        self._outStreamViewer.setCodec('UTF-8') # setCodec not avaiable in PyQt6, but UTF-8 the default encoding
+                    except Exception: # pylint: disable=broad-except
+                        pass
                 else:
                     # app is running, we announce us as viewer app
                     # First we remove existing servers of that name that might not have been properly closed as the server died
@@ -99,7 +115,7 @@ class QtSingleApplication(QApplication):
 
         self._activationWindow.show()
         self._activationWindow.setWindowState(
-            self._activationWindow.windowState() & ~Qt.WindowMinimized)
+            self._activationWindow.windowState() & ~Qt.WindowState.WindowMinimized)
         self._activationWindow.raise_()
         self._activationWindow.activateWindow()
 
@@ -118,7 +134,10 @@ class QtSingleApplication(QApplication):
         if not self._inSocket:
             return
         self._inStream = QTextStream(self._inSocket)
-        self._inStream.setCodec('UTF-8')
+        try:
+            self._inStream.setCodec('UTF-8') # setCodec not avaiable in PyQt6, but UTF-8 the default encoding
+        except Exception: # pylint: disable=broad-except
+            pass
         self._inSocket.readyRead.connect(self._onReadyRead)
         if self._activateOnMessage and self._isRunning:
             self.activateWindow()

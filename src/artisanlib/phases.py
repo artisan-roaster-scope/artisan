@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Phases Dialog
 
@@ -18,9 +18,16 @@
 
 from artisanlib.dialogs import ArtisanDialog
 
-from PyQt5.QtCore import Qt, pyqtSlot, QSettings
-from PyQt5.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout,
-    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QLayout, QSpinBox)
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import Qt, pyqtSlot, QSettings # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QLayout, QSpinBox) # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import Qt, pyqtSlot, QSettings # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QLayout, QSpinBox) # @UnusedImport @Reimport  @UnresolvedImport
 
 class phasesGraphDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
@@ -44,22 +51,22 @@ class phasesGraphDlg(ArtisanDialog):
         minf = QLabel(QApplication.translate("Label", "min","abbrev of minimum"))
         maxf = QLabel(QApplication.translate("Label", "max",None))
         self.startdry = QSpinBox()
-        self.startdry.setAlignment(Qt.AlignRight)
+        self.startdry.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.startdry.setMinimumWidth(80)
         self.enddry = QSpinBox()
-        self.enddry.setAlignment(Qt.AlignRight)
+        self.enddry.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.enddry.setMinimumWidth(80)
         self.startmid = QSpinBox()
-        self.startmid.setAlignment(Qt.AlignRight)
+        self.startmid.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.startmid.setMinimumWidth(80)
         self.endmid = QSpinBox()
-        self.endmid.setAlignment(Qt.AlignRight)
+        self.endmid.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.endmid.setMinimumWidth(80)
         self.startfinish = QSpinBox()
-        self.startfinish.setAlignment(Qt.AlignRight)
+        self.startfinish.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.startfinish.setMinimumWidth(80)
         self.endfinish = QSpinBox()
-        self.endfinish.setAlignment(Qt.AlignRight)
+        self.endfinish.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.endfinish.setMinimumWidth(80) 
         if self.aw.qmc.mode == "F":
             self.startdry.setSuffix(" F")
@@ -107,20 +114,20 @@ class phasesGraphDlg(ArtisanDialog):
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.updatephases)
         self.dialogbuttons.rejected.connect(self.cancel)
-        setDefaultButton = self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
+        setDefaultButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
         setDefaultButton.clicked.connect(self.setdefault)
         self.setButtonTranslations(setDefaultButton,"Restore Defaults",QApplication.translate("Button","Restore Defaults", None))
         
         phaseLayout = QGridLayout()
-        phaseLayout.addWidget(minf,0,1,Qt.AlignHCenter|Qt.AlignBottom)
-        phaseLayout.addWidget(maxf,0,2,Qt.AlignHCenter|Qt.AlignBottom)
-        phaseLayout.addWidget(dryLabel,1,0,Qt.AlignRight)
+        phaseLayout.addWidget(minf,0,1,Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignBottom)
+        phaseLayout.addWidget(maxf,0,2,Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignBottom)
+        phaseLayout.addWidget(dryLabel,1,0,Qt.AlignmentFlag.AlignRight)
         phaseLayout.addWidget(self.startdry,1,1)
         phaseLayout.addWidget(self.enddry,1,2)
-        phaseLayout.addWidget(midLabel,2,0,Qt.AlignRight)
+        phaseLayout.addWidget(midLabel,2,0,Qt.AlignmentFlag.AlignRight)
         phaseLayout.addWidget(self.startmid,2,1)
         phaseLayout.addWidget(self.endmid,2,2)
-        phaseLayout.addWidget(finishLabel,3,0,Qt.AlignRight)
+        phaseLayout.addWidget(finishLabel,3,0,Qt.AlignmentFlag.AlignRight)
         phaseLayout.addWidget(self.startfinish,3,1)
         phaseLayout.addWidget(self.endfinish,3,2)
 
@@ -129,20 +136,20 @@ class phasesGraphDlg(ArtisanDialog):
                     QApplication.translate("ComboBox","Temp",None)]
 
         lcdmode = QLabel(QApplication.translate("Label", "Phases\nLCDs Mode",None))
-        phaseLayout.addWidget(lcdmode,0,3,Qt.AlignCenter)
+        phaseLayout.addWidget(lcdmode,0,3,Qt.AlignmentFlag.AlignCenter)
         lcdmode = QLabel(QApplication.translate("Label", "Phases\nLCDs All",None))
-        phaseLayout.addWidget(lcdmode,0,4,Qt.AlignCenter)
+        phaseLayout.addWidget(lcdmode,0,4,Qt.AlignmentFlag.AlignCenter)
 
         self.lcdmodeComboBox_dry = QComboBox()
-        self.lcdmodeComboBox_dry.setFocusPolicy(Qt.NoFocus)
+        self.lcdmodeComboBox_dry.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcdmodeComboBox_dry.addItems(lcdmodes)
         self.lcdmodeComboBox_dry.currentIndexChanged.connect(self.lcdmodeComboBox_dryChanged)
         self.lcdmodeComboBox_mid = QComboBox()
-        self.lcdmodeComboBox_mid.setFocusPolicy(Qt.NoFocus)
+        self.lcdmodeComboBox_mid.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcdmodeComboBox_mid.addItems(lcdmodes)
         self.lcdmodeComboBox_mid.currentIndexChanged.connect(self.lcdmodeComboBox_midChanged)
         self.lcdmodeComboBox_fin = QComboBox()
-        self.lcdmodeComboBox_fin.setFocusPolicy(Qt.NoFocus)
+        self.lcdmodeComboBox_fin.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcdmodeComboBox_fin.addItems(lcdmodes)
         self.lcdmodeComboBox_fin.currentIndexChanged.connect(self.lcdmodeComboBox_finChanged)
         phaseLayout.addWidget(self.lcdmodeComboBox_dry,1,3)
@@ -157,10 +164,10 @@ class phasesGraphDlg(ArtisanDialog):
         self.lcdmodeComboBox_fin.setEnabled(not bool(self.aw.qmc.phasesLCDmode_all[2]))
         
         self.lcdmodeFlag_all_fin = QCheckBox()
-        self.lcdmodeFlag_all_fin.setFocusPolicy(Qt.NoFocus)
+        self.lcdmodeFlag_all_fin.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcdmodeFlag_all_fin.setChecked(self.aw.qmc.phasesLCDmode_all[2])
         self.lcdmodeFlag_all_fin.stateChanged.connect(self.lcdmodeFlagFinChanged)
-        phaseLayout.addWidget(self.lcdmodeFlag_all_fin,3,4,Qt.AlignCenter)
+        phaseLayout.addWidget(self.lcdmodeFlag_all_fin,3,4,Qt.AlignmentFlag.AlignCenter)
                
         self.events2phases()
         
@@ -189,13 +196,13 @@ class phasesGraphDlg(ArtisanDialog):
         mainLayout.addLayout(buttonsLayout)
         self.setLayout(mainLayout)
         self.getphases()
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
         
         settings = QSettings()
         if settings.contains("PhasesPosition"):
             self.move(settings.value("PhasesPosition"))
         
-        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
+        mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
         
     @pyqtSlot(int)
     def lcdmodeFlagFinChanged(self,value):

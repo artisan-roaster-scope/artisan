@@ -58,6 +58,7 @@ Recent changes:
 - hacked around the problem: The unicode elipsis \x85 "…" is not properly handled.  These seem to get into the Excel file when cut and paste from the blog.
 Must be replaced with three periods "..." in the Excel file.  
 - Alt-Enter in Excel to create newlines now tolerated
+- adds support for PyQt6
  
 '''
 
@@ -67,7 +68,13 @@ import importlib
 import subprocess
 import sys
 import re
-from PyQt5.QtWidgets import QApplication
+
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtWidgets import QApplication
+except:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtWidgets import QApplication
 from openpyxl import load_workbook
 import prettytable
 
@@ -167,7 +174,10 @@ def buildpyCode(fname_in):
     # wrap the output with python code to allow it to execute    
     outstr += 'import prettytable'
     outstr += '\n' + 'import re'
-    outstr += '\n' + 'from PyQt5.QtWidgets import QApplication'
+    outstr += '\n' + 'try:'
+    outstr += '\n' + '  from PyQt5.QtWidgets import QApplication'
+    outstr += '\n' + 'except Exception:'
+    outstr += '\n' + '  from PyQt6.QtWidgets import QApplication'
     outstr += '\n'
     outstr += '\ndef content():'
     outstr += nlind + "strlist = []"

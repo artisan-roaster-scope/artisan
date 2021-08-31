@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Axis Dialog
 
@@ -21,11 +21,20 @@ import platform
 from artisanlib.util import deltaLabelUTF8, stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanDialog
 
-from PyQt5.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings
-from PyQt5.QtGui import QIntValidator, QRegularExpressionValidator
-from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox, QFrame,
-    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, QLayout,
-    QSpinBox)
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QIntValidator, QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox, QFrame, # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, QLayout, # @UnusedImport @Reimport  @UnresolvedImport
+        QSpinBox) # @UnusedImport @Reimport  @UnresolvedImport
+    #pylint: disable = E, W, R, C
+except Exception:
+    from PyQt6.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QIntValidator, QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox, QFrame, # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, QLayout, # @UnusedImport @Reimport  @UnresolvedImport
+        QSpinBox) # @UnusedImport @Reimport  @UnresolvedImport
 
 class WindowsDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
@@ -42,16 +51,16 @@ class WindowsDlg(ArtisanDialog):
         self.step100Edit = QLineEdit()
         self.step100Edit.setMaximumWidth(55)
         self.step100Edit.setValidator(QIntValidator(self.aw.qmc.ylimit_min_max, 999999, self.step100Edit))
-        self.step100Edit.setAlignment(Qt.AlignRight)
+        self.step100Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.step100Edit.setToolTip(QApplication.translate("Tooltip", "100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty", None))
         self.xlimitEdit = QLineEdit()
         self.xlimitEdit.setMaximumWidth(50)
         self.xlimitEdit.setMinimumWidth(50)
-        self.xlimitEdit.setAlignment(Qt.AlignRight)
+        self.xlimitEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.xlimitEdit_min = QLineEdit()
         self.xlimitEdit_min.setMaximumWidth(55)
         self.xlimitEdit_min.setMinimumWidth(55)
-        self.xlimitEdit_min.setAlignment(Qt.AlignRight)
+        self.xlimitEdit_min.setAlignment(Qt.AlignmentFlag.AlignRight)
         regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         self.xlimitEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.xlimitEdit_min.setValidator(QRegularExpressionValidator(regextime,self))
@@ -61,16 +70,16 @@ class WindowsDlg(ArtisanDialog):
         self.ylimitEdit_min.setMaximumWidth(60)
         self.ylimitEdit.setValidator(QIntValidator(self.aw.qmc.ylimit_min_max, self.aw.qmc.ylimit_max, self.ylimitEdit))
         self.ylimitEdit_min.setValidator(QIntValidator(self.aw.qmc.ylimit_min_max, self.aw.qmc.ylimit_max, self.ylimitEdit_min))
-        self.ylimitEdit.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.ylimitEdit_min.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.ylimitEdit.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.ylimitEdit_min.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.zlimitEdit = QLineEdit()
         self.zlimitEdit.setMaximumWidth(60)
         self.zlimitEdit_min = QLineEdit()
         self.zlimitEdit_min.setMaximumWidth(60)
         self.zlimitEdit.setValidator(QIntValidator(self.aw.qmc.zlimit_min_max, self.aw.qmc.zlimit_max, self.zlimitEdit))
         self.zlimitEdit_min.setValidator(QIntValidator(self.aw.qmc.zlimit_min_max, self.aw.qmc.zlimit_max, self.zlimitEdit_min))
-        self.zlimitEdit.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.zlimitEdit_min.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.zlimitEdit.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.zlimitEdit_min.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.xlimitEdit.setText(stringfromseconds(self.aw.qmc.endofx))
         if self.aw.qmc.timeindex[0] != -1:
             self.xlimitEdit_min.setText(stringfromseconds(self.aw.qmc.startofx - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]))
@@ -104,7 +113,7 @@ class WindowsDlg(ArtisanDialog):
         self.resetEdit = QLineEdit()
         self.resetEdit.setMaximumWidth(50)
         self.resetEdit.setMinimumWidth(50)
-        self.resetEdit.setAlignment(Qt.AlignRight)
+        self.resetEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         self.resetEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.resetEdit.setText(stringfromseconds(self.aw.qmc.resetmaxtime))
@@ -114,7 +123,7 @@ class WindowsDlg(ArtisanDialog):
         self.chargeminEdit = QLineEdit()
         self.chargeminEdit.setMaximumWidth(50)
         self.chargeminEdit.setMinimumWidth(50)
-        self.chargeminEdit.setAlignment(Qt.AlignRight)
+        self.chargeminEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.chargeminEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.chargeminEdit.setText(stringfromseconds(self.aw.qmc.chargemintime))
         self.chargeminEdit.setToolTip(QApplication.translate("Tooltip", "Time axis min on RESET", None))
@@ -134,7 +143,7 @@ class WindowsDlg(ArtisanDialog):
         self.autotimexFlag.stateChanged.connect(self.autoTimexFlagChanged)
         self.autotimexFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set time axis min and max from profile CHARGE/DROP events", None))
         autoButton = QPushButton(QApplication.translate("Button","Calc",None))
-        autoButton.setFocusPolicy(Qt.NoFocus)
+        autoButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         autoButton.clicked.connect(self.autoAxis)
         # time axis steps
         timegridlabel = QLabel(QApplication.translate("Label", "Step",None))
@@ -167,17 +176,17 @@ class WindowsDlg(ArtisanDialog):
         self.timeGridCheckBox = QCheckBox(QApplication.translate("CheckBox","Time",None))
         self.timeGridCheckBox.setChecked(self.aw.qmc.time_grid)
         self.timeGridCheckBox.setToolTip(QApplication.translate("Tooltip", "Show time grid", None))
-        self.timeGridCheckBox.setFocusPolicy(Qt.NoFocus)
+        self.timeGridCheckBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.tempGridCheckBox = QCheckBox(QApplication.translate("CheckBox","Temp",None))
         self.tempGridCheckBox.setToolTip(QApplication.translate("Tooltip", "Show temperature grid", None))
         self.tempGridCheckBox.setChecked(self.aw.qmc.temp_grid)
-        self.tempGridCheckBox.setFocusPolicy(Qt.NoFocus)
+        self.tempGridCheckBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         ygridlabel = QLabel(QApplication.translate("Label", "Step",None))
         self.ygridSpinBox = QSpinBox()
         self.ygridSpinBox.setRange(0,500)
         self.ygridSpinBox.setSingleStep(5)
         self.ygridSpinBox.setValue(self.aw.qmc.ygrid)
-        self.ygridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.ygridSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.ygridSpinBox.editingFinished.connect(self.changeygrid)
         self.ygridSpinBox.setMaximumWidth(60)
         zgridlabel = QLabel(QApplication.translate("Label", "Step",None))
@@ -185,7 +194,7 @@ class WindowsDlg(ArtisanDialog):
         self.zgridSpinBox.setRange(0,100)
         self.zgridSpinBox.setSingleStep(1)
         self.zgridSpinBox.setValue(self.aw.qmc.zgrid)
-        self.zgridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.zgridSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.zgridSpinBox.editingFinished.connect(self.changezgrid)
         self.zgridSpinBox.setMaximumWidth(60)
         
@@ -197,7 +206,7 @@ class WindowsDlg(ArtisanDialog):
         self.autodeltaxETFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set delta axis max from DeltaET", None))
         self.autodeltaxBTFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set delta axis max from DeltaBT", None))
         autoDeltaButton = QPushButton(QApplication.translate("Button","Calc",None))
-        autoDeltaButton.setFocusPolicy(Qt.NoFocus)
+        autoDeltaButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         autoDeltaButton.clicked.connect(self.autoDeltaAxis)
 
         linestylegridlabel = QLabel(QApplication.translate("Label", "Style",None))
@@ -216,20 +225,20 @@ class WindowsDlg(ArtisanDialog):
         self.gridwidthSpinBox.setValue(self.aw.qmc.gridthickness)
         self.gridwidthSpinBox.valueChanged.connect(self.changegridwidth)
         self.gridwidthSpinBox.setMaximumWidth(40)
-        self.gridwidthSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.gridwidthSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         gridalphalabel = QLabel(QApplication.translate("Label", "Opaqueness",None))
         self.gridalphaSpinBox = QSpinBox()
         self.gridalphaSpinBox.setRange(1,10)
         self.gridalphaSpinBox.setValue(int(self.aw.qmc.gridalpha*10))
         self.gridalphaSpinBox.valueChanged.connect(self.changegridalpha)
         self.gridalphaSpinBox.setMaximumWidth(40)
-        self.gridalphaSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.gridalphaSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.updatewindow)
         self.dialogbuttons.rejected.connect(self.close)
         
-        resetButton = self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
+        resetButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
         resetButton.clicked.connect(self.reset)
         self.setButtonTranslations(resetButton,"Restore Defaults",QApplication.translate("Button","Restore Defaults", None))
             
@@ -237,12 +246,12 @@ class WindowsDlg(ArtisanDialog):
         self.loadAxisFromProfile.setChecked(self.aw.qmc.loadaxisfromprofile)
         
         hline = QFrame()
-        hline.setFrameShape(QFrame.HLine)
-        hline.setFrameShadow(QFrame.Sunken)
+        hline.setFrameShape(QFrame.Shape.HLine)
+        hline.setFrameShadow(QFrame.Shadow.Sunken)
         
         hline2 = QFrame()
-        hline2.setFrameShape(QFrame.HLine)
-        hline2.setFrameShadow(QFrame.Sunken)
+        hline2.setFrameShape(QFrame.Shape.HLine)
+        hline2.setFrameShadow(QFrame.Shadow.Sunken)
         
         xlayout1 = QHBoxLayout()
         xlayout1.addWidget(self.autotimexFlag)
@@ -273,11 +282,11 @@ class WindowsDlg(ArtisanDialog):
         xlayout.addWidget(hline)
         xlayout.addLayout(xlayout3)
         ylayout = QGridLayout()
-        ylayout.addWidget(ylimitLabel_min,0,0,Qt.AlignRight)
+        ylayout.addWidget(ylimitLabel_min,0,0,Qt.AlignmentFlag.AlignRight)
         ylayout.addWidget(self.ylimitEdit_min,0,1)
-        ylayout.addWidget(ylimitLabel,0,3,Qt.AlignRight)
+        ylayout.addWidget(ylimitLabel,0,3,Qt.AlignmentFlag.AlignRight)
         ylayout.addWidget(self.ylimitEdit,0,4)
-        ylayout.addWidget(ygridlabel,0,6,Qt.AlignRight)
+        ylayout.addWidget(ygridlabel,0,6,Qt.AlignmentFlag.AlignRight)
         ylayout.addWidget(self.ygridSpinBox,0,7)
         ylayout.setColumnMinimumWidth(2,10)
         ylayout.setColumnMinimumWidth(5,10)
@@ -304,11 +313,11 @@ class WindowsDlg(ArtisanDialog):
         zlayout1.addWidget(autoDeltaButton)
         zlayout1.addStretch()
         zlayout = QGridLayout()
-        zlayout.addWidget(zlimitLabel_min,0,0,Qt.AlignRight)
+        zlayout.addWidget(zlimitLabel_min,0,0,Qt.AlignmentFlag.AlignRight)
         zlayout.addWidget(self.zlimitEdit_min,0,1)
-        zlayout.addWidget(zlimitLabel,0,3,Qt.AlignRight)
+        zlayout.addWidget(zlimitLabel,0,3,Qt.AlignmentFlag.AlignRight)
         zlayout.addWidget(self.zlimitEdit,0,4)
-        zlayout.addWidget(zgridlabel,0,6,Qt.AlignRight)
+        zlayout.addWidget(zgridlabel,0,6,Qt.AlignmentFlag.AlignRight)
         zlayout.addWidget(self.zgridSpinBox,0,7)
         zlayout.setColumnMinimumWidth(2,10)
         zlayout.setColumnMinimumWidth(5,10)
@@ -323,17 +332,17 @@ class WindowsDlg(ArtisanDialog):
         
         legentlayout = QHBoxLayout()
         legentlayout.addStretch()
-        legentlayout.addWidget(self.legendComboBox,0,Qt.AlignLeft)
+        legentlayout.addWidget(self.legendComboBox,0,Qt.AlignmentFlag.AlignLeft)
         legentlayout.addStretch()
         graphgridlayout = QGridLayout()
-        graphgridlayout.addWidget(linestylegridlabel,1,0,Qt.AlignRight)
-        graphgridlayout.addWidget(self.gridstylecombobox,1,1,Qt.AlignLeft)
-        graphgridlayout.addWidget(gridthicknesslabel,1,2,Qt.AlignRight)
-        graphgridlayout.addWidget(self.gridwidthSpinBox,1,3,Qt.AlignLeft)
-        graphgridlayout.addWidget(self.timeGridCheckBox,2,0,Qt.AlignLeft)
-        graphgridlayout.addWidget(self.tempGridCheckBox,2,1,Qt.AlignLeft)
-        graphgridlayout.addWidget(gridalphalabel,2,2,Qt.AlignRight)
-        graphgridlayout.addWidget(self.gridalphaSpinBox,2,3,Qt.AlignLeft)
+        graphgridlayout.addWidget(linestylegridlabel,1,0,Qt.AlignmentFlag.AlignRight)
+        graphgridlayout.addWidget(self.gridstylecombobox,1,1,Qt.AlignmentFlag.AlignLeft)
+        graphgridlayout.addWidget(gridthicknesslabel,1,2,Qt.AlignmentFlag.AlignRight)
+        graphgridlayout.addWidget(self.gridwidthSpinBox,1,3,Qt.AlignmentFlag.AlignLeft)
+        graphgridlayout.addWidget(self.timeGridCheckBox,2,0,Qt.AlignmentFlag.AlignLeft)
+        graphgridlayout.addWidget(self.tempGridCheckBox,2,1,Qt.AlignmentFlag.AlignLeft)
+        graphgridlayout.addWidget(gridalphalabel,2,2,Qt.AlignmentFlag.AlignRight)
+        graphgridlayout.addWidget(self.gridalphaSpinBox,2,3,Qt.AlignmentFlag.AlignLeft)
         xGroupLayout = QGroupBox(QApplication.translate("GroupBox","Time Axis",None))
         xGroupLayout.setLayout(xlayout)
         yGroupLayout = QGroupBox(QApplication.translate("GroupBox","Temperature Axis",None))
@@ -365,7 +374,7 @@ class WindowsDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
         
         if self.aw.qmc.locktimex:
             self.disableXAxisControls()
@@ -376,7 +385,7 @@ class WindowsDlg(ArtisanDialog):
         if settings.contains("AxisPosition"):
             self.move(settings.value("AxisPosition"))
         
-        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
+        mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
             
             
     def enableXAxisControls(self):

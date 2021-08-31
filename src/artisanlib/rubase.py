@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # RUBASE CSV Roast Profile importer for Artisan
 
@@ -7,7 +7,13 @@ import os
 import io
 import csv
 
-from PyQt5.QtWidgets import QApplication
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+except:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+
 
 # returns a dict containing all profile information contained in the given Rubase CSV file
 def extractProfileRubaseCSV(file,aw):

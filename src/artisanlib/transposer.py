@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Profile Transposer
 
@@ -26,10 +26,19 @@ from artisanlib.util import stringfromseconds, stringtoseconds
 
 from help import transposer_help
 
-from PyQt5.QtCore import Qt, pyqtSlot, QSettings, QRegularExpression, QDateTime
-from PyQt5.QtGui import QRegularExpressionValidator
-from PyQt5.QtWidgets import (QApplication, QHeaderView, QAbstractItemView, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox,
-            QTableWidget, QTableWidgetItem, QGroupBox, QLayout, QHBoxLayout, QVBoxLayout)
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QRegularExpression, QDateTime # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QHeaderView, QAbstractItemView, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
+                QTableWidget, QTableWidgetItem, QGroupBox, QLayout, QHBoxLayout, QVBoxLayout, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import Qt, pyqtSlot, QSettings, QRegularExpression, QDateTime # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QHeaderView, QAbstractItemView, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
+                QTableWidget, QTableWidgetItem, QGroupBox, QLayout, QHBoxLayout, QVBoxLayout, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
+
 
 class profileTransformatorDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
@@ -96,16 +105,16 @@ class profileTransformatorDlg(ArtisanDialog):
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.applyTransformations)
         self.dialogbuttons.rejected.connect(self.restoreState)
-        self.applyButton = self.dialogbuttons.addButton(QDialogButtonBox.Apply)
-        self.resetButton = self.dialogbuttons.addButton(QDialogButtonBox.Reset)
-        self.helpButton = self.dialogbuttons.addButton(QDialogButtonBox.Help)
-        self.dialogbuttons.button(QDialogButtonBox.Apply).clicked.connect(self.apply)
-        self.dialogbuttons.button(QDialogButtonBox.Reset).clicked.connect(self.restore)
-        self.dialogbuttons.button(QDialogButtonBox.Help).clicked.connect(self.openHelp)
+        self.applyButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Apply)
+        self.resetButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Reset)
+        self.helpButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Help)
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Apply).clicked.connect(self.apply)
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Reset).clicked.connect(self.restore)
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Help).clicked.connect(self.openHelp)
         
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.Apply),"Apply",QApplication.translate("Button","Apply", None))
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.Reset),"Reset",QApplication.translate("Button","Reset", None))
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.Help),"Help",QApplication.translate("Button","Help", None))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Apply),"Apply",QApplication.translate("Button","Apply", None))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Reset),"Reset",QApplication.translate("Button","Reset", None))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Help),"Help",QApplication.translate("Button","Help", None))
         
         #buttons
         buttonsLayout = QHBoxLayout()
@@ -120,7 +129,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.mappingModeComboBox.currentIndexChanged.connect(self.changeMappingMode)
         
         self.temp_formula = QLabel()
-        self.temp_formula.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        self.temp_formula.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         
         settingsHLayout = QHBoxLayout()
         settingsHLayout.addStretch()
@@ -172,13 +181,13 @@ class profileTransformatorDlg(ArtisanDialog):
         mainlayout.addLayout(buttonsLayout)
         
         self.setLayout(mainlayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
 
         settings = QSettings()
         if settings.contains("TransformatorPosition"):
             self.move(settings.value("TransformatorPosition"))
         
-        mainlayout.setSizeConstraint(QLayout.SetFixedSize)
+        mainlayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
 
     # utility functions
@@ -487,7 +496,7 @@ class profileTransformatorDlg(ArtisanDialog):
         if applied_time or applied_temp:
             self.aw.qmc.roastUUID = None
             self.aw.qmc.roastdate = QDateTime.currentDateTime()
-            self.aw.qmc.roastepoch = self.aw.qmc.roastdate.toTime_t()
+            self.aw.qmc.roastepoch = self.aw.qmc.roastdate.toSecsSinceEpoch()
             self.aw.qmc.roasttzoffset = libtime.timezone
             self.aw.qmc.roastbatchnr = 0
             self.aw.setCurrentFile(None,addToRecent=False)
@@ -888,8 +897,8 @@ class profileTransformatorDlg(ArtisanDialog):
         self.phasestable.setRowCount(3)
         self.phasestable.setColumnCount(3)
         self.phasestable.horizontalHeader().setStretchLastSection(False)
-        self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         self.timetable.horizontalHeader().setHighlightSections(False)
         self.phasestable.setHorizontalHeaderLabels([QApplication.translate("Label","Drying",None),
                                                          QApplication.translate("Label","Maillard",None),
@@ -899,8 +908,8 @@ class profileTransformatorDlg(ArtisanDialog):
                                                          QApplication.translate("Table","Result",None)])
         self.phasestable.setShowGrid(True)
         self.phasestable.setAlternatingRowColors(True)
-        self.phasestable.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.phasestable.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.phasestable.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.phasestable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 #        self.phasestable.setFrameStyle(QTableWidget.NoFrame)
         self.phasestable.setFixedSize(
             self.phasestable.horizontalHeader().length() + 
@@ -908,9 +917,9 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.phasestable.verticalHeader().sizeHint().width(),
             self.phasestable.verticalHeader().length() + 
                 self.phasestable.horizontalHeader().height())
-        self.phasestable.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.phasestable.setFocusPolicy(Qt.NoFocus)
-        self.phasestable.setSelectionMode(QAbstractItemView.NoSelection)
+        self.phasestable.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.phasestable.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.phasestable.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         self.phasestable.setAutoScroll(False)
         self.phasestable.verticalHeader().sectionClicked.connect(self.phasesTableRowHeaderClicked)
         self.phasestable.horizontalHeader().sectionClicked.connect(self.phasesTableColumnHeaderClicked)
@@ -939,26 +948,26 @@ class profileTransformatorDlg(ArtisanDialog):
                 profile_phases_time_str = \
                     "{}    {}%".format(stringfromseconds(profilePhasesTimes[i],leadingzero=False),self.aw.float2float(profilePhasesPercentages[i]))
                 profile_phases_widget = QTableWidgetItem(profile_phases_time_str)
-                profile_phases_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                profile_phases_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.phasestable.setItem(0,i,profile_phases_widget)
                 #
                 target_widget_time = QLineEdit("")
                 target_widget_time.setValidator(QRegularExpressionValidator(self.regextime))
-                target_widget_time.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                target_widget_time.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 if phases_enabled:
                     target_widget_time.editingFinished.connect(self.updatePhasesWidget)
                 else:
                     target_widget_time.setEnabled(False)
                 target_widget_percent = QLineEdit("")
                 target_widget_percent.setValidator(QRegularExpressionValidator(self.regexpercent))
-                target_widget_percent.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                target_widget_percent.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 if phases_enabled:
                     target_widget_percent.editingFinished.connect(self.updatePhasesWidget)
                 else:
                     target_widget_percent.setEnabled(False)
                 target_cell_widget = QWidget()
                 target_cell_layout = QHBoxLayout(target_cell_widget)
-                target_cell_layout.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                target_cell_layout.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 target_cell_layout.setContentsMargins(4,4,4,4)
                 target_cell_layout.addWidget(target_widget_time)
                 target_cell_layout.addWidget(target_widget_percent)
@@ -966,7 +975,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.phasestable.setCellWidget(1,i,target_cell_widget)
                 #
                 result_widget = QTableWidgetItem("")
-                result_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                result_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.phasestable.setItem(2,i,result_widget)
             else:
                 target_widget_time = None
@@ -981,8 +990,8 @@ class profileTransformatorDlg(ArtisanDialog):
         self.timetable.setRowCount(3)
         self.timetable.setColumnCount(4)
         self.timetable.horizontalHeader().setStretchLastSection(False)
-        self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         self.timetable.horizontalHeader().setHighlightSections(False)
         self.timetable.setHorizontalHeaderLabels([QApplication.translate("Label","DRY END",None),
                                                          QApplication.translate("Label","FC START",None),
@@ -993,18 +1002,18 @@ class profileTransformatorDlg(ArtisanDialog):
                                                          QApplication.translate("Table","Result",None)])
         self.timetable.setShowGrid(True)
         self.timetable.setAlternatingRowColors(False)
-        self.timetable.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.timetable.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.timetable.setFrameStyle(QTableWidget.NoFrame)
+        self.timetable.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.timetable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.timetable.setFrameStyle(QFrame.Shape.NoFrame)
         self.timetable.setFixedSize(
             self.timetable.horizontalHeader().length() + 
 #                self.timetable.verticalHeader().width(), # only the width of the default labels (numbers)
                 self.timetable.verticalHeader().sizeHint().width(),
             self.timetable.verticalHeader().length() + 
                 self.timetable.horizontalHeader().height())
-        self.timetable.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.timetable.setFocusPolicy(Qt.NoFocus)
-        self.timetable.setSelectionMode(QAbstractItemView.NoSelection)
+        self.timetable.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.timetable.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.timetable.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         self.timetable.setAutoScroll(False)
 #        self.timetable.setStyleSheet("QTableWidget { background-color: #fafafa; }")
         self.timetable.verticalHeader().sectionClicked.connect(self.timeTableRowHeaderClicked)
@@ -1017,23 +1026,23 @@ class profileTransformatorDlg(ArtisanDialog):
             if len(self.profileTimes) > i and not self.profileTimes[i] is None:
                 profile_time_str = stringfromseconds(self.profileTimes[i],leadingzero=False)
                 profile_widget = QTableWidgetItem(profile_time_str)
-                profile_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                profile_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.timetable.setItem(0,i,profile_widget)
                 #
                 target_widget = QLineEdit("")
                 target_widget.setValidator(QRegularExpressionValidator(self.regextime))
-                target_widget.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                target_widget.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 target_widget.editingFinished.connect(self.updateTimesWidget)
                 target_cell_widget = QWidget()
                 target_cell_layout = QHBoxLayout(target_cell_widget)
-                target_cell_layout.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                target_cell_layout.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 target_cell_layout.setContentsMargins(4,4,4,4)
                 target_cell_layout.addWidget(target_widget)
                 target_cell_widget.setLayout(target_cell_layout)
                 self.timetable.setCellWidget(1,i,target_cell_widget)
                 #
                 result_widget = QTableWidgetItem("") #profile_time_str)
-                result_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                result_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.timetable.setItem(2,i,result_widget)
             else:
                 target_widget = None
@@ -1046,8 +1055,8 @@ class profileTransformatorDlg(ArtisanDialog):
         self.temptable.setRowCount(3)
         self.temptable.setColumnCount(5)
         self.temptable.horizontalHeader().setStretchLastSection(False)
-        self.temptable.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.temptable.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.temptable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        self.temptable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         self.temptable.setHorizontalHeaderLabels([QApplication.translate("Label","CHARGE",None),
                                                          QApplication.translate("Label","DRY END",None),
                                                          QApplication.translate("Label","FC START",None),
@@ -1058,8 +1067,8 @@ class profileTransformatorDlg(ArtisanDialog):
                                                          QApplication.translate("Table","Result",None)])
         self.temptable.setShowGrid(True)
         self.temptable.setAlternatingRowColors(False)
-        self.temptable.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.temptable.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.temptable.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.temptable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 #        self.temptable.setFrameStyle(QTableWidget.NoFrame)
         self.temptable.setFixedSize(
             self.temptable.horizontalHeader().length() + 
@@ -1067,9 +1076,9 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.temptable.verticalHeader().sizeHint().width(),
             self.temptable.verticalHeader().length() + 
                 self.temptable.horizontalHeader().height())
-        self.temptable.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.temptable.setFocusPolicy(Qt.NoFocus)
-        self.temptable.setSelectionMode(QAbstractItemView.NoSelection)
+        self.temptable.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.temptable.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.temptable.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         self.temptable.setAutoScroll(False)
         self.temptable.verticalHeader().sectionClicked.connect(self.tempTableRowHeaderClicked)
         self.temptable.horizontalHeader().sectionClicked.connect(self.tempTableColumnHeaderClicked)
@@ -1081,17 +1090,17 @@ class profileTransformatorDlg(ArtisanDialog):
             if len(self.profileTemps) > i and self.profileTemps[i] is not None:
                 profile_temp_str = str(self.aw.float2float(self.profileTemps[i])) + self.aw.qmc.mode
                 profile_widget = QTableWidgetItem(profile_temp_str)
-                profile_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                profile_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.temptable.setItem(0,i,profile_widget)
                 #
                 target_widget = QLineEdit("")
                 target_widget.setValidator(QRegularExpressionValidator(self.regextemp))
                 target_widget.editingFinished.connect(self.updateTempResults)
-                target_widget.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                target_widget.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 
                 target_cell_widget = QWidget()
                 target_cell_layout = QHBoxLayout(target_cell_widget)
-                target_cell_layout.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                target_cell_layout.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 target_cell_layout.setContentsMargins(4,4,4,4)
                 target_cell_layout.addWidget(target_widget)
 #                target_cell_layout.addWidget(QLabel(self.aw.qmc.mode))
@@ -1099,7 +1108,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.temptable.setCellWidget(1,i,target_cell_widget)
                 #
                 result_widget = QTableWidgetItem("")
-                result_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                result_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.temptable.setItem(2,i,result_widget)
             else:
                 target_widget = None

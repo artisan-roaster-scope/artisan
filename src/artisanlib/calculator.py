@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Roast Calculator
 
@@ -19,10 +19,18 @@
 from artisanlib.util import fromCtoF, fromFtoC, stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanDialog
 
-from PyQt5.QtCore import pyqtSlot, QSettings, QRegularExpression
-from PyQt5.QtGui import QRegularExpressionValidator
-from PyQt5.QtWidgets import (QApplication, QLabel, QGridLayout, QGroupBox, QLineEdit,
-    QComboBox, QHBoxLayout, QVBoxLayout)
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import pyqtSlot, QSettings, QRegularExpression # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QLabel, QGridLayout, QGroupBox, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout) # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import pyqtSlot, QSettings, QRegularExpression # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QLabel, QGridLayout, QGroupBox, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout) # @UnusedImport @Reimport  @UnresolvedImport
 
 class calculatorDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):

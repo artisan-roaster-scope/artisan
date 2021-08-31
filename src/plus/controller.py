@@ -22,8 +22,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5.QtCore import QSemaphore, QTimer, Qt
-from PyQt5.QtWidgets import QApplication, QMessageBox
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QSemaphore, QTimer, Qt # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import QApplication, QMessageBox # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QSemaphore, QTimer, Qt # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication, QMessageBox # @UnusedImport @Reimport  @UnresolvedImport
+
 from artisanlib import __build__
 from artisanlib import __revision__
 from artisanlib import __version__
@@ -83,11 +90,11 @@ def toggle(app_window):
     config.logger.info("controller:toggle()")
     config.app_window = app_window
     modifiers = QApplication.keyboardModifiers()
-    if modifiers == (Qt.AltModifier | Qt.ControlModifier):
+    if modifiers == (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ControlModifier):
         # ALT+CTR-CLICK (OPTION+COMMAND on macOS) toggles
         # the plus debug logging
         util.debugLogToggle()
-    elif modifiers == Qt.AltModifier:
+    elif modifiers == Qt.KeyboardModifier.AltModifier:
         # ALT-click (OPTION on macOS) sends the log file by email
         util.sendLog()
     else:
@@ -106,7 +113,7 @@ def toggle(app_window):
                     # discards the credentials
                     disconnect(
                         interactive=True,
-                        remove_credentials=(modifiers == Qt.ControlModifier),
+                        remove_credentials=(modifiers == Qt.KeyboardModifier.ControlModifier),
                         keepON=False,
                     )
                 else:
@@ -321,9 +328,9 @@ def disconnect_confirmed() -> bool:
         aw,
         QApplication.translate("Plus", "Disconnect?", None),
         string,
-        QMessageBox.Ok | QMessageBox.Cancel,
+        QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
     )
-    return bool(reply == QMessageBox.Ok)
+    return bool(reply == QMessageBox.StandardButton.Ok)
 
 
 # if keepON is set (the default), the credentials are not removed at all and

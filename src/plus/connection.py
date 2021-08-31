@@ -22,7 +22,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5.QtCore import QSemaphore
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
+
 from artisanlib import __version__
 from typing import Any
 from typing import Optional, Dict

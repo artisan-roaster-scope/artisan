@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Large LCDs
 
@@ -19,8 +19,14 @@
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQLabel
 
-from PyQt5.QtCore import (Qt, QSettings)
-from PyQt5.QtWidgets import (QApplication, QFrame, QWidget, QLCDNumber, QHBoxLayout, QVBoxLayout)
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import (Qt, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QFrame, QWidget, QLCDNumber, QHBoxLayout, QVBoxLayout) # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import (Qt, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QFrame, QWidget, QLCDNumber, QHBoxLayout, QVBoxLayout) # @UnusedImport @Reimport  @UnresolvedImport
 
 class LargeLCDs(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
@@ -42,7 +48,7 @@ class LargeLCDs(ArtisanDialog):
         self.layoutNr = -1 # 0: landscape, 1: portrait
         self.swaplcds = False
         windowFlags = self.windowFlags()
-        windowFlags |= Qt.Tool
+        windowFlags |= Qt.WindowType.Tool
         self.setWindowFlags(windowFlags)
     
     def resizeEvent(self, event):
@@ -163,8 +169,8 @@ class LargeLCDs(ArtisanDialog):
     
     def makeLCD(self,s):
         lcd = QLCDNumber()
-        lcd.setSegmentStyle(2)
-        lcd.setFrameStyle(QFrame.Plain)
+        lcd.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
+        lcd.setFrameStyle(QFrame.Shadow.Plain)
         lcd.setSmallDecimalPoint(False)
         lcd.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.aw.lcdpaletteF[s],self.aw.lcdpaletteB[s]))
         return lcd
@@ -172,8 +178,8 @@ class LargeLCDs(ArtisanDialog):
     @staticmethod
     def makeLabel(name):
         label = MyQLabel(name)
-        label.setTextFormat(Qt.RichText)
-        label.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
+        label.setTextFormat(Qt.TextFormat.RichText)
+        label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
         return label
     
     @staticmethod
@@ -675,7 +681,7 @@ class LargePhasesLCDs(LargeLCDs):
         self.lcds1labelsLower = [label1Lower,label3Lower]
         self.lcds1frames = [self.makeLCDframe(label1Upper,self.lcds1[0],label1Lower),self.makeLCDframe(label3Upper,self.lcds1[1],label3Lower)]
         for f in self.lcds1frames:
-            f.setContextMenuPolicy(Qt.CustomContextMenu)
+            f.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             f.customContextMenuRequested.connect(self.aw.PhaseslcdClicked)
         #
         self.lcds2styles = ["sv","sv"]
@@ -690,9 +696,9 @@ class LargePhasesLCDs(LargeLCDs):
         self.lcds2labelsUpper = [label2Upper,label4Upper]
         self.lcds2labelsLower = [label2Lower,label4Lower]
         self.lcds2frames = [self.makeLCDframe(label2Upper,self.lcds2[0],label2Lower),self.makeLCDframe(label4Upper,self.lcds2[1],label4Lower)]
-        self.lcds2frames[0].setContextMenuPolicy(Qt.CustomContextMenu)
+        self.lcds2frames[0].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.lcds2frames[0].customContextMenuRequested.connect(self.aw.PhaseslcdClicked)
-        self.lcds2frames[1].setContextMenuPolicy(Qt.CustomContextMenu)
+        self.lcds2frames[1].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.lcds2frames[1].customContextMenuRequested.connect(self.aw.AUClcdClicked)
         ##
         for i in range(len(self.values1)):

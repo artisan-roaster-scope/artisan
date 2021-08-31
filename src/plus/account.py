@@ -24,7 +24,13 @@
 
 """This module connects to the artisan.plus inventory management service."""
 
-from PyQt5.QtCore import QSemaphore
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
+
 from pathlib import Path
 from plus import config, util
 import dbm

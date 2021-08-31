@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Device Communication
 
@@ -31,14 +31,21 @@ import wquantiles
 
 from artisanlib.util import cmd2str, RoRfromCtoF, appFrozen, fromCtoF, fromFtoC, hex2int, str2cmd, toFloat
 
-from PyQt5.QtCore import Qt, QDateTime, QSemaphore, pyqtSlot
-from PyQt5.QtGui import QIntValidator
-from PyQt5.QtWidgets import (QApplication, QCheckBox, QDialog, QGridLayout, QHBoxLayout, QVBoxLayout,
-                             QLabel, QLineEdit,QPushButton)
-try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
-    from PyQt5 import sip # @UnusedImport
-except Exception: # pylint: disable=broad-except
-    pass
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import Qt, QDateTime, QSemaphore, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QIntValidator # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QCheckBox, QDialog, QGridLayout, QHBoxLayout, QVBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QLabel, QLineEdit,QPushButton) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6 import sip  # @UnusedImport @Reimport  @UnresolvedImport                                
+except Exception:  
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import Qt, QDateTime, QSemaphore, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QIntValidator # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QCheckBox, QDialog, QGridLayout, QHBoxLayout, QVBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QLabel, QLineEdit,QPushButton) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5 import sip  # @UnusedImport @Reimport  @UnresolvedImport                          
+
 
 from Phidget22.DeviceID import DeviceID
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
@@ -168,7 +175,7 @@ class nonedevDlg(QDialog):
         self.ETbox.stateChanged.connect(self.changemanuallogETflag)
         self.okButton = QPushButton(QApplication.translate("Button","OK",None))
         self.cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
-        self.cancelButton.setFocusPolicy(Qt.NoFocus)
+        self.cancelButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.okButton.clicked.connect(self.accept)
         self.cancelButton.clicked.connect(self.reject)
         buttonLayout = QHBoxLayout()
@@ -2091,7 +2098,7 @@ class serialport():
         # # sudo -H python3 -m pip install pympler 
         #from pympler import asizeof
         #print(asizeof.asizeof(dialogx)) # 2440 using slots; 2568 without using slots
-        if dialogx.exec_():
+        if dialogx.exec():
             try:
                 ET = (int(str(dialogx.etEdit.text())) * 10)/10.
             except Exception: # pylint: disable=broad-except

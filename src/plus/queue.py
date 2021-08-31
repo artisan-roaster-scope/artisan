@@ -23,8 +23,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtWidgets import QApplication
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QCoreApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QCoreApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+
 from plus import config, util, roast, connection, sync, controller
 from requests.exceptions import ConnectionError as RequestsConnectionError
 from typing import Any, Dict
@@ -235,7 +242,8 @@ def start():
 def stop():
     if not app.artisanviewerMode:
         config.logger.info("queue:stop()")
-        worker_thread.pause()
+        if worker_thread is not None:
+            worker_thread.pause()
 
 
 # check if a full roast record (one with date) with roast_id is in the queue

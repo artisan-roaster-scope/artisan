@@ -1,226 +1,242 @@
 <head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body><b>ALARMS</b><table width="100%" border="1" padding="1" border-collapse="collapse">
-    <tr>
-        <td>Each alarm is only triggered once.<br>Alarms are scanned in order from the top of the table to the bottom.</td>
-    </tr>
+    <tbody>
+        <tr>
+            <td>Each alarm is only triggered once.<br>Alarms are scanned in order from the top of the table to the bottom.</td>
+        </tr>
+    </tbody>
 </table><table width="100%" border="1" padding="1" border-collapse="collapse">
-    <tr>
-        <th>Field</th>
-        <th>Description</th>
-    </tr>
-    <tr>
-        <td>Nr</td>
-        <td>Alarm number for reference.</td>
-    </tr>
-    <tr>
-        <td>Status</td>
-        <td>Activate or Deactivate the alarm.</td>
-    </tr>
-    <tr>
-        <td>If Alarm</td>
-        <td>Alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.</td>
-    </tr>
-    <tr>
-        <td>But Not</td>
-        <td>Alarm triggered only if the alarm with the given number was not triggered before. Use 0 for no guard.</td>
-    </tr>
-    <tr>
-        <td>From</td>
-        <td>Alarm only triggered after the given event.</td>
-    </tr>
-    <tr>
-        <td>Time</td>
-        <td>If not 00:00, alarm is triggered mm:ss after the event &quot;From&quot; happens.</td>
-    </tr>
-    <tr>
-        <td>Source</td>
-        <td>The observed temperature source.</td>
-    </tr>
-    <tr>
-        <td>Condition</td>
-        <td>Alarm is triggered if source rises above or below the specified temperature.</td>
-    </tr>
-    <tr>
-        <td>Temp</td>
-        <td>The specified temperature limit.</td>
-    </tr>
-    <tr>
-        <td>Action</td>
-        <td>The action to be triggered if all conditions are fulfilled.</td>
-    </tr>
-    <tr>
-        <td>Description</td>
-        <td>Commands for alarms with an action go here.  Anything after a &#39;#&#39; character is considerd a comment and is ignored when processing the alarm.  </td>
-    </tr>
+    <thead>
+        <tr>
+            <th>Field</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Nr</td>
+            <td>Alarm number for reference.</td>
+        </tr>
+        <tr>
+            <td>Status</td>
+            <td>Activate or Deactivate the alarm.</td>
+        </tr>
+        <tr>
+            <td>If Alarm</td>
+            <td>Alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.</td>
+        </tr>
+        <tr>
+            <td>But Not</td>
+            <td>Alarm triggered only if the alarm with the given number was not triggered before. Use 0 for no guard.</td>
+        </tr>
+        <tr>
+            <td>From</td>
+            <td>Alarm only triggered after the given event.</td>
+        </tr>
+        <tr>
+            <td>Time</td>
+            <td>If not 00:00, alarm is triggered mm:ss after the event &quot;From&quot; happens.</td>
+        </tr>
+        <tr>
+            <td>Source</td>
+            <td>The observed temperature source.</td>
+        </tr>
+        <tr>
+            <td>Condition</td>
+            <td>Alarm is triggered if source rises above or below the specified temperature.</td>
+        </tr>
+        <tr>
+            <td>Temp</td>
+            <td>The specified temperature limit.</td>
+        </tr>
+        <tr>
+            <td>Action</td>
+            <td>The action to be triggered if all conditions are fulfilled.</td>
+        </tr>
+        <tr>
+            <td>Description</td>
+            <td>Commands for alarms with an action go here.  Anything after a &#39;#&#39; character is considerd a comment and is ignored when processing the alarm.  </td>
+        </tr>
+    </tbody>
 </table><br/><br/><b>ALARM CONFIGURATION OPTIONS</b><table width="100%" border="1" padding="1" border-collapse="collapse">
-    <tr>
-        <th>Option</th>
-        <th>Description</th>
-    </tr>
-    <tr>
-        <td>Add</td>
-        <td>Adds a new alarm to the bottom of the table.</td>
-    </tr>
-    <tr>
-        <td>Insert</td>
-        <td>Inserts a new alarm above the selected alarm.</td>
-    </tr>
-    <tr>
-        <td>Delete</td>
-        <td>Deletes the selected alarm.</td>
-    </tr>
-    <tr>
-        <td>Copy Table</td>
-        <td>Copy the alarm table in tab separated format to the clipboard.  Option or ALT click to copy a tabular format to the clipboard.</td>
-    </tr>
-    <tr>
-        <td>All On</td>
-        <td>Enables all alarms.</td>
-    </tr>
-    <tr>
-        <td>All Off</td>
-        <td>Disables all alarms.</td>
-    </tr>
-    <tr>
-        <td>Load</td>
-        <td>Load alarm definition from a file.</td>
-    </tr>
-    <tr>
-        <td>Save</td>
-        <td>Save the alarm definitions to a file.</td>
-    </tr>
-    <tr>
-        <td>Clear</td>
-        <td>Clears all alarms from the table.</td>
-    </tr>
-    <tr>
-        <td>Help</td>
-        <td>Opens this window.</td>
-    </tr>
-    <tr>
-        <td>Load from Profile</td>
-        <td>when ticked will replace the alarm table when loading a profile with the alarms stored in the profile.  If there are no alarms in the profile the alarm table will be cleared.</td>
-    </tr>
-    <tr>
-        <td>Load from Background</td>
-        <td>when ticked will replace the alarm table when loading a background profile with the alarms stored in the profile.  If there are no alarms in the profile the alarm table will be cleared.</td>
-    </tr>
-    <tr>
-        <td>PopUp TimeOut</td>
-        <td>A PopUp will automatically close after this time if the OK button has not been clicked.</td>
-    </tr>
+    <thead>
+        <tr>
+            <th>Option</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Add</td>
+            <td>Adds a new alarm to the bottom of the table.</td>
+        </tr>
+        <tr>
+            <td>Insert</td>
+            <td>Inserts a new alarm above the selected alarm.</td>
+        </tr>
+        <tr>
+            <td>Delete</td>
+            <td>Deletes the selected alarm.</td>
+        </tr>
+        <tr>
+            <td>Copy Table</td>
+            <td>Copy the alarm table in tab separated format to the clipboard.  Option or ALT click to copy a tabular format to the clipboard.</td>
+        </tr>
+        <tr>
+            <td>All On</td>
+            <td>Enables all alarms.</td>
+        </tr>
+        <tr>
+            <td>All Off</td>
+            <td>Disables all alarms.</td>
+        </tr>
+        <tr>
+            <td>Load</td>
+            <td>Load alarm definition from a file.</td>
+        </tr>
+        <tr>
+            <td>Save</td>
+            <td>Save the alarm definitions to a file.</td>
+        </tr>
+        <tr>
+            <td>Clear</td>
+            <td>Clears all alarms from the table.</td>
+        </tr>
+        <tr>
+            <td>Help</td>
+            <td>Opens this window.</td>
+        </tr>
+        <tr>
+            <td>Load from Profile</td>
+            <td>when ticked will replace the alarm table when loading a profile with the alarms stored in the profile.  If there are no alarms in the profile the alarm table will be cleared.</td>
+        </tr>
+        <tr>
+            <td>Load from Background</td>
+            <td>when ticked will replace the alarm table when loading a background profile with the alarms stored in the profile.  If there are no alarms in the profile the alarm table will be cleared.</td>
+        </tr>
+        <tr>
+            <td>PopUp TimeOut</td>
+            <td>A PopUp will automatically close after this time if the OK button has not been clicked.</td>
+        </tr>
+    </tbody>
 </table><br/><br/><b>Alarm Actions</b><table width="100%" border="1" padding="1" border-collapse="collapse">
-    <tr>
-        <td>Enter the Command into the Description field of the Alarm.</td>
-    </tr>
+    <tbody>
+        <tr>
+            <td>Enter the Command into the Description field of the Alarm.</td>
+        </tr>
+    </tbody>
 </table><table width="100%" border="1" padding="1" border-collapse="collapse">
-    <tr>
-        <th>Action</th>
-        <th>Command</th>
-        <th>Meaning</th>
-    </tr>
-    <tr>
-        <td>Pop Up</td>
-        <td>&lt;text&gt;</td>
-        <td>the text to  be displayed in the pop up</td>
-    </tr>
-    <tr>
-        <td>Call Program</td>
-        <td>A program/script path (absolute or relative)</td>
-        <td>start an external program</td>
-    </tr>
-    <tr>
-        <td>Event Button</td>
-        <td>&lt;button number&gt;</td>
-        <td>triggers the button, the button number comes from the Events Buttons configuration</td>
-    </tr>
-    <tr>
-        <td>Slider &lt;1&gt;</td>
-        <td>&lt;value&gt;</td>
-        <td>set the slider for special event nr. 1 to the value</td>
-    </tr>
-    <tr>
-        <td>Slider &lt;2&gt;</td>
-        <td>&lt;value&gt;</td>
-        <td>set the slider for special event nr. 2 to the value</td>
-    </tr>
-    <tr>
-        <td>Slider &lt;3&gt;</td>
-        <td>&lt;value&gt;</td>
-        <td>set the slider for special event nr. 3 to the value</td>
-    </tr>
-    <tr>
-        <td>Slider &lt;4&gt;</td>
-        <td>&lt;value&gt;</td>
-        <td>set the slider for special event nr. 4 to the value</td>
-    </tr>
-    <tr>
-        <td>START</td>
-        <td>&#160;</td>
-        <td>trigger START</td>
-    </tr>
-    <tr>
-        <td>DRY</td>
-        <td>&#160;</td>
-        <td>trigger the DRY event</td>
-    </tr>
-    <tr>
-        <td>FCs</td>
-        <td>&#160;</td>
-        <td>trigger the FCs event</td>
-    </tr>
-    <tr>
-        <td>FCe</td>
-        <td>&#160;</td>
-        <td>trigger the FCe event</td>
-    </tr>
-    <tr>
-        <td>SCs</td>
-        <td>&#160;</td>
-        <td>trigger the SCs event</td>
-    </tr>
-    <tr>
-        <td>SCe</td>
-        <td>&#160;</td>
-        <td>trigger the SCe event</td>
-    </tr>
-    <tr>
-        <td>DROP</td>
-        <td>&#160;</td>
-        <td>trigger the DROP event</td>
-    </tr>
-    <tr>
-        <td>COOL END</td>
-        <td>&#160;</td>
-        <td>trigger the COOL END event</td>
-    </tr>
-    <tr>
-        <td>OFF</td>
-        <td>&#160;</td>
-        <td>trigger OFF</td>
-    </tr>
-    <tr>
-        <td>CHARGE</td>
-        <td>&#160;</td>
-        <td>trigger the CHARGE event</td>
-    </tr>
-    <tr>
-        <td>RampSoak ON</td>
-        <td>&#160;</td>
-        <td>turns PID on and switches to RampSoak mode</td>
-    </tr>
-    <tr>
-        <td>RampSoak OFF</td>
-        <td>&#160;</td>
-        <td>turns PID off and switches to manual mode</td>
-    </tr>
-    <tr>
-        <td>Set Canvas Color</td>
-        <td>&lt;color&gt;</td>
-        <td>sets the canvas to &lt;color&gt;, can be in hex format, e.g. &quot;#ffaa55&quot; or a color name, e.g. &quot;blue&quot;</td>
-    </tr>
-    <tr>
-        <td>Reset Canvas Color</td>
-        <td>&#160;</td>
-        <td>reset the canvas color to the color specified in Config&gt;&gt;Colors<br>canvas color resets automatically at OFF</td>
-    </tr>
+    <thead>
+        <tr>
+            <th>Action</th>
+            <th>Command</th>
+            <th>Meaning</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Pop Up</td>
+            <td>&lt;text&gt;</td>
+            <td>the text to  be displayed in the pop up</td>
+        </tr>
+        <tr>
+            <td>Call Program</td>
+            <td>A program/script path (absolute or relative)</td>
+            <td>start an external program</td>
+        </tr>
+        <tr>
+            <td>Event Button</td>
+            <td>&lt;button number&gt;</td>
+            <td>triggers the button, the button number comes from the Events Buttons configuration</td>
+        </tr>
+        <tr>
+            <td>Slider &lt;1&gt;</td>
+            <td>&lt;value&gt;</td>
+            <td>set the slider for special event nr. 1 to the value</td>
+        </tr>
+        <tr>
+            <td>Slider &lt;2&gt;</td>
+            <td>&lt;value&gt;</td>
+            <td>set the slider for special event nr. 2 to the value</td>
+        </tr>
+        <tr>
+            <td>Slider &lt;3&gt;</td>
+            <td>&lt;value&gt;</td>
+            <td>set the slider for special event nr. 3 to the value</td>
+        </tr>
+        <tr>
+            <td>Slider &lt;4&gt;</td>
+            <td>&lt;value&gt;</td>
+            <td>set the slider for special event nr. 4 to the value</td>
+        </tr>
+        <tr>
+            <td>START</td>
+            <td>&#160;</td>
+            <td>trigger START</td>
+        </tr>
+        <tr>
+            <td>DRY</td>
+            <td>&#160;</td>
+            <td>trigger the DRY event</td>
+        </tr>
+        <tr>
+            <td>FCs</td>
+            <td>&#160;</td>
+            <td>trigger the FCs event</td>
+        </tr>
+        <tr>
+            <td>FCe</td>
+            <td>&#160;</td>
+            <td>trigger the FCe event</td>
+        </tr>
+        <tr>
+            <td>SCs</td>
+            <td>&#160;</td>
+            <td>trigger the SCs event</td>
+        </tr>
+        <tr>
+            <td>SCe</td>
+            <td>&#160;</td>
+            <td>trigger the SCe event</td>
+        </tr>
+        <tr>
+            <td>DROP</td>
+            <td>&#160;</td>
+            <td>trigger the DROP event</td>
+        </tr>
+        <tr>
+            <td>COOL END</td>
+            <td>&#160;</td>
+            <td>trigger the COOL END event</td>
+        </tr>
+        <tr>
+            <td>OFF</td>
+            <td>&#160;</td>
+            <td>trigger OFF</td>
+        </tr>
+        <tr>
+            <td>CHARGE</td>
+            <td>&#160;</td>
+            <td>trigger the CHARGE event</td>
+        </tr>
+        <tr>
+            <td>RampSoak ON</td>
+            <td>&#160;</td>
+            <td>turns PID on and switches to RampSoak mode</td>
+        </tr>
+        <tr>
+            <td>RampSoak OFF</td>
+            <td>&#160;</td>
+            <td>turns PID off and switches to manual mode</td>
+        </tr>
+        <tr>
+            <td>Set Canvas Color</td>
+            <td>&lt;color&gt;</td>
+            <td>sets the canvas to &lt;color&gt;, can be in hex format, e.g. &quot;#ffaa55&quot; or a color name, e.g. &quot;blue&quot;</td>
+        </tr>
+        <tr>
+            <td>Reset Canvas Color</td>
+            <td>&#160;</td>
+            <td>reset the canvas color to the color specified in Config&gt;&gt;Colors<br>canvas color resets automatically at OFF</td>
+        </tr>
+    </tbody>
 </table></body>

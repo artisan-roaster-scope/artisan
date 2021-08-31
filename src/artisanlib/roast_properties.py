@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Roast Properties Dialog
 
@@ -37,17 +37,25 @@ from help import energy_help
 from uic import EnergyWidget
 from uic import SetupWidget
 from uic import MeasureDialog
-    
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent
-from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette
-from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout,
-                             QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView, 
-                             QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy,
-                             QGroupBox)
-try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
-    from PyQt5 import sip # @UnusedImport
-except Exception: # pylint: disable=broad-except
-    pass
+
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView,  # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView,  # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5 import sip  # @UnusedImport @Reimport  @UnresolvedImport
 
 if sys.platform.startswith("darwin"):
     import darkdetect # @UnresolvedImport # pylint: disable=import-error
@@ -108,13 +116,13 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.unitvolumeEdit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.unitvolumeEdit))
         self.unitvolumeEdit.setMinimumWidth(70)
         self.unitvolumeEdit.setMaximumWidth(70)
-        self.unitvolumeEdit.setAlignment(Qt.AlignRight)
+        self.unitvolumeEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         unitvolumeUnit = QLabel(QApplication.translate("Label","ml", None))
         
         # unit button
         unitButton = QPushButton(QApplication.translate("Button", "unit",None))
         unitButton.clicked.connect(self.unitWeight)
-        unitButton.setFocusPolicy(Qt.NoFocus)
+        unitButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         unitLayout = QHBoxLayout()
         if self.scale_connected:
@@ -133,7 +141,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeinweightEdit = QLineEdit(self.aw.qmc.volumeCalcWeightInStr)
         self.coffeeinweightEdit.setMinimumWidth(70)
         self.coffeeinweightEdit.setMaximumWidth(70)
-        self.coffeeinweightEdit.setAlignment(Qt.AlignRight)
+        self.coffeeinweightEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         coffeeinunitweightUnit = QLabel(QApplication.translate("Label","g", None))
 
         coffeeinweightLabel = QLabel("<b>" + QApplication.translate("Label","Weight", None) + "</b>")
@@ -142,9 +150,9 @@ class volumeCalculatorDlg(ArtisanDialog):
             self.coffeeinweight.setText("%g" % self.aw.float2floatWeightVolume(self.weightIn))
         self.coffeeinweight.setMinimumWidth(70)
         self.coffeeinweight.setMaximumWidth(70)
-        self.coffeeinweight.setAlignment(Qt.AlignRight)
+        self.coffeeinweight.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.coffeeinweight.setReadOnly(True)
-        self.coffeeinweight.setFocusPolicy(Qt.NoFocus)
+        self.coffeeinweight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         if sys.platform.startswith("darwin"):
             self.coffeeinweight.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
         else:
@@ -160,15 +168,15 @@ class volumeCalculatorDlg(ArtisanDialog):
         palette.setColor(self.coffeeinvolume.foregroundRole(), QColor('red'))
         self.coffeeinvolume.setPalette(palette)
         
-        self.coffeeinvolume.setAlignment(Qt.AlignRight)
+        self.coffeeinvolume.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.coffeeinvolume.setReadOnly(True)
-        self.coffeeinvolume.setFocusPolicy(Qt.NoFocus)
+        self.coffeeinvolume.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         coffeeinvolumeUnit = QLabel(self.aw.qmc.volume_units[volumeunit])
             
         # in button
         inButton = QPushButton(QApplication.translate("Button", "in",None))
         inButton.clicked.connect(self.inWeight)
-        inButton.setFocusPolicy(Qt.NoFocus)
+        inButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         
         inGrid = QGridLayout()
         inGrid.addWidget(coffeeinweightLabel,0,0)
@@ -206,7 +214,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeoutweightEdit = QLineEdit(self.aw.qmc.volumeCalcWeightOutStr)
         self.coffeeoutweightEdit.setMinimumWidth(60)
         self.coffeeoutweightEdit.setMaximumWidth(60)
-        self.coffeeoutweightEdit.setAlignment(Qt.AlignRight)
+        self.coffeeoutweightEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         coffeeoutunitweightUnit = QLabel(QApplication.translate("Label","g", None))
 
         coffeeoutweightLabel = QLabel("<b>" + QApplication.translate("Label","Weight", None) + "</b>")
@@ -215,13 +223,13 @@ class volumeCalculatorDlg(ArtisanDialog):
             self.coffeeoutweight.setText("%g" % self.aw.float2floatWeightVolume(self.weightOut))
         self.coffeeoutweight.setMinimumWidth(60)
         self.coffeeoutweight.setMaximumWidth(60)
-        self.coffeeoutweight.setAlignment(Qt.AlignRight)
+        self.coffeeoutweight.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.coffeeoutweight.setReadOnly(True)
         if sys.platform.startswith("darwin"):
             self.coffeeoutweight.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
         else:
             self.coffeeoutweight.setStyleSheet("background-color:'lightgrey'")
-        self.coffeeoutweight.setFocusPolicy(Qt.NoFocus)
+        self.coffeeoutweight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         coffeeoutweightUnit = QLabel(self.aw.qmc.weight_units[weightunit])
 
         coffeeoutvolumeLabel = QLabel("<b>" + QApplication.translate("Label","Volume", None) + "</b>")
@@ -233,15 +241,15 @@ class volumeCalculatorDlg(ArtisanDialog):
         palette.setColor(self.coffeeoutvolume.foregroundRole(), QColor('red'))
         self.coffeeoutvolume.setPalette(palette)
 
-        self.coffeeoutvolume.setAlignment(Qt.AlignRight)
+        self.coffeeoutvolume.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.coffeeoutvolume.setReadOnly(True)
-        self.coffeeoutvolume.setFocusPolicy(Qt.NoFocus)
+        self.coffeeoutvolume.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         coffeeoutvolumeUnit = QLabel(self.aw.qmc.volume_units[volumeunit])
 
         # out button
         outButton = QPushButton(QApplication.translate("Button", "out",None))
         outButton.clicked.connect(self.outWeight)
-        outButton.setFocusPolicy(Qt.NoFocus)
+        outButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                 
         outGrid = QGridLayout()
         outGrid.addWidget(coffeeoutweightLabel,0,0)
@@ -450,17 +458,17 @@ class tareDlg(ArtisanDialog):
         self.taretable.itemSelectionChanged.connect(self.selectionChanged)
         
         addButton = QPushButton(QApplication.translate("Button","Add", None))
-        addButton.setFocusPolicy(Qt.NoFocus)
+        addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.delButton = QPushButton(QApplication.translate("Button","Delete", None))
         self.delButton.setDisabled(True)
-        self.delButton.setFocusPolicy(Qt.NoFocus)
+        self.delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         
         addButton.clicked.connect(self.addTare)
         self.delButton.clicked.connect(self.delTare)
         
         okButton = QPushButton(QApplication.translate("Button","OK", None))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
+        cancelButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         okButton.clicked.connect(self.close)
         cancelButton.clicked.connect(self.reject)
         contentbuttonLayout = QHBoxLayout()
@@ -508,11 +516,11 @@ class tareDlg(ArtisanDialog):
         self.taretable.setRowCount(rows + 1)
         #add widgets to the table
         name = QLineEdit()
-        name.setAlignment(Qt.AlignRight)
+        name.setAlignment(Qt.AlignmentFlag.AlignRight)
         name.setText("name")
         w,_,_ = self.aw.scale.readWeight(self.parent.scale_weight) # read value from scale in 'g'
         weight = QLineEdit()
-        weight.setAlignment(Qt.AlignRight)
+        weight.setAlignment(Qt.AlignmentFlag.AlignRight)
         if w > -1:
             weight.setText(str(w))
         else:
@@ -548,26 +556,26 @@ class tareDlg(ArtisanDialog):
         self.taretable.setHorizontalHeaderLabels([QApplication.translate("Table","Name",None),
                                                          QApplication.translate("Table","Weight",None)])
         self.taretable.setAlternatingRowColors(True)
-        self.taretable.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.taretable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.taretable.setSelectionMode(QTableWidget.SingleSelection)
+        self.taretable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.taretable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.taretable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.taretable.setShowGrid(True)
-        self.taretable.verticalHeader().setSectionResizeMode(2)
+        self.taretable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         for i in range(len(self.aw.qmc.container_names)):
             #add widgets to the table
             name = QLineEdit()
-            name.setAlignment(Qt.AlignRight)
+            name.setAlignment(Qt.AlignmentFlag.AlignRight)
             name.setText(self.aw.qmc.container_names[i])
             weight = QLineEdit()
-            weight.setAlignment(Qt.AlignRight)
+            weight.setAlignment(Qt.AlignmentFlag.AlignRight)
             weight.setText(str(self.aw.qmc.container_weights[i]))
             weight.setValidator(QIntValidator(0,999,weight))
             
             self.taretable.setCellWidget(i,0,name)
             self.taretable.setCellWidget(i,1,weight)
         header = self.taretable.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.Fixed)
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
         self.taretable.setColumnWidth(1,65)
         
 ########################################################################################
@@ -602,9 +610,9 @@ class RoastsComboBox(QComboBox):
 
     def eventFilter(self, _obj, event):
 # the next prevents correct setSelection on Windows
-#        if event.type() == QEvent.FocusIn:
+#        if event.type() == QEvent.Type.FocusIn:
 #            self.setSelection(self.currentIndex())
-        if event.type() == QEvent.MouseButtonPress:
+        if event.type() == QEvent.Type.MouseButtonPress:
             self.updateMenu()
 #            return True # stops processing # popup not drawn if this line is added
 #        return super().eventFilter(obj, event) # this seems to slow down things on Windows and not necessary anyhow
@@ -703,12 +711,12 @@ class editGraphDlg(ArtisanResizeablDialog):
         regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #MARKERS
         chargelabel = QLabel("<b>" + QApplication.translate("Label", "CHARGE",None) + "</b>")
-        chargelabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        chargelabel.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         chargelabel.setStyleSheet("background-color:'#f07800';")
         self.chargeeditcopy = stringfromseconds(0)
         self.chargeedit = QLineEdit(self.chargeeditcopy)
-#        self.chargeedit.setFocusPolicy(Qt.NoFocus)
-        self.chargeedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+#        self.chargeedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.chargeedit.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         self.chargeedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.chargeedit.setMaximumWidth(50)
         self.chargeedit.setMinimumWidth(50)
@@ -730,7 +738,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             if self.drop_idx != 0 and self.drop_idx != self.aw.qmc.timeindex[6]:
                 drop_str = stringfromseconds(self.aw.qmc.timex[self.drop_idx]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
         drylabel = QLabel("<b>" + QApplication.translate("Label", "DRY END",None) + "</b>")
-        drylabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        drylabel.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         drylabel.setStyleSheet("background-color:'orange';")
         if self.aw.qmc.timeindex[1] and self.aw.qmc.timeindex[1] < len(self.aw.qmc.timex):
             t2 = self.aw.qmc.timex[self.aw.qmc.timeindex[1]]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
@@ -738,13 +746,13 @@ class editGraphDlg(ArtisanResizeablDialog):
             t2 = 0
         self.dryeditcopy = stringfromseconds(t2)
         self.dryedit = QLineEdit(self.dryeditcopy)
-        self.dryedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.dryedit.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         self.dryedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.dryedit.setMaximumWidth(50)
         self.dryedit.setMinimumWidth(50)
         drylabel.setBuddy(self.dryedit)
         Cstartlabel = QLabel("<b>" + QApplication.translate("Label","FC START",None) + "</b>")
-        Cstartlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        Cstartlabel.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         Cstartlabel.setStyleSheet("background-color:'orange';")
         if self.aw.qmc.timeindex[2] and self.aw.qmc.timeindex[2] < len(self.aw.qmc.timex):
             t3 = self.aw.qmc.timex[self.aw.qmc.timeindex[2]]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
@@ -752,15 +760,15 @@ class editGraphDlg(ArtisanResizeablDialog):
             t3 = 0
         self.Cstarteditcopy = stringfromseconds(t3)
         self.Cstartedit = QLineEdit(self.Cstarteditcopy)
-#        self.Cstartedit.setFocusPolicy(Qt.NoFocus)
-        self.Cstartedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+#        self.Cstartedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.Cstartedit.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         self.Cstartedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.Cstartedit.setMaximumWidth(50)
         self.Cstartedit.setMinimumWidth(50)
         Cstartlabel.setBuddy(self.Cstartedit)
         
         Cendlabel = QLabel("<b>" + QApplication.translate("Label","FC END",None) + "</b>")
-        Cendlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        Cendlabel.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         Cendlabel.setStyleSheet("background-color:'orange';")
         if self.aw.qmc.timeindex[3] and self.aw.qmc.timeindex[3] < len(self.aw.qmc.timex):
             t4 = self.aw.qmc.timex[self.aw.qmc.timeindex[3]]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
@@ -768,14 +776,14 @@ class editGraphDlg(ArtisanResizeablDialog):
             t4 = 0
         self.Cendeditcopy = stringfromseconds(t4)
         self.Cendedit = QLineEdit(self.Cendeditcopy)
-#        self.Cendedit.setFocusPolicy(Qt.NoFocus)
-        self.Cendedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+#        self.Cendedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.Cendedit.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         self.Cendedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.Cendedit.setMaximumWidth(50)
         self.Cendedit.setMinimumWidth(50)
         Cendlabel.setBuddy(self.Cendedit)
         CCstartlabel = QLabel("<b>" + QApplication.translate("Label","SC START",None) + "</b>")
-        CCstartlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        CCstartlabel.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         CCstartlabel.setStyleSheet("background-color:'orange';")
         if self.aw.qmc.timeindex[4] and self.aw.qmc.timeindex[4] < len(self.aw.qmc.timex):
             t5 = self.aw.qmc.timex[self.aw.qmc.timeindex[4]]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
@@ -783,14 +791,14 @@ class editGraphDlg(ArtisanResizeablDialog):
             t5 = 0
         self.CCstarteditcopy = stringfromseconds(t5)
         self.CCstartedit = QLineEdit(self.CCstarteditcopy)
-#        self.CCstartedit.setFocusPolicy(Qt.NoFocus)
-        self.CCstartedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+#        self.CCstartedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.CCstartedit.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         self.CCstartedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.CCstartedit.setMaximumWidth(50)
         self.CCstartedit.setMinimumWidth(50)
         CCstartlabel.setBuddy(self.CCstartedit)
         CCendlabel = QLabel("<b>" + QApplication.translate("Label","SC END",None) + "</b>")
-        CCendlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        CCendlabel.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         CCendlabel.setStyleSheet("background-color:'orange';")
         if self.aw.qmc.timeindex[5] and self.aw.qmc.timeindex[5] < len(self.aw.qmc.timex):
             t6 = self.aw.qmc.timex[self.aw.qmc.timeindex[5]]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
@@ -798,23 +806,23 @@ class editGraphDlg(ArtisanResizeablDialog):
             t6 = 0
         self.CCendeditcopy = stringfromseconds(t6)
         self.CCendedit = QLineEdit(self.CCendeditcopy)
-#        self.CCendedit.setFocusPolicy(Qt.NoFocus)
-        self.CCendedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+#        self.CCendedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.CCendedit.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         self.CCendedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.CCendedit.setMaximumWidth(50)
         self.CCendedit.setMinimumWidth(50)
         CCendlabel.setBuddy(self.CCendedit)
         droplabel = QLabel("<b>" + QApplication.translate("Label", "DROP",None) + "</b>")
         droplabel.setStyleSheet("background-color:'#f07800';")
-        droplabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        droplabel.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         if self.aw.qmc.timeindex[6] and self.aw.qmc.timeindex[6] < len(self.aw.qmc.timex):
             t7 = self.aw.qmc.timex[self.aw.qmc.timeindex[6]]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
         else:
             t7 = 0
         self.dropeditcopy = stringfromseconds(t7)
         self.dropedit = QLineEdit(self.dropeditcopy)
-#        self.dropedit.setFocusPolicy(Qt.NoFocus)
-        self.dropedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+#        self.dropedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.dropedit.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         self.dropedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.dropedit.setMaximumWidth(50)
         self.dropedit.setMinimumWidth(50)
@@ -822,15 +830,15 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.dropestimate = QLabel(drop_str)
         coollabel = QLabel("<b>" + QApplication.translate("Label", "COOL",None) + "</b>")
         coollabel.setStyleSheet("background-color:'#6666ff';")
-        coollabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        coollabel.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         if self.aw.qmc.timeindex[7] and self.aw.qmc.timeindex[7] < len(self.aw.qmc.timex):
             t8 = self.aw.qmc.timex[self.aw.qmc.timeindex[7]]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
         else:
             t8 = 0
         self.cooleditcopy = stringfromseconds(t8)
         self.cooledit = QLineEdit(self.cooleditcopy)
-#        self.cooledit.setFocusPolicy(Qt.NoFocus)
-        self.cooledit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+#        self.cooledit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.cooledit.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         self.cooledit.setValidator(QRegularExpressionValidator(regextime,self))
         self.cooledit.setMaximumWidth(50)
         self.cooledit.setMinimumWidth(50)
@@ -849,38 +857,38 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.eventtable = QTableWidget()
         self.eventtable.setTabKeyNavigation(True)
         self.clusterEventsButton = QPushButton(QApplication.translate("Button", "Cluster",None))
-        self.clusterEventsButton.setFocusPolicy(Qt.NoFocus)
+        self.clusterEventsButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.clusterEventsButton.setMaximumSize(self.clusterEventsButton.sizeHint())
         self.clusterEventsButton.setMinimumSize(self.clusterEventsButton.minimumSizeHint())
         self.clusterEventsButton.clicked.connect(self.clusterEvents)
         self.clearEventsButton = QPushButton(QApplication.translate("Button", "Clear",None))
-        self.clearEventsButton.setFocusPolicy(Qt.NoFocus)
+        self.clearEventsButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.clearEventsButton.setMaximumSize(self.clearEventsButton.sizeHint())
         self.clearEventsButton.setMinimumSize(self.clearEventsButton.minimumSizeHint())
         self.clearEventsButton.clicked.connect(self.clearEvents) 
         self.createalarmTableButton = QPushButton(QApplication.translate("Button", "Create Alarms",None))
-        self.createalarmTableButton.setFocusPolicy(Qt.NoFocus)
+        self.createalarmTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.createalarmTableButton.setMaximumSize(self.createalarmTableButton.sizeHint())
         self.createalarmTableButton.setMinimumSize(self.createalarmTableButton.minimumSizeHint())
         self.createalarmTableButton.clicked.connect(self.createAlarmEventTable)
         self.ordereventTableButton = QPushButton(QApplication.translate("Button", "Order",None))
-        self.ordereventTableButton.setFocusPolicy(Qt.NoFocus)
+        self.ordereventTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.ordereventTableButton.setMaximumSize(self.ordereventTableButton.sizeHint())
         self.ordereventTableButton.setMinimumSize(self.ordereventTableButton.minimumSizeHint())
         self.ordereventTableButton.clicked.connect(self.orderEventTable)
         self.neweventTableButton = QPushButton(QApplication.translate("Button", "Add",None))
-        self.neweventTableButton.setFocusPolicy(Qt.NoFocus)
+        self.neweventTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.neweventTableButton.setMaximumSize(self.neweventTableButton.sizeHint())
         self.neweventTableButton.setMinimumSize(self.neweventTableButton.minimumSizeHint())
         self.neweventTableButton.clicked.connect(self.addEventTable)
         self.deleventTableButton = QPushButton(QApplication.translate("Button", "Delete",None))
-        self.deleventTableButton.setFocusPolicy(Qt.NoFocus)
+        self.deleventTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.deleventTableButton.setMaximumSize(self.deleventTableButton.sizeHint())
         self.deleventTableButton.setMinimumSize(self.deleventTableButton.minimumSizeHint())
         self.deleventTableButton.clicked.connect(self.deleteEventTable)
         self.copyeventTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
         self.copyeventTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
-        self.copyeventTableButton.setFocusPolicy(Qt.NoFocus)
+        self.copyeventTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.copyeventTableButton.setMaximumSize(self.copyeventTableButton.sizeHint())
         self.copyeventTableButton.setMinimumSize(self.copyeventTableButton.minimumSizeHint())
         self.copyeventTableButton.clicked.connect(self.copyEventTabletoClipboard)
@@ -890,7 +898,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.datatable.setTabKeyNavigation(True)
         self.copydataTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
         self.copydataTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
-        self.copydataTableButton.setFocusPolicy(Qt.NoFocus)
+        self.copydataTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.copydataTableButton.setMaximumSize(self.copydataTableButton.sizeHint())
         self.copydataTableButton.setMinimumSize(self.copydataTableButton.minimumSizeHint())
         self.copydataTableButton.clicked.connect(self.copyDataTabletoClipboard)
@@ -898,7 +906,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         titlelabel = QLabel("<b>" + QApplication.translate("Label", "Title",None) + "</b>")
         self.titleedit = RoastsComboBox(self,self.aw,selection = self.aw.qmc.title)
         self.titleedit.setMinimumWidth(100)
-        self.titleedit.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed)
+        self.titleedit.setSizePolicy(QSizePolicy.Policy.MinimumExpanding,QSizePolicy.Policy.Fixed)
         self.titleedit.activated.connect(self.recentRoastActivated)
         self.titleedit.editTextChanged.connect(self.recentRoastEnabled)
         if sys.platform.startswith("darwin") and darkdetect.isDark() and appFrozen():
@@ -935,7 +943,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         date = self.aw.qmc.roastdate.date().toString()
         date += ", " + self.aw.qmc.roastdate.time().toString()[:-3]
         dateedit = QLineEdit(date)
-        dateedit.setFocusPolicy(Qt.NoFocus)
+        dateedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         dateedit.setReadOnly(True)
         if sys.platform.startswith("darwin") and darkdetect.isDark() and appFrozen():
             dateedit.setStyleSheet("background-color: #757575; color : white;")
@@ -963,7 +971,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.batchedit.setStyleSheet("background-color: #757575; color : white;")
             else:
                 self.batchedit.setStyleSheet("background-color: #eeeeee;")
-            self.batchedit.setFocusPolicy(Qt.NoFocus)
+            self.batchedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             
         #Beans
         beanslabel = QLabel("<b>" + QApplication.translate("Label", "Beans",None) + "</b>")
@@ -983,16 +991,16 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.weightinedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.weightinedit))  # the max limit has to be high enough otherwise the connected signals are not send!
         self.weightinedit.setMinimumWidth(70)
         self.weightinedit.setMaximumWidth(70)
-        self.weightinedit.setAlignment(Qt.AlignRight)
+        self.weightinedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.weightoutedit = QLineEdit(outw)
         self.weightoutedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.weightoutedit))  # the max limit has to be high enough otherwise the connected signals are not send!
         self.weightoutedit.setMinimumWidth(70)
         self.weightoutedit.setMaximumWidth(70)
-        self.weightoutedit.setAlignment(Qt.AlignRight)
+        self.weightoutedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.weightpercentlabel = QLabel(QApplication.translate("Label", "",None))
         self.weightpercentlabel.setMinimumWidth(55)
         self.weightpercentlabel.setMaximumWidth(55)
-        self.weightpercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.weightpercentlabel.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.roastdegreelabel = QLabel("")
         self.roastdegreelabel.setMinimumWidth(80)
         self.roastdegreelabel.setMaximumWidth(80)
@@ -1013,16 +1021,16 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.volumeinedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999999., 4, self.volumeinedit)) # the max limit has to be high enough otherwise the connected signals are not send!
         self.volumeinedit.setMinimumWidth(70)
         self.volumeinedit.setMaximumWidth(70)
-        self.volumeinedit.setAlignment(Qt.AlignRight)
+        self.volumeinedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.volumeoutedit = QLineEdit(outv)
         self.volumeoutedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999999., 4, self.volumeoutedit)) # the max limit has to be high enough otherwise the connected signals are not send!
         self.volumeoutedit.setMinimumWidth(70)
         self.volumeoutedit.setMaximumWidth(70)
-        self.volumeoutedit.setAlignment(Qt.AlignRight)
+        self.volumeoutedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.volumepercentlabel = QLabel(QApplication.translate("Label", " %",None))
         self.volumepercentlabel.setMinimumWidth(55)
         self.volumepercentlabel.setMaximumWidth(55)
-        self.volumepercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.volumepercentlabel.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.volumeoutedit.editingFinished.connect(self.volume_percent)
         self.volumeinedit.editingFinished.connect(self.volume_percent)
         self.volumeUnitsComboBox = QComboBox()
@@ -1039,39 +1047,39 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.bean_density_in_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999999., 1,self.bean_density_in_edit))
         self.bean_density_in_edit.setMinimumWidth(70)
         self.bean_density_in_edit.setMaximumWidth(70)
-        self.bean_density_in_edit.setAlignment(Qt.AlignRight)
+        self.bean_density_in_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.bean_density_out_edit = QLineEdit("%g" % self.aw.float2float(self.aw.qmc.density_roasted[0]))
         self.bean_density_out_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999999., 1,self.bean_density_out_edit))
         self.bean_density_out_edit.setMinimumWidth(70)
         self.bean_density_out_edit.setMaximumWidth(70)
-        self.bean_density_out_edit.setAlignment(Qt.AlignRight)
+        self.bean_density_out_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.bean_density_in_edit.editingFinished.connect(self.density_in_editing_finished)
         self.bean_density_out_edit.editingFinished.connect(self.density_out_editing_finished)
         self.densitypercentlabel = QLabel(QApplication.translate("Label", "",None))
         self.densitypercentlabel.setMinimumWidth(55)
         self.densitypercentlabel.setMaximumWidth(55)
-        self.densitypercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.densitypercentlabel.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         
         self.organicpercentlabel = QLabel(QApplication.translate("Label", "",None))
         self.organicpercentlabel.setMinimumWidth(55)
         self.organicpercentlabel.setMaximumWidth(55)
-        self.organicpercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.organicpercentlabel.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         
         # volume calc button
         volumeCalcButton = QPushButton(QApplication.translate("Button", "calc",None))
         volumeCalcButton.clicked.connect(self.volumeCalculatorTimer)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
-        volumeCalcButton.setFocusPolicy(Qt.NoFocus)
+        volumeCalcButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         
         # add to recent
         self.addRecentButton = QPushButton("+")
         self.addRecentButton.clicked.connect(self.addRecentRoast)
-        self.addRecentButton.setFocusPolicy(Qt.NoFocus)
+        self.addRecentButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         
         # delete from recent
         self.delRecentButton = QPushButton("-")
         self.delRecentButton.clicked.connect(self.delRecentRoast)
-        self.delRecentButton.setFocusPolicy(Qt.NoFocus)
+        self.delRecentButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.recentRoastEnabled()
         
@@ -1082,14 +1090,14 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.bean_size_min_edit.setValidator(QIntValidator(0,50,self.bean_size_min_edit))
         self.bean_size_min_edit.setMinimumWidth(25)
         self.bean_size_min_edit.setMaximumWidth(25)
-        self.bean_size_min_edit.setAlignment(Qt.AlignRight)
+        self.bean_size_min_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         bean_size_sep_label = QLabel("/")
         self.bean_size_max_edit = QLineEdit(str(int(round(self.aw.qmc.beansize_max))))
         self.bean_size_max_edit.editingFinished.connect(self.beanSizeMaxEdited)
         self.bean_size_max_edit.setValidator(QIntValidator(0,50,self.bean_size_max_edit))
         self.bean_size_max_edit.setMinimumWidth(25)
         self.bean_size_max_edit.setMaximumWidth(25)
-        self.bean_size_max_edit.setAlignment(Qt.AlignRight)
+        self.bean_size_max_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         bean_size_unit_label = QLabel(QApplication.translate("Label", "18/64\u2033",None))
         #bean color
         color_label = QLabel("<b>" + QApplication.translate("Label", "Color",None) + "</b>")
@@ -1098,15 +1106,15 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.whole_color_edit.setValidator(QIntValidator(0, 1000, self.whole_color_edit))
         self.whole_color_edit.setMinimumWidth(70)
         self.whole_color_edit.setMaximumWidth(70)
-        self.whole_color_edit.setAlignment(Qt.AlignRight)
+        self.whole_color_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         ground_color_label = QLabel("<b>" + QApplication.translate("Label", "Ground",None) + "</b>")
         self.ground_color_edit = QLineEdit(str(self.aw.qmc.ground_color))
         self.ground_color_edit.setValidator(QIntValidator(0, 1000, self.ground_color_edit))
         self.ground_color_edit.setMinimumWidth(70)
         self.ground_color_edit.setMaximumWidth(70)
-        self.ground_color_edit.setAlignment(Qt.AlignRight)
-        self.bean_size_min_edit.setAlignment(Qt.AlignRight)
-        self.bean_size_max_edit.setAlignment(Qt.AlignRight)
+        self.ground_color_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.bean_size_min_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.bean_size_max_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.colorSystemComboBox = QComboBox()
         self.colorSystemComboBox.addItems(self.aw.qmc.color_systems)
         self.colorSystemComboBox.setCurrentIndex(self.aw.qmc.color_system_idx)
@@ -1117,7 +1125,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.greens_temp_edit.setText("%g" % self.aw.float2float(self.aw.qmc.greens_temp))
         self.greens_temp_edit.setMaximumWidth(60)
         self.greens_temp_edit.setValidator(self.aw.createCLocaleDoubleValidator(-9999., 999999., 1, self.greens_temp_edit)) # range to 1000 needed to trigger editing_finished on input "12,2"
-        self.greens_temp_edit.setAlignment(Qt.AlignRight)
+        self.greens_temp_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.greens_temp_edit.editingFinished.connect(self.greens_temp_editing_finished)
         greens_temp = QHBoxLayout()
         greens_temp.addStretch()
@@ -1128,7 +1136,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.moisture_greens_edit.setText("%g" % self.aw.float2float(self.aw.qmc.moisture_greens))
         self.moisture_greens_edit.setMaximumWidth(70)
         self.moisture_greens_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 100., 1, self.moisture_greens_edit))
-        self.moisture_greens_edit.setAlignment(Qt.AlignRight)
+        self.moisture_greens_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         #Moisture Roasted
         #bag humidity
         moisture_roasted_label = QLabel("<b>" + QApplication.translate("Label", "Roasted",None) + "</b>")
@@ -1137,11 +1145,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.moisture_roasted_edit.setText("%g" % self.aw.float2float(self.aw.qmc.moisture_roasted))
         self.moisture_roasted_edit.setMaximumWidth(70)
         self.moisture_roasted_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 100., 1, self.moisture_roasted_edit))
-        self.moisture_roasted_edit.setAlignment(Qt.AlignRight)
+        self.moisture_roasted_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.moisturepercentlabel = QLabel(QApplication.translate("Label", "",None))
         self.moisturepercentlabel.setMinimumWidth(55)
         self.moisturepercentlabel.setMaximumWidth(55)
-        self.moisturepercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.moisturepercentlabel.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.moisture_greens_edit.editingFinished.connect(self.moistureEdited)
         self.moisture_roasted_edit.editingFinished.connect(self.moistureEdited)
 
@@ -1158,14 +1166,14 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.ambient_humidity_edit.setMinimumWidth(50)
         self.ambient_humidity_edit.setMaximumWidth(50)
         self.ambient_humidity_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 1, self.ambient_humidity_edit))
-        self.ambient_humidity_edit.setAlignment(Qt.AlignRight)
+        self.ambient_humidity_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.ambient_humidity_edit.editingFinished.connect(self.ambient_humidity_editing_finished)
         self.ambientedit = QLineEdit()
         self.ambientedit.setText("%g" % self.aw.float2float(self.aw.qmc.ambientTemp))
         self.ambientedit.setMinimumWidth(50)
         self.ambientedit.setMaximumWidth(50)
         self.ambientedit.setValidator(self.aw.createCLocaleDoubleValidator(-9999., 9999999., 1, self.ambientedit))  # larger range needed to triger editing_finished
-        self.ambientedit.setAlignment(Qt.AlignRight)
+        self.ambientedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.ambientedit.editingFinished.connect(self.ambientedit_editing_finished)
         pressureunitslabel = QLabel("hPa")
         self.pressureedit = QLineEdit()
@@ -1173,7 +1181,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.pressureedit.setMinimumWidth(55)
         self.pressureedit.setMaximumWidth(55)
         self.pressureedit.setValidator(self.aw.createCLocaleDoubleValidator(0, 9999999., 1, self.pressureedit))
-        self.pressureedit.setAlignment(Qt.AlignRight)
+        self.pressureedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pressureedit.editingFinished.connect(self.pressureedit_editing_finished)
         ambient = QHBoxLayout()
         ambient.addWidget(self.ambient_humidity_edit)
@@ -1253,7 +1261,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         inButton = QPushButton(QApplication.translate("Button", "in",None))
         inButton.clicked.connect(self.inWeight)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
-        inButton.setFocusPolicy(Qt.NoFocus)
+        inButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         inButton.setMinimumWidth(70)
         inButtonLayout = QHBoxLayout()
         inButtonLayout.addStretch()
@@ -1263,7 +1271,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         outButton = QPushButton(QApplication.translate("Button", "out",None))
         outButton.clicked.connect(self.outWeight)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
-        outButton.setFocusPolicy(Qt.NoFocus)
+        outButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         outButton.setMinimumWidth(70)
         outButtonLayout = QHBoxLayout()
         outButtonLayout.addStretch()
@@ -1274,13 +1282,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         scanWholeButton.clicked.connect(self.scanWholeColor)
         scanWholeButton.setMinimumWidth(80)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
-        scanWholeButton.setFocusPolicy(Qt.NoFocus)
+        scanWholeButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         # scan ground button
         scanGroundButton = QPushButton(QApplication.translate("Button", "scan",None))
         scanGroundButton.setMinimumWidth(80)
         scanGroundButton.clicked.connect(self.scanGroundColor)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
-        scanGroundButton.setFocusPolicy(Qt.NoFocus)
+        scanGroundButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         # Ambient Temperature Source Selector
         self.ambientComboBox = QComboBox()
         self.ambientComboBox.addItems(self.buildAmbientTemperatureSourceList())
@@ -1288,7 +1296,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.ambientComboBox.currentIndexChanged.connect(self.ambientComboBoxIndexChanged)
         ambientSourceLabel = QLabel(QApplication.translate("Label", "Ambient Source",None))
         updateAmbientTemp = QPushButton(QApplication.translate("Button", "update",None))
-        updateAmbientTemp.setFocusPolicy(Qt.NoFocus)
+        updateAmbientTemp.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         updateAmbientTemp.clicked.connect(self.updateAmbientTemp)
         ##### LAYOUTS
         timeLayout = QGridLayout()
@@ -1302,14 +1310,14 @@ class editGraphDlg(ArtisanResizeablDialog):
         timeLayout.addWidget(CCendlabel,0,5)
         timeLayout.addWidget(droplabel,0,6)
         timeLayout.addWidget(coollabel,0,7)
-        timeLayout.addWidget(self.chargeedit,1,0,Qt.AlignHCenter)
-        timeLayout.addWidget(self.dryedit,1,1,Qt.AlignHCenter)
-        timeLayout.addWidget(self.Cstartedit,1,2,Qt.AlignHCenter)
-        timeLayout.addWidget(self.Cendedit,1,3,Qt.AlignHCenter)
-        timeLayout.addWidget(self.CCstartedit,1,4,Qt.AlignHCenter)
-        timeLayout.addWidget(self.CCendedit,1,5,Qt.AlignHCenter)
-        timeLayout.addWidget(self.dropedit,1,6,Qt.AlignHCenter)
-        timeLayout.addWidget(self.cooledit,1,7,Qt.AlignHCenter)
+        timeLayout.addWidget(self.chargeedit,1,0,Qt.AlignmentFlag.AlignHCenter)
+        timeLayout.addWidget(self.dryedit,1,1,Qt.AlignmentFlag.AlignHCenter)
+        timeLayout.addWidget(self.Cstartedit,1,2,Qt.AlignmentFlag.AlignHCenter)
+        timeLayout.addWidget(self.Cendedit,1,3,Qt.AlignmentFlag.AlignHCenter)
+        timeLayout.addWidget(self.CCstartedit,1,4,Qt.AlignmentFlag.AlignHCenter)
+        timeLayout.addWidget(self.CCendedit,1,5,Qt.AlignmentFlag.AlignHCenter)
+        timeLayout.addWidget(self.dropedit,1,6,Qt.AlignmentFlag.AlignHCenter)
+        timeLayout.addWidget(self.cooledit,1,7,Qt.AlignmentFlag.AlignHCenter)
         textLayout = QGridLayout()
         textLayout.setHorizontalSpacing(3)
         textLayout.setVerticalSpacing(2)
@@ -1385,12 +1393,12 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_blends_combo.setMinimumContentsLength(10)
             self.plus_stores_combo.setMinimumContentsLength(10)
             self.plus_stores_combo.setMaximumWidth(120)            
-            self.plus_coffees_combo.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
-            self.plus_coffees_combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
-            self.plus_blends_combo.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
-            self.plus_blends_combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
-            self.plus_stores_combo.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
-            self.plus_stores_combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+            self.plus_coffees_combo.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Maximum)
+            self.plus_coffees_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+            self.plus_blends_combo.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Maximum)
+            self.plus_blends_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+            self.plus_stores_combo.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Maximum)
+            self.plus_stores_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             # plus widget row
             plusLine = QHBoxLayout()
             plusLine.addWidget(self.plus_coffees_combo)
@@ -1426,17 +1434,17 @@ class editGraphDlg(ArtisanResizeablDialog):
         propGrid.setContentsMargins(0,0,0,0)
         propGrid.setHorizontalSpacing(3)
         propGrid.setVerticalSpacing(0)
-        propGrid.addWidget(green_label,0,1,Qt.AlignCenter | Qt.AlignBottom)
-        propGrid.addWidget(roasted_label,0,2,Qt.AlignCenter | Qt.AlignBottom)
-        propGrid.addWidget(self.organicpercentlabel,0,4,Qt.AlignRight)
-        propGrid.addWidget(self.organiclosslabel,0,5,1,3,Qt.AlignLeft)
-        propGrid.addWidget(self.scaleWeight,0,8,1,2,Qt.AlignCenter)
+        propGrid.addWidget(green_label,0,1,Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignBottom)
+        propGrid.addWidget(roasted_label,0,2,Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignBottom)
+        propGrid.addWidget(self.organicpercentlabel,0,4,Qt.AlignmentFlag.AlignRight)
+        propGrid.addWidget(self.organiclosslabel,0,5,1,3,Qt.AlignmentFlag.AlignLeft)
+        propGrid.addWidget(self.scaleWeight,0,8,1,2,Qt.AlignmentFlag.AlignCenter)
         
         propGrid.addWidget(weightlabel,1,0)
-        propGrid.addWidget(self.weightinedit,1,1,Qt.AlignRight)
-        propGrid.addWidget(self.weightoutedit,1,2,Qt.AlignRight)
+        propGrid.addWidget(self.weightinedit,1,1,Qt.AlignmentFlag.AlignRight)
+        propGrid.addWidget(self.weightoutedit,1,2,Qt.AlignmentFlag.AlignRight)
         propGrid.addWidget(self.unitsComboBox,1,3)
-        propGrid.addWidget(self.weightpercentlabel,1,4,Qt.AlignRight)
+        propGrid.addWidget(self.weightpercentlabel,1,4,Qt.AlignmentFlag.AlignRight)
         
         propGrid.setColumnStretch(5,10)
         
@@ -1472,40 +1480,40 @@ class editGraphDlg(ArtisanResizeablDialog):
                 QTimer.singleShot(2,lambda : self.connectScaleSignal.emit()) # pylint: disable= unnecessary-lambda
         
         propGrid.addWidget(volumelabel,2,0)
-        propGrid.addWidget(self.volumeinedit,2,1,Qt.AlignRight)
-        propGrid.addWidget(self.volumeoutedit,2,2,Qt.AlignRight)
+        propGrid.addWidget(self.volumeinedit,2,1,Qt.AlignmentFlag.AlignRight)
+        propGrid.addWidget(self.volumeoutedit,2,2,Qt.AlignmentFlag.AlignRight)
         propGrid.addWidget(self.volumeUnitsComboBox,2,3)
-        propGrid.addWidget(self.volumepercentlabel,2,4,Qt.AlignRight)
-        propGrid.addWidget(self.scaleWeightAccumulated,2,7,1,2,Qt.AlignCenter)
+        propGrid.addWidget(self.volumepercentlabel,2,4,Qt.AlignmentFlag.AlignRight)
+        propGrid.addWidget(self.scaleWeightAccumulated,2,7,1,2,Qt.AlignmentFlag.AlignCenter)
         propGrid.addWidget(volumeCalcButton,2,9)
         
         propGrid.setRowMinimumHeight(3,self.volumeUnitsComboBox.minimumSizeHint().height())
         propGrid.addWidget(bean_density_label,3,0)
-        propGrid.addWidget(self.bean_density_in_edit,3,1,Qt.AlignRight)
-        propGrid.addWidget(self.bean_density_out_edit,3,2,Qt.AlignRight)
-        propGrid.addWidget(density_unit_label,3,3,Qt.AlignCenter)
-        propGrid.addWidget(self.densitypercentlabel,3,4,Qt.AlignRight)
+        propGrid.addWidget(self.bean_density_in_edit,3,1,Qt.AlignmentFlag.AlignRight)
+        propGrid.addWidget(self.bean_density_out_edit,3,2,Qt.AlignmentFlag.AlignRight)
+        propGrid.addWidget(density_unit_label,3,3,Qt.AlignmentFlag.AlignCenter)
+        propGrid.addWidget(self.densitypercentlabel,3,4,Qt.AlignmentFlag.AlignRight)
         
         propGrid.addWidget(bean_size_label,3,7)
-        propGrid.addLayout(beanSizeLayout,3,8,Qt.AlignRight)
-        propGrid.addWidget(bean_size_unit_label,3,9,Qt.AlignCenter)
+        propGrid.addLayout(beanSizeLayout,3,8,Qt.AlignmentFlag.AlignRight)
+        propGrid.addWidget(bean_size_unit_label,3,9,Qt.AlignmentFlag.AlignCenter)
         
         propGrid.addWidget(moisture_label,4,0)
-        propGrid.addWidget(self.moisture_greens_edit,4,1,Qt.AlignRight)
-        propGrid.addWidget(self.moisture_roasted_edit,4,2,Qt.AlignRight)
-        propGrid.addWidget(moisture_greens_unit_label,4,3,Qt.AlignCenter)
-        propGrid.addWidget(self.moisturepercentlabel,4,4,Qt.AlignRight)
+        propGrid.addWidget(self.moisture_greens_edit,4,1,Qt.AlignmentFlag.AlignRight)
+        propGrid.addWidget(self.moisture_roasted_edit,4,2,Qt.AlignmentFlag.AlignRight)
+        propGrid.addWidget(moisture_greens_unit_label,4,3,Qt.AlignmentFlag.AlignCenter)
+        propGrid.addWidget(self.moisturepercentlabel,4,4,Qt.AlignmentFlag.AlignRight)
         propGrid.addWidget(greens_temp_label,4,7)
-        propGrid.addWidget(self.greens_temp_edit,4,8,Qt.AlignRight)
-        propGrid.addWidget(greens_temp_unit_label,4,9,Qt.AlignCenter)
+        propGrid.addWidget(self.greens_temp_edit,4,8,Qt.AlignmentFlag.AlignRight)
+        propGrid.addWidget(greens_temp_unit_label,4,9,Qt.AlignmentFlag.AlignCenter)
         
         propGrid.setRowMinimumHeight(7,30)
-        propGrid.addWidget(whole_color_label,7,1,Qt.AlignCenter | Qt.AlignBottom)
-        propGrid.addWidget(ground_color_label,7,2,Qt.AlignCenter | Qt.AlignBottom)
+        propGrid.addWidget(whole_color_label,7,1,Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignBottom)
+        propGrid.addWidget(ground_color_label,7,2,Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignBottom)
         
         propGrid.addWidget(color_label,8,0)
-        propGrid.addWidget(self.whole_color_edit,8,1,Qt.AlignRight)
-        propGrid.addWidget(self.ground_color_edit,8,2,Qt.AlignRight)
+        propGrid.addWidget(self.whole_color_edit,8,1,Qt.AlignmentFlag.AlignRight)
+        propGrid.addWidget(self.ground_color_edit,8,2,Qt.AlignmentFlag.AlignRight)
         propGrid.addWidget(self.colorSystemComboBox,8,3,1, 2)
                 
         if self.aw.color.device is not None and self.aw.color.device != "" and self.aw.color.device not in ["None","Tiny Tonino", "Classic Tonino"]:
@@ -1513,7 +1521,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.aw.color.device is not None and self.aw.color.device != "" and self.aw.color.device != "None":
             propGrid.addWidget(scanGroundButton,8,7)
             
-        propGrid.addWidget(ambientSourceLabel,8,8,1,2,Qt.AlignRight | Qt.AlignBottom)
+        propGrid.addWidget(ambientSourceLabel,8,8,1,2,Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignBottom)
         
         ambientGrid = QGridLayout()
         ambientGrid.setContentsMargins(0,0,0,0)
@@ -1522,7 +1530,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         ambientGrid.addWidget(ambientlabel,2,0)
         ambientGrid.addLayout(ambient,2,2,1,5)
         ambientGrid.addWidget(updateAmbientTemp,2,10)
-        ambientGrid.addWidget(self.ambientComboBox,2,11,Qt.AlignRight)
+        ambientGrid.addWidget(self.ambientComboBox,2,11,Qt.AlignmentFlag.AlignRight)
         ambientGrid.setColumnMinimumWidth(3, 11)
         ambientGrid.setColumnMinimumWidth(5, 11)
         ambientGrid.setColumnMinimumWidth(8, 11)
@@ -1674,9 +1682,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         except Exception:  # pylint: disable=broad-except
             pass
         if platform.system() == 'Windows':
-            self.dialogbuttons.button(QDialogButtonBox.Ok)
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         else:
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
     
     pyqtSlot(bool)
     def SetupSetDefaults(self,_):
@@ -1710,12 +1718,12 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.batchcounterSpinBox.setRange(0,999999)
         self.batchcounterSpinBox.setSingleStep(1)
         self.batchcounterSpinBox.setValue(self.aw.qmc.roastbatchnr)
-        self.batchcounterSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter) 
+        self.batchcounterSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter) 
         self.batchposSpinBox = QSpinBox()
         self.batchposSpinBox.setRange(1,99)
         self.batchposSpinBox.setSingleStep(1)
         self.batchposSpinBox.setValue(self.aw.qmc.roastbatchpos)
-        self.batchposSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.batchposSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.batchLayout.addWidget(self.batchprefixedit)
         self.batchLayout.addWidget(self.batchcounterSpinBox)
         self.batchLayout.addWidget(self.batchposSpinBox)
@@ -2479,7 +2487,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 
                 modifiers = QApplication.keyboardModifiers()
                 weightOut = volumeOut = densityRoasted = moistureRoasted = wholeColor = groundColor = None
-                if modifiers == Qt.AltModifier:  #alt click
+                if modifiers == Qt.KeyboardModifier.AltModifier:  #alt click
                     # we add weightOut, volumeOut, moistureRoasted, wholeColor, groundColor
                     weightOut = float(self.aw.comma2dot(str(self.weightoutedit.text())))
                     volumeOut = float(self.aw.comma2dot(str(self.volumeoutedit.text())))
@@ -2605,7 +2613,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
     def keyPressEvent(self,event):
         key = int(event.key())
-        if event.matches(QKeySequence.Copy):
+        if event.matches(QKeySequence.StandardKey.Copy):
             if self.TabWidget.currentIndex() == 3: # datatable
                 self.aw.copy_cells_to_clipboard(self.datatable,adjustment=1)
                 self.aw.sendmessage(QApplication.translate("Message","Data table copied to clipboard",None))
@@ -2707,8 +2715,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             
             ### reset UI text lables and tooltips for propper translation
             # hack to access the Qt automatic translation of the RestoreDefaults button
-            db_help = QDialogButtonBox(QDialogButtonBox.Help)
-            help_text_translated = db_help.button(QDialogButtonBox.Help).text()
+            db_help = QDialogButtonBox(QDialogButtonBox.StandardButton.Help)
+            help_text_translated = db_help.button(QDialogButtonBox.StandardButton.Help).text()
             self.energy_ui.helpButton.setText(help_text_translated)
             self.setButtonTranslations(self.energy_ui.helpButton,"Help",QApplication.translate("Button","Help", None))
             self.energy_ui.tabWidget.setTabText(0,QApplication.translate("Tab","Details",None))
@@ -2727,12 +2735,12 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.datatable.horizontalHeaderItem(4).setText(QApplication.translate("Table","Load",None))
             self.energy_ui.datatable.horizontalHeaderItem(5).setText(QApplication.translate("Table","Source",None))
             self.energy_ui.datatable.horizontalHeaderItem(6).setText(QApplication.translate("Table","Kind",None))
-            self.energy_ui.datatable.verticalHeader().setSectionResizeMode(2)
+            self.energy_ui.datatable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
             # Loads tab
             self.energy_ui.loadsSetDefaultsButton.setText(QApplication.translate("Button","Save Defaults",None))
             # hack to access the Qt automatic translation of the RestoreDefaults button
-            db = QDialogButtonBox(QDialogButtonBox.RestoreDefaults)
-            defaults_button_text_translated = db.button(QDialogButtonBox.RestoreDefaults).text()
+            db = QDialogButtonBox(QDialogButtonBox.StandardButton.RestoreDefaults)
+            defaults_button_text_translated = db.button(QDialogButtonBox.StandardButton.RestoreDefaults).text()
             self.energy_ui.loadsDefaultsButtons.setText(defaults_button_text_translated)
             self.setButtonTranslations(self.energy_ui.loadsDefaultsButtons,"Restore Defaults",QApplication.translate("Button","Restore Defaults", None))
             self.energy_ui.loadlabelsLabel.setText(QApplication.translate("Label","Label",None))
@@ -2903,30 +2911,30 @@ class editGraphDlg(ArtisanResizeablDialog):
                 load_widget = MyTableWidgetItemNumber("",self.btu_list[i]["load_pct"])
             else:
                 load_widget = MyTableWidgetItemNumber("{:.1f}%".format(self.btu_list[i]["load_pct"]),self.btu_list[i]["load_pct"])
-            load_widget.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            load_widget.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
             
             if self.btu_list[i]["Kind"] in [0, 2]:  #Preheat Measured, BBP Measured
                 duration_mmss_widget = MyTableWidgetItemNumber("",0)
             else:
                 duration_mmss_widget = MyTableWidgetItemNumber(stringfromseconds(self.btu_list[i]["duration"]),self.btu_list[i]["duration"])
-                duration_mmss_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                duration_mmss_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
             
             BTUs = self.aw.qmc.convertHeat(self.btu_list[i]["BTUs"],0,self.aw.qmc.energyresultunit_setup)
             BTUs_widget = MyTableWidgetItemNumber(self.scalefloat(BTUs),BTUs)
-            BTUs_widget.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            BTUs_widget.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
             
             CO2g = self.btu_list[i]["CO2g"]
             CO2g_widget = MyTableWidgetItemNumber(self.scalefloat(CO2g),CO2g)
-            CO2g_widget.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            CO2g_widget.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
                         
             Load_widget = QTableWidgetItem(self.btu_list[i]["LoadLabel"])
-            Load_widget.setTextAlignment(Qt.AlignLeft|Qt.AlignVCenter)
+            Load_widget.setTextAlignment(Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
             
             SourceType_widget = MyTableWidgetItemNumber(self.aw.qmc.sourcenames[self.btu_list[i]["SourceType"]],self.btu_list[i]["SortOrder"])
-            SourceType_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+            SourceType_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
             
             Kind_widget = MyTableWidgetItemNumber(self.aw.qmc.kind_list[self.btu_list[i]["Kind"]],self.btu_list[i]["SortOrder"])
-            Kind_widget.setTextAlignment(Qt.AlignLeft|Qt.AlignVCenter)
+            Kind_widget.setTextAlignment(Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
             
             self.energy_ui.datatable.setItem(i,0,load_widget)
             self.energy_ui.datatable.setItem(i,1,duration_mmss_widget)
@@ -2937,8 +2945,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.datatable.setItem(i,6,Kind_widget)
  
         header = self.energy_ui.datatable.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeToContents)
-#        header.setSectionResizeMode(QHeaderView.Stretch)
+        header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+#        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 #        self.energy_ui.datatable.resizeColumnsToContents()
         
 #        # remember the columnwidth
@@ -3332,7 +3340,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         ncols = self.energy_ui.datatable.columnCount()
         clipboard = ""
         modifiers = QApplication.keyboardModifiers()
-        if modifiers == Qt.AltModifier:  #alt click
+        if modifiers == Qt.KeyboardModifier.AltModifier:  #alt click
             tbl = prettytable.PrettyTable()
             fields = []
             for c in range(ncols):
@@ -3609,8 +3617,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.setup_ui.comboBoxHeating.addItems(self.aw.qmc.heating_types)
             self.setup_ui.SetDefaults.setText(QApplication.translate("Button", "Save Defaults",None))
             # hack to access the Qt automatic translation of the RestoreDefaults button
-            db = QDialogButtonBox(QDialogButtonBox.RestoreDefaults)
-            defaults_button_text_translated = db.button(QDialogButtonBox.RestoreDefaults).text()
+            db = QDialogButtonBox(QDialogButtonBox.StandardButton.RestoreDefaults)
+            defaults_button_text_translated = db.button(QDialogButtonBox.StandardButton.RestoreDefaults).text()
             self.setup_ui.Defaults.setText(defaults_button_text_translated)
             self.setButtonTranslations(self.setup_ui.Defaults,"Restore Defaults",QApplication.translate("Button","Restore Defaults", None))
             
@@ -3842,26 +3850,26 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.datatable.setColumnCount(len(columns))
         self.datatable.setHorizontalHeaderLabels(columns)
         self.datatable.setAlternatingRowColors(True)
-        self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.datatable.setSelectionMode(QTableWidget.ExtendedSelection) # QTableWidget.SingleSelection, ContiguousSelection, MultiSelection
+        self.datatable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.datatable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.datatable.setSelectionMode(QTableWidget.SelectionMode.ExtendedSelection) # QTableWidget.SelectionMode.SingleSelection, ContiguousSelection, MultiSelection
         self.datatable.setShowGrid(True)
-        self.datatable.verticalHeader().setSectionResizeMode(2)
+        self.datatable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         offset = 0
         if self.aw.qmc.timeindex[0] > -1:
             offset = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
         
         for i in range(ndata):
             Rtime = QTableWidgetItem(stringfromseconds(self.aw.qmc.timex[i]-offset))
-            Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            Rtime.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
             if self.aw.qmc.LCDdecimalplaces:
                 fmtstr = "%.1f"
             else:
                 fmtstr = "%.0f"
             ET = QTableWidgetItem(fmtstr%self.aw.qmc.temp1[i])
             BT = QTableWidgetItem(fmtstr%self.aw.qmc.temp2[i])
-            ET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            BT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)            
+            ET.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+            BT.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)            
             deltaET_str = "--"
             try:
                 if i > 0 and (self.aw.qmc.timex[i]-self.aw.qmc.timex[i-1]) and self.aw.qmc.temp1[i] != -1 and self.aw.qmc.temp1[i-1] != -1:
@@ -3889,8 +3897,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                 pass
             deltaBT = QTableWidgetItem(deltaBT_str)
             
-            deltaET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            deltaBT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            deltaET.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+            deltaBT.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
             if i in self.aw.qmc.specialevents:
                 index = self.aw.qmc.specialevents.index(i)
                 text = QApplication.translate("Table", "#{0} {1}{2}",None).format(str(index+1),self.aw.qmc.etypesf(self.aw.qmc.specialeventstype[index])[0],self.aw.qmc.eventsvalues(self.aw.qmc.specialeventsvalue[index]))
@@ -3942,7 +3950,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     if len(self.aw.qmc.extratemp1[k]) > i:
                         value = self.aw.qmc.extratemp1[k][i]
                     extra_qtw1 = QTableWidgetItem(fmtstr%value)
-                    extra_qtw1.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                    extra_qtw1.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
                     self.datatable.setItem(i,j,extra_qtw1)
                     j = j + 1
                 if len(self.aw.qmc.extratemp2) > k:
@@ -3950,7 +3958,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     if len(self.aw.qmc.extratemp2[k]) > i:
                         value = self.aw.qmc.extratemp2[k][i]
                     extra_qtw2 = QTableWidgetItem(fmtstr%value)
-                    extra_qtw2.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                    extra_qtw2.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
                     self.datatable.setItem(i,j,extra_qtw2)
                     j = j + 1
 
@@ -3976,20 +3984,20 @@ class editGraphDlg(ArtisanResizeablDialog):
                                                            QApplication.translate("Table", "Type", None),
                                                            QApplication.translate("Table", "Value", None)])
                 self.eventtable.setAlternatingRowColors(True)
-                self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
-                self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
-                self.eventtable.setSelectionMode(QTableWidget.ExtendedSelection)
+                self.eventtable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+                self.eventtable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+                self.eventtable.setSelectionMode(QTableWidget.SelectionMode.ExtendedSelection)
     
                 self.eventtable.setShowGrid(True)
                 
-                self.eventtable.verticalHeader().setSectionResizeMode(2)
+                self.eventtable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
                 regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
                 etypes = self.aw.qmc.getetypes()
                 #populate table
                 for i in range(nevents):
                     #create widgets
                     typeComboBox = MyQComboBox()
-                    typeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+                    typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
                     typeComboBox.addItems(etypes)
                     typeComboBox.setCurrentIndex(self.aw.qmc.specialeventstype[i])
         
@@ -4000,7 +4008,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         
                     etline = QLineEdit()
                     etline.setReadOnly(True)
-                    etline.setAlignment(Qt.AlignRight)
+                    etline.setAlignment(Qt.AlignmentFlag.AlignRight)
                     try:
                         ettemp = fmtstr%(self.aw.qmc.temp1[self.aw.qmc.specialevents[i]]) + self.aw.qmc.mode
                     except Exception: # pylint: disable=broad-except
@@ -4009,16 +4017,16 @@ class editGraphDlg(ArtisanResizeablDialog):
                         
                     btline = QLineEdit()
                     btline.setReadOnly(True)
-                    btline.setAlignment(Qt.AlignRight)
+                    btline.setAlignment(Qt.AlignmentFlag.AlignRight)
                     bttemp = fmtstr%(self.aw.qmc.temp2[self.aw.qmc.specialevents[i]]) + self.aw.qmc.mode
                     btline.setText(bttemp)
                     
                     valueEdit = QLineEdit()
-                    valueEdit.setAlignment(Qt.AlignRight)
+                    valueEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
                     valueEdit.setText(self.aw.qmc.eventsvalues(self.aw.qmc.specialeventsvalue[i]))
                     
                     timeline = QLineEdit()
-                    timeline.setAlignment(Qt.AlignRight)
+                    timeline.setAlignment(Qt.AlignmentFlag.AlignRight)
                     if self.aw.qmc.timeindex[0] > -1 and len(self.aw.qmc.timex) > self.aw.qmc.timeindex[0]:
                         timez = stringfromseconds(self.aw.qmc.timex[self.aw.qmc.specialevents[i]]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
                     else:
@@ -4040,18 +4048,18 @@ class editGraphDlg(ArtisanResizeablDialog):
                     valueEdit.setValidator(QIntValidator(0,self.aw.eventsMaxValue,self.eventtable.cellWidget(i,5)))
                 header = self.eventtable.horizontalHeader()
                 #header.setStretchLastSection(True)
-                header.setSectionResizeMode(0, QHeaderView.Fixed)
-                header.setSectionResizeMode(1, QHeaderView.Fixed)
-                header.setSectionResizeMode(2, QHeaderView.Fixed)
-                header.setSectionResizeMode(3, QHeaderView.Stretch)
-                header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
-                header.setSectionResizeMode(5, QHeaderView.Fixed)
+                header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
+                header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
+                header.setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
+                header.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
+                header.setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)
+                header.setSectionResizeMode(5, QHeaderView.ResizeMode.Fixed)
                 # improve width of Time column
                 self.eventtable.setColumnWidth(0,60)
                 self.eventtable.setColumnWidth(1,65)
                 self.eventtable.setColumnWidth(2,65)
                 self.eventtable.setColumnWidth(5,55)
-                # header.setSectionResizeMode(QHeaderView.Stretch)
+                # header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
             except Exception: # pylint: disable=broad-except
                 pass
             finally:
@@ -4098,7 +4106,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         ncols = self.eventtable.columnCount()
         clipboard = ""
         modifiers = QApplication.keyboardModifiers()
-        if modifiers == Qt.AltModifier:  #alt click
+        if modifiers == Qt.KeyboardModifier.AltModifier:  #alt click
             tbl = prettytable.PrettyTable()
             fields = []
             for c in range(ncols):
@@ -4919,7 +4927,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         # fixed hight
         layout.setSpacing(5)
         dialog.setFixedHeight(dialog.sizeHint().height())
-        res = dialog.exec_()
+        res = dialog.exec()
         #deleteLater() will not work here as the dialog is still bound via the parent
         #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
         # the following will immedately release the memory dispite this parent link
@@ -4941,9 +4949,9 @@ class EnergyMeasuringDialog(ArtisanDialog):
         self.ui = MeasureDialog.Ui_setMeasureDialog()
         self.ui.setupUi(self)
         self.setWindowTitle(QApplication.translate("Form Caption","Set Measure from Profile",None))
-        self.ui.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Apply)
+        self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
         # hack to assign the Apply button the AcceptRole without loosing default system translations
-        applyButton = self.ui.buttonBox.button(QDialogButtonBox.Apply)
+        applyButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply)
         self.ui.buttonBox.removeButton(applyButton)
-        self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.AcceptRole)
+        self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
 

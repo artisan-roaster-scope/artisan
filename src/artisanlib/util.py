@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 
 import platform
 import sys
@@ -24,10 +26,7 @@ def appFrozen():
             if getattr( sys, 'frozen', False ):
                 ib = True
         elif platf == "Windows":
-            ib = (hasattr(sys, "frozen") or # new py2exe
-                hasattr(sys, "importers") # old py2exe
-#                or imp.is_frozen("__main__")) # tools/freeze
-                )
+            ib = hasattr(sys, "frozen")
         elif platf == "Linux":
             if getattr(sys, 'frozen', False):
                 # The application is frozen
@@ -44,9 +43,6 @@ def stringp(x):
     return isinstance(x, str)
 def uchr(x):
     return chr(x)
-# the historical u() needed for Python2/Qt4 got eliminated or replaced by str()
-#def u(x): # convert to unicode string
-#    return str(x)
 def decodeLocal(x):
     if x is not None:
         return codecs.unicode_escape_decode(x)[0]

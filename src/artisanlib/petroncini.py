@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Petroncini CSV Roast Profile importer for Artisan
 
@@ -9,8 +9,14 @@ import time as libtime
 
 from artisanlib.util import fill_gaps, encodeLocal
 
-from PyQt5.QtCore import QDateTime, QDate, QTime, Qt
-from PyQt5.QtWidgets import QApplication
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QDateTime, QDate, QTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QDateTime, QDate, QTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
 def replace_duplicates(data):
     lv = -1
@@ -145,9 +151,9 @@ def extractProfilePetronciniCSV(file,_):
     # set date
     if roast_date is not None and roast_date.isValid():
         res["roastdate"] = encodeLocal(roast_date.date().toString())
-        res["roastisodate"] = encodeLocal(roast_date.date().toString(Qt.ISODate))
+        res["roastisodate"] = encodeLocal(roast_date.date().toString(Qt.DateFormat.ISODate))
         res["roasttime"] = encodeLocal(roast_date.time().toString())
-        res["roastepoch"] = int(roast_date.toTime_t())
+        res["roastepoch"] = int(roast_date.toSecsSinceEpoch())
         res["roasttzoffset"] = libtime.timezone    
     
     if len(specialevents) > 0:

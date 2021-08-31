@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Sampling Dialog
 
@@ -18,9 +18,16 @@
 
 from artisanlib.dialogs import ArtisanDialog
 
-from PyQt5.QtCore import Qt, pyqtSlot, QSettings
-from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout,
-                             QDialogButtonBox, QDoubleSpinBox, QLayout, QMessageBox)
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import Qt, pyqtSlot, QSettings # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QDialogButtonBox, QDoubleSpinBox, QLayout, QMessageBox) # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import Qt, pyqtSlot, QSettings # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QDialogButtonBox, QDoubleSpinBox, QLayout, QMessageBox) # @UnusedImport @Reimport  @UnresolvedImport
 
 class SamplingDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
@@ -33,11 +40,11 @@ class SamplingDlg(ArtisanDialog):
         self.org_flagOpenCompleted = self.aw.qmc.flagOpenCompleted
         
         self.keepOnFlag = QCheckBox(QApplication.translate("Label","Keep ON", None))
-        self.keepOnFlag.setFocusPolicy(Qt.NoFocus)
+        self.keepOnFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.keepOnFlag.setChecked(bool(self.aw.qmc.flagKeepON))
         
         self.openCompletedFlag = QCheckBox(QApplication.translate("Label","Open Completed Roast in Viewer", None))
-        self.openCompletedFlag.setFocusPolicy(Qt.NoFocus)
+        self.openCompletedFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.openCompletedFlag.setChecked(bool(self.aw.qmc.flagOpenCompleted))
         
         self.interval = QDoubleSpinBox()
@@ -45,7 +52,7 @@ class SamplingDlg(ArtisanDialog):
         self.interval.setValue(self.aw.qmc.delay/1000.)
         self.interval.setRange(self.aw.qmc.min_delay/1000.,40.)
         self.interval.setDecimals(1)
-        self.interval.setAlignment(Qt.AlignRight)
+        self.interval.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.interval.setSuffix("s")
         
         intervalLayout = QHBoxLayout()
@@ -76,13 +83,13 @@ class SamplingDlg(ArtisanDialog):
         layout.addStretch()
         layout.addLayout(buttonsLayout)
         self.setLayout(layout) 
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
         
         settings = QSettings()
         if settings.contains("SamplingPosition"):
             self.move(settings.value("SamplingPosition"))
         
-        layout.setSizeConstraint(QLayout.SetFixedSize)
+        layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
     
     #window close box
     def closeEvent(self,_):

@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Autosave Dialog
 
@@ -19,9 +19,16 @@
 from artisanlib.dialogs import ArtisanDialog
 from help import autosave_help
 
-from PyQt5.QtCore import Qt, pyqtSlot, QSettings
-from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox, 
-    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit)
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import Qt, pyqtSlot, QSettings # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox,  # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit) # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import Qt, pyqtSlot, QSettings # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox,  # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit) # @UnusedImport @Reimport  @UnresolvedImport
 
 class autosaveDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
@@ -39,11 +46,11 @@ class autosaveDlg(ArtisanDialog):
         self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name",None))
         self.prefixEdit.textChanged.connect(self.prefixChanged)
         prefixpreviewLabel = QLabel()
-        prefixpreviewLabel.setAlignment(Qt.Alignment(Qt.AlignCenter | Qt.AlignRight))
+        prefixpreviewLabel.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignRight)
         prefixpreviewLabel.setText(QApplication.translate("Label", "Preview:",None))
         self.prefixPreview = QLabel()
         self.prefixpreviewrecordingLabel = QLabel()
-        self.prefixpreviewrecordingLabel.setAlignment(Qt.Alignment(Qt.AlignCenter | Qt.AlignRight))
+        self.prefixpreviewrecordingLabel.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignRight)
         self.prefixPreviewrecording = QLabel()
         self.prefixChanged()
  
@@ -66,24 +73,24 @@ class autosaveDlg(ArtisanDialog):
         self.imageTypesComboBox.addItems(imageTypes)
         self.imageTypesComboBox.setCurrentIndex(imageTypes.index(self.aw.qmc.autosaveimageformat))
         prefixlabel = QLabel()
-        prefixlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
+        prefixlabel.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
         prefixlabel.setText(QApplication.translate("Label", "File Name Prefix",None))
 
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.autoChanged)
         self.dialogbuttons.rejected.connect(self.close)
-        self.helpButton = self.dialogbuttons.addButton(QDialogButtonBox.Help)
+        self.helpButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Help)
         self.setButtonTranslations(self.helpButton,"Help",QApplication.translate("Button","Help", None))
-        self.dialogbuttons.button(QDialogButtonBox.Help).clicked.connect(self.showautosavehelp)
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Help).clicked.connect(self.showautosavehelp)
         
         pathButton = QPushButton(QApplication.translate("Button","Path", None))
-        pathButton.setFocusPolicy(Qt.NoFocus)
+        pathButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pathEdit = QLineEdit(self.aw.qmc.autosavepath)
         self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [a]",None))
         pathButton.clicked.connect(self.getpath)
         
         pathAlsoButton = QPushButton(QApplication.translate("Button","Path", None))
-        pathAlsoButton.setFocusPolicy(Qt.NoFocus)
+        pathAlsoButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pathAlsoEdit = QLineEdit(self.aw.qmc.autosavealsopath)
         self.pathAlsoEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store the save also files",None))
         pathAlsoButton.clicked.connect(self.getalsopath)
@@ -98,7 +105,7 @@ class autosaveDlg(ArtisanDialog):
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(self.dialogbuttons)
         autolayout = QGridLayout()
-        autolayout.addWidget(self.autocheckbox,0,0,Qt.AlignRight)
+        autolayout.addWidget(self.autocheckbox,0,0,Qt.AlignmentFlag.AlignRight)
         autolayout.addLayout(autochecklabelplus,0,1)
         autolayout.addWidget(prefixlabel,1,0)
         autolayout.addWidget(self.prefixEdit,1,1,1,2)
@@ -108,7 +115,7 @@ class autosaveDlg(ArtisanDialog):
         autolayout.addWidget(self.prefixPreviewrecording,3,1)
         autolayout.addWidget(pathButton,4,0)
         autolayout.addWidget(self.pathEdit,4,1,1,2)
-        autolayout.addWidget(self.autopdfcheckbox,5,0,Qt.AlignRight)
+        autolayout.addWidget(self.autopdfcheckbox,5,0,Qt.AlignmentFlag.AlignRight)
         autolayout.addWidget(autopdflabel,5,1)
         autolayout.addWidget(self.imageTypesComboBox,5,2)
         autolayout.addWidget(pathAlsoButton,6,0)
@@ -122,7 +129,7 @@ class autosaveDlg(ArtisanDialog):
         mainLayout.addSpacing(10)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
         self.setFixedHeight(self.sizeHint().height())
 
     @pyqtSlot(bool)

@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-
+# -*- coding: utf-8 -*-
+#
 # results in a three digits resolution (eg. 1.234)
 #class ArtisanTime():
 #    def __init__(self):

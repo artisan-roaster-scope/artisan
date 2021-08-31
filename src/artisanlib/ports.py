@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Communication Ports Dialog
 
@@ -27,12 +27,22 @@ from artisanlib.comm import serialport
 from help import modbus_help
 from help import s7_help
 
-from PyQt5.QtCore import (Qt, pyqtSlot, QEvent, QSettings)
-from PyQt5.QtGui import QIntValidator
-from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-                             QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy,
-                             QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox,
-                             QHeaderView)
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import (Qt, pyqtSlot, QEvent, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QIntValidator # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QHeaderView)  # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import (Qt, pyqtSlot, QEvent, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QIntValidator # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
 
 class scanModbusDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
@@ -65,19 +75,19 @@ class scanModbusDlg(ArtisanDialog):
         self.slaveEdit = QLineEdit(str(self.slave))
         self.slaveEdit.setValidator(QIntValidator(1,247,self.slaveEdit))
         self.slaveEdit.setFixedWidth(65)
-        self.slaveEdit.setAlignment(Qt.AlignRight)
+        self.slaveEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.min_register = 0
         self.registerLabel = QLabel(QApplication.translate("Label", "Register",None))
         self.toLabel = QLabel(uchr(8212))
         self.minRegisterEdit = QLineEdit(str(self.min_register))
         self.minRegisterEdit.setValidator(QIntValidator(0,65536,self.minRegisterEdit))
         self.minRegisterEdit.setFixedWidth(65)
-        self.minRegisterEdit.setAlignment(Qt.AlignRight)
+        self.minRegisterEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.max_register = 65536
         self.maxRegisterEdit = QLineEdit(str(self.max_register))
         self.maxRegisterEdit.setValidator(QIntValidator(0,65536,self.maxRegisterEdit))
         self.maxRegisterEdit.setFixedWidth(65)
-        self.maxRegisterEdit.setAlignment(Qt.AlignRight)
+        self.maxRegisterEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.code3 = True
         self.code4 = False
         self.checkbox3 = QCheckBox(QApplication.translate("CheckBox","Fct. 3", None))
@@ -226,7 +236,7 @@ class scanS7Dlg(ArtisanDialog):
         self.area = 5
         self.areaLabel = QLabel(QApplication.translate("Label", "Area",None))
         self.areaCombo = QComboBox()
-        self.areaCombo.setFocusPolicy(Qt.NoFocus)
+        self.areaCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.areaCombo.addItems(s7_areas)
         self.areaCombo.setCurrentIndex(self.area)
         
@@ -235,7 +245,7 @@ class scanS7Dlg(ArtisanDialog):
         self.DBnrEdit = QLineEdit(str(self.DBnr))
         self.DBnrEdit.setValidator(QIntValidator(1,99999,self.DBnrEdit))
         self.DBnrEdit.setFixedWidth(65)
-        self.DBnrEdit.setAlignment(Qt.AlignRight)
+        self.DBnrEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         
         self.min_register = 0
         self.registerLabel = QLabel(QApplication.translate("Label", "Start",None))
@@ -243,12 +253,12 @@ class scanS7Dlg(ArtisanDialog):
         self.minRegisterEdit = QLineEdit(str(self.min_register))
         self.minRegisterEdit.setValidator(QIntValidator(0,65536,self.minRegisterEdit))
         self.minRegisterEdit.setFixedWidth(65)
-        self.minRegisterEdit.setAlignment(Qt.AlignRight)
+        self.minRegisterEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.max_register = 65536
         self.maxRegisterEdit = QLineEdit(str(self.max_register))
         self.maxRegisterEdit.setValidator(QIntValidator(0,65536,self.maxRegisterEdit))
         self.maxRegisterEdit.setFixedWidth(65)
-        self.maxRegisterEdit.setAlignment(Qt.AlignRight)
+        self.maxRegisterEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.typeInt = True
         self.typeFloat = False
         self.checkbox3 = QCheckBox(QApplication.translate("CheckBox","Int", None))
@@ -269,7 +279,7 @@ class scanS7Dlg(ArtisanDialog):
         gridlayout.addWidget(self.areaCombo,1,0)
         gridlayout.addWidget(self.DBnrEdit,1,1)
         gridlayout.addWidget(self.minRegisterEdit,1,2)
-        gridlayout.addWidget(self.toLabel,1,3,Qt.AlignHCenter)
+        gridlayout.addWidget(self.toLabel,1,3,Qt.AlignmentFlag.AlignHCenter)
         gridlayout.addWidget(self.maxRegisterEdit,1,4)
         cblayout= QHBoxLayout()
         cblayout.addStretch()
@@ -392,9 +402,9 @@ class PortComboBox(QComboBox):
 
     def eventFilter(self, obj, event):
 # the next prevents correct setSelection on Windows
-#        if event.type() == QEvent.FocusIn:
+#        if event.type() == QEvent.Type.FocusIn:
 #            self.setSelection(self.currentIndex())
-        if event.type() == QEvent.MouseButtonPress:
+        if event.type() == QEvent.Type.MouseButtonPress:
             self.updateMenu()
         return super().eventFilter(obj, event)
 
@@ -425,7 +435,7 @@ class PortComboBox(QComboBox):
 class comportDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
-        self.setAttribute(Qt.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
         self.setWindowTitle(QApplication.translate("Form Caption","Ports Configuration",None))
         self.setModal(True)
         self.helpdialog = None
@@ -466,8 +476,8 @@ class comportDlg(ArtisanResizeablDialog):
         ##########################    TAB 2  WIDGETS   EXTRA DEVICES
         self.serialtable = QTableWidget()
         self.serialtable.setTabKeyNavigation(True)
-        self.serialtable.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding)
-        self.serialtable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.serialtable.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Expanding)
+        self.serialtable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         self.serialtable.horizontalHeader().setStretchLastSection(True)
         self.createserialTable()
         ##########################    TAB 3 WIDGETS   MODBUS
@@ -528,33 +538,33 @@ class comportDlg(ArtisanResizeablDialog):
             self.modbus_inputSlaveEdits[i] = QLineEdit(str(self.aw.modbus.inputSlaves[i]))
             self.modbus_inputSlaveEdits[i].setValidator(QIntValidator(0,247,self.modbus_inputSlaveEdits[i]))
             self.modbus_inputSlaveEdits[i].setFixedWidth(65)
-            self.modbus_inputSlaveEdits[i].setAlignment(Qt.AlignRight)
+            self.modbus_inputSlaveEdits[i].setAlignment(Qt.AlignmentFlag.AlignRight)
             #
             self.modbus_inputRegisterEdits[i] = QLineEdit(str(self.aw.modbus.inputRegisters[i]))
             self.modbus_inputRegisterEdits[i].setValidator(QIntValidator(0,65536,self.modbus_inputRegisterEdits[i]))
             self.modbus_inputRegisterEdits[i].setFixedWidth(65)
-            self.modbus_inputRegisterEdits[i].setAlignment(Qt.AlignRight)
+            self.modbus_inputRegisterEdits[i].setAlignment(Qt.AlignmentFlag.AlignRight)
             #
             self.modbus_inputCodes[i] = QComboBox()
-            self.modbus_inputCodes[i].setFocusPolicy(Qt.NoFocus)
+            self.modbus_inputCodes[i].setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.modbus_inputCodes[i].addItems(modbus_function_codes)
             self.modbus_inputCodes[i].setCurrentIndex(modbus_function_codes.index(str(self.aw.modbus.inputCodes[i])))
             self.modbus_inputCodes[i].setFixedWidth(70)
             #
             self.modbus_inputDivs[i] = QComboBox()
-            self.modbus_inputDivs[i].setFocusPolicy(Qt.NoFocus)
+            self.modbus_inputDivs[i].setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.modbus_inputDivs[i].addItems(modbus_divs)
             self.modbus_inputDivs[i].setCurrentIndex(self.aw.modbus.inputDivs[i])
             self.modbus_inputDivs[i].setFixedWidth(70)
             #
             self.modbus_inputModes[i] = QComboBox()
-            self.modbus_inputModes[i].setFocusPolicy(Qt.NoFocus)
+            self.modbus_inputModes[i].setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.modbus_inputModes[i].addItems(modbus_modes)
             self.modbus_inputModes[i].setCurrentIndex(modbus_modes.index(str(self.aw.modbus.inputModes[i])))
             self.modbus_inputModes[i].setFixedWidth(70)
             #
             self.modbus_inputDecodes[i] = QComboBox()
-            self.modbus_inputDecodes[i].setFocusPolicy(Qt.NoFocus)
+            self.modbus_inputDecodes[i].setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.modbus_inputDecodes[i].addItems(modbus_decode)
             if self.aw.modbus.inputBCDsAsInt[i]:
                 self.modbus_inputDecodes[i].setCurrentIndex(4)
@@ -570,17 +580,17 @@ class comportDlg(ArtisanResizeablDialog):
         
         self.modbus_littleEndianBytes = QCheckBox(QApplication.translate("ComboBox","bytes",None))
         self.modbus_littleEndianBytes.setChecked(self.aw.modbus.byteorderLittle)
-        self.modbus_littleEndianBytes.setFocusPolicy(Qt.NoFocus)
+        self.modbus_littleEndianBytes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.modbus_littleEndianWords = QCheckBox(QApplication.translate("ComboBox","words",None))
         self.modbus_littleEndianWords.setChecked(self.aw.modbus.wordorderLittle)
-        self.modbus_littleEndianWords.setFocusPolicy(Qt.NoFocus)
+        self.modbus_littleEndianWords.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         # type
         self.modbus_type = QComboBox()
         modbus_typelabel = QLabel(QApplication.translate("Label", "Type",None))
         modbus_typelabel.setBuddy(self.modbus_type)
-        self.modbus_type.setFocusPolicy(Qt.NoFocus)
+        self.modbus_type.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.modbus_type.addItems(["Serial RTU", "Serial ASCII", "Serial Binary", "TCP", "UDP"])
         self.modbus_type.setCurrentIndex(self.aw.modbus.type)
         
@@ -588,38 +598,38 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_hostlabel = QLabel(QApplication.translate("Label", "Host",None))
         self.modbus_hostEdit = QLineEdit(str(self.aw.modbus.host))
         self.modbus_hostEdit.setFixedWidth(120)
-        self.modbus_hostEdit.setAlignment(Qt.AlignRight)
+        self.modbus_hostEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         # port (default 502)
         modbus_portlabel = QLabel(QApplication.translate("Label", "Port",None))
         self.modbus_portEdit = QLineEdit(str(self.aw.modbus.port))
         self.modbus_portEdit.setValidator(QIntValidator(1,65535,self.modbus_portEdit))
         self.modbus_portEdit.setFixedWidth(60)
-        self.modbus_portEdit.setAlignment(Qt.AlignRight)
+        self.modbus_portEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         
         # modbus external PID conf
         modbus_PIDslave_label = QLabel(QApplication.translate("Label", "Slave",None))
         self.modbus_PIDslave_Edit = QLineEdit(str(self.aw.modbus.PID_slave_ID))
         self.modbus_PIDslave_Edit.setValidator(QIntValidator(0,65536,self.modbus_PIDslave_Edit))
         self.modbus_PIDslave_Edit.setFixedWidth(50)
-        self.modbus_PIDslave_Edit.setAlignment(Qt.AlignRight)       
+        self.modbus_PIDslave_Edit.setAlignment(Qt.AlignmentFlag.AlignRight)       
         modbus_SVregister_label = QLabel(QApplication.translate("Label", "SV",None))
         self.modbus_SVregister_Edit = QLineEdit(str(self.aw.modbus.PID_SV_register))
         self.modbus_SVregister_Edit.setValidator(QIntValidator(0,65536,self.modbus_SVregister_Edit))
         self.modbus_SVregister_Edit.setFixedWidth(50)
-        self.modbus_SVregister_Edit.setAlignment(Qt.AlignRight)
+        self.modbus_SVregister_Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         
         modbus_multis = ["", "10","100"]
         
         modbus_SVmultiplier_label = QLabel(QApplication.translate("Label", "SV Factor",None))
         self.modbus_SVmultiplier = QComboBox()
-        self.modbus_SVmultiplier.setFocusPolicy(Qt.NoFocus)
+        self.modbus_SVmultiplier.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.modbus_SVmultiplier.addItems(modbus_multis)
         self.modbus_SVmultiplier.setCurrentIndex(self.aw.modbus.SVmultiplier)
         self.modbus_SVmultiplier.setFixedWidth(70)
         
         modbus_PIDmultiplier_label = QLabel(QApplication.translate("Label", "pid Factor",None))
         self.modbus_PIDmultiplier = QComboBox()
-        self.modbus_PIDmultiplier.setFocusPolicy(Qt.NoFocus)
+        self.modbus_PIDmultiplier.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.modbus_PIDmultiplier.addItems(modbus_multis)
         self.modbus_PIDmultiplier.setCurrentIndex(self.aw.modbus.PIDmultiplier)
         self.modbus_PIDmultiplier.setFixedWidth(70)
@@ -628,19 +638,19 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_Pregister_Edit = QLineEdit(str(self.aw.modbus.PID_p_register))
         self.modbus_Pregister_Edit.setValidator(QIntValidator(0,65536,self.modbus_Pregister_Edit))
         self.modbus_Pregister_Edit.setFixedWidth(50)
-        self.modbus_Pregister_Edit.setAlignment(Qt.AlignRight)
+        self.modbus_Pregister_Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
                 
         modbus_Iregister_label = QLabel(QApplication.translate("Label", "I",None))
         self.modbus_Iregister_Edit = QLineEdit(str(self.aw.modbus.PID_i_register))
         self.modbus_Iregister_Edit.setValidator(QIntValidator(0,65536,self.modbus_Iregister_Edit))
         self.modbus_Iregister_Edit.setFixedWidth(50)
-        self.modbus_Iregister_Edit.setAlignment(Qt.AlignRight)
+        self.modbus_Iregister_Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
                 
         modbus_Dregister_label = QLabel(QApplication.translate("Label", "D",None))
         self.modbus_Dregister_Edit = QLineEdit(str(self.aw.modbus.PID_d_register))
         self.modbus_Dregister_Edit.setValidator(QIntValidator(0,65536,self.modbus_Dregister_Edit))
         self.modbus_Dregister_Edit.setFixedWidth(50)
-        self.modbus_Dregister_Edit.setAlignment(Qt.AlignRight)
+        self.modbus_Dregister_Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         
         modbus_pid_registers = QHBoxLayout()
         modbus_pid_registers.addWidget(modbus_SVregister_label)
@@ -705,22 +715,22 @@ class comportDlg(ArtisanResizeablDialog):
         
         scanButton = QPushButton(QApplication.translate("Button","Scan",None))
         scanButton.setToolTip(QApplication.translate("Tooltip","Scan MODBUS",None))
-        scanButton.setFocusPolicy(Qt.NoFocus)
+        scanButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         scanButton.clicked.connect(self.scanModbus)
 
         self.modbus_optimize = QCheckBox(QApplication.translate("ComboBox","optimize",None))
         self.modbus_optimize.setChecked(self.aw.modbus.optimizer)
-        self.modbus_optimize.setFocusPolicy(Qt.NoFocus)
+        self.modbus_optimize.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.modbus_optimize.stateChanged.connect(self.modbus_optimize_toggle)
         
         self.modbus_full_block = QCheckBox(QApplication.translate("ComboBox","fetch full blocks",None))
         self.modbus_full_block.setChecked(self.aw.modbus.fetch_max_blocks)
-        self.modbus_full_block.setFocusPolicy(Qt.NoFocus)
+        self.modbus_full_block.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.modbus_full_block.setEnabled(bool(self.aw.modbus.optimizer))
         
         self.modbus_reset = QCheckBox(QApplication.translate("ComboBox","reset",None))
         self.modbus_reset.setChecked(self.aw.modbus.reset_socket)
-        self.modbus_reset.setFocusPolicy(Qt.NoFocus)
+        self.modbus_reset.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.modbus_reset.setToolTip(QApplication.translate("Tooltip","Reset socket connection on error", None))
 
         ##########################    TAB 4 WIDGETS   SCALE
@@ -815,11 +825,11 @@ class comportDlg(ArtisanResizeablDialog):
         self.dialogbuttons.accepted.connect(self.accept)
         self.dialogbuttons.rejected.connect(self.close)
         
-        helpButton = self.dialogbuttons.addButton(QDialogButtonBox.Help)
+        helpButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Help)
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
         self.setButtonTranslations(helpButton,"Help",QApplication.translate("Button","Help", None))
         helpButton.clicked.connect(self.showModbusbuttonhelp)
-        helpButton.setFocusPolicy(Qt.NoFocus)
+        helpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         
         #button layout
         buttonLayout = QHBoxLayout()
@@ -830,17 +840,17 @@ class comportDlg(ArtisanResizeablDialog):
         devid = self.aw.qmc.device
         if not(devid in self.aw.qmc.nonSerialDevices) and not(devid == 0 and self.aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             grid = QGridLayout()
-            grid.addWidget(comportlabel,0,0,Qt.AlignRight)
+            grid.addWidget(comportlabel,0,0,Qt.AlignmentFlag.AlignRight)
             grid.addWidget(self.comportEdit,0,1)
-            grid.addWidget(baudratelabel,1,0,Qt.AlignRight)
+            grid.addWidget(baudratelabel,1,0,Qt.AlignmentFlag.AlignRight)
             grid.addWidget(self.baudrateComboBox,1,1)
-            grid.addWidget(bytesizelabel,2,0,Qt.AlignRight)
+            grid.addWidget(bytesizelabel,2,0,Qt.AlignmentFlag.AlignRight)
             grid.addWidget(self.bytesizeComboBox,2,1)
-            grid.addWidget(paritylabel,3,0,Qt.AlignRight)
+            grid.addWidget(paritylabel,3,0,Qt.AlignmentFlag.AlignRight)
             grid.addWidget(self.parityComboBox,3,1)
-            grid.addWidget(stopbitslabel,4,0,Qt.AlignRight)
+            grid.addWidget(stopbitslabel,4,0,Qt.AlignmentFlag.AlignRight)
             grid.addWidget(self.stopbitsComboBox,4,1)
-            grid.addWidget(timeoutlabel,5,0,Qt.AlignRight)
+            grid.addWidget(timeoutlabel,5,0,Qt.AlignmentFlag.AlignRight)
             grid.addWidget(self.timeoutEdit,5,1)
             gridBoxLayout = QHBoxLayout()
             gridBoxLayout.addLayout(grid)
@@ -852,17 +862,17 @@ class comportDlg(ArtisanResizeablDialog):
         tab2Layout.addWidget(self.serialtable)
         #LAYOUT TAB 3
         modbus_grid = QGridLayout()
-        modbus_grid.addWidget(modbus_comportlabel,0,0,Qt.AlignRight)
+        modbus_grid.addWidget(modbus_comportlabel,0,0,Qt.AlignmentFlag.AlignRight)
         modbus_grid.addWidget(self.modbus_comportEdit,0,1)
-        modbus_grid.addWidget(modbus_baudratelabel,1,0,Qt.AlignRight)
+        modbus_grid.addWidget(modbus_baudratelabel,1,0,Qt.AlignmentFlag.AlignRight)
         modbus_grid.addWidget(self.modbus_baudrateComboBox,1,1)
-        modbus_grid.addWidget(modbus_bytesizelabel,2,0,Qt.AlignRight)
+        modbus_grid.addWidget(modbus_bytesizelabel,2,0,Qt.AlignmentFlag.AlignRight)
         modbus_grid.addWidget(self.modbus_bytesizeComboBox,2,1)
-        modbus_grid.addWidget(modbus_paritylabel,3,0,Qt.AlignRight)
+        modbus_grid.addWidget(modbus_paritylabel,3,0,Qt.AlignmentFlag.AlignRight)
         modbus_grid.addWidget(self.modbus_parityComboBox,3,1)
-        modbus_grid.addWidget(modbus_stopbitslabel,4,0,Qt.AlignRight)
+        modbus_grid.addWidget(modbus_stopbitslabel,4,0,Qt.AlignmentFlag.AlignRight)
         modbus_grid.addWidget(self.modbus_stopbitsComboBox,4,1)
-        modbus_grid.addWidget(modbus_timeoutlabel,5,0,Qt.AlignRight)
+        modbus_grid.addWidget(modbus_timeoutlabel,5,0,Qt.AlignmentFlag.AlignRight)
         modbus_grid.addWidget(self.modbus_timeoutEdit,5,1)
         modbus_grid.setContentsMargins(5,5,5,5)
         modbus_grid.setSpacing(7)
@@ -873,21 +883,21 @@ class comportDlg(ArtisanResizeablDialog):
         
         modbus_input_grid = QGridLayout()
         
-        modbus_input_grid.addWidget(modbus_input1slavelabel,1,0,Qt.AlignRight)
-        modbus_input_grid.addWidget(modbus_input1registerlabel,2,0,Qt.AlignRight)
-        modbus_input_grid.addWidget(modbus_input1codelabel,3,0,Qt.AlignRight)
-        modbus_input_grid.addWidget(modbus_input1divlabel,4,0,Qt.AlignRight)
-        modbus_input_grid.addWidget(modbus_input1modelabel,5,0,Qt.AlignRight)
-        modbus_input_grid.addWidget(modbus_input1floatlabel,6,0,Qt.AlignRight)
+        modbus_input_grid.addWidget(modbus_input1slavelabel,1,0,Qt.AlignmentFlag.AlignRight)
+        modbus_input_grid.addWidget(modbus_input1registerlabel,2,0,Qt.AlignmentFlag.AlignRight)
+        modbus_input_grid.addWidget(modbus_input1codelabel,3,0,Qt.AlignmentFlag.AlignRight)
+        modbus_input_grid.addWidget(modbus_input1divlabel,4,0,Qt.AlignmentFlag.AlignRight)
+        modbus_input_grid.addWidget(modbus_input1modelabel,5,0,Qt.AlignmentFlag.AlignRight)
+        modbus_input_grid.addWidget(modbus_input1floatlabel,6,0,Qt.AlignmentFlag.AlignRight)
         
         for i in range(self.aw.modbus.channels):
-            modbus_input_grid.addWidget(QLabel(QApplication.translate("GroupBox", "Input",None) + " " + str(i+1)),0,i+1,Qt.AlignCenter)
+            modbus_input_grid.addWidget(QLabel(QApplication.translate("GroupBox", "Input",None) + " " + str(i+1)),0,i+1,Qt.AlignmentFlag.AlignCenter)
             modbus_input_grid.addWidget(self.modbus_inputSlaveEdits[i],1,i+1)
             modbus_input_grid.addWidget(self.modbus_inputRegisterEdits[i],2,i+1)
             modbus_input_grid.addWidget(self.modbus_inputCodes[i],3,i+1)
             modbus_input_grid.addWidget(self.modbus_inputDivs[i],4,i+1)
             modbus_input_grid.addWidget(self.modbus_inputModes[i],5,i+1)
-            modbus_input_grid.addWidget(self.modbus_inputDecodes[i],6,i+1,Qt.AlignCenter)
+            modbus_input_grid.addWidget(self.modbus_inputDecodes[i],6,i+1,Qt.AlignmentFlag.AlignCenter)
         
         modbus_gridVLayout = QHBoxLayout()
         modbus_gridVLayout.addLayout(modbus_gridV)
@@ -933,39 +943,39 @@ class comportDlg(ArtisanResizeablDialog):
         s7_hostlabel = QLabel(QApplication.translate("Label", "Host",None))
         self.s7_hostEdit = QLineEdit(str(self.aw.s7.host))
         self.s7_hostEdit.setFixedWidth(120)
-        self.s7_hostEdit.setAlignment(Qt.AlignRight)
+        self.s7_hostEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         # port (default 102)
         s7_portlabel = QLabel(QApplication.translate("Label", "Port",None))
         self.s7_portEdit = QLineEdit(str(self.aw.s7.port))
         self.s7_portEdit.setValidator(QIntValidator(1,65535,self.s7_portEdit))
         self.s7_portEdit.setFixedWidth(60)
-        self.s7_portEdit.setAlignment(Qt.AlignRight)
+        self.s7_portEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         # rack (default 0)
         s7_racklabel = QLabel(QApplication.translate("Label", "Rack",None))
         self.s7_rackEdit = QLineEdit(str(self.aw.s7.rack))
         self.s7_rackEdit.setValidator(QIntValidator(0,7,self.s7_rackEdit))
         self.s7_rackEdit.setFixedWidth(60)
-        self.s7_rackEdit.setAlignment(Qt.AlignRight)
+        self.s7_rackEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         # slot (default 0)
         s7_slotlabel = QLabel(QApplication.translate("Label", "Slot",None))
         self.s7_slotEdit = QLineEdit(str(self.aw.s7.slot))
         self.s7_slotEdit.setValidator(QIntValidator(0,31,self.s7_slotEdit))
         self.s7_slotEdit.setFixedWidth(60)
-        self.s7_slotEdit.setAlignment(Qt.AlignRight)
+        self.s7_slotEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         
         scanButtonS7 = QPushButton(QApplication.translate("Button","Scan",None))
         scanButtonS7.setToolTip(QApplication.translate("Tooltip","Scan S7",None))
-        scanButtonS7.setFocusPolicy(Qt.NoFocus)
+        scanButtonS7.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         scanButtonS7.clicked.connect(self.scanS7)
 
         self.s7_optimize = QCheckBox(QApplication.translate("ComboBox","optimize",None))
         self.s7_optimize.setChecked(self.aw.s7.optimizer)
-        self.s7_optimize.setFocusPolicy(Qt.NoFocus)
+        self.s7_optimize.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.s7_optimize.stateChanged.connect(self.s7_optimize_toggle)
         
         self.s7_full_block = QCheckBox(QApplication.translate("ComboBox","fetch full blocks",None))
         self.s7_full_block.setChecked(self.aw.s7.fetch_max_blocks)
-        self.s7_full_block.setFocusPolicy(Qt.NoFocus)
+        self.s7_full_block.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.s7_full_block.setEnabled(bool(self.aw.s7.optimizer))
 
         s7_areaLabel = QLabel(QApplication.translate("Label", "Area",None))
@@ -987,69 +997,69 @@ class comportDlg(ArtisanResizeablDialog):
         
         s7_grid = QGridLayout()
         
-        s7_grid.addWidget(s7_areaLabel,1,0,Qt.AlignRight)
-        s7_grid.addWidget(s7_dbLabel,2,0,Qt.AlignRight)
-        s7_grid.addWidget(s7_startLabel,3,0,Qt.AlignRight)
-        s7_grid.addWidget(s7_typeLabel,4,0,Qt.AlignRight)
-        s7_grid.addWidget(s7_divLabel,5,0,Qt.AlignRight)
-        s7_grid.addWidget(s7_modeLabel,6,0,Qt.AlignRight)
+        s7_grid.addWidget(s7_areaLabel,1,0,Qt.AlignmentFlag.AlignRight)
+        s7_grid.addWidget(s7_dbLabel,2,0,Qt.AlignmentFlag.AlignRight)
+        s7_grid.addWidget(s7_startLabel,3,0,Qt.AlignmentFlag.AlignRight)
+        s7_grid.addWidget(s7_typeLabel,4,0,Qt.AlignmentFlag.AlignRight)
+        s7_grid.addWidget(s7_divLabel,5,0,Qt.AlignmentFlag.AlignRight)
+        s7_grid.addWidget(s7_modeLabel,6,0,Qt.AlignmentFlag.AlignRight)
         
         for i in range(self.aw.s7.channels):
             # channel label
             label = QLabel(QApplication.translate("Label", "Input",None) + " " + str(i+1))
-            s7_grid.addWidget(label,0,i+1,Qt.AlignRight)
+            s7_grid.addWidget(label,0,i+1,Qt.AlignmentFlag.AlignRight)
             # area combo
             area = QComboBox()
-            area.setFocusPolicy(Qt.NoFocus)
+            area.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             area.addItems(s7_areas)
             area.setCurrentIndex(self.aw.s7.area[i])
             area.setFixedWidth(70)
             self.s7_areaCombos.append(area) 
-            s7_grid.addWidget(area,1,i+1,Qt.AlignRight)
+            s7_grid.addWidget(area,1,i+1,Qt.AlignmentFlag.AlignRight)
             # db edit: 1-16000
             dbEdit = QLineEdit(str(self.aw.s7.db_nr[i]))
             dbEdit.setFixedWidth(65)
-            dbEdit.setAlignment(Qt.AlignRight)
+            dbEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
             self.s7_dbEdits.append(dbEdit)
             dbEdit.setValidator(QIntValidator(1,16000,self.s7_dbEdits[i]))
-            s7_grid.addWidget(dbEdit,2,i+1,Qt.AlignRight)
+            s7_grid.addWidget(dbEdit,2,i+1,Qt.AlignmentFlag.AlignRight)
             # start edit:
             startEdit = QLineEdit(str(self.aw.s7.start[i]))
             startEdit.setFixedWidth(65)
-            startEdit.setAlignment(Qt.AlignRight)
+            startEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
             self.s7_startEdits.append(startEdit)
             startEdit.setValidator(QIntValidator(0,65536,self.s7_startEdits[i]))
-            s7_grid.addWidget(startEdit,3,i+1,Qt.AlignRight)
+            s7_grid.addWidget(startEdit,3,i+1,Qt.AlignmentFlag.AlignRight)
             # type combo: Int, Float
             tp = QComboBox()
-            tp.setFocusPolicy(Qt.NoFocus)
+            tp.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             tp.addItems(s7_types)
             tp.setCurrentIndex(self.aw.s7.type[i])
             tp.setFixedWidth(70)
             self.s7_typeCombos.append(tp)
-            s7_grid.addWidget(tp,4,i+1,Qt.AlignRight)
+            s7_grid.addWidget(tp,4,i+1,Qt.AlignmentFlag.AlignRight)
             # div combo: -,1/10,1/100
             div = QComboBox()
-            div.setFocusPolicy(Qt.NoFocus)
+            div.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             div.addItems(modbus_divs)
             div.setCurrentIndex(self.aw.s7.div[i])
             div.setFixedWidth(70)
             self.s7_divCombos.append(div)
-            s7_grid.addWidget(div,5,i+1,Qt.AlignRight)
+            s7_grid.addWidget(div,5,i+1,Qt.AlignmentFlag.AlignRight)
             # mode combo: -,C,F
             mode = QComboBox()
-            mode.setFocusPolicy(Qt.NoFocus)
+            mode.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             mode.addItems(modbus_modes)
             mode.setCurrentIndex(self.aw.s7.mode[i])
             mode.setFixedWidth(70) 
             self.s7_modeCombos.append(mode)
-            s7_grid.addWidget(mode,6,i+1,Qt.AlignRight)
+            s7_grid.addWidget(mode,6,i+1,Qt.AlignmentFlag.AlignRight)
           
         # s7 external PID conf
         
         s7_PIDareaLabel = QLabel(QApplication.translate("Label", "Area",None))
         self.s7_PIDarea = QComboBox()
-        self.s7_PIDarea.setFocusPolicy(Qt.NoFocus)
+        self.s7_PIDarea.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.s7_PIDarea.addItems(s7_areas)
         self.s7_PIDarea.setCurrentIndex(self.aw.s7.PID_area)
         self.s7_PIDarea.setFixedWidth(70)
@@ -1057,18 +1067,18 @@ class comportDlg(ArtisanResizeablDialog):
         self.s7_PIDdb_nr_Edit = QLineEdit(str(self.aw.s7.PID_db_nr))
         self.s7_PIDdb_nr_Edit.setValidator(QIntValidator(0,65536,self.s7_PIDdb_nr_Edit))
         self.s7_PIDdb_nr_Edit.setFixedWidth(50)
-        self.s7_PIDdb_nr_Edit.setAlignment(Qt.AlignRight)
+        self.s7_PIDdb_nr_Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         s7_SVregister_label = QLabel(QApplication.translate("Label", "SV",None))
         self.s7_SVregister_Edit = QLineEdit(str(self.aw.s7.PID_SV_register))
         self.s7_SVregister_Edit.setValidator(QIntValidator(0,65536,self.s7_SVregister_Edit))
         self.s7_SVregister_Edit.setFixedWidth(50)
-        self.s7_SVregister_Edit.setAlignment(Qt.AlignRight)
+        self.s7_SVregister_Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         
         s7_SVtypes = ["Int", "Float"]
         
         s7_SVtype_label = QLabel(QApplication.translate("Label", "Type",None))
         self.s7_SVtype = QComboBox()
-        self.s7_SVtype.setFocusPolicy(Qt.NoFocus)
+        self.s7_SVtype.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.s7_SVtype.addItems(s7_SVtypes)
         self.s7_SVtype.setCurrentIndex(self.aw.s7.SVtype)
         self.s7_SVtype.setFixedWidth(70)
@@ -1077,14 +1087,14 @@ class comportDlg(ArtisanResizeablDialog):
         
         s7_SVmultiplier_label = QLabel(QApplication.translate("Label", "SV Factor",None))
         self.s7_SVmultiplier = QComboBox()
-        self.s7_SVmultiplier.setFocusPolicy(Qt.NoFocus)
+        self.s7_SVmultiplier.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.s7_SVmultiplier.addItems(s7_multis)
         self.s7_SVmultiplier.setCurrentIndex(self.aw.s7.SVmultiplier)
         self.s7_SVmultiplier.setFixedWidth(70)
         
         s7_PIDmultiplier_label = QLabel(QApplication.translate("Label", "pid Factor",None))
         self.s7_PIDmultiplier = QComboBox()
-        self.s7_PIDmultiplier.setFocusPolicy(Qt.NoFocus)
+        self.s7_PIDmultiplier.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.s7_PIDmultiplier.addItems(s7_multis)
         self.s7_PIDmultiplier.setCurrentIndex(self.aw.s7.PIDmultiplier)
         self.s7_PIDmultiplier.setFixedWidth(70)
@@ -1093,19 +1103,19 @@ class comportDlg(ArtisanResizeablDialog):
         self.s7_Pregister_Edit = QLineEdit(str(self.aw.s7.PID_p_register))
         self.s7_Pregister_Edit.setValidator(QIntValidator(0,65536,self.s7_Pregister_Edit))
         self.s7_Pregister_Edit.setFixedWidth(50)
-        self.s7_Pregister_Edit.setAlignment(Qt.AlignRight)
+        self.s7_Pregister_Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
                 
         s7_Iregister_label = QLabel(QApplication.translate("Label", "I",None))
         self.s7_Iregister_Edit = QLineEdit(str(self.aw.s7.PID_i_register))
         self.s7_Iregister_Edit.setValidator(QIntValidator(0,65536,self.s7_Iregister_Edit))
         self.s7_Iregister_Edit.setFixedWidth(50)
-        self.s7_Iregister_Edit.setAlignment(Qt.AlignRight)
+        self.s7_Iregister_Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
                 
         s7_Dregister_label = QLabel(QApplication.translate("Label", "D",None))
         self.s7_Dregister_Edit = QLineEdit(str(self.aw.s7.PID_d_register))
         self.s7_Dregister_Edit.setValidator(QIntValidator(0,65536,self.s7_Dregister_Edit))
         self.s7_Dregister_Edit.setFixedWidth(50)
-        self.s7_Dregister_Edit.setAlignment(Qt.AlignRight)
+        self.s7_Dregister_Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         
         s7_pid_registers = QHBoxLayout()
         s7_pid_registers.addWidget(s7_SVregister_label)
@@ -1221,19 +1231,19 @@ class comportDlg(ArtisanResizeablDialog):
         
         #LAYOUT TAB 5
         scale_grid = QGridLayout()
-        scale_grid.addWidget(scale_devicelabel,0,0,Qt.AlignRight)
+        scale_grid.addWidget(scale_devicelabel,0,0,Qt.AlignmentFlag.AlignRight)
         scale_grid.addWidget(self.scale_deviceEdit,0,1)
-        scale_grid.addWidget(scale_comportlabel,1,0,Qt.AlignRight)
+        scale_grid.addWidget(scale_comportlabel,1,0,Qt.AlignmentFlag.AlignRight)
         scale_grid.addWidget(self.scale_comportEdit,1,1)
-        scale_grid.addWidget(scale_baudratelabel,2,0,Qt.AlignRight)
+        scale_grid.addWidget(scale_baudratelabel,2,0,Qt.AlignmentFlag.AlignRight)
         scale_grid.addWidget(self.scale_baudrateComboBox,2,1)
-        scale_grid.addWidget(scale_bytesizelabel,3,0,Qt.AlignRight)
+        scale_grid.addWidget(scale_bytesizelabel,3,0,Qt.AlignmentFlag.AlignRight)
         scale_grid.addWidget(self.scale_bytesizeComboBox,3,1)
-        scale_grid.addWidget(scale_paritylabel,4,0,Qt.AlignRight)
+        scale_grid.addWidget(scale_paritylabel,4,0,Qt.AlignmentFlag.AlignRight)
         scale_grid.addWidget(self.scale_parityComboBox,4,1)
-        scale_grid.addWidget(scale_stopbitslabel,5,0,Qt.AlignRight)
+        scale_grid.addWidget(scale_stopbitslabel,5,0,Qt.AlignmentFlag.AlignRight)
         scale_grid.addWidget(self.scale_stopbitsComboBox,5,1)
-        scale_grid.addWidget(scale_timeoutlabel,6,0,Qt.AlignRight)
+        scale_grid.addWidget(scale_timeoutlabel,6,0,Qt.AlignmentFlag.AlignRight)
         scale_grid.addWidget(self.scale_timeoutEdit,6,1)
         scaleH = QHBoxLayout()
         scaleH.addLayout(scale_grid)
@@ -1244,19 +1254,19 @@ class comportDlg(ArtisanResizeablDialog):
         
         #LAYOUT TAB 6
         color_grid = QGridLayout()
-        color_grid.addWidget(color_devicelabel,0,0,Qt.AlignRight)
+        color_grid.addWidget(color_devicelabel,0,0,Qt.AlignmentFlag.AlignRight)
         color_grid.addWidget(self.color_deviceEdit,0,1)
-        color_grid.addWidget(color_comportlabel,1,0,Qt.AlignRight)
+        color_grid.addWidget(color_comportlabel,1,0,Qt.AlignmentFlag.AlignRight)
         color_grid.addWidget(self.color_comportEdit,1,1)
-        color_grid.addWidget(color_baudratelabel,2,0,Qt.AlignRight)
+        color_grid.addWidget(color_baudratelabel,2,0,Qt.AlignmentFlag.AlignRight)
         color_grid.addWidget(self.color_baudrateComboBox,2,1)
-        color_grid.addWidget(color_bytesizelabel,3,0,Qt.AlignRight)
+        color_grid.addWidget(color_bytesizelabel,3,0,Qt.AlignmentFlag.AlignRight)
         color_grid.addWidget(self.color_bytesizeComboBox,3,1)
-        color_grid.addWidget(color_paritylabel,4,0,Qt.AlignRight)
+        color_grid.addWidget(color_paritylabel,4,0,Qt.AlignmentFlag.AlignRight)
         color_grid.addWidget(self.color_parityComboBox,4,1)
-        color_grid.addWidget(color_stopbitslabel,5,0,Qt.AlignRight)
+        color_grid.addWidget(color_stopbitslabel,5,0,Qt.AlignmentFlag.AlignRight)
         color_grid.addWidget(self.color_stopbitsComboBox,5,1)
-        color_grid.addWidget(color_timeoutlabel,6,0,Qt.AlignRight)
+        color_grid.addWidget(color_timeoutlabel,6,0,Qt.AlignmentFlag.AlignRight)
         color_grid.addWidget(self.color_timeoutEdit,6,1)
         colorH = QHBoxLayout()
         colorH.addLayout(color_grid)
@@ -1268,26 +1278,26 @@ class comportDlg(ArtisanResizeablDialog):
         # host (IP or hostname)
         ws_hostlabel = QLabel(QApplication.translate("Label", "Host",None))
         self.ws_hostEdit = QLineEdit(str(self.aw.ws.host))
-        self.ws_hostEdit.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
-        self.ws_hostEdit.setAlignment(Qt.AlignRight)
+        self.ws_hostEdit.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
+        self.ws_hostEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         # port (default 102)
         ws_portlabel = QLabel(QApplication.translate("Label", "Port",None))
         self.ws_portEdit = QLineEdit(str(self.aw.ws.port))
         self.ws_portEdit.setValidator(QIntValidator(1,65535,self.ws_portEdit))
         self.ws_portEdit.setFixedWidth(40)
-        self.ws_portEdit.setAlignment(Qt.AlignRight)
+        self.ws_portEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         # rack (default 0)
         ws_pathlabel = QLabel(QApplication.translate("Label", "Path",None))
         self.ws_pathEdit = QLineEdit(str(self.aw.ws.path))
-        self.ws_pathEdit.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
-        self.ws_pathEdit.setAlignment(Qt.AlignLeft)
+        self.ws_pathEdit.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
+        self.ws_pathEdit.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.ws_pathEdit.setCursorPosition(0)
         # slot (default 0)
         ws_machineIDlabel = QLabel(QApplication.translate("Label", "ID",None))
         self.ws_machineIDEdit = QLineEdit(str(self.aw.ws.machineID))
         self.ws_machineIDEdit.setValidator(QIntValidator(0,99999,self.ws_machineIDEdit))
         self.ws_machineIDEdit.setFixedWidth(25)
-        self.ws_machineIDEdit.setAlignment(Qt.AlignRight)
+        self.ws_machineIDEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
                 
         ws_setup = QHBoxLayout()
         ws_setup.addWidget(ws_hostlabel)
@@ -1312,7 +1322,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.ws_connect_timeout.setValue(self.aw.ws.connect_timeout)
         self.ws_connect_timeout.setRange(0,5)
         self.ws_connect_timeout.setDecimals(1)
-        self.ws_connect_timeout.setAlignment(Qt.AlignRight)
+        self.ws_connect_timeout.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.ws_connect_timeout.setSuffix("s")
         
         self.ws_reconnect_timeout = QDoubleSpinBox()
@@ -1320,7 +1330,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.ws_reconnect_timeout.setValue(self.aw.ws.reconnect_interval)
         self.ws_reconnect_timeout.setRange(0,5)
         self.ws_reconnect_timeout.setDecimals(1)
-        self.ws_reconnect_timeout.setAlignment(Qt.AlignRight)
+        self.ws_reconnect_timeout.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.ws_reconnect_timeout.setSuffix("s")
         
         self.ws_request_timeout = QDoubleSpinBox()
@@ -1328,7 +1338,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.ws_request_timeout.setValue(self.aw.ws.request_timeout)
         self.ws_request_timeout.setRange(0,5)
         self.ws_request_timeout.setDecimals(1)
-        self.ws_request_timeout.setAlignment(Qt.AlignRight)
+        self.ws_request_timeout.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.ws_request_timeout.setSuffix("s")
         
         ws_timeouts = QHBoxLayout()
@@ -1351,17 +1361,17 @@ class comportDlg(ArtisanResizeablDialog):
         ws_line1.addWidget(ws_timeouts_box)
         
         self.ws_messageID = QLineEdit(str(self.aw.ws.id_node))
-        self.ws_messageID.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_messageID.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_messageID.setCursorPosition(0)
         self.ws_machineID = QLineEdit(str(self.aw.ws.machine_node))
         self.ws_machineID.setMinimumWidth(70)
-        self.ws_messageID.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_messageID.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_machineID.setCursorPosition(0)
         self.ws_message = QLineEdit(str(self.aw.ws.pushMessage_node))
-        self.ws_message.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_message.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_message.setCursorPosition(0)
         self.ws_command = QLineEdit(str(self.aw.ws.command_node))
-        self.ws_command.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_command.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_command.setCursorPosition(0)
         self.ws_data = QLineEdit(str(self.aw.ws.data_node))
         self.ws_data.setCursorPosition(0)
@@ -1384,7 +1394,7 @@ class comportDlg(ArtisanResizeablDialog):
         ws_nodes_box.setLayout(ws_nodes)
         
         self.ws_data_request = QLineEdit(str(self.aw.ws.request_data_command))
-        self.ws_data_request.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_data_request.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_data_request.setCursorPosition(0)
         ws_commands = QGridLayout()
         ws_commands.addWidget(QLabel(QApplication.translate("Label","Data Request",None)),0,0)
@@ -1397,10 +1407,10 @@ class comportDlg(ArtisanResizeablDialog):
 
 
         self.ws_charge = QLineEdit(str(self.aw.ws.charge_message))
-        self.ws_charge.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_charge.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_charge.setCursorPosition(0)
         self.ws_drop = QLineEdit(str(self.aw.ws.drop_message))
-        self.ws_drop.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_drop.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_drop.setCursorPosition(0)
         ws_messages = QGridLayout()
         ws_messages.addWidget(QLabel(QApplication.translate("Label","CHARGE",None)),0,0)
@@ -1435,31 +1445,31 @@ class comportDlg(ArtisanResizeablDialog):
         #
         
         self.ws_event_message = QLineEdit(str(self.aw.ws.addEvent_message))
-        self.ws_event_message.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_event_message.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_event_message.setCursorPosition(0)
         
         self.ws_event = QLineEdit(str(self.aw.ws.event_node))
-        self.ws_event.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_event.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_event.setCursorPosition(0)
         
         self.ws_DRY = QLineEdit(str(self.aw.ws.DRY_node))
-        self.ws_DRY.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_DRY.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_DRY.setCursorPosition(0)
         
         self.ws_FCs = QLineEdit(str(self.aw.ws.FCs_node))
-        self.ws_FCs.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_FCs.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_FCs.setCursorPosition(0)
         
         self.ws_FCe = QLineEdit(str(self.aw.ws.FCe_node))
-        self.ws_FCe.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_FCe.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_FCe.setCursorPosition(0)
         
         self.ws_SCs = QLineEdit(str(self.aw.ws.SCs_node))
-        self.ws_SCs.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_SCs.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_SCs.setCursorPosition(0)
         
         self.ws_SCe = QLineEdit(str(self.aw.ws.SCe_node))
-        self.ws_SCe.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_SCe.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_SCe.setCursorPosition(0)
         
         ws_events = QGridLayout()
@@ -1499,37 +1509,37 @@ class comportDlg(ArtisanResizeablDialog):
         ws_nodeLabel = QLabel(QApplication.translate("Label", "Node",None))
         ws_modeLabel = QLabel(QApplication.translate("Label", "Mode",None))
         
-        ws_grid.addWidget(ws_requestLabel,1,0,Qt.AlignRight)
-        ws_grid.addWidget(ws_nodeLabel,2,0,Qt.AlignRight)
-        ws_grid.addWidget(ws_modeLabel,3,0,Qt.AlignRight)
+        ws_grid.addWidget(ws_requestLabel,1,0,Qt.AlignmentFlag.AlignRight)
+        ws_grid.addWidget(ws_nodeLabel,2,0,Qt.AlignmentFlag.AlignRight)
+        ws_grid.addWidget(ws_modeLabel,3,0,Qt.AlignmentFlag.AlignRight)
         
         
         for i in range(self.aw.ws.channels):
             # channel label
             label = QLabel(QApplication.translate("Label", "Input",None) + " " + str(i+1))
-            ws_grid.addWidget(label,0,i+1,Qt.AlignRight)
+            ws_grid.addWidget(label,0,i+1,Qt.AlignmentFlag.AlignRight)
             
             # request edit
             request_edit = QLineEdit(str(self.aw.ws.channel_requests[i]))
-            request_edit.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+            request_edit.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
             request_edit.setCursorPosition(0)
             self.ws_requestEdits.append(request_edit)
-            ws_grid.addWidget(request_edit,1,i+1,Qt.AlignRight)
+            ws_grid.addWidget(request_edit,1,i+1,Qt.AlignmentFlag.AlignRight)
             
             # node edit
             node_edit = QLineEdit(str(self.aw.ws.channel_nodes[i]))
-            node_edit.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+            node_edit.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
             node_edit.setCursorPosition(0)
             self.ws_nodeEdits.append(node_edit)
-            ws_grid.addWidget(node_edit,2,i+1,Qt.AlignRight)
+            ws_grid.addWidget(node_edit,2,i+1,Qt.AlignmentFlag.AlignRight)
             
             # mode combo: -,C,F
             mode = QComboBox()
-            mode.setFocusPolicy(Qt.NoFocus)
+            mode.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             mode.addItems(modbus_modes)
             mode.setCurrentIndex(self.aw.ws.channel_modes[i])
             self.ws_modeCombos.append(mode)
-            ws_grid.addWidget(mode,3,i+1,1,1) #Qt.AlignRight)
+            ws_grid.addWidget(mode,3,i+1,1,1) #Qt.AlignmentFlag.AlignRight)
             
             
         ws_line4 = QHBoxLayout()
@@ -1584,9 +1594,9 @@ class comportDlg(ArtisanResizeablDialog):
         Mlayout.setSpacing(5)
         self.setLayout(Mlayout)
         if platform.system() == 'Windows':
-            self.dialogbuttons.button(QDialogButtonBox.Ok)
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         else:
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
         settings = QSettings()
         if settings.contains("PortsGeometry"):
             self.restoreGeometry(settings.value("PortsGeometry"))
@@ -1658,11 +1668,11 @@ class comportDlg(ArtisanResizeablDialog):
                                                             QApplication.translate("Table","Stopbits",None),
                                                             QApplication.translate("Table","Timeout",None)])
                 self.serialtable.setAlternatingRowColors(True)
-                self.serialtable.setEditTriggers(QTableWidget.NoEditTriggers)
-                self.serialtable.setSelectionBehavior(QTableWidget.SelectRows)
-                self.serialtable.setSelectionMode(QTableWidget.SingleSelection)
+                self.serialtable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+                self.serialtable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+                self.serialtable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
                 self.serialtable.setShowGrid(True)
-                self.serialtable.verticalHeader().setSectionResizeMode(2)
+                self.serialtable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
                 for i in range(nssdevices):
                     if len(self.aw.qmc.extradevices) > i:
                         devid = self.aw.qmc.extradevices[i]
@@ -1697,7 +1707,7 @@ class comportDlg(ArtisanResizeablDialog):
                             timeoutEdit.setValidator(self.aw.createCLocaleDoubleValidator(0,5,1,timeoutEdit))
 #                            timeoutEdit.setFixedWidth(65)
                             timeoutEdit.setMinimumWidth(65)
-                            timeoutEdit.setAlignment(Qt.AlignRight)
+                            timeoutEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
                             #add widgets to the table
                             self.serialtable.setCellWidget(i,1,comportComboBox)
                             self.serialtable.setCellWidget(i,2,baudComboBox)

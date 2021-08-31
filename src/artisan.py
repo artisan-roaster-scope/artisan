@@ -10,12 +10,13 @@ import sys
 import os
 from platform import system
 
-#try:
-#    from PyQt6.QtCore import QLibraryInfo  # @UnusedImport @UnresolvedImport
-#    pyqtversion = 6
-#except Exception as e:
-#    pyqtversion = 5
-pyqtversion = 5 # until MPL and all build tools fully support PyQt6 we run on PyQt5
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QLibraryInfo  # @UnusedImport @UnresolvedImport
+    pyqtversion = 6
+except Exception as e:
+    #pylint: disable = E, W, R, C
+    pyqtversion = 5
 
 # highDPI support must be set before creating the Application instance
 try:
@@ -27,8 +28,8 @@ try:
     else:
         from PyQt6.QtWidgets import QApplication  # @UnresolvedImport @Reimport # pylint: disable=import-error
         from PyQt6.QtCore import Qt     # @Reimport # @UnresolvedImport # pylint: disable=import-error
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
-    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
+    QApplication.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
+    QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 #    os.environ["QT_SCALE_FACTOR"] = "1"
 except Exception: # pylint: disable=broad-except
     pass
@@ -96,10 +97,7 @@ else: # Linux
 from artisanlib import main, command_utility
 from multiprocessing import freeze_support
 
-if system() == "Windows" and (hasattr(sys, "frozen") # new py2exe
-                            or hasattr(sys, "importers") # old py2exe
-#                            or imp.is_frozen("__main__")): # tools/freeze
-                            or getattr(sys, 'frozen', False)): # tools/freeze
+if system() == "Windows" and (hasattr(sys, "frozen") or getattr(sys, 'frozen', False)): # tools/freeze
     from multiprocessing import set_executable
     executable = os.path.join(os.path.dirname(sys.executable), 'artisan.exe')
     set_executable(executable)    
@@ -107,7 +105,7 @@ if system() == "Windows" and (hasattr(sys, "frozen") # new py2exe
 
 if __name__ == '__main__':
 
-    # Manange Commands that does not need to start the whole Application
+    # Manage commands that does not need to start the whole application
     if command_utility.handleCommands() == True:
         freeze_support()
         main.main()

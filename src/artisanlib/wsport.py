@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # WebSocket support for Artisan
 
@@ -24,9 +24,12 @@ import websocket
 import json
 import random
 
-
-from PyQt5.QtWidgets import QApplication
-
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
 class wsport():
     def __init__(self,aw):

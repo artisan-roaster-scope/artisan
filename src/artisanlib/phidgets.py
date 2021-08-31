@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Phidgets support for Artisan
 
@@ -16,17 +16,23 @@
 # AUTHOR
 # Marko Luther, 2018
 
-
 from Phidget22.Devices.Manager import Manager
 from Phidget22.DeviceID import DeviceID
 from Phidget22.DeviceClass import DeviceClass
-from PyQt5.QtCore import (QSemaphore)
+
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
+
 
 class PhidgetManager():
 
     def __init__(self):
         # a dictionary associating all physical attached Phidget channels
-        # to their availablility state:
+        # to their availability state:
         #    True: available for attach to a software channel
         #    False: occupied and connected to a software channel
         # access to this dict is protected by the managersemaphore and

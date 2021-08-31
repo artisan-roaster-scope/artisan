@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Platform Dialog
 
@@ -23,7 +23,12 @@ from artisanlib import __revision__
 
 from artisanlib.dialogs import ArtisanDialog
 
-from PyQt5.QtWidgets import QApplication, QVBoxLayout, QTextEdit
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtWidgets import QApplication, QVBoxLayout, QTextEdit # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtWidgets import QApplication, QVBoxLayout, QTextEdit # @UnusedImport @Reimport  @UnresolvedImport
 
 class platformDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):

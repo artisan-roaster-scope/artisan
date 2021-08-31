@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # RoastPATH HTML Roast Profile importer for Artisan
 
@@ -11,7 +11,12 @@ import re
 import json
 from lxml import html
 
-from PyQt5.QtCore import QDateTime, Qt
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
 
@@ -32,9 +37,9 @@ def extractProfileRoastPathHTML(url,_):
                 dateQt = QDateTime.fromString(date_str[-2]+date_str[-1], "yyyy-MM-ddhh:mm")
                 if dateQt.isValid():
                     res["roastdate"] = encodeLocal(dateQt.date().toString())
-                    res["roastisodate"] = encodeLocal(dateQt.date().toString(Qt.ISODate))
+                    res["roastisodate"] = encodeLocal(dateQt.date().toString(Qt.DateFormat.ISODate))
                     res["roasttime"] = encodeLocal(dateQt.time().toString())
-                    res["roastepoch"] = int(dateQt.toTime_t())
+                    res["roastepoch"] = int(dateQt.toSecsSinceEpoch())
                     res["roasttzoffset"] = libtime.timezone
                 title = "".join(date_str[:-2]).strip()
                 if len(title)>0 and title[-1] == "-": # we remove a trailing -

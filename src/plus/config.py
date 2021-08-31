@@ -27,6 +27,14 @@ import logging
 from logging.handlers import RotatingFileHandler
 from typing import Optional, Final
 
+
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtWidgets import QMainWindow # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtWidgets import QMainWindow # @UnusedImport @Reimport  @UnresolvedImport
+
 from plus import util
 
 # Constants
@@ -137,8 +145,8 @@ try:
     handler.setLevel(logging.INFO)
     #    handler.setLevel(logging.DEBUG)
     formatter = logging.Formatter(
-        "%(asctime)s - %(levelname)s - %(message)s"
-    )  # - %(name)s
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 except Exception:  # pylint: disable=broad-except
@@ -151,7 +159,6 @@ except Exception:  # pylint: disable=broad-except
 
 # Runtime variables
 
-from PyQt5.QtWidgets import QMainWindow
 app_window : QMainWindow # = None  # handle to the main Artisan application window
 #   if set, app_window.plus_login holds the current login account if any and
 #   app_window.updatePlusIcon() is a function that updates the toolbar

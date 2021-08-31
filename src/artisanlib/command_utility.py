@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
-# Handeling of Commandline Utility Functions
+# Handling of Commandline Utility Functions
 
 # LICENSE
 # This program or module is free software: you can redistribute it and/or

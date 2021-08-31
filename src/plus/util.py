@@ -22,9 +22,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5.QtCore import QStandardPaths, QCoreApplication, QDir, QUrl
-from PyQt5.QtGui import QDesktopServices
-from PyQt5.QtWidgets import QApplication
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QStandardPaths, QCoreApplication, QDir, QUrl # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QDesktopServices # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QStandardPaths, QCoreApplication, QDir, QUrl # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QDesktopServices # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+
 from artisanlib.util import decodeLocal
 from pathlib import Path
 from plus import config
@@ -41,7 +49,7 @@ app = QCoreApplication.instance()
 appName = app.applicationName()
 app.setApplicationName("Artisan")
 data_dir = QStandardPaths.standardLocations(
-    QStandardPaths.AppLocalDataLocation
+    QStandardPaths.StandardLocation.AppLocalDataLocation
 )[0]
 app.setApplicationName(appName)
 

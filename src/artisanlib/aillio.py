@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Aillio support for Artisan
 
@@ -28,9 +28,17 @@ import requests
 from requests_file import FileAdapter  # @UnresolvedImport
 import json
 from lxml import html
-from PyQt5.QtCore import QDateTime, Qt
+
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
+
 from artisanlib.util import encodeLocal
 import io
+        
 
 class AillioR1:
     AILLIO_VID = 0x0483
@@ -386,14 +394,14 @@ def extractProfileBulletDict(data,aw):
         try:
             if "dateTime" in data:
                 try:
-                    dateQt = QDateTime.fromString(data["dateTime"],Qt.ISODate) # RFC 3339 date time
+                    dateQt = QDateTime.fromString(data["dateTime"],Qt.DateFormat.ISODate) # RFC 3339 date time
                 except Exception: # pylint: disable=broad-except
                     dateQt = QDateTime.fromMSecsSinceEpoch (data["dateTime"])
                 if dateQt.isValid():
                     res["roastdate"] = encodeLocal(dateQt.date().toString())
-                    res["roastisodate"] = encodeLocal(dateQt.date().toString(Qt.ISODate))
+                    res["roastisodate"] = encodeLocal(dateQt.date().toString(Qt.DateFormat.ISODate))
                     res["roasttime"] = encodeLocal(dateQt.time().toString())
-                    res["roastepoch"] = int(dateQt.toTime_t())
+                    res["roastepoch"] = int(dateQt.toSecsSinceEpoch())
                     res["roasttzoffset"] = time.timezone
         except Exception: # pylint: disable=broad-except
             pass

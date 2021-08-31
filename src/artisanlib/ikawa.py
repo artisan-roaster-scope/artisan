@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # IKAWA CSV Roast Profile importer for Artisan
 
@@ -8,9 +8,15 @@ import os
 import io
 import csv
 import re
-            
-from PyQt5.QtCore import QDateTime,Qt
-from PyQt5.QtWidgets import QApplication
+
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QDateTime,Qt # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QDateTime,Qt # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
 
@@ -27,9 +33,9 @@ def extractProfileIkawaCSV(file,_):
         s = filename[6:-4] # the extracted date time string
         date = QDateTime.fromString(s,"yyyy-MM-dd HHmmss")
         res["roastdate"] = encodeLocal(date.date().toString())
-        res["roastisodate"] = encodeLocal(date.date().toString(Qt.ISODate))
+        res["roastisodate"] = encodeLocal(date.date().toString(Qt.DateFormat.ISODate))
         res["roasttime"] = encodeLocal(date.time().toString())
-        res["roastepoch"] = int(date.toTime_t())
+        res["roastepoch"] = int(date.toSecsSinceEpoch())
         res["roasttzoffset"] = libtime.timezone
 
     with io.open(file, 'r', newline="",encoding='utf-8') as csvFile:

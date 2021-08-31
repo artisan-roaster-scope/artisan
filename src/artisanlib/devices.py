@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Device Configuration Dialog
 
@@ -29,12 +29,23 @@ from artisanlib.widgets import MyQComboBox
 from help import programs_help
 from help import symbolic_help
 
-from PyQt5.QtCore import (Qt, pyqtSlot, QSettings)
-from PyQt5.QtGui import (QStandardItem, QColor)
-from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-                             QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,
-                             QGroupBox, QRadioButton, QDoubleSpinBox, QSizePolicy,
-                             QTableWidget, QMessageBox)
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import (Qt, pyqtSlot, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import (QStandardItem, QColor) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,  # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QRadioButton, QDoubleSpinBox, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QMessageBox, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import (QStandardItem, QColor) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QRadioButton, QDoubleSpinBox, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QMessageBox, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
+
 
 class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None, aw = None, activeTab = 0):
@@ -105,12 +116,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.sorted_devices = sorted(dev)
         self.devicetypeComboBox = MyQComboBox()
         
-#        self.devicetypeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-#        self.devicetypeComboBox.view().setTextElideMode(Qt.ElideNone)
+#        self.devicetypeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
+#        self.devicetypeComboBox.view().setTextElideMode(Qt.TextElideMode.ElideNone)
         # HACK: only needed for the macintosh UI on Qt 5.12 onwords; without long items get cutted in the popup
         #  note the -7 as the width of the popup is too large if given the correct maximum characters
 #        self.devicetypeComboBox.setMinimumContentsLength(max(22,len(max(dev, key=len)) - 7)) # expects # characters, but is to wide
-        self.devicetypeComboBox.setSizePolicy(QSizePolicy.Expanding,self.devicetypeComboBox.sizePolicy().verticalPolicy())
+        self.devicetypeComboBox.setSizePolicy(QSizePolicy.Policy.Expanding,self.devicetypeComboBox.sizePolicy().verticalPolicy())
 
         self.devicetypeComboBox.addItems(self.sorted_devices)
         self.programedit = QLineEdit(self.aw.ser.externalprogram)
@@ -119,18 +130,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.outprogramFlag.setChecked(self.aw.ser.externaloutprogramFlag)
         self.outprogramFlag.stateChanged.connect(self.changeOutprogramFlag)         #toggle
         selectprogrambutton =  QPushButton(QApplication.translate("Button","Select",None))
-        selectprogrambutton.setFocusPolicy(Qt.NoFocus)
+        selectprogrambutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         selectprogrambutton.clicked.connect(self.loadprogramname)
         
         # hack to access the Qt automatic translation of the RestoreDefaults button
-        db_help = QDialogButtonBox(QDialogButtonBox.Help)
-        help_text_translated = db_help.button(QDialogButtonBox.Help).text()
+        db_help = QDialogButtonBox(QDialogButtonBox.StandardButton.Help)
+        help_text_translated = db_help.button(QDialogButtonBox.StandardButton.Help).text()
         helpprogrambutton =  QPushButton(help_text_translated)
         self.setButtonTranslations(helpprogrambutton,"Help",QApplication.translate("Button","Help", None))
-        helpprogrambutton.setFocusPolicy(Qt.NoFocus)
+        helpprogrambutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         helpprogrambutton.clicked.connect(self.showhelpprogram)
         selectoutprogrambutton =  QPushButton(QApplication.translate("Button","Select",None))
-        selectoutprogrambutton.setFocusPolicy(Qt.NoFocus)
+        selectoutprogrambutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         selectoutprogrambutton.clicked.connect(self.loadoutprogramname)
         ###################################################
         # PID
@@ -208,7 +219,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.FILTspinBoxes = []
         for i in range(4):
             spinBox = QSpinBox()
-            spinBox.setAlignment(Qt.AlignRight)
+            spinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
             spinBox.setRange(0,99)
             spinBox.setSingleStep(5)
             spinBox.setSuffix(" %")
@@ -228,7 +239,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.setButtonTranslations(symbolicHelpButton,"Help",QApplication.translate("Button","Help", None))
         symbolicHelpButton.setMaximumSize(symbolicHelpButton.sizeHint())
         symbolicHelpButton.setMinimumSize(symbolicHelpButton.minimumSizeHint())
-        symbolicHelpButton.setFocusPolicy(Qt.NoFocus)
+        symbolicHelpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         symbolicHelpButton.clicked.connect(self.showSymbolicHelp)
         ##########################    TAB 2  WIDGETS   "EXTRA DEVICES"
         #table for showing data
@@ -237,33 +248,33 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.createDeviceTable()
         self.copydeviceTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
         self.copydeviceTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
-        self.copydeviceTableButton.setFocusPolicy(Qt.NoFocus)
+        self.copydeviceTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.copydeviceTableButton.clicked.connect(self.copyDeviceTabletoClipboard)
         self.addButton = QPushButton(QApplication.translate("Button","Add",None))
-        self.addButton.setFocusPolicy(Qt.NoFocus)
+        self.addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.addButton.setMinimumWidth(100)
         #self.addButton.setMaximumWidth(100)
         self.addButton.clicked.connect(self.adddevice)
         # hack to access the Qt automatic translation of the RestoreDefaults button
-        db_reset = QDialogButtonBox(QDialogButtonBox.Reset)
-        reset_text_translated = db_reset.button(QDialogButtonBox.Reset).text()
+        db_reset = QDialogButtonBox(QDialogButtonBox.StandardButton.Reset)
+        reset_text_translated = db_reset.button(QDialogButtonBox.StandardButton.Reset).text()
         resetButton =  QPushButton(reset_text_translated)
         self.setButtonTranslations(resetButton,"Reset",QApplication.translate("Button","Reset", None))
-        resetButton.setFocusPolicy(Qt.NoFocus)
+        resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         resetButton.setMinimumWidth(100)
         resetButton.clicked.connect(self.resetextradevices)
         extradevHelpButton = QPushButton(help_text_translated)
         self.setButtonTranslations(extradevHelpButton,"Help",QApplication.translate("Button","Help", None))
         extradevHelpButton.setMinimumWidth(100)
-        extradevHelpButton.setFocusPolicy(Qt.NoFocus)
+        extradevHelpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         extradevHelpButton.clicked.connect(self.showExtradevHelp)
         self.delButton = QPushButton(QApplication.translate("Button","Delete",None))
-        self.delButton.setFocusPolicy(Qt.NoFocus)
+        self.delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.delButton.setMinimumWidth(100)
         #self.delButton.setMaximumWidth(100)
         self.delButton.clicked.connect(self.deldevice)
         self.recalcButton = QPushButton(QApplication.translate("Button","Update Profile",None))
-        self.recalcButton.setFocusPolicy(Qt.NoFocus)
+        self.recalcButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.recalcButton.setMinimumWidth(100)
         self.recalcButton.setToolTip(QApplication.translate("Tooltip","Recaclulates all Virtual Devices and updates their values in the profile",None))
         self.recalcButton.clicked.connect(self.updateVirtualdevicesinprofile_clicked)
@@ -278,7 +289,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.probeTypeCombos = []
         for i in range(1,5):
             changeTriggersCombo = QComboBox()
-            changeTriggersCombo.setFocusPolicy(Qt.NoFocus)
+            changeTriggersCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             model = changeTriggersCombo.model()
             changeTriggerItems = self.createItems(self.aw.qmc.phidget1048_changeTriggersStrings)
             for item in changeTriggerItems:
@@ -289,20 +300,20 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 pass
             
             changeTriggersCombo.setMinimumContentsLength(3)
-            changeTriggersCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+            changeTriggersCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             changeTriggersCombo.setEnabled(bool(self.aw.qmc.phidget1048_async[i-1]))
             
             self.changeTriggerCombos1048.append(changeTriggersCombo)
             phidgetBox1048.addWidget(changeTriggersCombo,3,i)
             asyncFlag = QCheckBox()
-            asyncFlag.setFocusPolicy(Qt.NoFocus)
+            asyncFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             asyncFlag.setChecked(True)
             asyncFlag.stateChanged.connect(self.asyncFlagStateChanged1048)
             asyncFlag.setChecked(self.aw.qmc.phidget1048_async[i-1])
             self.asyncCheckBoxes1048.append(asyncFlag)
             phidgetBox1048.addWidget(asyncFlag,2,i)
             probeTypeCombo = QComboBox()
-            probeTypeCombo.setFocusPolicy(Qt.NoFocus)
+            probeTypeCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             model = probeTypeCombo.model()
             probeTypeItems = self.createItems(phidgetProbeTypeItems)
             for item in probeTypeItems:
@@ -313,7 +324,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 pass
                 
             probeTypeCombo.setMinimumContentsLength(0)
-            probeTypeCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+            probeTypeCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
 #            width = probeTypeCombo.minimumSizeHint().width()
 #            probeTypeCombo.setMinimumWidth(width)
 #            if platf == 'Darwin':
@@ -325,7 +336,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             phidgetBox1048.addWidget(rowLabel,0,i)
      
         self.dataRateCombo1048 = QComboBox()
-        self.dataRateCombo1048.setFocusPolicy(Qt.NoFocus)
+        self.dataRateCombo1048.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         model = self.dataRateCombo1048.model()
         dataRateItems = self.createItems(self.aw.qmc.phidget_dataRatesStrings)
         for item in dataRateItems:
@@ -335,7 +346,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         except Exception: # pylint: disable=broad-except
             pass
         self.dataRateCombo1048.setMinimumContentsLength(5)
-        self.dataRateCombo1048.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self.dataRateCombo1048.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         width = self.dataRateCombo1048.minimumSizeHint().width()
         self.dataRateCombo1048.setMinimumWidth(width)
         if platform.system() == 'Darwin':
@@ -348,10 +359,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         asyncLabel = QLabel(QApplication.translate("Label","Async", None))
         changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None))
         rateLabel = QLabel(QApplication.translate("Label","Rate", None))
-        phidgetBox1048.addWidget(typeLabel,1,0,Qt.AlignRight)
-        phidgetBox1048.addWidget(asyncLabel,2,0,Qt.AlignRight)
-        phidgetBox1048.addWidget(changeTriggerLabel,3,0,Qt.AlignRight)
-        phidgetBox1048.addWidget(rateLabel,4,0,Qt.AlignRight)
+        phidgetBox1048.addWidget(typeLabel,1,0,Qt.AlignmentFlag.AlignRight)
+        phidgetBox1048.addWidget(asyncLabel,2,0,Qt.AlignmentFlag.AlignRight)
+        phidgetBox1048.addWidget(changeTriggerLabel,3,0,Qt.AlignmentFlag.AlignRight)
+        phidgetBox1048.addWidget(rateLabel,4,0,Qt.AlignmentFlag.AlignRight)
         phidget1048HBox = QHBoxLayout()
         phidget1048HBox.addStretch()
         phidget1048HBox.addLayout(phidgetBox1048)
@@ -369,7 +380,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidgetBox1045 = QGridLayout()
         phidgetBox1045.setSpacing(1)
         self.changeTriggerCombos1045 = QComboBox()
-        self.changeTriggerCombos1045.setFocusPolicy(Qt.NoFocus)
+        self.changeTriggerCombos1045.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         model = self.changeTriggerCombos1045.model()
         changeTriggerItems = self.createItems(self.aw.qmc.phidget1045_changeTriggersStrings)
         for item in changeTriggerItems:
@@ -381,11 +392,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             
         #self.changeTriggerCombos1045.setMaximumSize(65,100)
         self.changeTriggerCombos1045.setMinimumContentsLength(4)
-        self.changeTriggerCombos1045.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self.changeTriggerCombos1045.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         
         phidgetBox1045.addWidget(self.changeTriggerCombos1045,3,1)
         self.asyncCheckBoxe1045 = QCheckBox()
-        self.asyncCheckBoxe1045.setFocusPolicy(Qt.NoFocus)
+        self.asyncCheckBoxe1045.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.asyncCheckBoxe1045.setChecked(True)
         self.asyncCheckBoxe1045.stateChanged.connect(self.asyncFlagStateChanged1045)
         self.asyncCheckBoxe1045.setChecked(self.aw.qmc.phidget1045_async)
@@ -395,7 +406,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         rateLabel = QLabel(QApplication.translate("Label","Rate", None)) 
                 
         self.dataRateCombo1045 = QComboBox()
-        self.dataRateCombo1045.setFocusPolicy(Qt.NoFocus)
+        self.dataRateCombo1045.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         model = self.dataRateCombo1045.model()
         dataRateItems = self.createItems(self.aw.qmc.phidget_dataRatesStrings)
         for item in dataRateItems:
@@ -405,7 +416,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         except Exception: # pylint: disable=broad-except
             pass
         self.dataRateCombo1045.setMinimumContentsLength(5)
-        self.dataRateCombo1045.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self.dataRateCombo1045.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         width = self.dataRateCombo1045.minimumSizeHint().width()
         self.dataRateCombo1045.setMinimumWidth(width)
         if platform.system() == 'Darwin':
@@ -413,16 +424,16 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         
         EmissivityLabel = QLabel(QApplication.translate("Label","Emissivity", None))
         self.emissivitySpinBox = QDoubleSpinBox()
-        self.emissivitySpinBox.setAlignment(Qt.AlignRight)
+        self.emissivitySpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.emissivitySpinBox.setRange(0.,1.)
         self.emissivitySpinBox.setSingleStep(.1) 
         self.emissivitySpinBox.setValue(self.aw.qmc.phidget1045_emissivity) 
 
-        phidgetBox1045.addWidget(asyncLabel,2,0,Qt.AlignRight)
-        phidgetBox1045.addWidget(changeTriggerLabel,3,0,Qt.AlignRight)
-        phidgetBox1045.addWidget(rateLabel,4,0,Qt.AlignRight) 
+        phidgetBox1045.addWidget(asyncLabel,2,0,Qt.AlignmentFlag.AlignRight)
+        phidgetBox1045.addWidget(changeTriggerLabel,3,0,Qt.AlignmentFlag.AlignRight)
+        phidgetBox1045.addWidget(rateLabel,4,0,Qt.AlignmentFlag.AlignRight) 
         phidgetBox1045.addWidget(self.dataRateCombo1045,4,1)
-        phidgetBox1045.addWidget(EmissivityLabel,5,0,Qt.AlignRight)
+        phidgetBox1045.addWidget(EmissivityLabel,5,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1045.addWidget(self.emissivitySpinBox,5,1)
         phidget1045VBox = QVBoxLayout()
         phidget1045VBox.addStretch()
@@ -442,7 +453,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.asyncCheckBoxes1046 = []
         for i in range(1,5):
             gainCombo = QComboBox()
-            gainCombo.setFocusPolicy(Qt.NoFocus)
+            gainCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             
             model = gainCombo.model()
             gainItems = self.createItems(self.aw.qmc.phidget1046_gainValues)
@@ -453,7 +464,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
           
-            gainCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+            gainCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             gainCombo.setMinimumContentsLength(2)
             width = gainCombo.minimumSizeHint().width()
             gainCombo.setMinimumWidth(width)
@@ -463,7 +474,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             phidgetBox1046.addWidget(gainCombo,1,i)
             
             formulaCombo = QComboBox()
-            formulaCombo.setFocusPolicy(Qt.NoFocus)
+            formulaCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             model = formulaCombo.model()
             formulaItems = self.createItems(self.aw.qmc.phidget1046_formulaValues)
             for item in formulaItems:
@@ -473,7 +484,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
 
-            formulaCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+            formulaCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             formulaCombo.setMinimumContentsLength(3)
             width = formulaCombo.minimumSizeHint().width()
             formulaCombo.setMinimumWidth(width)
@@ -484,7 +495,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             phidgetBox1046.addWidget(formulaCombo,2,i)
 
             asyncFlag = QCheckBox()
-            asyncFlag.setFocusPolicy(Qt.NoFocus)
+            asyncFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             asyncFlag.setChecked(True)
             asyncFlag.setChecked(self.aw.qmc.phidget1046_async[i-1])
             self.asyncCheckBoxes1046.append(asyncFlag)
@@ -493,7 +504,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             phidgetBox1046.addWidget(rowLabel,0,i)
             
         self.dataRateCombo1046 = QComboBox()
-        self.dataRateCombo1046.setFocusPolicy(Qt.NoFocus)
+        self.dataRateCombo1046.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         model = self.dataRateCombo1046.model()
         dataRateItems = self.createItems(self.aw.qmc.phidget_dataRatesStrings)
         for item in dataRateItems:
@@ -502,7 +513,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.dataRateCombo1046.setCurrentIndex(self.aw.qmc.phidget_dataRatesValues.index(self.aw.qmc.phidget1046_dataRate))
         except Exception: # pylint: disable=broad-except
             pass                
-        self.dataRateCombo1046.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self.dataRateCombo1046.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         self.dataRateCombo1046.setMinimumContentsLength(5)
         width = self.dataRateCombo1046.minimumSizeHint().width()
         self.dataRateCombo1046.setMinimumWidth(width)
@@ -516,10 +527,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         formulaLabel = QLabel(QApplication.translate("Label","Wiring", None))
         asyncLabel = QLabel(QApplication.translate("Label","Async", None))
         rateLabel = QLabel(QApplication.translate("Label","Rate", None))
-        phidgetBox1046.addWidget(gainLabel,1,0,Qt.AlignRight)
-        phidgetBox1046.addWidget(formulaLabel,2,0,Qt.AlignRight)
-        phidgetBox1046.addWidget(asyncLabel,3,0,Qt.AlignRight)
-        phidgetBox1046.addWidget(rateLabel,4,0,Qt.AlignRight)
+        phidgetBox1046.addWidget(gainLabel,1,0,Qt.AlignmentFlag.AlignRight)
+        phidgetBox1046.addWidget(formulaLabel,2,0,Qt.AlignmentFlag.AlignRight)
+        phidgetBox1046.addWidget(asyncLabel,3,0,Qt.AlignmentFlag.AlignRight)
+        phidgetBox1046.addWidget(rateLabel,4,0,Qt.AlignmentFlag.AlignRight)
         phidget1046HBox = QHBoxLayout()
         phidget1046HBox.addStretch()
         phidget1046HBox.addLayout(phidgetBox1046)
@@ -540,7 +551,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidgetBox1200_2.setSpacing(1)
 
         self.formulaCombo1200 = QComboBox()
-        self.formulaCombo1200.setFocusPolicy(Qt.NoFocus)
+        self.formulaCombo1200.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         model = self.formulaCombo1200.model()
         wireItems = self.createItems(self.aw.qmc.phidget1200_formulaValues)
         for item in wireItems:
@@ -555,7 +566,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 #        self.formulaCombo1200.setMaximumWidth(width)
         
         self.wireCombo1200 = QComboBox()
-        self.wireCombo1200.setFocusPolicy(Qt.NoFocus)
+        self.wireCombo1200.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         model = self.wireCombo1200.model()
         wireItems = self.createItems(self.aw.qmc.phidget1200_wireValues)
         for item in wireItems:
@@ -570,12 +581,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 #        self.wireCombo1200.setMaximumWidth(width)
 
         self.asyncCheckBoxe1200 = QCheckBox()
-        self.asyncCheckBoxe1200.setFocusPolicy(Qt.NoFocus)
+        self.asyncCheckBoxe1200.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.asyncCheckBoxe1200.setChecked(self.aw.qmc.phidget1200_async)
         self.asyncCheckBoxe1200.stateChanged.connect(self.asyncFlagStateChanged1200)
             
         self.changeTriggerCombo1200 = QComboBox()
-        self.changeTriggerCombo1200.setFocusPolicy(Qt.NoFocus)
+        self.changeTriggerCombo1200.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         model = self.changeTriggerCombo1200.model()
         changeTriggerItems = self.createItems(self.aw.qmc.phidget1200_changeTriggersStrings)
         for item in changeTriggerItems:
@@ -591,7 +602,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.changeTriggerCombo1200.setEnabled(self.aw.qmc.phidget1200_async)
         
         self.rateCombo1200 = QComboBox()
-        self.rateCombo1200.setFocusPolicy(Qt.NoFocus)
+        self.rateCombo1200.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         model = self.rateCombo1200.model()
         dataRateItems = self.createItems(self.aw.qmc.phidget1200_dataRatesStrings)
         for item in dataRateItems:
@@ -607,7 +618,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
 #---
         self.formulaCombo1200_2 = QComboBox()
-        self.formulaCombo1200_2.setFocusPolicy(Qt.NoFocus)
+        self.formulaCombo1200_2.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         model = self.formulaCombo1200_2.model()
         wireItems = self.createItems(self.aw.qmc.phidget1200_formulaValues)
         for item in wireItems:
@@ -622,7 +633,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 #        self.formulaCombo1200_2.setMaximumWidth(width)
         
         self.wireCombo1200_2 = QComboBox()
-        self.wireCombo1200_2.setFocusPolicy(Qt.NoFocus)
+        self.wireCombo1200_2.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         model = self.wireCombo1200_2.model()
         wireItems = self.createItems(self.aw.qmc.phidget1200_wireValues)
         for item in wireItems:
@@ -637,12 +648,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 #        self.wireCombo1200_2.setMaximumWidth(width)
 
         self.asyncCheckBoxe1200_2 = QCheckBox()
-        self.asyncCheckBoxe1200_2.setFocusPolicy(Qt.NoFocus)
+        self.asyncCheckBoxe1200_2.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.asyncCheckBoxe1200_2.setChecked(self.aw.qmc.phidget1200_2_async)
         self.asyncCheckBoxe1200_2.stateChanged.connect(self.asyncFlagStateChanged1200_2)
             
         self.changeTriggerCombo1200_2 = QComboBox()
-        self.changeTriggerCombo1200_2.setFocusPolicy(Qt.NoFocus)
+        self.changeTriggerCombo1200_2.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         model = self.changeTriggerCombo1200_2.model()
         changeTriggerItems = self.createItems(self.aw.qmc.phidget1200_changeTriggersStrings)
         for item in changeTriggerItems:
@@ -658,7 +669,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.changeTriggerCombo1200_2.setEnabled(self.aw.qmc.phidget1200_async)
         
         self.rateCombo1200_2 = QComboBox()
-        self.rateCombo1200_2.setFocusPolicy(Qt.NoFocus)
+        self.rateCombo1200_2.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         model = self.rateCombo1200_2.model()
         dataRateItems = self.createItems(self.aw.qmc.phidget1200_dataRatesStrings)
         for item in dataRateItems:
@@ -685,26 +696,26 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         changeLabel2 = QLabel(QApplication.translate("Label","Change", None))
         rateLabel2 = QLabel(QApplication.translate("Label","Rate", None))
         
-        phidgetBox1200.addWidget(typeLabel,1,0,Qt.AlignRight)
+        phidgetBox1200.addWidget(typeLabel,1,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1200.addWidget(self.formulaCombo1200,1,1)
-        phidgetBox1200.addWidget(wireLabel,2,0,Qt.AlignRight)
+        phidgetBox1200.addWidget(wireLabel,2,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1200.addWidget(self.wireCombo1200,2,1)
-        phidgetBox1200.addWidget(asyncLabel,3,0,Qt.AlignRight)
+        phidgetBox1200.addWidget(asyncLabel,3,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1200.addWidget(self.asyncCheckBoxe1200,3,1)
-        phidgetBox1200.addWidget(changeLabel,4,0,Qt.AlignRight)
+        phidgetBox1200.addWidget(changeLabel,4,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1200.addWidget(self.changeTriggerCombo1200,4,1)
-        phidgetBox1200.addWidget(rateLabel,5,0,Qt.AlignRight)
+        phidgetBox1200.addWidget(rateLabel,5,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1200.addWidget(self.rateCombo1200,5,1)
         
-        phidgetBox1200_2.addWidget(typeLabel2,1,0,Qt.AlignRight)
+        phidgetBox1200_2.addWidget(typeLabel2,1,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1200_2.addWidget(self.formulaCombo1200_2,1,1)
-        phidgetBox1200_2.addWidget(wireLabel2,2,0,Qt.AlignRight)
+        phidgetBox1200_2.addWidget(wireLabel2,2,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1200_2.addWidget(self.wireCombo1200_2,2,1)
-        phidgetBox1200_2.addWidget(asyncLabel2,3,0,Qt.AlignRight)
+        phidgetBox1200_2.addWidget(asyncLabel2,3,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1200_2.addWidget(self.asyncCheckBoxe1200_2,3,1)
-        phidgetBox1200_2.addWidget(changeLabel2,4,0,Qt.AlignRight)
+        phidgetBox1200_2.addWidget(changeLabel2,4,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1200_2.addWidget(self.changeTriggerCombo1200_2,4,1)
-        phidgetBox1200_2.addWidget(rateLabel2,5,0,Qt.AlignRight)
+        phidgetBox1200_2.addWidget(rateLabel2,5,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1200_2.addWidget(self.rateCombo1200_2,5,1)
 
         phidget1200HBox = QHBoxLayout()
@@ -750,7 +761,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         modeLabel = QLabel(QApplication.translate("Label","Mode", None))
 
         self.powerCombo1400 = QComboBox()
-        self.powerCombo1400.setFocusPolicy(Qt.NoFocus)
+        self.powerCombo1400.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.powerCombo1400.addItems(self.aw.qmc.phidgetDAQ1400_powerSupplyStrings)
         self.powerCombo1400.setCurrentIndex(self.aw.qmc.phidgetDAQ1400_powerSupply)
         self.powerCombo1400.setMinimumContentsLength(3)
@@ -758,7 +769,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.powerCombo1400.setMinimumWidth(width)
 
         self.modeCombo1400 = QComboBox()
-        self.modeCombo1400.setFocusPolicy(Qt.NoFocus)
+        self.modeCombo1400.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.modeCombo1400.addItems(self.aw.qmc.phidgetDAQ1400_inputModeStrings)
         self.modeCombo1400.setCurrentIndex(self.aw.qmc.phidgetDAQ1400_inputMode)
         self.modeCombo1400.setMinimumContentsLength(3)
@@ -767,9 +778,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         phidgetBox1400 = QGridLayout()
         phidgetBox1400.setSpacing(1)
-        phidgetBox1400.addWidget(powerLabel,0,0,Qt.AlignRight)
+        phidgetBox1400.addWidget(powerLabel,0,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1400.addWidget(self.powerCombo1400,0,1)
-        phidgetBox1400.addWidget(modeLabel,1,0,Qt.AlignRight)
+        phidgetBox1400.addWidget(modeLabel,1,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1400.addWidget(self.modeCombo1400,1,1)
 
         phidget1400HBox = QHBoxLayout()
@@ -806,7 +817,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.changeTriggerCombos = []
         for i in range(1,9):
             dataRatesCombo = QComboBox()
-            dataRatesCombo.setFocusPolicy(Qt.NoFocus)
+            dataRatesCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             model = dataRatesCombo.model()
             dataRateItems = self.createItems(self.aw.qmc.phidget_dataRatesStrings)
             for item in dataRateItems:
@@ -816,7 +827,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
 
-            dataRatesCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+            dataRatesCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             dataRatesCombo.setMinimumContentsLength(5)
             width = dataRatesCombo.minimumSizeHint().width()
             dataRatesCombo.setMinimumWidth(width)
@@ -828,7 +839,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             phidgetBox1018.addWidget(dataRatesCombo,4,i)
             
             changeTriggersCombo = QComboBox()
-            changeTriggersCombo.setFocusPolicy(Qt.NoFocus)
+            changeTriggersCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             changeTriggersCombo.setEnabled(bool(self.aw.qmc.phidget1018_async[i-1]))
             model = changeTriggersCombo.model()
             changeTriggerItems = self.createItems(self.aw.qmc.phidget1018_changeTriggersStrings)
@@ -840,7 +851,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 pass
 
             changeTriggersCombo.setMinimumContentsLength(5)
-            changeTriggersCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+            changeTriggersCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             width = changeTriggersCombo.minimumSizeHint().width()
             changeTriggersCombo.setMinimumWidth(width)
             if platform.system() == 'Darwin':
@@ -850,7 +861,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             phidgetBox1018.addWidget(changeTriggersCombo,3,i)
 
             asyncFlag = QCheckBox()
-            asyncFlag.setFocusPolicy(Qt.NoFocus)
+            asyncFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             asyncFlag.setChecked(True)
             asyncFlag.stateChanged.connect(self.asyncFlagStateChanged)
             asyncFlag.setChecked(self.aw.qmc.phidget1018_async[i-1])
@@ -858,7 +869,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             phidgetBox1018.addWidget(asyncFlag,2,i)
 
             ratioFlag = QCheckBox()
-            ratioFlag.setFocusPolicy(Qt.NoFocus)
+            ratioFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             ratioFlag.setChecked(False)
             ratioFlag.setChecked(self.aw.qmc.phidget1018_ratio[i-1])
             self.ratioCheckBoxes.append(ratioFlag)
@@ -871,30 +882,30 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         dataRateLabel = QLabel(QApplication.translate("Label","Rate", None))
         changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None))
         ratioLabel = QLabel(QApplication.translate("Label","Ratio", None))
-        phidgetBox1018.addWidget(asyncLabel,2,0,Qt.AlignRight)
-        phidgetBox1018.addWidget(changeTriggerLabel,3,0,Qt.AlignRight)
-        phidgetBox1018.addWidget(dataRateLabel,4,0,Qt.AlignRight)
-        phidgetBox1018.addWidget(ratioLabel,5,0,Qt.AlignRight)
+        phidgetBox1018.addWidget(asyncLabel,2,0,Qt.AlignmentFlag.AlignRight)
+        phidgetBox1018.addWidget(changeTriggerLabel,3,0,Qt.AlignmentFlag.AlignRight)
+        phidgetBox1018.addWidget(dataRateLabel,4,0,Qt.AlignmentFlag.AlignRight)
+        phidgetBox1018.addWidget(ratioLabel,5,0,Qt.AlignmentFlag.AlignRight)
         phidget1018HBox = QVBoxLayout()
         phidget1018HBox.addLayout(phidgetBox1018)
         phidget1018GroupBox = QGroupBox("1010/1011/1013/1018/1019/HUB0000/SBC IO")
         phidget1018GroupBox.setLayout(phidget1018HBox)
         phidget1018HBox.setContentsMargins(0,0,0,0)
         self.phidgetBoxRemoteFlag = QCheckBox()
-        self.phidgetBoxRemoteFlag.setFocusPolicy(Qt.NoFocus)
+        self.phidgetBoxRemoteFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.phidgetBoxRemoteFlag.setChecked(self.aw.qmc.phidgetRemoteFlag)
         phidgetServerIdLabel = QLabel(QApplication.translate("Label","Host", None))
         self.phidgetServerId = QLineEdit(self.aw.qmc.phidgetServerID)
         self.phidgetServerId.setMinimumWidth(200)
         phidgetPasswordLabel = QLabel(QApplication.translate("Label","Password", None))
         self.phidgetPassword = QLineEdit(self.aw.qmc.phidgetPassword)
-        self.phidgetPassword.setEchoMode(3)
+        self.phidgetPassword.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
         self.phidgetPassword.setMinimumWidth(100)
         phidgetPortLabel = QLabel(QApplication.translate("Label","Port", None))
         self.phidgetPort = QLineEdit(str(self.aw.qmc.phidgetPort))
         self.phidgetPort.setMaximumWidth(70)
         self.phidgetBoxRemoteOnlyFlag = QCheckBox(QApplication.translate("Label","Remote Only", None))
-        self.phidgetBoxRemoteOnlyFlag.setFocusPolicy(Qt.NoFocus)
+        self.phidgetBoxRemoteOnlyFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.phidgetBoxRemoteOnlyFlag.setChecked(self.aw.qmc.phidgetRemoteOnlyFlag)
         phidgetServerBox = QHBoxLayout()
         phidgetServerBox.addWidget(phidgetServerIdLabel)
@@ -937,13 +948,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidgetVBox.setSpacing(5)
         # yoctopuce widgets
         self.yoctoBoxRemoteFlag = QCheckBox()
-        self.yoctoBoxRemoteFlag.setFocusPolicy(Qt.NoFocus)
+        self.yoctoBoxRemoteFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.yoctoBoxRemoteFlag.setChecked(self.aw.qmc.yoctoRemoteFlag)
         yoctoServerIdLabel = QLabel(QApplication.translate("Label","VirtualHub", None))
         self.yoctoServerId = QLineEdit(self.aw.qmc.yoctoServerID)
         YoctoEmissivityLabel = QLabel(QApplication.translate("Label","Emissivity", None))
         self.yoctoEmissivitySpinBox = QDoubleSpinBox()
-        self.yoctoEmissivitySpinBox.setAlignment(Qt.AlignRight)
+        self.yoctoEmissivitySpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.yoctoEmissivitySpinBox.setRange(0.,1.)
         self.yoctoEmissivitySpinBox.setSingleStep(.1) 
         self.yoctoEmissivitySpinBox.setValue(self.aw.qmc.YOCTO_emissivity) 
@@ -967,7 +978,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         yoctoIRHorizontalLayout.addLayout(yoctoIRGrid)
         yoctoIRHorizontalLayout.addStretch()
         self.yoctoDataRateCombo = QComboBox()
-        self.yoctoDataRateCombo.setFocusPolicy(Qt.NoFocus)
+        self.yoctoDataRateCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         model = self.yoctoDataRateCombo.model()
         dataRateItems = self.createItems(self.aw.qmc.YOCTO_dataRatesStrings)
         for item in dataRateItems:
@@ -976,12 +987,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.yoctoDataRateCombo.setCurrentIndex(self.aw.qmc.YOCTO_dataRatesValues.index(self.aw.qmc.YOCTO_dataRate))
         except Exception: # pylint: disable=broad-except
             pass
-        self.yoctoDataRateCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self.yoctoDataRateCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         self.yoctoDataRateCombo.setMinimumContentsLength(5)
         width = self.yoctoDataRateCombo.minimumSizeHint().width()
         self.yoctoDataRateCombo.setMinimumWidth(width)
         self.yoctoAyncChanFlag = QCheckBox()
-        self.yoctoAyncChanFlag.setFocusPolicy(Qt.NoFocus)
+        self.yoctoAyncChanFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.yoctoAyncChanFlag.setChecked(self.aw.qmc.YOCTO_async[0]) # only one flag for both channels, as running on async and the other sync will disturbe the readings
         yoctoAsyncGrid = QGridLayout()
         yoctoAsyncGrid.addWidget(self.yoctoAyncChanFlag,0,0)
@@ -1002,7 +1013,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         yoctoVBox.setContentsMargins(0,0,0,0)  
         # Ambient Widgets and Layouts
         self.temperatureDeviceCombo = QComboBox()
-        self.temperatureDeviceCombo.setFocusPolicy(Qt.NoFocus)
+        self.temperatureDeviceCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.temperatureDeviceCombo.addItems(self.aw.qmc.temperaturedevicefunctionlist)
 
         # HACK: only needed for the macintosh UI on Qt 5.12 onwords; withou long items get cutted in the popup
@@ -1014,21 +1025,21 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         except Exception: # pylint: disable=broad-except
             pass
         self.humidityDeviceCombo = QComboBox()
-        self.humidityDeviceCombo.setFocusPolicy(Qt.NoFocus)
+        self.humidityDeviceCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.humidityDeviceCombo.addItems(self.aw.qmc.humiditydevicefunctionlist)
         try:
             self.humidityDeviceCombo.setCurrentIndex(self.aw.qmc.ambient_humidity_device)
         except Exception: # pylint: disable=broad-except
             pass
         self.pressureDeviceCombo = QComboBox()
-        self.pressureDeviceCombo.setFocusPolicy(Qt.NoFocus)
+        self.pressureDeviceCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pressureDeviceCombo.addItems(self.aw.qmc.pressuredevicefunctionlist)
         try:
             self.pressureDeviceCombo.setCurrentIndex(self.aw.qmc.ambient_pressure_device)
         except Exception: # pylint: disable=broad-except
             pass
         self.elevationSpinBox = QSpinBox()
-        self.elevationSpinBox.setAlignment(Qt.AlignRight)
+        self.elevationSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.elevationSpinBox.setRange(0,3000)
         self.elevationSpinBox.setSingleStep(1)
         self.elevationSpinBox.setValue(self.aw.qmc.elevation)
@@ -1063,7 +1074,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         PIDgrid.addWidget(self.controlpidtypeComboBox,1,1)
         PIDgrid.addWidget(self.controlpidunitidComboBox,1,2)
         PIDgrid.addWidget(self.showFujiLCDs,1,3)
-        PIDgrid.addWidget(btlabel,2,0,Qt.AlignRight)
+        PIDgrid.addWidget(btlabel,2,0,Qt.AlignmentFlag.AlignRight)
         PIDgrid.addWidget(self.btpidtypeComboBox,2,1)
         PIDgrid.addWidget(self.btpidunitidComboBox,2,2)
         PIDgrid.addWidget(self.useModbusPort,2,3)
@@ -1082,14 +1093,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         filtgridBox.addStretch()
         filtgridBox.setContentsMargins(5,5,5,5)
         arduinogrid = QGridLayout()
-        arduinogrid.addWidget(arduinoETLabel,1,0,Qt.AlignRight)
+        arduinogrid.addWidget(arduinoETLabel,1,0,Qt.AlignmentFlag.AlignRight)
         arduinogrid.addWidget(self.arduinoETComboBox,1,1)
-        arduinogrid.addWidget(arduinoBTLabel,2,0,Qt.AlignRight)
+        arduinogrid.addWidget(arduinoBTLabel,2,0,Qt.AlignmentFlag.AlignRight)
         arduinogrid.addWidget(self.arduinoBTComboBox,2,1)
         arduinogrid.addWidget(self.arduinoATComboBox,2,3)
         arduinogrid.addWidget(arduinoATLabel,2,4)
         arduinogrid.addWidget(self.showControlButton,2,5)
-        arduinogrid.addWidget(FILTLabel,1,3,Qt.AlignRight)
+        arduinogrid.addWidget(FILTLabel,1,3,Qt.AlignmentFlag.AlignRight)
         arduinogrid.addLayout(filtgridBox,1,4,1,2)
         arduinogridBox = QHBoxLayout()
         arduinogridBox.addLayout(arduinogrid)
@@ -1116,7 +1127,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         programGroupBox.setContentsMargins(0,12,0,0)
         #ET BT symbolic adjustments/assignments Box
         self.updateETBTButton = QPushButton(QApplication.translate("Button","Update Profile",None))
-        self.updateETBTButton.setFocusPolicy(Qt.NoFocus)
+        self.updateETBTButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.updateETBTButton.setToolTip(QApplication.translate("Tooltip","Recaclulates ET and BT and updates their values in the profile",None))
         self.updateETBTButton.clicked.connect(self.updateETBTinprofile)
 
@@ -1230,9 +1241,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         Mlayout.setContentsMargins(5,10,5,5)
         self.setLayout(Mlayout)
         if platform.system() == 'Windows':
-            self.dialogbuttons.button(QDialogButtonBox.Ok)
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         else:
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
         settings = QSettings()
         if settings.contains("DeviceAssignmentGeometry"):
             self.restoreGeometry(settings.value("DeviceAssignmentGeometry"))
@@ -1350,11 +1361,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                                                         QApplication.translate("Table", "Fill 1",None),
                                                         QApplication.translate("Table", "Fill 2",None)])
             self.devicetable.setAlternatingRowColors(True)
-            self.devicetable.setEditTriggers(QTableWidget.NoEditTriggers)
-            self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
-            self.devicetable.setSelectionMode(QTableWidget.SingleSelection)
+            self.devicetable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+            self.devicetable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+            self.devicetable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
             self.devicetable.setShowGrid(True)
-            self.devicetable.verticalHeader().setSectionResizeMode(2)
+            self.devicetable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
             if nddevices:
                 dev = self.aw.qmc.devices[:]             #deep copy
                 limit = len(dev)
@@ -1367,7 +1378,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 for i in range(nddevices):
                     try:
                         typeComboBox =  MyQComboBox()
-                        typeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+                        typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
                         typeComboBox.addItems(devices[:])
                         try:
                             dev_name = self.aw.qmc.devices[max(0,self.aw.qmc.extradevices[i]-1)]
@@ -1377,12 +1388,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         except Exception: # pylint: disable=broad-except
                             pass
                         color1Button = QPushButton(self.aw.qmc.extradevicecolor1[i])
-                        color1Button.setFocusPolicy(Qt.NoFocus)
+                        color1Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                         color1Button.clicked.connect(self.setextracolor1)
                         textcolor = self.aw.labelBorW(self.aw.qmc.extradevicecolor1[i])
                         color1Button.setStyleSheet("background-color: %s; color: %s"%(self.aw.qmc.extradevicecolor1[i], textcolor))
                         color2Button = QPushButton(self.aw.qmc.extradevicecolor2[i])
-                        color2Button.setFocusPolicy(Qt.NoFocus)
+                        color2Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                         color2Button.clicked.connect(self.setextracolor2)
                         textcolor = self.aw.labelBorW(self.aw.qmc.extradevicecolor2[i])
                         color2Button.setStyleSheet("background-color: %s; color: %s"%(self.aw.qmc.extradevicecolor2[i], textcolor))
@@ -1394,50 +1405,50 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         mexpr2edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + x",None))
                         LCD1visibilityComboBox =  QCheckBox()
                         if self.aw.extraLCDvisibility1[i]:
-                            LCD1visibilityComboBox.setCheckState(Qt.Checked)
+                            LCD1visibilityComboBox.setCheckState(Qt.CheckState.Checked)
                         else:
-                            LCD1visibilityComboBox.setCheckState(Qt.Unchecked)
+                            LCD1visibilityComboBox.setCheckState(Qt.CheckState.Unchecked)
                         LCD1visibilityComboBox.stateChanged.connect(self.updateLCDvisibility1)
                         LCD2visibilityComboBox =  QCheckBox()
                         if self.aw.extraLCDvisibility2[i]:
-                            LCD2visibilityComboBox.setCheckState(Qt.Checked)
+                            LCD2visibilityComboBox.setCheckState(Qt.CheckState.Checked)
                         else:
-                            LCD2visibilityComboBox.setCheckState(Qt.Unchecked)
+                            LCD2visibilityComboBox.setCheckState(Qt.CheckState.Unchecked)
                         LCD2visibilityComboBox.stateChanged.connect(self.updateLCDvisibility2)
                         Curve1visibilityComboBox =  QCheckBox()
                         if self.aw.extraCurveVisibility1[i]:
-                            Curve1visibilityComboBox.setCheckState(Qt.Checked)
+                            Curve1visibilityComboBox.setCheckState(Qt.CheckState.Checked)
                         else:
-                            Curve1visibilityComboBox.setCheckState(Qt.Unchecked)
+                            Curve1visibilityComboBox.setCheckState(Qt.CheckState.Unchecked)
                         Curve1visibilityComboBox.stateChanged.connect(self.updateCurveVisibility1)
                         Curve2visibilityComboBox =  QCheckBox()
                         if self.aw.extraCurveVisibility2[i]:
-                            Curve2visibilityComboBox.setCheckState(Qt.Checked)
+                            Curve2visibilityComboBox.setCheckState(Qt.CheckState.Checked)
                         else:
-                            Curve2visibilityComboBox.setCheckState(Qt.Unchecked)
+                            Curve2visibilityComboBox.setCheckState(Qt.CheckState.Unchecked)
                         Curve2visibilityComboBox.stateChanged.connect(self.updateCurveVisibility2)
                         Delta1ComboBox =  QCheckBox()
                         if self.aw.extraDelta1[i]:
-                            Delta1ComboBox.setCheckState(Qt.Checked)
+                            Delta1ComboBox.setCheckState(Qt.CheckState.Checked)
                         else:
-                            Delta1ComboBox.setCheckState(Qt.Unchecked)
+                            Delta1ComboBox.setCheckState(Qt.CheckState.Unchecked)
                         Delta1ComboBox.stateChanged.connect(self.updateDelta1)
                         Delta2ComboBox =  QCheckBox()
                         if self.aw.extraDelta2[i]:
-                            Delta2ComboBox.setCheckState(Qt.Checked)
+                            Delta2ComboBox.setCheckState(Qt.CheckState.Checked)
                         else:
-                            Delta2ComboBox.setCheckState(Qt.Unchecked)
+                            Delta2ComboBox.setCheckState(Qt.CheckState.Unchecked)
                         Delta2ComboBox.stateChanged.connect(self.updateDelta2)
                         Fill1SpinBox =  QSpinBox()
                         Fill1SpinBox.setSingleStep(1)
                         Fill1SpinBox.setRange(0,100)
-                        Fill1SpinBox.setAlignment(Qt.AlignRight)
+                        Fill1SpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
                         Fill1SpinBox.setValue(self.aw.extraFill1[i])
                         Fill1SpinBox.editingFinished.connect(self.updateFill1)
                         Fill2SpinBox =  QSpinBox()
                         Fill2SpinBox.setSingleStep(1)
                         Fill2SpinBox.setRange(0,100)
-                        Fill2SpinBox.setAlignment(Qt.AlignRight)
+                        Fill2SpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
                         Fill2SpinBox.setValue(self.aw.extraFill2[i])
                         Fill2SpinBox.editingFinished.connect(self.updateFill2)
                         #add widgets to the table
@@ -1480,7 +1491,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         ncols = self.devicetable.columnCount()
         clipboard = ""
         modifiers = QApplication.keyboardModifiers()
-        if modifiers == Qt.AltModifier:  #alt click
+        if modifiers == Qt.KeyboardModifier.AltModifier:  #alt click
             tbl = prettytable.PrettyTable()
             fields = []
             re_strip = re.compile('[\u2009]')  #thin space is not read properly by prettytable
@@ -1773,8 +1784,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 # confirm the action
                 string = QApplication.translate("Message", "Clicking YES will overwrite the existing ET and BT values in this profile with the symbolic values defined here.  Click CANCEL to abort.",None)
                 reply = QMessageBox.warning(self.aw,QApplication.translate("Message", "Caution - About to overwrite profile data",None),string,
-                            QMessageBox.Yes|QMessageBox.Cancel)
-                if reply == QMessageBox.Cancel:
+                            QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+                if reply == QMessageBox.StandardButton.Cancel:
                     return
 
                 # confirm updating the dependent Virtual Extra Devices?
@@ -1784,8 +1795,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     if (re.search(etorbt,self.aw.qmc.extramathexpression1[j]) or re.search(etorbt,self.aw.qmc.extramathexpression2[j])):
                         string = QApplication.translate("Message", "At least one Virtual Extra Device depends on ET or BT.  Do you want to update all the Virtual Extra Devices after ET and BT are updated?",None)
                         reply = QMessageBox.warning(self.aw,QApplication.translate("Message", "Caution - About to overwrite profile data",None),string,
-                                    QMessageBox.Yes|QMessageBox.No)
-                        if reply == QMessageBox.Yes:
+                                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No)
+                        if reply == QMessageBox.StandardButton.Yes:
                             updatevirtualextradevices = True
                         break
 

@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Cup Profile Dialog
 
@@ -21,10 +21,18 @@ from matplotlib import rcParams
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import MyQDoubleSpinBox
 
-from PyQt5.QtCore import (Qt, pyqtSlot, QSettings)
-from PyQt5.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QVBoxLayout, QLabel, 
-                             QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView,
-                             QTableWidget, QDoubleSpinBox, QGroupBox)
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import (Qt, pyqtSlot, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QVBoxLayout, QLabel, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QDoubleSpinBox, QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QVBoxLayout, QLabel,# @UnusedImport @Reimport  @UnresolvedImport
+                                 QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QDoubleSpinBox, QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
 
 class flavorDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None, aw = None):
@@ -33,7 +41,7 @@ class flavorDlg(ArtisanResizeablDialog):
         rcParams['path.effects'] = []
         #avoid question mark context help
         flags = self.windowFlags()
-        helpFlag = Qt.WindowContextHelpButtonHint
+        helpFlag = Qt.WindowType.WindowContextHelpButtonHint
         flags = flags & (~helpFlag)
         self.setWindowFlags(flags)
         self.setWindowTitle(QApplication.translate("Form Caption","Cup Profile",None))
@@ -52,24 +60,24 @@ class flavorDlg(ArtisanResizeablDialog):
         self.flavortable.setTabKeyNavigation(True)
         self.createFlavorTable()
         leftButton = QPushButton("<")
-        leftButton.setFocusPolicy(Qt.NoFocus)
+        leftButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         leftButton.clicked.connect(self.moveLeft)
         rightButton = QPushButton(">")
-        rightButton.setFocusPolicy(Qt.NoFocus)
+        rightButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         rightButton.clicked.connect(self.moveRight)
         addButton = QPushButton(QApplication.translate("Button","Add",None))
-        addButton.setFocusPolicy(Qt.NoFocus)
+        addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         addButton.clicked.connect(self.addlabel)
         delButton = QPushButton(QApplication.translate("Button","Del",None))
-        delButton.setFocusPolicy(Qt.NoFocus)
+        delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         delButton.clicked.connect(self.poplabel)
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
-        saveImgButton.setFocusPolicy(Qt.NoFocus)
+        saveImgButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         saveImgButton.clicked.connect(self.aw.saveVectorGraph_PDF) # save as PDF (vector)
         
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.close)
-        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
+        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
         
         self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Background", None))
         if self.aw.qmc.flavorbackgroundflag:
@@ -121,7 +129,7 @@ class flavorDlg(ArtisanResizeablDialog):
         mainLayout.addLayout(mainButtonsLayout)
         self.setLayout(mainLayout)
         self.aw.qmc.flavorchart()
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
 
     @pyqtSlot(float)
     def setaspect(self,_):
@@ -143,11 +151,11 @@ class flavorDlg(ArtisanResizeablDialog):
                                                         QApplication.translate("Table", "Value",None),
                                                         ""])
             self.flavortable.setAlternatingRowColors(True)
-            self.flavortable.setEditTriggers(QTableWidget.NoEditTriggers)
-            self.flavortable.setSelectionBehavior(QTableWidget.SelectRows)
-            self.flavortable.setSelectionMode(QTableWidget.SingleSelection)
+            self.flavortable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+            self.flavortable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+            self.flavortable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
             self.flavortable.setShowGrid(True)
-            #self.flavortable.verticalHeader().setSectionResizeMode(2)
+            #self.flavortable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
             #populate table
             for i in range(nflavors):
                 labeledit = QLineEdit(self.aw.qmc.flavorlabels[i])
@@ -155,7 +163,7 @@ class flavorDlg(ArtisanResizeablDialog):
                 valueSpinBox = MyQDoubleSpinBox()
                 valueSpinBox.setRange(0.,10.)
                 valueSpinBox.setSingleStep(.25)
-                valueSpinBox.setAlignment(Qt.AlignRight)
+                valueSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
                 val = self.aw.qmc.flavors[i]
                 if self.aw.qmc.flavors[0] < 1. and self.aw.qmc.flavors[-1] < 1.: # < 0.5.0 version style compatibility
                     val *= 10.
@@ -166,7 +174,7 @@ class flavorDlg(ArtisanResizeablDialog):
                 self.flavortable.setCellWidget(i,1,valueSpinBox)
             self.flavortable.resizeColumnsToContents()
             header = self.flavortable.horizontalHeader()
-            header.setSectionResizeMode(0, QHeaderView.Stretch)
+            header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
 
     @pyqtSlot(bool)
     def showbackground(self,_):

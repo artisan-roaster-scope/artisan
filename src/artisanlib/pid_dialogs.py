@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+#
 # ABOUT
 # Artisan Fuji PID Dialog
 
@@ -23,12 +23,22 @@ from artisanlib.util import stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 
-from PyQt5.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings
-from PyQt5.QtGui import QIntValidator, QRegularExpressionValidator
-from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, 
-    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit,
-    QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QButtonGroup, QDoubleSpinBox,
-    QTimeEdit, QLayout, QSizePolicy)
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QIntValidator, QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
+        QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QButtonGroup, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QTimeEdit, QLayout, QSizePolicy, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QIntValidator, QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
+        QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QButtonGroup, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QTimeEdit, QLayout, QSizePolicy, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 ############################################################################
@@ -39,28 +49,28 @@ class PID_DlgControl(ArtisanDialog):
     def __init__(self, parent = None, aw = None, activeTab = 0):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        #self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose) # default is True and this is set by default in ArtisanDialog!
         self.setWindowTitle(QApplication.translate("Form Caption","PID Control",None))
         
         # PID tab
         tab1Layout = QVBoxLayout()
         pidGrp = QGroupBox(QApplication.translate("GroupBox","p-i-d",None))
         self.pidKp = QDoubleSpinBox()
-        self.pidKp.setAlignment(Qt.AlignRight)
+        self.pidKp.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidKp.setRange(.0,9999.)
         self.pidKp.setSingleStep(.1)
         self.pidKp.setDecimals(3)
         self.pidKp.setValue(self.aw.pidcontrol.pidKp)
         pidKpLabel = QLabel("kp")
         self.pidKi = QDoubleSpinBox()
-        self.pidKi.setAlignment(Qt.AlignRight)
+        self.pidKi.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidKi.setRange(.0,9999.)
         self.pidKi.setSingleStep(.1)
         self.pidKi.setDecimals(3)
         self.pidKi.setValue(self.aw.pidcontrol.pidKi)
         pidKiLabel = QLabel("ki")
         self.pidKd = QDoubleSpinBox()
-        self.pidKd.setAlignment(Qt.AlignRight)
+        self.pidKd.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidKd.setRange(.0,9999.)
         self.pidKd.setSingleStep(.1)
         self.pidKd.setDecimals(3)
@@ -68,7 +78,7 @@ class PID_DlgControl(ArtisanDialog):
         pidKdLabel = QLabel("kd")
         pidSetPID = QPushButton(QApplication.translate("Button","Set",None))
         pidSetPID.clicked.connect(self.pidConf)
-        pidSetPID.setFocusPolicy(Qt.NoFocus)
+        pidSetPID.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         
         self.pidSource = QComboBox()
         if self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag:
@@ -104,7 +114,7 @@ class PID_DlgControl(ArtisanDialog):
         pidSourceBox.addStretch()
         
         self.pidCycle = QSpinBox()
-        self.pidCycle.setAlignment(Qt.AlignRight)
+        self.pidCycle.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidCycle.setRange(0,99999)
         self.pidCycle.setSingleStep(100)
         self.pidCycle.setValue(self.aw.pidcontrol.pidCycle)
@@ -142,9 +152,9 @@ class PID_DlgControl(ArtisanDialog):
         if self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag: # ArduinoTC4
             pidVBox.addLayout(pidCycleBox)
         pidVBox.addLayout(pOnLayout)
-        pidVBox.setAlignment(pOnLayout,Qt.AlignRight)
+        pidVBox.setAlignment(pOnLayout,Qt.AlignmentFlag.AlignRight)
         pidVBox.addLayout(pidSetBox)
-        pidVBox.setAlignment(pidSetBox,Qt.AlignRight)
+        pidVBox.setAlignment(pidSetBox,Qt.AlignmentFlag.AlignRight)
         
         #PID target (only shown if interal PID for hottop/modbus/TC4 is active
         controlItems = ["None",self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3)]
@@ -152,13 +162,13 @@ class PID_DlgControl(ArtisanDialog):
         positiveControlLabel = QLabel(QApplication.translate("Label","Positive", None))
         self.positiveControlCombo = QComboBox()
         self.positiveControlCombo.addItems(controlItems)
-        self.positiveControlCombo.setFocusPolicy(Qt.NoFocus)
+        self.positiveControlCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.positiveControlCombo.setCurrentIndex(self.aw.pidcontrol.pidPositiveTarget)
         #negativeControl
         negativeControlLabel = QLabel(QApplication.translate("Label","Negative", None))
         self.negativeControlCombo = QComboBox()
         self.negativeControlCombo.addItems(controlItems)
-        self.negativeControlCombo.setFocusPolicy(Qt.NoFocus)
+        self.negativeControlCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.negativeControlCombo.setCurrentIndex(self.aw.pidcontrol.pidNegativeTarget)
         
         controlSelectorLayout = QGridLayout()
@@ -168,7 +178,7 @@ class PID_DlgControl(ArtisanDialog):
         controlSelectorLayout.addWidget(self.negativeControlCombo,1,1)
                 
         self.invertControlFlag = QCheckBox(QApplication.translate("Label", "Invert Control", None))
-        self.invertControlFlag.setFocusPolicy(Qt.NoFocus)
+        self.invertControlFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.invertControlFlag.setChecked(self.aw.pidcontrol.invertControl)
 
         controlVBox = QVBoxLayout()
@@ -197,14 +207,14 @@ class PID_DlgControl(ArtisanDialog):
         pidGrp.setContentsMargins(0,10,0,0)
         
         self.pidSV = QSpinBox()
-        self.pidSV.setAlignment(Qt.AlignRight)
+        self.pidSV.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSV.setRange(0,999)
         self.pidSV.setSingleStep(10)
         self.pidSV.setValue(self.aw.pidcontrol.svValue)
         pidSVLabel = QLabel(QApplication.translate("Label","SV",None))
         
         self.pidSVLookahead = QSpinBox()
-        self.pidSVLookahead.setAlignment(Qt.AlignRight)
+        self.pidSVLookahead.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVLookahead.setRange(0,999)
         self.pidSVLookahead.setSingleStep(1)
         self.pidSVLookahead.setValue(self.aw.pidcontrol.svLookahead)
@@ -212,7 +222,7 @@ class PID_DlgControl(ArtisanDialog):
         pidSVLookaheadLabel = QLabel(QApplication.translate("Label","Lookahead",None))
         
         self.pidDutySteps = QSpinBox()
-        self.pidDutySteps.setAlignment(Qt.AlignRight)
+        self.pidDutySteps.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidDutySteps.setRange(1,10)
         self.pidDutySteps.setSingleStep(1)
         self.pidDutySteps.setValue(self.aw.pidcontrol.dutySteps)  
@@ -221,7 +231,7 @@ class PID_DlgControl(ArtisanDialog):
         
         pidSetSV = QPushButton(QApplication.translate("Button","Set",None))
         pidSetSV.clicked.connect(self.setSV)
-        pidSetSV.setFocusPolicy(Qt.NoFocus)
+        pidSetSV.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         pidSVModeLabel = QLabel(QApplication.translate("Label","Mode",None))
         pidModeItems = [
@@ -241,7 +251,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSVsliderFlag.stateChanged.connect(self.activateSVSlider)
         
         self.pidSVSliderMin = QSpinBox()
-        self.pidSVSliderMin.setAlignment(Qt.AlignRight)
+        self.pidSVSliderMin.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVSliderMin.setRange(0,999)
         self.pidSVSliderMin.setSingleStep(10)
         self.pidSVSliderMin.setValue(self.aw.pidcontrol.svSliderMin)
@@ -249,7 +259,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSVSliderMin.valueChanged.connect(self.sliderMinValueChangedSlot)
         
         self.pidSVSliderMax = QSpinBox()
-        self.pidSVSliderMax.setAlignment(Qt.AlignRight)
+        self.pidSVSliderMax.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVSliderMax.setRange(0,999)
         self.pidSVSliderMax.setSingleStep(10)
         self.pidSVSliderMax.setValue(self.aw.pidcontrol.svSliderMax)
@@ -289,7 +299,7 @@ class PID_DlgControl(ArtisanDialog):
         svInputBox.addWidget(pidSetSV)
         
         self.dutyMin = QSpinBox()
-        self.dutyMin.setAlignment(Qt.AlignRight)
+        self.dutyMin.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.dutyMin.setRange(-100,100)
         self.dutyMin.setSingleStep(10)
         self.dutyMin.setValue(self.aw.pidcontrol.dutyMin)
@@ -297,7 +307,7 @@ class PID_DlgControl(ArtisanDialog):
         dutyMinLabel = QLabel(QApplication.translate("Label","Min",None))
         
         self.dutyMax = QSpinBox()
-        self.dutyMax.setAlignment(Qt.AlignRight)
+        self.dutyMax.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.dutyMax.setRange(-100,100)
         self.dutyMax.setSingleStep(10)
         self.dutyMax.setValue(self.aw.pidcontrol.dutyMax) 
@@ -405,7 +415,7 @@ class PID_DlgControl(ArtisanDialog):
         for i in range(self.aw.pidcontrol.svLen):
             n = i+1
             svwidget = QSpinBox()
-            svwidget.setAlignment(Qt.AlignRight)
+            svwidget.setAlignment(Qt.AlignmentFlag.AlignRight)
             svwidget.setRange(0,999)
             svwidget.setSingleStep(10)
             if self.aw.qmc.mode == "F":
@@ -415,11 +425,11 @@ class PID_DlgControl(ArtisanDialog):
             self.SVWidgets.append(svwidget)
             rampwidget = QTimeEdit()
             rampwidget.setDisplayFormat("mm:ss")
-            rampwidget.setAlignment(Qt.AlignRight)
+            rampwidget.setAlignment(Qt.AlignmentFlag.AlignRight)
             self.RampWidgets.append(rampwidget)
             soakwidget = QTimeEdit()
             soakwidget.setDisplayFormat("mm:ss")
-            soakwidget.setAlignment(Qt.AlignRight)
+            soakwidget.setAlignment(Qt.AlignmentFlag.AlignRight)
             self.SoakWidgets.append(soakwidget)
             actionwidget = MyQComboBox()
             actionwidget.addItems(actions)  
@@ -427,7 +437,7 @@ class PID_DlgControl(ArtisanDialog):
             #beep
             beepwidget = QWidget()
             beepCheckBox = QCheckBox()
-            beepCheckBox.setFocusPolicy(Qt.NoFocus)
+            beepCheckBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             beepLayout = QHBoxLayout()
             beepLayout.addStretch()
             beepLayout.addWidget(beepCheckBox)
@@ -452,23 +462,23 @@ class PID_DlgControl(ArtisanDialog):
         ############################
         importButton = QPushButton(QApplication.translate("Button","Load",None))
         importButton.setMinimumWidth(80)
-        importButton.setFocusPolicy(Qt.NoFocus)
+        importButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         importButton.clicked.connect(self.importrampsoaks)
         exportButton = QPushButton(QApplication.translate("Button","Save",None))
         exportButton.setMinimumWidth(80)
-        exportButton.setFocusPolicy(Qt.NoFocus)
+        exportButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         exportButton.clicked.connect(self.exportrampsoaks)
         self.loadRampSoakFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load from profile",None))
         self.loadRampSoakFromProfile.setChecked(self.aw.pidcontrol.loadRampSoakFromProfile)
-        self.loadRampSoakFromProfile.setFocusPolicy(Qt.NoFocus)
+        self.loadRampSoakFromProfile.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.loadRampSoakFromBackground = QCheckBox(QApplication.translate("CheckBox", "Load from background",None))
         self.loadRampSoakFromBackground.setChecked(self.aw.pidcontrol.loadRampSoakFromBackground)
-        self.loadRampSoakFromBackground.setFocusPolicy(Qt.NoFocus)
+        self.loadRampSoakFromBackground.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         
         self.rsfile = QLabel(self.aw.qmc.rsfile)
-        self.rsfile.setAlignment(Qt.AlignLeft)
+        self.rsfile.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.rsfile.setMinimumWidth(300)
-        self.rsfile.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Preferred)
+        self.rsfile.setSizePolicy(QSizePolicy.Policy.MinimumExpanding,QSizePolicy.Policy.Preferred)
         
         tab2InnerLayout.addStretch()
         tab2InnerLayout.addLayout(rsGrid)
@@ -478,10 +488,10 @@ class PID_DlgControl(ArtisanDialog):
         okButton.clicked.connect(self.okAction)
         onButton = QPushButton(QApplication.translate("Button","On",None))
         onButton.clicked.connect(self.pidONAction)
-        onButton.setFocusPolicy(Qt.NoFocus)
+        onButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         offButton = QPushButton(QApplication.translate("Button","Off",None))
         offButton.clicked.connect(self.pidOFFAction)
-        offButton.setFocusPolicy(Qt.NoFocus)
+        offButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         okButtonLayout = QHBoxLayout()
         okButtonLayout.addWidget(onButton)
         okButtonLayout.addWidget(offButton)
@@ -538,7 +548,7 @@ class PID_DlgControl(ArtisanDialog):
             for i in range(self.aw.pidcontrol.svLen):
                 n = i+1              
                 svwidget = QSpinBox()
-                svwidget.setAlignment(Qt.AlignRight)
+                svwidget.setAlignment(Qt.AlignmentFlag.AlignRight)
                 svwidget.setRange(0,999)
                 svwidget.setSingleStep(10)
                 if self.aw.qmc.mode == "F":
@@ -548,11 +558,11 @@ class PID_DlgControl(ArtisanDialog):
                 SVWidgets.append(svwidget)
                 rampwidget = QTimeEdit()
                 rampwidget.setDisplayFormat("mm:ss")
-                rampwidget.setAlignment(Qt.AlignRight)
+                rampwidget.setAlignment(Qt.AlignmentFlag.AlignRight)
                 RampWidgets.append(rampwidget)
                 soakwidget = QTimeEdit()
                 soakwidget.setDisplayFormat("mm:ss")
-                soakwidget.setAlignment(Qt.AlignRight)
+                soakwidget.setAlignment(Qt.AlignmentFlag.AlignRight)
                 SoakWidgets.append(soakwidget)
                 actionwidget = MyQComboBox()
                 actionwidget.addItems(actions)  
@@ -560,7 +570,7 @@ class PID_DlgControl(ArtisanDialog):
                 #beep
                 beepwidget = QWidget()
                 beepCheckBox = QCheckBox()
-                beepCheckBox.setFocusPolicy(Qt.NoFocus)
+                beepCheckBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                 beepLayout = QHBoxLayout()
                 beepLayout.addStretch()
                 beepLayout.addWidget(beepCheckBox)
@@ -613,7 +623,7 @@ class PID_DlgControl(ArtisanDialog):
             self.tabWidget.addTab(RSnTabWidget,QApplication.translate("Tab","RS",None)+str(j+1))
             
             setRSnButton = QPushButton(QApplication.translate("Button","RS",None)+str(j+1))
-            setRSnButton.setFocusPolicy(Qt.NoFocus)
+            setRSnButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             setRSnButton.clicked.connect(self.setRS)
             self.RSnButtons.append(setRSnButton)
             RSbuttonLayout.addWidget(setRSnButton)
@@ -658,7 +668,7 @@ class PID_DlgControl(ArtisanDialog):
         if settings.contains("PIDPosition"):
             self.move(settings.value("PIDPosition"))
         
-        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
+        mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
     
     @pyqtSlot(int)
     def updatePidMode(self,i):
@@ -753,9 +763,9 @@ class PID_DlgControl(ArtisanDialog):
         for i in range(self.aw.pidcontrol.svLen):
             beep = self.RSnTab_BeepWidgets[n][i].layout().itemAt(1).widget()
             if self.aw.pidcontrol.RS_svBeeps[n][i]:
-                beep.setCheckState(Qt.Checked)
+                beep.setCheckState(Qt.CheckState.Checked)
             else:
-                beep.setCheckState(Qt.Unchecked)
+                beep.setCheckState(Qt.CheckState.Unchecked)
     def setRSnSVdescriptions(self,n):
         for i in range(self.aw.pidcontrol.svLen):
             self.RSnTab_DescriptionWidgets[n][i].setText(self.aw.pidcontrol.RS_svDescriptions[n][i])
@@ -848,9 +858,9 @@ class PID_DlgControl(ArtisanDialog):
                 self.ActionWidgets[i].setCurrentIndex(self.aw.pidcontrol.svActions[i] + 1)
                 beep = self.BeepWidgets[i].layout().itemAt(1).widget() 
                 if self.aw.pidcontrol.svBeeps[i]:
-                    beep.setCheckState(Qt.Checked)
+                    beep.setCheckState(Qt.CheckState.Checked)
                 else:
-                    beep.setCheckState(Qt.Unchecked)
+                    beep.setCheckState(Qt.CheckState.Unchecked)
                 self.DescriptionWidgets[i].setText(self.aw.pidcontrol.svDescriptions[i])
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
@@ -1138,7 +1148,7 @@ class PXRpidDlgControl(PXpidDlgControl):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent,aw)
         self.setModal(True)
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        #self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose) # default is True and this is set already in ArtisanDialog by default
         self.setWindowTitle(QApplication.translate("Form Caption","Fuji PXR PID Control",None))
         #create Ramp Soak control button colums
         self.labelrs1 = QLabel()
@@ -1167,15 +1177,15 @@ class PXRpidDlgControl(PXpidDlgControl):
         self.paintlabels()
         #update button and exit button
         button_getall = QPushButton(QApplication.translate("Button","Read Ra/So values",None))
-        button_getall.setFocusPolicy(Qt.NoFocus)
+        button_getall.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_rson =  QPushButton(QApplication.translate("Button","RampSoak ON",None))
-        button_rson.setFocusPolicy(Qt.NoFocus)
+        button_rson.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_rsoff =  QPushButton(QApplication.translate("Button","RampSoak OFF",None))
-        button_rsoff.setFocusPolicy(Qt.NoFocus)
+        button_rsoff.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_standbyON = QPushButton(QApplication.translate("Button","PID OFF",None))
-        button_standbyON.setFocusPolicy(Qt.NoFocus)
+        button_standbyON.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_standbyOFF = QPushButton(QApplication.translate("Button","PID ON",None))
-        button_standbyOFF.setFocusPolicy(Qt.NoFocus)
+        button_standbyOFF.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         button_exit = QPushButton(QApplication.translate("Button","OK",None))
         button_exit.setFocus()
@@ -1189,7 +1199,7 @@ class PXRpidDlgControl(PXpidDlgControl):
         button_exit.clicked.connect(self.reject)
         #TAB 2
         tab2svbutton = QPushButton(QApplication.translate("Button","Write SV",None))
-        tab2svbutton.setFocusPolicy(Qt.NoFocus)
+        tab2svbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         
         self.tab2easySVbuttonsFlag = QCheckBox(QApplication.translate("Label","SV Buttons",None))
         self.tab2easySVbuttonsFlag.setChecked(self.aw.pidcontrol.svButtons)
@@ -1200,7 +1210,7 @@ class PXRpidDlgControl(PXpidDlgControl):
         
         
         tab2getsvbutton = QPushButton(QApplication.translate("Button","Read SV",None))
-        tab2getsvbutton.setFocusPolicy(Qt.NoFocus)
+        tab2getsvbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.readsvedit = QLineEdit()
         tab2svbutton.clicked.connect(self.setsv)
         tab2getsvbutton.clicked.connect(self.getsv)
@@ -1215,11 +1225,11 @@ class PXRpidDlgControl(PXpidDlgControl):
         self.svedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.svedit))
         #TAB 3
         button_p = QPushButton(QApplication.translate("Button","Set p",None))
-        button_p.setFocusPolicy(Qt.NoFocus)
+        button_p.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_i = QPushButton(QApplication.translate("Button","Set i",None))
-        button_i.setFocusPolicy(Qt.NoFocus)
+        button_i.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_d = QPushButton(QApplication.translate("Button","Set d",None))
-        button_d.setFocusPolicy(Qt.NoFocus)
+        button_d.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         plabel =  QLabel("p")
         ilabel =  QLabel("i")
         dlabel =  QLabel("d")
@@ -1233,11 +1243,11 @@ class PXRpidDlgControl(PXpidDlgControl):
         self.iedit.setValidator(QIntValidator(0, 3200, self.iedit))
         self.dedit.setValidator(QIntValidator(0., 999, self.dedit))
         button_autotuneON = QPushButton(QApplication.translate("Button","Autotune ON",None))
-        button_autotuneON.setFocusPolicy(Qt.NoFocus)
+        button_autotuneON.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_autotuneOFF = QPushButton(QApplication.translate("Button","Autotune OFF",None))
-        button_autotuneOFF.setFocusPolicy(Qt.NoFocus)
+        button_autotuneOFF.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_readpid = QPushButton(QApplication.translate("Button","Read PID Values",None))
-        button_readpid.setFocusPolicy(Qt.NoFocus)
+        button_readpid.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_autotuneON.clicked.connect(self.setONautotune)
         button_autotuneOFF.clicked.connect(self.setOFFautotune)
         button_p.clicked.connect(self.setpid_p)
@@ -1263,13 +1273,13 @@ class PXRpidDlgControl(PXpidDlgControl):
         if self.aw.fujipid.PXR["pvinputtype"][0] in self.aw.fujipid.PXRconversiontoindex:
             self.ETthermocombobox.setCurrentIndex(self.aw.fujipid.PXRconversiontoindex.index(self.aw.fujipid.PXR["pvinputtype"][0]))
         setETthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
-        setETthermocouplebutton.setFocusPolicy(Qt.NoFocus)
+        setETthermocouplebutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         setBTthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
-        setBTthermocouplebutton.setFocusPolicy(Qt.NoFocus)
+        setBTthermocouplebutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         getETthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None))
-        getETthermocouplebutton.setFocusPolicy(Qt.NoFocus)
+        getETthermocouplebutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         getBTthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None))
-        getBTthermocouplebutton.setFocusPolicy(Qt.NoFocus)
+        getBTthermocouplebutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         setETthermocouplebutton.setMaximumWidth(80)
         getETthermocouplebutton.setMaximumWidth(80)
         setBTthermocouplebutton.setMaximumWidth(80)
@@ -1279,9 +1289,9 @@ class PXRpidDlgControl(PXpidDlgControl):
         getETthermocouplebutton.clicked.connect(self.readthermocoupletypeET)
         getBTthermocouplebutton.clicked.connect(self.readthermocoupletypeBT)
         PointButtonET = QPushButton(QApplication.translate("Button","Set ET PID to 1 decimal point",None))
-        PointButtonET.setFocusPolicy(Qt.NoFocus)
+        PointButtonET.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         PointButtonBT = QPushButton(QApplication.translate("Button","Set BT PID to 1 decimal point",None))
-        PointButtonBT.setFocusPolicy(Qt.NoFocus)
+        PointButtonBT.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         PointButtonET.setMaximumWidth(250)
         PointButtonBT.setMaximumWidth(250)
         pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None))
@@ -1292,16 +1302,16 @@ class PXRpidDlgControl(PXpidDlgControl):
         # Follow Background 
         self.followBackground = QCheckBox(QApplication.translate("CheckBox", "Follow Background",None))
         self.followBackground.setChecked(self.aw.fujipid.followBackground)
-        self.followBackground.setFocusPolicy(Qt.NoFocus)
+        self.followBackground.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.followBackground.stateChanged.connect(self.changeFollowBackground)         #toggle
         # Follow Background Lookahead
         self.pidSVLookahead = QSpinBox()
-        self.pidSVLookahead.setAlignment(Qt.AlignRight)
+        self.pidSVLookahead.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVLookahead.setRange(0,999)
         self.pidSVLookahead.setSingleStep(1)
         self.pidSVLookahead.setValue(self.aw.fujipid.lookahead)  
         self.pidSVLookahead.setSuffix(" s")
-        self.pidSVLookahead.setFocusPolicy(Qt.NoFocus)
+        self.pidSVLookahead.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pidSVLookahead.valueChanged.connect(self.changeLookAhead)
         pidSVLookaheadLabel = QLabel(QApplication.translate("Label","Lookahead",None))  
         followLayout = QHBoxLayout()
@@ -1727,11 +1737,10 @@ class PXRpidDlgControl(PXpidDlgControl):
         string += QApplication.translate("Message","Use the Parameter Loader Software by Fuji if you need to\n\n",None) + "\n\n\n"
         string += QApplication.translate("Message","Continue?",None)
         reply = QMessageBox.question(self.aw,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
-                            QMessageBox.Yes|QMessageBox.Cancel)
-        if reply == QMessageBox.Cancel:
-            return 0
-        if reply == QMessageBox.Yes:
+                            QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+        if reply == QMessageBox.StandardButton.Yes:
             return 1
+        return 0
 
     @pyqtSlot(bool)
     def setONrampsoak(self,_):
@@ -1875,11 +1884,11 @@ class PXRpidDlgControl(PXpidDlgControl):
         self.segmenttable.setHorizontalHeaderLabels([QApplication.translate("Table","SV",None),
                                                      QApplication.translate("Table","Ramp HH:MM",None),
                                                      QApplication.translate("Table","Soak HH:MM",None),""])
-        self.segmenttable.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
+        self.segmenttable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.segmenttable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.segmenttable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.segmenttable.setShowGrid(True)
-        self.segmenttable.verticalHeader().setSectionResizeMode(2)
+        self.segmenttable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #populate table
         for i in range(8):
@@ -1896,7 +1905,7 @@ class PXRpidDlgControl(PXpidDlgControl):
             soakedit.setValidator(QRegularExpressionValidator(regextime,self))
             setButton = QPushButton(QApplication.translate("Button","Set",None))
             setButton.clicked.connect(self.setsegment)
-            setButton.setFocusPolicy(Qt.NoFocus)
+            setButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             #add widgets to the table
             self.segmenttable.setCellWidget(i,0,svedit)
             self.segmenttable.setCellWidget(i,1,rampedit)
@@ -1956,7 +1965,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        #self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose) # default is True and this is set already in ArtisanDialog by default
         if self.aw.ser.controlETpid[0] == 0:
             self.setWindowTitle(QApplication.translate("Form Caption","Fuji PXG PID Control",None))
         else:
@@ -2015,30 +2024,30 @@ class PXG4pidDlgControl(PXpidDlgControl):
             self.patternComboBox.setCurrentIndex(self.aw.fujipid.PXG4["rampsoakpattern"][0])
         else:
             self.patternComboBox.setCurrentIndex(self.aw.fujipid.PXF["rampsoakpattern"][0])
-        self.patternComboBox.setFocusPolicy(Qt.NoFocus)
+        self.patternComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.patternComboBox.currentIndexChanged.connect(self.paintlabels)
         self.paintlabels()
         button_load = QPushButton(QApplication.translate("Button","Load",None))
-        button_load.setFocusPolicy(Qt.NoFocus)
+        button_load.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_save = QPushButton(QApplication.translate("Button","Save",None))
-        button_save.setFocusPolicy(Qt.NoFocus)
+        button_save.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_writeall = QPushButton(QApplication.translate("Button","Write All",None))
-        button_writeall.setFocusPolicy(Qt.NoFocus)
+        button_writeall.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         patternlabel = QLabel(QApplication.translate("Label","Pattern",None))
-        patternlabel.setAlignment(Qt.AlignRight)
+        patternlabel.setAlignment(Qt.AlignmentFlag.AlignRight)
         button_getall = QPushButton(QApplication.translate("Button","Read RS values",None))
-        button_getall.setFocusPolicy(Qt.NoFocus)
+        button_getall.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_writeallrs = QPushButton(QApplication.translate("Button","Write RS values",None))
-        button_writeallrs.setFocusPolicy(Qt.NoFocus)
+        button_writeallrs.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_rson =  QPushButton(QApplication.translate("Button","RampSoak ON",None)) 
-        button_rson.setFocusPolicy(Qt.NoFocus)
+        button_rson.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_rsoff =  QPushButton(QApplication.translate("Button","RampSoak OFF",None))
-        button_rsoff.setFocusPolicy(Qt.NoFocus)
+        button_rsoff.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_exit = QPushButton(QApplication.translate("Button","OK",None))
         button_standbyON = QPushButton(QApplication.translate("Button","PID OFF",None))
-        button_standbyON.setFocusPolicy(Qt.NoFocus)
+        button_standbyON.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_standbyOFF = QPushButton(QApplication.translate("Button","PID ON",None))
-        button_standbyOFF.setFocusPolicy(Qt.NoFocus)
+        button_standbyOFF.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_getall.clicked.connect(self.getallsegments)
         button_writeallrs.clicked.connect(self.writeRSValues)
         button_rson.clicked.connect(self.setONrampsoak)
@@ -2079,16 +2088,16 @@ class PXG4pidDlgControl(PXpidDlgControl):
         # Follow Background 
         self.followBackground = QCheckBox(QApplication.translate("CheckBox", "Follow Background",None))
         self.followBackground.setChecked(self.aw.fujipid.followBackground)
-        self.followBackground.setFocusPolicy(Qt.NoFocus)
+        self.followBackground.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.followBackground.stateChanged.connect(self.changeFollowBackground)         #toggle
         # Follow Background Lookahead
         self.pidSVLookahead = QSpinBox()
-        self.pidSVLookahead.setAlignment(Qt.AlignRight)
+        self.pidSVLookahead.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVLookahead.setRange(0,999)
         self.pidSVLookahead.setSingleStep(1)
         self.pidSVLookahead.setValue(self.aw.fujipid.lookahead)
         self.pidSVLookahead.setSuffix(" s")
-        self.pidSVLookahead.setFocusPolicy(Qt.NoFocus)
+        self.pidSVLookahead.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pidSVLookahead.valueChanged.connect(self.changeLookAhead)
         pidSVLookaheadLabel = QLabel(QApplication.translate("Label","Lookahead",None))
         
@@ -2106,19 +2115,19 @@ class PXG4pidDlgControl(PXpidDlgControl):
         labelsvedit.setMaximumSize(100, 42)
         labelsvedit.setMinimumHeight(50)
         button_sv1 =QPushButton(QApplication.translate("Button","Write SV1",None))
-        button_sv1.setFocusPolicy(Qt.NoFocus)
+        button_sv1.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_sv2 =QPushButton(QApplication.translate("Button","Write SV2",None))
-        button_sv2.setFocusPolicy(Qt.NoFocus)
+        button_sv2.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_sv3 =QPushButton(QApplication.translate("Button","Write SV3",None))
-        button_sv3.setFocusPolicy(Qt.NoFocus)
+        button_sv3.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_sv4 =QPushButton(QApplication.translate("Button","Write SV4",None))
-        button_sv4.setFocusPolicy(Qt.NoFocus)
+        button_sv4.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_sv5 =QPushButton(QApplication.translate("Button","Write SV5",None))
-        button_sv5.setFocusPolicy(Qt.NoFocus)
+        button_sv5.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_sv6 =QPushButton(QApplication.translate("Button","Write SV6",None))
-        button_sv6.setFocusPolicy(Qt.NoFocus)
+        button_sv6.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_sv7 =QPushButton(QApplication.translate("Button","Write SV7",None))
-        button_sv7.setFocusPolicy(Qt.NoFocus)
+        button_sv7.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_sv1.clicked.connect(self.setsv1)
         button_sv2.clicked.connect(self.setsv2)
         button_sv3.clicked.connect(self.setsv3)
@@ -2176,14 +2185,14 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.tab2easySVsliderFlag.setChecked(self.aw.pidcontrol.svSlider)
         self.tab2easySVsliderFlag.stateChanged.connect(self.setSVsliderSlot)
         self.pidSVSliderMin = QSpinBox()
-        self.pidSVSliderMin.setAlignment(Qt.AlignRight)
+        self.pidSVSliderMin.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVSliderMin.setRange(0,999)
         self.pidSVSliderMin.setSingleStep(10)
         self.pidSVSliderMin.setValue(self.aw.pidcontrol.svSliderMin)
         self.pidSVSliderMin.valueChanged.connect(self.sliderMinValueChangedSlot)
         pidSVSliderMinLabel = QLabel(QApplication.translate("Label","SV min",None))
         self.pidSVSliderMax = QSpinBox()
-        self.pidSVSliderMax.setAlignment(Qt.AlignRight)
+        self.pidSVSliderMax.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVSliderMax.setRange(0,999)
         self.pidSVSliderMax.setSingleStep(10)
         self.pidSVSliderMax.setValue(self.aw.pidcontrol.svSliderMax)
@@ -2197,9 +2206,9 @@ class PXG4pidDlgControl(PXpidDlgControl):
             self.pidSVSliderMax.setSuffix(" C")
 
         tab2getsvbutton = QPushButton(QApplication.translate("Button","Read SV (7-0)",None))
-        tab2getsvbutton.setFocusPolicy(Qt.NoFocus)
+        tab2getsvbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         tab2putsvbutton = QPushButton(QApplication.translate("Button","Write SV (7-0)",None))
-        tab2putsvbutton.setFocusPolicy(Qt.NoFocus)
+        tab2putsvbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         tab2getsvbutton.clicked.connect(self.getallsv)
         tab2putsvbutton.clicked.connect(self.writeSetValues)
         self.radiosv1.clicked.connect(self.setNsvSlot)
@@ -2301,29 +2310,29 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.d6edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.d6edit))
         self.d7edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.d7edit))
         self.pid1button = QPushButton(QApplication.translate("Button","pid 1",None))
-        self.pid1button.setFocusPolicy(Qt.NoFocus)
+        self.pid1button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pid2button = QPushButton(QApplication.translate("Button","pid 2",None))
-        self.pid2button.setFocusPolicy(Qt.NoFocus)
+        self.pid2button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pid3button = QPushButton(QApplication.translate("Button","pid 3",None))
-        self.pid3button.setFocusPolicy(Qt.NoFocus)
+        self.pid3button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pid4button = QPushButton(QApplication.translate("Button","pid 4",None))
-        self.pid4button.setFocusPolicy(Qt.NoFocus)
+        self.pid4button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pid5button = QPushButton(QApplication.translate("Button","pid 5",None))
-        self.pid5button.setFocusPolicy(Qt.NoFocus)
+        self.pid5button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pid6button = QPushButton(QApplication.translate("Button","pid 6",None))
-        self.pid6button.setFocusPolicy(Qt.NoFocus)
+        self.pid6button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pid7button = QPushButton(QApplication.translate("Button","pid 7",None))
-        self.pid7button.setFocusPolicy(Qt.NoFocus)
+        self.pid7button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         pidreadallbutton = QPushButton(QApplication.translate("Button","Read PIDs",None))
-        pidreadallbutton.setFocusPolicy(Qt.NoFocus)
+        pidreadallbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         pidwriteallbutton = QPushButton(QApplication.translate("Button","Write PIDs",None))
-        pidwriteallbutton.setFocusPolicy(Qt.NoFocus)
+        pidwriteallbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         autotuneONbutton = QPushButton(QApplication.translate("Button","Autotune ON",None))
-        autotuneONbutton.setFocusPolicy(Qt.NoFocus)
+        autotuneONbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         autotuneOFFbutton = QPushButton(QApplication.translate("Button","Autotune OFF",None))
-        autotuneOFFbutton.setFocusPolicy(Qt.NoFocus)
+        autotuneOFFbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         cancel3button = QPushButton(QApplication.translate("Button","Cancel",None))
-        cancel3button.setFocusPolicy(Qt.NoFocus)
+        cancel3button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.radiopid1 = QRadioButton()
         self.radiopid2 = QRadioButton()
         self.radiopid3 = QRadioButton()
@@ -2357,9 +2366,9 @@ class PXG4pidDlgControl(PXpidDlgControl):
         #****************************   TAB5 WIDGETS
         BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan settings",None))
         self.ETthermocombobox = QComboBox()
-        self.ETthermocombobox.setFocusPolicy(Qt.NoFocus)
+        self.ETthermocombobox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.BTthermocombobox = QComboBox()
-        self.BTthermocombobox.setFocusPolicy(Qt.NoFocus)
+        self.BTthermocombobox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         if self.aw.ser.controlETpid[0] == 0: # PXG
             self.ETthermocombobox.addItems(self.aw.fujipid.PXGthermotypes)
             if self.aw.fujipid.PXG4["pvinputtype"][0] in self.aw.fujipid.PXGconversiontoindex:
@@ -2375,13 +2384,13 @@ class PXG4pidDlgControl(PXpidDlgControl):
         else:      #fuji PXF
             self.BTthermocombobox.addItems(self.aw.fujipid.PXFthermotypes)
         setETthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
-        setETthermocouplebutton.setFocusPolicy(Qt.NoFocus)
+        setETthermocouplebutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         setBTthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
-        setBTthermocouplebutton.setFocusPolicy(Qt.NoFocus)
+        setBTthermocouplebutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         getETthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None))
-        getETthermocouplebutton.setFocusPolicy(Qt.NoFocus)
+        getETthermocouplebutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         getBTthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None))
-        getBTthermocouplebutton.setFocusPolicy(Qt.NoFocus)
+        getBTthermocouplebutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         setETthermocouplebutton.setMaximumWidth(80)
         getETthermocouplebutton.setMaximumWidth(80)
         setBTthermocouplebutton.setMaximumWidth(80)
@@ -2391,11 +2400,11 @@ class PXG4pidDlgControl(PXpidDlgControl):
         getETthermocouplebutton.clicked.connect(self.readthermocoupletypeET)
         getBTthermocouplebutton.clicked.connect(self.readthermocoupletypeBT)
         PointButtonET = QPushButton(QApplication.translate("Button","Set ET PID to 1 decimal point",None))
-        PointButtonET.setFocusPolicy(Qt.NoFocus)
+        PointButtonET.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         PointButtonBT = QPushButton(QApplication.translate("Button","Set BT PID to 1 decimal point",None))
-        PointButtonBT.setFocusPolicy(Qt.NoFocus)
+        PointButtonBT.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         timeunitsbutton = QPushButton(QApplication.translate("Button","Set ET PID to MM:SS time units",None))
-        timeunitsbutton.setFocusPolicy(Qt.NoFocus)
+        timeunitsbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None))
         if self.aw.ser.controlETpid[0] == 0:
             timelabel = QLabel(QApplication.translate("Label","Artisan Fuji PXG uses MINUTES:SECONDS units in Ramp/Soaks",None))
@@ -2908,8 +2917,8 @@ class PXG4pidDlgControl(PXpidDlgControl):
             if N != svn:
                 string = QApplication.translate("Message","Current sv = {0}. Change now to sv = {1}?",None).format(str(N),str(svn))
                 reply = QMessageBox.question(self.aw,QApplication.translate("Message","Change svN",None),string,
-                                    QMessageBox.Yes|QMessageBox.Cancel)
-                if reply == QMessageBox.Yes:
+                                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+                if reply == QMessageBox.StandardButton.Yes:
                     #change variable svN
                     if self.aw.ser.useModbusPort:
                         reg = self.aw.modbus.address2register(reg_dict["selectsv"][1],6)
@@ -2928,7 +2937,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                             self.status.showMessage(message, 5000)
                     else:
                         self.status.showMessage(QApplication.translate("StatusBar","Problem setting SV",None),5000)
-                elif reply == QMessageBox.Cancel:
+                elif reply == QMessageBox.StandardButton.Cancel:
                     self.status.showMessage(QApplication.translate("StatusBar","Cancelled svN change",None),5000)
                     #set radio button
                     if N == 1:
@@ -2990,8 +2999,8 @@ class PXG4pidDlgControl(PXpidDlgControl):
             if N != pidn:
                 string = QApplication.translate("Message","Current pid = {0}. Change now to pid ={1}?",None).format(str(N),str(pidn))
                 reply = QMessageBox.question(self.aw,QApplication.translate("Message","Change svN",None),string,
-                                    QMessageBox.Yes|QMessageBox.Cancel)
-                if reply == QMessageBox.Yes:
+                                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+                if reply == QMessageBox.StandardButton.Yes:
                     #change variable svN
                     if self.aw.ser.useModbusPort:
                         reg = self.aw.modbus.address2register(reg_dict["selectedpid"][1],6)
@@ -3010,7 +3019,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                         mssg = QApplication.translate("StatusBar","setNpid(): bad confirmation",None)
                         self.status.showMessage(mssg,1000)
                         self.aw.qmc.adderror(mssg)
-                elif reply == QMessageBox.Cancel:
+                elif reply == QMessageBox.StandardButton.Cancel:
                     self.status.showMessage(QApplication.translate("StatusBar","Cancelled pid change",None),5000)
                     #put back radio button
                     if N == 1:
@@ -3615,11 +3624,10 @@ class PXG4pidDlgControl(PXpidDlgControl):
         string += "\nUse the Parameter Loader Software by Fuji if you need to\n\n"
         string += "\n\n\nContinue?" 
         reply = QMessageBox.question(self.aw,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
-                            QMessageBox.Yes|QMessageBox.Cancel)
-        if reply == QMessageBox.Cancel:
-            return 0
-        if reply == QMessageBox.Yes:
+                            QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+        if reply == QMessageBox.StandardButton.Yes:
             return 1
+        return 0
 
     @pyqtSlot(bool)
     def setONrampsoak(self,_):
@@ -3777,11 +3785,11 @@ class PXG4pidDlgControl(PXpidDlgControl):
         reg_dict["selectedpid"][0] = N
         string = QApplication.translate("StatusBar","Current pid = {0}. Proceed with autotune command?",None).format(str(N))
         reply = QMessageBox.question(self.aw,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
-                            QMessageBox.Yes|QMessageBox.Cancel)
-        if reply == QMessageBox.Cancel:
+                            QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+        if reply == QMessageBox.StandardButton.Cancel:
             self.status.showMessage(QApplication.translate("StatusBar","Autotune cancelled",None),5000)
             return
-        if reply == QMessageBox.Yes:
+        if reply == QMessageBox.StandardButton.Yes:
             if self.aw.ser.useModbusPort:
                 reg = self.aw.modbus.address2register(reg_dict["autotuning"][1],6)
                 self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,flag)
@@ -3851,11 +3859,11 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.segmenttable.setHorizontalHeaderLabels([QApplication.translate("StatusBar","SV",None),
                                                      QApplication.translate("StatusBar","Ramp (MM:SS)",None),
                                                      QApplication.translate("StatusBar","Soak (MM:SS)",None),""])
-        self.segmenttable.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
+        self.segmenttable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.segmenttable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.segmenttable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.segmenttable.setShowGrid(True)
-        self.segmenttable.verticalHeader().setSectionResizeMode(2)
+        self.segmenttable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #populate table
         for i in range(16):
@@ -3870,7 +3878,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             soakedit  = QLineEdit(stringfromseconds(self.aw.fujipid.PXG4[soakkey][0]))
             soakedit.setValidator(QRegularExpressionValidator(regextime,self))
             setButton = QPushButton(QApplication.translate("Button","Set",None))
-            setButton.setFocusPolicy(Qt.NoFocus)
+            setButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             setButton.clicked.connect(self.setsegment)
             #add widgets to the table
             self.segmenttable.setCellWidget(i,0,svedit)
@@ -3934,7 +3942,7 @@ class DTApidDlgControl(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        #self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose) # default is to set to True, which is already set in ArtisanDialog
         self.setWindowTitle(QApplication.translate("Form Caption","Delta DTA PID Control",None))
         self.status = QStatusBar()
         self.status.setSizeGripEnabled(False)

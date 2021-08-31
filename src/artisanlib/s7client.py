@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+#
+
 import snap7.client
 
 # patch S7 client

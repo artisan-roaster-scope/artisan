@@ -12,11 +12,13 @@ if [ ! -z $APPVEYOR ]; then
     export PYTHONBIN=$PYTHON/bin
     export PYTHONPATH=$PYTHON/lib/python3.9
     export PYTHON_V=3.9
+    export PYLUPDATE=$PYTHONBIN/pylupdate5
     
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt5 # from PyQt v5.15.4 this dir changed form PyQt5/Qt to PyQt5/Qt5
     export QT_SRC_PATH=${QT_PATH}
+    export PYUIC=pyuic5
+    export PYRCC=pyrcc5
     export MACOSX_DEPLOYMENT_TARGET=10.15
-    export ARTISAN_LEGACY_BUILD=false
 else
     # standard local builds
     echo "NOTICE: Standard build"
@@ -24,12 +26,14 @@ else
     export PYTHON=/Library/Frameworks/Python.framework/Versions/${PYTHON_V}
     export PYTHONBIN=$PYTHON/bin
     export PYTHONPATH=$PYTHON/lib/python${PYTHON_V}
+    export PYLUPDATE=$PYTHONBIN/pylupdate5
 
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt5 # from PyQt v5.15.4 this dir changed form PyQt5/Qt to PyQt5/Qt5
     export QT_SRC_PATH=~/Qt5.15.2/5.15.2/clang_64
+    export PYUIC=pyuic5
+    export PYRCC=pyrcc5
     export MACOSX_DEPLOYMENT_TARGET=10.15
     export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
-    export ARTISAN_LEGACY_BUILD=false
 fi
 
 export PATH=$PYTHON/bin:$PYTHON/lib:$PATH
@@ -45,7 +49,11 @@ if [ -z $APPVEYOR ]; then
     do
         fullfilename=$(basename $f)
         fn=${fullfilename%.*}
-        pyuic5 -o uic/${fn}.py --from-imports ui/${fn}.ui
+        if [ "$PYUIC" == "pyuic5" ]; then
+            $PYUIC -o uic/${fn}.py --from-imports ui/${fn}.ui
+        else
+            $PYUIC -o uic/${fn}.py -x ui/${fn}.ui
+        fi
     done
     
 #    # qrc
@@ -53,14 +61,13 @@ if [ -z $APPVEYOR ]; then
 #    do
 #        fullfilename=$(basename $f)
 #        fn=${fullfilename%.*}
-#        pyrcc5 -o uic/${fn}_rc.py qrc/${fn}.qrc
+#        $PYRCC -o uic/${fn}_rc.py qrc/${fn}.qrc
 #    done
 fi
 
 # translations
 echo "************* 1 **************"
-$PYTHONBIN/pylupdate5 artisan.pro
-#/Users/appveyor/venv3.8.6/bin/pylupdate5 artisan.pro
+$PYLUPDATE artisan.pro
 
 # there is no full Qt installation on Travis, thus don't run  lrelease
 if [ -z $APPVEYOR ]; then
@@ -78,4 +85,3 @@ rm -rf build dist
 sleep .3 # sometimes it takes a little for dist to get really empty
 echo "************* 3 **************"
 $PYTHON/bin/python$PYTHON_V setup-mac3.py py2app | egrep -v '^(creating|copying file|byte-compiling|locate)'
-#/Users/appveyor/venv3.8.6/bin/python$PYTHON_V setup-mac3.py py2app | egrep -v '^(creating|copying file|byte-compiling|locate)'
