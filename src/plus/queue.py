@@ -32,15 +32,18 @@ except Exception:
     from PyQt5.QtCore import QCoreApplication # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
+from artisanlib.util import getDirectory
 from plus import config, util, roast, connection, sync, controller
 from requests.exceptions import ConnectionError as RequestsConnectionError
-from typing import Any, Dict
+from typing import Any, Dict, Final
 import persistqueue
 import threading
 import time
+import logging
 
+_log: Final = logging.getLogger(__name__)
 
-queue_path = util.getDirectory(config.outbox_cache, share=True)
+queue_path = getDirectory(config.outbox_cache, share=True)
 
 app = QCoreApplication.instance()
 
@@ -80,7 +83,7 @@ class Concur(threading.Thread):
 
     def run(self):
         global queue  # pylint: disable=global-statement
-        config.logger.debug("queue:run()")
+        _log.debug("run()")
         time.sleep(config.queue_start_delay)
         self.resume()  # unpause self
         item = None
@@ -89,19 +92,19 @@ class Concur(threading.Thread):
             with self.state:
                 if self.paused:
                     self.state.wait()  # block until notified
-            config.logger.debug("queue: -> qsize: %s", queue.qsize())
-            config.logger.debug("queue: looking for next item to be fetched")
+            _log.debug("-> qsize: %s", queue.qsize())
+            _log.debug("looking for next item to be fetched")
             try:
                 if item is None:
                     item = queue.get()
                 time.sleep(config.queue_task_delay)
-                config.logger.debug(
-                    "queue: -> worker processing item: %s", item
+                _log.debug(
+                    "-> worker processing item: %s", item
                 )
                 iters = config.queue_retries + 1
                 while iters > 0:
-                    config.logger.debug(
-                        "queue: -> remaining iterations: %s", iters
+                    _log.debug(
+                        "-> remaining iterations: %s", iters
                     )
                     r = None
                     try:
@@ -138,8 +141,8 @@ class Concur(threading.Thread):
                     except RequestsConnectionError as e:
                         try:
                             if controller.is_connected():
-                                config.logger.debug(
-                                    ("queue: -> connection error,"
+                                _log.debug(
+                                    ("-> connection error,"
                                      " disconnecting: %s"),
                                     e,
                                 )
@@ -147,26 +150,26 @@ class Concur(threading.Thread):
                                 controller.disconnect(
                                     remove_credentials=False, stop_queue=True
                                 )
-                        except Exception:  # pylint: disable=broad-except
-                            pass
+                        except Exception as e:  # pylint: disable=broad-except
+                            _log.exception(e)
                         # we don't change the iter, but retry to connect after
                         # a delay in the next iteration
                         time.sleep(config.queue_retry_delay)
                     except Exception as e:  # pylint: disable=broad-except
-                        config.logger.debug("queue: -> task failed: %s", e)
+                        _log.debug("-> task failed: %s", e)
                         if r is not None:
-                            config.logger.debug(
-                                "queue: -> status code %s", r.status_code
+                            _log.debug(
+                                "-> status code %s", r.status_code
                             )
                         else:
-                            config.logger.debug("queue: -> no status code")
+                            _log.debug("-> no status code")
                         if (
                             r is not None and r.status_code == 401
                         ):  # authentication failed
                             try:
                                 if controller.is_connected():
-                                    config.logger.debug(
-                                        ("queue: -> connection error,"
+                                    _log.debug(
+                                        ("-> connection error,"
                                          " disconnecting: %s"),
                                         e,
                                     )
@@ -177,8 +180,8 @@ class Concur(threading.Thread):
                                         remove_credentials=False,
                                         stop_queue=False,
                                     )
-                            except Exception:  # pylint: disable=broad-except
-                                pass
+                            except Exception as e:  # pylint: disable=broad-except
+                                _log.exception(e)
                             iters = iters - 1
                             # we retry to connect after a delay in the next
                             # iteration
@@ -199,35 +202,35 @@ class Concur(threading.Thread):
                 # we call task_done to remove the item from the queue
                 queue.task_done()
                 item = None
-                config.logger.debug("queue: -> task done")
-                config.logger.debug(
-                    "queue: end of run:while paused=%s", self.paused
+                _log.debug("-> task done")
+                _log.debug(
+                    "end of run:while paused=%s", self.paused
                 )
             except Exception as e:  # pylint: disable=broad-except
-                pass
+                _log.exception(e)
 
     def resume(self):
-        config.logger.info("queue:resume()")
+        _log.info("resume()")
         with self.state:
             self.paused = False
             self.state.notify()  # unblock self if waiting
 
     def pause(self):
-        config.logger.info("queue:pause()")
+        _log.info("pause()")
         with self.state:
             self.paused = True  # make self block and wait
 
 
 def start():
     if app.artisanviewerMode:
-        config.logger.info(
-            "queue:start(): queue not started in ArtisanViewer mode"
+        _log.info(
+            "start(): queue not started in ArtisanViewer mode"
         )
     else:
         global queue  # pylint: disable=global-statement
         global worker_thread  # pylint: disable=global-statement
-        config.logger.info("queue:start()")
-        config.logger.debug("queue: -> qsize: %s", queue.qsize())
+        _log.info("start()")
+        _log.debug("-> qsize: %s", queue.qsize())
         if worker_thread is None:
             worker_thread = Concur()
             worker_thread.setDaemon(
@@ -241,7 +244,7 @@ def start():
 # the queue worker thread cannot really be stopped, but we can pause it
 def stop():
     if not app.artisanviewerMode:
-        config.logger.info("queue:stop()")
+        _log.info("stop()")
         if worker_thread is not None:
             worker_thread.pause()
 
@@ -288,10 +291,10 @@ def is_full_roast_record(r: Dict[str, Any]) -> bool:
 def addRoast(roast_record=None):
     global queue  # pylint: disable=global-statement
     try:
-        config.logger.info("queue:addRoast()")
+        _log.info("addRoast()")
         if config.app_window.plus_readonly:
-            config.logger.info(
-                ("queue: -> roast not queued as users"
+            _log.info(
+                ("-> roast not queued as users"
                  " account access is readonly")
             )
         else:
@@ -303,7 +306,7 @@ def addRoast(roast_record=None):
             # modified_at timestamp as float EPOCH with millisecond
             if "modified_at" not in r:
                 r["modified_at"] = util.epoch2ISO8601(time.time())
-            config.logger.debug("queue: -> roast: %s", r)
+            _log.debug("-> roast: %s", r)
             # check if all required data is available before queueing this up
             if (
                 "roast_id" in r
@@ -314,7 +317,7 @@ def addRoast(roast_record=None):
                 )
             ):  # amount can be 0 but has to be present
                 # put in upload queue
-                config.logger.debug("queue: -> put in queue")
+                _log.debug("-> put in queue")
                 config.app_window.sendmessage(
                     QApplication.translate(
                         "Plus",
@@ -331,18 +334,11 @@ def addRoast(roast_record=None):
                     # timeout=config.queue_put_timeout
                     # sql queue does not feature a timeout
                 )
-                config.logger.debug("queue: -> roast queued up")
-                config.logger.debug("queue: -> qsize: %s", queue.qsize())
+                _log.debug("-> roast queued up")
+                _log.debug("-> qsize: %s", queue.qsize())
             else:
-                config.logger.debug(
-                    "queue: -> roast not queued as mandatory info missing"
+                _log.debug(
+                    "-> roast not queued as mandatory info missing"
                 )
     except Exception as e:  # pylint: disable=broad-except
-        import sys
-
-        _, _, exc_tb = sys.exc_info()
-        config.logger.error(
-            "queue: Exception in addRoast() in line %s: %s",
-            exc_tb.tb_lineno,
-            e,
-        )
+        _log.exception(e)

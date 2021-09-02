@@ -36,62 +36,17 @@ except Exception:
 from artisanlib.util import decodeLocal
 from pathlib import Path
 from plus import config
-from typing import Optional
+from typing import Optional, Final
 import datetime
 import dateutil.parser
 import logging
 import os
 
 
-# we set the app name temporary to "Artisan" to have ArtisanViewer using
-# the same data location as Artisan
-app = QCoreApplication.instance()
-appName = app.applicationName()
-app.setApplicationName("Artisan")
-data_dir = QStandardPaths.standardLocations(
-    QStandardPaths.StandardLocation.AppLocalDataLocation
-)[0]
-app.setApplicationName(appName)
+_log: Final = logging.getLogger(__name__)
+
 
 # Files
-
-
-# we store data in the user- and app-specific local default data directory
-# for the platform
-# note that the path is based on the ApplicationName and OrganizationName
-# setting of the app
-# eg. /Users/<username>/Library/Application Support/Artisan-Scope/Artisan
-# on macOS
-def getDataDirectory():
-    try:
-        if not os.path.exists(data_dir):
-            os.makedirs(data_dir)
-        return data_dir
-    except Exception as e:  # pylint: disable=broad-except
-        config.logger.error("util: Exception in getDataDirectory() %s", e)
-        return None
-
-
-# if share is True, the same (cache) file is shared between the Artisan and
-# ArtisanViewer apps
-# and locks have to be used to avoid race conditions
-def getDirectory(
-    filename: str, ext: Optional[str] = None, share: bool = False
-):
-    fn = filename
-    if not share:
-        if app.artisanviewerMode:
-            fn = filename + "_viewer"
-    fp = Path(getDataDirectory(), fn)
-    if ext is not None:
-        fp = fp.with_suffix(ext)
-    try:
-        fp = (
-            fp.resolve()
-        )  # older pathlib raise an exception if a path does not exist
-    except Exception:  # pylint: disable=broad-except
-        pass
-    return str(fp)
 
 
 # returns the last modification date as EPOCH (float incl. milliseconds) of
@@ -101,7 +56,7 @@ def getModificationDate(path):
     try:
         return os.path.getmtime(Path(path))
     except Exception as e:  # pylint: disable=broad-except
-        config.logger.error("util: Exception in getModificationDate() %s", e)
+        _log.exception(e)
         return None
 
 
@@ -343,12 +298,16 @@ def add2dict(dict_source, key_source, dict_target, key_target):
 
 
 def getLanguage() -> str:
-    if (
-        config.app_window is not None
-        and config.app_window.plus_account is not None
-    ):
-        assert config.app_window.plus_language is str
-        return config.app_window.plus_language
+    try:
+        if (
+            config.app_window is not None
+            and config.app_window.plus_account is not None
+        ):
+            assert isinstance(config.app_window.plus_language, str)
+            return config.app_window.plus_language
+    except Exception: # pylint: disable=broad-except
+        # config.app_window might be still unbound
+        pass
     return "en"
 
 
@@ -393,117 +352,3 @@ def roastLink(plus_roast) -> str:
         + "/roasts;id="
         + str(plus_roast)
     )
-
-
-# Logging
-
-
-def debugLogON() -> None:
-    config.logger.info("util:debugLogON()")
-    config.logger.setLevel(logging.DEBUG)
-    config.handler.setLevel(logging.DEBUG)
-    config.app_window.sendmessage(
-        QApplication.translate("Plus", "artisan.plus debug logging ON.", None)
-    )  # @UndefinedVariable
-    try:
-        aw = config.app_window
-        aw.qmc.deviceLogDEBUG()
-    except Exception:  # pylint: disable=broad-except
-        pass
-
-
-def debugLogOFF() -> None:
-    config.logger.info("util:debugLogOFF()")
-    config.logger.setLevel(logging.INFO)
-    config.handler.setLevel(logging.INFO)
-    config.app_window.sendmessage(
-        QApplication.translate("Plus", "artisan.plus debug logging OFF.", None)
-    )  # @UndefinedVariable
-    try:
-        aw = config.app_window
-        aw.qmc.deviceLogINFO()
-    except Exception:  # pylint: disable=broad-except
-        pass
-
-
-def debugLogToggle() -> None:
-    if config.logger.isEnabledFor(logging.DEBUG):
-        debugLogOFF()
-    else:
-        debugLogON()
-
-
-def sendLog() -> None:
-    config.logger.info("util:sendLog()")
-    from email import encoders, generator
-    from email.mime.base import MIMEBase
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.text import MIMEText
-
-    message = MIMEMultipart()
-    if config.app_window.plus_email is not None:
-        message["From"] = config.app_window.plus_email
-    message["To"] = "{}@{}".format(
-        config.log_file_account, config.log_file_domain
-    )
-    message["Subject"] = "artisan.plus client log"
-    message["X-Unsent"] = "1"
-    # message["X-Uniform-Type-Identifier"] = "com.apple.mail-draft"
-    message.attach(
-        MIMEText(
-            (
-                "Please find attached the log files written by Artisan!"
-                "\nPlease forward this email to {}\n--\n"
-            ).format(message["To"]),
-            "plain",
-        )
-    )
-    try:
-        with open(config.log_file_path, "rb") as attachment:
-            # Add file as application/octet-stream
-            # Email client can usually download this automatically
-            # as attachment
-            part = MIMEBase("application", "octet-stream")
-            part.set_payload(attachment.read())
-        # Encode file in ASCII characters to send by email
-        encoders.encode_base64(part)
-        # Add header as key/value pair to attachment part
-        part.add_header(
-            "Content-Disposition",
-            "attachment; filename= {}{}".format(config.log_file, ".log"),
-        )
-        # Add attachment to message and convert message to string
-        message.attach(part)
-    except Exception:  # pylint: disable=broad-except
-        pass
-    try:
-        aw = config.app_window
-        with open(aw.qmc.device_log_file, "rb") as attachment:
-            # Add file as application/octet-stream
-            # Email client can usually download this automatically
-            # as attachment
-            part2 = MIMEBase("application", "octet-stream")
-            part2.set_payload(attachment.read())
-        # Encode file in ASCII characters to send by email
-        encoders.encode_base64(part2)
-        # Add header as key/value pair to attachment part
-        part2.add_header(
-            "Content-Disposition",
-            "attachment; filename= {}{}".format(
-                aw.qmc.device_log_file_name, ".log"
-            ),
-        )
-        # Add attachment to message and convert message to string
-        message.attach(part2)
-    except Exception:  # pylint: disable=broad-except
-        pass
-    # Save message to file tmp file
-    tmpfile = QDir(QDir.tempPath()).filePath("plus-log.eml")
-    try:
-        os.remove(tmpfile)
-    except OSError:
-        pass
-    with open(tmpfile, "w", encoding='utf-8') as outfile:
-        gen = generator.Generator(outfile)
-        gen.flatten(message)
-    QDesktopServices.openUrl(QUrl.fromLocalFile(tmpfile))

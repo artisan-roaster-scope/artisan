@@ -31,20 +31,24 @@ except Exception:
     from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
-from artisanlib.util import decodeLocal, encodeLocal
-from plus import config, connection, util, controller
+from artisanlib.util import decodeLocal, encodeLocal, getDirectory
+from plus import config, connection, controller
+from typing import Final
 import copy
 import json
-import sys
 import threading
 import time
+import logging
+
+
+_log: Final = logging.getLogger(__name__)
 
 
 stock_semaphore = QSemaphore(
     1
 )  # protects access to the stock_cache file and the stock dict
 
-stock_cache_path = util.getDirectory(config.stock_cache)
+stock_cache_path = getDirectory(config.stock_cache)
 
 stock = None  # holds the dict with the current stock data (coffees, blends,..)
 
@@ -65,7 +69,7 @@ def update() -> None:
 
 def update_blocking() -> None:
     global stock  # pylint: disable=global-statement
-    config.logger.debug("stock:update_blocking()")
+    _log.debug("update_blocking()")
     if stock is None:
         load()
     try:
@@ -86,25 +90,25 @@ def update_blocking() -> None:
         if res:
             save()
     else:
-        config.logger.debug("stock: -> stock valid")
+        _log.debug("-> stock valid")
 
 
 # requests stock data from server and fills the stock cache
 def fetch() -> bool:
     global stock  # pylint: disable=global-statement
-    config.logger.info("stock:fetch()")
+    _log.info("fetch()")
     try:
         # fetch from server
         d = connection.getData(config.stock_url)
-        config.logger.debug("stock: -> %s", d.status_code)
+        _log.debug("-> %s", d.status_code)
         j = d.json()
         if "success" in j and j["success"] and "result" in j and j["result"]:
             try:
                 stock_semaphore.acquire(1)
                 stock = j["result"]
                 stock["retrieved"] = time.time()
-                config.logger.debug("stock: -> retrieved")
-                config.logger.debug("stock = %s", stock)
+                _log.debug("-> retrieved")
+                _log.debug("stock = %s", stock)
             finally:
                 if stock_semaphore.available() < 1:
                     stock_semaphore.release(1)
@@ -112,16 +116,7 @@ def fetch() -> bool:
             return True
         return False
     except Exception as e:  # pylint: disable=broad-except
-        _, _, exc_tb = sys.exc_info()
-        config.logger.error(
-            "stock: -> failure line %s: %s",
-            getattr(exc_tb, 'tb_lineno', '?'),
-            e
-        )
-        #        import traceback
-        #        tr=traceback.format_exc()
-        #        aw = config.app_window
-        #        aw.qmc.adderror(str(tr))
+        _log.exception(e)
         controller.disconnect(remove_credentials=False, stop_queue=False)
         return False
 
@@ -133,14 +128,14 @@ def fetch() -> bool:
 # save stock data to local file cache
 def save() -> None:
     global stock  # pylint: disable=global-statement
-    config.logger.debug("stock:save()")
+    _log.debug("save()")
     try:
         stock_semaphore.acquire(1)
         if stock is not None:
             with open(stock_cache_path, "w", encoding="utf-8") as f:
                 json.dump(stock, f)
     except Exception as e:  # pylint: disable=broad-except
-        config.logger.error("stock: Exception in save() %s", e)
+        _log.exception(e)
     finally:
         if stock_semaphore.available() < 1:
             stock_semaphore.release(1)
@@ -149,15 +144,13 @@ def save() -> None:
 # load stock data from local file cache
 def load() -> None:
     global stock  # pylint: disable=global-statement
-    config.logger.info("stock:load()")
+    _log.info("load()")
     try:
         stock_semaphore.acquire(1)
         with open(stock_cache_path, encoding="utf-8") as f:
             stock = json.load(f)
     except Exception as e:  # pylint: disable=broad-except
-        config.logger.debug(
-            "stock: Exception in load() %s", e
-        )  # the stock_cache is created on first save()
+        _log.exception(e)
     finally:
         if stock_semaphore.available() < 1:
             stock_semaphore.release(1)
@@ -183,7 +176,8 @@ def blend2list(blend_dict):
                 ],
             ]
         return None
-    except Exception:  # pylint: disable=broad-except
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
         return None
 
 
@@ -198,7 +192,8 @@ def list2blend(blend_list):
             ]
             return d
         return None
-    except Exception:  # pylint: disable=broad-except
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
         return None
 
 
@@ -311,7 +306,7 @@ def getStoreId(store):
 # returns the list of stores defined in stock
 def getStores(acquire_lock=True):
     global stock  # pylint: disable=global-statement
-    config.logger.debug("stock:getStores()")
+    _log.debug("getStores()")
     try:
         if acquire_lock:
             stock_semaphore.acquire(1)
@@ -380,8 +375,8 @@ def coffee2beans(coffee):
         origin_str = c["origin"].strip()
         if len(origin_str) > 0 and origin_str != "null":
             origin = QApplication.translate("Countries", origin_str, None)
-    except Exception:  # pylint: disable=broad-except
-        pass
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
     if "label" in c:
         label = c["label"]
         if origin:
@@ -401,8 +396,8 @@ def coffee2beans(coffee):
             processing_str = processing_split[0]
         if len(processing_str) > 0 and processing_str != "null":
             processing = " {}".format(processing_str)
-    except Exception:  # pylint: disable=broad-except
-        pass
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
     grade = ""
     try:
         grade = " {}".format(c["grade"])
@@ -424,8 +419,8 @@ def coffee2beans(coffee):
                 varietals = " {}".format(", ".join(vs))
             else:
                 varietals = " ({})".format(", ".join(vs))
-    except Exception:  # pylint: disable=broad-except
-        pass
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
     bean = "{}{}{}".format(processing, grade, varietals)
     if bean:
         bean = "," + bean
@@ -451,14 +446,14 @@ def coffee2beans(coffee):
                 year = ", {:d}".format(picked)
             else:
                 year = ", {:d}/{:d}".format(picked, landed)
-    except Exception:  # pylint: disable=broad-except
-        pass
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
     return "{}{}{}{}".format(origin, label, bean, year)
 
 
 def getCoffees(weight_unit_idx, store=None):
     global stock  # pylint: disable=global-statement
-    config.logger.debug("stock:getCoffees(%s,%s)", weight_unit_idx, store)
+    _log.debug("getCoffees(%s,%s)", weight_unit_idx, store)
     try:
         stock_semaphore.acquire(1)
         if stock is not None and "coffees" in stock:
@@ -472,8 +467,8 @@ def getCoffees(weight_unit_idx, store=None):
                             origin = QApplication.translate(
                                 "Countries", origin_str, None
                             )
-                    except Exception:  # pylint: disable=broad-except
-                        pass
+                    except Exception as e:  # pylint: disable=broad-except
+                        _log.exception(e)
                     if origin != "":
                         try:
                             if "crop_date" in c:
@@ -484,8 +479,8 @@ def getCoffees(weight_unit_idx, store=None):
                                     and cy["picked"][0] is not None
                                 ):
                                     origin += " {:d}".format(cy["picked"][0])
-                        except Exception:  # pylint: disable=broad-except
-                            pass
+                        except Exception as e:  # pylint: disable=broad-except
+                            _log.exception(e)
                         origin += ", "
                     if "label" in c:
                         label = c["label"]
@@ -538,8 +533,8 @@ def getCoffees(weight_unit_idx, store=None):
                                                 + location
                                                 + ")"
                                             ] = [c, s]
-                except Exception:  # pylint: disable=broad-except
-                    pass
+                except Exception as e:  # pylint: disable=broad-except
+                    _log.exception(e)
             return sorted(res.items(), key=lambda x: x[0])
         return []
     finally:
@@ -552,7 +547,8 @@ def getCoffees(weight_unit_idx, store=None):
 def getCoffeePosition(coffeeId, coffees):
     try:
         return [getCoffeeId(c) for c in coffees].index(coffeeId)
-    except Exception:  # pylint: disable=broad-except
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
         return None
         # returns the position of coffee id in coffees or
         # None if store not in the stores
@@ -765,23 +761,23 @@ def getBlendBlendDict(blend, weight=None):
                 del res["moisture"]
             else:
                 res["moisture"] = config.app_window.float2float(sum(moistures))
-        except Exception:  # pylint: disable=broad-except
-            pass
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
         try:
             if None in densities:
                 del res["density"]
             else:
                 res["density"] = int(round(sum(densities)))
-        except Exception:  # pylint: disable=broad-except
-            pass
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
         try:
             del res["screen_min"]
-        except Exception:  # pylint: disable=broad-except
-            pass
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
         try:
             del res["screen_max"]
-        except Exception:  # pylint: disable=broad-except
-            pass
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
         try:
             if None not in screen_mins and None not in screen_maxs:
                 sizes = screen_mins + screen_maxs
@@ -791,8 +787,8 @@ def getBlendBlendDict(blend, weight=None):
                     res["screen_min"] = min_size
                     if max_size != min_size:
                         res["screen_max"] = max_size
-        except Exception:  # pylint: disable=broad-except
-            pass
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
     return res
 
 
@@ -863,8 +859,8 @@ def blend2beans(blend, weight_unit_idx, weightIn=0):
             else:
                 w = ""
             res.append("{}%{}  {}".format(int(round(i["ratio"] * 100)), w, c))
-    except Exception:  # pylint: disable=broad-except
-        pass
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
     return res
 
 
@@ -877,7 +873,7 @@ def blend2beans(blend, weight_unit_idx, weightIn=0):
 #       for blends with replacement coffees defined
 def getBlends(weight_unit_idx, store=None):
     global stock  # pylint: disable=global-statement
-    config.logger.debug("stock:getBlends(%s,%s)", weight_unit_idx, store)
+    _log.debug("getBlends(%s,%s)", weight_unit_idx, store)
     try:
         stock_semaphore.acquire(1)
         if stock is not None and "blends" in stock:
@@ -974,24 +970,24 @@ def getBlends(weight_unit_idx, store=None):
                                                 i["label"],
                                             )
                                             # pylint: disable=broad-except
-                                        except Exception:
-                                            pass
+                                        except Exception as e:
+                                            _log.exception(e)
                                     try:
                                         m = float(cd["moisture"])
                                         if m > 0:
                                             coffee_moisture[coffee] = m
                                             i["moisture"] = m
                                         # pylint: disable=broad-except
-                                    except Exception:
-                                        pass
+                                    except Exception as e:
+                                        _log.exception(e)
                                     try:
                                         d = int(cd["density"])
                                         if d > 0:
                                             coffee_density[coffee] = d
                                             i["density"] = d
                                         # pylint: disable=broad-except
-                                    except Exception:
-                                        pass
+                                    except Exception as e:
+                                        _log.exception(e)
                                     try:
                                         screen_size_min = int(
                                             cd["screen_size"]["min"]
@@ -1002,8 +998,8 @@ def getBlends(weight_unit_idx, store=None):
                                             ] = screen_size_min
                                             i["screen_min"] = screen_size_min
                                         # pylint: disable=broad-except
-                                    except Exception:
-                                        pass
+                                    except Exception as e:
+                                        _log.exception(e)
                                     try:
                                         screen_size_max = int(
                                             cd["screen_size"]["max"]
@@ -1014,8 +1010,8 @@ def getBlends(weight_unit_idx, store=None):
                                             ] = screen_size_max
                                             i["screen_max"] = screen_size_max
                                         # pylint: disable=broad-except
-                                    except Exception:
-                                        pass
+                                    except Exception as e:
+                                        _log.exception(e)
                             # add data for replacements if any
                             if "replace_coffee" in i:
                                 replaceCoffee = i["replace_coffee"]
@@ -1058,8 +1054,8 @@ def getBlends(weight_unit_idx, store=None):
                                                     replaceCoffee
                                                 ] = m
                                             # pylint: disable=broad-except
-                                        except Exception:
-                                            pass
+                                        except Exception as e:
+                                            _log.exception(e)
                                         try:
                                             d = int(cd["density"])
                                             if d > 0:
@@ -1067,8 +1063,8 @@ def getBlends(weight_unit_idx, store=None):
                                                     replaceCoffee
                                                 ] = d
                                             # pylint: disable=broad-except
-                                        except Exception:
-                                            pass
+                                        except Exception as e:
+                                            _log.exception(e)
                                         try:
                                             screen_size_min = int(
                                                 cd["screen_size"]["min"]
@@ -1078,8 +1074,8 @@ def getBlends(weight_unit_idx, store=None):
                                                     replaceCoffee
                                                 ] = screen_size_min
                                             # pylint: disable=broad-except
-                                        except Exception:
-                                            pass
+                                        except Exception as e:
+                                            _log.exception(e)
                                         try:
                                             screen_size_max = int(
                                                 cd["screen_size"]["max"]
@@ -1434,11 +1430,7 @@ def getBlends(weight_unit_idx, store=None):
             return sorted(res.items(), key=lambda x: x[0])
         return {}
     except Exception as e:  # pylint: disable=broad-except
-
-        _, _, exc_tb = sys.exc_info()
-        config.logger.error(
-            "stock getBlends(): -> failure line %s: %s", exc_tb.tb_lineno, e
-        )
+        _log.exception(e)
         return {}
     finally:
         if stock_semaphore.available() < 1:

@@ -52,10 +52,12 @@ except Exception:
     from PyQt5.QtCore import Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QKeySequence # @UnusedImport @Reimport  @UnresolvedImport
 
+import logging
 from artisanlib.dialogs import ArtisanDialog
 from plus import config
-from typing import Optional
+from typing import Optional, Final
 
+_log: Final = logging.getLogger(__name__)
 
 class Login(ArtisanDialog):
     def __init__(
@@ -113,10 +115,7 @@ class Login(ArtisanDialog):
         # add additional CMD-W shortcut to close this dialog
         cancelAction = QAction(self)
         cancelAction.triggered.connect(self.reject) # type: ignore
-        try:
-            cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
-        except Exception:  # pylint: disable=broad-except
-            pass
+        cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).addActions(
             [cancelAction]
         )
@@ -228,6 +227,7 @@ def plus_login(
     saved_password: Optional[str] = None,
     remember_credentials: bool = True
 ):
+    _log.debug("plus_login()")
     ld = Login(window, email, saved_password, remember_credentials)
     ld.setWindowTitle("plus")
     ld.setWindowFlags(Qt.WindowType.Sheet)   # type: ignore

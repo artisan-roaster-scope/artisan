@@ -86,6 +86,7 @@ cp includes/report-template.htm dist
 cp includes/roast-template.htm dist
 cp includes/ranking-template.htm dist
 cp includes/jquery-1.11.1.min.js dist
+cp includes/logging.yaml dist
 cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist

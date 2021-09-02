@@ -23,8 +23,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
-from logging.handlers import RotatingFileHandler
+#import logging
+#from logging.handlers import RotatingFileHandler
 from typing import Optional, Final
 
 
@@ -34,8 +34,6 @@ try:
 except Exception:
     #pylint: disable = E, W, R, C
     from PyQt5.QtWidgets import QMainWindow # @UnusedImport @Reimport  @UnresolvedImport
-
-from plus import util
 
 # Constants
 app_name: Final = "artisan.plus"
@@ -123,39 +121,6 @@ sync_cache: Final = "sync"
 # ArtisanViewer app, NOT protected by ab extra filelock
 outbox_cache: Final = "outbox"
 
-# the log_file logs communication and other important events
-log_file: Final = "artisan_plus"
-
-# logfile email destination
-log_file_domain: Final = "artisan.plus"
-log_file_account: Final = "logfile"
-
-# Logging
-
-log_file_path: Final = util.getDirectory(log_file, ".log")
-
-logger: Final = logging.getLogger("plus")
-# logger.setLevel(logging.NOTSET)
-logger.setLevel(logging.INFO)
-# logger.setLevel(logging.DEBUG)
-try:
-    handler = RotatingFileHandler(
-        log_file_path, maxBytes=200000, backupCount=1, encoding="utf-8"
-    )
-    handler.setLevel(logging.INFO)
-    #    handler.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-except Exception:  # pylint: disable=broad-except
-    # if permission on the logfile is denied, fail silently
-    pass
-
-# # Usage:
-# #   config.logger.info("something")
-# #   config.logger.debug('%s iteration, item=%s', i, item)
 
 # Runtime variables
 

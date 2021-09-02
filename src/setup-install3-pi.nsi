@@ -350,6 +350,7 @@ Section Uninstall
   Delete "$INSTDIR\jquery-1.11.1.min.js"
   Delete "$INSTDIR\qt.conf"
   Delete "$INSTDIR\vc_redist.x64.exe"
+  Delete "$INSTDIR\logging.yaml"
 
   SetShellVarContext all
   Delete "$SMPROGRAMS\Artisan\Uninstall.lnk"

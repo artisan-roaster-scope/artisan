@@ -89,10 +89,10 @@ class AcaiaBLE():
     # should be send every 3-5sec
     # this seems not to be essential for the acaia. The Pearl disconnects from time to time, the Lunar never!?
     def sendHeartbeat(self,write):
-        self.sendMessage(write,self.MSG_SYSTEM,b'\x02,\x00')
+        self.sendMessage(write,self.MSG_SYSTEM,b'\x02\x00')
 
     def sendStop(self,write):
-        self.sendMessage(write,self.MSG_SYSTEM,b'\x00,\x00')
+        self.sendMessage(write,self.MSG_SYSTEM,b'\x00\x00')
 
     def sendTare(self,write):
         self.sendMessage(write,self.MSG_TARE,b'\x00')

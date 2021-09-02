@@ -23,13 +23,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from plus import config, util
-from typing import Any, Optional, Dict, List, Tuple
+from typing import Any, Optional, Dict, List, Tuple, Final
 import hashlib
+import logging
 
+_log: Final = logging.getLogger(__name__)
 
 # given a profile dictionary extract key parameters to populate a Roast element
 def getTemplate(bp: Dict[str, Any]) -> Dict[str, Any]:
-    config.logger.debug("roast:getTemplate()")
+    _log.debug("getTemplate()")
     d: Dict[str, Any] = {}
     try:
         aw = config.app_window
@@ -46,21 +48,18 @@ def getTemplate(bp: Dict[str, Any]) -> Dict[str, Any]:
                     bp, "roastbatchpos", d, "batch_pos", 0, 255, 0
                 )
         except Exception as e:  # pylint: disable=broad-except
-            config.logger.info("roast: Exception in getTemplate() %s", e)
+            _log.exception(e)
 
         try:
             if "roastepoch" in bp:
                 d["date"] = util.epoch2ISO8601(bp["roastepoch"])
-                try:
-                    gmt_offset = util.limitnum(
-                        -60000, 60000, util.getGMToffset()
-                    )
-                    if gmt_offset is not None:
-                        d["GMT_offset"] = gmt_offset
-                except Exception:  # pylint: disable=broad-except
-                    pass
+                gmt_offset = util.limitnum(
+                    -60000, 60000, util.getGMToffset()
+                )
+                if gmt_offset is not None:
+                    d["GMT_offset"] = gmt_offset
         except Exception as e:  # pylint: disable=broad-except
-            config.logger.info("roast: Exception in getTemplate() %s", e)
+            _log.exception(e)
 
         if "weight" in bp:
             try:
@@ -77,8 +76,8 @@ def getTemplate(bp: Dict[str, Any]) -> Dict[str, Any]:
                     d["start_weight"] = util.float2floatMin(w, 3)  # in kg
                 else:
                     d["start_weight"] = 0
-            except Exception:  # pylint: disable=broad-except
-                pass
+            except Exception as e:  # pylint: disable=broad-except
+                _log.exception(e)
             try:
                 w = util.limitnum(
                     0,
@@ -93,8 +92,8 @@ def getTemplate(bp: Dict[str, Any]) -> Dict[str, Any]:
                     d["end_weight"] = util.float2floatMin(w, 3)  # in kg
                 else:
                     d["end_weight"] = 0
-            except Exception:  # pylint: disable=broad-except
-                pass
+            except Exception as e:  # pylint: disable=broad-except
+                _log.exception(e)
 
         if "density_roasted" in bp:
             if bp["density_roasted"][0]:
@@ -102,24 +101,24 @@ def getTemplate(bp: Dict[str, Any]) -> Dict[str, Any]:
                     n = util.limitnum(0, 1000, bp["density_roasted"][0])
                     if n is not None:
                         d["density_roasted"] = util.float2floatMin(n, 1)
-                except Exception:  # pylint: disable=broad-except
-                    pass
+                except Exception as e:  # pylint: disable=broad-except
+                    _log.exception(e)
 
         util.add2dict(bp, config.uuid_tag, d, "id")
 
         try:
             util.addNum2dict(bp, "moisture_roasted", d, "moisture", 0, 100, 1)
         except Exception as e:  # pylint: disable=broad-except
-            config.logger.info("roast: Exception in getTemplate() %s", e)
+            _log.exception(e)
         try:
             util.addString2dict(bp, "title", d, "label", 255)
         except Exception as e:  # pylint: disable=broad-except
-            config.logger.info("roast: Exception in getTemplate() %s", e)
+            _log.exception(e)
         try:
             util.addString2dict(bp, "roastertype", d, "machine", 50)
             util.addString2dict(bp, "machinesetup", d, "setup", 50)
         except Exception as e:  # pylint: disable=broad-except
-            config.logger.info("roast: Exception in getTemplate() %s", e)
+            _log.exception(e)
 
         try:
             if (
@@ -131,7 +130,7 @@ def getTemplate(bp: Dict[str, Any]) -> Dict[str, Any]:
                     bp, "roastersize", d, "roastersize", 0, 999, 1
                 )
         except Exception as e:  # pylint: disable=broad-except
-            config.logger.info("roast: Exception in getTemplate() %s", e)
+            _log.exception(e)
         try:
             if (
                 "roasterheating" in bp
@@ -142,7 +141,7 @@ def getTemplate(bp: Dict[str, Any]) -> Dict[str, Any]:
                     bp, "roasterheating", d, "roasterheating", 0, 999, 0
                 )
         except Exception as e:  # pylint: disable=broad-except
-            config.logger.info("roast: Exception in getTemplate() %s", e)
+            _log.exception(e)
 
         try:
             util.addNum2dict(bp, "whole_color", d, "whole_color", 0, 255, 0)
@@ -150,69 +149,59 @@ def getTemplate(bp: Dict[str, Any]) -> Dict[str, Any]:
             if "whole_color" in d or "ground_color" in d:
                 util.addString2dict(bp, "color_system", d, "color_system", 25)
         except Exception as e:  # pylint: disable=broad-except
-            config.logger.info("roast: Exception in getTemplate() %s", e)
+            _log.exception(e)
 
-        try:
-            if "computed" in bp:
-                cp = bp["computed"]
+        if "computed" in bp:
+            cp = bp["computed"]
 
-                util.addAllTemp2dict(
-                    cp,
-                    d,
-                    [
-                        ("CHARGE_ET", "charge_temp_ET"),
-                        ("CHARGE_BT", "charge_temp"),
-                        ("TP_BT", "TP_temp"),
-                        ("DRY_BT", "DRY_temp"),
-                        ("FCs_BT", "FCs_temp"),
-                        ("FCe_BT", "FCe_temp"),
-                        ("DROP_BT", "drop_temp"),
-                        ("DROP_ET", "drop_temp_ET"),
-                    ],
-                )
-                util.addAllTime2dict(
-                    cp,
-                    d,
-                    [
-                        "TP_time",
-                        "DRY_time",
-                        "FCs_time",
-                        "FCe_time",
-                        ("DROP_time", "drop_time"),
-                    ],
-                )
+            util.addAllTemp2dict(
+                cp,
+                d,
+                [
+                    ("CHARGE_ET", "charge_temp_ET"),
+                    ("CHARGE_BT", "charge_temp"),
+                    ("TP_BT", "TP_temp"),
+                    ("DRY_BT", "DRY_temp"),
+                    ("FCs_BT", "FCs_temp"),
+                    ("FCe_BT", "FCe_temp"),
+                    ("DROP_BT", "drop_temp"),
+                    ("DROP_ET", "drop_temp_ET"),
+                ],
+            )
+            util.addAllTime2dict(
+                cp,
+                d,
+                [
+                    "TP_time",
+                    "DRY_time",
+                    "FCs_time",
+                    "FCe_time",
+                    ("DROP_time", "drop_time"),
+                ],
+            )
 
-                if "fcs_ror" in cp:
-                    util.addRoRTemp2dict(cp, "fcs_ror", d, "FCs_RoR")
+            if "fcs_ror" in cp:
+                util.addRoRTemp2dict(cp, "fcs_ror", d, "FCs_RoR")
 
-                if "finishphasetime" in cp:
-                    util.addTime2dict(cp, "finishphasetime", d, "DEV_time")
-                    if "totaltime" in cp:
-                        v = util.limitnum(
-                            0,
-                            100,
-                            util.float2floatMin(
-                                cp["finishphasetime"] / cp["totaltime"] * 100,
-                                1,
-                            ),
-                        )
-                        if v is not None:
-                            d["DEV_ratio"] = v
+            if "finishphasetime" in cp:
+                util.addTime2dict(cp, "finishphasetime", d, "DEV_time")
+                if "totaltime" in cp:
+                    v = util.limitnum(
+                        0,
+                        100,
+                        util.float2floatMin(
+                            cp["finishphasetime"] / cp["totaltime"] * 100,
+                            1,
+                        ),
+                    )
+                    if v is not None:
+                        d["DEV_ratio"] = v
 
-                util.addNum2dict(cp, "AUC", d, "AUC", 0, 10000, 0)
-                util.addTemp2dict(cp, "AUCbase", d, "AUC_base")
-        except Exception as e:  # pylint: disable=broad-except
-            config.logger.info("roast: Exception in getTemplate() %s", e)
+            util.addNum2dict(cp, "AUC", d, "AUC", 0, 10000, 0)
+            util.addTemp2dict(cp, "AUCbase", d, "AUC_base")
 
     except Exception as e:  # pylint: disable=broad-except
-        import sys
-
-        _, _, exc_tb = sys.exc_info()
-        config.logger.error(
-            "roast: Exception in getTemplate() line %s: %s",
-            getattr(exc_tb, 'tb_lineno', '?'),
-            e,
-        )
+        _log.exception(e)
     return d
 
 
@@ -236,14 +225,15 @@ def trimBlendSpec(blend_spec):
         if res != {}:
             return res
         return None
-    except Exception:  # pylint: disable=broad-except
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
         return None
 
 
 def getRoast() -> Dict[str, Any]:
     d = {}
     try:
-        config.logger.debug("roast:getRoast()")
+        _log.debug("getRoast()")
         aw = config.app_window
         p = aw.getProfile()
 
@@ -313,7 +303,7 @@ def getRoast() -> Dict[str, Any]:
                     # the Artisan internal g)
                 )
         except Exception as e:  # pylint: disable=broad-except
-            config.logger.info("roast: Exception in getRoast() %s", e)
+            _log.exception(e)
 
         if aw.qmc.plus_store:
             d["location"] = aw.qmc.plus_store
@@ -351,12 +341,12 @@ def getRoast() -> Dict[str, Any]:
             )
             util.addNum2dict(p, "ambient_humidity", d, "humidity", 0, 100, 1)
         except Exception as e:  # pylint: disable=broad-except
-            config.logger.info("roast: Exception in getRoast() %s", e)
+            _log.exception(e)
 
         try:
             util.addString2dict(p, "roastingnotes", d, "notes", 1023)
         except Exception as e:  # pylint: disable=broad-except
-            config.logger.info("roast: Exception in getRoast() %s", e)
+            _log.exception(e)
 
         if aw.qmc.backgroundprofile:
             bp = aw.qmc.backgroundprofile
@@ -372,14 +362,7 @@ def getRoast() -> Dict[str, Any]:
             )
 
     except Exception as e:  # pylint: disable=broad-except
-        import sys
-
-        _, _, exc_tb = sys.exc_info()
-        config.logger.error(
-            "roast: Exception in getRoast() line %s: %s",
-            getattr(exc_tb, 'tb_lineno', '?'),
-            e
-        )
+        _log.exception(e)
         return {}
     return d
 
@@ -453,7 +436,7 @@ sync_record_attributes: List[str] = (
 # by roast.getRoast()
 def getSyncRecord(r: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], str]:
     try:
-        config.logger.info("roast:getSyncRecord()")
+        _log.info("getSyncRecord()")
         m = hashlib.sha256()
         d: Dict[str, Any] = {}
         if r is None:
@@ -464,13 +447,6 @@ def getSyncRecord(r: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], s
                 d[a] = r[a]
                 m.update(str(r[a]).encode("utf-8"))
     except Exception as e:  # pylint: disable=broad-except
-        import sys
-
-        _, _, exc_tb = sys.exc_info()
-        config.logger.error(
-            "roast: Exception in getSyncRecord() in line %s: %s",
-            getattr(exc_tb, 'tb_lineno', '?'),
-            e,
-        )
-    config.logger.debug("roast:getSyncRecord d -> %s", d)
+        _log.exception(e)
+    _log.debug("getSyncRecord d -> %s", d)
     return d, m.hexdigest()

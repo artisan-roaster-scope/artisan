@@ -165,6 +165,7 @@ DATA_FILES = [
     ("../Resources", [r"includes/Machines"]),
     ("../Resources", [r"includes/Themes"]),
     ("../Resources", [r"includes/Icons"]),
+    ("../Resources", [r"includes/logging.yaml"]),
   ]
 
 with open('Info.plist', 'r+b') as fp:

@@ -32,13 +32,17 @@ except Exception:
     from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
 
 from pathlib import Path
-from plus import config, util
+from artisanlib.util import getDirectory
+from plus import config
+
 import dbm
 import os
 import portalocker
 import shelve
-import sys
-from typing import Optional
+import logging
+from typing import Optional, Final
+
+_log: Final = logging.getLogger(__name__)
 
 
 ####
@@ -49,14 +53,14 @@ account_cache_semaphore = QSemaphore(1)
 
 # shared resource between the Artisan and ArtisanViewer app protected
 # by a file lock
-account_cache_path = util.getDirectory(config.account_cache, share=True)
-account_cache_lock_path = util.getDirectory(
+account_cache_path = getDirectory(config.account_cache, share=True)
+account_cache_lock_path = getDirectory(
     config.account_cache + "_lock", share=True
 )
 
 
 def setAccountShelve(account_id: str, fh) -> Optional[int]:
-    config.logger.debug("account: setAccountShelve(%s,_fh_)", account_id)
+    _log.debug("setAccountShelve(%s,_fh_)", account_id)
     try:
         with shelve.open(account_cache_path) as db:
             if account_id in db:
@@ -64,27 +68,18 @@ def setAccountShelve(account_id: str, fh) -> Optional[int]:
             new_nr = len(db)
             db[account_id] = new_nr
             return new_nr
-        config.logger.debug(
-            "account: DB type: %s", str(dbm.whichdb(account_cache_path))
+        _log.debug(
+            "DB type: %s", str(dbm.whichdb(account_cache_path))
         )
     except Exception as e:  # pylint: disable=broad-except
-        _, _, exc_tb = sys.exc_info()
-        config.logger.error(
-            (
-                "account: Exception in setAccountShelve(%s)"
-                "line (1): %s shelve.open %s"
-            ),
-            account_id,
-            getattr(exc_tb, 'tb_lineno', '?'),
-            e,
-        )
+        _log.exception(e)
         try:
             # in case we couldn't open the shelve file as "shelve.open db type
             # could not be determined" remove all files name account_cache
             # path with any extension as we do not know which extension is
             # chosen by shelve
-            config.logger.info(
-                "account: clean account cache %s", str(account_cache_path)
+            _log.info(
+                "clean account cache %s", str(account_cache_path)
             )
             # note that this deletes all "account" files including those for
             # the Viewer and other files of that name prefix like
@@ -102,18 +97,12 @@ def setAccountShelve(account_id: str, fh) -> Optional[int]:
                 new_nr = len(db)
                 db[account_id] = new_nr
                 return new_nr
-            config.logger.info(
-                "account: Generated db type: %s",
+            _log.info(
+                "Generated db type: %s",
                 str(dbm.whichdb(account_cache_path)),
             )
         except Exception as e:  # pylint: disable=broad-except
-            config.logger.error(
-                ("account: Exception in setAccountShelve(%s) line (2):"
-                 " %s shelve.open %s"),
-                account_id,
-                getattr(exc_tb, 'tb_lineno', '?'),
-                e,
-            )
+            _log.exception(e)
             return None
     finally:
         fh.flush()
@@ -125,55 +114,24 @@ def setAccountShelve(account_id: str, fh) -> Optional[int]:
 def setAccount(account_id: str) -> Optional[int]:
     try:
         account_cache_semaphore.acquire(1)
-        config.logger.debug("account:setAccount(%s)", account_id)
+        _log.debug("setAccount(%s)", account_id)
         with portalocker.Lock(account_cache_lock_path, timeout=0.5) as fh:
             return setAccountShelve(account_id, fh)
     except portalocker.exceptions.LockException as e:
-        _, _, exc_tb = sys.exc_info()
-        config.logger.info(
-            "account: LockException in setAccount(%s) line: %s %s",
-            account_id,
-            getattr(exc_tb, 'tb_lineno', '?'),
-            e,
-        )
+        _log.exception(e)
         # we couldn't fetch this lock. It seems to be blocked forever
         # we remove the lock file and retry with a shorter timeout
-        try:
-            config.logger.info(
-                "account: clean lock %s", str(account_cache_lock_path)
-            )
-            Path(account_cache_lock_path).unlink()
-            config.logger.debug(
-                "retry account:setAccount(%s)", account_id
-            )
-            with portalocker.Lock(account_cache_lock_path, timeout=0.3) as fh:
-                return setAccountShelve(account_id, fh)
-        except portalocker.exceptions.LockException as e:
-            _, _, exc_tb = sys.exc_info()
-            config.logger.error(
-                "account: LockException in setAccount(%s) line: %s %s",
-                account_id,
-                getattr(exc_tb, 'tb_lineno', '?'),
-                e,
-            )
-            return None
-        except Exception as e:  # pylint: disable=broad-except
-            _, _, exc_tb = sys.exc_info()
-            config.logger.error(
-                "account: Exception in setAccount(%s) line: %s %s",
-                account_id,
-                getattr(exc_tb, 'tb_lineno', '?'),
-                e,
-            )
-            return None
-    except Exception as e:  # pylint: disable=broad-except
-        _, _, exc_tb = sys.exc_info()
-        config.logger.error(
-            "account: Exception in setAccount(%s) line %s: %s",
-            account_id,
-            getattr(exc_tb, 'tb_lineno', '?'),
-            e,
+        _log.info(
+            "clean lock %s", str(account_cache_lock_path)
         )
+        Path(account_cache_lock_path).unlink()
+        _log.debug(
+            "retry setAccount(%s)", account_id
+        )
+        with portalocker.Lock(account_cache_lock_path, timeout=0.3) as fh:
+            return setAccountShelve(account_id, fh)
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
         return None
     finally:
         if account_cache_semaphore.available() < 1:

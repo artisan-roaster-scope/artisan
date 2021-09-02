@@ -143,6 +143,7 @@ for fn in [
     r'includes\roast-template.htm',
     r'includes\ranking-template.htm',
     r'includes\jquery-1.11.1.min.js',
+    r'includes\logging.yaml',
     ]:
   os.system('copy ' + fn + ' ' + TARGET)
 

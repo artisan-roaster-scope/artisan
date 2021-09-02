@@ -54,11 +54,17 @@ import zipfile
 import tempfile
 import traceback
 import signal
+import logging.config
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 from urllib import parse
 from json import load as json_load
-
+from yaml import safe_load as yaml_load
+from typing import Final
 from unidecode import unidecode
+from email import encoders, generator
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 ## MONKEY PATCH BEGIN: importlib.metadata fix for macOS builds with py2app that fails to set proper metadata for prettytable >0.7.2 and thus fail
 ## on import with importlib.metadata.PackageNotFoundError: prettytable on __version__ = importlib_metadata.version(__name__)
@@ -192,30 +198,16 @@ except Exception: # pylint: disable=broad-except
     pass
 
 
-#---------------------------------------------------------------------------#
-# configure the service logging and use _logger.debug("..") statements
-#---------------------------------------------------------------------------#
-#import logging
-#import logging.handlers as Handlers
-#logging.basicConfig()
-#myFormatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-#log = logging.getLogger()
-#log.setLevel(logging.DEBUG)
-#filehandler = Handlers.RotatingFileHandler(os.getenv("HOME") + "/Desktop/artisan-logfile", maxBytes=1024*1024)
-#filehandler.setFormatter(myFormatter)
-#log.addHandler(filehandler)
-#_logger = logging.getLogger(__name__)
-#---------------------------------------------------------------------------#
-
-
-
 import unicodedata # @UnresolvedImport
 
 import artisanlib.arabic_reshaper
 from artisanlib.util import (appFrozen, stringp, uchr, decodeLocal, encodeLocal, s2a, fill_gaps, 
         deltaLabelPrefix, deltaLabelUTF8, deltaLabelBigPrefix, deltaLabelMathPrefix, stringfromseconds, stringtoseconds,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
-        toBool, toStringList, toMap, removeAll)
+        toBool, toStringList, toMap, removeAll, application_name, application_viewer_name, application_organization_name,
+        application_organization_domain, getDataDirectory, getAppPath, getResourcePath, getDirectory, debugLogLevelToggle,
+        debugLogLevelActive, setDebugLogLevel)
+
 from artisanlib.qtsingleapplication import QtSingleApplication
 
 
@@ -451,18 +443,19 @@ if sys.platform.startswith("linux"):
 #        pass
 app = Artisan(app_args)
 
+
 # On the first run if there are legacy settings under "YourQuest" but no new settings under "artisan-scope" then the legacy settings
 # will be copied to the new settings location. Once settings exist under "artisan-scope" the legacy settings under "YourQuest" will
 # no longer be read or saved.  At start-up, versions of Artisan before to v2.0 will no longer share settings with versions v2.0 and after.
 # Settings can be shared among all versions of Artisan by explicitly saving and loading them using Help>Save/Load Settings.
 try:
-    app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
+    app.setApplicationName(application_name)                                #needed by QSettings() to store windows geometry in operating system
 
     app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
     app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
     legacysettings = QSettings()
-    app.setOrganizationName("artisan-scope")                                #needed by QSettings() to store windows geometry in operating system
-    app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system
+    app.setOrganizationName(application_organization_name)                  #needed by QSettings() to store windows geometry in operating system
+    app.setOrganizationDomain(application_organization_domain)              #needed by QSettings() to store windows geometry in operating system
     newsettings = QSettings()
 
     settingsRelocated = False
@@ -475,13 +468,13 @@ try:
         legacysettings.setValue("_settingsCopied", 1)  # prevents copying again in the future, this key not cleared by a Factory Reset
 
         # copy ArtisanViewer settings
-        app.setApplicationName("ArtisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
+        app.setApplicationName(application_viewer_name)                         #needed by QSettings() to store windows geometry in operating system
 
         app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
         app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
         legacysettings = QSettings()
-        app.setOrganizationName("artisan-scope")                                #needed by QSettings() to store windows geometry in operating system
-        app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system
+        app.setOrganizationName(application_organization_name)                  #needed by QSettings() to store windows geometry in operating system
+        app.setOrganizationDomain(application_organization_domain)              #needed by QSettings() to store windows geometry in operating system
         newsettings = QSettings()
         for key in legacysettings.allKeys():
             newsettings.setValue(key,legacysettings.value(key))
@@ -490,9 +483,32 @@ try:
 except Exception: # pylint: disable=broad-except
     pass
 
-app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
-app.setOrganizationName("artisan-scope")                                #needed by QSettings() to store windows geometry in operating system
-app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system
+app.setApplicationName(application_name)                                #needed by QSettings() to store windows geometry in operating system
+app.setOrganizationName(application_organization_name)                  #needed by QSettings() to store windows geometry in operating system
+app.setOrganizationDomain(application_organization_domain)              #needed by QSettings() to store windows geometry in operating system
+
+
+# configure logging
+try:
+    with io.open(os.path.join(getResourcePath(),"logging.yaml"), 'r', encoding='utf-8') as logging_conf:
+        conf = yaml_load(logging_conf)
+        try:
+            # set log file to Artisan data directory
+            conf["handlers"]["file"]["filename"] = os.path.join(getDataDirectory(),"artisan.log")
+        except Exception:
+            pass
+        logging.config.dictConfig(conf)
+except Exception:
+    pass
+
+_log: Final = logging.getLogger(__name__)
+_log.info(
+    "Artisan v%s (%s, %s)",
+    str(__version__),
+    str(__revision__),
+    str(__build__),
+)
+
 
 if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
@@ -858,7 +874,7 @@ class tgraphcanvas(FigureCanvas):
         
         self.device_logging = False # turn on/off device logging
         self.device_log_file_name = "artisan_device"
-        self.device_log_file = plus.util.getDirectory(self.device_log_file_name,".log")
+        self.device_log_file = getDirectory(self.device_log_file_name,".log")
 
         # Phidget variables
 
@@ -1457,11 +1473,7 @@ class tgraphcanvas(FigureCanvas):
         self.flavorbackgroundflag = False
         #background by value
         self.E1backgroundtimex,self.E2backgroundtimex,self.E3backgroundtimex,self.E4backgroundtimex = [],[],[],[]
-        self.E1backgroundvalues,self.E2backgroundvalues,self.E3backgroundvalues,self.E4backgroundvalues = [],[],[],[]
-#        self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color="grey")
-#        self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color="darkgrey")
-#        self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color="slategrey")
-#        self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color="slateblue")       
+        self.E1backgroundvalues,self.E2backgroundvalues,self.E3backgroundvalues,self.E4backgroundvalues = [],[],[],[]      
         self.l_backgroundeventtype1dots = None
         self.l_backgroundeventtype2dots = None
         self.l_backgroundeventtype3dots = None
@@ -1570,9 +1582,6 @@ class tgraphcanvas(FigureCanvas):
         self.deltaBTsamples = 6 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
         self.profile_sampling_interval = None # will be updated on loading a profile
         self.background_profile_sampling_interval = None # will be updated on loading a profile into the background
-
-#        self.altsmoothing = False # toggle between standard and alternative smoothing approach
-#        self.smoothingwindowsize = 3 # window size of the alternative smoothing approach
 
         self.optimalSmoothing = False
         self.polyfitRoRcalc = True
@@ -1852,8 +1861,6 @@ class tgraphcanvas(FigureCanvas):
         self.quantifiedEvent = [] # holds an event quantified during sample(), a tuple [<eventnr>,<value>,<recordEvent>]
 
         self.loadaxisfromprofile = False # if set, axis are loaded from profile
-        
-#        self.energytablecolumnwidths = []
 
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
         self.startofx_default = -30
@@ -3719,7 +3726,6 @@ class tgraphcanvas(FigureCanvas):
         if self.HUDflag:
             self.HUDflag = False
             aw.HUD.clear()
-#            aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
             aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_OFF"])
             aw.stack.setCurrentIndex(0)
             self.resetlines()
@@ -3732,7 +3738,6 @@ class tgraphcanvas(FigureCanvas):
             img = self.grab()
             aw.HUD.setPixmap(img)
             self.HUDflag = True
-#            aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
             aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_ON"])
             aw.stack.setCurrentIndex(1)
             aw.sendmessage(QApplication.translate("Message","HUD ON", None))
@@ -3858,7 +3863,6 @@ class tgraphcanvas(FigureCanvas):
     @staticmethod
     def resetlinecountcaches():
         aw.qmc.linecount = None
-        aw.qmc.deltalinecount = None
 
     # NOTE: delta lines are now drawn on the main ax
     def resetlines(self):
@@ -3866,12 +3870,12 @@ class tgraphcanvas(FigureCanvas):
             #note: delta curves are now in self.delta_ax and have been removed from the count of resetlines()
             if self.linecount is None:
                 self.linecount = self.lenaxlines()
-            # remove lines beyond the max limit of (self.linecount+self.deltalinecount)
+            # remove lines beyond the max limit of self.linecount)
             if isinstance(self.ax.lines,list): # MPL < v3.5
-                self.ax.lines = self.ax.lines[0:(self.linecount+self.deltalinecount)]
+                self.ax.lines = self.ax.lines[0:self.linecount]
             else:
                 for i in range(len(self.ax.lines)-1,-1,-1):
-                    if i >= (self.linecount+self.deltalinecount):
+                    if i >= self.linecount:
                         self.ax.lines[i].remove()
                     else:
                         break
@@ -4281,9 +4285,6 @@ class tgraphcanvas(FigureCanvas):
                     xcoords = None
                     if self.l_BTprojection is not None:
                         if aw.qmc.BTcurve and len(aw.qmc.delta2) > 0 and aw.qmc.delta2[-1] is not None and len(self.ctemp2) > 0:
-#                            BTprojection = self.ctemp2[-1] + aw.qmc.delta2[-1]*(self.endofx+starttime - self.timex[-1])/60.
-#                            #plot projections
-#                            self.l_BTprojection.set_data([self.timex[-1],self.endofx+starttime], [self.ctemp2[-1], BTprojection])
                             # projection extended to the plots current endofx
                             left = self.timex[-1]
                             _,right = aw.qmc.ax.get_xlim()
@@ -4296,8 +4297,6 @@ class tgraphcanvas(FigureCanvas):
                             self.l_BTprojection.set_data([],[])
                     if self.l_ETprojection is not None:
                         if aw.qmc.ETcurve and len(aw.qmc.delta1) > 0 and aw.qmc.delta1[-1] is not None and len(self.ctemp1) > 0:
-#                            ETprojection = self.ctemp1[-1] + aw.qmc.delta1[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
-#                            self.l_ETprojection.set_data([self.timex[-1],self.endofx+starttime], [self.ctemp1[-1], ETprojection])
                             if xcoords is None:
                                 # projection extended to the plots current endofx
                                 left = self.timex[-1]
@@ -5835,14 +5834,12 @@ class tgraphcanvas(FigureCanvas):
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,y,y,d)
                     if startB is not None:
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
-#                        e = 60
                         e = 0
                         a = aw.qmc.backgroundalpha
                     else:
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
                         if aw.qmc.graphfont == 1:
                             st1 = self.__to_ascii(st1)
-#                        e = 15
                         e = 0
                         a = 1.
                     time_temp_annos = self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a,draggable,0)
@@ -5853,7 +5850,6 @@ class tgraphcanvas(FigureCanvas):
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}", None),stringfromseconds(timex[TP_index]-t0,False))
                     a = 1.
-#                    e = -50
                     e = 0
                     anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1)
                 elif TP_time > -1:
@@ -5862,7 +5858,6 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-#                    e = -70
                     e = 0
                     TP_index = self.backgroundtime2index(TP_time) + timeindex[0]
 
@@ -5892,10 +5887,6 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-#                    if timeindex2 and timeindex2[2] and timex[timeindex[2]] > time2[timeindex2[2]]:
-#                        e = 0
-#                    else:
-#                        e = -80
                     e = 0
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,2)
                 #Add 1Ce markers
@@ -5907,10 +5898,6 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-#                    if timeindex2 and timeindex2[3] and timex[timeindex[3]] < time2[timeindex2[3]]:
-#                        e = 0
-#                    else:
-#                        e = -80
                     e = 0
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,3)
                     #add a water mark if FCs
@@ -5928,10 +5915,6 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-#                    if timeindex2 and timeindex2[4] and timex[timeindex[4]] < time2[timeindex2[4]]:
-#                        e = -80
-#                    else:
-#                        e = 0
                     e = 0
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,4)
                 #Add 2Ce markers
@@ -5943,10 +5926,6 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-#                    if timeindex2 and timeindex2[5] and timex[timeindex[5]] < time2[timeindex2[5]]:
-#                        e = -80
-#                    else:
-#                        e = 0
                     e = 0
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,5)
                     #do water mark if SCs
@@ -5975,10 +5954,6 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-#                    if timeindex2 and timeindex2[6] and timex[timeindex[6]] < time2[timeindex2[6]]:
-#                        e = -80
-#                    else:
-#                        e = 0
                     e = 0
 
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,6)
@@ -6311,8 +6286,6 @@ class tgraphcanvas(FigureCanvas):
             pass
 
         self.background_title_width = 0
-##        fontprop_small = aw.mpl_fontproperties.copy()
-##        fontprop_small.set_size("xx-small")
         backgroundtitle = backgroundtitle.strip()
         if backgroundtitle != "":
             if aw.qmc.graphfont in [1,9]: # if selected font is Humor we translate the unicode title into pure ascii
@@ -6321,8 +6294,6 @@ class tgraphcanvas(FigureCanvas):
             
         st_artist = self.fig.suptitle(backgroundtitle,
                 horizontalalignment="right",verticalalignment="top",
-##                fontproperties=fontprop_small,  # title not rendered in PDF in MPL3.4.x
-#                fontsize="xx-small",
                 fontsize="x-small",
                 x=suptitleX,y=1,
                 color=self.palette["title"])
@@ -6353,12 +6324,8 @@ class tgraphcanvas(FigureCanvas):
         if self.graphfont in [1,9]: # if selected font is Humor or Dijkstra we translate the unicode title into pure ascii
             title = self.__to_ascii(title)
         
-#        fontprop_xlarge = aw.mpl_fontproperties.copy()
-#        fontprop_xlarge.set_size("xx-large")
-        
         self.title_text = aw.arabicReshape(title.strip())
         self.title_artist = self.ax.set_title(self.title_text, color=self.palette["title"], loc='left',
-#                    fontproperties=fontprop_xlarge, # title not rendered in PDF in MPL3.4.x
                     fontsize="xx-large",
                     horizontalalignment="left",verticalalignment="top",x=0)
         try: # this one seems not to work for titles, subtitles and axis!?
@@ -6487,10 +6454,6 @@ class tgraphcanvas(FigureCanvas):
                 prop.set_size("small")
                 fontprop_small = aw.mpl_fontproperties.copy()
                 fontprop_small.set_size("xx-small")
-#                fontprop_medium = aw.mpl_fontproperties.copy()
-#                fontprop_medium.set_size("medium")
-#                fontprop_large = aw.mpl_fontproperties.copy()
-#                fontprop_large.set_size("large")
 
                 grid_axis = None
                 if self.temp_grid and self.time_grid:
@@ -6525,7 +6488,6 @@ class tgraphcanvas(FigureCanvas):
                     self.set_xlabel("")
                 else:
                     y_label = self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,
-#                        fontproperties=fontprop_large, # fails to render in PDF on MPL 3.4.x
                             fontsize="large",
                         fontfamily=prop.get_family()
                         )
@@ -6552,8 +6514,6 @@ class tgraphcanvas(FigureCanvas):
                         sponsor = QApplication.translate("About","sponsored by {}",None).format(__release_sponsor_domain__)
                         titleB = "\n{}".format(sponsor)
 
-    #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
-    #            self.ax.spines['top'].set_color('none')
                 if aw.qmc.flagon or sampling:
                     tick_dir = 'in'
                 else:
@@ -6597,7 +6557,6 @@ class tgraphcanvas(FigureCanvas):
                         y_label = self.delta_ax.set_ylabel("")
                     else:
                         y_label = self.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)),color = self.palette["ylabel"],
-#                            fontproperties=fontprop_large, # fails to render in PDF on MPL 3.4.x
                             fontsize="large",
                             fontfamily=prop.get_family()                            
                             )
@@ -6613,9 +6572,6 @@ class tgraphcanvas(FigureCanvas):
                             i.set_markersize(10)
                         for i in self.delta_ax.yaxis.get_minorticklines():
                             i.set_markersize(5)
-# labels not rendered in PDF exports on MPL 3.4 if fontproperties are set:
-#                        for label in self.delta_ax.get_yticklabels() :
-#                            label.set_fontproperties(prop)
                         for label in self.delta_ax.get_yticklabels() :
                             label.set_fontsize("small")
 
@@ -6624,8 +6580,6 @@ class tgraphcanvas(FigureCanvas):
                     self.delta_ax.fmt_xdata = self.fmt_timedata
                 #put a right tick on the graph
                 else:
-    ##                for tick in self.ax.yaxis.get_major_ticks():
-    ##                    tick.label2On = True
                     self.ax.tick_params(\
                         axis='y',
                         which='both',
@@ -6953,7 +6907,6 @@ class tgraphcanvas(FigureCanvas):
                                                     xytext=(self.timeB[event_idx], temp+height),
                                                     va="center", ha="center",
                                                     fontsize="x-small",
-#                                                    fontproperties=aw.mpl_fontproperties, # no PDF output with fontproperties on MPL3.4.x
                                                     color=self.palette["bgeventtext"],
                                                     arrowprops=dict(arrowstyle='wedge',
                                                                     color=self.palette["bgeventmarker"],
@@ -6998,7 +6951,6 @@ class tgraphcanvas(FigureCanvas):
                                                         color=self.palette["text"],
                                                         va="bottom", ha="left",
                                                         fontsize="x-small",
-#                                                        fontproperties=eventannotationprop, # no PDF output with fontproperties on MPL3.4.x
                                                         path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
                                                         )
                                             try:
@@ -7140,7 +7092,6 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0],
                                                                             marker=(self.EvalueMarker[0] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[0],
-#                                                                            picker=2, # deprecated in MPL 3.3.x
                                                                             picker=True,
                                                                             pickradius=2,
                                                                             #markevery=every,
@@ -7157,7 +7108,6 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1],
                                                                             marker=(self.EvalueMarker[1] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[1],
-#                                                                            picker=2, # deprecated in MPL 3.3.x
                                                                             picker=True,
                                                                             pickradius=2,
                                                                             #markevery=every,
@@ -7174,7 +7124,6 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2],
                                                                             marker=(self.EvalueMarker[2] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[2],
-#                                                                            picker=2, # deprecated in MPL 3.3.x
                                                                             picker=True,
                                                                             pickradius=2,
                                                                             #markevery=every,
@@ -7191,7 +7140,6 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3],
                                                                             marker=(self.EvalueMarker[3] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[3],
-#                                                                            picker=2, # deprecated in MPL 3.3.x
                                                                             picker=True,
                                                                             pickradius=2,
                                                                             #markevery=every,
@@ -8375,7 +8323,6 @@ class tgraphcanvas(FigureCanvas):
             # does the matchedgroup(4) always persist after the pattern.sub() above?
             # does the pattern.split always result in the same list pattern?  ex:
             #     ['', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '|', '100', 'A Point', '']
-#            pattern = re.compile(fr".*{nominalDelimopen}(?P<nominalstr>[^{nominalDelimclose}]+){nominalDelimclose}")
             pattern = re.compile(r".*{ndo}(?P<nominalstr>[^{ndc}]+){ndc}".format(ndo=nominalDelimopen,ndc=nominalDelimclose),_ignorecase)
             matched = pattern.match(eventanno)
             if matched != None:
@@ -8390,13 +8337,11 @@ class tgraphcanvas(FigureCanvas):
                         replacestring = matches[j+1]
                         break
                     j += 3
-#                pattern = re.compile(fr"({nominalDelimopen}[^{nominalDelimclose}]+{nominalDelimclose})")
                 pattern = re.compile(r"({ndo}[^{ndc}]+{ndc})".format(ndo=nominalDelimopen,ndc=nominalDelimclose))
                 eventanno = pattern.sub(replacestring,eventanno)
 
             # make all the remaining substitutions
             for i in range(len(fields)):
-#                pattern = re.compile(fr"(.*{fieldDelim})({fields[i][0]})(?P<mathop>[/*+-][0-9.]+)?(({nominalstringDelim}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?")
                 pattern = re.compile(r"(.*{})({})(?P<mathop>[/*+-][0-9.]+)?(({}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?".format(
                     fieldDelim,fields[i][0],nominalstringDelim),_ignorecase)
                 matched = pattern.match(eventanno)
@@ -8409,7 +8354,6 @@ class tgraphcanvas(FigureCanvas):
                         replacestring += matched.group('mathop')
                         replacestring = str(aw.float2float(eval(replacestring),1)) # pylint: disable=eval-used
 
-#                    pattern = re.compile(fr"{fieldDelim}{fields[i][0]}([/*+-][0-9.]+)?")
                     pattern = re.compile(r"{}{}([/*+-][0-9.]+)?".format(fieldDelim,fields[i][0]),_ignorecase)
                     eventanno = pattern.sub(replacestring,eventanno)
 
@@ -8687,7 +8631,6 @@ class tgraphcanvas(FigureCanvas):
 
                 text = self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',linespacing=ls,
                     fontsize=prop_size,
-#                    fontproperties=prop, # fails to render in PDF on MPL 3.4.x
                     color=tc,zorder=11,path_effects=[])
                 text.set_in_layout(False)
         except Exception as e: # pylint: disable=broad-except
@@ -8994,7 +8937,7 @@ class tgraphcanvas(FigureCanvas):
         #load selected dictionary
         if color == 1:
             aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
-            fname = os.path.join(aw.getResourcePath(),"Themes","Artisan","Default.athm")
+            fname = os.path.join(getResourcePath(), "Themes", application_name, "Default.athm")
             if os.path.isfile(fname) and not self.flagon:
                 aw.loadSettings_theme(fn=fname,remember=False,reset=False)
                 aw.sendmessage(QApplication.translate("Message","Colors set to Default Theme", None))
@@ -11606,9 +11549,6 @@ class tgraphcanvas(FigureCanvas):
             dryEndIndex, statisticstimes = self.calcStatistics(TP_index)
 
             if statisticstimes[0] == 0:
-# not sure we want this warning message to display on each redraw of a profile without proper events, maybe better to just silently don't render the statistics
-#                aw.sendmessage(QApplication.translate("Message","Statistics cancelled: need complete profile [CHARGE] + [FCs] + [DROP]", None))
-                # but at least we try to write the characteristics
                 self.writecharacteristics(TP_index,LP)
                 return
             self.statisticstimes = statisticstimes
@@ -11692,11 +11632,7 @@ class tgraphcanvas(FigureCanvas):
                     LP = self.temp2[TP_index]
 
                 if self.statisticsflags[0]:
-# fails be rendered in PDF exports on MPL v3.4.x
-#                    statsprop = aw.mpl_fontproperties.copy()
-#                    statsprop.set_size(11)
                     text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]/2.,statisticsupper,st1 + "  "+ dryphaseP+"%",color=self.palette["text"],ha="center",
-#                        fontproperties=statsprop
                         fontsize="medium"
                         )
                     try:
@@ -11705,7 +11641,6 @@ class tgraphcanvas(FigureCanvas):
                         pass
                     if self.timeindex[2]: # only if FCs exists
                         text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticsupper,st2+ "  " + midphaseP+"%",color=self.palette["text"],ha="center",
-#                            fontproperties=statsprop
                             fontsize="medium"
                             )
                         try:
@@ -11713,7 +11648,6 @@ class tgraphcanvas(FigureCanvas):
                         except Exception: # pylint: disable=broad-except
                             pass
                         text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticsupper,st3 + "  " + finishphaseP+ "%",color=self.palette["text"],ha="center",
-#                            fontproperties=statsprop
                             fontsize="medium"
                             )
                         try:
@@ -11722,7 +11656,6 @@ class tgraphcanvas(FigureCanvas):
                             pass
                     if self.timeindex[7]: # only if COOL exists
                         text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]+self.statisticstimes[4]/2.,statisticsupper,st4,color=self.palette["text"],ha="center",
-#                            fontproperties=statsprop
                             fontsize="medium"
                             )
                         try:
@@ -11746,10 +11679,6 @@ class tgraphcanvas(FigureCanvas):
                     st2 = st2 + fmtstr.format(rates_of_changes[4], aw.qmc.mode, rates_of_changes[1], aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None)))
                     st3 = st3 + fmtstr.format(rates_of_changes[5], aw.qmc.mode, rates_of_changes[2], aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None)))
 
-# fails be rendered in PDF exports on MPL v3.4.x
-#                    statsprop = aw.mpl_fontproperties.copy()
-#                    statsprop.set_size(11)
-                    
                     text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]/2.,statisticslower,st1,
                         color=self.palette["text"],
                         ha="center",
@@ -13298,20 +13227,6 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " removepoint() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
-# not used
-#    #finds a proper index location for a time that does not exists yet.
-#    @staticmethod
-#    def designerfindindex(time):
-#        if time < aw.qmc.timex[0]:
-#            return 0
-#        elif time > aw.qmc.timex[-1]:
-#            return len(aw.qmc.timex)-1
-#        else:
-#            for i in range(len(aw.qmc.timex)):
-#                if time == aw.qmc.timex[i]:
-#                    return i
-#                if aw.qmc.timex[i] > time:
-#                    return i-1
 
     #converts from a designer profile to a normal profile
     def convert_designer(self):
@@ -13831,38 +13746,6 @@ class tgraphcanvas(FigureCanvas):
                         for a in range(i+1,nsegments):
                             self.segmentlengths[x][a] = (100-parentanglecount)/(nsegments-(i+1))
 
-#    #adjusts size of all segements of the graph based on child parent relation
-#    #expects all segments to have a parent except in the first wheel
-#    @pyqtSlot(bool)
-#    def setWheelHierarchy(self,_):
-#        #check for not stablished relashionships (will cause graph plotting problems) and give warning
-#        for x in range(1,len(self.wheellabelparent)):
-#            for i in range(len(self.wheellabelparent[x])):
-#                if self.wheellabelparent[x][i] == 0:
-#                    QMessageBox.information(aw,"Wheel Hierarchy Problem",
-#                    "Please assign a parent to wheel #%i element#%i: \n\n%s"%(x+1,i+1,self.wheelnames[x][i]))
-#                    return
-#
-#        #adjust top wheel and make all segments equal
-#        for i in range(len(self.segmentlengths[-1])):
-#            self.segmentlengths[-1][i] = 100./len(self.segmentlengths[-1])
-#
-#        #adjust lower wheels based on previous wheels
-#        for p in range(len(self.wheellabelparent)-1,0,-1):
-#            nsegments = len(self.wheellabelparent[p])
-#            nparentsegments = len(self.wheellabelparent[p-1])
-#            angles = [0]*nparentsegments
-#            for x in range(nparentsegments):
-#                for i in range(nsegments):
-#                    if self.wheellabelparent[p][i]-1 == x:
-#                        angles[x] += self.segmentlengths[p][i]
-#
-#            #adjust angle length of parents proportionaly
-#            for i in range(nparentsegments):
-#                self.segmentlengths[p-1][i] = angles[i]
-#
-#        self.drawWheel()
-
 #############################     MOUSE CROSS     #############################
 
     def togglecrosslines(self):
@@ -14218,7 +14101,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
     def _icon(self, name):
         if aw is not None and name.startswith("plus"):
-            basedir = os.path.join(aw.getResourcePath(),"Icons")
+            basedir = os.path.join(getResourcePath(),"Icons")
         else:
             basedir = os.path.join(mpl.get_data_path(), 'images')
         if name.startswith("plus") and not self.white_icons:
@@ -14292,7 +14175,23 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 #PLUS
     @staticmethod
     def plus():
-        plus.controller.toggle(aw)
+        modifiers = QApplication.keyboardModifiers()
+        if modifiers == (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ControlModifier):
+            # ALT+CTR-CLICK (OPTION+COMMAND on macOS) toggles
+            # toggle debug logging
+            # first get all module loggers
+            debug_level = debugLogLevelToggle()
+            aw.sendmessage(
+                (
+                    QApplication.translate("Plus", "debug logging ON", None) if debug_level else
+                    QApplication.translate("Plus", "debug logging OFF", None)
+                )
+            )
+        elif modifiers == Qt.KeyboardModifier.AltModifier:
+            # ALT-click (OPTION on macOS) sends the log file by email
+            aw.sendLog()    
+        else:
+            plus.controller.toggle(aw)
 
     @staticmethod
     def subscription():
@@ -14359,7 +14258,6 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 #                    traceback.print_exc(file=sys.stdout)
                     pass
                 aw.fetchCurveStyles()
-#                aw.fetchAxisLimits() # DON'T
                 # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
                 aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e: # pylint: disable=broad-except
@@ -15447,7 +15345,7 @@ class ApplicationWindow(QMainWindow):
         self.userprofilepath = self.profilepath
 
         self.printer = QPrinter(QPrinter.PrinterMode.HighResolution)            
-        self.printer.setCreator("Artisan")
+        self.printer.setCreator(application_name)
 
         self.main_widget = QWidget(self)
         #set a minimum size (main window can be bigger but never smaller)
@@ -15973,7 +15871,7 @@ class ApplicationWindow(QMainWindow):
         if platf == 'Darwin':
             self.quitAction = QAction("Quit", self) # automatically translated by Qt Translators
         else:
-            self.quitAction = QAction(QApplication.translate("MAC_APPLICATION_MENU", "Quit {0}", None).format("Artisan"), self)
+            self.quitAction = QAction(QApplication.translate("MAC_APPLICATION_MENU", "Quit {0}", None).format(application_name), self)
         self.quitAction.setMenuRole(QAction.MenuRole.QuitRole)
         self.quitAction.setShortcut(QKeySequence.StandardKey.Quit)
         self.quitAction.triggered.connect(self.fileQuit)
@@ -16473,9 +16371,9 @@ class ApplicationWindow(QMainWindow):
 
         # HELP menu
         if app.artisanviewerMode:
-            helpAboutAction = QAction(QApplication.translate("MAC_APPLICATION_MENU", "About {0}", None).format("ArtisanViewer") , self)
+            helpAboutAction = QAction(QApplication.translate("MAC_APPLICATION_MENU", "About {0}", None).format(application_viewer_name), self)
         else:
-            helpAboutAction = QAction(QApplication.translate("MAC_APPLICATION_MENU", "About {0}", None).format("Artisan"), self)
+            helpAboutAction = QAction(QApplication.translate("MAC_APPLICATION_MENU", "About {0}", None).format(application_name), self)
         helpAboutAction.setMenuRole(QAction.MenuRole.AboutRole)
         helpAboutAction.triggered.connect(self.helpAbout)
         self.helpMenu.addAction(helpAboutAction)
@@ -18238,12 +18136,82 @@ class ApplicationWindow(QMainWindow):
         
         QTimer.singleShot(2000,self.donate)
 
+
+    def sendLog(self) -> None:
+        _log.info("sendLog()")
+    
+        message = MIMEMultipart()
+        if plus.config.app_window.plus_email is not None:
+            message["From"] = plus.config.app_window.plus_email
+        message["To"] = "{}@{}".format(
+            "logfile", "artisan.plus"
+        )
+        message["Subject"] = "artisan log"
+        message["X-Unsent"] = "1"
+        # message["X-Uniform-Type-Identifier"] = "com.apple.mail-draft"
+        message.attach(
+            MIMEText(
+                (
+                    "Please find attached the log files written by Artisan!"
+                    "\nPlease forward this email to {}\n--\n"
+                ).format(message["To"]),
+                "plain",
+            )
+        )
+        try:
+            log_file_name = "artisan.log"
+            with open(os.path.join(getDataDirectory(),log_file_name), "rb") as attachment:
+                # Add file as application/octet-stream
+                # Email client can usually download this automatically
+                # as attachment
+                part = MIMEBase("application", "octet-stream")
+                part.set_payload(attachment.read())
+            # Encode file in ASCII characters to send by email
+            encoders.encode_base64(part)
+            # Add header as key/value pair to attachment part
+            part.add_header(
+                "Content-Disposition",
+                "attachment; filename= {}".format(log_file_name),
+            )
+            # Add attachment to message and convert message to string
+            message.attach(part)
+        except Exception:  # pylint: disable=broad-except
+            pass
+        try:
+            with open(self.qmc.device_log_file, "rb") as attachment:
+                # Add file as application/octet-stream
+                # Email client can usually download this automatically
+                # as attachment
+                part2 = MIMEBase("application", "octet-stream")
+                part2.set_payload(attachment.read())
+            # Encode file in ASCII characters to send by email
+            encoders.encode_base64(part2)
+            # Add header as key/value pair to attachment part
+            part2.add_header(
+                "Content-Disposition",
+                "attachment; filename= {}{}".format(
+                    self.qmc.device_log_file_name, ".log"
+                ),
+            )
+            # Add attachment to message and convert message to string
+            message.attach(part2)
+        except Exception:  # pylint: disable=broad-except
+            pass
+        # Save message to file tmp file
+        tmpfile = QDir(QDir.tempPath()).filePath("plus-log.eml")
+        try:
+            os.remove(tmpfile)
+        except OSError:
+            pass
+        with open(tmpfile, "w", encoding='utf-8') as outfile:
+            gen = generator.Generator(outfile)
+            gen.flatten(message)
+        QDesktopServices.openUrl(QUrl.fromLocalFile(tmpfile))
+
+
     def updateWindowTitle(self):
         try:
-            if app.artisanviewerMode:
-                appTitle = "ArtisanViewer %s"%str(__version__)
-            else:
-                appTitle = "Artisan %s"%str(__version__)
+            appTitle = "%s %s"%((application_viewer_name if app.artisanviewerMode else application_name), str(__version__))
             if self.qmc.safesaveflag:
                 # file Dirty
                 dirtySign = "* "
@@ -19008,7 +18976,7 @@ class ApplicationWindow(QMainWindow):
     def populateListMenu(self,resourceName,ext,triggered,menu,addMenu = True,forceSubmenu=False):
         one_added = False
         res = {}
-        for root,dirs,files in os.walk(os.path.join(self.getResourcePath(),resourceName)):
+        for root,dirs,files in os.walk(os.path.join(getResourcePath(),resourceName)):
             dirs.sort()
             files.sort()
             for fl in files:
@@ -20569,44 +20537,44 @@ class ApplicationWindow(QMainWindow):
             self.slider4.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.slider4.clearFocus()
 
-    @staticmethod
-    def getAppPath():
-        res = ""
-        if platf in ['Darwin','Linux']:
-            if appFrozen():
-                res = QApplication.applicationDirPath() + "/../../../"
-            else:
-                res = os.path.dirname(os.path.realpath(__file__)) + "/../"
-        elif platf == "Windows":
-            if appFrozen():
-                res = os.path.dirname(sys.executable) + "\\"
-            else:
-                res = os.path.dirname(os.path.realpath(__file__)) + "\\..\\"
-        else:
-            res = QApplication.applicationDirPath() + "/"
-        return res
-
-    @staticmethod
-    def getResourcePath():
-        res = ""
-        if platf == 'Darwin':
-            if appFrozen():
-                res = QApplication.applicationDirPath() + "/../Resources/"
-            else:
-                res = os.path.dirname(os.path.realpath(__file__)) + "/../includes/"
-        elif platf == 'Linux':
-            if appFrozen():
-                res = QApplication.applicationDirPath() + "/"
-            else:
-                res = os.path.dirname(os.path.realpath(__file__)) + "/../includes/"
-        elif platf == "Windows":
-            if appFrozen():
-                res = os.path.dirname(sys.executable) + "\\"
-            else:
-                res = os.path.dirname(os.path.realpath(__file__)) + "\\..\\includes\\"
-        else:
-            res = QApplication.applicationDirPath() + "/"
-        return res
+#    @staticmethod
+#    def getAppPath():
+#        res = ""
+#        if platf in ['Darwin','Linux']:
+#            if appFrozen():
+#                res = QApplication.applicationDirPath() + "/../../../"
+#            else:
+#                res = os.path.dirname(os.path.realpath(__file__)) + "/../"
+#        elif platf == "Windows":
+#            if appFrozen():
+#                res = os.path.dirname(sys.executable) + "\\"
+#            else:
+#                res = os.path.dirname(os.path.realpath(__file__)) + "\\..\\"
+#        else:
+#            res = QApplication.applicationDirPath() + "/"
+#        return res
+#
+#    @staticmethod
+#    def getResourcePath():
+#        res = ""
+#        if platf == 'Darwin':
+#            if appFrozen():
+#                res = QApplication.applicationDirPath() + "/../Resources/"
+#            else:
+#                res = os.path.dirname(os.path.realpath(__file__)) + "/../includes/"
+#        elif platf == 'Linux':
+#            if appFrozen():
+#                res = QApplication.applicationDirPath() + "/"
+#            else:
+#                res = os.path.dirname(os.path.realpath(__file__)) + "/../includes/"
+#        elif platf == "Windows":
+#            if appFrozen():
+#                res = os.path.dirname(sys.executable) + "\\"
+#            else:
+#                res = os.path.dirname(os.path.realpath(__file__)) + "\\..\\includes\\"
+#        else:
+#            res = QApplication.applicationDirPath() + "/"
+#        return res
 
     def setFonts(self, redraw=True): # pylint: disable=no-self-use
         # try to select the right font for matplotlib according to the given locale and plattform
@@ -20650,37 +20618,37 @@ class ApplicationWindow(QMainWindow):
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['WenQuanYi Zen Hei']
 #            aw.set_mpl_fontproperties(self.getResourcePath() + "wqy-zenhei.ttc") # .ttc fonts are not supported yet by the PDF backend
-            aw.set_mpl_fontproperties(self.getResourcePath() + "WenQuanYiZenHei-01.ttf")
+            aw.set_mpl_fontproperties(getResourcePath() + "WenQuanYiZenHei-01.ttf")
         elif self.qmc.graphfont == 4: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Simplified Chinese
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans CN']
-            aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansCN-Regular.otf")
+            aw.set_mpl_fontproperties(getResourcePath() + "SourceHanSansCN-Regular.otf")
         elif self.qmc.graphfont == 5: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Traditional Chinese, Taiwan
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans TW']
-            aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansTW-Regular.otf")
+            aw.set_mpl_fontproperties(getResourcePath() + "SourceHanSansTW-Regular.otf")
         elif self.qmc.graphfont == 6: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Traditional Chinese, Hong Kong
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans HK']
-            aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansHK-Regular.otf")
+            aw.set_mpl_fontproperties(getResourcePath() + "SourceHanSansHK-Regular.otf")
         elif self.qmc.graphfont == 7: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Korean
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans KR']
-            aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansKR-Regular.otf")
+            aw.set_mpl_fontproperties(getResourcePath() + "SourceHanSansKR-Regular.otf")
         elif self.qmc.graphfont == 8: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Japanese
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans JP']
-            aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansJP-Regular.otf")
+            aw.set_mpl_fontproperties(getResourcePath() + "SourceHanSansJP-Regular.otf")
         elif self.qmc.graphfont == 9: 
             # font Dijkstra selected
             rcParams['font.size'] = 10.0
             rcParams['font.family'] = ['Dijkstra']
-            aw.set_mpl_fontproperties(self.getResourcePath() + "dijkstra.ttf")
+            aw.set_mpl_fontproperties(getResourcePath() + "dijkstra.ttf")
         elif self.qmc.graphfont == 1 or platf == "Linux": # no Comic on Linux!
             # font Humor selected
             rcParams['font.size'] = 16.0
@@ -20688,7 +20656,7 @@ class ApplicationWindow(QMainWindow):
                 rcParams['font.family'] = ['Humor Sans']
             else:
                 rcParams['font.family'] = ['Humor Sans', 'Comic Sans MS']
-            aw.set_mpl_fontproperties(self.getResourcePath() + "Humor-Sans.ttf")
+            aw.set_mpl_fontproperties(getResourcePath() + "Humor-Sans.ttf")
         elif self.qmc.graphfont == 2 and not platf == "Linux":
             # font Comic selected
             rcParams['font.size'] = 12.0
@@ -23037,7 +23005,7 @@ class ApplicationWindow(QMainWindow):
                 cmd = cmd_str_parts[0].strip()
                 qd = QDir(cmd)
                 current = QDir.current()
-                QDir.setCurrent(aw.getAppPath())
+                QDir.setCurrent(getAppPath())
                 my_env = self.calc_env()
                 if platf == 'Windows':
                     startupinfo = subprocess.STARTUPINFO()
@@ -28218,6 +28186,13 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.fahrenheitMode()
             if self.qmc.mode == "C" and old_mode == "F":
                 self.qmc.celsiusMode()
+            
+            if settings.contains("DebugLogLevel"):
+                try:
+                    setDebugLogLevel(bool(toBool(settings.value("DebugLogLevel",False))))
+                except Exception: # pylint: disable=broad-except
+                    pass
+                
             #restore device
             settings.beginGroup("Device")
             if settings.contains("device_logging"):
@@ -29764,7 +29739,7 @@ class ApplicationWindow(QMainWindow):
                 from artisanlib.weblcds import startWeb
                 res = startWeb(
                     self.WebLCDsPort,
-                    str(self.getResourcePath()),
+                    str(getResourcePath()),
                     ("&nbsp;&nbsp;-.-" if aw.qmc.LCDdecimalplaces else "&nbsp;--"),
                     aw.lcdpaletteF["timer"],
                     aw.lcdpaletteB["timer"],
@@ -30076,6 +30051,10 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue("NSQuitAlwaysKeepsWindows",False)
             #save mode
             settings.setValue("Mode",self.qmc.mode)
+            try:
+                settings.setValue("DebugLogLevel",debugLogLevelActive())
+            except Exception: # pylint: disable=broad-except
+                pass
             #save system
             settings.beginGroup("System")
             settings.setValue("artisan_version",__version__)
@@ -31083,7 +31062,7 @@ class ApplicationWindow(QMainWindow):
             return
         if self.printer is None:
             self.printer = QPrinter(QPrinter.PrinterMode.HighResolution)
-            self.printer.setCreator("Artisan")
+            self.printer.setCreator(application_name)
         form = QPrintDialog(self.printer, self)
         if form.exec():
             painter = QPainter(self.printer)
@@ -31331,7 +31310,7 @@ class ApplicationWindow(QMainWindow):
                 profiles = sorted(profiles,
                     key=lambda p: (QDateTime(QDate.fromString(p["roastisodate"], Qt.DateFormat.ISODate),QTime.fromString(p["roasttime"])).toMSecsSinceEpoch()
                          if "roastisodate" in p and "roasttime" in p else 0))
-                with open(self.getResourcePath() + 'report-template.htm', 'r', encoding='utf-8') as myfile:
+                with open(getResourcePath() + 'report-template.htm', 'r', encoding='utf-8') as myfile:
                     HTML_REPORT_TEMPLATE=myfile.read()
                 entries = ""
                 total_in = 0
@@ -31353,7 +31332,7 @@ class ApplicationWindow(QMainWindow):
                     total_in = ('{0:.2f}'.format(total_in) if unit in ["Kg","lb", "oz"] else '{0:.0f}'.format(total_in)),
                     total_out = ('{0:.2f}'.format(total_out) if unit in ["Kg","lb", "oz"] else '{0:.0f}'.format(total_out)),
                     total_loss = '{0:.1f}'.format(aw.weight_loss(total_in,total_out)),
-                    resources = str(self.getResourcePath()),
+                    resources = str(getResourcePath()),
                     batch = QApplication.translate("HTML Report Template", "Batch", None),
                     time = QApplication.translate("HTML Report Template", "Date", None),
                     profile = QApplication.translate("Label", "Title", None),
@@ -32080,7 +32059,7 @@ class ApplicationWindow(QMainWindow):
                 profiles = sorted(profiles,
                     key=lambda p: (QDateTime(QDate.fromString(p["roastisodate"], Qt.DateFormat.ISODate),QTime.fromString(p["roasttime"])).toMSecsSinceEpoch()
                          if "roastisodate" in p and "roasttime" in p else 0))
-                with open(self.getResourcePath() + 'ranking-template.htm', 'r', encoding='utf-8') as myfile:
+                with open(getResourcePath() + 'ranking-template.htm', 'r', encoding='utf-8') as myfile:
                     HTML_REPORT_TEMPLATE=myfile.read()
                 entries = ""
                 charges = 0
@@ -32595,7 +32574,7 @@ class ApplicationWindow(QMainWindow):
 
                 weight_fmt = ('{0:.2f}' if aw.qmc.weight[2] in ["Kg", "lb", "oz"] else '{0:.0f}')
                 html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
-                    resources = str(self.getResourcePath()),
+                    resources = str(getResourcePath()),
                     title = QApplication.translate("HTML Report Template", "Roast Ranking", None),
                     time = QApplication.translate("HTML Report Template", "Date", None),
                     profile = QApplication.translate("Label", "Title", None),
@@ -32910,7 +32889,7 @@ class ApplicationWindow(QMainWindow):
     def htmlReport(self,_=False):
         try:
             rcParams['path.effects'] = []
-            with open(self.getResourcePath() + 'roast-template.htm', 'r', encoding='utf-8') as myfile:
+            with open(getResourcePath() + 'roast-template.htm', 'r', encoding='utf-8') as myfile:
                 HTML_REPORT_TEMPLATE=myfile.read()
             beans_html = str(htmllib.escape(self.qmc.beans))
             if len(beans_html) > 43:
@@ -33831,10 +33810,7 @@ class ApplicationWindow(QMainWindow):
         build = ""
         if __build__ != "0":
             build = " build " + __build__
-        if app.artisanviewerMode:
-            name = "ArtisanViewer"
-        else:
-            name = "Artisan"
+        name = (application_viewer_name if app.artisanviewerMode else application_name)
         otherlibs = ""
         try:
             phidgetlibversion = PhidgetDriver.getLibraryVersion()
@@ -34401,7 +34377,7 @@ class ApplicationWindow(QMainWindow):
     def saveSettings_theme(self,_=False):
         path = QDir()
         path.setPath(self.getDefaultPath())
-        path.setPath(os.path.join(self.getResourcePath(),"Themes","User"))
+        path.setPath(os.path.join(getResourcePath(),"Themes","User"))
         fname = path.absoluteFilePath(QApplication.translate("Message","artisan-theme", None))
         filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Theme",None), path=fname, ext="*.athm")
         if filename:
@@ -36976,6 +36952,8 @@ def excepthook(excType, excValue, tracebackobj):
     @param excValue exception value
     @param tracebackobj traceback object
     """
+    _log.error("Logging an uncaught exception",
+                 exc_info=(excType, excValue, tracebackobj))
     separator = '-' * 80
     logFile = "simple.log"
     notice = \
@@ -37143,6 +37121,7 @@ def main():
     global aw, app, artisanviewerFirstStart # pylint: disable=global-statement
 
     locale_str = initialize_locale(app)
+    _log.info("locale: %s",locale_str)
 
     # supress all Qt messages
     qInstallMessageHandler(qt_message_handler)
@@ -37151,7 +37130,7 @@ def main():
     warnings.filterwarnings('ignore')
 
     if app.artisanviewerMode:
-        app.setApplicationName("ArtisanViewer")     #needed by QSettings() to store windows geometry in operating system
+        app.setApplicationName(application_viewer_name)     #needed by QSettings() to store windows geometry in operating system
         viewersettings = QSettings()
         if not viewersettings.contains("Mode"):
             artisanviewerFirstStart = True

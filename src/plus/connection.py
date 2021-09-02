@@ -30,15 +30,14 @@ except Exception:
     from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib import __version__
-from typing import Any
-from typing import Optional, Dict
+from typing import Any, Optional, Dict, Final
 
 import datetime
 import gzip
 import json
 import platform
 import requests
-import sys
+import logging
 
 if platform.system().startswith("Windows"):
     import keyring.backends.Windows  # @UnusedImport
@@ -49,6 +48,9 @@ else:
 import keyring  # @Reimport # imported last to make py2app work
 
 from plus import config, account, util
+
+_log: Final = logging.getLogger(__name__)
+
 
 JSON = Any
 
@@ -61,7 +63,8 @@ def getToken() -> Optional[str]:
     try:
         token_semaphore.acquire(1)
         return config.token
-    except Exception:  # pylint: disable=broad-except
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
         return None
     finally:
         if token_semaphore.available() < 1:
@@ -72,7 +75,8 @@ def getNickname() -> Optional[str]:
     try:
         token_semaphore.acquire(1)
         return config.nickname
-    except Exception:  # pylint: disable=broad-except
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
         return None
     finally:
         if token_semaphore.available() < 1:
@@ -97,19 +101,23 @@ def setToken(token: str, nickname: str = None) -> None:
 
 
 def clearCredentials(remove_from_keychain: bool = True) -> None:
-    config.logger.info("clearCredentials()")
+    _log.info("clearCredentials()")
     # remove credentials from keychain
-    if (
-        config.app_window is not None
-        and config.app_window.plus_account is not None
-        and remove_from_keychain
-    ):  # @UndefinedVariable
-        try:
-            keyring.delete_password(
-                config.app_name, config.app_window.plus_account
-            )  # @UndefinedVariable
-        except Exception:  # pylint: disable=broad-except
-            pass
+    try:
+        if (
+            config.app_window is not None
+            and config.app_window.plus_account is not None
+            and remove_from_keychain
+        ):  # @UndefinedVariable
+            try:
+                keyring.delete_password(
+                    config.app_name, config.app_window.plus_account
+                )  # @UndefinedVariable
+            except Exception as e:  # pylint: disable=broad-except
+                _log.exception(e)
+    except Exception: # pylint: disable=broad-except
+        # config.app_window might be still unbound
+        pass
     try:
         token_semaphore.acquire(1)
         config.token = None
@@ -134,23 +142,10 @@ def setKeyring() -> None:
             except Exception:  # pylint: disable=broad-except
                 keyring.set_keyring(keyring.backends.OS_X.Keyring())   # type: ignore
         else:  # Linux
-            try:
-                keyring.set_keyring(keyring.backends.SecretService.Keyring())
-            except Exception as e:  # pylint: disable=broad-except
-                _, _, exc_tb = sys.exc_info()
-                config.logger.error(
-                    "controller: Linux keyring Exception %s (line %s)",
-                    e,
-                    getattr(exc_tb, "tb_lineno", "?"),
-                )
-        # config.logger.debug("keyring: %s",str(keyring.get_keyring()))
+            keyring.set_keyring(keyring.backends.SecretService.Keyring())
+        # _log.debug("keyring: %s",str(keyring.get_keyring()))
     except Exception as e:  # pylint: disable=broad-except
-        _, _, exc_tb = sys.exc_info()
-        config.logger.error(
-            "controller: keyring Exception %s (line %s)",
-            e,
-            getattr(exc_tb, "tb_lineno", "?"),
-        )
+        _log.exception(e)
 
 
 # res is assumed to be a dict with non-empty res["result"]["user"]
@@ -162,7 +157,7 @@ def extractUserInfo(res, attr: str, default):
 
 # returns True on successful authentification
 def authentify() -> bool:
-    config.logger.info("authentify()")
+    _log.info("authentify()")
     try:
         if (
             config.app_window is not None
@@ -175,14 +170,14 @@ def authentify() -> bool:
                     config.passwd = keyring.get_password(
                         config.app_name, config.app_window.plus_account
                     )  # @UndefinedVariable
-                except Exception:  # pylint: disable=broad-except
-                    pass
+                except Exception as e:  # pylint: disable=broad-except
+                    _log.exception(e)
             if config.passwd is None:
-                config.logger.debug("connection: -> password not found")
+                _log.debug("-> password not found")
                 clearCredentials()
                 return False
-            config.logger.debug(
-                "connection: -> authentifying %s",
+            _log.debug(
+                "-> authentifying %s",
                 config.app_window.plus_account,
             )  # @UndefinedVariable
             data = {
@@ -190,8 +185,8 @@ def authentify() -> bool:
                 "password": config.passwd,
             }  # @UndefinedVariable
             r = postData(config.auth_url, data, False)
-            config.logger.debug(
-                "connection: -> authentifying reply status code: %s",
+            _log.debug(
+                "-> authentifying reply status code: %s",
                 r.status_code,
             )  # @UndefinedVariable
             # returns 404: login wrong and 401: passwd wrong
@@ -203,8 +198,8 @@ def authentify() -> bool:
                 and "user" in res["result"]
                 and "token" in res["result"]["user"]
             ):
-                config.logger.debug(
-                    "connection: -> authentified, token received"
+                _log.debug(
+                    "-> authentified, token received"
                 )
                 # extract in user/account data
                 nickname = extractUserInfo(
@@ -230,15 +225,15 @@ def authentify() -> bool:
                             config.app_window.plus_paidUntil = (
                                 util.ISO86012datetime(paidUntil)
                             )
-                    except Exception:  # pylint: disable=broad-except
-                        pass
+                    except Exception as e:  # pylint: disable=broad-except
+                        _log.exception(e)
                 if config.app_window.plus_paidUntil is not None and (
                     config.app_window.plus_paidUntil.date()
                     - datetime.datetime.now().date()
                 ).days < (-config.expired_subscription_max_days):
-                    config.logger.debug(
+                    _log.debug(
                         (
-                            "connection: -> authentication failed due to"
+                            "-> authentication failed due to"
                             " long expired subscription"
                         )
                     )
@@ -266,11 +261,11 @@ def authentify() -> bool:
                         res["result"]["user"]["account"]["_id"]
                     )
                     config.account_nr = account_nr
-                    config.logger.debug(
-                        "connection: -> account: %s", account_nr
+                    _log.debug(
+                        "-> account: %s", account_nr
                     )
                 return True
-            config.logger.debug("connection: -> authentication failed")
+            _log.debug("-> authentication failed")
             if "error" in res:
                 config.app_window.sendmessage(
                     res["error"]
@@ -279,10 +274,10 @@ def authentify() -> bool:
             return False
         return False
     except requests.exceptions.RequestException as e:
-        config.logger.error("connection: -> RequestException: %s", e)
+        _log.exception(e)
         raise (e)
     except Exception as e:
-        config.logger.debug("connection: -> Exception: %s", e)
+        _log.exception(e)
         clearCredentials()
         raise (e)
 
@@ -302,11 +297,11 @@ def getHeaders(
     try:
         locale = config.app_window.locale_str
         if locale is not None and locale != "":
-            assert locale is str
+            assert isinstance(locale, str)
             locale = locale.lower().replace("_", "-")
             headers["Accept-Language"] = locale
-    except Exception:  # pylint: disable=broad-except
-        pass
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
     if authorized:
         token = getToken()
         if token is not None:
@@ -334,7 +329,7 @@ def getHeadersAndData(authorized: bool, compress: bool, jsondata: JSON):
     headers["Content-Type"] = "application/json"
     if compress and len(jsondata) > config.post_compression_threshold:
         postdata = gzip.compress(jsondata)
-        config.logger.debug("connection: -> compressed size %s", len(postdata))
+        _log.debug("-> compressed size %s", len(postdata))
         headers["Content-Encoding"] = "gzip"
     else:
         postdata = jsondata
@@ -348,9 +343,9 @@ def postData(
     compress: bool = config.compress_posts,
 ) -> Any:
     # don't log POST data as it might contain credentials!
-    config.logger.info("connection:postData(%s,_data_,%s)", url, authorized)
+    _log.info("postData(%s,_data_,%s)", url, authorized)
     jsondata = json.dumps(data).encode("utf8")
-    config.logger.debug("connection: -> size %s", len(jsondata))
+    _log.debug("-> size %s", len(jsondata))
     headers, postdata = getHeadersAndData(authorized, compress, jsondata)
     r = requests.post(
         url,
@@ -359,10 +354,9 @@ def postData(
         verify=config.verify_ssl,
         timeout=(config.connect_timeout, config.read_timeout),
     )
-    config.logger.debug("connection: -> status %s", r.status_code)
-    config.logger.debug("connection: -> time %s", r.elapsed.total_seconds())
+    _log.debug("-> status %s, time %s", r.status_code, r.elapsed.total_seconds())
     if authorized and r.status_code == 401:  # authorisation failed
-        config.logger.debug("connection: -> session token outdated (401)")
+        _log.debug("-> session token outdated (401)")
         # we re-authentify by renewing the session token and try again
         if authentify():
             headers, postdata = getHeadersAndData(
@@ -375,29 +369,26 @@ def postData(
                 verify=config.verify_ssl,
                 timeout=(config.connect_timeout, config.read_timeout),
             )
-            config.logger.debug("connection: -> status %s", r.status_code)
-            config.logger.debug(
-                "connection: -> time %s", r.elapsed.total_seconds()
-            )
+            _log.debug("-> status %s, time %s", r.status_code, r.elapsed.total_seconds())
     return r
 
 
 def getData(url: str, authorized: bool = True) -> Any:
-    config.logger.info("getData(%s,%s)", url, authorized)
+    _log.info("getData(%s,%s)", url, authorized)
     headers = getHeaders(authorized)
-    #    config.logger.debug("connection: -> request headers %s",headers)
+    #    _log.debug("-> request headers %s",headers)
     r = requests.get(
         url,
         headers=headers,
         verify=config.verify_ssl,
         timeout=(config.connect_timeout, config.read_timeout),
     )
-    config.logger.debug("connection: -> status %s", r.status_code)
-    #    config.logger.debug("connection: -> headers %s",r.headers)
-    config.logger.debug("connection: -> time %s", r.elapsed.total_seconds())
+    _log.debug("-> status %s", r.status_code)
+    #    _log.debug("-> headers %s",r.headers)
+    _log.debug("-> time %s", r.elapsed.total_seconds())
     if authorized and r.status_code == 401:  # authorisation failed
-        config.logger.debug(
-            "connection: -> session token outdated (404) - re-authentify"
+        _log.debug(
+            "-> session token outdated (404) - re-authentify"
         )
         # we re-authentify by renewing the session token and try again
         authentify()
@@ -408,14 +399,14 @@ def getData(url: str, authorized: bool = True) -> Any:
             verify=config.verify_ssl,
             timeout=(config.connect_timeout, config.read_timeout),
         )
-        config.logger.debug("connection: -> status %s", r.status_code)
-        #        config.logger.debug("connection: -> headers %s",r.headers)
-        config.logger.debug(
-            "connection: -> time %s", r.elapsed.total_seconds()
+        _log.debug("-> status %s", r.status_code)
+        #        _log.debug("-> headers %s",r.headers)
+        _log.debug(
+            "-> time %s", r.elapsed.total_seconds()
         )
     try:
-        config.logger.debug("connection: -> size %s", len(r.content))
-    #        config.logger.debug("connection: -> data %s",r.json())
+        _log.debug("-> size %s", len(r.content))
+    #        _log.debug("-> data %s",r.json())
     except Exception:  # pylint: disable=broad-except
         pass
     return r

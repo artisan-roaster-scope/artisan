@@ -1,13 +1,36 @@
 # -*- coding: utf-8 -*-
 #
 
+import logging
 import platform
 import sys
+import os
 import codecs
 import math
+import functools
+from pathlib import Path
+from typing import Final, Optional
 
 import urllib.parse as urlparse  # @Reimport
 import urllib.request as urllib  # @Reimport
+
+##
+
+_log: Final = logging.getLogger(__name__)
+
+application_name: Final = "Artisan"
+application_viewer_name: Final = "ArtisanViewer"
+application_organization_name: Final = "artisan-scope"
+application_organization_domain: Final = "artisan-scope.org"
+
+
+try:
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import QStandardPaths, QCoreApplication # @UnusedImport @Reimport  @UnresolvedImport
+except Exception:
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QStandardPaths, QCoreApplication # @UnusedImport @Reimport  @UnresolvedImport
+
 
 deltaLabelPrefix = "<html>&Delta;&thinsp;</html>" # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
 if platform.system() == 'Linux':
@@ -218,3 +241,142 @@ def fill_gaps(l):
                 res.append(e)
                 last_val = e
     return res
+
+
+# we store data in the user- and app-specific local default data directory
+# for the platform
+# note that the path is based on the ApplicationName and OrganizationName
+# setting of the app
+# eg. /Users/<username>/Library/Application Support/Artisan-Scope/Artisan
+# on macOS
+
+# getDataDirectory() returns the Artisan data directory
+# if app is not yet initialized None is returned
+# otherwise the path is computed on first call and then memorized
+# if the computed path does not exists it is created
+# if creation or access of the path fails None is returned and memorized
+def getDataDirectory():
+    app = QCoreApplication.instance()
+    if app is not None:
+        return _getAppDataDirectory(app)
+    return None
+
+# internal function to return
+@functools.lru_cache
+def _getAppDataDirectory(app):
+    # temporarily switch app name to Artisan (as it might be ArtisanViewer)
+    appName = app.applicationName()
+    app.setApplicationName(application_name)
+    data_dir = QStandardPaths.standardLocations(
+        QStandardPaths.StandardLocation.AppLocalDataLocation
+    )[0]
+    app.setApplicationName(appName)
+    try:
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+        return data_dir
+    except Exception:  # pylint: disable=broad-except
+        return None
+
+@functools.lru_cache
+def getAppPath():
+    res = ""
+    platf = platform.system()
+    if platf in ['Darwin','Linux']:
+        if appFrozen():
+            res = QCoreApplication.applicationDirPath() + "/../../../"
+        else:
+            res = os.path.dirname(os.path.realpath(__file__)) + "/../"
+    elif platf == "Windows":
+        if appFrozen():
+            res = os.path.dirname(sys.executable) + "\\"
+        else:
+            res = os.path.dirname(os.path.realpath(__file__)) + "\\..\\"
+    else:
+        res = QCoreApplication.applicationDirPath() + "/"
+    return res
+
+@functools.lru_cache
+def getResourcePath():
+    res = ""
+    platf = platform.system()
+    if platf == 'Darwin':
+        if appFrozen():
+            res = QCoreApplication.applicationDirPath() + "/../Resources/"
+        else:
+            res = os.path.dirname(os.path.realpath(__file__)) + "/../includes/"
+    elif platf == 'Linux':
+        if appFrozen():
+            res = QCoreApplication.applicationDirPath() + "/"
+        else:
+            res = os.path.dirname(os.path.realpath(__file__)) + "/../includes/"
+    elif platf == "Windows":
+        if appFrozen():
+            res = os.path.dirname(sys.executable) + "\\"
+        else:
+            res = os.path.dirname(os.path.realpath(__file__)) + "\\..\\includes\\"
+    else:
+        res = QCoreApplication.applicationDirPath() + "/"
+    return res
+
+# if share is True, the same (cache) file is shared between the Artisan and
+# ArtisanViewer apps
+# and locks have to be used to avoid race conditions
+def getDirectory(
+    filename: str, ext: Optional[str] = None, share: bool = False
+):
+    fn = filename
+    if not share:
+        app = QCoreApplication.instance()
+        if app.artisanviewerMode:
+            fn = filename + "_viewer"
+    fp = Path(getDataDirectory(), fn)
+    if ext is not None:
+        fp = fp.with_suffix(ext)
+    try:
+        fp = (
+            fp.resolve()
+        )  # older pathlib raise an exception if a path does not exist
+    except Exception:  # pylint: disable=broad-except
+        pass
+    return str(fp)
+
+
+# Logging
+
+@functools.lru_cache
+def getLoggers():
+    return [logging.getLogger(name) for name in logging.root.manager.loggerDict if ("." not in name)]  # @UndefinedVariable pylint: disable=no-member
+
+def debugLogLevelActive() -> bool:
+    loggers = getLoggers()
+    return loggers and isinstance(loggers,list) and loggers[0].isEnabledFor(logging.DEBUG)
+    
+def setDebugLogLevel(state: bool) -> None:
+    if state:
+        # debug logging on
+        setFileLogLevels(logging.DEBUG)
+        _log.info("debug logging ON")
+    else:
+        # debug logging off
+        setFileLogLevels(logging.INFO)
+        _log.info("debug logging OFF")
+
+def setFileLogLevel(logger, level) -> None:
+    logger.setLevel(level)
+    for handler in logger.handlers:
+        if handler.get_name() == "file":
+            handler.setLevel(level)
+
+def setFileLogLevels(level) -> None:
+    loggers = getLoggers()
+    for logger in loggers:
+        setFileLogLevel(logger, level)
+
+# returns True if new log level of loggers is DEBUG, False otherwise
+def debugLogLevelToggle() -> bool:
+    _log.info("debugLogLevelToggle()")
+    # first get all module loggers
+    newDebugLevel = not debugLogLevelActive()
+    setDebugLogLevel(newDebugLevel)
+    return newDebugLevel

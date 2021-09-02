@@ -31,11 +31,10 @@ except Exception:
     from PyQt5.QtCore import QSemaphore, QTimer, Qt # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication, QMessageBox # @UnusedImport @Reimport  @UnresolvedImport
 
-from artisanlib import __build__
-from artisanlib import __revision__
-from artisanlib import __version__
 import platform
 import threading
+import logging
+from typing import Final
 
 if platform.system().startswith("Windows"):
     import keyring.backends.Windows  # @UnusedImport
@@ -45,7 +44,11 @@ else:
     import keyring.backends.SecretService  # @UnusedImport
 import keyring  # @Reimport # imported last to make py2app work
 
-from plus import config, connection, stock, queue, sync, roast, util
+from plus import config, connection, stock, queue, sync, roast
+
+
+
+_log: Final = logging.getLogger(__name__)
 
 connect_semaphore = QSemaphore(1)
 
@@ -87,53 +90,45 @@ def start(app_window):
 # toggles between connected and disconnected modes. If connected and
 # not is_synced() send current data to server
 def toggle(app_window):
-    config.logger.info("controller:toggle()")
+    _log.info("toggle()")
     config.app_window = app_window
-    modifiers = QApplication.keyboardModifiers()
-    if modifiers == (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ControlModifier):
-        # ALT+CTR-CLICK (OPTION+COMMAND on macOS) toggles
-        # the plus debug logging
-        util.debugLogToggle()
-    elif modifiers == Qt.KeyboardModifier.AltModifier:
-        # ALT-click (OPTION on macOS) sends the log file by email
-        util.sendLog()
+    if config.app_window.plus_account is None:  # @UndefinedVariable
+        connect()
+        if (
+            is_connected()
+            and is_synced()
+            and config.app_window.curFile is not None
+        ):  # @UndefinedVariable
+            sync.sync()
     else:
-        if config.app_window.plus_account is None:  # @UndefinedVariable
-            connect()
-            if (
-                is_connected()
-                and is_synced()
-                and config.app_window.curFile is not None
-            ):  # @UndefinedVariable
-                sync.sync()
-        else:
-            if config.connected:
-                if is_synced():
-                    # a CTR-click (COMMAND on macOS) logs out and
-                    # discards the credentials
-                    disconnect(
-                        interactive=True,
-                        remove_credentials=(modifiers == Qt.KeyboardModifier.ControlModifier),
-                        keepON=False,
-                    )
-                else:
-                    # we (manually) turn syncing for the current roast on
-                    if app_window.qmc.checkSaved(allow_discard=False):
-                        queue.addRoast()
-            else:
+        if config.connected:
+            if is_synced():
+                # a CTR-click (COMMAND on macOS) logs out and
+                # discards the credentials
+                modifiers = QApplication.keyboardModifiers()
                 disconnect(
-                    remove_credentials=False,
-                    stop_queue=True,
                     interactive=True,
+                    remove_credentials=(modifiers == Qt.KeyboardModifier.ControlModifier),
                     keepON=False,
                 )
+            else:
+                # we (manually) turn syncing for the current roast on
+                if app_window.qmc.checkSaved(allow_discard=False):
+                    queue.addRoast()
+        else:
+            disconnect(
+                remove_credentials=False,
+                stop_queue=True,
+                interactive=True,
+                keepON=False,
+            )
 
 
 # if clear_on_failure is set, credentials are removed if connect fails
 def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
     if not is_connected():
-        config.logger.info(
-            "controller:connect(%s,%s)", clear_on_failure, interactive
+        _log.info(
+            "connect(%s,%s)", clear_on_failure, interactive
         )
         try:
             connect_semaphore.acquire(1)
@@ -156,18 +151,16 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                             config.app_name, account
                         )  # @UndefinedVariable
                         if config.passwd is None:
-                            config.logger.debug(
-                                ("controller: -> keyring.get_password"
+                            _log.debug(
+                                ("-> keyring.get_password"
                                  " returned None")
                             )
                         else:
-                            config.logger.debug(
-                                "controller: -> keyring passwd received"
+                            _log.debug(
+                                "-> keyring passwd received"
                             )
                     except Exception as e:  # pylint: disable=broad-except
-                        config.logger.error(
-                            "controller: keyring Exception %s", e
-                        )
+                        _log.exception(e)
                 if interactive and (
                     config.app_window.plus_account is None
                     or config.passwd is None
@@ -200,15 +193,10 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                                 keyring.set_password(
                                     config.app_name, login, passwd
                                 )
-                                config.logger.debug(
-                                    "controller: -> keyring set password (%s)",
-                                    login,
-                                )
+                                _log.debug("keyring set password (%s)", login)
                             # pylint: disable=broad-except
                             except Exception as e:
-                                config.logger.error(
-                                    "controller: keyring Exception %s", e
-                                )
+                                _log.exception(e)
                                 if (
                                     not platform.system().startswith("Windows")
                                     and platform.system() != "Darwin"
@@ -252,20 +240,15 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                         True,
                         None,
                     )  # @UndefinedVariable
-                    config.logger.info(
-                        "Artisan v%s (%s, %s) connected",
-                        str(__version__),
-                        str(__revision__),
-                        str(__build__),
-                    )
+                    _log.info("artisan.plus connected")
                     try:
                         queue.start()  # start the outbox queue
-                    except Exception:  # pylint: disable=broad-except
-                        pass
+                    except Exception as e:  # pylint: disable=broad-except
+                        _log.exception(e)
                     try:
                         config.app_window.resetDonateCounter()
-                    except Exception:  # pylint: disable=broad-except
-                        pass
+                    except Exception as e:  # pylint: disable=broad-except
+                        _log.exception(e)
                 else:
                     if clear_on_failure:
                         connection.clearCredentials()
@@ -291,7 +274,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                         )  # @UndefinedVariable
         except Exception as e:  # pylint: disable=broad-except
             if interactive:
-                config.logger.error("controller: connect Exception %s", e)
+                _log.exception(e)
             if clear_on_failure:
                 connection.clearCredentials()
                 if interactive:
@@ -341,8 +324,8 @@ def disconnect(
     interactive: bool = False,
     keepON: bool = True
 ) -> None:
-    config.logger.info(
-        "controller:disconnect(%s,%s,%s,%s)",
+    _log.info(
+        "disconnect(%s,%s,%s,%s)",
         remove_credentials,
         stop_queue,
         interactive,
@@ -386,7 +369,7 @@ def disconnect(
 
 def reconnected() -> None:
     if not is_connected():
-        config.logger.info("controller:reconnected()")
+        _log.info("reconnected()")
         try:
             connect_semaphore.acquire(1)
             config.connected = True
@@ -405,7 +388,7 @@ def reconnected() -> None:
 # to be added to the saved file
 def updateSyncRecordHashAndSync() -> None:
     try:
-        config.logger.info("controller:updateSyncRecordHashAndSync()")
+        _log.info("updateSyncRecordHashAndSync()")
         if is_on():
             roast_record = roast.getRoast()
             sync_record, sync_record_hash = roast.getSyncRecord(roast_record)
@@ -437,13 +420,5 @@ def updateSyncRecordHashAndSync() -> None:
             return sync_record_hash
         return None
     except Exception as e:  # pylint: disable=broad-except
-        import sys
-
-        _, _, exc_tb = sys.exc_info()
-        config.logger.error(
-            ("controller: Exception in updateSyncRecordHashAndSync()"
-             " line %s: %s"),
-            getattr(exc_tb, 'tb_lineno', '?'),
-            e,
-        )
+        _log.exception(e)
         return None
