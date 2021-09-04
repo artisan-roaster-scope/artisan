@@ -11,11 +11,13 @@ author_profile: true
 
 Menu: `Roast` >> `Properties`
 
-Under the Roast Properties, you can input many parameters for your current batch and you can choose a prior roast profile to run in the background.  What you enter here may end up as part of the Summary dialog box which can be printed for your labels.  
+Under the Roast Properties, you can input many parameters for your current batch and you can choose a prior roast profile to run in the background.  What you enter here may end up as part of the Summary dialog box which can be printed for your labels.  There is a tab called Setup which contains basic information including the Organzation Name, Operator Name, Machine Model and Size, Heating Method and Drum Speed.  Fill this out first.  For those interested there is a new feature for tracking engery consumption and those parameters are entered on the Engery tab.  The analysis and entries are explained in the blog post [Tracking Energy Consumption & CO2 Production in Coffee Roasting](https://artisan-roasterscope.blogspot.com/2021/07/tracking-energy-consumption-co2.html).
 
 ![roasting menus](/assets/images/gsg/roast menu.png)
 
-![roast properties](/assets/images/gsg/roast properties dialog.png)
+![roast properties](/assets/images/gsg/Roast Properties Setup.png)
+![roast properties](/assets/images/gsg/Roast Properties Energy.png)
+![roast properties](/assets/images/gsg/Roast Properties Roast.png)
 
 When you enter the coffee bean name under Title, it shows up on the graph.  The idea is that "Title" is actual the product title, but some people use the title for other things. That product title gets combined with the batch number to be rendered as a title on the profile. The beans you use can be specified in the beans field.  So for example you have a product called Holiday Roast and in the bean field you enter the three types of beans you used.  The items in the red box are for Artisan.Plus users.  
 
