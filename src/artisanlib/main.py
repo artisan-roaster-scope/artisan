@@ -2882,6 +2882,7 @@ class tgraphcanvas(FigureCanvas):
                             self.starteventmessagetimer()
                             break
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onpick() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -2914,6 +2915,7 @@ class tgraphcanvas(FigureCanvas):
                 corners = aw.qmc.ax.transAxes.inverted().transform(aw.segmentresultsanno.get_bbox_patch().get_extents())
                 aw.qmc.segmentresultsloc = (corners[0][0], corners[0][1] + (corners[1][1] - corners[0][1])/2)
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onclick() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -3008,7 +3010,7 @@ class tgraphcanvas(FigureCanvas):
                                 if self.timeindex[i] and self.timeindex[i] != -1:
                                     idx_after = self.timeindex[i]
                             if ((not idx_before) or timex > idx_before) and ((not idx_after) or timex < idx_after):
-                                if not self.flagstart or (k[1] == 0 and self.timeindex[0] > -1) or (k[1] != 0 and self.timeindex[k[1]] != 0): # only add menu item during recording if already a value is set (via a button)
+                                if not self.flagstart or (k[1] == 0) or (k[1] != 0 and self.timeindex[k[1]] != 0): # only add menu item during recording if already a value is set (via a button)
                                     ac = QAction(menu)
                                     ac.key = (k[1],timex)
                                     ac.setText(" " + k[0])
@@ -3027,6 +3029,7 @@ class tgraphcanvas(FigureCanvas):
                         menu.triggered.connect(self.event_popup_action)
                         menu.popup(QCursor.pos())
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onclick() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -3337,6 +3340,7 @@ class tgraphcanvas(FigureCanvas):
                     tempx[-1] = (tempx[-2] + temp) / 2.0
             return temp
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " filterDropOuts() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -4441,6 +4445,7 @@ class tgraphcanvas(FigureCanvas):
                             if self.backgroundPlaybackDROP:
                                 self.playbackdrop()
                     except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
                         _, _, exc_tb = sys.exc_info()
                         self.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -4469,6 +4474,7 @@ class tgraphcanvas(FigureCanvas):
                     self.setalarm(i)
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -4594,6 +4600,7 @@ class tgraphcanvas(FigureCanvas):
             elif redraw and force: # only on aligning with CHARGE we redraw even if nothing is moved to redraw the time axis
                 self.updateBackground()
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " timealign() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -4818,6 +4825,7 @@ class tgraphcanvas(FigureCanvas):
                                 aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=str("A%d (S%d)"%(number,slidernr)))
                             aw.fireslideraction(slidernr)
                     except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                         aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '{0}' not a valid number [0-100]",None).format(string))
@@ -4907,6 +4915,7 @@ class tgraphcanvas(FigureCanvas):
                                 #aw.qmc.temporarysetsv = sv
                                 aw.pidcontrol.setSV(sv,init=False)
                     except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " processAlarm() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                         aw.sendmessage(QApplication.translate("Message","Alarm trigger SV slider error, description '{0}' not a valid number",None).format(string))
@@ -4926,6 +4935,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.resetCanvasColorSignal.emit()
 
             except Exception as ex: # pylint: disable=broad-except
+                _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
                 self.adderror((QApplication.translate("Error Message","Exception:",None) + " processAlarm() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -4953,6 +4963,7 @@ class tgraphcanvas(FigureCanvas):
                     (aw.qmc.replayType == 2 and aw.qmc.TPalarmtimeindex and self.stemp21[self.timeindexB[6]] - self.ctemp1[-1] <= 0)): # by ET
                     aw.qmc.autoDropIdx = len(aw.qmc.timex) - 2
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " playbackdrop() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -5062,6 +5073,7 @@ class tgraphcanvas(FigureCanvas):
                         if text[0] == ">":
                             aw.clearMessageLine(style="background-color:'transparent';")
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " playbackevent() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -5140,6 +5152,7 @@ class tgraphcanvas(FigureCanvas):
                         if self.l_BTprojection:
                             self.l_BTprojection.set_data([],[])
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updateProjection() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -5821,6 +5834,7 @@ class tgraphcanvas(FigureCanvas):
                 #if sample()
                 #virtual devices with symbolic may need 2 samples min.
                 if len(sample_timex) > 2:
+                    _log.exception(e)
                     e = str(e)
                     _, _, exc_tb = sys.exc_info()
                     mathexpression = mathexpression.replace("{","(").replace("}",")") # avoid {x} leading to key arrows
@@ -6053,6 +6067,7 @@ class tgraphcanvas(FigureCanvas):
                 self.clearLCDs()
 
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " clearMeasurements() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -6351,6 +6366,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.updatePlusStatus()
 
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " reset() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -6430,6 +6446,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 return y
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " smooth() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -6779,6 +6796,7 @@ class tgraphcanvas(FigureCanvas):
                         except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                             pass
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " place_annotations() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -6996,6 +7014,7 @@ class tgraphcanvas(FigureCanvas):
 
             return delta1, delta2
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " recomputeDeltas() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -7762,6 +7781,7 @@ class tgraphcanvas(FigureCanvas):
                                             except Exception: # pylint: disable=broad-except
                                                 pass
                                     except Exception as ex: # pylint: disable=broad-except
+                                        _log.exception(ex)
 #                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
                                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -7798,6 +7818,7 @@ class tgraphcanvas(FigureCanvas):
                                             except Exception: # pylint: disable=broad-except
                                                 pass
                                     except Exception as ex: # pylint: disable=broad-except
+                                        _log.exception(ex)
 #                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
                                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -7834,6 +7855,7 @@ class tgraphcanvas(FigureCanvas):
                                             except Exception: # pylint: disable=broad-except
                                                 pass
                                     except Exception as ex: # pylint: disable=broad-except
+                                        _log.exception(ex)
 #                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
                                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -7870,6 +7892,7 @@ class tgraphcanvas(FigureCanvas):
                                             except Exception: # pylint: disable=broad-except
                                                 pass
                                     except Exception as ex: # pylint: disable=broad-except
+                                        _log.exception(ex)
 #                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
                                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -8261,6 +8284,7 @@ class tgraphcanvas(FigureCanvas):
                                         except Exception: # pylint: disable=broad-except
                                             pass
                                 except Exception as ex: # pylint: disable=broad-except
+                                    _log.exception(ex)
 #                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -8300,6 +8324,7 @@ class tgraphcanvas(FigureCanvas):
                                             pass
 
                                 except Exception as ex: # pylint: disable=broad-except
+                                    _log.exception(ex)
 #                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -8338,6 +8363,7 @@ class tgraphcanvas(FigureCanvas):
                                         except Exception: # pylint: disable=broad-except
                                             pass
                                 except Exception as ex: # pylint: disable=broad-except
+                                    _log.exception(ex)
 #                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -8376,6 +8402,7 @@ class tgraphcanvas(FigureCanvas):
                                         except Exception: # pylint: disable=broad-except
                                             pass
                                 except Exception as ex: # pylint: disable=broad-except
+                                    _log.exception(ex)
 #                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -8657,6 +8684,7 @@ class tgraphcanvas(FigureCanvas):
                                 markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],
                                 drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
                     except Exception as ex: # pylint: disable=broad-except
+                        _log.exception(ex)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                     try:
@@ -8680,6 +8708,7 @@ class tgraphcanvas(FigureCanvas):
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
                     except Exception as ex: # pylint: disable=broad-except
+                        _log.exception(ex)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                 ##### ET,BT curves
@@ -8885,6 +8914,7 @@ class tgraphcanvas(FigureCanvas):
                     pass
 
             except Exception as ex: # pylint: disable=broad-except
+                _log.exception(ex)
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -8931,6 +8961,7 @@ class tgraphcanvas(FigureCanvas):
                 # note to self, the eventno and annotext can be removed from the list.  Only here for debug prints
                 self.overlapList.append((xl,xr,yl,yu)) #,eventno,annotext))
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkOverlap() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return overlap
@@ -8946,6 +8977,7 @@ class tgraphcanvas(FigureCanvas):
             bbox = Bbox(bbox_data) # x0, y0, width, height
             corners = (bbox.bounds[0],bbox.bounds[0]+bbox.bounds[2],bbox.bounds[1],bbox.bounds[1]+bbox.bounds[3])
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " annoboxCorners() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return corners  # x0, x1, y0, y1
@@ -9152,6 +9184,7 @@ class tgraphcanvas(FigureCanvas):
                     eventanno = pattern.sub(replacestring,eventanno)
 
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " parseSpecialeventannotation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             eventanno = ""
@@ -9194,6 +9227,7 @@ class tgraphcanvas(FigureCanvas):
             self.ai = self.ax.imshow(self.logoimg, zorder=0, extent=extent, alpha=aw.logoimgalpha/10, aspect='auto', resample=False)
 
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " placelogoimage() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -9210,6 +9244,7 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message","Loaded watermark image {0}", None).format(filename))
             QTimer.singleShot(500, lambda : self.redraw(recomputeAllDeltas=False)) #some time needed before the redraw on artisan start with no profile loaded.  processevents() does not work here.
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " logoloadfile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             aw.logofilename = ""
@@ -9428,6 +9463,7 @@ class tgraphcanvas(FigureCanvas):
                     color=tc,zorder=11,path_effects=[])
                 text.set_in_layout(False)
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " statsSummary() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -10261,6 +10297,7 @@ class tgraphcanvas(FigureCanvas):
             if not bool(aw.simulator):
                 self.StartAsyncSamplingAction()
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OnMonitor() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -10353,6 +10390,7 @@ class tgraphcanvas(FigureCanvas):
             if recording and self.flagKeepON:
                 self.OnMonitor()
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -10674,6 +10712,7 @@ class tgraphcanvas(FigureCanvas):
             aw.update_minieventline_visibility()
 
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -10715,6 +10754,7 @@ class tgraphcanvas(FigureCanvas):
             aw.AUCLCD.hide()
             aw.hideEventsMinieditor()
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffRecorder() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -10775,8 +10815,8 @@ class tgraphcanvas(FigureCanvas):
                     self.fileDirtySignal.emit()
                     if aw.button_8.isFlat() and self.timeindex[0] > -1:
                         # undo wrongly set CHARGE
-                        # deactivate autoCHARGE
-                        aw.qmc.autoCHARGEenabled = False
+                        ## deactivate autoCHARGE
+                        ##aw.qmc.autoCHARGEenabled = False
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             try:
@@ -10848,6 +10888,7 @@ class tgraphcanvas(FigureCanvas):
                 message = QApplication.translate("Message","CHARGE: Scope is not recording", None)
                 aw.sendmessage(message)
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markCharge() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
@@ -10900,6 +10941,7 @@ class tgraphcanvas(FigureCanvas):
                     #set message at bottom
                     aw.sendmessage(message)
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markTP() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
@@ -10974,6 +11016,7 @@ class tgraphcanvas(FigureCanvas):
                     message = QApplication.translate("Message","DRY END: Scope is not recording", None)
                     aw.sendmessage(message)
             except Exception as ex: # pylint: disable=broad-except
+                _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDryEnd() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
@@ -11081,6 +11124,7 @@ class tgraphcanvas(FigureCanvas):
                     message = QApplication.translate("Message","FC START: Scope is not recording", None)
                     aw.sendmessage(message)
             except Exception as ex: # pylint: disable=broad-except
+                _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark1Cstart() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
@@ -11178,6 +11222,7 @@ class tgraphcanvas(FigureCanvas):
                     message = QApplication.translate("Message","FC END: Scope is not recording", None)
                     aw.sendmessage(message)
             except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark1Cend() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
@@ -11279,6 +11324,7 @@ class tgraphcanvas(FigureCanvas):
                     message = QApplication.translate("Message","SC START: Scope is not recording", None)
                     aw.sendmessage(message)
             except Exception as ex: # pylint: disable=broad-except
+                _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark2Cstart() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
@@ -11385,6 +11431,7 @@ class tgraphcanvas(FigureCanvas):
                     message = QApplication.translate("Message","SC END: Scope is not recording", None)
                     aw.sendmessage(message)
             except Exception as ex: # pylint: disable=broad-except
+                _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark2Cend() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
@@ -11528,6 +11575,7 @@ class tgraphcanvas(FigureCanvas):
                     message = QApplication.translate("Message","DROP: Scope is not recording", None)
                     aw.sendmessage(message)
             except Exception as ex: # pylint: disable=broad-except
+                _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDrop() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
@@ -11657,6 +11705,7 @@ class tgraphcanvas(FigureCanvas):
                     message = QApplication.translate("Message","COOL: Scope is not recording", None)
                     aw.sendmessage(message)
             except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markCoolEnd() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
@@ -11827,6 +11876,7 @@ class tgraphcanvas(FigureCanvas):
                 self.EventRecordAction(extraevent=extraevent,takeLock=takeLock,
                 doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " EventRecord() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -12050,6 +12100,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 aw.sendmessage(QApplication.translate("Message","Timer is OFF", None))
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " EventRecordAction() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -12152,6 +12203,7 @@ class tgraphcanvas(FigureCanvas):
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " DeviceEventRecord() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
@@ -12294,6 +12346,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 self.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min","abbrev. of minutes")))
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " writecharacteristics() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -12509,6 +12562,7 @@ class tgraphcanvas(FigureCanvas):
                             pass
             self.writecharacteristics(TP_index,LP)
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " writestatistics() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -12788,6 +12842,7 @@ class tgraphcanvas(FigureCanvas):
             energymetrics["KWH_roast_per_green_kg"] = kwh_roast_per_green_kg
             
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " calcEnergyuse() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -12818,6 +12873,7 @@ class tgraphcanvas(FigureCanvas):
                         factor = (load_pct / 100)
                     energy = self.loadratings[i] * factor * (duration / 3600) #* self.convertHeat(1,self.ratingunits[i],0)
                 except Exception as ex: # pylint: disable=broad-except
+                    _log.exception(ex)
                     #traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -12875,6 +12931,7 @@ class tgraphcanvas(FigureCanvas):
             coolDuration = self.timex[-1] - self.timex[self.timeindex[6]]
             
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -13034,12 +13091,14 @@ class tgraphcanvas(FigureCanvas):
 
             QMessageBox.information(aw,QApplication.translate("Message","Profile information",None),string)
 
-        except ValueError as e:
+        except ValueError as e: 
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:",None) + " univariateinfo() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " univariateinfo() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
@@ -13143,6 +13202,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         res = "%.8f * log(%.8f * t %s %.8f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Error in lnRegression:",None) + " lnRegression() " + str(e),getattr(exc_tb, 'tb_lineno', '?'))
@@ -13179,6 +13239,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror(QApplication.translate("Error Message","Value Error:",None) + " univariate()")
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " univariate() " + str(e),getattr(exc_tb, 'tb_lineno', '?'))
@@ -13204,6 +13265,7 @@ class tgraphcanvas(FigureCanvas):
             return
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " drawinterp() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
@@ -13428,6 +13490,7 @@ class tgraphcanvas(FigureCanvas):
                     f.write(repr(obj))
                 aw.sendmessage(QApplication.translate("Message","Points saved", None))
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " savepoints() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -13450,6 +13513,7 @@ class tgraphcanvas(FigureCanvas):
                 self.redrawdesigner()
                 aw.sendmessage(QApplication.translate("Message","Points loaded", None))
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadpoints() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -13860,6 +13924,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.sendmessage(string1+string2+string3,append=False)
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " on_motion() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -13878,6 +13943,7 @@ class tgraphcanvas(FigureCanvas):
             return min_bt, time_min_bt
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " findTPdes() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return None
@@ -13979,6 +14045,7 @@ class tgraphcanvas(FigureCanvas):
             return # i
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addpoint() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
@@ -14017,6 +14084,7 @@ class tgraphcanvas(FigureCanvas):
             self.redrawdesigner()
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " removepoint() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
@@ -14097,6 +14165,7 @@ class tgraphcanvas(FigureCanvas):
             return
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createFromDesigner() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
@@ -14500,6 +14569,7 @@ class tgraphcanvas(FigureCanvas):
             return
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " drawWheel() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
@@ -15055,6 +15125,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
                 aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " edit_parameters() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 #            traceback.print_exc(file=sys.stdout)
@@ -15099,43 +15170,46 @@ class SampleThread(QThread):
     # fetch the raw samples from the main and all extra devices once per interval
     def sample(self):
         _log.debug("sample")
-        gotlock = aw.qmc.samplingSemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
-        if gotlock:
-            try:
-                temp1_readings = []
-                temp2_readings = []
-                timex_readings = []
-                
-                ##### send sampling action if any interval is set to "sync" (extra_event_sampling_delay = 0)
+        if aw.qmc.device == 18 and aw.simulator is None: # NONE device
+            self.sample_processingSignal.emit([], [], [])            
+        else:
+            gotlock = aw.qmc.samplingSemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+            if gotlock:
                 try:
-                    if aw.qmc.extra_event_sampling_delay == 0 and aw.qmc.extrabuttonactions[2]:
-                        aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
-                except Exception: # pylint: disable=broad-except
-                    pass
-                
-                #### first retrieve readings from the main device
-                timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
-                #read time, ET (t1) and BT (t2) TEMPERATURE
-                tx_org,t1,t2 = self.sample_main_device()
-                timeAfterETBT = libtime.perf_counter() # the time the data of the main device was received
-                etbt_time = timeAfterETBT - timeBeforeETBT
-                tx = tx_org + (etbt_time / 2.0) # we take the average between before and after
-                temp1_readings.append(t1)
-                temp2_readings.append(t2)
-                timex_readings.append(tx)
-                
-                ##############  if using Extra devices
-                for i in range(len(aw.qmc.extradevices)):
-                    extratx, extrat2, extrat1 = self.sample_extra_device(i)
-                    temp1_readings.append(extrat1)
-                    temp2_readings.append(extrat2)
-                    timex_readings.append(extratx)
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
-            finally:
-                if aw.qmc.samplingSemaphore.available() < 1:
-                    aw.qmc.samplingSemaphore.release(1)
-                self.sample_processingSignal.emit(temp1_readings, temp2_readings, timex_readings)
+                    temp1_readings = []
+                    temp2_readings = []
+                    timex_readings = []
+                    
+                    ##### send sampling action if any interval is set to "sync" (extra_event_sampling_delay = 0)
+                    try:
+                        if aw.qmc.extra_event_sampling_delay == 0 and aw.qmc.extrabuttonactions[2]:
+                            aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
+                    except Exception: # pylint: disable=broad-except
+                        pass
+                    
+                    #### first retrieve readings from the main device
+                    timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
+                    #read time, ET (t1) and BT (t2) TEMPERATURE
+                    tx_org,t1,t2 = self.sample_main_device()
+                    timeAfterETBT = libtime.perf_counter() # the time the data of the main device was received
+                    etbt_time = timeAfterETBT - timeBeforeETBT
+                    tx = tx_org + (etbt_time / 2.0) # we take the average between before and after
+                    temp1_readings.append(t1)
+                    temp2_readings.append(t2)
+                    timex_readings.append(tx)
+                    
+                    ##############  if using Extra devices
+                    for i in range(len(aw.qmc.extradevices)):
+                        extratx, extrat2, extrat1 = self.sample_extra_device(i)
+                        temp1_readings.append(extrat1)
+                        temp2_readings.append(extrat2)
+                        timex_readings.append(extratx)
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+                finally:
+                    if aw.qmc.samplingSemaphore.available() < 1:
+                        aw.qmc.samplingSemaphore.release(1)
+                    self.sample_processingSignal.emit(temp1_readings, temp2_readings, timex_readings)
 
 
     def run(self):
@@ -18515,6 +18589,7 @@ class ApplicationWindow(QMainWindow):
             darker_rgb  = '#%02x%02x%02x' % (tuple([int(255 * (x * (1 - shade_factor))) for x in rgb_tuple])) # pylint: disable=consider-using-generator
             lighter_rgb = '#%02x%02x%02x' % (tuple([int(255 * (x + (1 - x) * tint_factor)) for x in rgb_tuple])) # pylint: disable=consider-using-generator
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createRGBGradient(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -18661,6 +18736,7 @@ class ApplicationWindow(QMainWindow):
                         a.setEnabled(True)
                         a.setIcon(ntb._icon(subscription_icon)) # pylint: disable=protected-access
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updatePlusStatus(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -18932,6 +19008,7 @@ class ApplicationWindow(QMainWindow):
             self.recentRoasts = [d] + rr[:self.maxRecentRoasts-1]
             self.updateNewMenuRecentRoasts()
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addRecentRoast(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -19410,6 +19487,7 @@ class ApplicationWindow(QMainWindow):
                 )
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " getcolorPairsToCheck() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -19442,6 +19520,7 @@ class ApplicationWindow(QMainWindow):
             c2_rgb = tuple(int(c2[i:i+2], 16) for i in (1, 3 ,5))
             cDiff = deltaE(c1_rgb, c2_rgb, input_space="sRGB255", uniform_space="CIELab")
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " colorDifference() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -19477,6 +19556,7 @@ class ApplicationWindow(QMainWindow):
 #                else: #debugprint
 #                    print("checkColors", str(c[0]), "/", str(c[2]), "  Okay", str(c[1]), str(c[3]), str(val))  #debugprint
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkColors() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -19501,6 +19581,7 @@ class ApplicationWindow(QMainWindow):
             nc_greyscale = "#{0:2x}{1:2x}{2:2x}".format(int(nc_greyscale_sRGB[0]),int(nc_greyscale_sRGB[1]),int(nc_greyscale_sRGB[2]))
             nc = str(QColor(nc_greyscale).name())
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " convertToGreyscale() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -19780,6 +19861,7 @@ class ApplicationWindow(QMainWindow):
                     auto_grid = max(2,steps)
                     aw.qmc.zgrid = auto_grid
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " autoAdjustAxis() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -20439,6 +20521,7 @@ class ApplicationWindow(QMainWindow):
             result['ror_min_delta'] = mindelta
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " curveSimilatrity2(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return result
@@ -20805,6 +20888,7 @@ class ApplicationWindow(QMainWindow):
                 aw.largePhasesLCDs_dialog.updateValues([None,None],[None,auc_value_str])
                 aw.largePhasesLCDs_dialog.updateAUCstyle(auc_style)
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updateAUCLCD(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -21094,6 +21178,7 @@ class ApplicationWindow(QMainWindow):
                 DRY =  "--:--"
                 FCs = "--:--"
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -21156,6 +21241,7 @@ class ApplicationWindow(QMainWindow):
                         pass
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -21364,6 +21450,7 @@ class ApplicationWindow(QMainWindow):
                     cmd = cmd.format(*(tuple([value]*cmd.count("{}"))))
                 self.eventaction(action,cmd) # cmd needs to be a string!
             except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fireslideraction() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -21642,6 +21729,7 @@ class ApplicationWindow(QMainWindow):
 #                            else: # on Darwin
 #                                QDesktopServices.openUrl(QUrl("file:///" + str(QApplication.applicationDirPath()) + "/../../../" + cmd_str, QUrl.ParsingMode.TolerantMode))
                     except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " eventaction() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                 elif action == 3: # Multiple Event
@@ -22009,6 +22097,7 @@ class ApplicationWindow(QMainWindow):
                     try:
                         self.call_prog_with_args(cmd_str)
                     except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " callProgram(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                 elif action == 8: # HOTTOP Heater
@@ -24437,6 +24526,7 @@ class ApplicationWindow(QMainWindow):
             #fn = self.removeDisallowedFilenameChars(str(fn))
             #fn = fn.strip()
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Error:",None) + " parseAutosaveprefix() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return fn
@@ -24502,6 +24592,7 @@ class ApplicationWindow(QMainWindow):
                 self.autosaveconf()
                 return None
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Error:",None) + " automaticsave() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return None
@@ -24556,6 +24647,7 @@ class ApplicationWindow(QMainWindow):
                 if not aw.qmc.flagstart:
                     self.qmc.fig.canvas.draw()
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " changeEventNumber() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -24799,6 +24891,7 @@ class ApplicationWindow(QMainWindow):
                 if fileName:
                     self.loadFile(fileName)
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fileLoad() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -24878,6 +24971,7 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None) + " fileload() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " loadFile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25020,6 +25114,7 @@ class ApplicationWindow(QMainWindow):
                 return True
             return False
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateSymbolicETBT(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         return False
@@ -25070,6 +25165,7 @@ class ApplicationWindow(QMainWindow):
             return False
 
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " calcVirtualdevices() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25320,6 +25416,7 @@ class ApplicationWindow(QMainWindow):
             return
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " loadbackground() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
@@ -25427,6 +25524,7 @@ class ApplicationWindow(QMainWindow):
             aw.autoAdjustAxis()
             self.qmc.redraw()
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importCSV() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25539,6 +25637,7 @@ class ApplicationWindow(QMainWindow):
                 outfile.write('\n')
             return True
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportJSON() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25680,6 +25779,7 @@ class ApplicationWindow(QMainWindow):
             ET.ElementTree(tree).write(filename,encoding='utf-8', xml_declaration=True)
             return True
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportPilot() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25755,6 +25855,7 @@ class ApplicationWindow(QMainWindow):
                 outfile.write("\n")
             return True
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportRoastLogger() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25775,6 +25876,7 @@ class ApplicationWindow(QMainWindow):
                 aw.autoAdjustAxis()
                 self.qmc.redraw()
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importJSON() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25789,6 +25891,7 @@ class ApplicationWindow(QMainWindow):
                 self.importRoastLoggerEnc(filename,'latin1')
             aw.qmc.fileDirtySignal.emit()
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importRoastLogger() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -25826,6 +25929,7 @@ class ApplicationWindow(QMainWindow):
             aw.extracomport,aw.extrabaudrate,aw.extrabytesize,aw.extraparity,aw.extrastopbits,aw.extratimeout = [],[],[],[],[],[]
             aw.qmc.resetlinecountcaches()
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " resetExtraDevices(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -26179,6 +26283,7 @@ class ApplicationWindow(QMainWindow):
                 return True
             return False
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportCSV() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -26349,6 +26454,7 @@ class ApplicationWindow(QMainWindow):
                 return True
             return False
         except Exception as ex:
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportExcel() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -26389,6 +26495,7 @@ class ApplicationWindow(QMainWindow):
 
             return obj
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " deserialize() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return {}
@@ -27192,6 +27299,7 @@ class ApplicationWindow(QMainWindow):
             aw.autoAdjustAxis()
             return True
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             # we don't report errors on settingsLoad
             _, _, exc_tb = sys.exc_info()
@@ -27296,6 +27404,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["COOL_ET"] = self.float2float(self.qmc.temp1[self.qmc.timeindex[7]])
                 computedProfile["COOL_BT"] = self.float2float(self.qmc.temp2[self.qmc.timeindex[7]])
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         ######### Phases #########
@@ -27313,6 +27422,7 @@ class ApplicationWindow(QMainWindow):
             if statisticstimes[4]:
                 computedProfile["coolphasetime"] = aw.float2float(statisticstimes[4],3)
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         ######### RoR #########
@@ -27328,6 +27438,7 @@ class ApplicationWindow(QMainWindow):
                 if aw.qmc.timeindex[2] > 0 and aw.qmc.delta2:
                     computedProfile["fcs_ror"] = self.float2float(aw.qmc.delta2[aw.qmc.timeindex[2]])
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         ######### ETBTarea #########
@@ -27424,6 +27535,7 @@ class ApplicationWindow(QMainWindow):
                 setdensity = aw.convertWeight(aw.qmc.density[0],aw.qmc.weight_units.index(aw.qmc.density[1]),0) / aw.convertVolume(aw.qmc.density[2],aw.qmc.volume_units.index(aw.qmc.density[3]),0)
                 computedProfile["set_density"] = self.float2float(setdensity,1)
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         ######### Humidity / Pressure #########
@@ -27439,6 +27551,7 @@ class ApplicationWindow(QMainWindow):
             if aw.qmc.ambientTemp != 0.0 and not math.isnan(aw.qmc.ambientTemp):
                 computedProfile["ambient_temperature"] = self.float2float(aw.qmc.ambientTemp)
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         ######### Similarity #########
@@ -27493,6 +27606,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["KWH_roast_per_green_kg"] = self.float2float(energymetrics["KWH_roast_per_green_kg"],1)
 
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         ######### RETURN #########
@@ -27707,12 +27821,14 @@ class ApplicationWindow(QMainWindow):
                 profile["betweenbatch_after_preheat"] = self.qmc.betweenbatch_after_preheat
                 profile["electricEnergyMix"] = self.qmc.electricEnergyMix
             except Exception as ex: # pylint: disable=broad-except
+                _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " getProfile(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
             return profile
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " getProfile(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return None
@@ -27796,6 +27912,7 @@ class ApplicationWindow(QMainWindow):
             self.sendmessage(QApplication.translate("Message","Cancelled", None))
             return False
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " filesave(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
@@ -27810,6 +27927,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " fileExport(): {0}").format(str(ex)))
             return
 
@@ -28080,6 +28198,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " fileImport(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -29793,6 +29912,7 @@ class ApplicationWindow(QMainWindow):
                 return False
             return False
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startWebLCDs() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -30026,6 +30146,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.etypes[2] = self.qmc.l_eventtype3dots.get_label()
                 self.qmc.etypes[3] = self.qmc.l_eventtype4dots.get_label()
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fetchCurveStyles() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -31403,6 +31524,7 @@ class ApplicationWindow(QMainWindow):
                     if f:
                         f.close()
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " productionReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -31441,6 +31563,7 @@ class ApplicationWindow(QMainWindow):
                 aw.sendmessage(QApplication.translate("Message","Statistics Saved",None))
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " saveStatistics() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -31588,6 +31711,7 @@ class ApplicationWindow(QMainWindow):
                     wb.save(filename)
                     aw.sendmessage(QApplication.translate("Message","Excel Production Report exported to {0}", None).format(filename))
                 except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
 #                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " productionExcelReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -31972,6 +32096,7 @@ class ApplicationWindow(QMainWindow):
                         res.append("")
             return res
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " extendedRankingData2List() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return []
@@ -32159,6 +32284,7 @@ class ApplicationWindow(QMainWindow):
                     try:
                         rd = self.profileRankingData(p)
                     except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
 #                        traceback.print_exc(file=sys.stdout)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -32316,6 +32442,7 @@ class ApplicationWindow(QMainWindow):
                             first_profile = False
 
                         except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
 #                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -32448,6 +32575,7 @@ class ApplicationWindow(QMainWindow):
                         graph_image = "<img alt='roast graph' style=\"width:100%;\" src='" + graph_image + "'>"
 
                     except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
 #                        traceback.print_exc(file=sys.stdout)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -32526,6 +32654,7 @@ class ApplicationWindow(QMainWindow):
                         try:
                             rd = self.profileRankingData(p)
                         except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
 #                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -32594,6 +32723,7 @@ class ApplicationWindow(QMainWindow):
                     graph_image_pct = "<img alt='roast graph pct' style=\"width: 95%;\" src='" + graph_image_pct + "'>"
 
                 except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
 #                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -32846,6 +32976,7 @@ class ApplicationWindow(QMainWindow):
                                         ws[cr] = str(conv_fld)
 
                         except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
 #                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -32912,9 +33043,11 @@ class ApplicationWindow(QMainWindow):
                     wb.save(filename)
                     aw.sendmessage(QApplication.translate("Message","Excel Ranking Report exported to {0}", None).format(filename))
                 except IOError as x:
+                    _log.exception(x)
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " Err [{0}] Can not write to file, perhaps it is open in an application or is write protected?").format(x.errno))
                     QApplication.beep()
                 except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
 #                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -33196,6 +33329,7 @@ class ApplicationWindow(QMainWindow):
                 QDesktopServices.openUrl(QUrl(full_path, QUrl.ParsingMode.TolerantMode))
 
             except IOError as e:
+                _log.exception(e)
                 aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " htmlReport() {0}").format(str(e)))
             finally:
                 if f:
@@ -33205,6 +33339,7 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.redraw(recomputeAllDeltas=False)
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " htmlReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -33736,6 +33871,7 @@ class ApplicationWindow(QMainWindow):
                 BT += self.calcAUC(rtbt,timex,temp2,i)
                 delta += self.calcAUC(rtbt,timex,temp1,i,temp2)
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ts() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -33920,6 +34056,7 @@ class ApplicationWindow(QMainWindow):
                 update_str = QApplication.translate("About", "You are using a beta continuous build.",None)
                 update_str += '<br/><br/>' + QApplication.translate("About", "You will see a notice here once a new official release is available.",None)
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkUpdate() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -34301,6 +34438,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadSettings() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -34506,6 +34644,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadSettings_theme() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -35076,6 +35215,7 @@ class ApplicationWindow(QMainWindow):
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importK202(): {0}").format(str(ex)))
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK202() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -35155,6 +35295,7 @@ class ApplicationWindow(QMainWindow):
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importK204(): {0}").format(str(ex)))
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK204() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -35350,6 +35491,7 @@ class ApplicationWindow(QMainWindow):
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importPilot(): {0}").format(str(ex)))
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.sendmessage(QApplication.translate("Message","Import Probat Pilot failed", None))
@@ -35405,6 +35547,7 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(message)
 
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " {1} {0}").format(str(ex),message),getattr(exc_tb, 'tb_lineno', '?'))
@@ -35440,6 +35583,7 @@ class ApplicationWindow(QMainWindow):
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " {1}: {0}").format(str(ex),message))
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " {1} {0}").format(str(ex),message),getattr(exc_tb, 'tb_lineno', '?'))
@@ -35539,6 +35683,7 @@ class ApplicationWindow(QMainWindow):
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importHH506RA(): {0}").format(str(ex)))
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importHH506RA() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -35911,6 +36056,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " loadWheel() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None) + " loadWheel() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return
@@ -36355,6 +36501,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " loadPalettes() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return None
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None) + " loadPalettes() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return None
@@ -36390,6 +36537,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " loadAlarms() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None) + " loadAlarms() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return
@@ -36598,6 +36746,7 @@ class ApplicationWindow(QMainWindow):
             cfr['segmentresultstr'] = res['segmentresultstr']
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisfitCurves(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -36612,6 +36761,7 @@ class ApplicationWindow(QMainWindow):
                 self.analysisShowResults(cfr, resultstr, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisfitCurves(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -36735,6 +36885,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.fig.canvas.draw()
 
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisShowResults(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -36815,6 +36966,7 @@ class ApplicationWindow(QMainWindow):
                 RoR_start = -1
             aw.qmc.delta1, aw.qmc.delta2 = aw.qmc.recomputeDeltas(aw.qmc.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisRecomputeDeltas(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -36898,6 +37050,7 @@ class ApplicationWindow(QMainWindow):
                         aw.sendmessage(QApplication.translate("Message","B1 = [%s] ; B2 = [%s]"%(EQU[0],EQU[1]), None))
 
             except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setbackgroundequ(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
