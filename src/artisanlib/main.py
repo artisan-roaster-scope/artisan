@@ -792,6 +792,11 @@ class tgraphcanvas(FigureCanvas):
         # Ambient Data Worker and Thread
         self.ambiWorker = None
         self.ambiThread = None
+        
+        # used by sample_processing
+        self.afterTP = False
+        self.decay_weights = None
+        self.temp_decay_weights = None
 
         self.flavorlabels = list(self.artisanflavordefaultlabels)
         #Initial flavor parameters.
@@ -2125,7 +2130,8 @@ class tgraphcanvas(FigureCanvas):
         self.projection = [1, 2, 2]
 
 
-        self.samplingsemaphore = QSemaphore(1)
+        self.samplingSemaphore = QSemaphore(1)
+        self.profileDataSemaphore = QSemaphore(1)
         self.messagesemaphore = QSemaphore(1)
         self.errorsemaphore = QSemaphore(1)
         self.serialsemaphore = QSemaphore(1)
@@ -2203,6 +2209,7 @@ class tgraphcanvas(FigureCanvas):
         self.currentpidsv = 0.
 
         self.linecount = None # linecount cache for resetlines(); has to be reseted if visibility of ET/BT or extra lines or background ET/BT changes
+        self.deltalinecount = None # deltalinecount cache for resetdeltalines(); has to be reseted if visibility of deltaET/deltaBT or background deltaET/deltaBT
 
         #variables to organize the delayed update of the backgrounds for bitblitting
         self.ax_background = None
@@ -3255,7 +3262,7 @@ class tgraphcanvas(FigureCanvas):
 
     def update_additional_artists(self):
         if aw.qmc.flagstart and ((aw.qmc.device == 18 and aw.simulator is None) or aw.qmc.showtimeguide): # not NONE device
-            tx = int(aw.qmc.timeclock.elapsed()/1000.)
+            tx = aw.qmc.timeclock.elapsed()/1000.
             if aw.qmc.l_timeline is None:
                 self.l_timeline = self.ax.axvline(tx,color = self.palette["timeguide"],
                                         label=aw.arabicReshape(QApplication.translate("Label", "TIMEguide", None)),
@@ -3271,6 +3278,789 @@ class tgraphcanvas(FigureCanvas):
         if aw.qmc.AUCguideFlag and aw.qmc.AUCguideTime and aw.qmc.AUCguideTime > 0:
             aw.qmc.ax.draw_artist(self.l_AUCguide)
 
+    # input filter
+    # if temp (the actual reading) is outside of the interval [tmin,tmax] or
+    # a spike is detected, the previous value is repeated or if that happend already before, -1 is returned
+    # note that here we assume that the actual measured temperature time/temp was not already added to the list of previous measurements timex/tempx
+    @staticmethod
+    def inputFilter(timex, tempx, time, temp, BT=False):
+        try:
+            wrong_reading = 0
+            #########################
+            # a) detect duplicates: remove a reading if it is equal to the previous or if that is -1 to the one before
+            if aw.qmc.dropDuplicates and ((len(tempx)>1 and tempx[-1] == -1 and abs(temp - tempx[-2]) <= aw.qmc.dropDuplicatesLimit) or (len(tempx)>0 and abs(temp - tempx[-1]) <= aw.qmc.dropDuplicatesLimit)):
+                wrong_reading = 2 # replace by previous reading not by -1
+            #########################
+            # b) detect overflows
+            if aw.qmc.minmaxLimits and (temp < aw.qmc.filterDropOut_tmin or temp > aw.qmc.filterDropOut_tmax):
+                wrong_reading = 1
+            #########################
+            # c) detect spikes (on BT only after CHARGE if autoChargeFlag=True not to have a conflict here)
+            n = aw.qmc.filterDropOut_spikeRoR_period
+            dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit # the limit of additional RoR in temp/sec (4C for C / 7F for F) compared to previous readings
+            if aw.qmc.dropSpikes and ((not aw.qmc.autoChargeFlag) or (not BT) or (aw.qmc.timeindex[0] != -1 and (aw.qmc.timeindex[0] + n) < len(timex))) and not wrong_reading and len(tempx) >= n:
+                # no min/max overflow detected
+                # check if RoR caused by actual measurement is way higher then the previous one
+                # calc previous RoR (pRoR) taking the last n samples into account
+                pdtemp = tempx[-1] - tempx[-n]
+                pdtime = timex[-1] - timex[-n]
+                if pdtime > 0:
+                    pRoR = abs(pdtemp/pdtime)
+                    dtemp = tempx[-1] - temp
+                    dtime = timex[-1] - time
+                    if dtime > 0:
+                        RoR = abs(dtemp/dtime)
+                        if RoR > (pRoR + dRoR_limit):
+                            wrong_reading = 2
+            #########################
+            # c) handle outliers if it could be detected
+            if wrong_reading:
+                if len(tempx) > 0 and tempx[-1] != -1:
+                    # repeate last correct reading if not done before in the last two fixes (min/max violation are always filtered)
+                    if len(tempx) == 1 or (len(tempx) > 3 and (tempx[-1] != tempx[-2] or tempx[-2] != tempx[-3])):
+                        return tempx[-1]
+                    if wrong_reading == 1:
+                        return -1
+                    # no way to correct this
+                    return temp
+                if wrong_reading == 1:
+                    return -1
+                # no way to correct this
+                return temp
+            # try to improve a previously corrected reading timex/temp[-1] based on the current reading time/temp (just in this case the actual reading is not a drop)
+            if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
+                if len(tempx) > 3 and tempx[-1] == tempx[-2] == tempx[-3] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2] and same for rthe one before
+                    delta = (tempx[-3] - temp) / 3.0
+                    tempx[-1] = tempx[-3] - 2*delta
+                    tempx[-2] = tempx[-3] - delta
+                elif len(tempx) > 2 and tempx[-1] == tempx[-2] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2]
+                    tempx[-1] = (tempx[-2] + temp) / 2.0
+            return temp
+        except Exception as e: # pylint: disable=broad-except
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " filterDropOuts() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            return temp
+
+    # the temp get's averaged using the given decay weights after resampling
+    # to linear time based on tx and the current sampling interval
+    @staticmethod
+    def decay_average(tx,temp,decay_weights):
+        if len(tx) != len(temp):
+            if len(temp)>0:
+                return temp[-1]
+            return -1
+        l = min(len(decay_weights),len(temp))
+        d = aw.qmc.delay / 1000.
+        tx_org = tx[-l:] # as len(tx)=len(temp) here, it is guranteed that len(tx_org)=l
+        # we create a linearly spaced time array starting from the newest timestamp in sampling interval distance
+        tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d), axis=0) # by contruction, len(tx_lin)=len(tx_org)=l
+        temp_trail = temp[-l:] # by construction, len(temp_trail)=len(tx_lin)=len(tx_org)=l
+        temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
+        try:
+            return numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:])  # len(decay_weights)>len(temp_trail_re)=l is possible
+        except Exception: # pylint: disable=broad-except
+            # in case something goes very wrong we at least return the standard average over temp, this should always work as len(tx)=len(temp)
+            return numpy.average(tx,temp)
+    
+    # returns true after BT passed the TP
+    def checkTPalarmtime(self):
+        seconds_since_CHARGE = int(aw.qmc.timex[-1]-aw.qmc.timex[aw.qmc.timeindex[0]])
+        # if v[-1] is the current temperature then check if
+        #   we are 20sec after CHARGE
+        #   len(BT) > 4
+        # BT[-5] <= BT[-4] abd BT[-5] <= BT[-3] and BT[-5] <= BT[-2] and BT[-5] <= BT[-1] and BT[-5] < BT[-1]
+        if seconds_since_CHARGE > 20 and not self.afterTP and len(aw.qmc.temp2) > 3 and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-4]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-3]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-2]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-1]) and (aw.qmc.temp2[-5] < aw.qmc.temp2[-1]):
+            self.afterTP = True
+        return self.afterTP
+    
+    # sample devices at interval self.delay miliseconds.
+    # we can assume within the processing of sample_processing() that flagon=True
+    def sample_processing(self, temp1_readings, temp2_readings, timex_readings):
+        _log.debug("sample_processing")
+        ##### (try to) lock resources  #########
+        gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,200) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+#        gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+        if gotlock:
+            try:
+                # duplicate system state flag flagstart locally and only refer to this copy within this function to make it behaving uniquely (either append or overwrite mode)
+                local_flagstart = aw.qmc.flagstart
+
+                # initalize the arrays modified depending on the recording state
+                if local_flagstart:
+                    sample_timex = aw.qmc.timex
+                    sample_temp1 = aw.qmc.temp1
+                    sample_temp2 = aw.qmc.temp2
+                    sample_ctimex1 = aw.qmc.ctimex1
+                    sample_ctemp1 = aw.qmc.ctemp1
+                    sample_ctimex2 = aw.qmc.ctimex2
+                    sample_ctemp2 = aw.qmc.ctemp2
+                    sample_tstemp1 = aw.qmc.tstemp1
+                    sample_tstemp2 = aw.qmc.tstemp2
+                    sample_stemp1 = aw.qmc.stemp1
+                    sample_stemp2 = aw.qmc.stemp2
+                    sample_unfiltereddelta1 = aw.qmc.unfiltereddelta1
+                    sample_unfiltereddelta2 = aw.qmc.unfiltereddelta2
+                    sample_delta1 = aw.qmc.delta1
+                    sample_delta2 = aw.qmc.delta2
+                    # list of lists:
+                    sample_extratimex = aw.qmc.extratimex
+                    sample_extratemp1 = aw.qmc.extratemp1
+                    sample_extratemp2 = aw.qmc.extratemp2
+                    sample_extractimex1 = aw.qmc.extractimex1
+                    sample_extractemp1 = aw.qmc.extractemp1
+                    sample_extractimex2 = aw.qmc.extractimex2
+                    sample_extractemp2 = aw.qmc.extractemp2
+                else:
+                    m_len = aw.qmc.curvefilter*2
+                    sample_timex = aw.qmc.on_timex = aw.qmc.on_timex[-m_len:]
+                    sample_temp1 = aw.qmc.on_temp1 = aw.qmc.on_temp1[-m_len:]
+                    sample_temp2 = aw.qmc.on_temp2 = aw.qmc.on_temp2[-m_len:]
+                    sample_ctimex1 = aw.qmc.on_ctimex1 = aw.qmc.on_ctimex1[-m_len:]
+                    sample_ctemp1 = aw.qmc.on_ctemp1 = aw.qmc.on_ctemp1[-m_len:]
+                    sample_ctimex2 = aw.qmc.on_ctimex2 = aw.qmc.on_ctimex2[-m_len:]
+                    sample_ctemp2 = aw.qmc.on_ctemp2 = aw.qmc.on_ctemp2[-m_len:]
+                    sample_tstemp1 = aw.qmc.on_tstemp1 = aw.qmc.on_tstemp1[-m_len:]
+                    sample_tstemp2 = aw.qmc.on_tstemp2 = aw.qmc.on_tstemp2[-m_len:]
+                    sample_stemp1 = aw.qmc.on_stemp1 = aw.qmc.on_stemp1[-m_len:]
+                    sample_stemp2 = aw.qmc.on_stemp2 = aw.qmc.on_stemp2[-m_len:]
+                    sample_unfiltereddelta1 = aw.qmc.on_unfiltereddelta1 = aw.qmc.on_unfiltereddelta1[-m_len:]
+                    sample_unfiltereddelta2 = aw.qmc.on_unfiltereddelta2 = aw.qmc.on_unfiltereddelta2[-m_len:]
+                    sample_delta1 = aw.qmc.on_delta1 = aw.qmc.on_delta1[-m_len:]
+                    sample_delta2 = aw.qmc.on_delta2 = aw.qmc.on_delta2[-m_len:]
+                    # list of lists:
+                    for i in range(len(aw.qmc.extradevices)):
+                        aw.qmc.on_extratimex[i] = aw.qmc.on_extratimex[i][-m_len:]
+                        aw.qmc.on_extratemp1[i] = aw.qmc.on_extratemp1[i][-m_len:]
+                        aw.qmc.on_extratemp2[i] = aw.qmc.on_extratemp2[i][-m_len:]
+                        aw.qmc.on_extractimex1[i] = aw.qmc.on_extractimex1[i][-m_len:]
+                        aw.qmc.on_extractemp1[i] = aw.qmc.on_extractemp1[i][-m_len:]
+                        aw.qmc.on_extractimex2[i] = aw.qmc.on_extractimex2[i][-m_len:]
+                        aw.qmc.on_extractemp2[i] = aw.qmc.on_extractemp2[i][-m_len:]
+                    sample_extratimex = aw.qmc.on_extratimex
+                    sample_extratemp1 = aw.qmc.on_extratemp1
+                    sample_extratemp2 = aw.qmc.on_extratemp2
+                    sample_extractimex1 = aw.qmc.on_extractimex1
+                    sample_extractemp1 = aw.qmc.on_extractemp1
+                    sample_extractimex2 = aw.qmc.on_extractimex2
+                    sample_extractemp2 = aw.qmc.on_extractemp2
+
+
+
+                #if using a meter (thermocouple device)
+                if aw.qmc.device != 18 or aw.simulator is not None: # not NONE device
+
+                    t1 = temp1_readings[0]
+                    t2 = temp2_readings[0]
+                    tx = timex_readings[0]
+                    
+                    aw.qmc.RTtemp1 = t1 # store readings for real-time symbolic evaluation
+                    aw.qmc.RTtemp2 = t2
+                    ##############  if using Extra devices
+                    nxdevices = len(aw.qmc.extradevices)
+                    if nxdevices:
+                        les,led,let =  len(aw.extraser),nxdevices,len(sample_extratimex)
+                        if les == led == let:
+                            xtra_dev_lines1 = 0
+                            xtra_dev_lines2 = 0
+                            #1 clear extra device buffers
+                            aw.qmc.RTextratemp1,aw.qmc.RTextratemp2,aw.qmc.RTextratx = [],[],[]
+                            #2 load RT buffers
+                            aw.qmc.RTextratemp1 = temp1_readings[1:]
+                            aw.qmc.RTextratemp2 = temp2_readings[1:]
+                            aw.qmc.RTextratx = timex_readings[1:]
+                            #3 evaluate symbolic expressions
+                            for i in range(nxdevices):
+                                extratx = aw.qmc.RTextratx[i]
+                                extrat1 = aw.qmc.RTextratemp1[i]
+                                extrat2 = aw.qmc.RTextratemp2[i]
+                                if len(aw.qmc.extramathexpression1) > i and aw.qmc.extramathexpression1[i] is not None and len(aw.qmc.extramathexpression1[i]):
+                                    try:
+                                        extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+3),RTsval=aw.qmc.RTextratemp1[i])
+                                        aw.qmc.RTextratemp1[i] = extrat1
+                                    except Exception: # pylint: disable=broad-except
+                                        pass
+                                if len(aw.qmc.extramathexpression2) > i and aw.qmc.extramathexpression2[i] is not None and len(aw.qmc.extramathexpression2[i]):
+                                    try:
+                                        extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
+                                        aw.qmc.RTextratemp2[i] = extrat2
+                                    except Exception: # pylint: disable=broad-except
+                                        pass
+                                        
+                                et1_prev = et2_prev = None
+                                et1_prevprev = et2_prevprev = None
+                                if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
+                                
+                                    ## Apply InputFilters. As those might modify destructively up to two older readings in temp1/2 via interpolation for drop outs we try to dectect this and copy those
+                                    # changes back to the ctemp lines that are rendered.
+                                    if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
+                                        if len(sample_extratemp1[i])>0:
+                                            et1_prev = sample_extratemp1[i][-1]
+                                            if len(sample_extratemp1[i])>1:
+                                                et1_prevprev = sample_extratemp1[i][-2]
+                                        if len(sample_extratemp2[i])>0:
+                                            et2_prev = sample_extratemp2[i][-1]
+                                            if len(sample_extratemp2[i])>1:
+                                                et2_prevprev = sample_extratemp2[i][-2]
+                                    extrat1 = self.inputFilter(sample_extratimex[i],sample_extratemp1[i],extratx,extrat1)
+                                    extrat2 = self.inputFilter(sample_extratimex[i],sample_extratemp2[i],extratx,extrat2)
+
+                                    # now copy the destructively modified values from temp1/2 to ctemp1/2 if any (to ensure to pick the right elements we compare the timestamps at those indicees)
+                                    if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
+                                        if len(sample_extractimex1[i])>0:
+                                            if et1_prev is not None and sample_extractimex1[i][-1] == sample_extratimex[i][-1] and et1_prev != sample_extratemp1[i][-1]:
+                                                sample_extractemp1[i][-1] = sample_extratemp1[i][-1]
+                                            if len(sample_extractimex1[i])>1 and et1_prevprev is not None and sample_extractimex1[i][-2] == sample_extratimex[i][-2] and et1_prevprev != sample_extratemp1[i][-2]:
+                                                sample_extractemp1[i][-2] = sample_extratemp1[i][-2]
+                                        if len(sample_extractimex2[i])>0:
+                                            if et2_prev is not None and sample_extractimex2[i][-1] == sample_extratimex[i][-1] and et2_prev != sample_extratemp2[i][-1]:
+                                                sample_extractemp2[i][-1] = sample_extratemp2[i][-1]
+                                            if len(sample_extractimex2[i])>1 and et2_prevprev is not None and sample_extractimex2[i][-2] == sample_extratimex[i][-2] and et2_prevprev != sample_extratemp2[i][-2]:
+                                                sample_extractemp2[i][-2] = sample_extratemp2[i][-2]
+
+                                sample_extratimex[i].append(extratx)
+                                sample_extratemp1[i].append(float(extrat1))
+                                sample_extratemp2[i].append(float(extrat2))
+                                
+                                if extrat1 != -1:
+                                    sample_extractimex1[i].append(float(extratx))
+                                    sample_extractemp1[i].append(float(extrat1))
+                                if extrat2 != -1:
+                                    sample_extractimex2[i].append(float(extratx))
+                                    sample_extractemp2[i].append(float(extrat2))
+                                # update extra lines
+
+                                if aw.extraCurveVisibility1[i] and len(aw.qmc.extratemp1lines) > xtra_dev_lines1:
+                                    aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(sample_extractimex1[i], sample_extractemp1[i])
+                                    xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                if aw.extraCurveVisibility2[i] and len(aw.qmc.extratemp2lines) > xtra_dev_lines2:
+                                    aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(sample_extractimex2[i], sample_extractemp2[i])
+                                    xtra_dev_lines2 = xtra_dev_lines2 + 1
+                        #ERROR FOUND
+                        else:
+                            lengths = [les,led,let]
+                            location = ["Extra-Serial","Extra-Devices","Extra-Temp"]
+                            #find error
+                            if (nxdevices-1) in lengths:
+                                indexerror =  lengths.index(nxdevices-1)
+                            elif (nxdevices+1) in lengths:
+                                indexerror =  lengths.index(nxdevices+1)
+                            else:
+                                indexerror = 1000
+                            if indexerror != 1000:
+                                errormessage = "ERROR: length of %s (=%i) does not have the necessary length (=%i)"%(location[indexerror],lengths[indexerror],nxdevices)
+                                errormessage += "\nPlease Reset: Extra devices"
+                            else:
+                                string = location[0] + "= " + str(lengths[0]) + " " + location[1] + "= " + str(lengths[1]) + " "
+                                string += location[2] + "= " + str(lengths[2])
+                                errormessage = "ERROR: extra devices lengths don't match: %s"%string
+                                errormessage += "\nPlease Reset: Extra devices"
+                            raise Exception(errormessage)
+
+                    ####### all values retrieved
+
+                    if aw.qmc.ETfunction is not None and len(aw.qmc.ETfunction):
+                        try:
+                            t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,tx,RTsname="Y1",RTsval=t1)
+                            aw.qmc.RTtemp1 = t1
+                        except Exception: # pylint: disable=broad-except
+                            pass
+                    if aw.qmc.BTfunction is not None and len(aw.qmc.BTfunction):
+                        try:
+                            t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,tx,RTsname="Y2",RTsval=t2)
+                            aw.qmc.RTtemp2 = t2
+                        except Exception: # pylint: disable=broad-except
+                            pass
+                    # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
+                    # modbus channel 1+2, respect input temperature scale setting
+                    
+                    ## Apply InputFilters. As those might modify destructively up to two older readings in temp1/2 via interpolation for drop outs we try to dectect this and copy those
+                    # changes back to the ctemp lines that are rendered.
+                    t1_prev = t2_prev = None
+                    t1_prevprev = t2_prevprev = None
+                    if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
+                        if len(sample_temp1)>0:
+                            t1_prev = sample_temp1[-1]
+                            if len(sample_temp1)>1:
+                                t1_prevprev = sample_temp1[-2]
+                        if len(sample_temp2)>0:
+                            t2_prev = sample_temp2[-1]
+                            if len(sample_temp2)>1:
+                                t2_prevprev = sample_temp2[-2]
+                    t1 = self.inputFilter(sample_timex,sample_temp1,tx,t1)
+                    t2 = self.inputFilter(sample_timex,sample_temp2,tx,t2,True)
+                    
+                    # now copy the destructively modified values from temp1/2 to ctemp1/2 if any (to ensure to pick the right elements we compare the timestamps at those indicees)                    
+                    if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
+                        if len(sample_ctimex1)>0:
+                            if t1_prev is not None and sample_ctimex1[-1] == sample_timex[-1] and t1_prev != sample_temp1[-1]:
+                                sample_ctemp1[-1] = sample_temp1[-1]
+                            if len(sample_ctimex1)>1 and t1_prevprev is not None and sample_ctimex1[-2] == sample_timex[-2] and t1_prevprev != sample_temp1[-2]:
+                                sample_ctemp1[-2] = sample_temp1[-2]
+                        if len(sample_ctimex2)>0:
+                            if t2_prev is not None and sample_ctimex2[-1] == sample_timex[-1] and t2_prev != sample_temp2[-1]:
+                                sample_ctemp2[-1] = sample_temp2[-1]
+                            if len(sample_ctimex2)>1 and t2_prevprev is not None and sample_ctimex2[-2] == sample_timex[-2] and t2_prevprev != sample_temp2[-2]:
+                                sample_ctemp2[-2] = sample_temp2[-2]
+
+                    length_of_qmc_timex = len(sample_timex)
+                    t1_final = t1
+                    t2_final = t2
+                    sample_temp2.append(t2_final)
+                    sample_temp1.append(t1_final)
+                    sample_timex.append(tx)
+                    length_of_qmc_timex += 1
+                    if t1_final != -1:
+                        sample_ctimex1.append(tx)
+                        sample_ctemp1.append(t1_final)
+                    if t2_final != -1:
+                        sample_ctimex2.append(tx)
+                        sample_ctemp2.append(t2_final)
+
+                    #we populate the temporary smoothed ET/BT data arrays (with readings cleansed from -1 dropouts)
+                    cf = aw.qmc.curvefilter*2 - 1 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                    if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
+                        self.temp_decay_weights = numpy.arange(1,cf+1)
+                    # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
+                    if -1 in sample_temp1[-(cf+1):]:
+                        dw1 = [1]
+                    else:
+                        dw1 = self.temp_decay_weights
+                    if -1 in sample_temp2[-(cf+1):]:
+                        dw2 = [1]
+                    else:
+                        dw2 = self.temp_decay_weights
+                    # average smoothing
+                    if len(sample_ctemp1) > 0:
+                        st1 = self.decay_average(sample_ctimex1,sample_ctemp1,dw1)
+                    else:
+                        st1 = -1
+                    if len(sample_ctemp2) > 0:
+                        st2 = self.decay_average(sample_ctimex2,sample_ctemp2,dw2)
+                    else:
+                        st2 = -1
+                    # register smoothed values
+                    sample_tstemp1.append(st1)
+                    sample_tstemp2.append(st2)
+
+                    if aw.qmc.smooth_curves_on_recording:
+                        cf = aw.qmc.curvefilter
+                        if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
+                            self.temp_decay_weights = numpy.arange(1,cf+1)
+                        # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
+                        if -1 in sample_temp1[-(cf+1):]:
+                            dw1 = [1]
+                        else:
+                            dw1 = self.temp_decay_weights
+                        if -1 in sample_temp2[-(cf+1):]:
+                            dw2 = [1]
+                        else:
+                            dw2 = self.temp_decay_weights
+                        # average smoothing
+                        if len(sample_ctemp1) > 0:
+                            sst1 = self.decay_average(sample_ctimex1,sample_ctemp1,dw1)
+                        else:
+                            sst1 = -1
+                        if len(sample_ctemp2) > 0:
+                            sst2 = self.decay_average(sample_ctimex2,sample_ctemp2,dw2)
+                        else:
+                            sst2 = -1
+                        # register smoothed values
+                        sample_stemp1.append(sst1)
+                        sample_stemp2.append(sst2)
+
+                    if local_flagstart:
+                        if aw.qmc.ETcurve:
+                            if aw.qmc.smooth_curves_on_recording:
+                                aw.qmc.l_temp1.set_data(sample_ctimex1, sample_stemp1)
+                            else:
+                                aw.qmc.l_temp1.set_data(sample_ctimex1, sample_ctemp1)
+                        if aw.qmc.BTcurve:
+                            if aw.qmc.smooth_curves_on_recording:
+                                aw.qmc.l_temp2.set_data(sample_ctimex2, sample_stemp2)
+                            else:
+                                aw.qmc.l_temp2.set_data(sample_ctimex2, sample_ctemp2)
+
+                    if (aw.qmc.Controlbuttonflag and aw.pidcontrol.pidActive and \
+                            not aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
+                        if aw.pidcontrol.pidSource == 1:
+                            aw.qmc.pid.update(st2) # smoothed BT
+                        else:
+                            aw.qmc.pid.update(st1) # smoothed ET
+
+                    #we need a minimum of two readings to calculate rate of change
+#                    if local_flagstart and length_of_qmc_timex > 1:
+                    if length_of_qmc_timex > 1:
+                        # compute T1 RoR
+                        if t1_final == -1 or len(sample_ctimex1)<2:  # we repeat the last RoR if underlying temperature dropped
+                            if sample_unfiltereddelta1:
+                                aw.qmc.rateofchange1 = sample_unfiltereddelta1[-1]
+                            else:
+                                aw.qmc.rateofchange1 = 0.
+                        else: # normal data received
+                            #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                            left_index = min(len(sample_ctimex1),len(sample_tstemp1),max(2,(aw.qmc.deltaETsamples + 1)))
+                            # ****** Instead of basing the estimate on the window extremal points,
+                            #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
+                            if aw.qmc.polyfitRoRcalc:
+                                try:
+                                    time_vec = sample_ctimex1[-left_index:]
+                                    temp_samples = sample_tstemp1[-left_index:]
+                                    with warnings.catch_warnings():
+                                        warnings.simplefilter('ignore')
+                                        # using stable polyfit from numpy polyfit module
+                                        LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
+                                        aw.qmc.rateofchange1 = LS_fit[1]*60.
+                                except Exception: # pylint: disable=broad-except
+                                    # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                                    # https://github.com/numpy/numpy/issues/16744
+                                    # we fall back to the two point algo
+                                    timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
+                                    aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
+                            else:
+                                timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
+                                aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
+                            
+                            if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction):
+                                try:
+                                    aw.qmc.rateofchange1 = aw.qmc.eval_math_expression(aw.qmc.DeltaETfunction,tx,RTsname="R1",RTsval=aw.qmc.rateofchange1)
+                                except Exception: # pylint: disable=broad-except
+                                    pass
+                        # compute T2 RoR
+                        if t2_final == -1 or len(sample_ctimex2)<2:  # we repeat the last RoR if underlying temperature dropped
+                            if sample_unfiltereddelta2:
+                                aw.qmc.rateofchange2 = sample_unfiltereddelta2[-1]
+                            else:
+                                aw.qmc.rateofchange2 = 0.
+                        else: # normal data received
+                            #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                            left_index = min(len(sample_ctimex2),len(sample_tstemp2),max(2,(aw.qmc.deltaBTsamples + 1)))
+                            # ****** Instead of basing the estimate on the window extremal points,
+                            #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
+                            if aw.qmc.polyfitRoRcalc:
+                                try:
+                                    time_vec = sample_ctimex2[-left_index:]
+                                    temp_samples = sample_tstemp2[-left_index:]
+                                    with warnings.catch_warnings():
+                                        warnings.simplefilter('ignore')
+                                        LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
+                                        aw.qmc.rateofchange2 = LS_fit[1]*60.
+                                except Exception: # pylint: disable=broad-except
+                                    # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                                    # https://github.com/numpy/numpy/issues/16744
+                                    # we fall back to the two point algo
+                                    timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
+                                    aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
+                            else:
+                                timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
+                                aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
+
+                            if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
+                                try:
+                                    aw.qmc.rateofchange2 = aw.qmc.eval_math_expression(aw.qmc.DeltaBTfunction,tx,RTsname="R2",RTsval=aw.qmc.rateofchange2)
+                                except Exception: # pylint: disable=broad-except
+                                    pass
+
+                        sample_unfiltereddelta1.append(aw.qmc.rateofchange1)
+                        sample_unfiltereddelta2.append(aw.qmc.rateofchange2)
+
+                        #######   filter deltaBT deltaET
+                        # decay smoothing
+                        if aw.qmc.deltaETfilter:
+                            user_filter = int(round(aw.qmc.deltaETfilter/2.))
+                            if user_filter and length_of_qmc_timex > user_filter and (len(sample_unfiltereddelta1) > user_filter):
+                                if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
+                                    self.decay_weights = numpy.arange(1,user_filter+1)
+                                aw.qmc.rateofchange1 = self.decay_average(sample_timex,sample_unfiltereddelta1,self.decay_weights)
+                        if aw.qmc.deltaBTfilter:
+                            user_filter = int(round(aw.qmc.deltaBTfilter/2.))
+                            if user_filter and length_of_qmc_timex > user_filter and (len(sample_unfiltereddelta2) > user_filter):
+                                if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
+                                    self.decay_weights = numpy.arange(1,user_filter+1)
+                                aw.qmc.rateofchange2 = self.decay_average(sample_timex,sample_unfiltereddelta2,self.decay_weights)
+                        rateofchange1plot = aw.qmc.rateofchange1
+                        rateofchange2plot = aw.qmc.rateofchange2
+                    else:
+                        sample_unfiltereddelta1.append(0.)
+                        sample_unfiltereddelta2.append(0.)
+                        aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
+
+                    # limit displayed RoR (only before TP is recognized) # WHY?
+                    if aw.qmc.RoRlimitFlag: # not aw.qmc.TPalarmtimeindex and aw.qmc.RoRlimitFlag:
+                        if not (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange1plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
+                            rateofchange1plot = None
+                        if not (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange2plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
+                            rateofchange2plot = None
+
+                    # append new data to the rateofchange arrays
+                    sample_delta1.append(rateofchange1plot)
+                    sample_delta2.append(rateofchange2plot)
+
+                    if local_flagstart:
+                        ror_start = 0
+                        ror_end = length_of_qmc_timex
+                        if aw.qmc.timeindex[6] > 0:
+                            ror_end = aw.qmc.timeindex[6]+1
+                        if aw.qmc.DeltaETflag:
+                            if aw.qmc.timeindex[0] > -1:
+                                ror_start = max(aw.qmc.timeindex[0],int(round(aw.qmc.deltaETfilter/2.)) + max(2,(aw.qmc.deltaETsamples + 1)))
+                                aw.qmc.l_delta1.set_data(sample_timex[ror_start:ror_end], sample_delta1[ror_start:ror_end])
+                            else:
+                                aw.qmc.l_delta1.set_data([], [])
+                        if aw.qmc.DeltaBTflag:
+                            if aw.qmc.timeindex[0] > -1:
+                                ror_start = max(aw.qmc.timeindex[0],int(round(aw.qmc.deltaBTfilter/2.)) + max(2,(aw.qmc.deltaBTsamples + 1)))
+                                aw.qmc.l_delta2.set_data(sample_timex[ror_start:ror_end], sample_delta2[ror_start:ror_end])
+                            else:
+                                aw.qmc.l_delta2.set_data([], [])
+                        #readjust xlimit of plot if needed
+                        if  not aw.qmc.fixmaxtime and not aw.qmc.locktimex and sample_timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
+                            aw.qmc.endofx = int(sample_timex[-1] + 180.)         # increase x limit by 3 minutes
+                            aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
+                            aw.qmc.tempory_sample_trigger_redraw = True # we enfore a full redraw within updategraphics
+                        if aw.qmc.projectFlag:
+                            aw.qmc.updateProjection()
+
+                        # autodetect CHARGE event
+                        # only if BT > 77C/170F
+                        if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeFlag and aw.qmc.autoCHARGEenabled and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
+                            ((aw.qmc.mode == "C" and sample_temp2[-1] > 77) or (aw.qmc.mode == "F" and sample_temp2[-1] > 170)):
+                            if aw.qmc.mode == "C":
+                                o = 0.5
+                            else:
+                                o = 0.5 * 1.8
+                            b = aw.BTbreak(length_of_qmc_timex - 1,o)
+                            if b > 0:
+                                # we found a BT break at the current index minus b
+                                aw.qmc.autoChargeIdx = length_of_qmc_timex - b
+                        # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
+                        elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+8 < len(sample_temp2) and self.checkTPalarmtime():
+                            try:
+                                tp = aw.findTP()
+                                if ((aw.qmc.mode == "C" and sample_temp2[tp] > 50 and sample_temp2[tp] < 150) or \
+                                    (aw.qmc.mode == "F" and sample_temp2[tp] > 100 and sample_temp2[tp] < 300)): # only mark TP if not an error value!
+                                    aw.qmc.autoTPIdx = 1
+                                    aw.qmc.TPalarmtimeindex = tp
+                            except Exception: # pylint: disable=broad-except
+                                pass
+                            try:
+                                # if 2:30min into the roast and TPalarmtimeindex alarmindex not yet set,
+                                # we place the TPalarmtimeindex at the current index to enable in airoasters without TP the autoDRY and autoFCs functions and activate the TP Phases LCDs
+                                if aw.qmc.TPalarmtimeindex is None and ((sample_timex[-1] - sample_timex[aw.qmc.timeindex[0]]) > 150):
+                                    aw.qmc.TPalarmtimeindex = length_of_qmc_timex - 1
+                            except Exception: # pylint: disable=broad-except
+                                pass
+                        # autodetect DROP event
+                        # only if 8min into roast and BT>160C/320F
+                        if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.autoDROPenabled and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6] and \
+                            length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and sample_temp2[-1] > 160) or (aw.qmc.mode == "F" and sample_temp2[-1] > 320)) and\
+                            ((sample_timex[-1] - sample_timex[aw.qmc.timeindex[0]]) > 420):
+                            if aw.qmc.mode == "C":
+                                o = 0.2
+                            else:
+                                o = 0.2 * 1.8
+                            b = aw.BTbreak(length_of_qmc_timex - 1,o)
+                            if b > 0:
+                                # we found a BT break at the current index minus b
+                                aw.qmc.autoDropIdx = length_of_qmc_timex - b
+                        #check for autoDRY: # only after CHARGE and TP and before FCs if not yet set
+                        if aw.qmc.autoDRYflag and aw.qmc.autoDRYenabled and aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
+                            # if DRY event not yet set check for BT exceeding Dry-max as specified in the phases dialog
+                            if sample_temp2[-1] >= aw.qmc.phases[1]:
+                                aw.qmc.autoDryIdx = 1
+                        #check for autoFCs: # only after CHARGE and TP and before FCe if not yet set
+                        if aw.qmc.autoFCsFlag and aw.qmc.autoFCsenabled and aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
+                            # after DRY (if FCs event not yet set) check for BT exceeding FC-min as specified in the phases dialog
+                            if sample_temp2[-1] >= aw.qmc.phases[2]:
+                                aw.qmc.autoFCsIdx = 1
+
+                    #process active quantifiers
+                    try:
+                        aw.process_active_quantifiers()
+                    except Exception: # pylint: disable=broad-except
+                        pass
+
+                    #update SV on Arduino/TC4, Hottop, or MODBUS if in Ramp/Soak or Background Follow mode and PID is active
+                    if aw.qmc.flagon: # only during sampling
+                        #update SV on FujiPIDs
+                        if aw.qmc.device == 0 and aw.fujipid.followBackground:
+                            # calculate actual SV
+                            sv = aw.fujipid.calcSV(tx)
+                            # update SV (if needed)
+                            if sv is not None and sv != aw.fujipid.sv:
+                                sv = max(0,sv) # we don't send SV < 0
+                                aw.qmc.temporarysetsv = sv
+                                # aw.fujipid.setsv(sv,silent=True) # this is called in updategraphics() within the GUI thread to move the sliders
+                        elif aw.pidcontrol.pidActive and aw.pidcontrol.svMode in [1,2]:
+                            # calculate actual SV
+                            sv = aw.pidcontrol.calcSV(tx)
+                            # update SV (if needed)
+                            if sv is not None and sv != aw.pidcontrol.sv:
+                                sv = max(0,sv) # we don't send SV < 0
+                                aw.qmc.temporarysetsv = sv
+                                # aw.pidcontrol.setSV(sv,init=False) # this is called in updategraphics() within the GUI thread to move the sliders
+
+                    # update AUC running value
+                    if local_flagstart: # only during recording
+                        try:
+                            aw.updateAUC()
+                            if aw.qmc.AUCguideFlag:
+                                aw.updateAUCguide()
+                        except Exception: # pylint: disable=broad-except
+                            pass
+
+                    #output ET, BT, ETB, BTB to output program
+                    if aw.ser.externaloutprogramFlag:
+                        try:
+                            if aw.qmc.background:
+                                if aw.qmc.timeindex[0] != -1:
+                                    j = aw.qmc.backgroundtime2index(tx - sample_timex[aw.qmc.timeindex[0]])
+                                else:
+                                    j = aw.qmc.backgroundtime2index(tx)
+                                ETB = aw.qmc.temp1B[j]
+                                BTB = aw.qmc.temp2B[j]
+                            else:
+                                ETB = -1
+                                BTB = -1
+                            subprocess.call([aw.ser.externaloutprogram,
+                                '{0:.1f}'.format(sample_temp1[-1]),
+                                '{0:.1f}'.format(sample_temp2[-1]),
+                                '{0:.1f}'.format(ETB),
+                                '{0:.1f}'.format(BTB)])
+                        except Exception: # pylint: disable=broad-except
+                            pass
+
+                    #check for each alarm that was not yet triggered
+                    try:
+                        aw.qmc.alarmSemaphore.acquire(1)
+                        for i in range(len(aw.qmc.alarmflag)):
+                            #if alarm on, and not triggered, and time is after set time:
+                            # menu: 0:ON, 1:START, 2:CHARGE, 3:TP, 4:DRY, 5:FCs, 6:FCe, 7:SCs, 8:SCe, 9:DROP, 10:COOL
+                            # qmc.alarmtime = -1 (None == START)
+                            # qmc.alarmtime = 0 (CHARGE)
+                            # qmc.alarmtime = 1 (DRY)
+                            # qmc.alarmtime = 2 (FCs)
+                            # qmc.alarmtime = 3 (FCe)
+                            # qmc.alarmtime = 4 (SCs)
+                            # qmc.alarmtime = 5 (SCe)
+                            # qmc.alarmtime = 6 (DROP)
+                            # qmc.alarmtime = 7 (COOL)
+                            # qmc.alarmtime = 8 (TP)
+                            # qmc.alarmtime = 9 (ON)
+                            # qmc.alamrtime = 10 (If Alarm)
+                            # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
+                            # 1) the alarm From is START
+                            # 2) the alarm was not triggered yet
+                            # 3) the alarm From is ON
+                            # 4) the alarm From is CHARGE
+                            # 5) the alarm From is any other event but TP
+                            # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
+                            if aw.qmc.alarmflag[i] \
+                              and aw.qmc.alarmstate[i] == -1 \
+                              and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmstate) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]] != -1)) \
+                              and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmstate) and aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]] == -1)) \
+                              and ((aw.qmc.alarmtime[i] == 9) or (aw.qmc.alarmtime[i] < 0 and local_flagstart) \
+                                or (local_flagstart and aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
+                                or (local_flagstart and aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
+                                or (aw.qmc.alarmtime[i] == 10 and aw.qmc.alarmguard[i] != -1)  \
+                                or (local_flagstart and aw.qmc.alarmtime[i] == 8 and aw.qmc.timeindex[0] > -1 \
+                                    and aw.qmc.TPalarmtimeindex)):
+                                #########
+                                # check alarmoffset (time after From event):
+                                if aw.qmc.alarmoffset[i] > 0:
+                                    alarm_time = aw.qmc.timeclock.elapsed()/1000.
+                                    if aw.qmc.alarmtime[i] < 0: # time after START
+                                        pass # the alarm_time is the clock time
+                                    elif local_flagstart and aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
+                                        alarm_time = alarm_time - sample_timex[aw.qmc.timeindex[0]]
+                                    elif local_flagstart and aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
+                                        alarm_time = alarm_time - sample_timex[aw.qmc.TPalarmtimeindex]
+                                    elif local_flagstart and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
+                                        alarm_time = alarm_time - sample_timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
+                                    elif local_flagstart and aw.qmc.alarmtime[i] == 10: # time or temp after the trigger of the alarmguard (if one is set)
+                                        # we know here that the alarmstate of the guard is valid as it has triggered
+                                        alarm_time = alarm_time - sample_timex[aw.qmc.alarmstate[aw.qmc.alarmguard[i]]]
+    
+                                    if alarm_time >= aw.qmc.alarmoffset[i]:
+                                        aw.qmc.temporaryalarmflag = i
+                                #########
+                                # check alarmtemp:
+                                alarm_temp = None
+                                if aw.qmc.alarmtime[i] == 10: # IF ALARM and only during recording as otherwise no data to refer to is available
+                                    # and this is a conditional alarm with alarm_time set to IF ALARM
+                                    if_alarm_state = aw.qmc.alarmstate[aw.qmc.alarmguard[i]] # reading when the IF ALARM triggered
+                                    if if_alarm_state != -1:
+                                        if if_alarm_state < len(sample_timex):
+                                            alarm_idx = if_alarm_state
+                                        else:
+                                            alarm_idx = -1
+                                    # we substract the reading at alarm_idx from the current reading of the channel determined by alarmsource
+                                else:
+                                    alarm_idx = None
+                                if aw.qmc.alarmsource[i] == -2 and sample_delta1[-1]:  #check DeltaET (might be None)
+                                    alarm_temp = sample_delta1[-1]
+                                    if alarm_idx != None:
+                                        alarm_temp -= sample_delta1[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                elif aw.qmc.alarmsource[i] == -1 and sample_delta2[-1]: #check DeltaBT (might be None
+                                    alarm_temp = sample_delta2[-1]
+                                    if alarm_idx != None:
+                                        alarm_temp -= sample_delta2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                elif aw.qmc.alarmsource[i] == 0:                      #check ET
+                                    alarm_temp = sample_temp1[-1]
+                                    if alarm_idx != None:
+                                        alarm_temp -= sample_temp1[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                elif aw.qmc.alarmsource[i] == 1:                      #check BT
+                                    alarm_temp = sample_temp2[-1]
+                                    if alarm_idx != None:
+                                        alarm_temp -= sample_temp2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
+                                    if (aw.qmc.alarmsource[i])%2==0:
+                                        alarm_temp = sample_extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                        if alarm_idx != None:
+                                            alarm_temp -= sample_extratemp1[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                    else:
+                                        alarm_temp = sample_extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                        if alarm_idx != None:
+                                            alarm_temp -= sample_extratemp2[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+    
+                                alarm_limit = aw.qmc.alarmtemperature[i]
+    
+                                if alarm_temp is not None and alarm_temp != -1 and (
+                                        (aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or
+                                        (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit) or
+                                        (alarm_idx != None and alarm_temp == alarm_limit)): # for relative IF_ALARMS we include the equality
+                                    aw.qmc.temporaryalarmflag = i
+                    except Exception: # pylint: disable=broad-except
+                        pass
+                    finally:
+                        if aw.qmc.alarmSemaphore.available() < 1:
+                            aw.qmc.alarmSemaphore.release(1)
+
+                #############    if using DEVICE 18 (no device). Manual mode
+                # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
+                else:
+                    tx = int(aw.qmc.timeclock.elapsed()/1000.)
+                    #readjust xlimit of plot if needed
+                    if  not aw.qmc.fixmaxtime and not aw.qmc.locktimex and tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds
+                        aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
+                        aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
+                        aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
+                    # also in the manual case we check for TP
+                    if local_flagstart:
+                        # check for TP event if already CHARGEed and not yet recognized
+                        if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0]+5 < len(sample_temp2) and self.checkTPalarmtime():
+                            aw.qmc.autoTPIdx = 1
+                            aw.qmc.TPalarmtimeindex = aw.findTP()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " sample() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            finally:
+                if aw.qmc.profileDataSemaphore.available() < 1:
+                    aw.qmc.profileDataSemaphore.release(1)
+                #update screen in main GUI thread
+                self.updategraphicsSignal.emit()
+
     # runs from GUI thread.
     # this function is called by a signal at the end of the thread sample()
     # during sample, updates to GUI widgets or anything GUI must be done here (never from thread)
@@ -3280,7 +4070,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             if self.flagon:
                 #### lock shared resources #####
-                self.samplingsemaphore.acquire(1)
+                self.profileDataSemaphore.acquire(1)
                 try:
                     # initalize the arrays depending on the recording state
                     if (self.flagstart and len(self.timex) > 0) or not self.flagon: # on recording or off we use the standard data structures
@@ -3415,8 +4205,8 @@ class tgraphcanvas(FigureCanvas):
                             self.updateLargeLCDsSignal.emit(btstr,etstr,timestr)
                         self.updateLargeExtraLCDs(extra1=extra1_values,extra2=extra2_values)
                 finally:
-                    if self.samplingsemaphore.available() < 1:
-                        self.samplingsemaphore.release(1)
+                    if self.profileDataSemaphore.available() < 1:
+                        self.profileDataSemaphore.release(1)
 
                 #check setSV
                 if self.temporarysetsv is not None:
@@ -3539,7 +4329,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                             #-- start update display
                                 #### lock shared resources to ensure that no other redraw is interfering with this one here #####
-                                self.samplingsemaphore.acquire(1)
+                                self.profileDataSemaphore.acquire(1)
                                 try:
                                     if self.ax_background is not None:
                                         self.fig.canvas.restore_region(self.ax_background)
@@ -3641,8 +4431,8 @@ class tgraphcanvas(FigureCanvas):
                                         self.updateBackground() # does the canvas draw, but also fills the ax_background cache
                                         self.update_additional_artists()
                                 finally:
-                                    if self.samplingsemaphore.available() < 1:
-                                        self.samplingsemaphore.release(1)
+                                    if self.profileDataSemaphore.available() < 1:
+                                        self.profileDataSemaphore.release(1)
                             #-- end update display
 
                         if self.backgroundprofile is not None and (self.timeindex[0] > -1 or self.timeindexB[0] < 0):
@@ -3863,6 +4653,7 @@ class tgraphcanvas(FigureCanvas):
     @staticmethod
     def resetlinecountcaches():
         aw.qmc.linecount = None
+        aw.qmc.deltalinecount = None
 
     # NOTE: delta lines are now drawn on the main ax
     def resetlines(self):
@@ -3870,12 +4661,15 @@ class tgraphcanvas(FigureCanvas):
             #note: delta curves are now in self.delta_ax and have been removed from the count of resetlines()
             if self.linecount is None:
                 self.linecount = self.lenaxlines()
+            if self.deltalinecount is None:
+                self.deltalinecount = self.lendeltaaxlines()
+            total_linecount = self.linecount+self.deltalinecount
             # remove lines beyond the max limit of self.linecount)
             if isinstance(self.ax.lines,list): # MPL < v3.5
-                self.ax.lines = self.ax.lines[0:self.linecount]
+                self.ax.lines = self.ax.lines[0:total_linecount]
             else:
                 for i in range(len(self.ax.lines)-1,-1,-1):
-                    if i >= self.linecount:
+                    if i >= total_linecount:
                         self.ax.lines[i].remove()
                     else:
                         break
@@ -5235,7 +6029,7 @@ class tgraphcanvas(FigureCanvas):
     def clearMeasurements(self,andLCDs=True):
         try:
             #### lock shared resources #####
-            aw.qmc.samplingsemaphore.acquire(1)
+            aw.qmc.profileDataSemaphore.acquire(1)
             self.fileCleanSignal.emit()
             self.rateofchange1 = 0.0
             self.rateofchange2 = 0.0
@@ -5263,8 +6057,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " clearMeasurements() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
+            if aw.qmc.profileDataSemaphore.available() < 1:
+                aw.qmc.profileDataSemaphore.release(1)
 
     @pyqtSlot(bool)
     def resetButtonAction(self,_=False):
@@ -5309,7 +6103,7 @@ class tgraphcanvas(FigureCanvas):
                 pass
         try:
             #### lock shared resources #####
-            aw.qmc.samplingsemaphore.acquire(1)
+            aw.qmc.profileDataSemaphore.acquire(1)
             #reset time
             aw.qmc.timeclock.start()
 
@@ -5561,8 +6355,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " reset() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
+            if aw.qmc.profileDataSemaphore.available() < 1:
+                aw.qmc.profileDataSemaphore.release(1)
         # now clear all measurements and redraw
         self.clearMeasurements()
         #clear PhasesLCDs
@@ -6309,7 +7103,7 @@ class tgraphcanvas(FigureCanvas):
         except Exception: # pylint: disable=broad-except
             self.background_title_width = 0
     
-    # if updatebackground is True, the samplingsemaphore is catched and updatebackground() is called
+    # if updatebackground is True, the profileDataSemaphore is catched and updatebackground() is called
     @pyqtSlot(str,bool)
     def setProfileTitle(self,title,updatebackground=False):
         if ((self.flagon and not aw.curFile) or self.flagstart) and self.batchcounter != -1:
@@ -6339,12 +7133,12 @@ class tgraphcanvas(FigureCanvas):
         
         if updatebackground:
             #### lock shared resources #####
-            aw.qmc.samplingsemaphore.acquire(1)
+            aw.qmc.profileDataSemaphore.acquire(1)
             try:
                 self.updateBackground()
             finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+                if aw.qmc.profileDataSemaphore.available() < 1:
+                    aw.qmc.profileDataSemaphore.release(1)
 
     # resize the given list to the length ln by cutting away elements or padding with trailing -1 items
     # used to resize temperature data to the length of the corresponding timex times
@@ -6378,15 +7172,15 @@ class tgraphcanvas(FigureCanvas):
             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
             linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "BT", None)))
 
-    # if samplingsemaphore lock cannot be fetched the redraw is not performed
+    # if profileDataSemaphore lock cannot be fetched the redraw is not performed
     def lazyredraw(self, recomputeAllDeltas=True, smooth=True,sampling=False):
-        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this redraw round (prevents stacking of waiting calls)
+        gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this redraw round (prevents stacking of waiting calls)
         if gotlock:
             try:
                 self.redraw(recomputeAllDeltas,smooth,sampling,takelock=False)
             finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+                if aw.qmc.profileDataSemaphore.available() < 1:
+                    aw.qmc.profileDataSemaphore.release(1)
 
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
@@ -6399,7 +7193,7 @@ class tgraphcanvas(FigureCanvas):
             try:
                 #### lock shared resources   ####
                 if takelock:
-                    aw.qmc.samplingsemaphore.acquire(1)
+                    aw.qmc.profileDataSemaphore.acquire(1)
 
                 decay_smoothing_p = (not aw.qmc.optimalSmoothing) or sampling or aw.qmc.flagon
 
@@ -7896,7 +8690,7 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     visible_et = self.stemp1
                     visible_bt = self.stemp2
-                                
+                
                 if aw.qmc.swaplcds:
                     self.drawET(visible_et)
                     self.drawBT(visible_bt)
@@ -8099,8 +8893,8 @@ class tgraphcanvas(FigureCanvas):
                 self.l_annotations_pos_dict = {}
                 self.l_event_flags_pos_dict = {}
                 self.legendloc_pos = None
-                if takelock and aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+                if takelock and aw.qmc.profileDataSemaphore.available() < 1:
+                    aw.qmc.profileDataSemaphore.release(1)
                 
                 # to allow the fit_title to work on the proper value we ping the redraw explicitly again after processing events
                 # we need to use draw_idle here to allow Qt for relayout event processing
@@ -9236,12 +10030,12 @@ class tgraphcanvas(FigureCanvas):
     def samplingAction():
         try:
             ###  lock resources ##
-            aw.qmc.samplingsemaphore.acquire(1)
+            aw.qmc.profileDataSemaphore.acquire(1)
             if aw.qmc.extra_event_sampling_delay != 0:
                 aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
         finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
+            if aw.qmc.profileDataSemaphore.available() < 1:
+                aw.qmc.profileDataSemaphore.release(1)
 
     def AsyncSamplingActionTrigger(self):
         if aw.AsyncSamplingAction and aw.qmc.extra_event_sampling_delay and aw.qmc.extrabuttonactions[2]:
@@ -9972,7 +10766,7 @@ class tgraphcanvas(FigureCanvas):
     @pyqtSlot(bool)
     def markCharge(self,_=False):
         try:
-            aw.qmc.samplingsemaphore.acquire(1)
+            aw.qmc.profileDataSemaphore.acquire(1)
             if self.flagstart:
                 removed = False
                 try:
@@ -10057,8 +10851,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markCharge() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
+            if aw.qmc.profileDataSemaphore.available() < 1:
+                aw.qmc.profileDataSemaphore.release(1)
         if self.flagstart:
             # redraw (within timealign) should not be called if semaphore is hold!
             # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
@@ -10090,7 +10884,7 @@ class tgraphcanvas(FigureCanvas):
     # called from sample() and marks the autodetected TP visually on the graph
     def markTP(self):
         try:
-            self.samplingsemaphore.acquire(1)
+            self.profileDataSemaphore.acquire(1)
             if self.flagstart and self.markTPflag:
                 if aw.qmc.TPalarmtimeindex and self.timeindex[0] != -1 and len(self.timex) > aw.qmc.TPalarmtimeindex:
                     st = stringfromseconds(self.timex[aw.qmc.TPalarmtimeindex]-self.timex[self.timeindex[0]],False)
@@ -10109,8 +10903,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markTP() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
-            if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)
+            if self.profileDataSemaphore.available() < 1:
+                self.profileDataSemaphore.release(1)
         self.autoTPIdx = 0 # avoid a loop on auto marking
 
     # trigger to be called by the markDRYSignal
@@ -10122,7 +10916,7 @@ class tgraphcanvas(FigureCanvas):
     def markDryEnd(self,_=False):
         if len(self.timex) > 1:
             try:
-                self.samplingsemaphore.acquire(1)
+                self.profileDataSemaphore.acquire(1)
                 if self.flagstart:
                     removed = False
                     aw.soundpopSignal.emit()
@@ -10183,8 +10977,8 @@ class tgraphcanvas(FigureCanvas):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDryEnd() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+                if aw.qmc.profileDataSemaphore.available() < 1:
+                    aw.qmc.profileDataSemaphore.release(1)
             if self.flagstart:
                 # redraw (within timealign) should not be called if semaphore is hold!
                 # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
@@ -10229,7 +11023,7 @@ class tgraphcanvas(FigureCanvas):
     def mark1Cstart(self,_=False):
         if len(self.timex) > 1:
             try:
-                aw.qmc.samplingsemaphore.acquire(1)
+                aw.qmc.profileDataSemaphore.acquire(1)
                 if self.flagstart:
                     removed = False
                     aw.soundpopSignal.emit()
@@ -10290,8 +11084,8 @@ class tgraphcanvas(FigureCanvas):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark1Cstart() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+                if aw.qmc.profileDataSemaphore.available() < 1:
+                    aw.qmc.profileDataSemaphore.release(1)
             if self.flagstart:
                 # redraw (within timealign) should not be called if semaphore is hold!
                 # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
@@ -10335,7 +11129,7 @@ class tgraphcanvas(FigureCanvas):
     def mark1Cend(self,_=False):
         if len(self.timex) > 1:
             try:
-                aw.qmc.samplingsemaphore.acquire(1)
+                aw.qmc.profileDataSemaphore.acquire(1)
                 if self.flagstart:
                     removed = False
                     aw.soundpopSignal.emit()
@@ -10387,8 +11181,8 @@ class tgraphcanvas(FigureCanvas):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark1Cend() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+                if aw.qmc.profileDataSemaphore.available() < 1:
+                    aw.qmc.profileDataSemaphore.release(1)
             if self.flagstart:
                 # redraw (within timealign) should not be called if semaphore is hold!
                 # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
@@ -10434,7 +11228,7 @@ class tgraphcanvas(FigureCanvas):
     def mark2Cstart(self,_=False):
         if len(self.timex) > 1:
             try:
-                aw.qmc.samplingsemaphore.acquire(1)
+                aw.qmc.profileDataSemaphore.acquire(1)
                 if self.flagstart:
                     removed = False
                     aw.soundpopSignal.emit()
@@ -10488,8 +11282,8 @@ class tgraphcanvas(FigureCanvas):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark2Cstart() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+                if aw.qmc.profileDataSemaphore.available() < 1:
+                    aw.qmc.profileDataSemaphore.release(1)
             if self.flagstart:
                 # redraw (within timealign) should not be called if semaphore is hold!
                 # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
@@ -10543,7 +11337,7 @@ class tgraphcanvas(FigureCanvas):
     def mark2Cend(self,_=False):
         if len(self.timex) > 1:
             try:
-                aw.qmc.samplingsemaphore.acquire(1)
+                aw.qmc.profileDataSemaphore.acquire(1)
                 if self.flagstart:
                     removed = False
                     aw.soundpopSignal.emit()
@@ -10594,8 +11388,8 @@ class tgraphcanvas(FigureCanvas):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark2Cend() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+                if aw.qmc.profileDataSemaphore.available() < 1:
+                    aw.qmc.profileDataSemaphore.release(1)
             if self.flagstart and len(self.timex) > 0:
                 # redraw (within timealign) should not be called if semaphore is hold!
                 # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
@@ -10646,7 +11440,7 @@ class tgraphcanvas(FigureCanvas):
     def markDrop(self,_=False):
         if len(self.timex) > 1:
             try:
-                aw.qmc.samplingsemaphore.acquire(1)
+                aw.qmc.profileDataSemaphore.acquire(1)
                 if self.flagstart:
                     removed = False
                     aw.soundpopSignal.emit()
@@ -10737,8 +11531,8 @@ class tgraphcanvas(FigureCanvas):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDrop() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+                if aw.qmc.profileDataSemaphore.available() < 1:
+                    aw.qmc.profileDataSemaphore.release(1)
             if self.flagstart:
                 # redraw (within timealign) should not be called if semaphore is hold!
                 # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
@@ -10810,7 +11604,7 @@ class tgraphcanvas(FigureCanvas):
     def markCoolEnd(self,_=False):
         if len(self.timex) > 1:
             try:
-                aw.qmc.samplingsemaphore.acquire(1)
+                aw.qmc.profileDataSemaphore.acquire(1)
                 if self.flagstart:
                     removed = False
                     aw.soundpopSignal.emit()
@@ -10866,8 +11660,8 @@ class tgraphcanvas(FigureCanvas):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markCoolEnd() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+                if aw.qmc.profileDataSemaphore.available() < 1:
+                    aw.qmc.profileDataSemaphore.release(1)
             if self.flagstart:
                 # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
                 if aw.button_20.isFlat():
@@ -11042,7 +11836,7 @@ class tgraphcanvas(FigureCanvas):
     def EventRecordAction(self,extraevent=None,eventtype=None,eventvalue=None,eventdescription="",takeLock=True,doupdategraphics=True,doupdatebackground=True):
         try:
             if takeLock:
-                aw.qmc.samplingsemaphore.acquire(1)
+                aw.qmc.profileDataSemaphore.acquire(1)
             if self.flagstart:
                 if len(self.timex) > 0 or (self.device == 18 and aw.simulator is None):
                     aw.soundpopSignal.emit()
@@ -11260,15 +12054,15 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " EventRecordAction() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
-            if takeLock and aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
+            if takeLock and aw.qmc.profileDataSemaphore.available() < 1:
+                aw.qmc.profileDataSemaphore.release(1)
         if self.flagstart and doupdategraphics:
             self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     #called from controlling devices when roasting to record steps (commands) and produce a profile later
     def DeviceEventRecord(self,command):
         try:
-            aw.qmc.samplingsemaphore.acquire(1)
+            aw.qmc.profileDataSemaphore.acquire(1)
             if self.flagstart:
                 #prevents accidentally deleting a modified profile.
                 self.fileDirtySignal.emit()
@@ -11361,8 +12155,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " DeviceEventRecord() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
+            if aw.qmc.profileDataSemaphore.available() < 1:
+                aw.qmc.profileDataSemaphore.release(1)
 
     def writecharacteristics(self,TP_index=None,LP=None):
         try:
@@ -13789,7 +14583,7 @@ class tgraphcanvas(FigureCanvas):
 
     def drawcross(self,event):
         # do not interleave with redraw()
-        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,0)
+        gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,0)
         if gotlock:
             try:
                 if event.inaxes == self.ax:
@@ -13825,8 +14619,8 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             self.updateBackground()
             finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+                if aw.qmc.profileDataSemaphore.available() < 1:
+                    aw.qmc.profileDataSemaphore.release(1)
 
     def __to_ascii(self, s):
         if s is None:
@@ -14271,77 +15065,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 ########################################################################################
 
 class SampleThread(QThread):
-    updategraphics = pyqtSignal()
-
-    def __init__(self,parent = None):
-        super().__init__(parent)
-        self.afterTP = False
-        self.decay_weights = None
-        self.temp_decay_weights = None
-
-    # input filter
-    # if temp (the actual reading) is outside of the interval [tmin,tmax] or
-    # a spike is detected, the previous value is repeated or if that happend already before, -1 is returned
-    # note that here we assume that the actual measured temperature time/temp was not already added to the list of previous measurements timex/tempx
-    @staticmethod
-    def inputFilter(timex, tempx, time, temp, BT=False):
-        try:
-            wrong_reading = 0
-            #########################
-            # a) detect duplicates: remove a reading if it is equal to the previous or if that is -1 to the one before
-            if aw.qmc.dropDuplicates and ((len(tempx)>1 and tempx[-1] == -1 and abs(temp - tempx[-2]) <= aw.qmc.dropDuplicatesLimit) or (len(tempx)>0 and abs(temp - tempx[-1]) <= aw.qmc.dropDuplicatesLimit)):
-                wrong_reading = 2 # replace by previous reading not by -1
-            #########################
-            # b) detect overflows
-            if aw.qmc.minmaxLimits and (temp < aw.qmc.filterDropOut_tmin or temp > aw.qmc.filterDropOut_tmax):
-                wrong_reading = 1
-            #########################
-            # c) detect spikes (on BT only after CHARGE if autoChargeFlag=True not to have a conflict here)
-            n = aw.qmc.filterDropOut_spikeRoR_period
-            dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit # the limit of additional RoR in temp/sec (4C for C / 7F for F) compared to previous readings
-            if aw.qmc.dropSpikes and ((not aw.qmc.autoChargeFlag) or (not BT) or (aw.qmc.timeindex[0] != -1 and (aw.qmc.timeindex[0] + n) < len(timex))) and not wrong_reading and len(tempx) >= n:
-                # no min/max overflow detected
-                # check if RoR caused by actual measurement is way higher then the previous one
-                # calc previous RoR (pRoR) taking the last n samples into account
-                pdtemp = tempx[-1] - tempx[-n]
-                pdtime = timex[-1] - timex[-n]
-                if pdtime > 0:
-                    pRoR = abs(pdtemp/pdtime)
-                    dtemp = tempx[-1] - temp
-                    dtime = timex[-1] - time
-                    if dtime > 0:
-                        RoR = abs(dtemp/dtime)
-                        if RoR > (pRoR + dRoR_limit):
-                            wrong_reading = 2
-            #########################
-            # c) handle outliers if it could be detected
-            if wrong_reading:
-                if len(tempx) > 0 and tempx[-1] != -1:
-                    # repeate last correct reading if not done before in the last two fixes (min/max violation are always filtered)
-                    if len(tempx) == 1 or (len(tempx) > 3 and (tempx[-1] != tempx[-2] or tempx[-2] != tempx[-3])):
-                        return tempx[-1]
-                    if wrong_reading == 1:
-                        return -1
-                    # no way to correct this
-                    return temp
-                if wrong_reading == 1:
-                    return -1
-                # no way to correct this
-                return temp
-            # try to improve a previously corrected reading timex/temp[-1] based on the current reading time/temp (just in this case the actual reading is not a drop)
-            if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
-                if len(tempx) > 3 and tempx[-1] == tempx[-2] == tempx[-3] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2] and same for rthe one before
-                    delta = (tempx[-3] - temp) / 3.0
-                    tempx[-1] = tempx[-3] - 2*delta
-                    tempx[-2] = tempx[-3] - delta
-                elif len(tempx) > 2 and tempx[-1] == tempx[-2] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2]
-                    tempx[-1] = (tempx[-2] + temp) / 2.0
-            return temp
-        except Exception as e: # pylint: disable=broad-except
-#            traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " filterDropOuts() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-            return temp
+    sample_processingSignal = pyqtSignal(list,list,list)
 
     @staticmethod
     def sample_main_device():
@@ -14371,741 +15095,55 @@ class SampleThread(QThread):
         except Exception: # pylint: disable=broad-except
             tx = aw.qmc.timeclock.elapsed()/1000.
             return tx,-1.0,-1.0
-
-    # the temp get's averaged using the given decay weights after resampling
-    # to linear time based on tx and the current sampling interval
-    @staticmethod
-    def decay_average(tx,temp,decay_weights):
-        if len(tx) != len(temp):
-            if len(temp)>0:
-                return temp[-1]
-            return -1
-        l = min(len(decay_weights),len(temp))
-        d = aw.qmc.delay / 1000.
-        tx_org = tx[-l:] # as len(tx)=len(temp) here, it is guranteed that len(tx_org)=l
-        # we create a linearly spaced time array starting from the newest timestamp in sampling interval distance
-        tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d), axis=0) # by contruction, len(tx_lin)=len(tx_org)=l
-        temp_trail = temp[-l:] # by construction, len(temp_trail)=len(tx_lin)=len(tx_org)=l
-        temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
-        try:
-            return numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:])  # len(decay_weights)>len(temp_trail_re)=l is possible
-        except Exception: # pylint: disable=broad-except
-            # in case something goes very wrong we at least return the standard average over temp, this should always work as len(tx)=len(temp)
-            return numpy.average(tx,temp)
-
-    # sample devices at interval self.delay miliseconds.
-    # we can assume within the processing of sample() that flagon=True
+    
+    # fetch the raw samples from the main and all extra devices once per interval
     def sample(self):
-        ##### (try to) lock resources  #########
-        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,200) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
-#        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+        _log.debug("sample")
+        gotlock = aw.qmc.samplingSemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
         if gotlock:
             try:
-                # duplicate system state flag flagstart locally and only refer to this copy within this function to make it behaving uniquely (either append or overwrite mode)
-                local_flagstart = aw.qmc.flagstart
-
-                # initalize the arrays modified depending on the recording state
-                if local_flagstart:
-                    sample_timex = aw.qmc.timex
-                    sample_temp1 = aw.qmc.temp1
-                    sample_temp2 = aw.qmc.temp2
-                    sample_ctimex1 = aw.qmc.ctimex1
-                    sample_ctemp1 = aw.qmc.ctemp1
-                    sample_ctimex2 = aw.qmc.ctimex2
-                    sample_ctemp2 = aw.qmc.ctemp2
-                    sample_tstemp1 = aw.qmc.tstemp1
-                    sample_tstemp2 = aw.qmc.tstemp2
-                    sample_stemp1 = aw.qmc.stemp1
-                    sample_stemp2 = aw.qmc.stemp2
-                    sample_unfiltereddelta1 = aw.qmc.unfiltereddelta1
-                    sample_unfiltereddelta2 = aw.qmc.unfiltereddelta2
-                    sample_delta1 = aw.qmc.delta1
-                    sample_delta2 = aw.qmc.delta2
-                    # list of lists:
-                    sample_extratimex = aw.qmc.extratimex
-                    sample_extratemp1 = aw.qmc.extratemp1
-                    sample_extratemp2 = aw.qmc.extratemp2
-                    sample_extractimex1 = aw.qmc.extractimex1
-                    sample_extractemp1 = aw.qmc.extractemp1
-                    sample_extractimex2 = aw.qmc.extractimex2
-                    sample_extractemp2 = aw.qmc.extractemp2
-                else:
-                    m_len = aw.qmc.curvefilter*2
-                    sample_timex = aw.qmc.on_timex = aw.qmc.on_timex[-m_len:]
-                    sample_temp1 = aw.qmc.on_temp1 = aw.qmc.on_temp1[-m_len:]
-                    sample_temp2 = aw.qmc.on_temp2 = aw.qmc.on_temp2[-m_len:]
-                    sample_ctimex1 = aw.qmc.on_ctimex1 = aw.qmc.on_ctimex1[-m_len:]
-                    sample_ctemp1 = aw.qmc.on_ctemp1 = aw.qmc.on_ctemp1[-m_len:]
-                    sample_ctimex2 = aw.qmc.on_ctimex2 = aw.qmc.on_ctimex2[-m_len:]
-                    sample_ctemp2 = aw.qmc.on_ctemp2 = aw.qmc.on_ctemp2[-m_len:]
-                    sample_tstemp1 = aw.qmc.on_tstemp1 = aw.qmc.on_tstemp1[-m_len:]
-                    sample_tstemp2 = aw.qmc.on_tstemp2 = aw.qmc.on_tstemp2[-m_len:]
-                    sample_stemp1 = aw.qmc.on_stemp1 = aw.qmc.on_stemp1[-m_len:]
-                    sample_stemp2 = aw.qmc.on_stemp2 = aw.qmc.on_stemp2[-m_len:]
-                    sample_unfiltereddelta1 = aw.qmc.on_unfiltereddelta1 = aw.qmc.on_unfiltereddelta1[-m_len:]
-                    sample_unfiltereddelta2 = aw.qmc.on_unfiltereddelta2 = aw.qmc.on_unfiltereddelta2[-m_len:]
-                    sample_delta1 = aw.qmc.on_delta1 = aw.qmc.on_delta1[-m_len:]
-                    sample_delta2 = aw.qmc.on_delta2 = aw.qmc.on_delta2[-m_len:]
-                    # list of lists:
-                    for i in range(len(aw.qmc.extradevices)):
-                        aw.qmc.on_extratimex[i] = aw.qmc.on_extratimex[i][-m_len:]
-                        aw.qmc.on_extratemp1[i] = aw.qmc.on_extratemp1[i][-m_len:]
-                        aw.qmc.on_extratemp2[i] = aw.qmc.on_extratemp2[i][-m_len:]
-                        aw.qmc.on_extractimex1[i] = aw.qmc.on_extractimex1[i][-m_len:]
-                        aw.qmc.on_extractemp1[i] = aw.qmc.on_extractemp1[i][-m_len:]
-                        aw.qmc.on_extractimex2[i] = aw.qmc.on_extractimex2[i][-m_len:]
-                        aw.qmc.on_extractemp2[i] = aw.qmc.on_extractemp2[i][-m_len:]
-                    sample_extratimex = aw.qmc.on_extratimex
-                    sample_extratemp1 = aw.qmc.on_extratemp1
-                    sample_extratemp2 = aw.qmc.on_extratemp2
-                    sample_extractimex1 = aw.qmc.on_extractimex1
-                    sample_extractemp1 = aw.qmc.on_extractemp1
-                    sample_extractimex2 = aw.qmc.on_extractimex2
-                    sample_extractemp2 = aw.qmc.on_extractemp2
-
-                # send sampling action if any interval is set to "sync" (extra_event_sampling_delay = 0)
+                temp1_readings = []
+                temp2_readings = []
+                timex_readings = []
+                
+                ##### send sampling action if any interval is set to "sync" (extra_event_sampling_delay = 0)
                 try:
                     if aw.qmc.extra_event_sampling_delay == 0 and aw.qmc.extrabuttonactions[2]:
                         aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
                 except Exception: # pylint: disable=broad-except
                     pass
-
-                #if using a meter (thermocouple device)
-                if aw.qmc.device != 18 or aw.simulator is not None: # not NONE device
-
-                    #### first retrieve readings from the main device
-                    timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
-                    #read time, ET (t1) and BT (t2) TEMPERATURE
-                    tx_org,t1,t2 = self.sample_main_device()
-                    timeAfterETBT = libtime.perf_counter() # the time the data of the main device was received
-                    etbt_time = timeAfterETBT - timeBeforeETBT
-                    tx = tx_org + (etbt_time / 2.0) # we take the average between before and after
-                    aw.qmc.RTtemp1 = t1 # store readings for real-time symbolic evaluation
-                    aw.qmc.RTtemp2 = t2
-                    ##############  if using Extra devices
-                    nxdevices = len(aw.qmc.extradevices)
-                    if nxdevices:
-                        les,led,let =  len(aw.extraser),nxdevices,len(sample_extratimex)
-                        if les == led == let:
-                            xtra_dev_lines1 = 0
-                            xtra_dev_lines2 = 0
-                            #1 clear extra device buffers
-                            aw.qmc.RTextratemp1,aw.qmc.RTextratemp2,aw.qmc.RTextratx = [],[],[]
-                            #2 load RT buffers
-                            for i in range(nxdevices):
-                                extratx,extrat2,extrat1 = self.sample_extra_device(i)
-                                aw.qmc.RTextratemp1.append(extrat1)
-                                aw.qmc.RTextratemp2.append(extrat2)
-                                aw.qmc.RTextratx.append(extratx)
-                            #3 evaluate symbolic expressions
-                            for i in range(nxdevices):
-                                extrat1 = aw.qmc.RTextratemp1[i]
-                                extrat2 = aw.qmc.RTextratemp2[i]
-                                if len(aw.qmc.extramathexpression1) > i and aw.qmc.extramathexpression1[i] is not None and len(aw.qmc.extramathexpression1[i]):
-                                    try:
-                                        extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+3),RTsval=aw.qmc.RTextratemp1[i])
-                                        aw.qmc.RTextratemp1[i] = extrat1
-                                    except Exception: # pylint: disable=broad-except
-                                        pass
-                                if len(aw.qmc.extramathexpression2) > i and aw.qmc.extramathexpression2[i] is not None and len(aw.qmc.extramathexpression2[i]):
-                                    try:
-                                        extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
-                                        aw.qmc.RTextratemp2[i] = extrat2
-                                    except Exception: # pylint: disable=broad-except
-                                        pass
-                                        
-                                et1_prev = et2_prev = None
-                                et1_prevprev = et2_prevprev = None
-                                if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
-                                
-                                    ## Apply InputFilters. As those might modify destructively up to two older readings in temp1/2 via interpolation for drop outs we try to dectect this and copy those
-                                    # changes back to the ctemp lines that are rendered.
-                                    if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
-                                        if len(sample_extratemp1[i])>0:
-                                            et1_prev = sample_extratemp1[i][-1]
-                                            if len(sample_extratemp1[i])>1:
-                                                et1_prevprev = sample_extratemp1[i][-2]
-                                        if len(sample_extratemp2[i])>0:
-                                            et2_prev = sample_extratemp2[i][-1]
-                                            if len(sample_extratemp2[i])>1:
-                                                et2_prevprev = sample_extratemp2[i][-2]
-                                    extrat1 = self.inputFilter(sample_extratimex[i],sample_extratemp1[i],extratx,extrat1)
-                                    extrat2 = self.inputFilter(sample_extratimex[i],sample_extratemp2[i],extratx,extrat2)
-
-                                    # now copy the destructively modified values from temp1/2 to ctemp1/2 if any (to ensure to pick the right elements we compare the timestamps at those indicees)
-                                    if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
-                                        if len(sample_extractimex1[i])>0:
-                                            if et1_prev is not None and sample_extractimex1[i][-1] == sample_extratimex[i][-1] and et1_prev != sample_extratemp1[i][-1]:
-                                                sample_extractemp1[i][-1] = sample_extratemp1[i][-1]
-                                            if len(sample_extractimex1[i])>1 and et1_prevprev is not None and sample_extractimex1[i][-2] == sample_extratimex[i][-2] and et1_prevprev != sample_extratemp1[i][-2]:
-                                                sample_extractemp1[i][-2] = sample_extratemp1[i][-2]
-                                        if len(sample_extractimex2[i])>0:
-                                            if et2_prev is not None and sample_extractimex2[i][-1] == sample_extratimex[i][-1] and et2_prev != sample_extratemp2[i][-1]:
-                                                sample_extractemp2[i][-1] = sample_extratemp2[i][-1]
-                                            if len(sample_extractimex2[i])>1 and et2_prevprev is not None and sample_extractimex2[i][-2] == sample_extratimex[i][-2] and et2_prevprev != sample_extratemp2[i][-2]:
-                                                sample_extractemp2[i][-2] = sample_extratemp2[i][-2]
-
-                                sample_extratimex[i].append(extratx)
-                                sample_extratemp1[i].append(float(extrat1))
-                                sample_extratemp2[i].append(float(extrat2))
-                                
-                                if extrat1 != -1:
-                                    sample_extractimex1[i].append(float(extratx))
-                                    sample_extractemp1[i].append(float(extrat1))
-                                if extrat2 != -1:
-                                    sample_extractimex2[i].append(float(extratx))
-                                    sample_extractemp2[i].append(float(extrat2))
-                                # update extra lines
-
-                                if aw.extraCurveVisibility1[i] and len(aw.qmc.extratemp1lines) > xtra_dev_lines1:
-                                    aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(sample_extractimex1[i], sample_extractemp1[i])
-                                    xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                if aw.extraCurveVisibility2[i] and len(aw.qmc.extratemp2lines) > xtra_dev_lines2:
-                                    aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(sample_extractimex2[i], sample_extractemp2[i])
-                                    xtra_dev_lines2 = xtra_dev_lines2 + 1
-                        #ERROR FOUND
-                        else:
-                            lengths = [les,led,let]
-                            location = ["Extra-Serial","Extra-Devices","Extra-Temp"]
-                            #find error
-                            if (nxdevices-1) in lengths:
-                                indexerror =  lengths.index(nxdevices-1)
-                            elif (nxdevices+1) in lengths:
-                                indexerror =  lengths.index(nxdevices+1)
-                            else:
-                                indexerror = 1000
-                            if indexerror != 1000:
-                                errormessage = "ERROR: length of %s (=%i) does not have the necessary length (=%i)"%(location[indexerror],lengths[indexerror],nxdevices)
-                                errormessage += "\nPlease Reset: Extra devices"
-                            else:
-                                string = location[0] + "= " + str(lengths[0]) + " " + location[1] + "= " + str(lengths[1]) + " "
-                                string += location[2] + "= " + str(lengths[2])
-                                errormessage = "ERROR: extra devices lengths don't match: %s"%string
-                                errormessage += "\nPlease Reset: Extra devices"
-                            raise Exception(errormessage)
-
-                    ####### all values retrieved
-
-                    if aw.qmc.ETfunction is not None and len(aw.qmc.ETfunction):
-                        try:
-                            t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,tx,RTsname="Y1",RTsval=t1)
-                            aw.qmc.RTtemp1 = t1
-                        except Exception: # pylint: disable=broad-except
-                            pass
-                    if aw.qmc.BTfunction is not None and len(aw.qmc.BTfunction):
-                        try:
-                            t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,tx,RTsname="Y2",RTsval=t2)
-                            aw.qmc.RTtemp2 = t2
-                        except Exception: # pylint: disable=broad-except
-                            pass
-                    # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
-                    # modbus channel 1+2, respect input temperature scale setting
-                    
-                    ## Apply InputFilters. As those might modify destructively up to two older readings in temp1/2 via interpolation for drop outs we try to dectect this and copy those
-                    # changes back to the ctemp lines that are rendered.
-                    t1_prev = t2_prev = None
-                    t1_prevprev = t2_prevprev = None
-                    if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
-                        if len(sample_temp1)>0:
-                            t1_prev = sample_temp1[-1]
-                            if len(sample_temp1)>1:
-                                t1_prevprev = sample_temp1[-2]
-                        if len(sample_temp2)>0:
-                            t2_prev = sample_temp2[-1]
-                            if len(sample_temp2)>1:
-                                t2_prevprev = sample_temp2[-2]
-                    t1 = self.inputFilter(sample_timex,sample_temp1,tx,t1)
-                    t2 = self.inputFilter(sample_timex,sample_temp2,tx,t2,True)
-                    
-                    # now copy the destructively modified values from temp1/2 to ctemp1/2 if any (to ensure to pick the right elements we compare the timestamps at those indicees)                    
-                    if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
-                        if len(sample_ctimex1)>0:
-                            if t1_prev is not None and sample_ctimex1[-1] == sample_timex[-1] and t1_prev != sample_temp1[-1]:
-                                sample_ctemp1[-1] = sample_temp1[-1]
-                            if len(sample_ctimex1)>1 and t1_prevprev is not None and sample_ctimex1[-2] == sample_timex[-2] and t1_prevprev != sample_temp1[-2]:
-                                sample_ctemp1[-2] = sample_temp1[-2]
-                        if len(sample_ctimex2)>0:
-                            if t2_prev is not None and sample_ctimex2[-1] == sample_timex[-1] and t2_prev != sample_temp2[-1]:
-                                sample_ctemp2[-1] = sample_temp2[-1]
-                            if len(sample_ctimex2)>1 and t2_prevprev is not None and sample_ctimex2[-2] == sample_timex[-2] and t2_prevprev != sample_temp2[-2]:
-                                sample_ctemp2[-2] = sample_temp2[-2]
-
-                    length_of_qmc_timex = len(sample_timex)
-                    t1_final = t1
-                    t2_final = t2
-                    sample_temp2.append(t2_final)
-                    sample_temp1.append(t1_final)
-                    sample_timex.append(tx)
-                    length_of_qmc_timex += 1
-                    if t1_final != -1:
-                        sample_ctimex1.append(tx)
-                        sample_ctemp1.append(t1_final)
-                    if t2_final != -1:
-                        sample_ctimex2.append(tx)
-                        sample_ctemp2.append(t2_final)
-
-                    #we populate the temporary smoothed ET/BT data arrays (with readings cleansed from -1 dropouts)
-                    cf = aw.qmc.curvefilter*2 - 1 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-                    if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
-                        self.temp_decay_weights = numpy.arange(1,cf+1)
-                    # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
-                    if -1 in sample_temp1[-(cf+1):]:
-                        dw1 = [1]
-                    else:
-                        dw1 = self.temp_decay_weights
-                    if -1 in sample_temp2[-(cf+1):]:
-                        dw2 = [1]
-                    else:
-                        dw2 = self.temp_decay_weights
-                    # average smoothing
-                    if len(sample_ctemp1) > 0:
-                        st1 = self.decay_average(sample_ctimex1,sample_ctemp1,dw1)
-                    else:
-                        st1 = -1
-                    if len(sample_ctemp2) > 0:
-                        st2 = self.decay_average(sample_ctimex2,sample_ctemp2,dw2)
-                    else:
-                        st2 = -1
-                    # register smoothed values
-                    sample_tstemp1.append(st1)
-                    sample_tstemp2.append(st2)
-
-                    if aw.qmc.smooth_curves_on_recording:
-                        cf = aw.qmc.curvefilter
-                        if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
-                            self.temp_decay_weights = numpy.arange(1,cf+1)
-                        # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
-                        if -1 in sample_temp1[-(cf+1):]:
-                            dw1 = [1]
-                        else:
-                            dw1 = self.temp_decay_weights
-                        if -1 in sample_temp2[-(cf+1):]:
-                            dw2 = [1]
-                        else:
-                            dw2 = self.temp_decay_weights
-                        # average smoothing
-                        if len(sample_ctemp1) > 0:
-                            sst1 = self.decay_average(sample_ctimex1,sample_ctemp1,dw1)
-                        else:
-                            sst1 = -1
-                        if len(sample_ctemp2) > 0:
-                            sst2 = self.decay_average(sample_ctimex2,sample_ctemp2,dw2)
-                        else:
-                            sst2 = -1
-                        # register smoothed values
-                        sample_stemp1.append(sst1)
-                        sample_stemp2.append(sst2)
-
-                    if local_flagstart:
-                        if aw.qmc.ETcurve:
-                            if aw.qmc.smooth_curves_on_recording:
-                                aw.qmc.l_temp1.set_data(sample_ctimex1, sample_stemp1)
-                            else:
-                                aw.qmc.l_temp1.set_data(sample_ctimex1, sample_ctemp1)
-                        if aw.qmc.BTcurve:
-                            if aw.qmc.smooth_curves_on_recording:
-                                aw.qmc.l_temp2.set_data(sample_ctimex2, sample_stemp2)
-                            else:
-                                aw.qmc.l_temp2.set_data(sample_ctimex2, sample_ctemp2)
-
-                    if (aw.qmc.Controlbuttonflag and aw.pidcontrol.pidActive and \
-                            not aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
-                        if aw.pidcontrol.pidSource == 1:
-                            aw.qmc.pid.update(st2) # smoothed BT
-                        else:
-                            aw.qmc.pid.update(st1) # smoothed ET
-
-                    #we need a minimum of two readings to calculate rate of change
-#                    if local_flagstart and length_of_qmc_timex > 1:
-                    if length_of_qmc_timex > 1:
-                        # compute T1 RoR
-                        if t1_final == -1 or len(sample_ctimex1)<2:  # we repeat the last RoR if underlying temperature dropped
-                            if sample_unfiltereddelta1:
-                                aw.qmc.rateofchange1 = sample_unfiltereddelta1[-1]
-                            else:
-                                aw.qmc.rateofchange1 = 0.
-                        else: # normal data received
-                            #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            left_index = min(len(sample_ctimex1),len(sample_tstemp1),max(2,(aw.qmc.deltaETsamples + 1)))
-                            # ****** Instead of basing the estimate on the window extremal points,
-                            #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
-                            if aw.qmc.polyfitRoRcalc:
-                                try:
-                                    time_vec = sample_ctimex1[-left_index:]
-                                    temp_samples = sample_tstemp1[-left_index:]
-                                    with warnings.catch_warnings():
-                                        warnings.simplefilter('ignore')
-                                        # using stable polyfit from numpy polyfit module
-                                        LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
-                                        aw.qmc.rateofchange1 = LS_fit[1]*60.
-                                except Exception: # pylint: disable=broad-except
-                                    # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                    # https://github.com/numpy/numpy/issues/16744
-                                    # we fall back to the two point algo
-                                    timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
-                                    aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
-                            else:
-                                timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
-                                aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
-                            
-                            if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction):
-                                try:
-                                    aw.qmc.rateofchange1 = aw.qmc.eval_math_expression(aw.qmc.DeltaETfunction,tx,RTsname="R1",RTsval=aw.qmc.rateofchange1)
-                                except Exception: # pylint: disable=broad-except
-                                    pass
-                        # compute T2 RoR
-                        if t2_final == -1 or len(sample_ctimex2)<2:  # we repeat the last RoR if underlying temperature dropped
-                            if sample_unfiltereddelta2:
-                                aw.qmc.rateofchange2 = sample_unfiltereddelta2[-1]
-                            else:
-                                aw.qmc.rateofchange2 = 0.
-                        else: # normal data received
-                            #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            left_index = min(len(sample_ctimex2),len(sample_tstemp2),max(2,(aw.qmc.deltaBTsamples + 1)))
-                            # ****** Instead of basing the estimate on the window extremal points,
-                            #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
-                            if aw.qmc.polyfitRoRcalc:
-                                try:
-                                    time_vec = sample_ctimex2[-left_index:]
-                                    temp_samples = sample_tstemp2[-left_index:]
-                                    with warnings.catch_warnings():
-                                        warnings.simplefilter('ignore')
-                                        LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
-                                        aw.qmc.rateofchange2 = LS_fit[1]*60.
-                                except Exception: # pylint: disable=broad-except
-                                    # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                    # https://github.com/numpy/numpy/issues/16744
-                                    # we fall back to the two point algo
-                                    timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
-                                    aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
-                            else:
-                                timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
-                                aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
-
-                            if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
-                                try:
-                                    aw.qmc.rateofchange2 = aw.qmc.eval_math_expression(aw.qmc.DeltaBTfunction,tx,RTsname="R2",RTsval=aw.qmc.rateofchange2)
-                                except Exception: # pylint: disable=broad-except
-                                    pass
-
-                        sample_unfiltereddelta1.append(aw.qmc.rateofchange1)
-                        sample_unfiltereddelta2.append(aw.qmc.rateofchange2)
-
-                        #######   filter deltaBT deltaET
-                        # decay smoothing
-                        if aw.qmc.deltaETfilter:
-                            user_filter = int(round(aw.qmc.deltaETfilter/2.))
-                            if user_filter and length_of_qmc_timex > user_filter and (len(sample_unfiltereddelta1) > user_filter):
-                                if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
-                                    self.decay_weights = numpy.arange(1,user_filter+1)
-                                aw.qmc.rateofchange1 = self.decay_average(sample_timex,sample_unfiltereddelta1,self.decay_weights)
-                        if aw.qmc.deltaBTfilter:
-                            user_filter = int(round(aw.qmc.deltaBTfilter/2.))
-                            if user_filter and length_of_qmc_timex > user_filter and (len(sample_unfiltereddelta2) > user_filter):
-                                if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
-                                    self.decay_weights = numpy.arange(1,user_filter+1)
-                                aw.qmc.rateofchange2 = self.decay_average(sample_timex,sample_unfiltereddelta2,self.decay_weights)
-                        rateofchange1plot = aw.qmc.rateofchange1
-                        rateofchange2plot = aw.qmc.rateofchange2
-                    else:
-                        sample_unfiltereddelta1.append(0.)
-                        sample_unfiltereddelta2.append(0.)
-                        aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
-
-                    # limit displayed RoR (only before TP is recognized) # WHY?
-                    if aw.qmc.RoRlimitFlag: # not aw.qmc.TPalarmtimeindex and aw.qmc.RoRlimitFlag:
-                        if not (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange1plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
-                            rateofchange1plot = None
-                        if not (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange2plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
-                            rateofchange2plot = None
-
-                    # append new data to the rateofchange arrays
-                    sample_delta1.append(rateofchange1plot)
-                    sample_delta2.append(rateofchange2plot)
-
-                    if local_flagstart:
-                        ror_start = 0
-                        ror_end = length_of_qmc_timex
-                        if aw.qmc.timeindex[6] > 0:
-                            ror_end = aw.qmc.timeindex[6]+1
-                        if aw.qmc.DeltaETflag:
-                            if aw.qmc.timeindex[0] > -1:
-                                ror_start = max(aw.qmc.timeindex[0],int(round(aw.qmc.deltaETfilter/2.)) + max(2,(aw.qmc.deltaETsamples + 1)))
-                                aw.qmc.l_delta1.set_data(sample_timex[ror_start:ror_end], sample_delta1[ror_start:ror_end])
-                            else:
-                                aw.qmc.l_delta1.set_data([], [])
-                        if aw.qmc.DeltaBTflag:
-                            if aw.qmc.timeindex[0] > -1:
-                                ror_start = max(aw.qmc.timeindex[0],int(round(aw.qmc.deltaBTfilter/2.)) + max(2,(aw.qmc.deltaBTsamples + 1)))
-                                aw.qmc.l_delta2.set_data(sample_timex[ror_start:ror_end], sample_delta2[ror_start:ror_end])
-                            else:
-                                aw.qmc.l_delta2.set_data([], [])
-                        #readjust xlimit of plot if needed
-                        if  not aw.qmc.fixmaxtime and not aw.qmc.locktimex and sample_timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
-                            aw.qmc.endofx = int(sample_timex[-1] + 180.)         # increase x limit by 3 minutes
-                            aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
-                            aw.qmc.tempory_sample_trigger_redraw = True # we enfore a full redraw within updategraphics
-                        if aw.qmc.projectFlag:
-                            aw.qmc.updateProjection()
-
-                        # autodetect CHARGE event
-                        # only if BT > 77C/170F
-                        if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeFlag and aw.qmc.autoCHARGEenabled and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
-                            ((aw.qmc.mode == "C" and sample_temp2[-1] > 77) or (aw.qmc.mode == "F" and sample_temp2[-1] > 170)):
-                            if aw.qmc.mode == "C":
-                                o = 0.5
-                            else:
-                                o = 0.5 * 1.8
-                            b = aw.BTbreak(length_of_qmc_timex - 1,o)
-                            if b > 0:
-                                # we found a BT break at the current index minus b
-                                aw.qmc.autoChargeIdx = length_of_qmc_timex - b
-                        # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
-                        elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+8 < len(sample_temp2) and self.checkTPalarmtime():
-                            try:
-                                tp = aw.findTP()
-                                if ((aw.qmc.mode == "C" and sample_temp2[tp] > 50 and sample_temp2[tp] < 150) or \
-                                    (aw.qmc.mode == "F" and sample_temp2[tp] > 100 and sample_temp2[tp] < 300)): # only mark TP if not an error value!
-                                    aw.qmc.autoTPIdx = 1
-                                    aw.qmc.TPalarmtimeindex = tp
-                            except Exception: # pylint: disable=broad-except
-                                pass
-                            try:
-                                # if 2:30min into the roast and TPalarmtimeindex alarmindex not yet set,
-                                # we place the TPalarmtimeindex at the current index to enable in airoasters without TP the autoDRY and autoFCs functions and activate the TP Phases LCDs
-                                if aw.qmc.TPalarmtimeindex is None and ((sample_timex[-1] - sample_timex[aw.qmc.timeindex[0]]) > 150):
-                                    aw.qmc.TPalarmtimeindex = length_of_qmc_timex - 1
-                            except Exception: # pylint: disable=broad-except
-                                pass
-                        # autodetect DROP event
-                        # only if 8min into roast and BT>160C/320F
-                        if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.autoDROPenabled and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6] and \
-                            length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and sample_temp2[-1] > 160) or (aw.qmc.mode == "F" and sample_temp2[-1] > 320)) and\
-                            ((sample_timex[-1] - sample_timex[aw.qmc.timeindex[0]]) > 420):
-                            if aw.qmc.mode == "C":
-                                o = 0.2
-                            else:
-                                o = 0.2 * 1.8
-                            b = aw.BTbreak(length_of_qmc_timex - 1,o)
-                            if b > 0:
-                                # we found a BT break at the current index minus b
-                                aw.qmc.autoDropIdx = length_of_qmc_timex - b
-                        #check for autoDRY: # only after CHARGE and TP and before FCs if not yet set
-                        if aw.qmc.autoDRYflag and aw.qmc.autoDRYenabled and aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
-                            # if DRY event not yet set check for BT exceeding Dry-max as specified in the phases dialog
-                            if sample_temp2[-1] >= aw.qmc.phases[1]:
-                                aw.qmc.autoDryIdx = 1
-                        #check for autoFCs: # only after CHARGE and TP and before FCe if not yet set
-                        if aw.qmc.autoFCsFlag and aw.qmc.autoFCsenabled and aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
-                            # after DRY (if FCs event not yet set) check for BT exceeding FC-min as specified in the phases dialog
-                            if sample_temp2[-1] >= aw.qmc.phases[2]:
-                                aw.qmc.autoFCsIdx = 1
-
-                    #process active quantifiers
-                    try:
-                        aw.process_active_quantifiers()
-                    except Exception: # pylint: disable=broad-except
-                        pass
-
-                    #update SV on Arduino/TC4, Hottop, or MODBUS if in Ramp/Soak or Background Follow mode and PID is active
-                    if aw.qmc.flagon: # only during sampling
-                        #update SV on FujiPIDs
-                        if aw.qmc.device == 0 and aw.fujipid.followBackground:
-                            # calculate actual SV
-                            sv = aw.fujipid.calcSV(tx)
-                            # update SV (if needed)
-                            if sv is not None and sv != aw.fujipid.sv:
-                                sv = max(0,sv) # we don't send SV < 0
-                                aw.qmc.temporarysetsv = sv
-                                # aw.fujipid.setsv(sv,silent=True) # this is called in updategraphics() within the GUI thread to move the sliders
-                        elif aw.pidcontrol.pidActive and aw.pidcontrol.svMode in [1,2]:
-                            # calculate actual SV
-                            sv = aw.pidcontrol.calcSV(tx)
-                            # update SV (if needed)
-                            if sv is not None and sv != aw.pidcontrol.sv:
-                                sv = max(0,sv) # we don't send SV < 0
-                                aw.qmc.temporarysetsv = sv
-                                # aw.pidcontrol.setSV(sv,init=False) # this is called in updategraphics() within the GUI thread to move the sliders
-
-                    # update AUC running value
-                    if local_flagstart: # only during recording
-                        try:
-                            aw.updateAUC()
-                            if aw.qmc.AUCguideFlag:
-                                aw.updateAUCguide()
-                        except Exception: # pylint: disable=broad-except
-                            pass
-
-                    #output ET, BT, ETB, BTB to output program
-                    if aw.ser.externaloutprogramFlag:
-                        try:
-                            if aw.qmc.background:
-                                if aw.qmc.timeindex[0] != -1:
-                                    j = aw.qmc.backgroundtime2index(tx - sample_timex[aw.qmc.timeindex[0]])
-                                else:
-                                    j = aw.qmc.backgroundtime2index(tx)
-                                ETB = aw.qmc.temp1B[j]
-                                BTB = aw.qmc.temp2B[j]
-                            else:
-                                ETB = -1
-                                BTB = -1
-                            subprocess.call([aw.ser.externaloutprogram,
-                                '{0:.1f}'.format(sample_temp1[-1]),
-                                '{0:.1f}'.format(sample_temp2[-1]),
-                                '{0:.1f}'.format(ETB),
-                                '{0:.1f}'.format(BTB)])
-                        except Exception: # pylint: disable=broad-except
-                            pass
-
-                    #check for each alarm that was not yet triggered
-                    try:
-                        aw.qmc.alarmSemaphore.acquire(1)
-                        for i in range(len(aw.qmc.alarmflag)):
-                            #if alarm on, and not triggered, and time is after set time:
-                            # menu: 0:ON, 1:START, 2:CHARGE, 3:TP, 4:DRY, 5:FCs, 6:FCe, 7:SCs, 8:SCe, 9:DROP, 10:COOL
-                            # qmc.alarmtime = -1 (None == START)
-                            # qmc.alarmtime = 0 (CHARGE)
-                            # qmc.alarmtime = 1 (DRY)
-                            # qmc.alarmtime = 2 (FCs)
-                            # qmc.alarmtime = 3 (FCe)
-                            # qmc.alarmtime = 4 (SCs)
-                            # qmc.alarmtime = 5 (SCe)
-                            # qmc.alarmtime = 6 (DROP)
-                            # qmc.alarmtime = 7 (COOL)
-                            # qmc.alarmtime = 8 (TP)
-                            # qmc.alarmtime = 9 (ON)
-                            # qmc.alamrtime = 10 (If Alarm)
-                            # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
-                            # 1) the alarm From is START
-                            # 2) the alarm was not triggered yet
-                            # 3) the alarm From is ON
-                            # 4) the alarm From is CHARGE
-                            # 5) the alarm From is any other event but TP
-                            # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
-                            if aw.qmc.alarmflag[i] \
-                              and aw.qmc.alarmstate[i] == -1 \
-                              and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmstate) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]] != -1)) \
-                              and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmstate) and aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]] == -1)) \
-                              and ((aw.qmc.alarmtime[i] == 9) or (aw.qmc.alarmtime[i] < 0 and local_flagstart) \
-                                or (local_flagstart and aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
-                                or (local_flagstart and aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
-                                or (aw.qmc.alarmtime[i] == 10 and aw.qmc.alarmguard[i] != -1)  \
-                                or (local_flagstart and aw.qmc.alarmtime[i] == 8 and aw.qmc.timeindex[0] > -1 \
-                                    and aw.qmc.TPalarmtimeindex)):
-                                #########
-                                # check alarmoffset (time after From event):
-                                if aw.qmc.alarmoffset[i] > 0:
-                                    alarm_time = aw.qmc.timeclock.elapsed()/1000.
-                                    if aw.qmc.alarmtime[i] < 0: # time after START
-                                        pass # the alarm_time is the clock time
-                                    elif local_flagstart and aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
-                                        alarm_time = alarm_time - sample_timex[aw.qmc.timeindex[0]]
-                                    elif local_flagstart and aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
-                                        alarm_time = alarm_time - sample_timex[aw.qmc.TPalarmtimeindex]
-                                    elif local_flagstart and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
-                                        alarm_time = alarm_time - sample_timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
-                                    elif local_flagstart and aw.qmc.alarmtime[i] == 10: # time or temp after the trigger of the alarmguard (if one is set)
-                                        # we know here that the alarmstate of the guard is valid as it has triggered
-                                        alarm_time = alarm_time - sample_timex[aw.qmc.alarmstate[aw.qmc.alarmguard[i]]]
-    
-                                    if alarm_time >= aw.qmc.alarmoffset[i]:
-                                        aw.qmc.temporaryalarmflag = i
-                                #########
-                                # check alarmtemp:
-                                alarm_temp = None
-                                if aw.qmc.alarmtime[i] == 10: # IF ALARM and only during recording as otherwise no data to refer to is available
-                                    # and this is a conditional alarm with alarm_time set to IF ALARM
-                                    if_alarm_state = aw.qmc.alarmstate[aw.qmc.alarmguard[i]] # reading when the IF ALARM triggered
-                                    if if_alarm_state != -1:
-                                        if if_alarm_state < len(sample_timex):
-                                            alarm_idx = if_alarm_state
-                                        else:
-                                            alarm_idx = -1
-                                    # we substract the reading at alarm_idx from the current reading of the channel determined by alarmsource
-                                else:
-                                    alarm_idx = None
-                                if aw.qmc.alarmsource[i] == -2 and sample_delta1[-1]:  #check DeltaET (might be None)
-                                    alarm_temp = sample_delta1[-1]
-                                    if alarm_idx != None:
-                                        alarm_temp -= sample_delta1[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
-                                elif aw.qmc.alarmsource[i] == -1 and sample_delta2[-1]: #check DeltaBT (might be None
-                                    alarm_temp = sample_delta2[-1]
-                                    if alarm_idx != None:
-                                        alarm_temp -= sample_delta2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
-                                elif aw.qmc.alarmsource[i] == 0:                      #check ET
-                                    alarm_temp = sample_temp1[-1]
-                                    if alarm_idx != None:
-                                        alarm_temp -= sample_temp1[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
-                                elif aw.qmc.alarmsource[i] == 1:                      #check BT
-                                    alarm_temp = sample_temp2[-1]
-                                    if alarm_idx != None:
-                                        alarm_temp -= sample_temp2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
-                                elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
-                                    if (aw.qmc.alarmsource[i])%2==0:
-                                        alarm_temp = sample_extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
-                                        if alarm_idx != None:
-                                            alarm_temp -= sample_extratemp1[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
-                                    else:
-                                        alarm_temp = sample_extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
-                                        if alarm_idx != None:
-                                            alarm_temp -= sample_extratemp2[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
-    
-                                alarm_limit = aw.qmc.alarmtemperature[i]
-    
-                                if alarm_temp is not None and alarm_temp != -1 and (
-                                        (aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or
-                                        (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit) or
-                                        (alarm_idx != None and alarm_temp == alarm_limit)): # for relative IF_ALARMS we include the equality
-                                    aw.qmc.temporaryalarmflag = i
-                    except Exception: # pylint: disable=broad-except
-                        pass
-                    finally:
-                        if aw.qmc.alarmSemaphore.available() < 1:
-                            aw.qmc.alarmSemaphore.release(1)
-
-                #############    if using DEVICE 18 (no device). Manual mode
-                # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
-                else:
-                    tx = int(aw.qmc.timeclock.elapsed()/1000.)
-                    #readjust xlimit of plot if needed
-                    if  not aw.qmc.fixmaxtime and not aw.qmc.locktimex and tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds
-                        aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
-                        aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
-                        aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
-                    # also in the manual case we check for TP
-                    if local_flagstart:
-                        # check for TP event if already CHARGEed and not yet recognized
-                        if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0]+5 < len(sample_temp2) and self.checkTPalarmtime():
-                            aw.qmc.autoTPIdx = 1
-                            aw.qmc.TPalarmtimeindex = aw.findTP()
+                
+                #### first retrieve readings from the main device
+                timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
+                #read time, ET (t1) and BT (t2) TEMPERATURE
+                tx_org,t1,t2 = self.sample_main_device()
+                timeAfterETBT = libtime.perf_counter() # the time the data of the main device was received
+                etbt_time = timeAfterETBT - timeBeforeETBT
+                tx = tx_org + (etbt_time / 2.0) # we take the average between before and after
+                temp1_readings.append(t1)
+                temp2_readings.append(t2)
+                timex_readings.append(tx)
+                
+                ##############  if using Extra devices
+                for i in range(len(aw.qmc.extradevices)):
+                    extratx, extrat2, extrat1 = self.sample_extra_device(i)
+                    temp1_readings.append(extrat1)
+                    temp2_readings.append(extrat2)
+                    timex_readings.append(extratx)
             except Exception as e: # pylint: disable=broad-except
-#                traceback.print_exc(file=sys.stdout)
-                _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " sample() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+                _log.exception(e)
             finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
-                #update screen in main GUI thread
-                self.updategraphics.emit()
+                if aw.qmc.samplingSemaphore.available() < 1:
+                    aw.qmc.samplingSemaphore.release(1)
+                self.sample_processingSignal.emit(temp1_readings, temp2_readings, timex_readings)
 
-
-    # returns true after BT passed the TP
-    def checkTPalarmtime(self):
-        seconds_since_CHARGE = int(aw.qmc.timex[-1]-aw.qmc.timex[aw.qmc.timeindex[0]])
-        # if v[-1] is the current temperature then check if
-        #   we are 20sec after CHARGE
-        #   len(BT) > 4
-        # BT[-5] <= BT[-4] abd BT[-5] <= BT[-3] and BT[-5] <= BT[-2] and BT[-5] <= BT[-1] and BT[-5] < BT[-1]
-        if seconds_since_CHARGE > 20 and not self.afterTP and len(aw.qmc.temp2) > 3 and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-4]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-3]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-2]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-1]) and (aw.qmc.temp2[-5] < aw.qmc.temp2[-1]):
-            self.afterTP = True
-        return self.afterTP
 
     def run(self):
         try:
             aw.qmc.flagsamplingthreadrunning = True
             if sys.platform.startswith("darwin"):
                 pool = Foundation.NSAutoreleasePool.alloc().init()  # @UndefinedVariable # pylint: disable=maybe-no-member
-            self.afterTP = False
+            aw.qmc.afterTP = False
             if not aw.qmc.flagon:
                 return
 
@@ -15161,11 +15199,9 @@ class Athreadserver(QWidget):
     def createSampleThread(self):
         if not aw.qmc.flagsamplingthreadrunning: # we only start a new sampling thread if none is running yet
             sthread = SampleThread(self)
-            sthread.decay_weights = None
-            sthread.temp_decay_weights = None
 
             #connect graphics to GUI thread
-            sthread.updategraphics.connect(aw.qmc.updategraphics)
+            sthread.sample_processingSignal.connect(aw.qmc.sample_processing)
             sthread.start(QThread.Priority.TimeCriticalPriority) # QThread.Priority.HighPriority, QThread.Priority.HighestPriority
             sthread.wait(300)    #needed in some Win OS
 
@@ -19186,6 +19222,7 @@ class ApplicationWindow(QMainWindow):
                                         self.qmc.restoreEnergyLoadDefaults()
                                         self.sendmessage(QApplication.translate("Message","Energy loads configured for {0} {1}kg",None).format(label,self.qmc.roastersize_setup))
                             self.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(label))
+                            _log.info("Artisan configured for %s",label)
                         else:
                             res = None
                     if res is None:
@@ -19849,7 +19886,7 @@ class ApplicationWindow(QMainWindow):
         try:
             #### lock shared resources #####
             if lock:
-                aw.qmc.samplingsemaphore.acquire(1)
+                aw.qmc.profileDataSemaphore.acquire(1)
             nevents = len(aw.qmc.specialevents)
             packed_events = []
             # pack
@@ -19868,8 +19905,8 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.specialeventsStrings[i] = packed_events[i][2]
                 aw.qmc.specialeventsvalue[i] = packed_events[i][3]
         finally:
-            if lock and aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
+            if lock and aw.qmc.profileDataSemaphore.available() < 1:
+                aw.qmc.profileDataSemaphore.release(1)
 
 
     # if only_active then only the event types with quantifiers activated are grouped
@@ -19882,7 +19919,7 @@ class ApplicationWindow(QMainWindow):
     def clusterEventsType(self,tp):
         try:
             #### lock shared resources #####
-            aw.qmc.samplingsemaphore.acquire(1)
+            aw.qmc.profileDataSemaphore.acquire(1)
             nevents = len(aw.qmc.specialevents)
             if nevents:
                 # first order the events table
@@ -19933,8 +19970,8 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.specialeventsStrings = specialeventsStrings
                     aw.qmc.specialeventsvalue = specialeventsvalue
         finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
+            if aw.qmc.profileDataSemaphore.available() < 1:
+                aw.qmc.profileDataSemaphore.release(1)
 
 
     # decides on visibility of the Control button based on the selected devices and configuration
@@ -23156,7 +23193,6 @@ class ApplicationWindow(QMainWindow):
                 self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # and record the event
                 if self.qmc.flagstart:
-#                    self.qmc.EventRecord(extraevent = ee,doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
                     # we use event handling to enable the doupdategraphics/doupdatebackground also if running in background thread
                     self.qmc.eventRecordSignal.emit(ee)
             else:
@@ -23190,7 +23226,6 @@ class ApplicationWindow(QMainWindow):
                 # move corresponding slider to new value:
                 self.moveslider(etype,new_value)
                 if self.qmc.flagstart:
-#                    self.qmc.EventRecord(extraevent = ee,doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
                     # we use event handling to enable the doupdategraphics/doupdatebackground also if running in background thread
                     self.qmc.eventRecordSignal.emit(ee)
         else:
@@ -28143,6 +28178,7 @@ class ApplicationWindow(QMainWindow):
                     #
                     aw.setFonts()
                     self.qmc.redraw()
+                    _log.info("Factory reset")
                     return True  #don't load any more settings. They could be bad (corrupted). Stop here.
 
             # we remember from which location we loaded the last settings file

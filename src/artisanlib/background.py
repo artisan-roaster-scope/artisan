@@ -649,7 +649,7 @@ class backgroundDlg(ArtisanResizeablDialog):
     def createDataTable(self):
         try:
             #### lock shared resources #####
-            self.aw.qmc.samplingsemaphore.acquire(1)
+            self.aw.qmc.profileDataSemaphore.acquire(1)
             
             ndata = len(self.aw.qmc.timeB)
             
@@ -801,8 +801,8 @@ class backgroundDlg(ArtisanResizeablDialog):
                 header.setSectionResizeMode(5, QHeaderView.ResizeMode.Stretch)
             self.datatable.resizeColumnsToContents()
         finally:
-            if self.aw.qmc.samplingsemaphore.available() < 1:
-                self.aw.qmc.samplingsemaphore.release(1)
+            if self.aw.qmc.profileDataSemaphore.available() < 1:
+                self.aw.qmc.profileDataSemaphore.release(1)
 
     @pyqtSlot(bool)
     def copyDataTabletoClipboard(self,_=False):

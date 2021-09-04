@@ -4747,7 +4747,7 @@ class serialport():
     #  - Phidget VCP1000: PHIDID_VCP1000 (20-bit ±40V Voltage Input Phidget; ±312mV, ±40V)
     #  - Phidget VCP1001: PHIDID_VCP1001 (±40V Voltage Input Phidget; ±5V, ±15V or ±40V)
     #  - Phidget VCP1002: PHIDID_VCP1002 (±1V Voltage Input Phidget; ±10mV -- ±1V)
-	
+
     # the API parameter is one of "voltage", "digital", "current", "frequency"
     # if single is set, only the first channel of the two is allocated
     def PHIDGET1018values(self,deviceType=DeviceID.PHIDID_1010_1013_1018_1019,mode=0, API="voltage", retry=True, single=False):
@@ -5708,7 +5708,7 @@ class serialport():
     def sendTXcommand(self,command):
         try:
             #### lock shared resources #####
-            self.aw.qmc.samplingsemaphore.acquire(1)
+            self.aw.qmc.samplingSemaphore.acquire(1)
             if not self.SP.isOpen():
                 self.openport()
                 libtime.sleep(1)
@@ -5727,8 +5727,8 @@ class serialport():
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.sendTXcommand() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
-            if self.aw.qmc.samplingsemaphore.available() < 1:
-                self.aw.qmc.samplingsemaphore.release(1)
+            if self.aw.qmc.samplingSemaphore.available() < 1:
+                self.aw.qmc.samplingSemaphore.release(1)
             #note: logged chars should not be binary
             if self.aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)

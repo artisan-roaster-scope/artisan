@@ -3,7 +3,7 @@ formatters:
   simple:
     format: '%(asctime)s - %(levelname)s: %(message)s'
   advanced:
-    format: '%(asctime)s %(threadName)-14s %(name)-19s %(levelname)-7s: %(message)s'
+    format: '%(asctime)s %(threadName)-10s %(name)-20s %(levelname)-7s: %(message)s'
     datefmt: '%m-%d %H:%M:%S'
 handlers:
   console:

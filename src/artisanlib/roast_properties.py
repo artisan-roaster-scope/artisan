@@ -3966,7 +3966,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if force or not self.tabInitialized[2]:
             try:
                 #### lock shared resources #####
-                self.aw.qmc.samplingsemaphore.acquire(1)
+                self.aw.qmc.profileDataSemaphore.acquire(1)
                 
                 nevents = len(self.aw.qmc.specialevents)
                 
@@ -4063,8 +4063,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
             finally:
-                if self.aw.qmc.samplingsemaphore.available() < 1:
-                    self.aw.qmc.samplingsemaphore.release(1)
+                if self.aw.qmc.profileDataSemaphore.available() < 1:
+                    self.aw.qmc.profileDataSemaphore.release(1)
             self.tabInitialized[2] = True
 
 
@@ -4072,7 +4072,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.tabInitialized[2]:
             try:
                 #### lock shared resources #####
-                self.aw.qmc.samplingsemaphore.acquire(1)
+                self.aw.qmc.profileDataSemaphore.acquire(1)
                 nevents = self.eventtable.rowCount()
                 for i in range(nevents):
                     try:
@@ -4092,8 +4092,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
             finally:
-                if self.aw.qmc.samplingsemaphore.available() < 1:
-                    self.aw.qmc.samplingsemaphore.release(1)
+                if self.aw.qmc.profileDataSemaphore.available() < 1:
+                    self.aw.qmc.profileDataSemaphore.release(1)
 
     @pyqtSlot(bool)
     def copyDataTabletoClipboard(self,_=False):
@@ -4175,7 +4175,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def clearEvents(self,_=False):
         try:
             #### lock shared resources #####
-            self.aw.qmc.samplingsemaphore.acquire(1)
+            self.aw.qmc.profileDataSemaphore.acquire(1)
             nevents = len(self.aw.qmc.specialevents)
             if nevents:
                 self.aw.qmc.specialevents = []
@@ -4185,8 +4185,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         except Exception:  # pylint: disable=broad-except
             pass
         finally:
-            if self.aw.qmc.samplingsemaphore.available() < 1:
-                self.aw.qmc.samplingsemaphore.release(1)
+            if self.aw.qmc.profileDataSemaphore.available() < 1:
+                self.aw.qmc.profileDataSemaphore.release(1)
         self.createEventTable(force=True)
         self.aw.qmc.redraw(recomputeAllDeltas=False)
         self.aw.qmc.fileDirty()
