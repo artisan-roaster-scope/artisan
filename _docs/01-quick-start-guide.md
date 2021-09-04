@@ -36,7 +36,7 @@ The [artisan.plus service](https://artisan.plus/en/) features support for
 
 ### Learn what Artisan can do and Your First Roast 
 
-1.	Skim the pages of this Quick Start Guide, learn what Artisan RoasterScope can do, and then go back and read the pages of interest in detail. For each roast, an Artisan "profile" will be created and can be saved.  For most of the topics below, you will find a page in this Quick Start Guide, and some are linked.  
+1.	Skim the pages of this Quick Start Guide, learn what Artisan RoasterScope can do, and then go back and read the pages of interest in detail. For each roast, an Artisan "profile" will be created and can be saved in various formats under File>Save Graph (be sure to review these).  For most of the topics below, you will find a page in this Quick Start Guide, and some are linked.  
 2.	`Config` >> `Temperature`  
 Pick ˚F or ˚C.
 3.	`Config` >> [`Sampling`](https://artisan-scope.org/docs/sampling/)  
