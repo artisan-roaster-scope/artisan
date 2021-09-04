@@ -2,7 +2,7 @@
 title: "Properties"
 permalink: /docs/properties/
 excerpt: "Roast properties dialog"
-last_modified_at: 2019-11-20T15:59:00-04:00
+last_modified_at: 2021-09-04T15:59:00-04:00
 toc: false
 author: Michael Herbert
 author_profile: true
