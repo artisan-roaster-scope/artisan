@@ -21,6 +21,8 @@ import time as libtime
 import re
 import platform
 import prettytable
+import logging
+from typing import Final
 
 from artisanlib.util import deltaLabelUTF8
 from artisanlib.dialogs import ArtisanResizeablDialog
@@ -28,6 +30,8 @@ from artisanlib.widgets import MyQComboBox
 
 from help import programs_help
 from help import symbolic_help
+
+_log: Final = logging.getLogger(__name__)
 
 try:
     #pylint: disable = E, W, R, C
@@ -2640,6 +2644,42 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 119 is +WebSocket 910 but +DEVICE cannot be set as main device
                 ##########################
+                ##########################
+                ####  DEVICE 120 is Yocto 0-10V Rx
+                elif meter == "Yocto 0-10V Rx":
+                    self.aw.qmc.device = 120
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ##########################
+                ####  DEVICE 121 is Yocto milliVolt Rx
+                elif meter == "Yocto milliVolt Rx":
+                    self.aw.qmc.device = 121
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ##########################
+                ####  DEVICE 122 is Yocto Serial
+                elif meter == "Yocto Serial":
+                    self.aw.qmc.device = 122
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ##########################
+                ####  DEVICE 123 is Phidget VCP1000
+                elif meter == "Phidget VCP1000":
+                    self.aw.qmc.device = 123
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ##########################
+                ####  DEVICE 124 is Phidget VCP1001
+                elif meter == "Phidget VCP1001":
+                    self.aw.qmc.device = 124
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ##########################
+                ####  DEVICE 125 is Phidget VCP1002
+                elif meter == "Phidget VCP1002":
+                    self.aw.qmc.device = 125
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
 
                 # ADD DEVICE:
 
@@ -2653,12 +2693,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     # - add an elif entry above to specify the default serial settings
             #extra devices serial config
             #set of different serial settings modes options
-            ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],
+            ssettings: Final = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],
                          [19200,8,'N',1,1],[2400,8,'N',1,1],[9600,8,'E',1,1],[38400,8,'E',1,1],[115200,8,'N',1,1],[57600,8,'N',1,1]]
             #map device index to a setting mode (choose the one that matches the device)
     # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
     # - add an entry to devsettings below (and potentially to ssettings above)
-            devssettings = [
+            devssettings: Final = [
                 0, # 0
                 1, # 1
                 2, # 2
@@ -2754,6 +2794,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 92
                 1, # 93
                 1, # 94
+                1, # 95
+                1, # 96
+                1, # 97
+                1, # 98
                 1, # 99
                 1, # 100
                 9, # 101
@@ -2775,6 +2819,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 3, # 117
                 1, # 118
                 1, # 119
+                1, # 120
+                1, # 121
+                1, # 122
+                1, # 123
+                1, # 124
+                1, # 125
                 ] 
             #init serial settings of extra devices
             for i in range(len(self.aw.qmc.extradevices)):
@@ -2918,6 +2968,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.aw.setcommport()
             self.close()
         except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " device accept(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
