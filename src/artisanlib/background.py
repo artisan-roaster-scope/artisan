@@ -186,7 +186,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.backgroundReproduce.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundReproduce.stateChanged.connect(self.setreproduce)
         self.backgroundReproduceBeep = QCheckBox(QApplication.translate("CheckBox","Beep",None))
-        self.backgroundReproduceBeep.setChecked(self.aw.qmc.backgroundReproduce)
+        self.backgroundReproduceBeep.setChecked(self.aw.qmc.backgroundReproduceBeep)
         self.backgroundReproduceBeep.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundReproduceBeep.stateChanged.connect(self.setreproduceBeep)
         self.backgroundPlaybackEvents = QCheckBox(QApplication.translate("CheckBox","Playback Events",None))

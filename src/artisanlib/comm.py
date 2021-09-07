@@ -975,17 +975,17 @@ class serialport():
     
     def PHIDGET_VCP1000(self):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
-        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_VCP1000, 0, "voltage", True)
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_VCP1000, 0, "voltage", single=True)
         return tx,v1,v2
 
     def PHIDGET_VCP1001(self):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
-        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_VCP1001, 0, "voltage", True)
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_VCP1001, 0, "voltage", single=True)
         return tx,v1,v2
 
     def PHIDGET_VCP1002(self):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
-        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_VCP1002, 0, "voltage", True)
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_VCP1002, 0, "voltage", single=True)
         return tx,v1,v2
 
     def HOTTOP_BTET(self):

@@ -4369,24 +4369,24 @@ class tgraphcanvas(FigureCanvas):
                                             if self.DeltaETflag and self.l_delta1 is not None:
                                                 try:
                                                     self.ax.draw_artist(self.l_delta1)
-                                                except Exception: # pylint: disable=broad-except
-                                                    pass
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
                                             if self.DeltaBTflag and self.l_delta2 is not None:
                                                 try:
                                                     self.ax.draw_artist(self.l_delta2)
-                                                except Exception: # pylint: disable=broad-except
-                                                    pass
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
                                         else:
                                             if self.DeltaBTflag and self.l_delta2 is not None:
                                                 try:
                                                     self.ax.draw_artist(self.l_delta2)
-                                                except Exception: # pylint: disable=broad-except
-                                                    pass
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
                                             if self.DeltaETflag and self.l_delta1 is not None:
                                                 try:
                                                     self.ax.draw_artist(self.l_delta1)
-                                                except Exception: # pylint: disable=broad-except
-                                                    pass
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
 
                                         # draw extra curves
                                         xtra_dev_lines1 = 0
@@ -4397,14 +4397,14 @@ class tgraphcanvas(FigureCanvas):
                                                 if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
                                                     try:
                                                         self.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
-                                                    except Exception: # pylint: disable=broad-except
-                                                        pass
+                                                    except Exception as e: # pylint: disable=broad-except
+                                                        _log.exception(e)
                                                     xtra_dev_lines1 = xtra_dev_lines1 + 1
                                                 if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
                                                     try:
                                                         self.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
-                                                    except Exception: # pylint: disable=broad-except
-                                                        pass
+                                                    except Exception as e: # pylint: disable=broad-except
+                                                        _log.exception(e)
                                                     xtra_dev_lines2 = xtra_dev_lines2 + 1
                                         except Exception: # pylint: disable=broad-except
                                             pass
@@ -4413,39 +4413,39 @@ class tgraphcanvas(FigureCanvas):
                                             if self.ETcurve:
                                                 try:
                                                     self.ax.draw_artist(self.l_temp1)
-                                                except Exception: # pylint: disable=broad-except
-                                                    pass
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
                                             # draw BT
                                             if self.BTcurve:
                                                 try:
                                                     self.ax.draw_artist(self.l_temp2)
-                                                except Exception: # pylint: disable=broad-except
-                                                    pass
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
                                         else:
                                             # draw BT
                                             if self.BTcurve:
                                                 try:
                                                     self.ax.draw_artist(self.l_temp2)
-                                                except Exception: # pylint: disable=broad-except
-                                                    pass
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
                                             # draw ET
                                             if self.ETcurve:
                                                 try:
                                                     self.ax.draw_artist(self.l_temp1)
-                                                except Exception: # pylint: disable=broad-except
-                                                    pass
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
 
                                         try:
                                             if self.BTcurve:
                                                 for a in self.l_annotations:
                                                     self.ax.draw_artist(a)
-                                        except Exception: # pylint: disable=broad-except
-                                            pass
+                                        except Exception as e : # pylint: disable=broad-except
+                                            _log.exception(e)
 
                                         try:
                                             self.update_additional_artists()
-                                        except Exception: # pylint: disable=broad-except
-                                            pass
+                                        except Exception as e: # pylint: disable=broad-except
+                                            _log.exception(e)
 
                                         self.fig.canvas.blit(self.ax.get_figure().bbox)
 
