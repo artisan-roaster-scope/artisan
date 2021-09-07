@@ -215,6 +215,7 @@ from Phidget22.Phidget import Phidget as PhidgetDriver
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
 from Phidget22.Devices.Log import Log as PhidgetLog
 from Phidget22.LogLevel import LogLevel as PhidgetLogLevel
+from Phidget22. VoltageRange import VoltageRange
 
 try:
     # spanning a second multiprocessing instance (Hottop server) on macOS falils to import the YAPI interface
@@ -973,6 +974,34 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1018_changeTriggersValues = range(0,51,1)
         self.phidget1018_changeTriggersStrings = list(map(lambda x:str(x*10)+"mV",self.phidget1018_changeTriggersValues))
 
+        self.phidgetVCP100x_voltageRanges = [VoltageRange.VOLTAGE_RANGE_AUTO]*8
+        self.phidgetVCP100x_voltageRangeValues: Final = [
+            VoltageRange.VOLTAGE_RANGE_AUTO,
+            VoltageRange.VOLTAGE_RANGE_10mV,
+            VoltageRange.VOLTAGE_RANGE_40mV,
+            VoltageRange.VOLTAGE_RANGE_200mV,
+            VoltageRange.VOLTAGE_RANGE_312_5mV,
+            VoltageRange.VOLTAGE_RANGE_400mV,
+            VoltageRange.VOLTAGE_RANGE_1000mV,
+            VoltageRange.VOLTAGE_RANGE_2V,
+            VoltageRange.VOLTAGE_RANGE_5V,
+            VoltageRange.VOLTAGE_RANGE_15V,
+            VoltageRange.VOLTAGE_RANGE_40V
+        ]
+        self.phidgetVCP100x_voltageRangeStrings: Final = [
+            "Auto",
+            "±10mV",
+            "±40mV",
+            "±200mV",
+            "±312.5mV",
+            "±400mV",
+            "±1000mV",
+            "±2V",
+            "±5V",
+            "±15V",
+            "±40V"
+        ]
+
         self.phidgetDAQ1400_powerSupplyStrings = ["--","12V","24V"]
         self.phidgetDAQ1400_powerSupply = 1
         self.phidgetDAQ1400_inputModeStrings = ["NPN","PNP"]
@@ -986,7 +1015,7 @@ class tgraphcanvas(FigureCanvas):
         # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:" in the code
         # (check also the tags in comm.py and devices.py!!)
         # - add to self.devices
-        self.devices = [#Fuji PID               #0
+        self.devices: Final = [#Fuji PID        #0
                        "Omega HH806AU",         #1
                        "Omega HH506RA",         #2
                        "CENTER 309",            #3
@@ -1109,49 +1138,14 @@ class tgraphcanvas(FigureCanvas):
                        "Yocto 0-10V Rx",            #120
                        "Yocto milliVolt Rx",        #121
                        "Yocto Serial",              #122
+                       "Phidget VCP1000",           #123
+                       "Phidget VCP1001",           #124
+                       "Phidget VCP1002",           #125
                        ]
 
         # ADD DEVICE:
-        # ids of (main) devices (without a + in front of their name string)
-        # that do NOT communicate via any serial port thus do not need any serial port configuration
-        self.nonSerialDevices = [
-            27, # Program
-            34, # Phidget 1048 4xTC 01
-            37, # Phidget 1046 4xRTD 01
-            40, # Phidget IO 01
-            45, # Yocto Thermocouple
-            46, # Yocto PT100
-            47, # Phidget 1045 IR
-            52, # Phidget 1051 1xTC 01
-            58, # Phidget TMP1101 4xTC 01
-            61, # Phidget TMP1100 1xTC
-            62, # Phidget 1011 IO 01
-            63, # Phidget HUB IO 01
-            68, # Phidget TMP1200 1xRTD
-            69, # Phidget IO Digital 01
-            73, # Phidget 1011 IO Digital 01
-            74, # Phidget HUB IO Digital 01
-            79, # S7
-            83, # Aillio Bullet R1 BT/DT
-            92, # Probat Middleware
-            95, # Phidget DAQ1400 Current
-            96, # Phidget DAQ1400 Frequency
-            97, # Phidget DAQ1400 Digital
-            98, # Phidget DAQ1400 Voltage
-            99, # Aillio Bullet R1 IBTS/BT
-            100, # Yocto IR
-            106, # Phidget HUB IO 0
-            107, # Phidget HUB IO Digital 0
-            108, # Yocto 4-20mA Rx
-            111,  # WebSocket
-            120, # Yocto-0-10V-Rx
-            121, # Yocto-milliVolt-Rx
-            122 # Yocto-Serial
-        ]
-
-        # ADD DEVICE:
         # ids of (main) Phidget devices (without a + in front of their name string)
-        self.phidgetDevices = [
+        self.phidgetDevices : Final = [
             34, # Phidget 1048
             37, # Phidget 1046
             40, # Phidget IO
@@ -1170,12 +1164,34 @@ class tgraphcanvas(FigureCanvas):
             97, # Phidget DAQ1400 Digital
             98, # Phidget DAQ1400 Voltage
             106, # Phidget HUB IO 0
-            107  # Phidget HUB IO Digital 0
+            107, # Phidget HUB IO Digital 0
+            123, # Phidget VCP1000
+            124, # Phidget VCP1001
+            125  # Phidget VCP1002
+        ]
+
+        # ADD DEVICE:
+        # ids of (main) devices (without a + in front of their name string)
+        # that do NOT communicate via any serial port thus do not need any serial port configuration
+        self.nonSerialDevices : Final = self.phidgetDevices + [
+            27, # Program
+            45, # Yocto Thermocouple
+            46, # Yocto PT100
+            79, # S7
+            83, # Aillio Bullet R1 BT/DT
+            92, # Probat Middleware
+            99, # Aillio Bullet R1 IBTS/BT
+            100, # Yocto IR
+            108, # Yocto 4-20mA Rx
+            111,  # WebSocket
+            120, # Yocto-0-10V-Rx
+            121, # Yocto-milliVolt-Rx
+            122  # Yocto-Serial
         ]
 
         # ADD DEVICE:
         # ids of devices temperature conversions should not be applied
-        self.nonTempDevices = [
+        self.nonTempDevices : Final = [
             22, # +PID SV/DUTY %
             25, # +Virtual
             40, # Phidget IO 01
@@ -1213,6 +1229,9 @@ class tgraphcanvas(FigureCanvas):
             120, # Yocto-0-10V-Rx
             121, # Yocto-milliVolt-Rx
             122, # Yocto-Serial
+            123, # Phidget VCP1000
+            124, # Phidget VCP1001
+            125  # Phidget VCP1002
         ]
 
         #extra devices
@@ -15170,16 +15189,14 @@ class SampleThread(QThread):
     # fetch the raw samples from the main and all extra devices once per interval
     def sample(self):
         _log.debug("sample")
-        if aw.qmc.device == 18 and aw.simulator is None: # NONE device
-            self.sample_processingSignal.emit([], [], [])            
-        else:
-            gotlock = aw.qmc.samplingSemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
-            if gotlock:
-                try:
-                    temp1_readings = []
-                    temp2_readings = []
-                    timex_readings = []
-                    
+        gotlock = aw.qmc.samplingSemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+        if gotlock:
+            try:
+                temp1_readings = []
+                temp2_readings = []
+                timex_readings = []
+                
+                if aw.qmc.device != 18 or aw.simulator is not None: # not NONE device
                     ##### send sampling action if any interval is set to "sync" (extra_event_sampling_delay = 0)
                     try:
                         if aw.qmc.extra_event_sampling_delay == 0 and aw.qmc.extrabuttonactions[2]:
@@ -15204,12 +15221,13 @@ class SampleThread(QThread):
                         temp1_readings.append(extrat1)
                         temp2_readings.append(extrat2)
                         timex_readings.append(extratx)
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
-                finally:
-                    if aw.qmc.samplingSemaphore.available() < 1:
-                        aw.qmc.samplingSemaphore.release(1)
-                    self.sample_processingSignal.emit(temp1_readings, temp2_readings, timex_readings)
+
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+            finally:
+                if aw.qmc.samplingSemaphore.available() < 1:
+                    aw.qmc.samplingSemaphore.release(1)
+                self.sample_processingSignal.emit(temp1_readings, temp2_readings, timex_readings)
 
 
     def run(self):
@@ -15295,6 +15313,9 @@ class EventActionThread(QThread):
         # as eventaction_internal is not running in the GUI thread we avoid doing graphic updates and run them instead after thread termination within
         # the GUI thread
         aw.eventaction_internal(self.action,self.command)
+
+
+#########################################################################################################
 
 # applies comma2dot as fixup to automatically turn numbers like "1,2" into valid numbers like "1.0" and the empty entry into "0.0"
 class MyQDoubleValidator(QDoubleValidator):
@@ -28406,6 +28427,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phidget1018_changeTriggers = [toInt(x) for x in toList(settings.value("phidget1018_changeTriggers",self.qmc.phidget1018_changeTriggers))]
             if settings.contains("phidget1018_ratio"):
                 self.qmc.phidget1018_ratio = [bool(toBool(x)) for x in toList(settings.value("phidget1018_ratio",self.qmc.phidget1018_ratio))]
+            if settings.contains("phidgetVCP100x_voltageRanges"):
+                self.qmc.phidgetVCP100x_voltageRanges = [toInt(x) for x in toList(settings.value("phidgetVCP100x_voltageRanges",self.qmc.phidgetVCP100x_voltageRanges))]
             if settings.contains("PIDbuttonflag"):
                 self.qmc.PIDbuttonflag = bool(toBool(settings.value("PIDbuttonflag",self.qmc.PIDbuttonflag)))
             if settings.contains("Controlbuttonflag"):
@@ -30258,6 +30281,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phidget1018_ratio",self.qmc.phidget1018_ratio)
             settings.setValue("phidget1018_dataRates",self.qmc.phidget1018_dataRates)
             settings.setValue("phidget1018_changeTriggers",self.qmc.phidget1018_changeTriggers)
+            settings.setValue("phidgetVCP100x_voltageRanges",self.qmc.phidgetVCP100x_voltageRanges)
             settings.setValue("controlETpid",self.ser.controlETpid)
             settings.setValue("readBTpid",self.ser.readBTpid)
             settings.setValue("arduinoETChannel",self.ser.arduinoETChannel)

@@ -815,6 +815,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.ratioCheckBoxes = []
         self.dataRateCombos = []
         self.changeTriggerCombos = []
+        self.voltageRangeCombos = []
         for i in range(1,9):
             dataRatesCombo = QComboBox()
             dataRatesCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -826,16 +827,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 dataRatesCombo.setCurrentIndex(self.aw.qmc.phidget_dataRatesValues.index(self.aw.qmc.phidget1018_dataRates[i-1]))
             except Exception: # pylint: disable=broad-except
                 pass
-
             dataRatesCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
             dataRatesCombo.setMinimumContentsLength(5)
             width = dataRatesCombo.minimumSizeHint().width()
             dataRatesCombo.setMinimumWidth(width)
             if platform.system() == 'Darwin':
                 dataRatesCombo.setMaximumWidth(width)
-            
             self.dataRateCombos.append(dataRatesCombo)
-            
             phidgetBox1018.addWidget(dataRatesCombo,4,i)
             
             changeTriggersCombo = QComboBox()
@@ -846,19 +844,37 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             for item in changeTriggerItems:
                 model.appendRow(item)
             try:
-                changeTriggersCombo.setCurrentIndex((self.aw.qmc.phidget1018_changeTriggersValues.index(self.aw.qmc.phidget1018_changeTriggers[i-1])))
+                changeTriggersCombo.setCurrentIndex(self.aw.qmc.phidget1018_changeTriggersValues.index(self.aw.qmc.phidget1018_changeTriggers[i-1]))
             except Exception: # pylint: disable=broad-except
                 pass
-
             changeTriggersCombo.setMinimumContentsLength(5)
             changeTriggersCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
             width = changeTriggersCombo.minimumSizeHint().width()
             changeTriggersCombo.setMinimumWidth(width)
             if platform.system() == 'Darwin':
                 changeTriggersCombo.setMaximumWidth(width)
-
             self.changeTriggerCombos.append(changeTriggersCombo)
             phidgetBox1018.addWidget(changeTriggersCombo,3,i)
+            
+            voltageRangeCombo = QComboBox()
+            voltageRangeCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            model = voltageRangeCombo.model()
+            voltageRangeItems = self.createItems(self.aw.qmc.phidgetVCP100x_voltageRangeStrings)
+            for item in voltageRangeItems:
+                model.appendRow(item)
+            try:
+                voltageRangeCombo.setCurrentIndex(self.aw.qmc.phidgetVCP100x_voltageRangeValues.index(self.aw.qmc.phidgetVCP100x_voltageRanges[i-1]))
+            except Exception: # pylint: disable=broad-except
+                pass
+            voltageRangeCombo.setMinimumContentsLength(5)
+            voltageRangeCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
+            width = voltageRangeCombo.minimumSizeHint().width()
+            voltageRangeCombo.setMinimumWidth(width)
+            if platform.system() == 'Darwin':
+                voltageRangeCombo.setMaximumWidth(width)
+            self.voltageRangeCombos.append(voltageRangeCombo)
+            phidgetBox1018.addWidget(voltageRangeCombo,5,i)
+                        
 
             asyncFlag = QCheckBox()
             asyncFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -873,7 +889,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             ratioFlag.setChecked(False)
             ratioFlag.setChecked(self.aw.qmc.phidget1018_ratio[i-1])
             self.ratioCheckBoxes.append(ratioFlag)
-            phidgetBox1018.addWidget(ratioFlag,5,i)
+            phidgetBox1018.addWidget(ratioFlag,6,i)
 
             rowLabel = QLabel(str(i-1))
             phidgetBox1018.addWidget(rowLabel,0,i)
@@ -882,13 +898,15 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         dataRateLabel = QLabel(QApplication.translate("Label","Rate", None))
         changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None))
         ratioLabel = QLabel(QApplication.translate("Label","Ratio", None))
+        rangeLabel = QLabel(QApplication.translate("Label","Range", None))
         phidgetBox1018.addWidget(asyncLabel,2,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1018.addWidget(changeTriggerLabel,3,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1018.addWidget(dataRateLabel,4,0,Qt.AlignmentFlag.AlignRight)
-        phidgetBox1018.addWidget(ratioLabel,5,0,Qt.AlignmentFlag.AlignRight)
+        phidgetBox1018.addWidget(rangeLabel,5,0,Qt.AlignmentFlag.AlignRight)
+        phidgetBox1018.addWidget(ratioLabel,6,0,Qt.AlignmentFlag.AlignRight)
         phidget1018HBox = QVBoxLayout()
         phidget1018HBox.addLayout(phidgetBox1018)
-        phidget1018GroupBox = QGroupBox("1010/1011/1013/1018/1019/HUB0000/SBC IO")
+        phidget1018GroupBox = QGroupBox("1010/1011/1013/1018/1019/HUB0000/SBC/DAQ1400/VCP100x IO")
         phidget1018GroupBox.setLayout(phidget1018HBox)
         phidget1018HBox.setContentsMargins(0,0,0,0)
         self.phidgetBoxRemoteFlag = QCheckBox()
@@ -2873,6 +2891,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.aw.qmc.phidget1018_ratio[i] = self.ratioCheckBoxes[i].isChecked()
                 self.aw.qmc.phidget1018_dataRates[i] = self.aw.qmc.phidget_dataRatesValues[self.dataRateCombos[i].currentIndex()]
                 self.aw.qmc.phidget1018_changeTriggers[i] = self.aw.qmc.phidget1018_changeTriggersValues[self.changeTriggerCombos[i].currentIndex()]
+                self.aw.qmc.phidgetVCP100x_voltageRanges[i] = self.aw.qmc.phidgetVCP100x_voltageRangeValues[self.voltageRangeCombos[i].currentIndex()]
 
             # LCD visibility
             self.aw.LCD2frame.setVisible((self.aw.qmc.BTlcd if self.aw.qmc.swaplcds else self.aw.qmc.ETlcd))

@@ -457,8 +457,11 @@ class serialport():
                                    self.WS_78,  # self.probat_sample_inlet_ambient, # 118
                                    self.WS_910,  # self.probat_sample_cooling # 119
                                    self.YOCTO_generic,        #120 # Yocto-0-10V-Rx
-                                   self.YOCTO_generic,        #120 # Yocto-milliVolt-Rx
-                                   self.YOCTO_generic        #120 # Yocto-Serial
+                                   self.YOCTO_generic,        #121 # Yocto-milliVolt-Rx
+                                   self.YOCTO_generic,        #122 # Yocto-Serial
+                                   self.PHIDGET_VCP1000,      #123 Phidget VCP1000
+                                   self.PHIDGET_VCP1001,      #124 Phidget VCP1001
+                                   self.PHIDGET_VCP1002       #125 Phidget VCP1002
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -968,6 +971,21 @@ class serialport():
     def PHIDGET_DAQ1400_VOLTAGE(self):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"voltage")
+        return tx,v1,v2
+    
+    def PHIDGET_VCP1000(self):
+        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_VCP1000, 0, "voltage", True)
+        return tx,v1,v2
+
+    def PHIDGET_VCP1001(self):
+        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_VCP1001, 0, "voltage", True)
+        return tx,v1,v2
+
+    def PHIDGET_VCP1002(self):
+        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_VCP1002, 0, "voltage", True)
         return tx,v1,v2
 
     def HOTTOP_BTET(self):
@@ -4627,6 +4645,13 @@ class serialport():
                 self.PhidgetIO[idx].setDataInterval(self.aw.qmc.phidget1018_dataRates[channel])
             except Exception: # pylint: disable=broad-except
                 pass
+            # set VCP100x voltage range
+            if deviceType in [DeviceID.PHIDID_VCP1000, DeviceID.PHIDID_VCP1001, DeviceID.PHIDID_VCP1002]:
+                try:
+                    voltageRangeIdx = self.aw.qmc.phidgetVCP100x_voltageRanges[channel]
+                    self.PhidgetIO[idx].setVoltageRange(self.aw.qmc.phidgetVCP100x_voltageRangeValues[voltageRangeIdx])
+                except Exception: # pylint: disable=broad-except
+                    pass
             # set the PowerSupply for the DAQ1400
             if deviceType == DeviceID.PHIDID_DAQ1400:
                 try:
@@ -4715,6 +4740,12 @@ class serialport():
                         self.aw.sendmessage(QApplication.translate("Message","Phidget IO 8/8/8 attached",None))
                     elif deviceType == DeviceID.PHIDID_DAQ1400:
                         self.aw.sendmessage(QApplication.translate("Message","Phidget DAQ1400 attached",None))
+                    elif deviceType == DeviceID.PHIDID_VCP1000:
+                        self.aw.sendmessage(QApplication.translate("Message","Phidget VCP1000 attached",None))
+                    elif deviceType == DeviceID.PHIDID_VCP1001:
+                        self.aw.sendmessage(QApplication.translate("Message","Phidget VCP1001 attached",None))
+                    elif deviceType == DeviceID.PHIDID_VCP1002:
+                        self.aw.sendmessage(QApplication.translate("Message","Phidget VCP1002 attached",None))
                     else:
                         self.aw.sendmessage(QApplication.translate("Message","Phidget IO attached",None))
         except Exception: # pylint: disable=broad-except
@@ -4734,6 +4765,12 @@ class serialport():
                         self.aw.sendmessage(QApplication.translate("Message","Phidget IO 8/8/8 detached",None))
                     elif deviceType == DeviceID.PHIDID_DAQ1400:
                         self.aw.sendmessage(QApplication.translate("Message","Phidget DAQ1400 detached",None))
+                    elif deviceType == DeviceID.PHIDID_VCP1000:
+                        self.aw.sendmessage(QApplication.translate("Message","Phidget VCP1000 detached",None))
+                    elif deviceType == DeviceID.PHIDID_VCP1001:
+                        self.aw.sendmessage(QApplication.translate("Message","Phidget VCP1001 detached",None))
+                    elif deviceType == DeviceID.PHIDID_VCP1002:
+                        self.aw.sendmessage(QApplication.translate("Message","Phidget VCP1002 detached",None))
                     else:
                         self.aw.sendmessage(QApplication.translate("Message","Phidget IO detached",None))
         except Exception: # pylint: disable=broad-except
@@ -4744,6 +4781,7 @@ class serialport():
     #  - Phidget IO 8/8/8 (1010,1013,1018,1019,SBC): DeviceID.PHIDID_1010_1013_1018_1019
     #  - Phidget IO 6/6/6 (HUB0000): DeviceID.PHIDID_HUB0000
     #  - Phidget IO 2/2/2 (1011): DeviceID.PHIDID_1011
+    #  - Phidget Phidget DAQ1400 Current/Frequency/Digital/VOLTAGE  (DAQ1400): PHIDID_DAQ1400
     #  - Phidget VCP1000: PHIDID_VCP1000 (20-bit ±40V Voltage Input Phidget; ±312mV, ±40V)
     #  - Phidget VCP1001: PHIDID_VCP1001 (±40V Voltage Input Phidget; ±5V, ±15V or ±40V)
     #  - Phidget VCP1002: PHIDID_VCP1002 (±1V Voltage Input Phidget; ±10mV -- ±1V)
