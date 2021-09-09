@@ -171,10 +171,7 @@ class BleInterface(QtCore.QObject):
             for c in self.m_service.characteristics():
                 if c.isValid():
                     # we register write only for the given char_uuid associated to the service uuid we are connected to
-                    print("self.char_uuid",self.char_uuid)
-                    print("c.uuid()",c.uuid())
                     if self.char_uuid == c.uuid():
-                        print("in")
                         if c.properties() & QtBluetooth.QLowEnergyCharacteristic.WriteNoResponse or c.properties() & QtBluetooth.QLowEnergyCharacteristic.Write:
                             self.m_writeCharacteristic = c
                             self.update_connected(True)
