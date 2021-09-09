@@ -67,7 +67,6 @@ gallery:
     image_path: /assets/images/coffed-logo-light.png
     alt: "Coffed"
     title: "Coffed"
-    
   - url: https://www.ingnapoli.com/
     image_path: /assets/images/tostabar-logo.png
     alt: "Tostabar"
@@ -92,6 +91,10 @@ gallery:
     image_path: /assets/images/twino-logo.png
     alt: "Twino"
     title: "Twino"
+  - url: https://acaia.co/
+    image_path: /assets/images/acaia-logo.jpeg
+    alt: "acaia"
+    title: "acaia"
 
     
 
