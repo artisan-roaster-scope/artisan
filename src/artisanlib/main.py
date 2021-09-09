@@ -6403,7 +6403,8 @@ class tgraphcanvas(FigureCanvas):
         ### REDRAW  ##
         if redraw:
             self.redraw(True,sampling=sampling,smooth=aw.qmc.optimalSmoothing) # we need to re-smooth with standard smoothing if ON and optimal-smoothing is ticked
-        QApplication.processEvents() # this one seems to be needed for a proper redraw in fullscreen mode on OS X if a profile was loaded and NEW is pressed
+        #QApplication.processEvents() # this one seems to be needed for a proper redraw in fullscreen mode on OS X if a profile was loaded and NEW is pressed
+        #   this processEvents() seems not to be needed any longer!?
         return True
 
     @staticmethod
@@ -7100,7 +7101,9 @@ class tgraphcanvas(FigureCanvas):
             fontfamily=fontprop_medium.get_family()
             )
         try:
-            self.xlabel_width = self.xlabel_artist.get_window_extent(renderer=self.fig.canvas.get_renderer()).width
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                self.xlabel_width = self.xlabel_artist.get_window_extent(renderer=self.fig.canvas.get_renderer()).width
         except Exception: # pylint: disable=broad-except
             pass
         try:
@@ -9488,15 +9491,19 @@ class tgraphcanvas(FigureCanvas):
 
     def statstextboxBounds(self,x_pos,y_pos,textstr,ls,prop,fc):
         from matplotlib.transforms import Bbox
-        t = self.ax.text(x_pos, y_pos, textstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,path_effects=[])
-        f = self.ax.get_figure()
-        r = f.canvas.get_renderer()
-        t.update_bbox_position_size(renderer=r)
-        bb = t.get_window_extent(renderer=r) # bounding box in display space
-        bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
-        bbox = Bbox(bbox_data)
-        t.remove()
-        return bbox.bounds
+        
+        with warnings.catch_warnings():
+            # MPL will generate warnings for missing glyphs in some fonts
+            warnings.simplefilter("ignore")
+            t = self.ax.text(x_pos, y_pos, textstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,path_effects=[])
+            f = self.ax.get_figure()
+            r = f.canvas.get_renderer()
+            t.update_bbox_position_size(renderer=r)
+            bb = t.get_window_extent(renderer=r) # bounding box in display space
+            bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
+            bbox = Bbox(bbox_data)
+            t.remove()
+            return bbox.bounds
 
 
     def droptextBounds(self,drop_label,x_pos,y_pos,ls,prop,fc):
@@ -37461,7 +37468,7 @@ def main():
 #            pass
 
     aw.qmc.startPhidgetManager()
-
+    
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):
         with warnings.catch_warnings():

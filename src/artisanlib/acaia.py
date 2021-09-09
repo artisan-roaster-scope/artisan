@@ -16,10 +16,22 @@
 # AUTHOR
 # Marko Luther, 2019
 
+import logging
+from typing import Final
+
+
+_log: Final = logging.getLogger(__name__)
+
+
 class AcaiaBLE():
 
-    SERVICE_UUID = "00001820-0000-1000-8000-00805f9b34fb"
-    CHAR_UUID =    "00002a80-0000-1000-8000-00805f9b34fb"
+    # Acaia Pearl, Lunar uses this UUID
+    SERVICE_UUID_LEGACY = "00001820-0000-1000-8000-00805f9b34fb"
+    CHAR_UUID_LEGACY =    "00002a80-0000-1000-8000-00805f9b34fb"
+    
+    # Acaia Pearl (2021) uses this UUID
+    SERVICE_UUID_CURRENT = "49535343-FE7D-4AE5-8FA9-9FAFD205E455"
+    CHAR_UUID_CURRENT =    "49535343-1E4D-4BD9-BA61-23C647249616" # should this rather contain or end with "ecbe34729bb3"??
     
     HEADER1      = 0xef
     HEADER2      = 0xdd
@@ -52,7 +64,27 @@ class AcaiaBLE():
     TIMER_STATE_STARTED = 1
     TIMER_STATE_PAUSED = 2
     
-    
+    # Acaia Protocol Parser
+    E_PRS_CHECKHEADER1 = 0
+    E_PRS_CHECKHEADER2 = 1
+    E_PRS_CMDID = 2
+    E_PRS_CMDDATA = 3
+    E_PRS_CHECKSUM1 = 4
+    E_PRS_CHECKSUM2 = 5
+
+    NEW_CMD_SYSTEM_SA = 0
+    NEW_CMD_INFO_A = 7
+    NEW_CMD_STATUS_A = 8
+    NEW_CMD_EVENT_SA = 12
+
+    protocolParseStep=E_PRS_CHECKHEADER1
+    protocolParseBuf=[]
+    protocolParseCMD=0
+    protocolParseDataIndex = 0
+    protocolParseDataLen = 0
+    protocolParseCRC=[]
+
+
     def __init__(self):
         self.notificationConfSent = False
         # holds msgType on messages split in header and payload
@@ -62,6 +94,61 @@ class AcaiaBLE():
         self.firmware = None # on connect this is set to a triple of integers, (major, minor, patch)-version
         self.unit = 2 # 1: kg, 2: g, 5: ounce
         self.max_weight = 0 # in g
+
+    def resetProtocolParser(self):
+        self.protocolParseStep = self.E_PRS_CHECKHEADER1
+        self.protocolParseBuf = []
+        self.protocolParseCRC = []
+        self.protocolParseCMD = 0
+        self.protocolParseDataLen = 0
+        self.protocolParseDataIndex = 0
+
+    def acaiaProtocolParser(self,write,dataIn):
+        for c_in in dataIn:
+            if self.protocolParseStep==self.E_PRS_CHECKHEADER1:
+                if c_in == self.HEADER1:
+                    self.protocolParseStep=self.E_PRS_CHECKHEADER2
+            elif self.protocolParseStep == self.E_PRS_CHECKHEADER2:
+                if c_in == self.HEADER2:
+                    self.protocolParseStep=self.E_PRS_CMDID
+                else:
+                    self.resetProtocolParser()
+            elif self.protocolParseStep == self.E_PRS_CMDID:
+                self.protocolParseCMD=c_in
+                # In these commands the data len is determined by the next byte, so assign 255
+                if(self.protocolParseCMD == self.NEW_CMD_SYSTEM_SA):
+                    self.protocolParseDataLen=255
+                elif (self.protocolParseCMD == self.NEW_CMD_INFO_A):
+                    self.protocolParseDataLen = 255
+                elif (self.protocolParseCMD == self.NEW_CMD_STATUS_A):
+                    self.protocolParseDataLen = 255
+                elif (self.protocolParseCMD == self.NEW_CMD_EVENT_SA):
+                    self.protocolParseDataLen = 255
+                self.protocolParseStep = self.E_PRS_CMDDATA
+            elif self.protocolParseStep == self.E_PRS_CMDDATA:
+                if (self.protocolParseDataIndex==0 and self.protocolParseDataLen==255):
+                    self.protocolParseDataLen = c_in
+                self.protocolParseBuf.append(c_in)
+                self.protocolParseDataIndex+=1
+
+                if(self.protocolParseDataIndex==self.protocolParseDataLen):
+                    self.protocolParseStep=self.E_PRS_CHECKSUM1
+                if(self.protocolParseDataIndex > 20):
+                    self.resetProtocolParser()
+            elif self.protocolParseStep == self.E_PRS_CHECKSUM1:
+                self.protocolParseCRC.append(c_in)
+                self.protocolParseStep = self.E_PRS_CHECKSUM2
+            elif self.protocolParseStep == self.E_PRS_CHECKSUM2:
+                self.protocolParseCRC.append(c_in)
+                cal_crc=self.crc(self.protocolParseBuf)
+                if cal_crc[0] == self.protocolParseCRC[0] and cal_crc[1] == self.protocolParseCRC[1]:
+                    self.msgType=self.protocolParseCMD
+                    # When protocol parsing success, call original data parser
+                    self.parseScaleData(write, self.msgType, self.protocolParseBuf)
+                    self.msgType = None  # message consumed completely
+
+                self.resetProtocolParser()
+
     
     def reset(self):
         self.__init__()
@@ -108,6 +195,7 @@ class AcaiaBLE():
 
     # configure notifications
     def confNotifications(self,write):
+        _log.debug("confNotifications(_)")
         self.sendEvent(write,
             bytes([ # pairs of key/setting
                     0,  # weight id
@@ -123,16 +211,18 @@ class AcaiaBLE():
                 )
 
     def parseInfo(self,data):
+        _log.debug("parseInfo(_)")
 #        if len(data)>1:
-#            data[1]
+#            print(data[1])
         if len(data)>4:
             self.firmware = (data[2],data[3],data[4])
+            _log.debug("firmware: %s", self.firmware)
             #print("{}.{}.{}".format(self.firmware[0],self.firmware[1],self.firmware[2]))
         # passwd_set
 #        if len(data)>5:
-#            data[5]
+#            print(data[5])
 #        if len(data)>6:
-#            data[6]
+#            print(data[6])
    
     # returns length of consumed data or -1 on error
     def parseWeightEvent(self,payload):
@@ -168,16 +258,19 @@ class AcaiaBLE():
         # if value is fresh and reading is stable
         if value != self.weight: # and stable:
             self.weight = value
+            _log.debug("new weight: %s", self.weight)
         
         return self.EVENT_WEIGHT_LEN
     
     def parseBatteryEvent(self,payload):
+        _log.debug("parseBatteryEvent(_)")
         if len(payload) < self.EVENT_BATTERY_LEN:
             return -1
         b = payload[0]
         if 0 <= b <= 100:
             self.battery = int(payload[0])
             #print("bat","{}%".format(self.battery))
+            _log.debug("battery: %s", self.battery)
         return self.EVENT_BATTERY_LEN
     
     def parseTimerEvent(self,payload):
@@ -186,6 +279,7 @@ class AcaiaBLE():
 #            print("minutes",payload[0])
 #            print("seconds",payload[1])
 #            print("mseconds",payload[2])
+        _log.debug("parseTimerEvent(_): %sm%s%sms",payload[0],payload[1],payload[2])
         return self.EVENT_TIMER_LEN
     
     def parseAckEvent(self,payload):
@@ -194,14 +288,15 @@ class AcaiaBLE():
         return self.EVENT_ACK_LEN
     
     def parseKeyEvent(self,payload):
+        _log.debug("parseKeyEvent(_)")
         if len(payload) < self.EVENT_KEY_LEN:
             return -1
         return self.EVENT_KEY_LEN
 
     def parseScaleEvent(self,payload):
         if payload and len(payload) > 0:
-            event = payload[0]
-            payload = payload[1:]
+            event = payload[1]
+            payload = payload[2:]
             val = -1
             if event == self.EVENT_WEIGHT:
                 val = self.parseWeightEvent(payload)
@@ -227,13 +322,16 @@ class AcaiaBLE():
                 self.parseScaleEvents(payload[pos+1:])
                 
     def parseStatus(self,payload):
+        _log.debug("parseStatus(_,_)")
         # battery level (7 bits of first byte) + TIMER_START (1bit)
         if payload and len(payload) > 0:
             self.battery = int(payload[0] & ~(1 << 7))
+            _log.debug("battery: %s%%", self.battery)
             #print("bat","{}%".format(self.battery))
         # unit (7 bits of second byte) + CD_START (1bit)
         if payload and len(payload) > 1:
             self.unit = int(payload[1] & ~(1 << 7))
+            _log.debug("unit: %s", self.unit)
         # mode (7 bits of third byte) + tare (1bit)
         # sleep (4th byte), 0:off, 1:5sec, 2:10sec, 3:20sec, 4:30sec, 5:60sec
         # key disabled (5th byte), touch key setting 0: off , 1:On
@@ -242,6 +340,7 @@ class AcaiaBLE():
         # max weight (8th byte)
         if payload and len(payload) > 7:
             self.max_weight = (payload[7] + 1) * 1000
+            _log.debug("max_weight: %s", self.max_weight)
 
     def parseScaleData(self,write,msgType,data):
         if msgType == self.MSG_INFO:
@@ -256,44 +355,12 @@ class AcaiaBLE():
 
     # returns None or new weight data as first result and
     # None or new battery level as second result
-    def processData(self,write,data):
-        data = data.data() # convert QByteArray to Python byte array
-        if len(data) == 3 and data[0] == self.HEADER1 and data[1] == self.HEADER2:
-            # data package contains just the header (alternately send with payload)
-            self.msgType = data[2]
-            # we now expect a data package belonging to this header
-            return None, None
-        if self.msgType is None and len(data)>3 and data[0] == self.HEADER1 and data[1] == self.HEADER2:
-            # a complete package containing header and payload
-            self.msgType = data[2]
-            data = data[3:]
-        # otherwise we might have received a payload package belonging to the header we previously received
-        # in any case data now contains the package without the first 3 bytes (magic1, magic2, msgType)
+    def processData(self, write, data):
         
+        data = data.data() # convert QByteArray to Python byte array
         old_weight = self.weight
         old_battery = self.battery
-
-        if self.msgType != None:
-            msgCRC = data[-2:]
-            if msgCRC != self.crc(data[:-2]):
-#                print("CRC check failed")
-                return None, None
-            offset = 0
-            if self.msgType in [self.MSG_STATUS, self.MSG_EVENT, self.MSG_INFO]:
-                l = data[0]
-                if l == 0:
-                    l = 1
-                offset = 1
-            elif self.msgType == self.MSG_SYSTEM:
-                l = 2
-                return None, None # we ignore system messages
-            else:
-                l = 2
-            if len(data) < (l + 2):
-#                   print("Invalid data length")
-                return None, None
-            self.parseScaleData(write,self.msgType,data[offset:offset+l-1])
-            self.msgType = None # message consumed completely
+        self.acaiaProtocolParser(write, data)
             
         if old_weight == self.weight:
             w = None # weight did not change

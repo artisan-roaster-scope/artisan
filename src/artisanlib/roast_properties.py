@@ -20,6 +20,8 @@ import sys
 import math
 import platform
 import prettytable
+import logging
+from typing import Final
 
 # import artisan.plus module
 import plus.config  # @UnusedImport
@@ -27,7 +29,7 @@ import plus.util
 import plus.stock
 import plus.controller
 
-from artisanlib.suppress_errors import suppress_stdout_stderr
+#from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import deltaLabelUTF8, appFrozen, stringfromseconds,stringtoseconds, toInt, toFloat
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
 from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit, MyTableWidgetItemNumber
@@ -37,6 +39,8 @@ from help import energy_help
 from uic import EnergyWidget
 from uic import SetupWidget
 from uic import MeasureDialog
+
+_log: Final = logging.getLogger(__name__)
 
 try:
     #pylint: disable = E, W, R, C
@@ -1455,26 +1459,25 @@ class editGraphDlg(ArtisanResizeablDialog):
             
             if self.aw.scale.device == "acaia":
                 try:
-                    with suppress_stdout_stderr():
-                        # if selected scale is the Acaia, start the BLE interface
-                        from artisanlib.ble import BleInterface
-                        from artisanlib.acaia import AcaiaBLE
-                        acaia = AcaiaBLE()
-                        self.ble = BleInterface(
-                            acaia.SERVICE_UUID,
-                            acaia.CHAR_UUID,
-                            acaia.processData,
-                            acaia.sendHeartbeat,
-                            acaia.sendStop,
-                            acaia.reset)
+#                    with suppress_stdout_stderr():
+                    # if selected scale is the Acaia, start the BLE interface
+                    from artisanlib.ble import BleInterface
+                    from artisanlib.acaia import AcaiaBLE
+                    acaia = AcaiaBLE()
+                    self.ble = BleInterface(
+                        [(acaia.SERVICE_UUID_LEGACY, acaia.CHAR_UUID_LEGACY), (acaia.SERVICE_UUID_CURRENT, acaia.CHAR_UUID_CURRENT)],
+                        acaia.processData,
+                        acaia.sendHeartbeat,
+                        acaia.sendStop,
+                        acaia.reset)
                             
                     # start BLE loop
                     self.ble.deviceDisconnected.connect(self.ble_scan_failed)
                     self.ble.weightChanged.connect(self.ble_weight_changed)
                     self.ble.batteryChanged.connect(self.ble_battery_changed)
                     self.ble.scanDevices()
-                except Exception:  # pylint: disable=broad-except
-                    pass
+                except Exception as e:  # pylint: disable=broad-except
+                    _log.exception(e)
             elif self.aw.scale.device in ["KERN NDE","Shore 930"]:
                 self.connectScaleSignal.connect(self.connectScaleLoop)
                 QTimer.singleShot(2,lambda : self.connectScaleSignal.emit()) # pylint: disable= unnecessary-lambda
