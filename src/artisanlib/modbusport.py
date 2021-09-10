@@ -18,6 +18,8 @@
 
 import sys
 import time
+import logging
+from typing import Final
 
 try:
     #pylint: disable = E, W, R, C
@@ -27,9 +29,12 @@ except Exception:
     #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-    
 
 from artisanlib.util import stringp
+
+
+_log: Final = logging.getLogger(__name__)
+
 
 def convert_to_bcd(decimal):
     ''' Converts a decimal value to a bcd value
@@ -186,10 +191,12 @@ class modbusport():
         return not (self.master is None) and self.master.socket
         
     def disconnect(self):
+        _log.debug("disconnect()")
         try:
-            self.master.close()
-        except Exception: # pylint: disable=broad-except
-            pass
+            if self.master is not None:
+                self.master.close()
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
         self.master = None
     
     # t a duration between start and end time in seconds to be formated in a string as ms
@@ -201,6 +208,7 @@ class modbusport():
 #        if self.master and not self.master.socket:
 #            self.master = None
         if self.master is None:
+            _log.debug("connect()")
             self.commError = False
             try:
                 # as in the following the port is None, no port is opened on creation of the (py)serial object
@@ -285,12 +293,14 @@ class modbusport():
 #                    self.master.inter_char_timeout = 0.05
                     self.readRetries = 0
                 self.master.connect()
+                _log.debug("connect(): connected")
                 self.updateActiveRegisters()
                 self.clearReadingsCache()
                 time.sleep(.5) # avoid possible hickups on startup
                 if self.isConnected() != None:
                     self.aw.sendmessage(QApplication.translate("Message", "Connected via MODBUS", None))
             except Exception as ex: # pylint: disable=broad-except
+                _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
                 self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " connect() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
     
@@ -298,6 +308,7 @@ class modbusport():
 
     # MODBUS code => slave => [registers]
     def updateActiveRegisters(self):
+        _log.debug("updateActiveRegisters()")
         self.activeRegisters = {}
         for c in range(self.channels):
             slave = self.inputSlaves[c]
@@ -335,6 +346,7 @@ class modbusport():
         if not self.optimizer:
             return
         try:
+            _log.debug("readActiveRegisters()")
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
@@ -346,7 +358,7 @@ class modbusport():
                         sequences = [[registers[0],registers[-1]]]
                     else:
                         # split in successive sequences
-                        gaps = [[s, e] for s, e in zip(registers, registers[1:]) if s+1 < e]
+                        gaps = [[s, er] for s, er in zip(registers, registers[1:]) if s+1 < er]
                         edges = iter(registers[:1] + sum(gaps, []) + registers[-1:])
                         sequences = list(zip(edges, edges)) # list of pairs of the form (start-register,end-register)
                     just_send = False
@@ -367,7 +379,8 @@ class modbusport():
                                     res = self.master.read_holding_registers(register,count,unit=slave)
                                 elif code == 4:
                                     res = self.master.read_input_registers(register,count,unit=slave)
-                            except Exception: # pylint: disable=broad-except
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.exception(e)
                                 res = None
                             if res is None or res.isError(): # requires pymodbus v1.5.1
                                 if retry > 0:
@@ -410,7 +423,8 @@ class modbusport():
                                 self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
                             self.cacheReadings(code,slave,register,res.registers)
 
-        except Exception: # pylint: disable=broad-except
+        except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -426,6 +440,7 @@ class modbusport():
 
     # function 15 (Write Multiple Coils)
     def writeCoils(self,slave,register,values):
+        _log.debug("writeCoils(%d,%d,%s)", slave, register, values)
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -433,6 +448,7 @@ class modbusport():
             self.master.write_coils(int(register),list(values),unit=int(slave))
             time.sleep(.3) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -445,6 +461,7 @@ class modbusport():
                 
     # function 5 (Write Single Coil)
     def writeCoil(self,slave,register,value):
+        _log.debug("writeCoil(%d,%d,%d)", slave, register, value)
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -452,6 +469,7 @@ class modbusport():
             self.master.write_coil(int(register),value,unit=int(slave))
             time.sleep(.3) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
@@ -463,6 +481,7 @@ class modbusport():
     # write value to register on slave (function 6 for int or function 16 for float)
     # value can be one of string (containing an int or float), an int or a float
     def writeRegister(self,slave,register,value):
+        _log.debug("writeRegister(%d,%d,%d)", slave, register, value)
         if stringp(value):
             if "." in value:
                 self.writeWord(slave,register,value)
@@ -475,7 +494,7 @@ class modbusport():
 
     # function 6 (Write Single Holding Register)
     def writeSingleRegister(self,slave,register,value):
-#        _logger.debug("writeSingleRegister(%d,%d,%d)" % (slave,register,value))
+        _log.debug("writeSingleRegister(%d,%d,%d)", slave, register, value)
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -483,6 +502,7 @@ class modbusport():
             self.master.write_register(int(register),int(round(value)),unit=int(slave))
             time.sleep(.03) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            _logger.debug("writeSingleRegister exception: %s" % str(ex))
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -498,6 +518,7 @@ class modbusport():
     # bits to be modified are "masked" with a 0 in the and_mask (not and_mask)
     # new bit values to be written are taken from the or_mask
     def maskWriteRegister(self,slave,register,and_mask,or_mask):
+        _log.debug("maskWriteRegister(%d,%d,%s,%s)", slave, register, and_mask, or_mask)
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -505,8 +526,9 @@ class modbusport():
             self.master.mask_write_register(int(register),int(and_mask),int(or_mask),unit=int(slave))
             time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+            _log.exception(ex)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
@@ -525,6 +547,7 @@ class modbusport():
     # function 16 (Write Multiple Holding Registers)
     # values is a list of integers or one integer
     def writeRegisters(self,slave,register,values):
+        _log.debug("writeRegisters(%d,%d,%s)", slave, register, values)
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -532,6 +555,7 @@ class modbusport():
             self.master.write_registers(int(register),values,unit=int(slave))
             time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
@@ -540,21 +564,22 @@ class modbusport():
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
 
-
     # function 16 (Write Multiple Holding Registers)
     # value=int or float
     # writes a single precision 32bit float (2-registers)
     def writeWord(self,slave,register,value):
+        _log.debug("writeWord(%d,%d,%d)", slave, register, value)
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
             builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
             builder.add_32bit_float(float(value))
-            payload = builder.build() # .tolist()
+            payload = builder.build()
             self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
             time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
@@ -565,6 +590,7 @@ class modbusport():
 
     # translates given int value int a 16bit BCD and writes it into one register
     def writeBCD(self,slave,register,value):
+        _log.debug("writeBCD(%d,%d,%d)", slave, register, value)
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -576,6 +602,7 @@ class modbusport():
             self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
             time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
@@ -587,6 +614,7 @@ class modbusport():
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
     def readFloat(self,slave,register,code=3,force=False):
+        _log.debug("readFloat(%d,%d,%d,%s)", slave, register, code, force)
         if slave == 0:
             return None
         r = None
@@ -602,6 +630,7 @@ class modbusport():
                 res = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
                 decoder = getBinaryPayloadDecoderFromRegisters(res, self.byteorderLittle, self.wordorderLittle)
                 r = decoder.decode_32bit_float()
+                _log.debug("return cached value => %.3f", r)
                 return r
             self.connect()
             while True:
@@ -623,7 +652,8 @@ class modbusport():
                 self.commError = False
                 self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
             return r
-        except Exception: # pylint: disable=broad-except
+        except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
@@ -667,6 +697,7 @@ class modbusport():
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
     def readBCD(self,slave,register,code=3,force=False):
+        _log.debug("readBCD(%d,%d,%d,%s)", slave, register, code, force)
         if slave == 0:
             return None
         r = None
@@ -681,8 +712,9 @@ class modbusport():
                 # cache hit
                 res = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
                 decoder = getBinaryPayloadDecoderFromRegisters(res, self.byteorderLittle, self.wordorderLittle)
-                r = decoder.decode_32bit_uint()
-                return convert_from_bcd(r)
+                r = convert_from_bcd(decoder.decode_32bit_uint())
+                _log.debug("return cached value => %.3f", r)
+                return r
             self.connect()
             while True:
                 if code==3:
@@ -704,7 +736,8 @@ class modbusport():
                 self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
             time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
             return convert_from_bcd(r)
-        except Exception: # pylint: disable=broad-except
+        except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
@@ -748,6 +781,7 @@ class modbusport():
     # as readSingleRegister, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore!
     def peekSingleRegister(self,slave,register,code=3):
+        _log.debug("peekSingleRegister(%d,%d,%d)", slave, register, code)
         if slave == 0:
             return None
         try:
@@ -759,7 +793,8 @@ class modbusport():
                 res = self.master.read_input_registers(int(register),1,unit=int(slave))
             else: # code==3
                 res = self.master.read_holding_registers(int(register),1,unit=int(slave))
-        except Exception: # pylint: disable=broad-except
+        except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             res = None
         if res is not None and not res.isError(): # requires pymodbus v1.5.1
             if code in [1,2]:
@@ -777,6 +812,7 @@ class modbusport():
     # function 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
     def readSingleRegister(self,slave,register,code=3,force=False):
+        _log.debug("readSingleRegister(%d,%d,%d,%s)", slave, register, code, force)
 #        import logging
 #        logging.basicConfig()
 #        log = logging.getLogger()
@@ -795,6 +831,7 @@ class modbusport():
                 res = self.readingsCache[code][slave][register]
                 decoder = getBinaryPayloadDecoderFromRegisters([res], self.byteorderLittle, self.wordorderLittle)
                 r = decoder.decode_16bit_uint()
+                _log.debug("return cached value => %d", r)
                 return r
             self.connect()
             while True:
@@ -807,7 +844,8 @@ class modbusport():
                         res = self.master.read_input_registers(int(register),1,unit=int(slave))
                     else: # code==3
                         res = self.master.read_holding_registers(int(register),1,unit=int(slave))
-                except Exception: # pylint: disable=broad-except
+                except Exception as ex: # pylint: disable=broad-except
+                    _log.exception(ex)
                     res = None
                 if res is None or res.isError(): # requires pymodbus v1.5.1
                     if retry > 0:
@@ -832,7 +870,8 @@ class modbusport():
                 self.commError = False
                 self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
             return r
-        except Exception: # pylint: disable=broad-except
+        except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -876,6 +915,7 @@ class modbusport():
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
     def readInt32(self,slave,register,code=3,force=False):
+        _log.debug("readInt32(%d,%d,%d,%s)", slave, register, code, force)
         if slave == 0:
             return None
         r = None
@@ -891,6 +931,7 @@ class modbusport():
                 res = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
                 decoder = getBinaryPayloadDecoderFromRegisters(res, self.byteorderLittle, self.wordorderLittle)
                 r = decoder.decode_32bit_uint()
+                _log.debug("return cached value => %d", r)
                 return r
             self.connect()
             while True:
@@ -912,7 +953,8 @@ class modbusport():
                 self.commError = False
                 self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
             return r
-        except Exception: # pylint: disable=broad-except
+        except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
@@ -957,6 +999,7 @@ class modbusport():
     # function 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
     def readBCDint(self,slave,register,code=3,force=False):
+        _log.debug("readBCDint(%d,%d,%d,%s)", slave, register, code, force)
 #        import logging
 #        logging.basicConfig()
 #        log = logging.getLogger()
@@ -974,8 +1017,9 @@ class modbusport():
                 # cache hit
                 res = self.readingsCache[code][slave][register]
                 decoder = getBinaryPayloadDecoderFromRegisters([res], self.byteorderLittle, self.wordorderLittle)
-                r = decoder.decode_16bit_uint()
-                return convert_from_bcd(r)
+                r = convert_from_bcd(decoder.decode_16bit_uint())
+                _log.debug("return cached value => %d", r)
+                return r
             self.connect()
             while True:
                 try:
@@ -1042,6 +1086,7 @@ class modbusport():
                 self.aw.addserial(ser_str)
 
     def setTarget(self,sv):
+        _log.debug("setTarget(%s)", sv)
         if self.PID_slave_ID:
             multiplier = 1.
             if self.SVmultiplier == 1:
@@ -1051,6 +1096,7 @@ class modbusport():
             self.writeSingleRegister(self.PID_slave_ID,self.PID_SV_register,int(round(sv*multiplier)))
         
     def setPID(self,p,i,d):
+        _log.debug("setPID(%s,%s,%s)", p, i, d)
         if self.PID_slave_ID and not (self.PID_p_register == self.PID_i_register == self.PID_d_register == 0):
             multiplier = 1.
             if self.PIDmultiplier == 1:

@@ -29,6 +29,9 @@ from requests_file import FileAdapter  # @UnresolvedImport
 import json
 from lxml import html
 
+import logging
+from typing import Final
+
 try:
     #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
@@ -38,6 +41,9 @@ except Exception:
 
 from artisanlib.util import encodeLocal
 import io
+
+
+_log: Final = logging.getLogger(__name__)
         
 
 class AillioR1:
@@ -403,8 +409,8 @@ def extractProfileBulletDict(data,aw):
                     res["roasttime"] = encodeLocal(dateQt.time().toString())
                     res["roastepoch"] = int(dateQt.toSecsSinceEpoch())
                     res["roasttzoffset"] = time.timezone
-        except Exception: # pylint: disable=broad-except
-            pass
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
         try:
             res["title"] = data["beanName"]
         except Exception: # pylint: disable=broad-except
@@ -536,8 +542,8 @@ def extractProfileBulletDict(data,aw):
                             specialeventsvalue.append(v)
                             specialeventsStrings.append("")
                             last = v
-        except Exception: # pylint: disable=broad-except
-            pass
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 
         # extract events from newer JSON format
         try:
@@ -554,8 +560,8 @@ def extractProfileBulletDict(data,aw):
                 specialeventstype.append(event_type)
                 specialeventsvalue.append(value)
                 specialeventsStrings.append(str(value))
-        except Exception: # pylint: disable=broad-except
-            pass
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
         if len(specialevents) > 0:
             res["specialevents"] = specialevents
             res["specialeventstype"] = specialeventstype
@@ -605,10 +611,8 @@ def extractProfileBulletDict(data,aw):
             res["extradrawstyles2"] = ['default']
 
         return res
-    except Exception: # pylint: disable=broad-except
-#        import traceback
-#        import sys
-#        traceback.print_exc(file=sys.stdout)
+    except Exception as e: # pylint: disable=broad-except
+        _log.exception(e)
         return {}
         
 def extractProfileRoastWorld(url,aw):

@@ -306,7 +306,7 @@ class CheckComboBox(QComboBox):
         state : Qt.CheckState
         """
         state = self.itemData(index, role=Qt.ItemDataRole.CheckStateRole)
-        if isinstance(state, Qt.CheckState, int):
+        if isinstance(state, (int, Qt.CheckState)):
             return Qt.CheckState(state)
         return Qt.CheckState.Unchecked
 

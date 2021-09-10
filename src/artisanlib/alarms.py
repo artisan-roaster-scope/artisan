@@ -19,6 +19,9 @@
 import os
 import sys
 import prettytable
+import logging
+from typing import Final
+
 
 from artisanlib.util import deltaLabelUTF8
 from artisanlib.dialogs import ArtisanResizeablDialog
@@ -42,6 +45,11 @@ except Exception:
     from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
                 QTableWidget, QHBoxLayout, QVBoxLayout, QCheckBox, QPushButton, QSizePolicy, QSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
                 QTableWidgetSelectionRange, QTimeEdit, QTabWidget, QGridLayout, QGroupBox, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
+
+
+
+_log: Final = logging.getLogger(__name__)
+
 
 class AlarmDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None, aw = None, activeTab = 0):
@@ -654,8 +662,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                     self.aw.qmc.alarmsource[i] = 1 # BT
             self.createalarmtable()
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             self.aw.sendmessage(QApplication.translate("Message","Error loading alarm file", None))
             self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importalarmsJSON() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -685,6 +692,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                 outfile.write('\n')
             return True
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " exportalarmsJSON(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False

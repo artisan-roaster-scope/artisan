@@ -247,8 +247,8 @@ def fill_gaps(l):
 # for the platform
 # note that the path is based on the ApplicationName and OrganizationName
 # setting of the app
-# eg. /Users/<username>/Library/Application Support/Artisan-Scope/Artisan
-# on macOS
+# eg. ~/Library/Application Support/Artisan-Scope/Artisan (macOS)
+#     C:/Users/<USER>/AppData/Local/Artisan-Scope/Artisan" (Windows)
 
 # getDataDirectory() returns the Artisan data directory
 # if app is not yet initialized None is returned

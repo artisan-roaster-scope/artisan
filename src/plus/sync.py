@@ -199,8 +199,8 @@ def delSync(uuid):
             try:
                 with shelve.open(getSyncPath()) as db:
                     del db[uuid]
-            except Exception as e:  # pylint: disable=broad-except
-                _log.exception(e)
+            except Exception:  # pylint: disable=broad-except
+                pass # fails if uuid is not in db
             finally:
                 fh.flush()
                 os.fsync(fh.fileno())

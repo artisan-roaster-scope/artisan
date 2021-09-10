@@ -25,6 +25,8 @@ from matplotlib import rcParams
 if sys.platform.startswith("darwin"):
     # import module to detect if OS X dark mode is active or not
     import darkdetect # @UnresolvedImport # pylint: disable=import-error
+import logging
+from typing import Final
 
 from artisanlib.util import deltaLabelUTF8, decodeLocal, stringfromseconds, appFrozen, fromFtoC, fromCtoF, fill_gaps
 from artisanlib.suppress_errors import suppress_stdout_stderr
@@ -50,6 +52,8 @@ except Exception:
     from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton,  # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox) # @UnusedImport @Reimport  @UnresolvedImport
 
+
+_log: Final = logging.getLogger(__name__)
 
 class RoastProfile():
     def __init__(self, aw, profile, filepath, color):
@@ -1475,10 +1479,8 @@ class roastCompareDlg(ArtisanDialog):
                     # add profile to the table
                     self.profileTable.setRowCount(len(self.profiles))
                     self.setProfileTableRow(len(self.profiles)-1)
-        except Exception: # pylint: disable=broad-except
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-            pass
+        except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
     
     def addProfiles(self,filenames):
         if filenames:

@@ -124,7 +124,7 @@ outbox_cache: Final = "outbox"
 
 # Runtime variables
 
-app_window : QMainWindow # = None  # handle to the main Artisan application window
+app_window = None  # handle to the main Artisan application window
 #   if set, app_window.plus_login holds the current login account if any and
 #   app_window.updatePlusIcon() is a function that updates the toolbar
 #   plus service connection indicator icon
