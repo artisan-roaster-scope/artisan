@@ -38,7 +38,7 @@
         <translation type="obsolete">{0}, Arduino/TC4</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34042"/>
+        <location filename="../artisanlib/main.py" line="34051"/>
         <source>About</source>
         <translation>Om</translation>
     </message>
@@ -48,62 +48,62 @@
         <translation type="obsolete">Versjon:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34042"/>
+        <location filename="../artisanlib/main.py" line="34051"/>
         <source>Core Developers</source>
         <translation>Kjerne Utviklere</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34042"/>
+        <location filename="../artisanlib/main.py" line="34051"/>
         <source>Contributors</source>
         <translation>Medarbeidere</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34042"/>
+        <location filename="../artisanlib/main.py" line="34051"/>
         <source>License</source>
         <translation>Tillatelse</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34093"/>
+        <location filename="../artisanlib/main.py" line="34102"/>
         <source>A new release is available.</source>
         <translation>En ny utgivelse er tilgjengelig.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34095"/>
+        <location filename="../artisanlib/main.py" line="34104"/>
         <source>Show Change list</source>
         <translation>Vis Endringsliste</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34097"/>
+        <location filename="../artisanlib/main.py" line="34106"/>
         <source>Download Release</source>
         <translation>Last ned utgivelse</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34099"/>
+        <location filename="../artisanlib/main.py" line="34108"/>
         <source>You are using the latest release.</source>
         <translation>Du bruker den siste utgivelsen.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34101"/>
+        <location filename="../artisanlib/main.py" line="34110"/>
         <source>You are using a beta continuous build.</source>
         <translation>Du bruker en kontinuerlig betaversjon.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34102"/>
+        <location filename="../artisanlib/main.py" line="34111"/>
         <source>You will see a notice here once a new official release is available.</source>
         <translation>Du vil se et varsel her når en ny offisiell utgivelse er tilgjengelig.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34108"/>
+        <location filename="../artisanlib/main.py" line="34117"/>
         <source>There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.</source>
         <translation>Det oppsto et problem under henting av den nyeste versjonsinformasjonen. Kontroller Internett-tilkoblingen din, prøv igjen senere, eller sjekk manuelt.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34111"/>
+        <location filename="../artisanlib/main.py" line="34120"/>
         <source>Update status</source>
         <translation>Oppdater status</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18377"/>
+        <location filename="../artisanlib/main.py" line="18386"/>
         <source>Release Sponsor</source>
         <translation>Slipp sponsor</translation>
     </message>
@@ -116,7 +116,7 @@
 <context>
     <name>AddlInfo</name>
     <message>
-        <location filename="../artisanlib/main.py" line="9296"/>
+        <location filename="../artisanlib/main.py" line="9302"/>
         <source>Roast of the Day</source>
         <translation>Dagens stek</translation>
     </message>
@@ -126,57 +126,57 @@
         <translation type="obsolete">Bønne størrelse</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9355"/>
+        <location filename="../artisanlib/main.py" line="9361"/>
         <source>Moisture Green</source>
         <translation>Fuktighetsgrønn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9370"/>
+        <location filename="../artisanlib/main.py" line="9376"/>
         <source>Moisture Roasted</source>
         <translation>Fuktighet stekt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9372"/>
+        <location filename="../artisanlib/main.py" line="9378"/>
         <source>Whole Color</source>
         <translation type="unfinished">Farge Hel</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9374"/>
+        <location filename="../artisanlib/main.py" line="9380"/>
         <source>Ground Color</source>
         <translation type="unfinished">Farge Kvernet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9351"/>
+        <location filename="../artisanlib/main.py" line="9357"/>
         <source>Screen Size</source>
         <translation>Skjerm størrelse</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9353"/>
+        <location filename="../artisanlib/main.py" line="9359"/>
         <source>Density Green</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9361"/>
+        <location filename="../artisanlib/main.py" line="9367"/>
         <source>Batch Size</source>
         <translation>Partistørrelse, Gruppestørrelse</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9368"/>
+        <location filename="../artisanlib/main.py" line="9374"/>
         <source>Density Roasted</source>
         <translation>Tetthet stekt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9384"/>
+        <location filename="../artisanlib/main.py" line="9390"/>
         <source>AUC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9376"/>
+        <location filename="../artisanlib/main.py" line="9382"/>
         <source>Energy</source>
         <translation>Energi</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9380"/>
+        <location filename="../artisanlib/main.py" line="9386"/>
         <source>CO2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -184,112 +184,112 @@
 <context>
     <name>Button</name>
     <message>
-        <location filename="../artisanlib/main.py" line="17312"/>
+        <location filename="../artisanlib/main.py" line="17321"/>
         <source>ON</source>
         <translation>PÅ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17326"/>
+        <location filename="../artisanlib/main.py" line="17335"/>
         <source>START</source>
         <translation>START</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10717"/>
+        <location filename="../artisanlib/main.py" line="10723"/>
         <source>OFF</source>
         <translation>AV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17341"/>
+        <location filename="../artisanlib/main.py" line="17350"/>
         <source>FC
 START</source>
         <translation>1K START</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17349"/>
+        <location filename="../artisanlib/main.py" line="17358"/>
         <source>FC
 END</source>
         <translation>1K SLUTT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17357"/>
+        <location filename="../artisanlib/main.py" line="17366"/>
         <source>SC
 START</source>
         <translation>2K START</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17365"/>
+        <location filename="../artisanlib/main.py" line="17374"/>
         <source>SC
 END</source>
         <translation>2K SLUTT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17374"/>
+        <location filename="../artisanlib/main.py" line="17383"/>
         <source>RESET</source>
         <translation>TILBAKESTILL</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17386"/>
+        <location filename="../artisanlib/main.py" line="17395"/>
         <source>CHARGE</source>
         <translation>Dropp inn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17395"/>
+        <location filename="../artisanlib/main.py" line="17404"/>
         <source>DROP</source>
         <translation>Dropp ut</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17404"/>
+        <location filename="../artisanlib/main.py" line="17413"/>
         <source>Control</source>
         <translation>Kontroll</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17417"/>
+        <location filename="../artisanlib/main.py" line="17426"/>
         <source>EVENT</source>
         <translation>Hendelse</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17426"/>
+        <location filename="../artisanlib/main.py" line="17435"/>
         <source>SV +5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17435"/>
+        <location filename="../artisanlib/main.py" line="17444"/>
         <source>SV +10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17444"/>
+        <location filename="../artisanlib/main.py" line="17453"/>
         <source>SV +20</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17453"/>
+        <location filename="../artisanlib/main.py" line="17462"/>
         <source>SV -20</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17462"/>
+        <location filename="../artisanlib/main.py" line="17471"/>
         <source>SV -10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17471"/>
+        <location filename="../artisanlib/main.py" line="17480"/>
         <source>SV -5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17480"/>
+        <location filename="../artisanlib/main.py" line="17489"/>
         <source>HUD</source>
         <translation>HUD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17496"/>
+        <location filename="../artisanlib/main.py" line="17505"/>
         <source>DRY
 END</source>
         <translation>Tørking SLUTT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17505"/>
+        <location filename="../artisanlib/main.py" line="17514"/>
         <source>COOL
 END</source>
         <translation>Kjøling SLUTT</translation>
@@ -2421,22 +2421,22 @@ Ekstra enhet</translation>
         <translation type="obsolete">Lag</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13783"/>
+        <location filename="../artisanlib/main.py" line="13792"/>
         <source>Config...</source>
         <translation>Konfigurer...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13759"/>
+        <location filename="../artisanlib/main.py" line="13768"/>
         <source>Add point</source>
         <translation>Legg til punkt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13763"/>
+        <location filename="../artisanlib/main.py" line="13772"/>
         <source>Remove point</source>
         <translation>Fjern punkt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13779"/>
+        <location filename="../artisanlib/main.py" line="13788"/>
         <source>Reset Designer</source>
         <translation>Tilbakestill Designer</translation>
     </message>
@@ -2446,12 +2446,12 @@ Ekstra enhet</translation>
         <translation type="obsolete">Avslutt Designer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14428"/>
+        <location filename="../artisanlib/main.py" line="14437"/>
         <source>Add to Cupping Notes</source>
         <translation>Legg til Cupping notater</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14432"/>
+        <location filename="../artisanlib/main.py" line="14441"/>
         <source>Add to Roasting Notes</source>
         <translation>Legg til Brennings Notater</translation>
     </message>
@@ -2471,17 +2471,17 @@ Ekstra enhet</translation>
         <translation type="obsolete">Avslutt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13769"/>
+        <location filename="../artisanlib/main.py" line="13778"/>
         <source>Load points</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13773"/>
+        <location filename="../artisanlib/main.py" line="13782"/>
         <source>Save points</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14438"/>
+        <location filename="../artisanlib/main.py" line="14447"/>
         <source>Edit</source>
         <translation type="unfinished">Endre</translation>
     </message>
@@ -3843,7 +3843,7 @@ Ekstra enhet</translation>
         <translation>Unntak:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36101"/>
+        <location filename="../artisanlib/main.py" line="36110"/>
         <source>Value Error:</source>
         <translation>Verdi Feil:</translation>
     </message>
@@ -3853,7 +3853,7 @@ Ekstra enhet</translation>
         <translation>IO Feil:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31115"/>
+        <location filename="../artisanlib/main.py" line="31124"/>
         <source>Error</source>
         <translation>Feil</translation>
     </message>
@@ -4008,32 +4008,32 @@ Ekstra enhet</translation>
         <translation type="obsolete">HH806AUtemperature(): {0} bytes mottatt men 14 nødvendig {806A?} {1 ?} {16 ?}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24637"/>
+        <location filename="../artisanlib/main.py" line="24646"/>
         <source>Error:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13241"/>
+        <location filename="../artisanlib/main.py" line="13250"/>
         <source>Error in lnRegression:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32705"/>
+        <location filename="../artisanlib/main.py" line="32714"/>
         <source>Exception (probably due to an empty profile):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10243"/>
+        <location filename="../artisanlib/main.py" line="10249"/>
         <source>Exception: PhidgetManager couldn&apos;t be started. Verify that the Phidget driver is correctly installed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36708"/>
+        <location filename="../artisanlib/main.py" line="36717"/>
         <source>Analyze: no background profile data available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36711"/>
+        <location filename="../artisanlib/main.py" line="36720"/>
         <source>Analyze: background profile requires CHARGE and DROP events</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4103,22 +4103,22 @@ Ekstra enhet</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13693"/>
+        <location filename="../artisanlib/main.py" line="13702"/>
         <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28297"/>
+        <location filename="../artisanlib/main.py" line="28306"/>
         <source>Exception: {} not a valid settings file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36626"/>
+        <location filename="../artisanlib/main.py" line="36635"/>
         <source>Analyze: DROP event required, none found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36622"/>
+        <location filename="../artisanlib/main.py" line="36631"/>
         <source>Analyze: CHARGE event required, none found</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4339,7 +4339,7 @@ Ekstra enhet</translation>
         <translation type="unfinished">Hendelse</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24643"/>
+        <location filename="../artisanlib/main.py" line="24652"/>
         <source>Keyboard Shortcuts Help</source>
         <translation>Tastatursnarveier Hjelp</translation>
     </message>
@@ -4900,27 +4900,27 @@ Ekstra enhet</translation>
 <context>
     <name>HTML Report Template</name>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Roasting Report</source>
         <translation type="unfinished">Brennings Rapport</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Date:</source>
         <translation>Dato:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Beans:</source>
         <translation>Bønner:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Size:</source>
         <translation>Størrelse:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Weight:</source>
         <translation>Vekt:</translation>
     </message>
@@ -4930,12 +4930,12 @@ Ekstra enhet</translation>
         <translation type="obsolete">Grad:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Volume:</source>
         <translation>Volum:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Density:</source>
         <translation>Tetthet:</translation>
     </message>
@@ -4945,67 +4945,67 @@ Ekstra enhet</translation>
         <translation type="obsolete">Fuktighet:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Roaster:</source>
         <translation>Brenner:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Operator:</source>
         <translation>Operatør:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Cupping:</source>
         <translation>Cupping:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Color:</source>
         <translation>Farge:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>CHARGE:</source>
         <translation>DROPP INN:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>DRY:</source>
         <translation>TØRR:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>FCs:</source>
         <translation>1Ks:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>FCe:</source>
         <translation>1Ke:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>SCs:</source>
         <translation>2Ks:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>SCe:</source>
         <translation>2Ke:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>DROP:</source>
         <translation>DROPP UT:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>COOL:</source>
         <translation>KJØLING:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>RoR:</source>
         <translation>RoR:</translation>
     </message>
@@ -5015,12 +5015,12 @@ Ekstra enhet</translation>
         <translation type="obsolete">MTBTa:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Drying:</source>
         <translation>Tørkefase:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Maillard:</source>
         <translation>Maillard:</translation>
     </message>
@@ -5030,117 +5030,117 @@ Ekstra enhet</translation>
         <translation type="obsolete">Utvikling:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Cooling:</source>
         <translation>Kjøling:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Roasting Notes</source>
         <translation>Brennings Merknader</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Cupping Notes</source>
         <translation>Cupping Merknader</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>TP:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Events</source>
         <translation type="unfinished">arrangementer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>CM:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>MET:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Moisture:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Ambient:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31923"/>
+        <location filename="../artisanlib/main.py" line="31932"/>
         <source>Batch</source>
         <translation type="unfinished">Parti</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32787"/>
+        <location filename="../artisanlib/main.py" line="32796"/>
         <source>Date</source>
         <translation type="unfinished">Dato</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31924"/>
+        <location filename="../artisanlib/main.py" line="31933"/>
         <source>Time</source>
         <translation type="unfinished">Tid</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31925"/>
+        <location filename="../artisanlib/main.py" line="31934"/>
         <source>Profile</source>
         <translation type="unfinished">Profil</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32008"/>
+        <location filename="../artisanlib/main.py" line="32017"/>
         <source>Beans</source>
         <translation type="unfinished">Bønner</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32787"/>
+        <location filename="../artisanlib/main.py" line="32796"/>
         <source>In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31707"/>
+        <location filename="../artisanlib/main.py" line="31716"/>
         <source>Out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32787"/>
+        <location filename="../artisanlib/main.py" line="32796"/>
         <source>Loss</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31532"/>
+        <location filename="../artisanlib/main.py" line="31541"/>
         <source>Roast Batches</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31745"/>
+        <location filename="../artisanlib/main.py" line="31754"/>
         <source>SUM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32787"/>
+        <location filename="../artisanlib/main.py" line="32796"/>
         <source>Roast Ranking</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33035"/>
+        <location filename="../artisanlib/main.py" line="33044"/>
         <source>AVG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31688"/>
+        <location filename="../artisanlib/main.py" line="31697"/>
         <source>Production Report</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5150,552 +5150,552 @@ Ekstra enhet</translation>
         <translation type="obsolete">Last inn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32787"/>
+        <location filename="../artisanlib/main.py" line="32796"/>
         <source>Color</source>
         <translation type="unfinished">Farge</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>AUC:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Finishing:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31987"/>
+        <location filename="../artisanlib/main.py" line="31996"/>
         <source>AUC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Alarms:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Organization:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31993"/>
+        <location filename="../artisanlib/main.py" line="32002"/>
         <source>Weight In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31951"/>
+        <location filename="../artisanlib/main.py" line="31960"/>
         <source>CHARGE BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31958"/>
+        <location filename="../artisanlib/main.py" line="31967"/>
         <source>FCs Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31960"/>
+        <location filename="../artisanlib/main.py" line="31969"/>
         <source>FCs BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31970"/>
+        <location filename="../artisanlib/main.py" line="31979"/>
         <source>DROP Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31972"/>
+        <location filename="../artisanlib/main.py" line="31981"/>
         <source>DROP BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31932"/>
+        <location filename="../artisanlib/main.py" line="31941"/>
         <source>Dry Percent</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31933"/>
+        <location filename="../artisanlib/main.py" line="31942"/>
         <source>MAI Percent</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31934"/>
+        <location filename="../artisanlib/main.py" line="31943"/>
         <source>Dev Percent</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31995"/>
+        <location filename="../artisanlib/main.py" line="32004"/>
         <source>Weight Loss</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31938"/>
+        <location filename="../artisanlib/main.py" line="31947"/>
         <source>Cupping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31939"/>
+        <location filename="../artisanlib/main.py" line="31948"/>
         <source>Roaster</source>
         <translation type="unfinished">Brenner</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31941"/>
+        <location filename="../artisanlib/main.py" line="31950"/>
         <source>Operator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31942"/>
+        <location filename="../artisanlib/main.py" line="31951"/>
         <source>Organization</source>
         <translation type="unfinished">Organisasjon</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31943"/>
+        <location filename="../artisanlib/main.py" line="31952"/>
         <source>Drum Speed</source>
         <translation type="unfinished">Trommehastighet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31944"/>
+        <location filename="../artisanlib/main.py" line="31953"/>
         <source>Whole Color</source>
         <translation type="unfinished">Farge Hel</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31945"/>
+        <location filename="../artisanlib/main.py" line="31954"/>
         <source>Ground Color</source>
         <translation type="unfinished">Farge Kvernet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31946"/>
+        <location filename="../artisanlib/main.py" line="31955"/>
         <source>Color System</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31947"/>
+        <location filename="../artisanlib/main.py" line="31956"/>
         <source>Screen Min</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31948"/>
+        <location filename="../artisanlib/main.py" line="31957"/>
         <source>Screen Max</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31949"/>
+        <location filename="../artisanlib/main.py" line="31958"/>
         <source>Bean Temp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31950"/>
+        <location filename="../artisanlib/main.py" line="31959"/>
         <source>CHARGE ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31952"/>
+        <location filename="../artisanlib/main.py" line="31961"/>
         <source>TP Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31953"/>
+        <location filename="../artisanlib/main.py" line="31962"/>
         <source>TP ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31954"/>
+        <location filename="../artisanlib/main.py" line="31963"/>
         <source>TP BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31955"/>
+        <location filename="../artisanlib/main.py" line="31964"/>
         <source>DRY Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31956"/>
+        <location filename="../artisanlib/main.py" line="31965"/>
         <source>DRY ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31957"/>
+        <location filename="../artisanlib/main.py" line="31966"/>
         <source>DRY BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31959"/>
+        <location filename="../artisanlib/main.py" line="31968"/>
         <source>FCs ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31961"/>
+        <location filename="../artisanlib/main.py" line="31970"/>
         <source>FCe Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31962"/>
+        <location filename="../artisanlib/main.py" line="31971"/>
         <source>FCe ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31963"/>
+        <location filename="../artisanlib/main.py" line="31972"/>
         <source>FCe BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31964"/>
+        <location filename="../artisanlib/main.py" line="31973"/>
         <source>SCs Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31965"/>
+        <location filename="../artisanlib/main.py" line="31974"/>
         <source>SCs ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31966"/>
+        <location filename="../artisanlib/main.py" line="31975"/>
         <source>SCs BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31967"/>
+        <location filename="../artisanlib/main.py" line="31976"/>
         <source>SCe Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31968"/>
+        <location filename="../artisanlib/main.py" line="31977"/>
         <source>SCe ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31971"/>
+        <location filename="../artisanlib/main.py" line="31980"/>
         <source>DROP ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31973"/>
+        <location filename="../artisanlib/main.py" line="31982"/>
         <source>COOL Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31974"/>
+        <location filename="../artisanlib/main.py" line="31983"/>
         <source>COOL ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31975"/>
+        <location filename="../artisanlib/main.py" line="31984"/>
         <source>COOL BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31976"/>
+        <location filename="../artisanlib/main.py" line="31985"/>
         <source>Total Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31977"/>
+        <location filename="../artisanlib/main.py" line="31986"/>
         <source>Dry Phase Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31978"/>
+        <location filename="../artisanlib/main.py" line="31987"/>
         <source>Mid Phase Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31979"/>
+        <location filename="../artisanlib/main.py" line="31988"/>
         <source>Finish Phase Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31980"/>
+        <location filename="../artisanlib/main.py" line="31989"/>
         <source>Dry Phase RoR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31981"/>
+        <location filename="../artisanlib/main.py" line="31990"/>
         <source>Mid Phase RoR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31982"/>
+        <location filename="../artisanlib/main.py" line="31991"/>
         <source>Finish Phase RoR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31984"/>
+        <location filename="../artisanlib/main.py" line="31993"/>
         <source>Total RoR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31985"/>
+        <location filename="../artisanlib/main.py" line="31994"/>
         <source>FCs RoR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31986"/>
+        <location filename="../artisanlib/main.py" line="31995"/>
         <source>MET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31988"/>
+        <location filename="../artisanlib/main.py" line="31997"/>
         <source>AUC Begin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31989"/>
+        <location filename="../artisanlib/main.py" line="31998"/>
         <source>AUC Base</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31991"/>
+        <location filename="../artisanlib/main.py" line="32000"/>
         <source>Mid Phase AUC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31992"/>
+        <location filename="../artisanlib/main.py" line="32001"/>
         <source>Finish Phase AUC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31994"/>
+        <location filename="../artisanlib/main.py" line="32003"/>
         <source>Weight Out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31996"/>
+        <location filename="../artisanlib/main.py" line="32005"/>
         <source>Volume In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31997"/>
+        <location filename="../artisanlib/main.py" line="32006"/>
         <source>Volume Out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31998"/>
+        <location filename="../artisanlib/main.py" line="32007"/>
         <source>Volume Gain</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31999"/>
+        <location filename="../artisanlib/main.py" line="32008"/>
         <source>Green Density</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32000"/>
+        <location filename="../artisanlib/main.py" line="32009"/>
         <source>Roasted Density</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32001"/>
+        <location filename="../artisanlib/main.py" line="32010"/>
         <source>Moisture Greens</source>
         <translation type="unfinished">Lagringsforhold</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32002"/>
+        <location filename="../artisanlib/main.py" line="32011"/>
         <source>Moisture Roasted</source>
         <translation type="unfinished">Fuktighet stekt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32003"/>
+        <location filename="../artisanlib/main.py" line="32012"/>
         <source>Moisture Loss</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32004"/>
+        <location filename="../artisanlib/main.py" line="32013"/>
         <source>Organic Loss</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32005"/>
+        <location filename="../artisanlib/main.py" line="32014"/>
         <source>Ambient Humidity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32006"/>
+        <location filename="../artisanlib/main.py" line="32015"/>
         <source>Ambient Pressure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32007"/>
+        <location filename="../artisanlib/main.py" line="32016"/>
         <source>Ambient Temperature</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32011"/>
+        <location filename="../artisanlib/main.py" line="32020"/>
         <source>Heavy FC</source>
         <translation type="unfinished">Kraftig 1K</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32012"/>
+        <location filename="../artisanlib/main.py" line="32021"/>
         <source>Low FC</source>
         <translation type="unfinished">Svak 1K</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32013"/>
+        <location filename="../artisanlib/main.py" line="32022"/>
         <source>Light Cut</source>
         <translation type="unfinished">Lys Sprekke</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32014"/>
+        <location filename="../artisanlib/main.py" line="32023"/>
         <source>Dark Cut</source>
         <translation type="unfinished">Mørk Sprekke</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32015"/>
+        <location filename="../artisanlib/main.py" line="32024"/>
         <source>Drops</source>
         <translation type="unfinished">Dråper</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32016"/>
+        <location filename="../artisanlib/main.py" line="32025"/>
         <source>Oily</source>
         <translation type="unfinished">Oljete</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32017"/>
+        <location filename="../artisanlib/main.py" line="32026"/>
         <source>Uneven</source>
         <translation type="unfinished">Ujevn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32018"/>
+        <location filename="../artisanlib/main.py" line="32027"/>
         <source>Tipping</source>
         <translation type="unfinished">Svidde tupper</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32019"/>
+        <location filename="../artisanlib/main.py" line="32028"/>
         <source>Scorching</source>
         <translation type="unfinished">Svidd</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32020"/>
+        <location filename="../artisanlib/main.py" line="32029"/>
         <source>Divots</source>
         <translation type="unfinished">Krater</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32021"/>
+        <location filename="../artisanlib/main.py" line="32030"/>
         <source>Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32893"/>
+        <location filename="../artisanlib/main.py" line="32902"/>
         <source>Ranking Report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31940"/>
+        <location filename="../artisanlib/main.py" line="31949"/>
         <source>Capacity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31969"/>
+        <location filename="../artisanlib/main.py" line="31978"/>
         <source>SCe BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31990"/>
+        <location filename="../artisanlib/main.py" line="31999"/>
         <source>Dry Phase AUC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>Energy:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32022"/>
+        <location filename="../artisanlib/main.py" line="32031"/>
         <source>BTU Batch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32023"/>
+        <location filename="../artisanlib/main.py" line="32032"/>
         <source>BTU Batch per green kg</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32025"/>
+        <location filename="../artisanlib/main.py" line="32034"/>
         <source>BTU Preheat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32027"/>
+        <location filename="../artisanlib/main.py" line="32036"/>
         <source>BTU BBP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32029"/>
+        <location filename="../artisanlib/main.py" line="32038"/>
         <source>BTU Cooling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32031"/>
+        <location filename="../artisanlib/main.py" line="32040"/>
         <source>BTU Roast</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32032"/>
+        <location filename="../artisanlib/main.py" line="32041"/>
         <source>BTU Roast per green kg</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32035"/>
+        <location filename="../artisanlib/main.py" line="32044"/>
         <source>BTU LPG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32036"/>
+        <location filename="../artisanlib/main.py" line="32045"/>
         <source>BTU NG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32037"/>
+        <location filename="../artisanlib/main.py" line="32046"/>
         <source>BTU ELEC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32038"/>
+        <location filename="../artisanlib/main.py" line="32047"/>
         <source>Efficiency Batch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32039"/>
+        <location filename="../artisanlib/main.py" line="32048"/>
         <source>Efficiency Roast</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31983"/>
+        <location filename="../artisanlib/main.py" line="31992"/>
         <source>Finish Phase Rise</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32024"/>
+        <location filename="../artisanlib/main.py" line="32033"/>
         <source>CO2 Batch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32026"/>
+        <location filename="../artisanlib/main.py" line="32035"/>
         <source>CO2 Preheat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32028"/>
+        <location filename="../artisanlib/main.py" line="32037"/>
         <source>CO2 BBP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32030"/>
+        <location filename="../artisanlib/main.py" line="32039"/>
         <source>CO2 Cooling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32033"/>
+        <location filename="../artisanlib/main.py" line="32042"/>
         <source>CO2 Roast</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32034"/>
+        <location filename="../artisanlib/main.py" line="32043"/>
         <source>CO2 Batch per green kg</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33277"/>
+        <location filename="../artisanlib/main.py" line="33286"/>
         <source>CO2:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9550,12 +9550,12 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation>HENDELSE</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13650"/>
+        <location filename="../artisanlib/main.py" line="13659"/>
         <source>BackgroundET</source>
         <translation>BakgrunnMT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13654"/>
+        <location filename="../artisanlib/main.py" line="13663"/>
         <source>BackgroundBT</source>
         <translation>BakgrunnBT</translation>
     </message>
@@ -9580,7 +9580,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">BT={0}-{1} ({2})   MT={3}-{4} ({5})...T=%7...SR=%8g/m   MTBTa=%9 [{0}1-{0}2]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15130"/>
+        <location filename="../artisanlib/main.py" line="15139"/>
         <source>Time</source>
         <translation>Tid</translation>
     </message>
@@ -9595,22 +9595,22 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">MT {0} g/m for {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17602"/>
+        <location filename="../artisanlib/main.py" line="17611"/>
         <source>PID SV</source>
         <translation>PID SV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17606"/>
+        <location filename="../artisanlib/main.py" line="17615"/>
         <source>PID %</source>
         <translation>PID %</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17671"/>
+        <location filename="../artisanlib/main.py" line="17680"/>
         <source>Event #&lt;b&gt;0 &lt;/b&gt;</source>
         <translation>Hendelse # &lt;b&gt;0 &lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24659"/>
+        <location filename="../artisanlib/main.py" line="24668"/>
         <source>Event #&lt;b&gt;{0} &lt;/b&gt;</source>
         <translation type="unfinished">Hendelse #&lt;b&gt;{0} &lt;/b&gt;</translation>
     </message>
@@ -9650,7 +9650,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">{0} for å nå MT mål {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35929"/>
+        <location filename="../artisanlib/main.py" line="35938"/>
         <source> at {0}</source>
         <translation> ved {0}</translation>
     </message>
@@ -9660,22 +9660,22 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">{0} for å nå BT mål {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35941"/>
+        <location filename="../artisanlib/main.py" line="35950"/>
         <source>{0} after FCs</source>
         <translation type="unfinished">{0} etter 1Ks</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35948"/>
+        <location filename="../artisanlib/main.py" line="35957"/>
         <source>{0} after FCe</source>
         <translation type="unfinished">{0} etter 1Ke</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35981"/>
+        <location filename="../artisanlib/main.py" line="35990"/>
         <source>ET - BT = {0}</source>
         <translation type="unfinished">MT - BT = {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36028"/>
+        <location filename="../artisanlib/main.py" line="36037"/>
         <source>ET - BT = {0}{1}</source>
         <translation type="unfinished">MT - BT.=.{0}{1}</translation>
     </message>
@@ -9895,7 +9895,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Stil</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14784"/>
+        <location filename="../artisanlib/main.py" line="14793"/>
         <source>Width</source>
         <translation type="unfinished">Vidde</translation>
     </message>
@@ -9965,7 +9965,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Farge</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14786"/>
+        <location filename="../artisanlib/main.py" line="14795"/>
         <source>Marker</source>
         <translation type="unfinished">Markør</translation>
     </message>
@@ -9980,7 +9980,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Opasitet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14788"/>
+        <location filename="../artisanlib/main.py" line="14797"/>
         <source>Size</source>
         <translation type="unfinished">Størrelse</translation>
     </message>
@@ -10360,7 +10360,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">MTBTa</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36779"/>
+        <location filename="../artisanlib/main.py" line="36788"/>
         <source>RoR</source>
         <translation></translation>
     </message>
@@ -10400,12 +10400,12 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26203"/>
+        <location filename="../artisanlib/main.py" line="26212"/>
         <source>Charge the beans</source>
         <translation>Lad bønnene</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26189"/>
+        <location filename="../artisanlib/main.py" line="26198"/>
         <source>Start recording</source>
         <translation type="unfinished">Start opptak</translation>
     </message>
@@ -10415,7 +10415,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Kilde</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12351"/>
+        <location filename="../artisanlib/main.py" line="12360"/>
         <source>CM</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10430,47 +10430,47 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Network</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12344"/>
+        <location filename="../artisanlib/main.py" line="12353"/>
         <source>MET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21210"/>
+        <location filename="../artisanlib/main.py" line="21219"/>
         <source>DRY%</source>
         <translation>TØRKE%</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21073"/>
+        <location filename="../artisanlib/main.py" line="21082"/>
         <source>RAMP%</source>
         <translation>RAMPE%</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21140"/>
+        <location filename="../artisanlib/main.py" line="21149"/>
         <source>DEV%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33196"/>
+        <location filename="../artisanlib/main.py" line="33205"/>
         <source>greens</source>
         <translation>greener</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33201"/>
+        <location filename="../artisanlib/main.py" line="33210"/>
         <source>roasted</source>
         <translation>stekt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15138"/>
+        <location filename="../artisanlib/main.py" line="15147"/>
         <source>/min</source>
         <translation>/ min</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33170"/>
+        <location filename="../artisanlib/main.py" line="33179"/>
         <source>/m</source>
         <translation>/ m</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20528"/>
+        <location filename="../artisanlib/main.py" line="20537"/>
         <source>Delta Span</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10520,12 +10520,12 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation>BakgrunnXT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14256"/>
+        <location filename="../artisanlib/main.py" line="14265"/>
         <source>BT {0} {1}/min for {2}</source>
         <translation>BT {0} {1} / min for {2}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14272"/>
+        <location filename="../artisanlib/main.py" line="14281"/>
         <source>ET {0} {1}/min for {2}</source>
         <translation>ET {0} {1} / min for {2}</translation>
     </message>
@@ -10545,7 +10545,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">Ekstra</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13646"/>
+        <location filename="../artisanlib/main.py" line="13655"/>
         <source>Designer</source>
         <translation type="unfinished">Designer</translation>
     </message>
@@ -10570,7 +10570,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Glidebryter</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20908"/>
+        <location filename="../artisanlib/main.py" line="20917"/>
         <source>AUC</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10580,22 +10580,22 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Fra</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20179"/>
+        <location filename="../artisanlib/main.py" line="20188"/>
         <source>AUC FCs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8910"/>
+        <location filename="../artisanlib/main.py" line="8916"/>
         <source>BTprojection</source>
         <translation>BTprojeksjon</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8915"/>
+        <location filename="../artisanlib/main.py" line="8921"/>
         <source>ETprojection</source>
         <translation>ETprojeksjon</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8921"/>
+        <location filename="../artisanlib/main.py" line="8927"/>
         <source>AUCguide</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10610,7 +10610,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Tekst Farge</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12353"/>
+        <location filename="../artisanlib/main.py" line="12362"/>
         <source>FC</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10620,132 +10620,132 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Temp</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19414"/>
+        <location filename="../artisanlib/main.py" line="19423"/>
         <source>Markers</source>
         <translation type="unfinished">Markør</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19420"/>
+        <location filename="../artisanlib/main.py" line="19429"/>
         <source>Time Guide</source>
         <translation>Tidsguide</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19423"/>
+        <location filename="../artisanlib/main.py" line="19432"/>
         <source>Background ET</source>
         <translation>Bakgrunn ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19426"/>
+        <location filename="../artisanlib/main.py" line="19435"/>
         <source>Background BT</source>
         <translation>Bakgrunn BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19435"/>
+        <location filename="../artisanlib/main.py" line="19444"/>
         <source>Background Extra</source>
         <translation>Bakgrunn Ekstra</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19438"/>
+        <location filename="../artisanlib/main.py" line="19447"/>
         <source>X Label</source>
         <translation type="unfinished">X etikett</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19444"/>
+        <location filename="../artisanlib/main.py" line="19453"/>
         <source>Canvas</source>
         <translation>Lerret</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19441"/>
+        <location filename="../artisanlib/main.py" line="19450"/>
         <source>Y Label</source>
         <translation type="unfinished">Y etikett</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19447"/>
+        <location filename="../artisanlib/main.py" line="19456"/>
         <source>SpecialEventText</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19447"/>
+        <location filename="../artisanlib/main.py" line="19456"/>
         <source>SpecialEventBox</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19513"/>
+        <location filename="../artisanlib/main.py" line="19522"/>
         <source>Legend bkgnd</source>
         <translation>Legende bkgnd</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19465"/>
+        <location filename="../artisanlib/main.py" line="19474"/>
         <source>MET Text</source>
         <translation>MET Tekst</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19468"/>
+        <location filename="../artisanlib/main.py" line="19477"/>
         <source>MET Box</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19472"/>
+        <location filename="../artisanlib/main.py" line="19481"/>
         <source>Timer LCD Digits</source>
         <translation>Timer LCD-sifre</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19472"/>
+        <location filename="../artisanlib/main.py" line="19481"/>
         <source>Timer LCD Background</source>
         <translation>Timer LCD Bakgrunn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19481"/>
+        <location filename="../artisanlib/main.py" line="19490"/>
         <source>ET LCD Digits</source>
         <translation>ET LCD-sifre</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19481"/>
+        <location filename="../artisanlib/main.py" line="19490"/>
         <source>ET LCD Background</source>
         <translation>ET LCD bakgrunn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19484"/>
+        <location filename="../artisanlib/main.py" line="19493"/>
         <source>BT LCD Digits</source>
         <translation>BT LCD-sifre</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19484"/>
+        <location filename="../artisanlib/main.py" line="19493"/>
         <source>BT LCD Background</source>
         <translation>BT LCD bakgrunn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19487"/>
+        <location filename="../artisanlib/main.py" line="19496"/>
         <source>Extra/PID LCD Digits</source>
         <translation>Ekstra / PID LCD-sifre</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19487"/>
+        <location filename="../artisanlib/main.py" line="19496"/>
         <source>Extra/PID LCD Background</source>
         <translation>Ekstra / PID LCD-bakgrunn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19525"/>
+        <location filename="../artisanlib/main.py" line="19534"/>
         <source>Event button</source>
         <translation>Hendelsesknapp</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19525"/>
+        <location filename="../artisanlib/main.py" line="19534"/>
         <source>its text</source>
         <translation>teksten</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21169"/>
+        <location filename="../artisanlib/main.py" line="21178"/>
         <source>TIME MODE</source>
         <translation>TIDSMODUS</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21173"/>
+        <location filename="../artisanlib/main.py" line="21182"/>
         <source>PERCENTAGE MODE</source>
         <translation>PERSENTASJONSMODUS</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21177"/>
+        <location filename="../artisanlib/main.py" line="21186"/>
         <source>TEMP MODE</source>
         <translation>TEMPMODUS</translation>
     </message>
@@ -10760,7 +10760,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation>TIDSguide</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20971"/>
+        <location filename="../artisanlib/main.py" line="20980"/>
         <source>ALL FINISHING MODE</source>
         <translation>ALLE FERDIGMODUS</translation>
     </message>
@@ -10775,32 +10775,32 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Effekt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19450"/>
+        <location filename="../artisanlib/main.py" line="19459"/>
         <source>Bg SpecialEventText</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19450"/>
+        <location filename="../artisanlib/main.py" line="19459"/>
         <source>Bg SpecialEventBox</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9330"/>
+        <location filename="../artisanlib/main.py" line="9336"/>
         <source>RPM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36789"/>
+        <location filename="../artisanlib/main.py" line="36798"/>
         <source>ln()</source>
         <translation>ln ()</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36787"/>
+        <location filename="../artisanlib/main.py" line="36796"/>
         <source>x</source>
         <translation type="unfinished">x</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36783"/>
+        <location filename="../artisanlib/main.py" line="36792"/>
         <source>Bkgnd</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10810,77 +10810,77 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation>Varighet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20495"/>
+        <location filename="../artisanlib/main.py" line="20504"/>
         <source>Max Delta</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20496"/>
+        <location filename="../artisanlib/main.py" line="20505"/>
         <source>Swing</source>
         <translation>Svinge</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20497"/>
+        <location filename="../artisanlib/main.py" line="20506"/>
         <source>ABC/secs</source>
         <translation>ABC / sek</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20525"/>
+        <location filename="../artisanlib/main.py" line="20534"/>
         <source>Curve Fit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20526"/>
+        <location filename="../artisanlib/main.py" line="20535"/>
         <source>Samples Threshold</source>
         <translation>Terskel for prøver</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20526"/>
+        <location filename="../artisanlib/main.py" line="20535"/>
         <source>Delta Threshold</source>
         <translation>Delta terskel</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20527"/>
+        <location filename="../artisanlib/main.py" line="20536"/>
         <source>Sample rate (secs)</source>
         <translation>Prøvefrekvens (sek.)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20528"/>
+        <location filename="../artisanlib/main.py" line="20537"/>
         <source>Delta Smoothing</source>
         <translation>Delta utjevning</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20529"/>
+        <location filename="../artisanlib/main.py" line="20538"/>
         <source>Fit RoRoR (C/min/min)</source>
         <translation>Tilpass RoRoR (C / min / min)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20529"/>
+        <location filename="../artisanlib/main.py" line="20538"/>
         <source>Actual RoR at FCs</source>
         <translation>Faktisk RoR på FCs</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36778"/>
+        <location filename="../artisanlib/main.py" line="36787"/>
         <source>MSE BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36779"/>
+        <location filename="../artisanlib/main.py" line="36788"/>
         <source>@FCs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36780"/>
+        <location filename="../artisanlib/main.py" line="36789"/>
         <source>Max+/Max- RoR</source>
         <translation>Max + / Max- RoR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20515"/>
+        <location filename="../artisanlib/main.py" line="20524"/>
         <source>Segment Analysis (rise, crash and flick)</source>
         <translation>Segmentanalyse (stige, krasje og svirpe)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20527"/>
+        <location filename="../artisanlib/main.py" line="20536"/>
         <source>Smooth Curves/Spikes</source>
         <translation>Glatte kurver / pigger</translation>
     </message>
@@ -10895,12 +10895,12 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Juster</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35918"/>
+        <location filename="../artisanlib/main.py" line="35927"/>
         <source>{0} to reach ET {1}{2}</source>
         <translation>{0} for å nå ET {1} {2}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35931"/>
+        <location filename="../artisanlib/main.py" line="35940"/>
         <source>{0} to reach BT {1}{2}</source>
         <translation>{0} for å nå BT {1} {2}</translation>
     </message>
@@ -11614,7 +11614,7 @@ LCD-skjermer Alle</translation>
         <translation>nåværende:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12378"/>
+        <location filename="../artisanlib/main.py" line="12387"/>
         <source>min</source>
         <comment>abbrev. of minutes</comment>
         <translation type="unfinished">min</translation>
@@ -11776,32 +11776,32 @@ LCD-skjermer Alle</translation>
         <translation>per kg grønn kaffe</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14782"/>
+        <location filename="../artisanlib/main.py" line="14791"/>
         <source>Line style</source>
         <translation>Linjestil</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14783"/>
+        <location filename="../artisanlib/main.py" line="14792"/>
         <source>Draw style</source>
         <translation>Tegn stil</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14785"/>
+        <location filename="../artisanlib/main.py" line="14794"/>
         <source>Color (RGBA)</source>
         <translation>Farge (RGBA)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14789"/>
+        <location filename="../artisanlib/main.py" line="14798"/>
         <source>Face color (RGBA)</source>
         <translation>Ansiktsfarge (RGBA)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14790"/>
+        <location filename="../artisanlib/main.py" line="14799"/>
         <source>Edge color (RGBA)</source>
         <translation>Kantfarge (RGBA)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14787"/>
+        <location filename="../artisanlib/main.py" line="14796"/>
         <source>Symbol</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11814,37 +11814,37 @@ LCD-skjermer Alle</translation>
 <context>
     <name>MAC_APPLICATION_MENU</name>
     <message>
-        <location filename="../artisanlib/main.py" line="15713"/>
+        <location filename="../artisanlib/main.py" line="15722"/>
         <source>Services</source>
         <translation>Servicer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15714"/>
+        <location filename="../artisanlib/main.py" line="15723"/>
         <source>Hide {0}</source>
         <translation type="unfinished">Skjul {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15715"/>
+        <location filename="../artisanlib/main.py" line="15724"/>
         <source>Hide Others</source>
         <translation>Skjul Andre</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15716"/>
+        <location filename="../artisanlib/main.py" line="15725"/>
         <source>Show All</source>
         <translation>Vis Alle</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15717"/>
+        <location filename="../artisanlib/main.py" line="15726"/>
         <source>Preferences...</source>
         <translation>Preferanser...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16024"/>
+        <location filename="../artisanlib/main.py" line="16033"/>
         <source>Quit {0}</source>
         <translation type="unfinished">Avslutt {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16526"/>
+        <location filename="../artisanlib/main.py" line="16535"/>
         <source>About {0}</source>
         <translation type="unfinished">Om {0}</translation>
     </message>
@@ -11905,7 +11905,7 @@ LCD-skjermer Alle</translation>
 <context>
     <name>Menu</name>
     <message>
-        <location filename="../artisanlib/main.py" line="16002"/>
+        <location filename="../artisanlib/main.py" line="16011"/>
         <source>CSV...</source>
         <translation>CSV...</translation>
     </message>
@@ -11915,7 +11915,7 @@ LCD-skjermer Alle</translation>
         <translation type="obsolete">JSON...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15893"/>
+        <location filename="../artisanlib/main.py" line="15902"/>
         <source>RoastLogger...</source>
         <translation>RoastLogger...</translation>
     </message>
@@ -11935,47 +11935,47 @@ LCD-skjermer Alle</translation>
         <translation type="obsolete">K204...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15722"/>
+        <location filename="../artisanlib/main.py" line="15731"/>
         <source>File</source>
         <translation>Fil</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19094"/>
+        <location filename="../artisanlib/main.py" line="19103"/>
         <source>New</source>
         <translation>Ny</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15733"/>
+        <location filename="../artisanlib/main.py" line="15742"/>
         <source>Open...</source>
         <translation>Åpne...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15738"/>
+        <location filename="../artisanlib/main.py" line="15747"/>
         <source>Open Recent</source>
         <translation>Åpne nylig brukt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15743"/>
+        <location filename="../artisanlib/main.py" line="15752"/>
         <source>Import</source>
         <translation>Importer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15818"/>
+        <location filename="../artisanlib/main.py" line="15827"/>
         <source>Save</source>
         <translation>Lagre</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15823"/>
+        <location filename="../artisanlib/main.py" line="15832"/>
         <source>Save As...</source>
         <translation>Lagre som...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15835"/>
+        <location filename="../artisanlib/main.py" line="15844"/>
         <source>Export</source>
         <translation>Eksporter</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15921"/>
+        <location filename="../artisanlib/main.py" line="15930"/>
         <source>Save Graph</source>
         <translation>Lagre graf</translation>
     </message>
@@ -11990,82 +11990,82 @@ LCD-skjermer Alle</translation>
         <translation type="obsolete">Rapport brenning</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16016"/>
+        <location filename="../artisanlib/main.py" line="16025"/>
         <source>Print...</source>
         <translation>Skriv ut...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15723"/>
+        <location filename="../artisanlib/main.py" line="15732"/>
         <source>Edit</source>
         <translation>Endre</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16031"/>
+        <location filename="../artisanlib/main.py" line="16040"/>
         <source>Cut</source>
         <translation>Klipp ut</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16035"/>
+        <location filename="../artisanlib/main.py" line="16044"/>
         <source>Copy</source>
         <translation>Kopier</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16039"/>
+        <location filename="../artisanlib/main.py" line="16048"/>
         <source>Paste</source>
         <translation>Lim inn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15977"/>
+        <location filename="../artisanlib/main.py" line="15986"/>
         <source>Roast</source>
         <translation>Brenn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16045"/>
+        <location filename="../artisanlib/main.py" line="16054"/>
         <source>Properties...</source>
         <translation>Egenskaper...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16051"/>
+        <location filename="../artisanlib/main.py" line="16060"/>
         <source>Background...</source>
         <translation>Bakgrunn...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16056"/>
+        <location filename="../artisanlib/main.py" line="16065"/>
         <source>Cup Profile...</source>
         <translation>Cupping profil...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16146"/>
+        <location filename="../artisanlib/main.py" line="16155"/>
         <source>Temperature</source>
         <translation>Temperatur</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16430"/>
+        <location filename="../artisanlib/main.py" line="16439"/>
         <source>Convert to Fahrenheit</source>
         <translation>Konverter til Farenheit</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16434"/>
+        <location filename="../artisanlib/main.py" line="16443"/>
         <source>Convert to Celsius</source>
         <translation>Konverter til Celsius</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16148"/>
+        <location filename="../artisanlib/main.py" line="16157"/>
         <source>Fahrenheit Mode</source>
         <translation>Farenheit Modus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16152"/>
+        <location filename="../artisanlib/main.py" line="16161"/>
         <source>Celsius Mode</source>
         <translation>Celsius Modus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15725"/>
+        <location filename="../artisanlib/main.py" line="15734"/>
         <source>Config</source>
         <translation>Konfigurer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16076"/>
+        <location filename="../artisanlib/main.py" line="16085"/>
         <source>Device...</source>
         <translation>Utstyr...</translation>
     </message>
@@ -12080,62 +12080,62 @@ LCD-skjermer Alle</translation>
         <translation type="obsolete">Prøveintervall...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16125"/>
+        <location filename="../artisanlib/main.py" line="16134"/>
         <source>Colors...</source>
         <translation>Farger...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16111"/>
+        <location filename="../artisanlib/main.py" line="16120"/>
         <source>Phases...</source>
         <translation>Faser...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16099"/>
+        <location filename="../artisanlib/main.py" line="16108"/>
         <source>Events...</source>
         <translation>Hendelse...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16115"/>
+        <location filename="../artisanlib/main.py" line="16124"/>
         <source>Statistics...</source>
         <translation>Statistikk...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16119"/>
+        <location filename="../artisanlib/main.py" line="16128"/>
         <source>Axes...</source>
         <translation>Akser...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16136"/>
+        <location filename="../artisanlib/main.py" line="16145"/>
         <source>Autosave...</source>
         <translation>Autolagre...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16104"/>
+        <location filename="../artisanlib/main.py" line="16113"/>
         <source>Alarms...</source>
         <translation>Alarmer...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16156"/>
+        <location filename="../artisanlib/main.py" line="16165"/>
         <source>Language</source>
         <translation>Språk</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15726"/>
+        <location filename="../artisanlib/main.py" line="15735"/>
         <source>Tools</source>
         <translation>Verktøy</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16404"/>
+        <location filename="../artisanlib/main.py" line="16413"/>
         <source>Designer</source>
         <translation>Designer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16447"/>
+        <location filename="../artisanlib/main.py" line="16456"/>
         <source>Calculator</source>
         <translation>Kalkulator</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16416"/>
+        <location filename="../artisanlib/main.py" line="16425"/>
         <source>Wheel Graph</source>
         <translation>Sirkeldiagram</translation>
     </message>
@@ -12145,12 +12145,12 @@ LCD-skjermer Alle</translation>
         <translation type="obsolete">Ekstra...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15728"/>
+        <location filename="../artisanlib/main.py" line="15737"/>
         <source>Help</source>
         <translation>Hjelp</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16536"/>
+        <location filename="../artisanlib/main.py" line="16545"/>
         <source>Documentation</source>
         <translation>Dokumentasjon</translation>
     </message>
@@ -12160,22 +12160,22 @@ LCD-skjermer Alle</translation>
         <translation type="obsolete">Blog</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16541"/>
+        <location filename="../artisanlib/main.py" line="16550"/>
         <source>Keyboard Shortcuts</source>
         <translation>Tastatur snarveger</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16554"/>
+        <location filename="../artisanlib/main.py" line="16563"/>
         <source>Errors</source>
         <translation>Feil</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16558"/>
+        <location filename="../artisanlib/main.py" line="16567"/>
         <source>Messages</source>
         <translation>Meldinger</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16562"/>
+        <location filename="../artisanlib/main.py" line="16571"/>
         <source>Serial</source>
         <translation>Seriell</translation>
     </message>
@@ -12185,22 +12185,22 @@ LCD-skjermer Alle</translation>
         <translation type="obsolete">Innstillinger</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16567"/>
+        <location filename="../artisanlib/main.py" line="16576"/>
         <source>Platform</source>
         <translation>Plattform</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16592"/>
+        <location filename="../artisanlib/main.py" line="16601"/>
         <source>Factory Reset</source>
         <translation>Tilbakestill fabkrikk innstillinger</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16531"/>
+        <location filename="../artisanlib/main.py" line="16540"/>
         <source>About Qt</source>
         <translation>Om Qt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16062"/>
+        <location filename="../artisanlib/main.py" line="16071"/>
         <source>Switch Profiles</source>
         <translation>Bytt profil</translation>
     </message>
@@ -12210,82 +12210,82 @@ LCD-skjermer Alle</translation>
         <translation type="obsolete">LCDs</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16140"/>
+        <location filename="../artisanlib/main.py" line="16149"/>
         <source>Batch...</source>
         <translation>Parti...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16575"/>
+        <location filename="../artisanlib/main.py" line="16584"/>
         <source>Load Settings...</source>
         <translation>Last innstillinger ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16580"/>
+        <location filename="../artisanlib/main.py" line="16589"/>
         <source>Load Recent Settings</source>
         <translation>Last inn nylige innstillinger</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16585"/>
+        <location filename="../artisanlib/main.py" line="16594"/>
         <source>Save Settings...</source>
         <translation>Lagre innstillinger...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16466"/>
+        <location filename="../artisanlib/main.py" line="16475"/>
         <source>Buttons</source>
         <translation type="unfinished">Knapper</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16472"/>
+        <location filename="../artisanlib/main.py" line="16481"/>
         <source>Sliders</source>
         <translation type="unfinished">Glidebrytere</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15975"/>
+        <location filename="../artisanlib/main.py" line="15984"/>
         <source>Report</source>
         <translation>Rapportere</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15982"/>
+        <location filename="../artisanlib/main.py" line="15991"/>
         <source>Batches</source>
         <translation>Batcher</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15996"/>
+        <location filename="../artisanlib/main.py" line="16005"/>
         <source>Ranking</source>
         <translation>Rangering</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15998"/>
+        <location filename="../artisanlib/main.py" line="16007"/>
         <source>Web...</source>
         <translation>Internett ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16006"/>
+        <location filename="../artisanlib/main.py" line="16015"/>
         <source>Excel...</source>
         <translation>Utmerke...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15861"/>
+        <location filename="../artisanlib/main.py" line="15870"/>
         <source>Convert To</source>
         <translation>Konvertere til</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15931"/>
+        <location filename="../artisanlib/main.py" line="15940"/>
         <source>PNG...</source>
         <translation>PNG ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15911"/>
+        <location filename="../artisanlib/main.py" line="15920"/>
         <source>SVG...</source>
         <translation>SVG ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15915"/>
+        <location filename="../artisanlib/main.py" line="15924"/>
         <source>PDF...</source>
         <translation>PDF ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16067"/>
+        <location filename="../artisanlib/main.py" line="16076"/>
         <source>Switch ET&lt;-&gt;BT</source>
         <translation>Bytt ET &lt;-&gt; BT</translation>
     </message>
@@ -12295,177 +12295,177 @@ LCD-skjermer Alle</translation>
         <translation type="obsolete">Stor (1200x?) ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15863"/>
+        <location filename="../artisanlib/main.py" line="15872"/>
         <source>Fahrenheit...</source>
         <translation>Fahrenheit ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15867"/>
+        <location filename="../artisanlib/main.py" line="15876"/>
         <source>Celsius...</source>
         <translation>Celsius ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15889"/>
+        <location filename="../artisanlib/main.py" line="15898"/>
         <source>Probat Pilot...</source>
         <translation>Probat Pilot ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16072"/>
+        <location filename="../artisanlib/main.py" line="16081"/>
         <source>Machine</source>
         <translation type="unfinished">Maskin</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15879"/>
+        <location filename="../artisanlib/main.py" line="15888"/>
         <source>Artisan CSV...</source>
         <translation>Artisan CSV ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15883"/>
+        <location filename="../artisanlib/main.py" line="15892"/>
         <source>Artisan JSON...</source>
         <translation>Artisan JSON ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16454"/>
+        <location filename="../artisanlib/main.py" line="16463"/>
         <source>Controls</source>
         <translation>Kontroller</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16460"/>
+        <location filename="../artisanlib/main.py" line="16469"/>
         <source>Readings</source>
         <translation>Avlesninger</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16129"/>
+        <location filename="../artisanlib/main.py" line="16138"/>
         <source>Themes</source>
         <translation>Temaer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19374"/>
+        <location filename="../artisanlib/main.py" line="19383"/>
         <source>Save Theme...</source>
         <translation>Lagre tema ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16081"/>
+        <location filename="../artisanlib/main.py" line="16090"/>
         <source>Port...</source>
         <translation>Port...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15727"/>
+        <location filename="../artisanlib/main.py" line="15736"/>
         <source>View</source>
         <translation>Utsikt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16514"/>
+        <location filename="../artisanlib/main.py" line="16523"/>
         <source>Full Screen</source>
         <translation>Full skjerm</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16093"/>
+        <location filename="../artisanlib/main.py" line="16102"/>
         <source>Curves...</source>
         <translation>Kurver ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19370"/>
+        <location filename="../artisanlib/main.py" line="19379"/>
         <source>Load Theme...</source>
         <translation>Last inn tema ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15903"/>
+        <location filename="../artisanlib/main.py" line="15912"/>
         <source>JPEG...</source>
         <translation>JPEG ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15907"/>
+        <location filename="../artisanlib/main.py" line="15916"/>
         <source>BMP...</source>
         <translation>BMP ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15829"/>
+        <location filename="../artisanlib/main.py" line="15838"/>
         <source>Save a Copy As...</source>
         <translation>Lagre en kopi som ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16480"/>
+        <location filename="../artisanlib/main.py" line="16489"/>
         <source>Main LCDs</source>
         <translation>Hoved-LCD-skjermer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16487"/>
+        <location filename="../artisanlib/main.py" line="16496"/>
         <source>Delta LCDs</source>
         <translation>Delta LCD-skjermer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16493"/>
+        <location filename="../artisanlib/main.py" line="16502"/>
         <source>PID LCDs</source>
         <translation>PID LCD-skjermer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16499"/>
+        <location filename="../artisanlib/main.py" line="16508"/>
         <source>Extra LCDs</source>
         <translation>Ekstra LCD-skjermer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16428"/>
+        <location filename="../artisanlib/main.py" line="16437"/>
         <source>Convert Profile Temperature</source>
         <translation type="unfinished">Konverter Profil Temperatur</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16393"/>
+        <location filename="../artisanlib/main.py" line="16402"/>
         <source>Clear results</source>
         <translation>Tydelige resultater</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16385"/>
+        <location filename="../artisanlib/main.py" line="16394"/>
         <source>Fit BT to</source>
         <translation>Monter BT til</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16010"/>
+        <location filename="../artisanlib/main.py" line="16019"/>
         <source>Save Statistics...</source>
         <translation>Lagre statistikk ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16389"/>
+        <location filename="../artisanlib/main.py" line="16398"/>
         <source>Fit BT to Bkgnd</source>
         <translation>Monter BT til Bkgnd</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16374"/>
+        <location filename="../artisanlib/main.py" line="16383"/>
         <source>Auto All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16373"/>
+        <location filename="../artisanlib/main.py" line="16382"/>
         <source>Analyzer</source>
         <translation>Analysator</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16410"/>
+        <location filename="../artisanlib/main.py" line="16419"/>
         <source>Simulator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16505"/>
+        <location filename="../artisanlib/main.py" line="16514"/>
         <source>Phases LCDs</source>
         <translation>Faser LCD-skjermer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16424"/>
+        <location filename="../artisanlib/main.py" line="16433"/>
         <source>Transposer</source>
         <translation>Transponer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16398"/>
+        <location filename="../artisanlib/main.py" line="16407"/>
         <source>Comparator</source>
         <translation>Komparator</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16087"/>
+        <location filename="../artisanlib/main.py" line="16096"/>
         <source>Sampling...</source>
         <translation>Prøvetaking ...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16547"/>
+        <location filename="../artisanlib/main.py" line="16556"/>
         <source>Check for Updates</source>
         <translation>Se etter oppdateringer</translation>
     </message>
@@ -12518,7 +12518,7 @@ LCD-skjermer Alle</translation>
         <translation>Ulagret Profil</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19359"/>
+        <location filename="../artisanlib/main.py" line="19368"/>
         <source>Action canceled</source>
         <translation>Handling kansellert</translation>
     </message>
@@ -12533,82 +12533,82 @@ LCD-skjermer Alle</translation>
         <translation type="obsolete">Tids format feil oppdaget</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9666"/>
+        <location filename="../artisanlib/main.py" line="9672"/>
         <source>Convert profile data to Fahrenheit?</source>
         <translation>Konverter profil data til Farenheit?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9779"/>
+        <location filename="../artisanlib/main.py" line="9785"/>
         <source>Convert Profile Temperature</source>
         <translation>Konverter Profil Temperatur</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9714"/>
+        <location filename="../artisanlib/main.py" line="9720"/>
         <source>Profile changed to Fahrenheit</source>
         <translation>Profil endret til Farrenheit</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9717"/>
+        <location filename="../artisanlib/main.py" line="9723"/>
         <source>Unable to comply. You already are in Fahrenheit</source>
         <translation>Ikke i stand til å etterkomme</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9781"/>
+        <location filename="../artisanlib/main.py" line="9787"/>
         <source>Profile not changed</source>
         <translation>Profil ikke endret</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9726"/>
+        <location filename="../artisanlib/main.py" line="9732"/>
         <source>Convert profile data to Celsius?</source>
         <translation>Konverter profil data til Celsius?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9779"/>
+        <location filename="../artisanlib/main.py" line="9785"/>
         <source>Unable to comply. You already are in Celsius</source>
         <translation>Ikke i stand til å etterkomme. Du er allerede i Celsius</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9776"/>
+        <location filename="../artisanlib/main.py" line="9782"/>
         <source>Profile changed to Celsius</source>
         <translation>Endret profil til Celsius</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9788"/>
+        <location filename="../artisanlib/main.py" line="9794"/>
         <source>Convert Profile Scale</source>
         <translation>Konverter Profil Skala</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9788"/>
+        <location filename="../artisanlib/main.py" line="9794"/>
         <source>No profile data found</source>
         <translation>Ingen profil data funnet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9816"/>
+        <location filename="../artisanlib/main.py" line="9822"/>
         <source>Colors set to defaults</source>
         <translation>Farger satt til standard</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9820"/>
+        <location filename="../artisanlib/main.py" line="9826"/>
         <source>Colors set to grey</source>
         <translation>Farger satt til grå</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10306"/>
+        <location filename="../artisanlib/main.py" line="10312"/>
         <source>Scope monitoring...</source>
         <translation>Skopet monitorerer...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10382"/>
+        <location filename="../artisanlib/main.py" line="10388"/>
         <source>Scope stopped</source>
         <translation>Skop stoppet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10714"/>
+        <location filename="../artisanlib/main.py" line="10720"/>
         <source>Scope recording...</source>
         <translation>Skopet tar opp...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10780"/>
+        <location filename="../artisanlib/main.py" line="10786"/>
         <source>Scope recording stopped</source>
         <translation>Skop opptak stoppet</translation>
     </message>
@@ -12618,7 +12618,7 @@ LCD-skjermer Alle</translation>
         <translation type="obsolete">Ikke nok variabler samlet inn. Prøv igjen etter noen sekunder</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10945"/>
+        <location filename="../artisanlib/main.py" line="10951"/>
         <source>Roast time starts now 00:00 BT = {0}</source>
         <translation type="unfinished">Brennings tid starter nå 00:00 BT ={0}</translation>
     </message>
@@ -12628,52 +12628,52 @@ LCD-skjermer Alle</translation>
         <translation type="obsolete">Skopet er AV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11080"/>
+        <location filename="../artisanlib/main.py" line="11086"/>
         <source>[DRY END] recorded at {0} BT = {1}</source>
         <translation type="unfinished">[TØRKING SLUTT] registrert ved {0} BT ={1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11190"/>
+        <location filename="../artisanlib/main.py" line="11196"/>
         <source>[FC START] recorded at {0} BT = {1}</source>
         <translation type="unfinished">[1K START] registrert ved {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11291"/>
+        <location filename="../artisanlib/main.py" line="11297"/>
         <source>[FC END] recorded at {0} BT = {1}</source>
         <translation type="unfinished">[1K SLUTT] registrert ved {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11400"/>
+        <location filename="../artisanlib/main.py" line="11406"/>
         <source>[SC START] recorded at {0} BT = {1}</source>
         <translation type="unfinished">[2K START] registrert ved {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11506"/>
+        <location filename="../artisanlib/main.py" line="11512"/>
         <source>[SC END] recorded at {0} BT = {1}</source>
         <translation type="unfinished">[2K SLUTT] registrert ved {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11656"/>
+        <location filename="../artisanlib/main.py" line="11662"/>
         <source>Roast ended at {0} BT = {1}</source>
         <translation type="unfinished">Brenning avsluttet ved {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11782"/>
+        <location filename="../artisanlib/main.py" line="11788"/>
         <source>[COOL END] recorded at {0} BT = {1}</source>
         <translation type="unfinished">[KJØLING SLUTT] registrert ved {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12112"/>
+        <location filename="../artisanlib/main.py" line="12121"/>
         <source>Event # {0} recorded at BT = {1} Time = {2}</source>
         <translation type="unfinished">Hendelse # {0} registrert ved BT = {1} Tid = {2}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12132"/>
+        <location filename="../artisanlib/main.py" line="12141"/>
         <source>Timer is OFF</source>
         <translation>Tidtaker er AV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12166"/>
+        <location filename="../artisanlib/main.py" line="12175"/>
         <source>Computer Event # {0} recorded at BT = {1} Time = {2}</source>
         <translation type="unfinished">Komputer Hendelse # {0} registrert ved BT = {1} Tid = {2}</translation>
     </message>
@@ -12683,42 +12683,42 @@ LCD-skjermer Alle</translation>
         <translation type="obsolete">Statistikk kansellert: komplett profil [DROPP INN] + [DROPP UT]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13035"/>
+        <location filename="../artisanlib/main.py" line="13044"/>
         <source>Unable to move background</source>
         <translation>Ikke i stand til å flytte bakgrunn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13093"/>
+        <location filename="../artisanlib/main.py" line="13102"/>
         <source>No finished profile found</source>
         <translation>Ingen avsluttet profil funnet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13111"/>
+        <location filename="../artisanlib/main.py" line="13120"/>
         <source>Polynomial coefficients (Horner form):</source>
         <translation>Polynomiske koeffisienter (Horner format):</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13114"/>
+        <location filename="../artisanlib/main.py" line="13123"/>
         <source>Knots:</source>
         <translation>Knuter:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13117"/>
+        <location filename="../artisanlib/main.py" line="13126"/>
         <source>Residual:</source>
         <translation>Rester:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13120"/>
+        <location filename="../artisanlib/main.py" line="13129"/>
         <source>Roots:</source>
         <translation>Røtter:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13124"/>
+        <location filename="../artisanlib/main.py" line="13133"/>
         <source>Profile information</source>
         <translation>Profil informasjon</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13484"/>
+        <location filename="../artisanlib/main.py" line="13493"/>
         <source>Designer Start</source>
         <translation>Designer Start</translation>
     </message>
@@ -12732,54 +12732,54 @@ alle data unntatt hoved [punkt].
 Fortsett?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13584"/>
+        <location filename="../artisanlib/main.py" line="13593"/>
         <source>Designer Init</source>
         <translation>Designer Init</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13584"/>
+        <location filename="../artisanlib/main.py" line="13593"/>
         <source>Unable to start designer.
 Profile missing [CHARGE] or [DROP]</source>
         <translation>Ikke i stand til å starte Designer.
 Profil savnet [DROPP INN] eller[DROPP UT]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13873"/>
+        <location filename="../artisanlib/main.py" line="13882"/>
         <source>[ CHARGE ]</source>
         <translation>[ DROPP INN ]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13876"/>
+        <location filename="../artisanlib/main.py" line="13885"/>
         <source>[ DRY END ]</source>
         <translation>[ TØRKING SLUTT ]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13879"/>
+        <location filename="../artisanlib/main.py" line="13888"/>
         <source>[ FC START ]</source>
         <translation>[ 1K START ]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13882"/>
+        <location filename="../artisanlib/main.py" line="13891"/>
         <source>[ FC END ]</source>
         <translation>[ 1K SLUTT ]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13885"/>
+        <location filename="../artisanlib/main.py" line="13894"/>
         <source>[ SC START ]</source>
         <translation>[ 2K START ]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13888"/>
+        <location filename="../artisanlib/main.py" line="13897"/>
         <source>[ SC END ]</source>
         <translation>[ 2K SLUTT ]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13891"/>
+        <location filename="../artisanlib/main.py" line="13900"/>
         <source>[ DROP ]</source>
         <translation>[ DROPP UT ]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14193"/>
+        <location filename="../artisanlib/main.py" line="14202"/>
         <source>New profile created</source>
         <translation>Ny profil laget</translation>
     </message>
@@ -12789,22 +12789,22 @@ Profil savnet [DROPP INN] eller[DROPP UT]</translation>
         <translation>Åpne hjul graf</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14388"/>
+        <location filename="../artisanlib/main.py" line="14397"/>
         <source> added to cupping notes</source>
         <translation> lagt til cupping notater</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14399"/>
+        <location filename="../artisanlib/main.py" line="14408"/>
         <source> added to roasting notes</source>
         <translation> lagt til brennings notater</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14655"/>
+        <location filename="../artisanlib/main.py" line="14664"/>
         <source>Mouse Cross ON: move mouse around</source>
         <translation>Mus KRYSS PÅ: beveg mus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14683"/>
+        <location filename="../artisanlib/main.py" line="14692"/>
         <source>Mouse cross OFF</source>
         <translation>Mus Kryss AV</translation>
     </message>
@@ -12814,17 +12814,17 @@ Profil savnet [DROPP INN] eller[DROPP UT]</translation>
         <translation type="obsolete">Vil du tilbakestille alle innstillinger?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23374"/>
+        <location filename="../artisanlib/main.py" line="23383"/>
         <source>Factory Reset</source>
         <translation>Tilbakestill til Fabrikk innstillinger</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24041"/>
+        <location filename="../artisanlib/main.py" line="24050"/>
         <source>Exit Designer?</source>
         <translation>Gå ut av Designer?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24042"/>
+        <location filename="../artisanlib/main.py" line="24051"/>
         <source>Designer Mode ON</source>
         <translation>Designer modus PÅ</translation>
     </message>
@@ -12834,22 +12834,22 @@ Profil savnet [DROPP INN] eller[DROPP UT]</translation>
         <translation type="obsolete">Ekstra Hendelse Knapp Palett</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24289"/>
+        <location filename="../artisanlib/main.py" line="24298"/>
         <source>Keyboard moves turned ON</source>
         <translation>Tastatur bevegelse slått PÅ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24297"/>
+        <location filename="../artisanlib/main.py" line="24306"/>
         <source>Keyboard moves turned OFF</source>
         <translation>Tastatur bevegelse slått AV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24596"/>
+        <location filename="../artisanlib/main.py" line="24605"/>
         <source>Profile {0} saved in: {1}</source>
         <translation type="unfinished">Profil {0} lagert i: {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24631"/>
+        <location filename="../artisanlib/main.py" line="24640"/>
         <source>Empty path or box unchecked in Autosave</source>
         <translation>Tom sti eller umerket boks i Autosave</translation>
     </message>
@@ -12929,17 +12929,17 @@ Profil savnet [DROPP INN] eller[DROPP UT]</translation>
         <translation type="obsolete">Tastatur Hurtigtaster</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24734"/>
+        <location filename="../artisanlib/main.py" line="24743"/>
         <source>Event #{0}:  {1} has been updated</source>
         <translation type="unfinished">Hendelse # {0}:  {1} er oppdatert</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24846"/>
+        <location filename="../artisanlib/main.py" line="24855"/>
         <source>Save</source>
         <translation>LAgre</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24855"/>
+        <location filename="../artisanlib/main.py" line="24864"/>
         <source>Select Directory</source>
         <translation>Velg Katalog</translation>
     </message>
@@ -12949,27 +12949,27 @@ Profil savnet [DROPP INN] eller[DROPP UT]</translation>
         <translation type="unfinished">Ingen profil funnet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24911"/>
+        <location filename="../artisanlib/main.py" line="24920"/>
         <source>{0} has been saved. New roast has started</source>
         <translation type="unfinished">{0} er lagret. Ny brenning er startet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="37172"/>
+        <location filename="../artisanlib/main.py" line="37181"/>
         <source>Invalid artisan format</source>
         <translation>Ugyldig artisan format</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24982"/>
+        <location filename="../artisanlib/main.py" line="24991"/>
         <source>{0}  loaded </source>
         <translation>{0} lastet inn </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25440"/>
+        <location filename="../artisanlib/main.py" line="25449"/>
         <source>Background {0} loaded successfully {1}</source>
         <translation type="unfinished">Bakgrunn {0} lastet inn uten feil {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25563"/>
+        <location filename="../artisanlib/main.py" line="25572"/>
         <source>Artisan CSV file loaded successfully</source>
         <translation>Artisan CSV fil lastet inn uten feil</translation>
     </message>
@@ -12985,57 +12985,57 @@ Continue?</source>
         <translation type="obsolete">Forskjellig antall kurver funnet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27907"/>
+        <location filename="../artisanlib/main.py" line="27916"/>
         <source>Save Profile</source>
         <translation>Lagre Profil</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27923"/>
+        <location filename="../artisanlib/main.py" line="27932"/>
         <source>Profile saved</source>
         <translation>Profil lagret</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34692"/>
+        <location filename="../artisanlib/main.py" line="34701"/>
         <source>Cancelled</source>
         <translation>Kanseller</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27968"/>
+        <location filename="../artisanlib/main.py" line="27977"/>
         <source>Readings exported</source>
         <translation>Innlest data eksporert</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27984"/>
+        <location filename="../artisanlib/main.py" line="27993"/>
         <source>Export CSV</source>
         <translation>Eksporter CSV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27989"/>
+        <location filename="../artisanlib/main.py" line="27998"/>
         <source>Export JSON</source>
         <translation>Eksporter JSON</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27994"/>
+        <location filename="../artisanlib/main.py" line="28003"/>
         <source>Export RoastLogger</source>
         <translation>Eksporter RoastLogger</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28239"/>
+        <location filename="../artisanlib/main.py" line="28248"/>
         <source>Readings imported</source>
         <translation>Innlest data importert</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28275"/>
+        <location filename="../artisanlib/main.py" line="28284"/>
         <source>Import CSV</source>
         <translation>Importer CSV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28280"/>
+        <location filename="../artisanlib/main.py" line="28289"/>
         <source>Import JSON</source>
         <translation>Importer JSON</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28285"/>
+        <location filename="../artisanlib/main.py" line="28294"/>
         <source>Import RoastLogger</source>
         <translation>Importer RoastLogger</translation>
     </message>
@@ -13050,12 +13050,12 @@ Continue?</source>
         <translation type="obsolete">Sekunder</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34948"/>
+        <location filename="../artisanlib/main.py" line="34957"/>
         <source>Alarm Config</source>
         <translation>Alarm Konfig</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34948"/>
+        <location filename="../artisanlib/main.py" line="34957"/>
         <source>Alarms are not available for device None</source>
         <translation>Alarmer er ikke tilgjengelig for dette utstyret</translation>
     </message>
@@ -13070,32 +13070,32 @@ Continue?</source>
         <translation type="obsolete">Språk endret. Start program på nytt.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35208"/>
+        <location filename="../artisanlib/main.py" line="35217"/>
         <source>Import K202 CSV</source>
         <translation>Importer K202 CSV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35258"/>
+        <location filename="../artisanlib/main.py" line="35267"/>
         <source>K202 file loaded successfully</source>
         <translation>K202 fil er lastet inn uten feil</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35274"/>
+        <location filename="../artisanlib/main.py" line="35283"/>
         <source>Import K204 CSV</source>
         <translation>Importer K204 CSV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35338"/>
+        <location filename="../artisanlib/main.py" line="35347"/>
         <source>K204 file loaded successfully</source>
         <translation>K204 fil lagret uten feil</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35675"/>
+        <location filename="../artisanlib/main.py" line="35684"/>
         <source>Import HH506RA CSV</source>
         <translation>Importer HH506RA CSV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35724"/>
+        <location filename="../artisanlib/main.py" line="35733"/>
         <source>HH506RA file loaded successfully</source>
         <translation>HH506RA fil lastet inn uten feil</translation>
     </message>
@@ -13105,22 +13105,22 @@ Continue?</source>
         <translation type="obsolete">Lagre graf som PNG</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35861"/>
+        <location filename="../artisanlib/main.py" line="35870"/>
         <source>{0}  size({1},{2}) saved</source>
         <translation type="unfinished">{0} størrelse({1},{2}) lagret</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35872"/>
+        <location filename="../artisanlib/main.py" line="35881"/>
         <source>Save Graph as SVG</source>
         <translation>Lagre graf som SVG</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35890"/>
+        <location filename="../artisanlib/main.py" line="35899"/>
         <source>{0} saved</source>
         <translation type="unfinished">{0} lagret</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36090"/>
+        <location filename="../artisanlib/main.py" line="36099"/>
         <source>Invalid Wheel graph format</source>
         <translation>Ugyldig Hjul graf format</translation>
     </message>
@@ -13245,32 +13245,32 @@ Continue?</source>
         <translation type="obsolete">Symbolske funksjoner</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36463"/>
+        <location filename="../artisanlib/main.py" line="36472"/>
         <source>Save Palettes</source>
         <translation>Lagre Palett</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36467"/>
+        <location filename="../artisanlib/main.py" line="36476"/>
         <source>Palettes saved</source>
         <translation>Palett lagret</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36543"/>
+        <location filename="../artisanlib/main.py" line="36552"/>
         <source>Invalid palettes file format</source>
         <translation>Ugyldig palett fil format</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36540"/>
+        <location filename="../artisanlib/main.py" line="36549"/>
         <source>Palettes loaded</source>
         <translation>Palett lastet inn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36557"/>
+        <location filename="../artisanlib/main.py" line="36566"/>
         <source>Load Palettes</source>
         <translation>Last inn Palett</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36580"/>
+        <location filename="../artisanlib/main.py" line="36589"/>
         <source>Alarms loaded</source>
         <translation>Alarmer lastet inn</translation>
     </message>
@@ -13445,7 +13445,7 @@ Continue?</source>
         <translation type="unfinished">Bakgrunnsprofil ikke funnet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10008"/>
+        <location filename="../artisanlib/main.py" line="10014"/>
         <source>Background does not match number of labels</source>
         <translation>Bakgrunn passer ikke med antall merker</translation>
     </message>
@@ -13460,7 +13460,7 @@ Continue?</source>
         <translation type="obsolete">Ingen profil bakgrunn funnet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25252"/>
+        <location filename="../artisanlib/main.py" line="25261"/>
         <source>Reading background profile...</source>
         <translation type="unfinished">Leser bakgrunnsprofil...</translation>
     </message>
@@ -13685,7 +13685,7 @@ Continue?</source>
         <translation type="unfinished">Hjulgraf lagret</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23963"/>
+        <location filename="../artisanlib/main.py" line="23972"/>
         <source>Load Alarms</source>
         <translation>Last Alarmer</translation>
     </message>
@@ -13936,7 +13936,7 @@ Fortsett?</translation>
         <translation type="unfinished">Ikke mulig å sette ny sv</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35870"/>
+        <location filename="../artisanlib/main.py" line="35879"/>
         <source>Save Graph as PDF</source>
         <translation>Lagre graf som PDF</translation>
     </message>
@@ -13946,7 +13946,7 @@ Fortsett?</translation>
         <translation type="obsolete">En temperatur på 145.2C blir ofte sendt som 1452.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13484"/>
+        <location filename="../artisanlib/main.py" line="13493"/>
         <source>Importing a profile in to Designer will decimate all data except the main [points].
 Continue?</source>
         <translation type="unfinished"></translation>
@@ -13957,27 +13957,27 @@ Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34310"/>
+        <location filename="../artisanlib/main.py" line="34319"/>
         <source>Hottop control turned off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34324"/>
+        <location filename="../artisanlib/main.py" line="34333"/>
         <source>Hottop control turned on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34535"/>
+        <location filename="../artisanlib/main.py" line="34544"/>
         <source>artisan-settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34536"/>
+        <location filename="../artisanlib/main.py" line="34545"/>
         <source>Save Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34540"/>
+        <location filename="../artisanlib/main.py" line="34549"/>
         <source>Settings saved</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13992,132 +13992,132 @@ Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10971"/>
+        <location filename="../artisanlib/main.py" line="10977"/>
         <source>[TP] recorded at {0} BT = {1}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34341"/>
+        <location filename="../artisanlib/main.py" line="34350"/>
         <source>PID Standby ON</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34346"/>
+        <location filename="../artisanlib/main.py" line="34355"/>
         <source>PID Standby OFF</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="37034"/>
+        <location filename="../artisanlib/main.py" line="37043"/>
         <source>Assignment problem</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14991"/>
+        <location filename="../artisanlib/main.py" line="15000"/>
         <source>follow on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14993"/>
+        <location filename="../artisanlib/main.py" line="15002"/>
         <source>follow off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20162"/>
+        <location filename="../artisanlib/main.py" line="20171"/>
         <source>super on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20164"/>
+        <location filename="../artisanlib/main.py" line="20173"/>
         <source>super off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13515"/>
+        <location filename="../artisanlib/main.py" line="13524"/>
         <source>Save Points</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13524"/>
+        <location filename="../artisanlib/main.py" line="13533"/>
         <source>Points saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13535"/>
+        <location filename="../artisanlib/main.py" line="13544"/>
         <source>Load Points</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13547"/>
+        <location filename="../artisanlib/main.py" line="13556"/>
         <source>Points loaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23994"/>
+        <location filename="../artisanlib/main.py" line="24003"/>
         <source>PID Mode: Ramp/Soak</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23996"/>
+        <location filename="../artisanlib/main.py" line="24005"/>
         <source>PID Mode: Background</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23992"/>
+        <location filename="../artisanlib/main.py" line="24001"/>
         <source>PID Mode: Manual</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24010"/>
+        <location filename="../artisanlib/main.py" line="24019"/>
         <source>PID Lookahead: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23945"/>
+        <location filename="../artisanlib/main.py" line="23954"/>
         <source>Load Background</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24827"/>
+        <location filename="../artisanlib/main.py" line="24836"/>
         <source>Open</source>
         <translation type="unfinished">Åpne</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28200"/>
+        <location filename="../artisanlib/main.py" line="28209"/>
         <source>Converting...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10882"/>
+        <location filename="../artisanlib/main.py" line="10888"/>
         <source>Not enough data collected yet. Try again in a few seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24628"/>
+        <location filename="../artisanlib/main.py" line="24637"/>
         <source>Autosave path does not exist. Autosave failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28219"/>
+        <location filename="../artisanlib/main.py" line="28228"/>
         <source>Target file {0} exists. {1} not converted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27999"/>
+        <location filename="../artisanlib/main.py" line="28008"/>
         <source>Export Probat Pilot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35372"/>
+        <location filename="../artisanlib/main.py" line="35381"/>
         <source>Import Probat Recipe</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35533"/>
+        <location filename="../artisanlib/main.py" line="35542"/>
         <source>Probat Pilot data imported successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34594"/>
+        <location filename="../artisanlib/main.py" line="34603"/>
         <source>Settings not found</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14127,7 +14127,7 @@ Continue?</source>
         <translation type="obsolete">Konfigurer for {0}?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19197"/>
+        <location filename="../artisanlib/main.py" line="19206"/>
         <source>Adjust Settings</source>
         <translation>Juster innstillinger</translation>
     </message>
@@ -14142,12 +14142,12 @@ Continue?</source>
         <translation type="obsolete">Maskinnavn eller IP-adresse</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19306"/>
+        <location filename="../artisanlib/main.py" line="19315"/>
         <source>Machine</source>
         <translation>Maskin</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19247"/>
+        <location filename="../artisanlib/main.py" line="19256"/>
         <source>Network name or IP address</source>
         <translation>Nettverksnavn eller IP-adresse</translation>
     </message>
@@ -14172,297 +14172,297 @@ Continue?</source>
         <translation type="obsolete">Tastatur snarveger</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19275"/>
+        <location filename="../artisanlib/main.py" line="19284"/>
         <source>Comm Port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36087"/>
+        <location filename="../artisanlib/main.py" line="36096"/>
         <source>Wheel {0} loaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34635"/>
+        <location filename="../artisanlib/main.py" line="34644"/>
         <source>Load theme {0}?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34636"/>
+        <location filename="../artisanlib/main.py" line="34645"/>
         <source>Adjust Theme Related Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34601"/>
+        <location filename="../artisanlib/main.py" line="34610"/>
         <source>artisan-theme</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34602"/>
+        <location filename="../artisanlib/main.py" line="34611"/>
         <source>Save Theme</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34605"/>
+        <location filename="../artisanlib/main.py" line="34614"/>
         <source>Theme saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19341"/>
+        <location filename="../artisanlib/main.py" line="19350"/>
         <source>Artisan configured for {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32732"/>
+        <location filename="../artisanlib/main.py" line="32741"/>
         <source>Profile missing Dry event</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32747"/>
+        <location filename="../artisanlib/main.py" line="32756"/>
         <source>Profile missing phase events</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19275"/>
+        <location filename="../artisanlib/main.py" line="19284"/>
         <source>Port Configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35155"/>
+        <location filename="../artisanlib/main.py" line="35164"/>
         <source>Switching the language needs a restart. Restart now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35156"/>
+        <location filename="../artisanlib/main.py" line="35165"/>
         <source>Restart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9804"/>
+        <location filename="../artisanlib/main.py" line="9810"/>
         <source>Colors set to Default Theme</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23373"/>
+        <location filename="../artisanlib/main.py" line="23382"/>
         <source>Do you want to reset all settings?&lt;br&gt; Artisan has to be restarted!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19594"/>
+        <location filename="../artisanlib/main.py" line="19603"/>
         <source>Detected a color pair that may be hard to see: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34633"/>
+        <location filename="../artisanlib/main.py" line="34642"/>
         <source>Load Theme</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34659"/>
+        <location filename="../artisanlib/main.py" line="34668"/>
         <source>Theme loaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34642"/>
+        <location filename="../artisanlib/main.py" line="34651"/>
         <source>Loaded theme {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31757"/>
+        <location filename="../artisanlib/main.py" line="31766"/>
         <source>Excel Production Report exported to {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="33089"/>
+        <location filename="../artisanlib/main.py" line="33098"/>
         <source>Excel Ranking Report exported to {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="34327"/>
+        <location filename="../artisanlib/main.py" line="34336"/>
         <source>To control a Hottop you need to activate the super user mode via a right click on the timer LCD first!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27979"/>
+        <location filename="../artisanlib/main.py" line="27988"/>
         <source>Export Excel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25707"/>
+        <location filename="../artisanlib/main.py" line="25716"/>
         <source>The Probat Shop Pilot Software expects files named &lt;Name&gt;_&lt;Index&gt;.xml like in Test_0.xml on import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35544"/>
+        <location filename="../artisanlib/main.py" line="35553"/>
         <source>Import Probat Pilot failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10478"/>
+        <location filename="../artisanlib/main.py" line="10484"/>
         <source>Temperature: {}{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10472"/>
+        <location filename="../artisanlib/main.py" line="10478"/>
         <source>Humidity: {}%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10482"/>
+        <location filename="../artisanlib/main.py" line="10488"/>
         <source>Pressure: {}hPa</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32515"/>
+        <location filename="../artisanlib/main.py" line="32524"/>
         <source>Ranking Report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24896"/>
+        <location filename="../artisanlib/main.py" line="24905"/>
         <source>NEW ROAST canceled: incomplete profile lacking CHARGE and DROP found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24901"/>
+        <location filename="../artisanlib/main.py" line="24910"/>
         <source>NEW ROAST canceled: incomplete profile lacking DROP found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32515"/>
+        <location filename="../artisanlib/main.py" line="32524"/>
         <source>Ranking graphs are only generated up to {0} profiles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24806"/>
+        <location filename="../artisanlib/main.py" line="24815"/>
         <source>Select</source>
         <translation type="unfinished">Velg</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23371"/>
+        <location filename="../artisanlib/main.py" line="23380"/>
         <source>Do you want to reset all settings?&lt;br&gt; ArtisanViewer has to be restarted!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18259"/>
+        <location filename="../artisanlib/main.py" line="18268"/>
         <source>The Artisan Team</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35812"/>
+        <location filename="../artisanlib/main.py" line="35821"/>
         <source>Save Graph as</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18253"/>
+        <location filename="../artisanlib/main.py" line="18262"/>
         <source>Welcome to the ArtisanViewer!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18254"/>
+        <location filename="../artisanlib/main.py" line="18263"/>
         <source>This is a one time message to introduce you to the ArtisanViewer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18255"/>
+        <location filename="../artisanlib/main.py" line="18264"/>
         <source>The ArtisanViewer opens whenever a copy of Artisan is already running.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18256"/>
+        <location filename="../artisanlib/main.py" line="18265"/>
         <source>ArtisanViewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start ArtisanViewer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18257"/>
+        <location filename="../artisanlib/main.py" line="18266"/>
         <source>Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using &apos;Help&gt;Save Settings&apos; and &apos;Help&gt;Load Settings&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18258"/>
+        <location filename="../artisanlib/main.py" line="18267"/>
         <source>Enjoy using ArtisanViewer,</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22542"/>
+        <location filename="../artisanlib/main.py" line="22551"/>
         <source>Alarms on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22545"/>
+        <location filename="../artisanlib/main.py" line="22554"/>
         <source>Alarms off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22554"/>
+        <location filename="../artisanlib/main.py" line="22563"/>
         <source>autoCHARGE on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22557"/>
+        <location filename="../artisanlib/main.py" line="22566"/>
         <source>autoCHARGE off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22566"/>
+        <location filename="../artisanlib/main.py" line="22575"/>
         <source>autoDROP on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22569"/>
+        <location filename="../artisanlib/main.py" line="22578"/>
         <source>autoDROP off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28315"/>
+        <location filename="../artisanlib/main.py" line="28324"/>
         <source>Batch Counter</source>
         <translation type="unfinished">Batchteller</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28318"/>
+        <location filename="../artisanlib/main.py" line="28327"/>
         <source>Load Settings canceled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18241"/>
+        <location filename="../artisanlib/main.py" line="18250"/>
         <source>Welcome to version {0} of Artisan!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18242"/>
+        <location filename="../artisanlib/main.py" line="18251"/>
         <source>This is a one time message to inform you about a change in Artisan.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18243"/>
+        <location filename="../artisanlib/main.py" line="18252"/>
         <source>If you never run older versions of Artisan you can skip this message, the change does not affect you.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18244"/>
+        <location filename="../artisanlib/main.py" line="18253"/>
         <source>Artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start Artisan.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18245"/>
+        <location filename="../artisanlib/main.py" line="18254"/>
         <source>Beginning with release v2.0, settings will no longer be automatically shared at start-up with versions before v2.0.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18246"/>
+        <location filename="../artisanlib/main.py" line="18255"/>
         <source>Do not worry. Since this is the first time you opened this new version Artisan has already loaded your last used settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18247"/>
+        <location filename="../artisanlib/main.py" line="18256"/>
         <source>To share settings between this version and Artisan versions before v2.0 use &apos;Help&gt;Save Settings&apos; and &apos;Help&gt;Load Settings&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18248"/>
+        <location filename="../artisanlib/main.py" line="18257"/>
         <source>Enjoy using Artisan, The Artisan Team</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18249"/>
+        <location filename="../artisanlib/main.py" line="18258"/>
         <source>One time message about loading settings at start-up</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14472,22 +14472,22 @@ Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9266"/>
+        <location filename="../artisanlib/main.py" line="9272"/>
         <source>Load Image File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9272"/>
+        <location filename="../artisanlib/main.py" line="9278"/>
         <source>Loaded watermark image {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15116"/>
+        <location filename="../artisanlib/main.py" line="15125"/>
         <source>Subscription</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36638"/>
+        <location filename="../artisanlib/main.py" line="36647"/>
         <source>Fitting curves...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14497,113 +14497,113 @@ Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22602"/>
+        <location filename="../artisanlib/main.py" line="22611"/>
         <source>PID mode manual</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22605"/>
+        <location filename="../artisanlib/main.py" line="22614"/>
         <source>PID mode Ramp/Soak</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22608"/>
+        <location filename="../artisanlib/main.py" line="22617"/>
         <source>PID mode background</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22618"/>
+        <location filename="../artisanlib/main.py" line="22627"/>
         <source>playback off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22622"/>
+        <location filename="../artisanlib/main.py" line="22631"/>
         <source>playback by time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22626"/>
+        <location filename="../artisanlib/main.py" line="22635"/>
         <source>playback by BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22630"/>
+        <location filename="../artisanlib/main.py" line="22639"/>
         <source>playback by ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19195"/>
+        <location filename="../artisanlib/main.py" line="19204"/>
         <source>Configure for {0}?&lt;br&gt;&lt;br&gt;Your current settings will be overwritten!&lt;br&gt;&lt;br&gt;It is advisable to save your current settings beforehand via menu Help &gt;&gt; Save Settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19219"/>
+        <location filename="../artisanlib/main.py" line="19228"/>
         <source>Ambient</source>
         <translation type="unfinished">Omgivende</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19219"/>
+        <location filename="../artisanlib/main.py" line="19228"/>
         <source>Elevation (MASL)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31609"/>
+        <location filename="../artisanlib/main.py" line="31618"/>
         <source>Statistics Saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36880"/>
+        <location filename="../artisanlib/main.py" line="36889"/>
         <source>Analysis earlier than Curve fit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31589"/>
+        <location filename="../artisanlib/main.py" line="31598"/>
         <source>No statistics found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31604"/>
+        <location filename="../artisanlib/main.py" line="31613"/>
         <source>Save Statistics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36879"/>
+        <location filename="../artisanlib/main.py" line="36888"/>
         <source>Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.
 Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10187"/>
+        <location filename="../artisanlib/main.py" line="10193"/>
         <source>Phidget service discovery started...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35639"/>
+        <location filename="../artisanlib/main.py" line="35648"/>
         <source>Import Cropster XLS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35664"/>
+        <location filename="../artisanlib/main.py" line="35673"/>
         <source>Import IKAWA CSV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13248"/>
+        <location filename="../artisanlib/main.py" line="13257"/>
         <source>Curve fit problem</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35654"/>
+        <location filename="../artisanlib/main.py" line="35663"/>
         <source>Import Giesen CSV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26719"/>
+        <location filename="../artisanlib/main.py" line="26728"/>
         <source>Found a different set of extra devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35623"/>
+        <location filename="../artisanlib/main.py" line="35632"/>
         <source>{0} imported</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14808,7 +14808,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26715"/>
+        <location filename="../artisanlib/main.py" line="26724"/>
         <source>To fully load this profile the extra device configuration needs to be modified.
 
 Overwrite your extra device definitions using the values from the profile?
@@ -14887,27 +14887,27 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24829"/>
+        <location filename="../artisanlib/main.py" line="24838"/>
         <source>URL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35649"/>
+        <location filename="../artisanlib/main.py" line="35658"/>
         <source>Import RoastPATH URL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="37141"/>
+        <location filename="../artisanlib/main.py" line="37150"/>
         <source>Simulator stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="37170"/>
+        <location filename="../artisanlib/main.py" line="37179"/>
         <source>Simulator started @{}x</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35644"/>
+        <location filename="../artisanlib/main.py" line="35653"/>
         <source>Import RoastLog URL</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14947,72 +14947,72 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10919"/>
+        <location filename="../artisanlib/main.py" line="10925"/>
         <source>CHARGE: Scope is not recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11047"/>
+        <location filename="../artisanlib/main.py" line="11053"/>
         <source>DRY END: Scope is not recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11155"/>
+        <location filename="../artisanlib/main.py" line="11161"/>
         <source>FC START: Scope is not recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11253"/>
+        <location filename="../artisanlib/main.py" line="11259"/>
         <source>FC END: Scope is not recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11355"/>
+        <location filename="../artisanlib/main.py" line="11361"/>
         <source>SC START: Scope is not recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11462"/>
+        <location filename="../artisanlib/main.py" line="11468"/>
         <source>SC END: Scope is not recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11606"/>
+        <location filename="../artisanlib/main.py" line="11612"/>
         <source>DROP: Scope is not recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11736"/>
+        <location filename="../artisanlib/main.py" line="11742"/>
         <source>COOL: Scope is not recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25129"/>
+        <location filename="../artisanlib/main.py" line="25138"/>
         <source>No profile data.  ET/BT not recalculated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25131"/>
+        <location filename="../artisanlib/main.py" line="25140"/>
         <source>Problem with the profile data.  ET/BT not recalculated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35669"/>
+        <location filename="../artisanlib/main.py" line="35678"/>
         <source>Import Rubase CSV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="32873"/>
+        <location filename="../artisanlib/main.py" line="32882"/>
         <source>CSV Ranking Report exported to {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35551"/>
+        <location filename="../artisanlib/main.py" line="35560"/>
         <source>Import Aillio RoasTime</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35559"/>
+        <location filename="../artisanlib/main.py" line="35568"/>
         <source>Import Aillio Roast.World URL</source>
         <translation type="unfinished"></translation>
     </message>
@@ -15027,7 +15027,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18260"/>
+        <location filename="../artisanlib/main.py" line="18269"/>
         <source>One time message about ArtisanViewer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -15042,7 +15042,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19292"/>
+        <location filename="../artisanlib/main.py" line="19301"/>
         <source>Machine Capacity (kg)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -15052,22 +15052,22 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19340"/>
+        <location filename="../artisanlib/main.py" line="19349"/>
         <source>Energy loads configured for {0} {1}kg</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="35659"/>
+        <location filename="../artisanlib/main.py" line="35668"/>
         <source>Import Petroncini CSV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28268"/>
+        <location filename="../artisanlib/main.py" line="28277"/>
         <source>Import Artisan URL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18403"/>
+        <location filename="../artisanlib/main.py" line="18412"/>
         <source>Please support Artisan with your donation!</source>
         <translation>Vennligst støtt Artisan med donasjonen din!</translation>
     </message>
@@ -15170,7 +15170,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation>Oppdaterte data mottatt fra artisan.plus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15101"/>
+        <location filename="../artisanlib/main.py" line="15110"/>
         <source>Paid until</source>
         <translation>Betalt til</translation>
     </message>
@@ -15235,27 +15235,27 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation>artisan.plus koblet fra</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15110"/>
+        <location filename="../artisanlib/main.py" line="15119"/>
         <source>Please visit our {0}shop{1} to extend your subscription</source>
         <translation>Gå til {0} butikken {1} for å utvide abonnementet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15097"/>
+        <location filename="../artisanlib/main.py" line="15106"/>
         <source>1 day left</source>
         <translation>1 dag igjen</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15099"/>
+        <location filename="../artisanlib/main.py" line="15108"/>
         <source>{} days left</source>
         <translation>{} dager igjen</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15081"/>
+        <location filename="../artisanlib/main.py" line="15090"/>
         <source>debug logging ON</source>
         <translation>feilsøkingslogging PÅ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15081"/>
+        <location filename="../artisanlib/main.py" line="15090"/>
         <source>debug logging OFF</source>
         <translation>feilsøkingslogging AV</translation>
     </message>
@@ -15347,27 +15347,27 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="obsolete">START 00:00</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11037"/>
+        <location filename="../artisanlib/main.py" line="11043"/>
         <source>DE {0}</source>
         <translation type="unfinished">TS {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11144"/>
+        <location filename="../artisanlib/main.py" line="11150"/>
         <source>FCs {0}</source>
         <translation type="unfinished">1Ks {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11246"/>
+        <location filename="../artisanlib/main.py" line="11252"/>
         <source>FCe {0}</source>
         <translation type="unfinished">1Ke {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11345"/>
+        <location filename="../artisanlib/main.py" line="11351"/>
         <source>SCs {0}</source>
         <translation type="unfinished">2Ks {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11455"/>
+        <location filename="../artisanlib/main.py" line="11461"/>
         <source>SCe {0}</source>
         <translation type="unfinished">2Ke {0}</translation>
     </message>
@@ -15377,22 +15377,22 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="obsolete">Slutt {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11728"/>
+        <location filename="../artisanlib/main.py" line="11734"/>
         <source>CE {0}</source>
         <translation type="unfinished">KS {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10893"/>
+        <location filename="../artisanlib/main.py" line="10899"/>
         <source>CHARGE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10963"/>
+        <location filename="../artisanlib/main.py" line="10969"/>
         <source>TP {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11572"/>
+        <location filename="../artisanlib/main.py" line="11578"/>
         <source>DROP {0}</source>
         <translation type="unfinished"></translation>
     </message>
@@ -16747,32 +16747,32 @@ Skarphet</translation>
 <context>
     <name>Toolbar</name>
     <message>
-        <location filename="../artisanlib/main.py" line="14847"/>
+        <location filename="../artisanlib/main.py" line="14856"/>
         <source>Home</source>
         <translation>Hjem</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14847"/>
+        <location filename="../artisanlib/main.py" line="14856"/>
         <source>Back</source>
         <translation>Tilbake</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14847"/>
+        <location filename="../artisanlib/main.py" line="14856"/>
         <source>Forward</source>
         <translation>Framover</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14847"/>
+        <location filename="../artisanlib/main.py" line="14856"/>
         <source>Pan</source>
         <translation>Panne</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14847"/>
+        <location filename="../artisanlib/main.py" line="14856"/>
         <source>Zoom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14874"/>
+        <location filename="../artisanlib/main.py" line="14883"/>
         <source>Lines</source>
         <translation>Linjer</translation>
     </message>
@@ -16780,22 +16780,22 @@ Skarphet</translation>
 <context>
     <name>Tooltip</name>
     <message>
-        <location filename="../artisanlib/main.py" line="10317"/>
+        <location filename="../artisanlib/main.py" line="10323"/>
         <source>Stop monitoring</source>
         <translation>Stop overvåking</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17314"/>
+        <location filename="../artisanlib/main.py" line="17323"/>
         <source>Start monitoring</source>
         <translation>Start overvåking</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10718"/>
+        <location filename="../artisanlib/main.py" line="10724"/>
         <source>Stop recording</source>
         <translation>Stop opptak</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17328"/>
+        <location filename="../artisanlib/main.py" line="17337"/>
         <source>Start recording</source>
         <translation>Start opptak</translation>
     </message>
@@ -16820,7 +16820,7 @@ Skarphet</translation>
         <translation type="obsolete">Markerer slutten av Andre Krakk (2Ke)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17382"/>
+        <location filename="../artisanlib/main.py" line="17391"/>
         <source>Reset</source>
         <translation>Tilbakestill</translation>
     </message>
@@ -16840,37 +16840,37 @@ Skarphet</translation>
         <translation type="obsolete">Markerer en Hendelse</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17431"/>
+        <location filename="../artisanlib/main.py" line="17440"/>
         <source>Increases the current SV value by 5</source>
         <translation>Øker gjeldende SV verdi med 5</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17440"/>
+        <location filename="../artisanlib/main.py" line="17449"/>
         <source>Increases the current SV value by 10</source>
         <translation>Øker gjeldende SV verdi med 10</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17449"/>
+        <location filename="../artisanlib/main.py" line="17458"/>
         <source>Increases the current SV value by 20</source>
         <translation>Øker gjeldende SV verdi med 20</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17458"/>
+        <location filename="../artisanlib/main.py" line="17467"/>
         <source>Decreases the current SV value by 20</source>
         <translation>Senker gjeldende SV verdi med 20</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17467"/>
+        <location filename="../artisanlib/main.py" line="17476"/>
         <source>Decreases the current SV value by 10</source>
         <translation>Senker gjeldende SV verdi med 10</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17476"/>
+        <location filename="../artisanlib/main.py" line="17485"/>
         <source>Decreases the current SV value by 5</source>
         <translation>Senker gjeldende SV verdi med 5</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17487"/>
+        <location filename="../artisanlib/main.py" line="17496"/>
         <source>Turns ON/OFF the HUD</source>
         <translation>Slår HUD PÅ/AV</translation>
     </message>
@@ -16885,87 +16885,87 @@ Skarphet</translation>
         <translation type="obsolete">Markerer slutten på Kjøle fasen (KJØLING SLUTT)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17571"/>
+        <location filename="../artisanlib/main.py" line="17580"/>
         <source>Timer</source>
         <translation>Tidtaker</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17572"/>
+        <location filename="../artisanlib/main.py" line="17581"/>
         <source>ET Temperature</source>
         <translation>MT Temperatur</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17573"/>
+        <location filename="../artisanlib/main.py" line="17582"/>
         <source>BT Temperature</source>
         <translation>BT Temperatur</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17574"/>
+        <location filename="../artisanlib/main.py" line="17583"/>
         <source>ET/time (degrees/min)</source>
         <translation>MT/tid (grader/min)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17575"/>
+        <location filename="../artisanlib/main.py" line="17584"/>
         <source>BT/time (degrees/min)</source>
         <translation>BT/tid (grader/min)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17576"/>
+        <location filename="../artisanlib/main.py" line="17585"/>
         <source>Value of SV in PID</source>
         <translation>Verdi av SV i PID</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17577"/>
+        <location filename="../artisanlib/main.py" line="17586"/>
         <source>PID power %</source>
         <translation>PID effekt %</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17676"/>
+        <location filename="../artisanlib/main.py" line="17685"/>
         <source>Number of events found</source>
         <translation>Antall hendelser funnet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17686"/>
+        <location filename="../artisanlib/main.py" line="17695"/>
         <source>Type of event</source>
         <translation>Type hendelse</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17693"/>
+        <location filename="../artisanlib/main.py" line="17702"/>
         <source>Value of event</source>
         <translation>Verdi på hendelse</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17705"/>
+        <location filename="../artisanlib/main.py" line="17714"/>
         <source>Updates the event</source>
         <translation>Oppdaterer hendelse</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36263"/>
+        <location filename="../artisanlib/main.py" line="36272"/>
         <source>&lt;b&gt;Label&lt;/b&gt;= </source>
         <translation>&lt;b&gt;Betegnelse&lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36264"/>
+        <location filename="../artisanlib/main.py" line="36273"/>
         <source>&lt;b&gt;Description &lt;/b&gt;= </source>
         <translation>&lt;b&gt;Beskrivelse &lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36265"/>
+        <location filename="../artisanlib/main.py" line="36274"/>
         <source>&lt;b&gt;Type &lt;/b&gt;= </source>
         <translation>&lt;b&gt;Type &lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36267"/>
+        <location filename="../artisanlib/main.py" line="36276"/>
         <source>&lt;b&gt;Value &lt;/b&gt;= </source>
         <translation>&lt;b&gt;Verdi &lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36269"/>
+        <location filename="../artisanlib/main.py" line="36278"/>
         <source>&lt;b&gt;Documentation &lt;/b&gt;= </source>
         <translation>&lt;b&gt;Dokumentasjon &lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="36270"/>
+        <location filename="../artisanlib/main.py" line="36279"/>
         <source>&lt;b&gt;Button# &lt;/b&gt;= </source>
         <translation>&lt;b&gt;Knapp# &lt;/b&gt;= </translation>
     </message>
@@ -17139,131 +17139,131 @@ nærmeste: y verdi til nærmeste punkt</translation>
         <translation type="unfinished">Gjenopprett alle paletter fra tekst</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17345"/>
+        <location filename="../artisanlib/main.py" line="17354"/>
         <source>First Crack Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17353"/>
+        <location filename="../artisanlib/main.py" line="17362"/>
         <source>First Crack End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17361"/>
+        <location filename="../artisanlib/main.py" line="17370"/>
         <source>Second Crack Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17369"/>
+        <location filename="../artisanlib/main.py" line="17378"/>
         <source>Second Crack End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17390"/>
+        <location filename="../artisanlib/main.py" line="17399"/>
         <source>Charge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17399"/>
+        <location filename="../artisanlib/main.py" line="17408"/>
         <source>Drop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17421"/>
+        <location filename="../artisanlib/main.py" line="17430"/>
         <source>Event</source>
         <translation type="unfinished">Hendelse</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17500"/>
+        <location filename="../artisanlib/main.py" line="17509"/>
         <source>Dry End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17509"/>
+        <location filename="../artisanlib/main.py" line="17518"/>
         <source>Cool End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14847"/>
+        <location filename="../artisanlib/main.py" line="14856"/>
         <source>Reset original view</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14847"/>
+        <location filename="../artisanlib/main.py" line="14856"/>
         <source>Back to  previous view</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14847"/>
+        <location filename="../artisanlib/main.py" line="14856"/>
         <source>Forward to next view</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14847"/>
+        <location filename="../artisanlib/main.py" line="14856"/>
         <source>Pan axes with left mouse, zoom with right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14847"/>
+        <location filename="../artisanlib/main.py" line="14856"/>
         <source>Zoom to rectangle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18006"/>
+        <location filename="../artisanlib/main.py" line="18015"/>
         <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21003"/>
+        <location filename="../artisanlib/main.py" line="21012"/>
         <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in TIME MODE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21021"/>
+        <location filename="../artisanlib/main.py" line="21030"/>
         <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in PERCENTAGE MODE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21035"/>
+        <location filename="../artisanlib/main.py" line="21044"/>
         <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in TEMP MODE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18753"/>
+        <location filename="../artisanlib/main.py" line="18762"/>
         <source>Disconnect artisan.plus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18756"/>
+        <location filename="../artisanlib/main.py" line="18765"/>
         <source>Connect artisan.plus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="20966"/>
+        <location filename="../artisanlib/main.py" line="20975"/>
         <source>Phase LCDs
 Currently in ALL FINISHING MODE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18726"/>
+        <location filename="../artisanlib/main.py" line="18735"/>
         <source>Syncing with artisan.plus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18733"/>
+        <location filename="../artisanlib/main.py" line="18742"/>
         <source>Upload to artisan.plus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14847"/>
+        <location filename="../artisanlib/main.py" line="14856"/>
         <source>Connect to plus service</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14847"/>
+        <location filename="../artisanlib/main.py" line="14856"/>
         <source>Subscription</source>
         <translation type="unfinished"></translation>
     </message>
@@ -17518,7 +17518,7 @@ has to be reduced by 4 times.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14876"/>
+        <location filename="../artisanlib/main.py" line="14885"/>
         <source>Line styles</source>
         <translation>Linjestiler</translation>
     </message>

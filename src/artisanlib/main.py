@@ -8003,7 +8003,10 @@ class tgraphcanvas(FigureCanvas):
                                         Betype = self.Betypesf(self.backgroundEtypes[i])
                                         firstletter = str(Betype[0])
                                         secondletter = self.eventsvaluesShort(self.backgroundEvalues[i])
-                                        thirdletter = aw.eventsliderunits[self.backgroundEtypes[i]] # postfix
+                                        if aw.eventslidertemp[self.backgroundEtypes[i]]:
+                                            thirdletter = self.mode # postfix
+                                        else:
+                                            thirdletter = aw.eventsliderunits[self.backgroundEtypes[i]] # postfix
                                     else:
                                         firstletter = self.backgroundEStrings[i].strip()[:aw.qmc.eventslabelschars]
                                         if firstletter == "":
@@ -8548,7 +8551,10 @@ class tgraphcanvas(FigureCanvas):
                                     etype = self.etypesf(self.specialeventstype[i])
                                     firstletter = str(etype[0])
                                     secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
-                                    thirdletter = aw.eventsliderunits[self.specialeventstype[i]] # postfix
+                                    if aw.eventslidertemp[self.specialeventstype[i]]:
+                                        thirdletter = self.mode # postfix
+                                    else:
+                                        thirdletter = aw.eventsliderunits[self.specialeventstype[i]] # postfix
                                 else:
                                     firstletter = self.specialeventsStrings[i].strip()[:aw.qmc.eventslabelschars]
                                     if firstletter == "":
@@ -10224,8 +10230,8 @@ class tgraphcanvas(FigureCanvas):
         try:
             PhidgetLog.enable(PhidgetLogLevel.PHIDGET_LOG_DEBUG, self.device_log_file)
             PhidgetLog.enableRotating()
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception: # pylint: disable=broad-except
+            pass # logging might already be enabled
         try:
             if self.phidgetRemoteFlag:
                 try:
@@ -11977,7 +11983,10 @@ class tgraphcanvas(FigureCanvas):
                             if etype < 4  and (not aw.qmc.renderEventsDescr or len(self.specialeventsStrings[-1].strip()) == 0):
                                 firstletter = self.etypesf(self.specialeventstype[-1])[0]
                                 secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
-                                thirdletter = aw.eventsliderunits[self.specialeventstype[-1]] # postfix
+                                if aw.eventslidertemp[self.specialeventstype[-1]]:
+                                    thirdletter = self.mode # postfix
+                                else:
+                                    thirdletter = aw.eventsliderunits[self.specialeventstype[-1]] # postfix
                             else:
                                 firstletter = self.specialeventsStrings[-1].strip()[:aw.qmc.eventslabelschars]
                                 if firstletter == "":
@@ -29877,8 +29886,8 @@ class ApplicationWindow(QMainWindow):
                     i = list(map(lambda x:x.lower(),available)).index(toString(settings.value("appearance")))
                     app.setStyle(available[i])
                     aw.appearance = available[i].lower()
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
+                except Exception: # pylint: disable=broad-except
+                    pass # appearance not in list of availble once on this platform
 
             # set dpi
             if filename is not None and settings.contains("dpi"):

@@ -146,7 +146,7 @@ eventsliderBernoulli=0, 0, 0, 0
 eventslidercoarse=0, 0, 0, 1
 eventslidersflags=1, 1, 1
 eventslidertemp=0, 0, 1, 0
-eventsliderunits=, , , 
+eventsliderunits=Pa, Hz, , %
 slideractions=12, 12, 12, 12
 slidercommands="setDBint(2,16,{})", "setDBint(2,18,{})", "setDBint(2,10,{})", "setDBint(2,14,{})"
 sliderfactors=1, 1, 1, 0.1
@@ -157,3 +157,4 @@ slidervisibilities=1, 1, 1, 1
 
 [events]
 etypes=Air, Drum, SP, Burner, --
+renderEventsDescr=false
