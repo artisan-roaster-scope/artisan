@@ -62,6 +62,9 @@ worker_thread = None
 
 
 class Concur(threading.Thread):
+
+    __slots__ = [ 'daemon', 'paused', 'state' ]
+    
     def __init__(self):
         threading.Thread.__init__(self)
         self.daemon = (

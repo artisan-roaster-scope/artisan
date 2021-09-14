@@ -60,6 +60,10 @@ from typing import Optional, Final
 _log: Final = logging.getLogger(__name__)
 
 class Login(ArtisanDialog):
+
+    __slots__ = [ 'login', 'passwd', 'remember', 'linkRegister', 'linkResetPassword', 'textPass', 'textName', 'rememberCheckbox' ]
+        
+    
     def __init__(
         self,
         parent=None,

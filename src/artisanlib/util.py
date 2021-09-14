@@ -349,8 +349,10 @@ def getLoggers():
     return [logging.getLogger(name) for name in logging.root.manager.loggerDict if ("." not in name)]  # @UndefinedVariable pylint: disable=no-member
 
 def debugLogLevelActive() -> bool:
-    loggers = getLoggers()
-    return loggers and isinstance(loggers,list) and loggers[0].isEnabledFor(logging.DEBUG)
+    try:
+        return logging.getLogger("artisanlib").isEnabledFor(logging.DEBUG)
+    except Exception: # pylint: disable=broad-except
+        return False
     
 def setDebugLogLevel(state: bool) -> None:
     if state:

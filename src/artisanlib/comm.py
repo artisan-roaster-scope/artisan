@@ -28,6 +28,8 @@ import subprocess
 import threading
 import platform
 import wquantiles
+import logging
+from typing import Final
 
 from artisanlib.util import cmd2str, RoRfromCtoF, appFrozen, fromCtoF, fromFtoC, hex2int, str2cmd, toFloat
 
@@ -62,6 +64,10 @@ from Phidget22.Devices.FrequencyCounter import FrequencyCounter # @UnusedWildImp
 from Phidget22.Devices.DCMotor import DCMotor # @UnusedWildImport
 
 from yoctopuce.yocto_api import YAPI, YRefParam
+
+
+_log: Final = logging.getLogger(__name__)
+
 
 # maps Artisan thermocouple types (order as listed in the menu; see phidget1048_types) to Phidget thermocouple types
 # 1 => k-type (default)
@@ -223,7 +229,7 @@ class serialport():
         'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','YOCTOservos','YOCTOpwmOutputs','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
         'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
-        'externaloutprogram','externaloutprogramFlag']
+        'externaloutprogram','externaloutprogramFlag','PhidgetHUMtemp','PhidgetHUMhum','PhidgetPREpre','TMP1000temp']
 
     def __init__(self, aw = None):
     
@@ -284,6 +290,11 @@ class serialport():
         self.PhidgetBinaryOut = {} # a dict associating binary out serials with lists of channels
         #store the Phidget DCMotor objects
         self.PhidgetDCMotor = {} # a dict associating serials with lists of channels
+        # Phidget Ambient Sensor Channels
+        self.PhidgetHUMtemp = None
+        self.PhidgetHUMhum = None
+        self.PhidgetPREpre = None
+        self.TMP1000temp = None
         #Yoctopuce channels
         self.YOCTOlibImported = False # ensure that the YOCTOlib is only imported once
         self.YOCTOsensor = None
@@ -428,9 +439,9 @@ class serialport():
                                    self.callprogram_910,      #89
                                    self.slider_01,            #90
                                    self.slider_23,            #91
-                                   self.probat_middleware,    #92
-                                   self.probat_middleware_burner_drum,  #93
-                                   self.probat_middleware_fan_pressure, #94
+                                   self.DUMMY,                #92 # was: self.probat_middleware
+                                   self.DUMMY,                #93 # was: self.probat_middleware_burner_drum
+                                   self.DUMMY,                #94 # was: self.probat_middleware_fan_pressure
                                    self.PHIDGET_DAQ1400_CURRENT,   #95
                                    self.PHIDGET_DAQ1400_FREQUENCY, #96 
                                    self.PHIDGET_DAQ1400_DIGITAL,   #97 
@@ -1273,60 +1284,60 @@ class serialport():
         t = self.aw.qmc.extraArduinoT6
         return tx,t,t
 
-    def probat_middleware(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
-        t1 = -1
-        t2 = -1
-        self.aw.qmc.ProbatMiddleware_pressure = -1
-        self.aw.qmc.ProbatMiddleware_burner = -1
-        self.aw.qmc.ProbatMiddleware_drum = -1
-        self.aw.qmc.ProbatMiddleware_fan = -1
-        if self.aw.qmc.probatManager is None:
-            from artisanlib.probat import ProbatMiddleware
-            self.aw.qmc.probatManager = ProbatMiddleware()
-        if self.aw.qmc.probatManager is not None:
-            connected = self.aw.qmc.probatManager.isConnected()
-            if not connected:
-                connected = self.aw.qmc.probatManager.connect()
-                if connected:
-                    name = self.aw.qmc.probatManager.getRoasterName()
-                    if name is None:
-                        name = ""
-                    self.aw.sendmessage(QApplication.translate("Message","Probat Middleware roaster {} connected".format(name),None))
-            if connected:
-                url = self.aw.qmc.probatManager.getRoasterURL()
-                if url is not None:
-                    try:
-                        data = self.aw.qmc.probatManager.getJSON(url)
-                        roastData = data["roastingProcess"]
-                        if "productTemperature" in roastData:
-                            t1 = roastData["productTemperature"]
-                        if "exhaustTemperature" in roastData:
-                            t2 = roastData["exhaustTemperature"]
-                        if "underPressure" in roastData:
-                            self.aw.qmc.ProbatMiddleware_pressure = roastData["underPressure"]
-                        if "burnerCapacity" in roastData:
-                            self.aw.qmc.ProbatMiddleware_burner = roastData["burnerCapacity"]
-                        if "drumSpeed" in roastData:
-                            self.aw.qmc.ProbatMiddleware_drum = roastData["drumSpeed"]
-                        if "exhaustFanSpeed" in roastData:
-                            self.aw.qmc.ProbatMiddleware_fan = roastData["exhaustFanSpeed"]
-                    except Exception: # pylint: disable=broad-except
-                        self.aw.qmc.probatManager.disconnect()
-                        self.aw.sendmessage(QApplication.translate("Message","Probat Middleware disconnected",None))
-        return tx,t2,t1
-
-    def probat_middleware_burner_drum(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
-        t1 = self.aw.qmc.ProbatMiddleware_burner
-        t2 = self.aw.qmc.ProbatMiddleware_drum
-        return tx,t2,t1
-
-    def probat_middleware_fan_pressure(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
-        t1 = self.aw.qmc.ProbatMiddleware_fan
-        t2 = self.aw.qmc.ProbatMiddleware_pressure
-        return tx,t2,t1
+#    def probat_middleware(self):
+#        tx = self.aw.qmc.timeclock.elapsed()/1000.
+#        t1 = -1
+#        t2 = -1
+#        self.aw.qmc.ProbatMiddleware_pressure = -1
+#        self.aw.qmc.ProbatMiddleware_burner = -1
+#        self.aw.qmc.ProbatMiddleware_drum = -1
+#        self.aw.qmc.ProbatMiddleware_fan = -1
+#        if self.aw.qmc.probatManager is None:
+#            from artisanlib.probat import ProbatMiddleware
+#            self.aw.qmc.probatManager = ProbatMiddleware()
+#        if self.aw.qmc.probatManager is not None:
+#            connected = self.aw.qmc.probatManager.isConnected()
+#            if not connected:
+#                connected = self.aw.qmc.probatManager.connect()
+#                if connected:
+#                    name = self.aw.qmc.probatManager.getRoasterName()
+#                    if name is None:
+#                        name = ""
+#                    self.aw.sendmessage(QApplication.translate("Message","Probat Middleware roaster {} connected".format(name),None))
+#            if connected:
+#                url = self.aw.qmc.probatManager.getRoasterURL()
+#                if url is not None:
+#                    try:
+#                        data = self.aw.qmc.probatManager.getJSON(url)
+#                        roastData = data["roastingProcess"]
+#                        if "productTemperature" in roastData:
+#                            t1 = roastData["productTemperature"]
+#                        if "exhaustTemperature" in roastData:
+#                            t2 = roastData["exhaustTemperature"]
+#                        if "underPressure" in roastData:
+#                            self.aw.qmc.ProbatMiddleware_pressure = roastData["underPressure"]
+#                        if "burnerCapacity" in roastData:
+#                            self.aw.qmc.ProbatMiddleware_burner = roastData["burnerCapacity"]
+#                        if "drumSpeed" in roastData:
+#                            self.aw.qmc.ProbatMiddleware_drum = roastData["drumSpeed"]
+#                        if "exhaustFanSpeed" in roastData:
+#                            self.aw.qmc.ProbatMiddleware_fan = roastData["exhaustFanSpeed"]
+#                    except Exception: # pylint: disable=broad-except
+#                        self.aw.qmc.probatManager.disconnect()
+#                        self.aw.sendmessage(QApplication.translate("Message","Probat Middleware disconnected",None))
+#        return tx,t2,t1
+#
+#    def probat_middleware_burner_drum(self):
+#        tx = self.aw.qmc.timeclock.elapsed()/1000.
+#        t1 = self.aw.qmc.ProbatMiddleware_burner
+#        t2 = self.aw.qmc.ProbatMiddleware_drum
+#        return tx,t2,t1
+#
+#    def probat_middleware_fan_pressure(self):
+#        tx = self.aw.qmc.timeclock.elapsed()/1000.
+#        t1 = self.aw.qmc.ProbatMiddleware_fan
+#        t2 = self.aw.qmc.ProbatMiddleware_pressure
+#        return tx,t2,t1
     
     def WSextractData(self,channel,data):
         if self.aw.ws.channel_nodes[channel] != "" and self.aw.ws.channel_nodes[channel] in data:
@@ -1555,108 +1566,196 @@ class serialport():
         except Exception: # pylint: disable=broad-except
             return None
 
-    # connects to a Phidgets HUM1000, returns current temperature value and disconnects
-    def PhidgetHUM1000temperature(self):
-        try:
-            # Temperature
-            tempSensor = PhidgetTemperatureSensor()
-            ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',DeviceID.PHIDID_HUM1000,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
-            if ser is None:
-                ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',DeviceID.PHIDID_HUM1001,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
-            if ser:
-                tempSensor.setDeviceSerialNumber(ser)
-                tempSensor.setHubPort(port)   #explicitly set the port to where the HUM is attached
-                if self.aw.qmc.phidgetRemoteFlag:
-                    self.addPhidgetServer() 
-                if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
-                    tempSensor.setIsRemote(True)
-                    tempSensor.setIsLocal(False)
-                tempSensor.openWaitForAttachment(1500)
-                if tempSensor.getAttached():
-                    libtime.sleep(0.3)
-                    res = tempSensor.getTemperature()
-                    tempSensor.close()
-                    return res
-                return None
-            return None
-        except Exception: # pylint: disable=broad-except
-            return None
-
-    # connects to a Phidgets TMP1000, returns current temperature value and disconnects
+    # connects to a Phidgets TMP1000, returns current temperature value and stays connected
+    # NOTE: disconnected devices still physically attached can introduce signals that are not filtered by the HUB and thus
+    # can disturb and even crash the HUB. Thus we keep the device channel attached as long as possible
     def PhidgetTMP1000temperature(self):
         try:
             # Temperature
-            tempSensor = PhidgetTemperatureSensor()
-            ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',DeviceID.PHIDID_TMP1000,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
-            if ser:
-                tempSensor.setDeviceSerialNumber(ser)
-                tempSensor.setHubPort(port)   #explicitly set the port to where the HUM is attached
-                if self.aw.qmc.phidgetRemoteFlag:
-                    self.addPhidgetServer() 
-                if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
-                    tempSensor.setIsRemote(True)
-                    tempSensor.setIsLocal(False)
-                tempSensor.openWaitForAttachment(1500)
-                if tempSensor.getAttached():
-                    libtime.sleep(0.3)
-                    res = tempSensor.getTemperature()
-                    tempSensor.close()
-                    return res
-                return None
+            if self.aw.ser.TMP1000temp is None:
+                self.aw.ser.TMP1000temp = PhidgetTemperatureSensor()
+            if not self.aw.ser.TMP1000temp.getAttached():
+                ser, port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget(
+                    'PhidgetTemperatureSensor',
+                    DeviceID.PHIDID_TMP1000,
+                    remote=self.aw.qmc.phidgetRemoteFlag,
+                    remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
+                if ser:
+                    self.aw.ser.TMP1000temp.setDeviceSerialNumber(ser)
+                    self.aw.ser.TMP1000temp.setHubPort(port)   #explicitly set the port to where the HUM is attached
+                    if self.aw.qmc.phidgetRemoteFlag:
+                        self.addPhidgetServer() 
+                    if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
+                        self.aw.ser.TMP1000temp.setIsRemote(True)
+                        self.aw.ser.TMP1000temp.setIsLocal(False)
+                    self.aw.ser.TMP1000temp.openWaitForAttachment(1500)
+                    if self.aw.ser.TMP1000temp.getAttached():
+                        _log.debug("Phidget TMP1000 temperature channel attached")
+                        libtime.sleep(0.3)
+                        # note that we do not register the attach in the aw.qmc.phidgetManager as we only support one of those devices
+                    else:
+                        _log.debug("Phidget TEMP1000 temperature could not be attached")
+            if self.aw.ser.TMP1000temp is not None and self.aw.ser.TMP1000temp.getAttached():
+                res = self.aw.ser.TMP1000temp.getTemperature()
+                _log.debug("Phidget TMP1000 temperature received: %s", res)
+                return res
             return None
-        except Exception: # pylint: disable=broad-except
-            return None
-            
-    # connects to a Phidgets HUM1000, returns current humidity value and disconnects
-    def PhidgetHUM1000humidity(self):
-        try:
-            # Humidity
-            humSensor = PhidgetHumiditySensor()
-            ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetHumiditySensor',DeviceID.PHIDID_HUM1000,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
-            if ser is None:
-                ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetHumiditySensor',DeviceID.PHIDID_HUM1001,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
-            if ser:
-                humSensor.setDeviceSerialNumber(ser)
-                humSensor.setHubPort(port)   #explicitly set the port to where the HUM is attached
-                if self.aw.qmc.phidgetRemoteFlag:
-                    self.addPhidgetServer() 
-                if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
-                    humSensor.setIsRemote(True)
-                    humSensor.setIsLocal(False)
-                humSensor.openWaitForAttachment(1500)
-                if humSensor.getAttached():
-                    libtime.sleep(0.3)
-                    res = humSensor.getHumidity()
-                    humSensor.close()
-                    return res
-                return None
-            return None
-        except Exception: # pylint: disable=broad-except
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+            if self.aw.ser.TMP1000temp is not None:
+                try:
+                    self.aw.ser.TMP1000temp.close()
+                except Exception: # pylint: disable=broad-except
+                    pass
+                self.aw.ser.TMP1000temp = None
             return None
 
-    # connects to a Phidgets PRE1000, returns current pressure value and disconnects
+    # connects to a Phidgets HUM1000 temp channel, returns current temperature value and stays connected
+    # NOTE: disconnected devices still physically attached can introduce signals that are not filtered by the HUB and thus
+    # can disturb and even crash the HUB. Thus we keep the device channel attached as long as possible
+    def PhidgetHUM1000temperature(self):
+        try:
+            # HUM Temperature
+            if self.aw.ser.PhidgetHUMtemp is None:
+                self.aw.ser.PhidgetHUMtemp = PhidgetTemperatureSensor()
+            if not self.aw.ser.PhidgetHUMtemp.getAttached():
+                ser, port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget(
+                    'PhidgetTemperatureSensor',
+                    DeviceID.PHIDID_HUM1000,
+                    remote=self.aw.qmc.phidgetRemoteFlag,
+                    remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
+                if ser is None:
+                    ser, port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget(
+                        'PhidgetTemperatureSensor',
+                        DeviceID.PHIDID_HUM1001,
+                        remote=self.aw.qmc.phidgetRemoteFlag,
+                        remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
+                if ser:
+                    self.aw.ser.PhidgetHUMtemp.setDeviceSerialNumber(ser)
+                    self.aw.ser.PhidgetHUMtemp.setHubPort(port)   #explicitly set the port to where the HUM is attached
+                    if self.aw.qmc.phidgetRemoteFlag:
+                        self.addPhidgetServer() 
+                    if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
+                        self.aw.ser.PhidgetHUMtemp.setIsRemote(True)
+                        self.aw.ser.PhidgetHUMtemp.setIsLocal(False)
+                    self.aw.ser.PhidgetHUMtemp.openWaitForAttachment(1500)
+                    if self.aw.ser.PhidgetHUMtemp.getAttached():
+                        _log.debug("Phidget HUM100x temperature channel attached")
+                        libtime.sleep(0.3)
+                        # note that we do not register the attach in the aw.qmc.phidgetManager as we only support one of those devices
+                    else:
+                        _log.debug("Phidget HUM100x temperature could not be attached")
+            if self.aw.ser.PhidgetHUMtemp is not None and self.aw.ser.PhidgetHUMtemp.getAttached():
+                res = self.aw.ser.PhidgetHUMtemp.getTemperature()
+                _log.debug("Phidget HUM100x temperature received: %s", res)
+                # we don't close the HUM here, but in closePhidgetAMBIENTs
+                return res
+            return None
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+            if self.aw.ser.PhidgetHUMhum is not None:
+                try:
+                    self.aw.ser.PhidgetHUMhum.close()
+                except Exception: # pylint: disable=broad-except
+                    pass
+                self.aw.ser.PhidgetHUMhum = None
+            return None
+            
+    # connects to a Phidgets HUM1000 hum channel, returns current humidity value and stays connected
+    # NOTE: disconnected devices still physically attached can introduce signals that are not filtered by the HUB and thus
+    # can disturb and even crash the HUB. Thus we keep the device channel attached as long as possible
+    def PhidgetHUM1000humidity(self):
+        try:
+            # HUM Humidity
+            if self.aw.ser.PhidgetHUMhum is None:
+                self.aw.ser.PhidgetHUMhum = PhidgetHumiditySensor()
+            if not self.aw.ser.PhidgetHUMhum.getAttached():
+                ser, port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget(
+                    'PhidgetTemperatureSensor',
+                    DeviceID.PHIDID_HUM1000,
+                    remote=self.aw.qmc.phidgetRemoteFlag,
+                    remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
+                if ser is None:
+                    ser, port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget(
+                        'PhidgetTemperatureSensor',
+                        DeviceID.PHIDID_HUM1001,
+                        remote=self.aw.qmc.phidgetRemoteFlag,
+                        remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
+                if ser:
+                    self.aw.ser.PhidgetHUMhum.setDeviceSerialNumber(ser)
+                    self.aw.ser.PhidgetHUMhum.setHubPort(port)   #explicitly set the port to where the HUM is attached
+                    if self.aw.qmc.phidgetRemoteFlag:
+                        self.addPhidgetServer() 
+                    if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
+                        self.aw.ser.PhidgetHUMhum.setIsRemote(True)
+                        self.aw.ser.PhidgetHUMhum.setIsLocal(False)
+                    self.aw.ser.PhidgetHUMhum.openWaitForAttachment(1500)
+                    if self.aw.ser.PhidgetHUMhum.getAttached():
+                        _log.debug("Phidget HUM100x humidity channel attached")
+                        libtime.sleep(0.3)
+                        # note that we do not register the attach in the aw.qmc.phidgetManager as we only support one of those devices
+                    else:
+                        _log.debug("Phidget HUM100x humidity could not be attached")
+            if self.aw.ser.PhidgetHUMhum is not None and self.aw.ser.PhidgetHUMhum.getAttached():
+                res = self.aw.ser.PhidgetHUMhum.getHumidity()
+                _log.debug("Phidget HUM100x humidity received: %s", res)
+                # we don't close the HUM here, but in closePhidgetAMBIENTs
+                return res
+            return None
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+            if self.aw.ser.PhidgetHUMhum is not None:
+                try:
+                    self.aw.ser.PhidgetHUMhum.close()
+                except Exception: # pylint: disable=broad-except
+                    pass
+                self.aw.ser.PhidgetHUMhum = None
+            return None
+            
+    # connects to a Phidgets PRE1000, returns current pressure value and stays connected
+    # NOTE: disconnected devices still physically attached can introduce signals that are not filtered by the HUB and thus
+    # can disturb and even crash the HUB. Thus we keep the device channel attached as long as possible
     def PhidgetPRE1000pressure(self):
         try:
-            pressSensor = PhidgetPressureSensor()
-            ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetPressureSensor',DeviceID.PHIDID_PRE1000,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
-            if ser:
-                pressSensor.setDeviceSerialNumber(ser)
-                pressSensor.setHubPort(port)   #explicitly set the port to where the PRE is attached  
-                if self.aw.qmc.phidgetRemoteFlag:
-                    self.addPhidgetServer() 
-                if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
-                    pressSensor.setIsRemote(True)
-                    pressSensor.setIsLocal(False)
-                pressSensor.openWaitForAttachment(1500)
-                if pressSensor.getAttached():
-                    libtime.sleep(0.3)
-                    res = pressSensor.getPressure()
-                    pressSensor.close()
-                    return res
-                return None
+            # PRE Pressure
+            if self.aw.ser.PhidgetPREpre is None:
+                self.aw.ser.PhidgetPREpre = PhidgetPressureSensor()
+            if not self.aw.ser.PhidgetPREpre.getAttached():
+                ser, port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget(
+                    'PhidgetPressureSensor',
+                    DeviceID.PHIDID_PRE1000,
+                    remote=self.aw.qmc.phidgetRemoteFlag,
+                    remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
+                if ser:
+                    self.aw.ser.PhidgetPREpre.setDeviceSerialNumber(ser)
+                    self.aw.ser.PhidgetPREpre.setHubPort(port)   #explicitly set the port to where the HUM is attached
+                    if self.aw.qmc.phidgetRemoteFlag:
+                        self.addPhidgetServer() 
+                    if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
+                        self.aw.ser.PhidgetPREpre.setIsRemote(True)
+                        self.aw.ser.PhidgetPREpre.setIsLocal(False)
+                    self.aw.ser.PhidgetPREpre.openWaitForAttachment(1500)
+                    if self.aw.ser.PhidgetPREpre.getAttached():
+                        _log.debug("Phidget PRE1000 pressure channel attached")
+                        libtime.sleep(0.3)
+                        # note that we do not register the attach in the aw.qmc.phidgetManager as we only support one of those devices
+                    else:
+                        _log.debug("Phidget PRE1000 pressure could not be attached")
+            if self.aw.ser.PhidgetPREpre is not None and self.aw.ser.PhidgetPREpre.getAttached():
+                res = self.aw.ser.PhidgetPREpre.getPressure()
+                _log.debug("Phidget PRE1000 pressure received: %s", res)
+                # we don't close the PRE here, but in closePhidgetAMBIENTs
+                return res
             return None
-        except Exception: # pylint: disable=broad-except
-            return None
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+            if self.aw.ser.PhidgetPREpre is not None:
+                try:
+                    self.aw.ser.PhidgetPREpre.close()
+                except Exception: # pylint: disable=broad-except
+                    pass
+                self.aw.ser.PhidgetPREpre = None
+            return None            
 
 ############################################################################
     def openport(self):
@@ -5779,6 +5878,9 @@ class serialport():
 #########################################################################
 
 class extraserialport():
+
+    __slots__ = ['aw', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits', 'timeout', 'devicefunctionlist', 'device', 'SP']
+    
     def __init__(self, aw):
         self.aw = aw
         
@@ -5843,6 +5945,9 @@ class extraserialport():
 
 class scaleport(extraserialport):
     """ this class handles the communications with the scale"""
+    
+    __slots__ = []
+    
     def __init__(self,aw):
         super().__init__(aw)
         
@@ -5956,6 +6061,9 @@ class scaleport(extraserialport):
 
 class colorport(extraserialport):
     """ this class handles the communications with the color meter"""
+    
+    __slots__ = []
+    
     def __init__(self,aw):
         super().__init__(aw)
         

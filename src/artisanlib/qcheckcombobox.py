@@ -84,6 +84,9 @@ class CheckComboBox(QComboBox):
         delegate used by the QComboBox). Used to style the popup like a
         menu. (e.g osx aqua style).
         """
+        
+        __slots__ = [ '__popupIsShown', '__blockMouseReleaseTimer', '__initialMousePos', '__separator', '__placeholderText' ]
+        
         def isSeparator(self, index): # pylint: disable=no-self-use
             return str(index.data(Qt.ItemDataRole.AccessibleDescriptionRole)) == "separator"
 

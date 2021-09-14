@@ -137,6 +137,7 @@ def content():
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','clearBackground',None),QApplication.translate('HelpDlg','clears the current background profile',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','alarmset(<as>)',None),QApplication.translate('HelpDlg','activates the alarmset with the given number or label',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','moveBackground(<direction>,<int>)',None),QApplication.translate('HelpDlg','moves the background profile the indicated number of steps towards <direction>, with <direction> one of up, down, left, right',None)])
+    tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','keyboard(<bool>)',None),QApplication.translate('HelpDlg','enables/disables keyboard mode',None)])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','RC Command',None),QApplication.translate('HelpDlg','pulse(ch,min,max[,sn])',None),QApplication.translate('HelpDlg','for PHIDGET RC modules: sets the min/max pulse width in microseconds',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','pos(ch,min,max[,sn])',None),QApplication.translate('HelpDlg','for PHIDGET RC modules: sets the min/max position',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','engaged(ch,b[,sn])',None),QApplication.translate('HelpDlg','for PHIDGET RC modules: engage (b=1) or disengage (b = 0)',None)])

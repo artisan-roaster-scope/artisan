@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 
+import time as libtime
+startup_time = libtime.process_time()
+
 from artisanlib import __version__
 from artisanlib import __revision__
 from artisanlib import __build__
@@ -8,6 +11,8 @@ from artisanlib import __build__
 from artisanlib import __release_sponsor_name__
 from artisanlib import __release_sponsor_domain__
 from artisanlib import __release_sponsor_url__
+
+
 
 # ABOUT
 # This program shows how to plot the temperature and its rate of change from a
@@ -31,13 +36,13 @@ import sys  # @UnusedImport
 import ast
 import platform
 import math
-import time as libtime
 import datetime
 import warnings
 import string as libstring
 import html as htmllib
 import numpy
 from scipy.signal import savgol_filter
+from scipy.interpolate import UnivariateSpline
 import subprocess
 import binascii
 import codecs
@@ -54,6 +59,7 @@ import zipfile
 import tempfile
 import traceback
 import signal
+import functools
 import logging.config
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 from urllib import parse
@@ -179,7 +185,7 @@ from functools import reduce as freduce
 mpl.use('Qt5Agg')
 
 from matplotlib.figure import Figure
-from matplotlib import rcParams, patches, transforms, ticker
+from matplotlib import rcParams, patches, transforms, ticker, colors
 import matplotlib.patheffects as PathEffects
 
 import matplotlib.backends.backend_pdf # @UnusedImport
@@ -190,6 +196,11 @@ from matplotlib.backend_bases import LocationEvent as mplLocationevent
 
 from matplotlib.backends.qt_editor import figureoptions
 import matplotlib.backends.qt_editor._formlayout as formlayout
+
+from matplotlib.patches import Polygon
+from matplotlib.transforms import Bbox
+from matplotlib.pyplot import imread
+        
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
@@ -602,6 +613,7 @@ from artisanlib.autosave import autosaveDlg
 from artisanlib.platform import platformDlg
 from artisanlib.pid_control import FujiPID, PIDcontrol, DtaPID
 from artisanlib.widgets import MyQLCDNumber
+from artisanlib.hottop import startHottop, stopHottop, setHottop, releaseHottopControl, takeHottopControl, isHottopLoopRunning
 
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
@@ -660,7 +672,8 @@ class tgraphcanvas(FigureCanvas):
     alarmsetSignal = pyqtSignal(int)
     moveBackgroundSignal = pyqtSignal(str,int)
     eventRecordSignal = pyqtSignal(int)
-    umlaute_dict = {
+    
+    umlaute_dict : Final = {
        uchr(228): 'ae',  # U+00E4   \xc3\xa4
        uchr(246): 'oe',  # U+00F6   \xc3\xb6
        uchr(252): 'ue',  # U+00FC   \xc3\xbc
@@ -670,6 +683,124 @@ class tgraphcanvas(FigureCanvas):
        uchr(223): 'ss',  # U+00DF   \xc3\x9f
     }
 
+    __slots__ = [ 'locale_str', 'alpha', 'palette', 'palette1', 'EvalueColor_default', 'EvalueTextColor_default', 'artisanflavordefaultlabels', 'customflavorlabels',
+        'SCCAflavordefaultlabels', 'CQIflavordefaultlabels', 'SweetMariasflavordefaultlabels', 'Cflavordefaultlabels', 'Eflavordefaultlabels', 'coffeegeekflavordefaultlabels',
+        'Intelligentsiaflavordefaultlabels', 'IstitutoInternazionaleAssaggiatoriCaffe', 'WorldCoffeeRoastingChampionship', 'ax1', 'ax2', 'ambiWorker', 'ambiThread', 'afterTP',
+        'decay_weights', 'temp_decay_weights', 'flavorlabels', 'flavors', 'flavorstartangle', 'flavoraspect', 'flavorchart_plotf', 'flavorchart_angles', 'flavorchart_plot',
+        'flavorchart_fill', 'flavorchart_labels', 'flavorchart_total', 'mode', 'mode_tempsliders', 'errorlog', 'default_delay', 'delay', 'min_delay', 'extra_event_sampling_delay',
+        'phases_fahrenheit_defaults', 'phases_celsius_defaults', 'phases', 'phasesbuttonflag', 'phasesfromBackgroundflag', 'watermarksflag', 'step100temp', 'phasesLCDflag',
+        'phasesLCDmode', 'phasesLCDmode_l', 'phasesLCDmode_all', 'statisticsflags', 'statisticsmode', 'AUCbegin', 'AUCbase', 'AUCbaseFlag', 'AUCtarget', 'AUCbackground',
+        'AUCtargetFlag', 'AUCguideFlag', 'AUClcdFlag', 'AUCLCDmode', 'AUCvalue', 'AUCsinceFCs', 'AUCguideTime', 'AUCshowFlag', 'statisticstimes', 'device', 'device_logging',
+        'device_log_file_name', 'device_log_file', 'phidget_dataRatesStrings', 'phidget_dataRatesValues', 'phidget1048_types', 'phidget1048_async', 'phidget1048_changeTriggers',
+        'phidget1048_changeTriggersValues', 'phidget1048_changeTriggersStrings', 'phidget1048_dataRate', 'phidget1045_async', 'phidget1045_changeTrigger', 'phidget1045_changeTriggersValues',
+        'phidget1045_changeTriggersStrings', 'phidget1045_emissivity', 'phidget1045_dataRate', 'phidget1200_async', 'phidget1200_formula', 'phidget1200_formulaValues', 'phidget1200_wire',
+        'phidget1200_wireValues', 'phidget1200_changeTrigger', 'phidget1200_changeTriggersValues', 'phidget1200_changeTriggersStrings', 'phidget1200_dataRate',
+        'phidget1200_dataRatesStrings', 'phidget1200_dataRatesValues', 'phidget1200_2_async', 'phidget1200_2_formula', 'phidget1200_2_wire', 'phidget1200_2_changeTrigger',
+        'phidget1200_2_dataRate', 'phidget1046_async', 'phidget1046_gain', 'phidget1046_gainValues', 'phidget1046_formula', 'phidget1046_formulaValues', 'phidget1046_dataRate',
+        'phidgetRemoteFlag', 'phidgetRemoteOnlyFlag', 'phidgetServerID', 'phidgetPassword', 'phidgetPort', 'phidgetServerAdded', 'phidgetServiceDiscoveryStarted',
+        'phidgetManager', 'probatManager', 'yoctoRemoteFlag', 'yoctoServerID', 'YOCTOchanUnit', 'YOCTOchan1Unit', 'YOCTOchan2Unit', 'YOCTO_emissivity', 'YOCTO_async',
+        'YOCTO_dataRate', 'YOCTO_dataRatesStrings', 'YOCTO_dataRatesValues', 'phidget1018valueFactor', 'phidget1018_async', 'phidget1018_ratio', 'phidget1018_dataRates',
+        'phidget1018_changeTriggers', 'phidget1018_changeTriggersValues', 'phidget1018_changeTriggersStrings', 'phidgetVCP100x_voltageRanges', 'phidgetVCP100x_voltageRangeValues',
+        'phidgetVCP100x_voltageRangeStrings', 'phidgetDAQ1400_powerSupplyStrings', 'phidgetDAQ1400_powerSupply', 'phidgetDAQ1400_inputModeStrings', 'phidgetDAQ1400_inputMode',
+        'devices', 'phidgetDevices', 'nonSerialDevices', 'nonTempDevices', 'extradevices', 'extratimex', 'extradevicecolor1', 'extradevicecolor2', 'extratemp1',
+        'extratemp2', 'extrastemp1', 'extrastemp2', 'extractimex1', 'extractimex2', 'extractemp1', 'extractemp2', 'extratemp1lines', 'extratemp2lines',
+        'extraname1', 'extraname2', 'extramathexpression1', 'extramathexpression2', 'extralinestyles1', 'extralinestyles2', 'extradrawstyles1', 'extradrawstyles2', 
+        'extralinewidths1', 'extralinewidths2', 'extramarkers1', 'extramarkers2', 'extramarkersizes1', 'extramarkersizes2', 'devicetablecolumnwidths', 'extraNoneTempHint1',
+        'extraNoneTempHint2', 'plotcurves', 'plotcurvecolor', 'overlapList', 'tight_layout_params', 'fig', 'ax', 'delta_ax', 'legendloc', 'legendloc_pos', 'onclick_cid',
+        'oncpick_cid', 'ondraw_cid', 'rateofchange1', 'rateofchange2', 'flagon', 'flagstart', 'flagKeepON', 'flagOpenCompleted', 'flagsampling', 'flagsamplingthreadrunning',
+        'manuallogETflag', 'zoom_follow', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents',
+        'replayType', 'replayedBackgroundEvents', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
+        'title', 'title_show_always', 'ambientTemp', 'ambientTempSource', 'ambient_temperature_device', 'ambient_pressure', 'ambient_pressure_device', 'ambient_humidity',
+        'ambient_humidity_device', 'elevation', 'temperaturedevicefunctionlist', 'humiditydevicefunctionlist', 'pressuredevicefunctionlist', 'moisture_greens', 'moisture_roasted',
+        'greens_temp', 'beansize', 'beansize_min', 'beansize_max', 'whole_color', 'ground_color', 'color_systems', 'color_system_idx', 'heavyFC_flag', 'lowFC_flag', 'lightCut_flag',
+        'darkCut_flag', 'drops_flag', 'oily_flag', 'uneven_flag', 'tipping_flag', 'scorching_flag', 'divots_flag', 'timex', 'smooth_curves_on_recording', 
+        'temp1', 'temp2', 'delta1', 'delta2', 'stemp1', 'stemp2', 'tstemp1', 'tstemp2', 'ctimex1', 'ctimex2', 'ctemp1', 'ctemp2', 'unfiltereddelta1', 'unfiltereddelta2',
+        'on_timex', 'on_temp1', 'on_temp2', 'on_ctimex1', 'on_ctimex2', 'on_ctemp1', 'on_ctemp2','on_tstemp1', 'on_tstemp2', 'on_stemp1', 'on_stemp2', 'on_unfiltereddelta1', 
+        'on_unfiltereddelta2', 'on_delta1', 'on_delta2', 'on_extratemp1', 'on_extratemp2', 'on_extratimex', 'on_extractimex1', 'on_extractemp1', 'on_extractimex2', 'on_extractemp2',
+        'timeindex', 'ETfunction', 'BTfunction', 'DeltaETfunction', 'DeltaBTfunction', 'safesaveflag', 'pid', 'background', 'backgroundprofile', 'backgroundDetails',
+        'backgroundeventsflag', 'backgroundpath', 'backgroundUUID', 'backgroundUUID', 'backgroundShowFullflag', 'titleB', 'roastbatchnrB', 'roastbatchprefixB',
+        'roastbatchposB', 'temp1B', 'temp2B', 'temp1BX', 'temp2BX', 'timeB', 'temp1Bdelta', 'temp1Bdelta', 'temp2Bdelta', 'temp2Bdelta',
+        'stemp1B', 'stemp2B', 'stemp1BX', 'stemp2BX', 'extraname1B', 'extraname2B', 'extratimexB', 'xtcurveidx', 'ytcurveidx', 'delta1B', 'delta2B', 'timeindexB',
+        'TP_time_B', 'TP_time_B_loaded', 'backgroundEvents', 'backgroundEtypes', 'backgroundEvalues', 'backgroundEStrings', 'backgroundalpha', 'backgroundmetcolor',
+        'backgroundbtcolor', 'backgroundxtcolor', 'backgroundytcolor', 'backgrounddeltaetcolor', 'backgrounddeltabtcolor', 'backmoveflag', 'detectBackgroundEventTime',
+        'backgroundReproduce', 'backgroundReproduceBeep', 'backgroundPlaybackEvents', 'backgroundPlaybackDROP', 'Betypes', 'backgroundFlavors', 'flavorbackgroundflag', 
+        'E1backgroundtimex', 'E2backgroundtimex', 'E3backgroundtimex', 'E4backgroundtimex', 'E1backgroundvalues', 'E2backgroundvalues', 'E3backgroundvalues', 
+        'E4backgroundvalues', 'l_backgroundeventtype1dots', 'l_backgroundeventtype2dots', 'l_backgroundeventtype3dots', 'l_backgroundeventtype4dots',
+        'DeltaETBflag', 'DeltaBTBflag', 'clearBgbeforeprofileload', 'hideBgafterprofileload', 'HUDflag', 'hudresizeflag', 'ETtarget', 'ET2target', 'BTtarget',
+        'BT2target', 'hudETpid', 'pidpreviouserror', 'heating_types', 'operator', 'organization', 'roastertype', 'roastersize', 'roasterheating', 'drumspeed',
+        'organization_setup', 'operator_setup', 'roastertype_setup', 'roastersize_setup', 'roasterheating_setup', 'drumspeed_setup', 'machinesetup_energy_ratings',
+        'machinesetup', 'roastingnotes', 'cuppingnotes', 'roastdate', 'roastepoch', 'lastroastepoch', 'batchcounter', 'batchsequence', 'batchprefix', 'neverUpdateBatchCounter', 
+        'roastbatchnr', 'roastbatchprefix', 'roastbatchpos', 'roasttzoffset', 'roastUUID', 'plus_default_store', 'plus_store', 'plus_store_label', 'plus_coffee',
+        'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_sync_record_hash', 'beans', 'projectFlag', 'ETcurve', 'BTcurve',
+        'ETlcd', 'BTlcd', 'swaplcds', 'LCDdecimalplaces', 'foregroundShowFullflag', 'DeltaETflag', 'DeltaBTflag', 'DeltaETlcdflag', 'DeltaBTlcdflag', 
+        'swapdeltalcds', 'HUDbuttonflag', 'PIDbuttonflag', 'Controlbuttonflag', 'deltaETfilter', 'deltaBTfilter', 'curvefilter', 'deltaETspan', 'deltaBTspan',
+        'deltaETsamples', 'deltaBTsamples', 'profile_sampling_interval', 'background_profile_sampling_interval', 'optimalSmoothing', 'polyfitRoRcalc',
+        'patheffects', 'graphstyle', 'graphfont', 'buttonvisibility', 'buttonactions', 'buttonactionstrings', 'extrabuttonactions', 'extrabuttonactionstrings',
+        'xextrabuttonactions', 'xextrabuttonactionstrings', 'autoChargeFlag', 'autoDropFlag', 'autoChargeIdx', 'autoDropIdx', 'markTPflag', 'autoTPIdx',
+        'autoDRYflag', 'autoFCsFlag', 'autoCHARGEenabled', 'autoDRYenabled', 'autoFCsenabled', 'autoDROPenabled', 'autoDryIdx', 'autoFCsIdx', 'projectionconstant',
+        'projectionmode', 'transMappingMode', 'weight', 'volume_units', 'volume', 'density', 'density_roasted', 'volumeCalcUnit', 'volumeCalcWeightInStr',
+        'volumeCalcWeightOutStr', 'container_names', 'container_weights', 'container_idx', 'specialevents', 'etypes', 'etypesdefault', 'specialeventstype',
+        'specialeventsStrings', 'specialeventsvalue', 'eventsGraphflag', 'clampEvents', 'renderEventsDescr', 'eventslabelschars', 'eventsshowflag',
+        'annotationsflag', 'showeventsonbt', 'showEtypes', 'E1timex', 'E2timex', 'E3timex', 'E4timex', 'E1values', 'E2values', 'E3values', 'E4values',
+        'EvalueColor', 'EvalueTextColor', 'EvalueMarker', 'EvalueMarkerSize', 'Evaluelinethickness', 'Evaluealpha', 'eventpositionbars', 'specialeventannotations',
+        'specialeventannovisibilities', 'overlappct', 'linestyle_default', 'drawstyle_default', 'linewidth_default', 'back_linewidth_default', 'delta_linewidth_default',
+        'back_delta_linewidth_default', 'extra_linewidth_default', 'marker_default', 'markersize_default', 'BTlinestyle', 'BTdrawstyle', 'BTlinewidth', 'BTmarker', 
+        'BTmarkersize', 'ETlinestyle', 'ETdrawstyle', 'ETlinewidth', 'ETmarker', 'ETmarkersize', 'BTdeltalinestyle', 'BTdeltadrawstyle', 'BTdeltalinewidth',
+        'BTdeltamarker', 'BTdeltamarkersize', 'ETdeltalinestyle', 'ETdeltadrawstyle', 'ETdeltalinewidth', 'ETdeltamarker', 'ETdeltamarkersize', 'BTbacklinestyle',
+        'BTbackdrawstyle', 'BTbacklinewidth', 'BTbackmarker', 'BTbackmarkersize', 'ETbacklinestyle', 'ETbackdrawstyle', 'ETbacklinewidth', 'ETbackmarker', 
+        'ETbackmarkersize', 'XTbacklinestyle', 'XTbackdrawstyle', 'XTbacklinewidth', 'XTbackmarker', 'XTbackmarkersize', 'YTbacklinestyle', 'YTbackdrawstyle',
+        'YTbacklinewidth', 'YTbackmarker', 'YTbackmarkersize', 'BTBdeltalinestyle', 'BTBdeltadrawstyle', 'BTBdeltalinewidth', 'BTBdeltamarker', 'BTBdeltamarkersize',
+        'ETBdeltalinestyle', 'ETBdeltadrawstyle', 'ETBdeltalinewidth', 'ETBdeltamarker', 'ETBdeltamarkersize', 'BTBdeltalinestyle', 'BTBdeltadrawstyle',
+        'BTBdeltalinewidth', 'BTBdeltamarker', 'BTBdeltamarkersize', 'ETBdeltalinestyle', 'ETBdeltadrawstyle', 'ETBdeltalinewidth', 'ETBdeltamarker',
+        'ETBdeltamarkersize', 'alarmsetlabel', 'alarmflag', 'alarmguard', 'alarmnegguard', 'alarmtime', 'alarmoffset', 'alarmtime2menuidx', 'menuidx2alarmtime',
+        'alarmcond', 'alarmstate', 'alarmsource', 'alarmtemperature', 'alarmaction', 'alarmbeep', 'alarmstrings', 'alarmtablecolumnwidths', 'silent_alarms',
+        'alarmsets_count', 'alarmsets', 'loadalarmsfromprofile', 'loadalarmsfrombackground', 'alarmsfile', 'temporaryalarmflag', 'TPalarmtimeindex',
+        'rsfile', 'tempory_sample_trigger_redraw', 'temporarysetsv', 'temporary_error', 'temporarymovepositiveslider', 'temporarymovenegativeslider',
+        'temporayslider_force_move', 'quantifiedEvent', 'loadaxisfromprofile', 'startofx_default', 'endofx_default', 'xgrid_default', 'ylimit_F_default',
+        'ylimit_min_F_default', 'ygrid_F_default', 'zlimit_F_default', 'zlimit_min_F_default', 'zgrid_F_default', 'ylimit_C_default', 'ylimit_min_C_default',
+        'ygrid_C_default', 'zlimit_C_default', 'zlimit_min_C_default', 'zgrid_C_default', 'temp_grid', 'time_grid', 'zlimit_max', 'zlimit_min_max',
+        'ylimit_max', 'ylimit_min_max', 'ylimit', 'ylimit_min', 'zlimit', 'zlimit_min', 'RoRlimitFlag', 'RoRlimit', 'RoRlimitm', 'maxRoRlimit',
+        'endofx', 'startofx', 'resetmaxtime', 'chargemintime', 'fixmaxtime', 'locktimex', 'autotimex', 'autodeltaxET', 'autodeltaxBT', 'locktimex_start',
+        'locktimex_end', 'xgrid', 'ygrid', 'zgrid', 'gridstyles', 'gridlinestyle', 'gridthickness', 'gridalpha', 'xrotation',
+        'statisticsheight', 'statisticsupper', 'statisticslower', 'autosaveflag', 'autosaveprefix', 'autosavepath', 'autosavealsopath',
+        'autosaveaddtorecentfilesflag', 'autosaveimage', 'autosaveimageformat', 'ystep_down', 'ystep_up', 'backgroundETcurve', 'backgroundBTcurve',
+        'l_temp1', 'l_temp2', 'l_delta1', 'l_delta2', 'l_back1', 'l_back2', 'l_back3', 'l_back4', 'l_delta1B', 'l_delta2B', 'l_BTprojection',
+        'l_ETprojection', 'l_AUCguide', 'l_horizontalcrossline', 'l_verticalcrossline', 'l_timeline', 'legend', 'l_eventtype1dots', 'l_eventtype2dots',
+        'l_eventtype3dots', 'l_eventtype4dots', 'l_eteventannos', 'l_bteventannos', 'l_eventtype1annos', 'l_eventtype2annos', 'l_eventtype3annos',
+        'l_eventtype4annos', 'l_annotations', 'l_background_annotations', 'l_annotations_dict', 'l_annotations_pos_dict', 'l_event_flags_dict',
+        'l_event_flags_pos_dict', 'ai', 'timeclock', 'threadserver', 'designerflag', 'designerconnections', 'mousepress', 'indexpoint',
+        'workingline', 'eventtimecopy', 'specialeventsStringscopy', 'specialeventsvaluecopy', 'specialeventstypecopy', 'currentx', 'currenty',
+        'designertimeinit', 'BTsplinedegree', 'ETsplinedegree', 'reproducedesigner', 'designertemp1init', 'designertemp2init', 
+        'filterDropOut_replaceRoR_period', 'filterDropOut_spikeRoR_period', 'filterDropOut_tmin_C_default', 'filterDropOut_tmax_C_default', 
+        'filterDropOut_tmin_F_default', 'filterDropOut_tmax_F_default', 'filterDropOut_spikeRoR_dRoR_limit_C_default', 'filterDropOut_spikeRoR_dRoR_limit_F_default',
+        'filterDropOuts', 'filterDropOut_tmin', 'filterDropOut_tmax', 'filterDropOut_spikeRoR_dRoR_limit', 'minmaxLimits',
+        'dropSpikes', 'dropDuplicates', 'dropDuplicatesLimit', 'swapETBT', 'wheelflag', 'wheelnames', 'segmentlengths', 'segmentsalpha',
+        'wheellabelparent', 'wheelcolor', 'wradii', 'startangle', 'projection', 'wheeltextsize', 'wheelcolorpattern', 'wheeledge',
+        'wheellinewidth', 'wheellinecolor', 'wheeltextcolor', 'wheelconnections', 'wheelx', 'wheelz', 'wheellocationx', 'wheellocationz',
+        'wheelaspect', 'samplingSemaphore', 'profileDataSemaphore', 'messagesemaphore', 'errorsemaphore', 'serialsemaphore', 'seriallogsemaphore',
+        'eventactionsemaphore', 'updateBackgroundSemaphore', 'alarmSemaphore', 'rampSoakSemaphore', 'crossmarker', 'crossmouseid', 'onreleaseid',
+        'analyzer_connect_id', 'extra309T3', 'extra309T4', 'extra309TX', 'hottop_ET', 'hottop_BT', 'hottop_HEATER', 'hottop_MAIN_FAN', 'hottop_TX',
+        'R1_DT', 'R1_BT', 'R1_BT_ROR', 'R1_EXIT_TEMP', 'R1_HEATER', 'R1_FAN', 'R1_DRUM', 'R1_VOLTAGE', 'R1_TX', 'R1_STATE', 'R1_FAN_RPM', 'R1_STATE_STR',
+        'extraArduinoT1', 'extraArduinoT2', 'extraArduinoT3', 'extraArduinoT4', 'extraArduinoT5', 'extraArduinoT6', 'program_t3', 'program_t4', 'program_t5', 'program_t6', 
+        'program_t7', 'program_t8', 'program_t9', 'program_t10', 'dutycycle', 'dutycycleTX', 'currentpidsv', 'linecount', 'deltalinecount',
+        'ax_background', 'block_update', 'fmt_data_RoR', 'plotterstack', 'plotterequationresults', 'plottermessage', 'alarm_popup_timout',
+        'RTtemp1', 'RTtemp2', 'RTextratemp1', 'RTextratemp2', 'RTextratx', 'idx_met', 'showmet', 'met_annotate', 'met_timex_temp1_delta',
+        'extendevents', 'statssummary', 'showtimeguide', 'statsmaxchrperline', 'energyunits', 'powerunits', 'sourcenames', 'loadlabels_setup',
+        'loadratings_setup', 'ratingunits_setup', 'sourcetypes_setup', 'load_etypes_setup', 'presssure_percents_setup', 'loadevent_zeropcts_setup',
+        'loadevent_hundpcts_setup', 'preheatDuration_setup', 'preheatenergies_setup', 'betweenbatchDuration_setup', 'betweenbatchenergies_setup',
+        'coolingDuration_setup', 'coolingenergies_setup', 'betweenbatch_after_preheat_setup', 'electricEnergyMix_setup', 'energyresultunit_setup',
+        'kind_list', 'loadlabels', 'loadratings', 'ratingunits', 'sourcetypes', 'load_etypes', 'presssure_percents', 'loadevent_zeropcts',
+        'loadevent_hundpcts', 'preheatDuration', 'preheatenergies', 'betweenbatchDuration', 'betweenbatchenergies', 'coolingDuration', 'coolingenergies',
+        'betweenbatch_after_preheat', 'electricEnergyMix', 'baseX', 'baseY', 'base_horizontalcrossline', 'base_verticalcrossline',
+        'base_messagevisible', 'colorDifferenceThreshold', 'handles', 'labels', 'legend_lines', 'eventmessage', 'backgroundeventmessage',
+        'eventmessagetimer', 'resizeredrawing', 'logoimg', 'analysisresultsloc_default', 'analysisresultsloc', 'analysispickflag', 'analysisresultsstr',
+        'analysisstartchoice', 'analysisoffset', 'curvefitstartchoice', 'curvefitoffset', 'segmentresultsloc_default', 'segmentresultsloc',
+        'segmentpickflag', 'segmentdeltathreshold', 'segmentsamplesthreshold', 'stats_summary_rect', 'title_text', 'title_artist', 'title_width',
+        'background_title_width', 'xlabel_text', 'xlabel_artist', 'xlabel_width', 'lazyredraw_on_resize_timer' ]
+        
+        
+        
+    
     def __init__(self, parent, dpi, *, locale):
 
         #default palette of colors
@@ -689,7 +820,7 @@ class tgraphcanvas(FigureCanvas):
         self.EvalueColor_default = ['#43A7CF','#49B160','#800080','#AD0427']
         self.EvalueTextColor_default = ['white','#FFFFFF','white','#FFFFFF']
 
-        self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None),
+        self.artisanflavordefaultlabels: Final = [QApplication.translate("Textbox", "Acidity",None),
                                             QApplication.translate("Textbox", "Aftertaste",None),
                                             QApplication.translate("Textbox", "Clean Cup",None),
                                             QApplication.translate("Textbox", "Head",None),
@@ -702,7 +833,7 @@ class tgraphcanvas(FigureCanvas):
         # custom labels are stored in the application settings and can be edited by the user
         self.customflavorlabels = self.artisanflavordefaultlabels
 
-        self.SCCAflavordefaultlabels = [QApplication.translate("Textbox", "Sour",None),
+        self.SCCAflavordefaultlabels: Final = [QApplication.translate("Textbox", "Sour",None),
                                         QApplication.translate("Textbox", "Flavor",None),
                                         QApplication.translate("Textbox", "Critical\nStimulus",None),
                                         QApplication.translate("Textbox", "Aftertaste",None),
@@ -719,14 +850,14 @@ class tgraphcanvas(FigureCanvas):
                                         QApplication.translate("Textbox", "pH",None),
                                         QApplication.translate("Textbox", "Balance",None)]
 
-        self.CQIflavordefaultlabels =  [QApplication.translate("Textbox", "Fragance",None),
+        self.CQIflavordefaultlabels: Final =  [QApplication.translate("Textbox", "Fragance",None),
                                         QApplication.translate("Textbox", "Aroma",None),
                                         QApplication.translate("Textbox", "Flavor",None),
                                         QApplication.translate("Textbox", "Acidity",None),
                                         QApplication.translate("Textbox", "Body",None),
                                         QApplication.translate("Textbox", "Aftertaste",None)]
 
-        self.SweetMariasflavordefaultlabels = [QApplication.translate("Textbox", "Dry Fragrance",None),
+        self.SweetMariasflavordefaultlabels: Final = [QApplication.translate("Textbox", "Dry Fragrance",None),
                                             QApplication.translate("Textbox", "Uniformity",None),
                                             QApplication.translate("Textbox", "Complexity",None),
                                             QApplication.translate("Textbox", "Clean Cup",None),
@@ -737,7 +868,7 @@ class tgraphcanvas(FigureCanvas):
                                             QApplication.translate("Textbox", "Brightness",None),
                                             QApplication.translate("Textbox", "Wet Aroma",None)]
 
-        self.Cflavordefaultlabels = [QApplication.translate("Textbox", "Fragrance",None),
+        self.Cflavordefaultlabels: Final = [QApplication.translate("Textbox", "Fragrance",None),
                                             QApplication.translate("Textbox", "Aroma",None),
                                             QApplication.translate("Textbox", "Taste",None),
                                             QApplication.translate("Textbox", "Nose",None),
@@ -745,7 +876,7 @@ class tgraphcanvas(FigureCanvas):
                                             QApplication.translate("Textbox", "Body",None),
                                             QApplication.translate("Textbox", "Acidity",None)]
 
-        self.Eflavordefaultlabels = [QApplication.translate("Textbox", "Fragrance-Aroma",None),
+        self.Eflavordefaultlabels: Final = [QApplication.translate("Textbox", "Fragrance-Aroma",None),
                                             QApplication.translate("Textbox", "Acidity",None),
                                             QApplication.translate("Textbox", "Flavor",None),
                                             QApplication.translate("Textbox", "Body",None),
@@ -753,19 +884,19 @@ class tgraphcanvas(FigureCanvas):
                                             QApplication.translate("Textbox", "Balance",None)]
 
 
-        self.coffeegeekflavordefaultlabels = [QApplication.translate("Textbox", "Aroma",None),
+        self.coffeegeekflavordefaultlabels: Final = [QApplication.translate("Textbox", "Aroma",None),
                                             QApplication.translate("Textbox", "Acidity",None),
                                             QApplication.translate("Textbox", "Mouthfeel",None),
                                             QApplication.translate("Textbox", "Flavour",None),
                                             QApplication.translate("Textbox", "Aftertaste",None),
                                             QApplication.translate("Textbox", "Balance",None)]
 
-        self.Intelligentsiaflavordefaultlabels = [QApplication.translate("Textbox", "Sweetness",None),
+        self.Intelligentsiaflavordefaultlabels: Final = [QApplication.translate("Textbox", "Sweetness",None),
                                             QApplication.translate("Textbox", "Acidity",None),
                                             QApplication.translate("Textbox", "Body",None),
                                             QApplication.translate("Textbox", "Finish",None)]
 
-        self.IstitutoInternazionaleAssaggiatoriCaffe = [QApplication.translate("Textbox", "Roast Color",None),
+        self.IstitutoInternazionaleAssaggiatoriCaffe: Final = [QApplication.translate("Textbox", "Roast Color",None),
                                             QApplication.translate("Textbox", "Crema Texture",None),
                                             QApplication.translate("Textbox", "Crema Volume",None),
                                             QApplication.translate("Textbox", "Fragrance",None),
@@ -777,7 +908,7 @@ class tgraphcanvas(FigureCanvas):
                                             QApplication.translate("Textbox", "Aroma Persistence",None),
                                             QApplication.translate("Textbox", "Balance",None)]
 
-        self.WorldCoffeeRoastingChampionship = [QApplication.translate("Textbox", "Aroma",None),
+        self.WorldCoffeeRoastingChampionship: Final = [QApplication.translate("Textbox", "Aroma",None),
                                             QApplication.translate("Textbox", "Flavour",None),
                                             QApplication.translate("Textbox", "Flavour",None),
                                             QApplication.translate("Textbox", "Aftertaste",None),
@@ -827,7 +958,7 @@ class tgraphcanvas(FigureCanvas):
         self.errorlog = []
 
         # default delay between readings in miliseconds
-        self.default_delay = 3000 # default 3s
+        self.default_delay: Final = 3000 # default 3s
         self.delay = self.default_delay
         self.min_delay = 500 # 1000
 
@@ -835,8 +966,8 @@ class tgraphcanvas(FigureCanvas):
         self.extra_event_sampling_delay = 0 # sync, 0.5s, 1.0s, 1.5s,.., 5s => 0, 500, 1000, 1500, ..
 
         #watermarks limits: dryphase1, dryphase2 (DRY), midphase (FCs), and finish phase Y limits
-        self.phases_fahrenheit_defaults = [300,300,390,450]
-        self.phases_celsius_defaults = [150,150,200,230]
+        self.phases_fahrenheit_defaults: Final = [300,300,390,450]
+        self.phases_celsius_defaults: Final = [150,150,200,230]
         self.phases = list(self.phases_fahrenheit_defaults) # contains either the phases_filter or phases_espresso, depending on the mode
         #this flag makes the main push buttons DryEnd, and FCstart change the phases[1] and phases[2] respectively
         self.phasesbuttonflag = True #False no change; True make the DRY and FC buttons change the phases during roast automatically
@@ -884,8 +1015,8 @@ class tgraphcanvas(FigureCanvas):
 
         # Phidget variables
 
-        self.phidget_dataRatesStrings = ["32ms","64ms","128ms","256ms","512ms","768ms","1s"] # too fast: "8ms","16ms","32ms","64ms","0.12s",
-        self.phidget_dataRatesValues = [32,64,128,256,512,768,1024] # 8,16,32,64,128,
+        self.phidget_dataRatesStrings : Final = ["32ms","64ms","128ms","256ms","512ms","768ms","1s"] # too fast: "8ms","16ms","32ms","64ms","0.12s",
+        self.phidget_dataRatesValues : Final = [32,64,128,256,512,768,1024] # 8,16,32,64,128,
 
         # probe type values (along the Phidgets21 lib): k-type => 1, j-type => 2, e-type => 3, t-type => 4
         # Artisan will keep on using the Phidgets21 mapping
@@ -915,9 +1046,9 @@ class tgraphcanvas(FigureCanvas):
 
         self.phidget1200_async = False
         self.phidget1200_formula = 0
-        self.phidget1200_formulaValues = ["PT100  3850", "PT100  3920","PT1000 3850", "PT1000 3920"]
+        self.phidget1200_formulaValues: Final = ["PT100  3850", "PT100  3920","PT1000 3850", "PT1000 3920"]
         self.phidget1200_wire = 0
-        self.phidget1200_wireValues = ["2-wire", "3-wire","4-wire"]
+        self.phidget1200_wireValues: Final = ["2-wire", "3-wire","4-wire"]
         self.phidget1200_changeTrigger = 0
         self.phidget1200_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
         self.phidget1200_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1200_changeTriggersValues))
@@ -927,8 +1058,8 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1200_changeTriggersStrings.insert(1,"0.05C")
         self.phidget1200_changeTriggersStrings.insert(1,"0.02C")
         self.phidget1200_dataRate = 250
-        self.phidget1200_dataRatesStrings = ["250ms","500ms","750ms","1s"]
-        self.phidget1200_dataRatesValues = [250,500,700,1024]
+        self.phidget1200_dataRatesStrings: Final = ["250ms","500ms","750ms","1s"]
+        self.phidget1200_dataRatesValues: Final = [250,500,700,1024]
 
         self.phidget1200_2_async = False
         self.phidget1200_2_formula = 0
@@ -938,9 +1069,9 @@ class tgraphcanvas(FigureCanvas):
 
         self.phidget1046_async = [False]*4
         self.phidget1046_gain = [1]*4 # defaults to no gain (values are 0-based)
-        self.phidget1046_gainValues = ["1", "8","16","32","64","128"] # 1 for no gain
-        self.phidget1046_formula = [1]*4 # 0: 1K Ohm Wheatstone Bridge, 1: 1K Ohm Voltage Divider, 2: raw
-        self.phidget1046_formulaValues = ["WS", "Div","raw"]
+        self.phidget1046_gainValues: Final = ["1", "8","16","32","64","128"] # 1 for no gain
+        self.phidget1046_formula: Final = [1]*4 # 0: 1K Ohm Wheatstone Bridge, 1: 1K Ohm Voltage Divider, 2: raw
+        self.phidget1046_formulaValues: Final = ["WS", "Div","raw"]
         self.phidget1046_dataRate = 256 # in ms; (Phidgets default 8ms, 16ms if wireless is active)
 
         self.phidgetRemoteFlag = False # if True the specified remote server is harvestd to potentially attache Phidget devices
@@ -962,8 +1093,8 @@ class tgraphcanvas(FigureCanvas):
         self.YOCTO_emissivity = 1.0
         self.YOCTO_async = [False]*2
         self.YOCTO_dataRate = 256 # in ms
-        self.YOCTO_dataRatesStrings = ["32ms","64ms","128ms","256ms","512ms","768ms","1s","1s*"]
-        self.YOCTO_dataRatesValues = [32,64,128,256,512,768,1000,1024] # the 1024 mode returns every sec an average over the period, while 1000 returns every second the last sample
+        self.YOCTO_dataRatesStrings: Final = ["32ms","64ms","128ms","256ms","512ms","768ms","1s","1s*"]
+        self.YOCTO_dataRatesValues: Final = [32,64,128,256,512,768,1000,1024] # the 1024 mode returns every sec an average over the period, while 1000 returns every second the last sample
 
         self.phidget1018valueFactor = 1000 # we map the 0-5V voltage returned by the Phidgets22 API to mV (0-5000)
         self.phidget1018_async = [False]*8
@@ -971,8 +1102,8 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1018_dataRates = [256]*8 # in ms; (Phidgets default 256ms, min is 8ms, 16ms if wireless is active), max 1000ms
                 # with the new PhidgetsAPI the 1011/1018 dataRate is from 1ms to 1.000ms
         self.phidget1018_changeTriggers = [10]*8
-        self.phidget1018_changeTriggersValues = range(0,51,1)
-        self.phidget1018_changeTriggersStrings = list(map(lambda x:str(x*10)+"mV",self.phidget1018_changeTriggersValues))
+        self.phidget1018_changeTriggersValues: Final = range(0,51,1)
+        self.phidget1018_changeTriggersStrings: Final = list(map(lambda x:str(x*10)+"mV",self.phidget1018_changeTriggersValues))
 
         self.phidgetVCP100x_voltageRanges = [VoltageRange.VOLTAGE_RANGE_AUTO]*8
         self.phidgetVCP100x_voltageRangeValues: Final = [
@@ -1002,9 +1133,9 @@ class tgraphcanvas(FigureCanvas):
             "±40V"
         ]
 
-        self.phidgetDAQ1400_powerSupplyStrings = ["--","12V","24V"]
+        self.phidgetDAQ1400_powerSupplyStrings: Final = ["--","12V","24V"]
         self.phidgetDAQ1400_powerSupply = 1
-        self.phidgetDAQ1400_inputModeStrings = ["NPN","PNP"]
+        self.phidgetDAQ1400_inputModeStrings: Final = ["NPN","PNP"]
         self.phidgetDAQ1400_inputMode = 0
 
         #menu of thermocouple devices
@@ -1107,9 +1238,9 @@ class tgraphcanvas(FigureCanvas):
                        "+Program 910",              #89
                        "+Slider 01",                #90
                        "+Slider 23",                #91
-                       "Probat Middleware",                  #92
-                       "+Probat Middleware burner/drum",     #93
-                       "+Probat Middleware fan/pressure",    #94
+                       "-Probat Middleware",                 #92
+                       "-Probat Middleware burner/drum",     #93
+                       "-Probat Middleware fan/pressure",    #94
                        "Phidget DAQ1400 Current",   #95
                        "Phidget DAQ1400 Frequency", #96
                        "Phidget DAQ1400 Digital",   #97
@@ -1179,7 +1310,6 @@ class tgraphcanvas(FigureCanvas):
             46, # Yocto PT100
             79, # S7
             83, # Aillio Bullet R1 BT/DT
-            92, # Probat Middleware
             99, # Aillio Bullet R1 IBTS/BT
             100, # Yocto IR
             108, # Yocto 4-20mA Rx
@@ -1217,8 +1347,6 @@ class tgraphcanvas(FigureCanvas):
             87, # +Aillio Bullet R1 State
             90, # +Slider 01
             91, # +Slider 23
-            93, # +Probat Middleware burner/drum"
-            94, # +Probat Middleware fan/pressure"
             95, # Phidget DAQ1400 Current
             96, # Phidget DAQ1400 Frequency
             97, # Phidget DAQ1400 Digital
@@ -1265,7 +1393,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.overlapList = []
         
-        self.tight_layout_params = {"pad":.3,"h_pad":0.0,"w_pad":0.0} # slightly less space for axis labels
+        self.tight_layout_params: Final = {"pad":.3,"h_pad":0.0,"w_pad":0.0} # slightly less space for axis labels
 #        self.tight_layout_params = True
         self.fig = Figure(tight_layout=self.tight_layout_params,frameon=True,dpi=dpi)
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
@@ -1349,18 +1477,18 @@ class tgraphcanvas(FigureCanvas):
         self.ambient_humidity_device = 0
         self.elevation = 0
 
-        self.temperaturedevicefunctionlist = [
+        self.temperaturedevicefunctionlist: Final = [
             "",                #0
             "Phidget HUM100x", #1
             "Yocto Meteo",     #2
             "Phidget TMP1000", #3
         ]
-        self.humiditydevicefunctionlist = [
+        self.humiditydevicefunctionlist: Final = [
             "",                #0
             "Phidget HUM100x", #1
             "Yocto Meteo",     #2
         ]
-        self.pressuredevicefunctionlist = [
+        self.pressuredevicefunctionlist: Final = [
             "",                #0
             "Phidget PRE1000", #1
             "Yocto Meteo",     #2
@@ -1376,7 +1504,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.whole_color = 0
         self.ground_color = 0
-        self.color_systems = ["","Tonino","ColorTest","Colorette","ColorTrack","Agtron"]
+        self.color_systems: Final = ["","Tonino","ColorTest","Colorette","ColorTrack","Agtron"]
         self.color_system_idx = 0
 
         # roast property flags
@@ -1519,7 +1647,7 @@ class tgraphcanvas(FigureCanvas):
         self.hudETpid = [5,240,60]    # HUD pid: p = 20, i = 60, d = 13
         self.pidpreviouserror = 0  # temporary storage of pid error
         
-        self.heating_types = [
+        self.heating_types: Final = [
             "",
             QApplication.translate("ComboBox", "Propane Gas (LPG)",None),
             QApplication.translate("ComboBox", "Natural Gas (NG)",None),
@@ -1643,7 +1771,7 @@ class tgraphcanvas(FigureCanvas):
         self.autoCHARGEenabled = True # get's disabled on undo of the CHARGE event and prevents further autoCHARGE marks
         self.autoDRYenabled = True # get's disabled on undo of the DRY event and prevents further autoDRY marks
         self.autoFCsenabled = True # get's disabled on undo of the FCs event and prevents further autoFCs marks
-        self.autoDROPsenabled = True # get's disabled on undo of the DROP event and prevents further autoDROP marks
+        self.autoDROPenabled = True # get's disabled on undo of the DROP event and prevents further autoDROP marks
 
         self.autoDryIdx = 0 # set by sample() on recognition and cleared once DRY is marked
         self.autoFCsIdx = 0 # set by sample() on recognition and cleared once FCs is marked
@@ -1702,7 +1830,7 @@ class tgraphcanvas(FigureCanvas):
                        QApplication.translate("ComboBox", "Burner",None),
                        "--"]
         #default etype settings to restore
-        self.etypesdefault = [QApplication.translate("ComboBox", "Air",None),
+        self.etypesdefault: Final = [QApplication.translate("ComboBox", "Air",None),
                               QApplication.translate("ComboBox", "Drum",None),
                               QApplication.translate("ComboBox", "Damper",None),
                               QApplication.translate("ComboBox", "Burner",None),
@@ -1744,15 +1872,15 @@ class tgraphcanvas(FigureCanvas):
         self.overlappct = 100
 
         #curve styles
-        self.linestyle_default = "-"
-        self.drawstyle_default = "default"
-        self.linewidth_default = 1.5
-        self.back_linewidth_default = 2
-        self.delta_linewidth_default = 1
-        self.back_delta_linewidth_default = 1.5
-        self.extra_linewidth_default = 1
-        self.marker_default = None
-        self.markersize_default = 6
+        self.linestyle_default: Final = "-"
+        self.drawstyle_default: Final = "default"
+        self.linewidth_default: Final = 1.5
+        self.back_linewidth_default: Final = 2
+        self.delta_linewidth_default: Final = 1
+        self.back_delta_linewidth_default: Final = 1.5
+        self.extra_linewidth_default: Final = 1
+        self.marker_default: Final = None
+        self.markersize_default: Final = 6
 
         self.BTlinestyle = self.linestyle_default
         self.BTdrawstyle = self.drawstyle_default
@@ -1827,8 +1955,8 @@ class tgraphcanvas(FigureCanvas):
 #                               # 9: ON
 #                               # 10: If Alarm
         self.alarmoffset = []  # for timed alarms, the seconds after alarmtime the alarm is triggered
-        self.alarmtime2menuidx = [2,4,5,6,7,8,9,10,3,0,11,1] # maps self.alarmtime index to menu idx (to move TP in menu from index 9 to 3)
-        self.menuidx2alarmtime = [9,-1,0,8,1,2,3,4,5,6,7,10] # inverse of above (note that those two are only inverse in one direction!)
+        self.alarmtime2menuidx: Final = [2,4,5,6,7,8,9,10,3,0,11,1] # maps self.alarmtime index to menu idx (to move TP in menu from index 9 to 3)
+        self.menuidx2alarmtime: Final = [9,-1,0,8,1,2,3,4,5,6,7,10] # inverse of above (note that those two are only inverse in one direction!)
         self.alarmcond = []    # 0 = falls below; 1 = rises above
         # alarmstate is set to 'not triggered' on reset(). This is needed so that the user does not have to turn the alarms ON next roast after alarm being used once.
         self.alarmstate = []   # <idx>=triggered, -1=not triggered.
@@ -1844,10 +1972,10 @@ class tgraphcanvas(FigureCanvas):
         self.alarmbeep = []    # 0 = OFF; 1 = ON flags
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program (comments after # are ignored)
         self.alarmtablecolumnwidths = []
-        self.silent_alarms = False # if this is true (can be set via a Artisan Command button action "alarm(1)", alarms are triggered, but actions are not fired
+        self.silent_alarms = False # if this is true (can be set via a + button action "alarm(1)", alarms are triggered, but actions are not fired
         
         # alarm sets
-        self.alarmsets_count = 10 # number of alarm sets
+        self.alarmsets_count: Final = 10 # number of alarm sets
         self.alarmsets = []
         for _ in range(self.alarmsets_count):
             self.alarmsets.append([
@@ -1887,24 +2015,24 @@ class tgraphcanvas(FigureCanvas):
         self.loadaxisfromprofile = False # if set, axis are loaded from profile
 
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
-        self.startofx_default = -30
-        self.endofx_default = 600 # 10min*60
+        self.startofx_default: Final = -30
+        self.endofx_default: Final = 600 # 10min*60
 
-        self.xgrid_default = 120
+        self.xgrid_default: Final = 120
         
-        self.ylimit_F_default = 500
-        self.ylimit_min_F_default = 100
-        self.ygrid_F_default = 100
-        self.zlimit_F_default = 45
-        self.zlimit_min_F_default = 0
-        self.zgrid_F_default = 10
+        self.ylimit_F_default: Final = 500
+        self.ylimit_min_F_default: Final = 100
+        self.ygrid_F_default: Final = 100
+        self.zlimit_F_default: Final = 45
+        self.zlimit_min_F_default: Final = 0
+        self.zgrid_F_default: Final = 10
 
-        self.ylimit_C_default = 250
-        self.ylimit_min_C_default = 0
-        self.ygrid_C_default = 50
-        self.zlimit_C_default = 25
-        self.zlimit_min_C_default = 0
-        self.zgrid_C_default = 5
+        self.ylimit_C_default: Final = 250
+        self.ylimit_min_C_default: Final = 0
+        self.ygrid_C_default: Final = 50
+        self.zlimit_C_default: Final = 25
+        self.zlimit_min_C_default: Final = 0
+        self.zgrid_C_default: Final = 5
 
         self.temp_grid = False
         self.time_grid = False
@@ -1930,7 +2058,7 @@ class tgraphcanvas(FigureCanvas):
         self.RoRlimit = 95
         self.RoRlimitm = -95
         # system fixed RoR limits (only applied if flag is True; usually higher than the user configurable once and always applied)
-        self.maxRoRlimit = 170
+        self.maxRoRlimit: Final = 170
         # axis limits
         self.endofx = self.endofx_default
         self.startofx = self.startofx_default
@@ -1982,7 +2110,7 @@ class tgraphcanvas(FigureCanvas):
         # disable figure autoscale
         self.ax.set_autoscale_on(False)
 
-        #set grid + axle labels + title
+        #set grid + axis labels + title
         grid_axis = None
         if self.temp_grid and self.time_grid:
             grid_axis = 'both'
@@ -2114,8 +2242,6 @@ class tgraphcanvas(FigureCanvas):
         #data containers for wheel
         self.wheelnames,self.segmentlengths,self.segmentsalpha,self.wheellabelparent,self.wheelcolor = [],[],[],[],[]
 
-
-
         #properties
         #store radius of each circle as percentage(sum of all must at all times add up to 100.0%)
         self.wradii = [25.,20.,20.,35.]
@@ -2204,14 +2330,6 @@ class tgraphcanvas(FigureCanvas):
         self.extraArduinoT5 = 0.  # Arduino T7: SV
         self.extraArduinoT6 = 0.  # Arduino T8: TC4 internal ambient temperature
 
-        # used by the ProbatMiddleware extra devices
-        # +ProbatMiddleware_burner_drum and
-        # +ProbatMidleware_fan_pressure
-        self.ProbatMiddleware_burner = -1
-        self.ProbatMiddleware_drum = -1
-        self.ProbatMiddleware_fan = -1
-        self.ProbatMiddleware_pressure = -1
-
         #used by extra device +Program_34, +Program_56, +Program_78 and +Program_910 to pass values
         self.program_t3 = -1
         self.program_t4 = -1
@@ -2232,7 +2350,6 @@ class tgraphcanvas(FigureCanvas):
 
         #variables to organize the delayed update of the backgrounds for bitblitting
         self.ax_background = None
-        self.delayTimeout = 10
         self.block_update = False
 
         # flag to toggle between Temp and RoR scale of xy-display
@@ -2271,9 +2388,9 @@ class tgraphcanvas(FigureCanvas):
         self.statsmaxchrperline = 30
         
         #EnergyUse
-        self.energyunits = ["BTU", "kJ", "kCal", "kWh", "hph"]
-        self.powerunits = ["BTU/h", "kJ/h", "kCal/h", "kW", "hp"]
-        self.sourcenames = ["LPG", "NG", QApplication.translate("ComboBox","Elec",None)]
+        self.energyunits: Final = ["BTU", "kJ", "kCal", "kWh", "hph"]
+        self.powerunits: Final = ["BTU/h", "kJ/h", "kCal/h", "kW", "hp"]
+        self.sourcenames: Final = ["LPG", "NG", QApplication.translate("ComboBox","Elec",None)]
         ## setup defaults (stored in app :
         # Burners
         self.loadlabels_setup = [""]*4                   # burner labels
@@ -2295,7 +2412,7 @@ class tgraphcanvas(FigureCanvas):
         self.electricEnergyMix_setup = 0                   # the amount of renewable electric energy in the energy mix in %
         # Others
         self.energyresultunit_setup = 0                    # index in list self.powerunits
-        self.kind_list = [QApplication.translate("Label","Preheat Measured",None),
+        self.kind_list: Final = [QApplication.translate("Label","Preheat Measured",None),
                           QApplication.translate("Label","Preheat %",None),
                           QApplication.translate("Label","BBP Measured",None),
                           QApplication.translate("Label","BBP %",None),
@@ -2345,7 +2462,7 @@ class tgraphcanvas(FigureCanvas):
         self.resizeredrawing = 0 # holds timestamp of last resize triggered redraw
 
         self.logoimg = None # holds the background logo image
-        self.analysisresultsloc_default = [.49,.5]
+        self.analysisresultsloc_default: Final = [.49,.5]
         self.analysisresultsloc = self.analysisresultsloc_default
         self.analysispickflag = False
         self.analysisresultsstr = ""
@@ -2353,7 +2470,7 @@ class tgraphcanvas(FigureCanvas):
         self.analysisoffset = 180
         self.curvefitstartchoice = 0
         self.curvefitoffset = 180
-        self.segmentresultsloc_default = [.5,.5]
+        self.segmentresultsloc_default: Final = [.5,.5]
         self.segmentresultsloc = self.segmentresultsloc_default
         self.segmentpickflag = False
         self.segmentdeltathreshold = 0.6
@@ -2902,7 +3019,6 @@ class tgraphcanvas(FigureCanvas):
                             break
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onpick() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -2935,7 +3051,6 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.segmentresultsloc = (corners[0][0], corners[0][1] + (corners[1][1] - corners[0][1])/2)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onclick() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -3049,7 +3164,6 @@ class tgraphcanvas(FigureCanvas):
                         menu.popup(QCursor.pos())
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onclick() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -3358,7 +3472,6 @@ class tgraphcanvas(FigureCanvas):
             return temp
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " filterDropOuts() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return temp
@@ -4499,7 +4612,6 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -4627,7 +4739,6 @@ class tgraphcanvas(FigureCanvas):
                 self.updateBackground()
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " timealign() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -5871,73 +5982,76 @@ class tgraphcanvas(FigureCanvas):
 
     #format X axis labels
     def xaxistosm(self,redraw=True,min_time=None,max_time=None):
-        if min_time is None:
-            startofx = self.startofx
-        else:
-            startofx = min_time
-        if max_time is None:
-            endofx = self.endofx
-        else:
-            endofx = max_time
-            
-        if bool(aw.comparator):
-            starttime = 0
-        else:
-            if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
-                starttime = self.timex[self.timeindex[0]]
+        try:
+            if min_time is None:
+                startofx = self.startofx
             else:
+                startofx = min_time
+            if max_time is None:
+                endofx = self.endofx
+            else:
+                endofx = max_time
+                
+            if bool(aw.comparator):
                 starttime = 0
-    
-        endtime = endofx + starttime
-        
-        self.ax.set_xlim(startofx,endtime)
-        
-        if self.xgrid != 0:
-    
-            mfactor1 =  round(float(2. + int(starttime)/int(self.xgrid)))
-            mfactor2 =  round(float(2. + int(endofx)/int(self.xgrid)))
-    
-            majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid)
-            if self.xgrid == 60:
-                minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 30)
             else:
-                minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 60)
+                if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
+                    starttime = self.timex[self.timeindex[0]]
+                else:
+                    starttime = 0
+        
+            endtime = endofx + starttime
+            
+            self.ax.set_xlim(startofx,endtime)
+            
+            if self.xgrid != 0:
+        
+                mfactor1 =  round(float(2. + int(starttime)/int(self.xgrid)))
+                mfactor2 =  round(float(2. + int(endofx)/int(self.xgrid)))
+        
+                majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid)
+                if self.xgrid == 60:
+                    minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 30)
+                else:
+                    minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 60)
+        
+                majorlocator = ticker.FixedLocator(majorloc)
+                minorlocator = ticker.FixedLocator(minorloc)
+        
+                self.ax.xaxis.set_major_locator(majorlocator)
+                self.ax.xaxis.set_minor_locator(minorlocator)
+        
+                formatter = ticker.FuncFormatter(self.formtime)
+                self.ax.xaxis.set_major_formatter(formatter)
     
-            majorlocator = ticker.FixedLocator(majorloc)
-            minorlocator = ticker.FixedLocator(minorloc)
     
-            self.ax.xaxis.set_major_locator(majorlocator)
-            self.ax.xaxis.set_minor_locator(minorlocator)
+                #adjust the length of the minor ticks
+                for i in self.ax.xaxis.get_minorticklines() + self.ax.yaxis.get_minorticklines():
+                    i.set_markersize(4)
+        
+                #adjust the length of the major ticks
+                for i in self.ax.get_xticklines() + self.ax.get_yticklines():
+                    i.set_markersize(6)
+                    #i.set_markeredgewidth(2)   #adjust the width
+        
+                # check x labels rotation
+                if self.xrotation:
+                    for label in self.ax.xaxis.get_ticklabels():
+                        label.set_rotation(self.xrotation)
+        
+                if not aw.qmc.LCDdecimalplaces:
+                    if self.ax:
+                        self.ax.minorticks_off()
+                    if self.delta_ax:
+                        self.delta_ax.minorticks_off()
     
-            formatter = ticker.FuncFormatter(self.formtime)
-            self.ax.xaxis.set_major_formatter(formatter)
-
-
-            #adjust the length of the minor ticks
-            for i in self.ax.xaxis.get_minorticklines() + self.ax.yaxis.get_minorticklines():
-                i.set_markersize(4)
-    
-            #adjust the length of the major ticks
-            for i in self.ax.get_xticklines() + self.ax.get_yticklines():
-                i.set_markersize(6)
-                #i.set_markeredgewidth(2)   #adjust the width
-    
-            # check x labels rotation
-            if self.xrotation:
-                for label in self.ax.xaxis.get_ticklabels():
-                    label.set_rotation(self.xrotation)
-    
-            if not aw.qmc.LCDdecimalplaces:
-                if self.ax:
-                    self.ax.minorticks_off()
-                if self.delta_ax:
-                    self.delta_ax.minorticks_off()
-
-        # we have to update the canvas cache
-        if redraw:
-            self.updateBackground()
-        else:
-            self.ax_background = None
+            # we have to update the canvas cache
+            if redraw:
+                self.updateBackground()
+            else:
+                self.ax_background = None
+        except Exception as e:
+            _log.exception(e)
 
     def fmt_timedata(self,x):
         if bool(aw.comparator):
@@ -6094,7 +6208,6 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " clearMeasurements() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
@@ -6107,7 +6220,14 @@ class tgraphcanvas(FigureCanvas):
         modifiers = QApplication.keyboardModifiers()
         if modifiers == Qt.KeyboardModifier.AltModifier:  #alt click
             # detach IO Phidgets
-            aw.qmc.closePhidgetOUTPUTs()
+            try:
+                aw.qmc.closePhidgetOUTPUTs()
+            except Exception as e:
+                _log.exception(e)
+            try:
+                aw.qmc.closePhidgetAMBIENTs()
+            except Exception as e:
+                _log.exception(e)
         self.reset()
 
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
@@ -6328,9 +6448,8 @@ class tgraphcanvas(FigureCanvas):
             try:
                 # reset color of last pressed button
                 if aw.lastbuttonpressed != -1:
-                    normalstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[aw.lastbuttonpressed],aw.extraeventbuttoncolor[aw.lastbuttonpressed])
                     buttonstyle = "min-width:75px;border-style:solid; border-radius:3;border-color:grey; border-width:1;"
-                    normalstyle = "QPushButton {" + buttonstyle + "font-size: 10pt; font-weight: bold; color: %s; background: %s}"%(aw.extraeventbuttontextcolor[aw.lastbuttonpressed],self.createGradient(aw.extraeventbuttoncolor[aw.lastbuttonpressed]))
+                    normalstyle = "QPushButton {" + buttonstyle + "font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[aw.lastbuttonpressed],aw.createGradient(aw.extraeventbuttoncolor[aw.lastbuttonpressed]))
                     aw.buttonlist[aw.lastbuttonpressed].setStyleSheet(normalstyle)
                 # reset lastbuttonpressed
                 aw.lastbuttonpressed = -1
@@ -6393,7 +6512,6 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " reset() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
@@ -6474,7 +6592,6 @@ class tgraphcanvas(FigureCanvas):
                 return y
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " smooth() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return x
@@ -6824,7 +6941,6 @@ class tgraphcanvas(FigureCanvas):
                             pass
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " place_annotations() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return anno_artists
@@ -7042,7 +7158,6 @@ class tgraphcanvas(FigureCanvas):
             return delta1, delta2
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " recomputeDeltas() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return [0]*len(timex),[0]*len(timex)
@@ -7087,7 +7202,6 @@ class tgraphcanvas(FigureCanvas):
             iy = self.stemp2[idx:self.timeindex[6]+1]
 
             # Create the shaded region
-            from matplotlib.patches import Polygon
             a = ix[0]
             b = ix[-1]
             verts = [ xy for xy in [(a, rtbt)] + list(zip(ix, iy)) + [(b, rtbt)] if xy[1] > 0 ]
@@ -7472,7 +7586,7 @@ class tgraphcanvas(FigureCanvas):
 #                    self.ax.spines['right'].set_visible(False)
 #                    self.ax.spines['top'].set_visible(False)
 
-                #update X ticks, labels, and colors
+                #update X ticks, labels, and rotating_colors
                 self.xaxistosm(redraw=False)
 
                 for label in self.ax.get_xticklabels() :
@@ -7810,7 +7924,6 @@ class tgraphcanvas(FigureCanvas):
                                                 pass
                                     except Exception as ex: # pylint: disable=broad-except
                                         _log.exception(ex)
-#                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
                                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                 elif self.backgroundEtypes[i] == 1 and aw.qmc.showEtypes[1]:
@@ -7847,7 +7960,6 @@ class tgraphcanvas(FigureCanvas):
                                                 pass
                                     except Exception as ex: # pylint: disable=broad-except
                                         _log.exception(ex)
-#                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
                                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                 elif self.backgroundEtypes[i] == 2 and aw.qmc.showEtypes[2]:
@@ -7884,7 +7996,6 @@ class tgraphcanvas(FigureCanvas):
                                                 pass
                                     except Exception as ex: # pylint: disable=broad-except
                                         _log.exception(ex)
-#                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
                                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                 elif self.backgroundEtypes[i] == 3 and aw.qmc.showEtypes[3]:
@@ -7921,7 +8032,6 @@ class tgraphcanvas(FigureCanvas):
                                                 pass
                                     except Exception as ex: # pylint: disable=broad-except
                                         _log.exception(ex)
-#                                        traceback.print_exc(file=sys.stdout)
                                         _, _, exc_tb = sys.exc_info()
                                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 #                            every = None
@@ -8201,12 +8311,12 @@ class tgraphcanvas(FigureCanvas):
                                     netypes[3].append(self.timex[self.specialevents[i]])
 
                         letters = "".join((char1,char2,char3,char4))   #"NPDF" first letter for each type (None, Power, Damper, Fan)
-                        colors = [self.palette["rect2"],self.palette["rect3"]] #rotating colors
+                        rotating_colors = [self.palette["rect2"],self.palette["rect3"]] #rotating rotating_colors
                         for p in range(len(letters)):
                             if len(netypes[p]) > 1:
                                 for i in range(len(netypes[p])-1):
                                     #draw differentiating color bars between events and place then in a different height acording with type
-                                    rect = patches.Rectangle((netypes[p][i], row[letters[p]]), width = (netypes[p][i+1]-netypes[p][i]), height = step, color = colors[i%2],alpha=0.5)
+                                    rect = patches.Rectangle((netypes[p][i], row[letters[p]]), width = (netypes[p][i+1]-netypes[p][i]), height = step, color = rotating_colors[i%2],alpha=0.5)
                                     self.ax.add_patch(rect)
 
                         # annotate event
@@ -8316,7 +8426,6 @@ class tgraphcanvas(FigureCanvas):
                                             pass
                                 except Exception as ex: # pylint: disable=broad-except
                                     _log.exception(ex)
-#                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                             elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
@@ -8356,7 +8465,6 @@ class tgraphcanvas(FigureCanvas):
 
                                 except Exception as ex: # pylint: disable=broad-except
                                     _log.exception(ex)
-#                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                             elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
@@ -8395,7 +8503,6 @@ class tgraphcanvas(FigureCanvas):
                                             pass
                                 except Exception as ex: # pylint: disable=broad-except
                                     _log.exception(ex)
-#                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                             elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
@@ -8434,7 +8541,6 @@ class tgraphcanvas(FigureCanvas):
                                             pass
                                 except Exception as ex: # pylint: disable=broad-except
                                     _log.exception(ex)
-#                                    traceback.print_exc(file=sys.stdout)
                                     _, _, exc_tb = sys.exc_info()
                                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -8838,7 +8944,7 @@ class tgraphcanvas(FigureCanvas):
 
                 if not sampling and not aw.qmc.flagon and self.timeindex[6] and aw.qmc.AUCshowFlag:
                     self.drawAUC()
-                #update label colors
+                #update label rotating_colors
                 for label in self.ax.xaxis.get_ticklabels():
                     label.set_color(self.palette["xlabel"])
                 for label in self.ax.yaxis.get_ticklabels():
@@ -8949,7 +9055,6 @@ class tgraphcanvas(FigureCanvas):
 
             except Exception as ex: # pylint: disable=broad-except
                 _log.exception(ex)
-#                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
@@ -9002,7 +9107,6 @@ class tgraphcanvas(FigureCanvas):
 
     def annoboxCorners(self,anno):
         try:
-            from matplotlib.transforms import Bbox
             f = self.ax.get_figure()
             r = f.canvas.get_renderer()
             anno.update_bbox_position_size(renderer=r)
@@ -9272,7 +9376,6 @@ class tgraphcanvas(FigureCanvas):
                 filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Image File",None),ext="*.png *.jpg")
             if len(filename) == 0:
                 return
-            from matplotlib.pyplot import imread
             aw.qmc.logoimg = imread(filename)
             aw.logofilename = filename
             aw.sendmessage(QApplication.translate("Message","Loaded watermark image {0}", None).format(filename))
@@ -9501,7 +9604,6 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " statsSummary() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def statstextboxBounds(self,x_pos,y_pos,textstr,ls,prop,fc):
-        from matplotlib.transforms import Bbox
         
         with warnings.catch_warnings():
             # MPL will generate warnings for missing glyphs in some fonts
@@ -10034,7 +10136,6 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.draw_idle()
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
 
     def flavorChartLabelText(self,i):
         return aw.arabicReshape(self.flavorlabels[i]) + "\n" + str("%.2f"%self.flavors[i])
@@ -10288,7 +10389,6 @@ class tgraphcanvas(FigureCanvas):
                 return
 
             if not bool(aw.simulator) and aw.qmc.device == 53:
-                from artisanlib.hottop import startHottop
                 startHottop(0.6,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
             try:
                 aw.eventactionx(aw.qmc.extrabuttonactions[0],aw.qmc.extrabuttonactionstrings[0])
@@ -10432,6 +10532,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def getAmbientData(self):
+        _log.debug("getAmbientData()")
         # this is needed to surpress the message on the ignored Exception
         #                            # Phidget that is raised on starting the PhidgetManager without installed
         #                            # Phidget driver (artisanlib/surpress_error.py fails to surpress this)
@@ -10447,7 +10548,7 @@ class tgraphcanvas(FigureCanvas):
                 humidity = aw.ser.PhidgetHUM1000humidity()
             elif self.ambient_humidity_device == 2: # Yocto Meteo
                 humidity = aw.ser.YoctoMeteoHUM()
-
+            
             #--- temperature
             if self.ambient_temperature_device == 1: # Phidget HUM1000
                 temp = aw.ser.PhidgetHUM1000temperature()
@@ -10476,16 +10577,20 @@ class tgraphcanvas(FigureCanvas):
             if humidity is not None:
                 self.ambient_humidity = aw.float2float(humidity,1)
                 aw.sendmessage(QApplication.translate("Message","Humidity: {}%", None).format(self.ambient_humidity))
+                libtime.sleep(1)
 
             if temp is not None:
                 if self.mode == "F":
                     temp = fromCtoF(temp)
                 self.ambientTemp = aw.float2float(temp,1)
                 aw.sendmessage(QApplication.translate("Message","Temperature: {}{}", None).format(self.ambientTemp,self.mode))
+                libtime.sleep(1)
 
             if pressure is not None:
                 self.ambient_pressure = aw.float2float(pressure,1)
                 aw.sendmessage(QApplication.translate("Message","Pressure: {}hPa", None).format(self.ambient_pressure))
+        except Exception as e:
+            _log.exception(e)
         finally:
             sys.stderr = _stderr
 
@@ -10635,7 +10740,35 @@ class tgraphcanvas(FigureCanvas):
         aw.ser.yoctoSERVOclose()
         # close Yocto PWM Outputs
         aw.ser.yoctoPWMclose()
-
+    
+    @staticmethod
+    def closePhidgetAMBIENTs():
+        # note that we do not unregister this detach in the aw.qmc.phidgetManager as we only support one of those devices
+        try:
+            if aw.ser.TMP1000temp is not None and aw.ser.TMP1000temp.getAttached():
+                aw.ser.TMP1000temp.close()
+                _log.debug("Phidget TMP1000 temperature channel closed")
+        except Exception as e:
+            _log.exception(e)
+        try:
+            if aw.ser.PhidgetHUMtemp is not None and aw.ser.PhidgetHUMtemp.getAttached():
+                aw.ser.PhidgetHUMtemp.close()
+                _log.debug("Phidget HUM100x temperature channel closed")
+        except Exception as e:
+            _log.exception(e)
+        try:
+            if aw.ser.PhidgetHUMhum is not None and aw.ser.PhidgetHUMhum.getAttached():
+                aw.ser.PhidgetHUMhum.close()
+                _log.debug("Phidget HUM100x humidity channel closed")
+        except Exception as e:
+            _log.exception(e)
+        try:
+            if aw.ser.PhidgetPREpre is not None and aw.ser.PhidgetPREpre.getAttached():
+                aw.ser.PhidgetPREpre.close()
+                _log.debug("Phidget PRE1000 pressure channel closed")
+        except Exception as e:
+            _log.exception(e)
+            
 
     def disconnectProbes(self):
         # close ports of main device
@@ -12141,7 +12274,6 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(QApplication.translate("Message","Timer is OFF", None))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " EventRecordAction() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
@@ -12387,7 +12519,6 @@ class tgraphcanvas(FigureCanvas):
                 self.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min","abbrev. of minutes")))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " writecharacteristics() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -12604,7 +12735,6 @@ class tgraphcanvas(FigureCanvas):
             self.writecharacteristics(TP_index,LP)
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-            #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " writestatistics() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -12884,7 +13014,6 @@ class tgraphcanvas(FigureCanvas):
             
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-            #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " calcEnergyuse() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         return energymetrics,btu_list
@@ -12915,7 +13044,6 @@ class tgraphcanvas(FigureCanvas):
                     energy = self.loadratings[i] * factor * (duration / 3600) #* self.convertHeat(1,self.ratingunits[i],0)
                 except Exception as ex: # pylint: disable=broad-except
                     _log.exception(ex)
-                    #traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                 return energy
@@ -12973,7 +13101,6 @@ class tgraphcanvas(FigureCanvas):
             
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-            #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " measureFromprofile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         return heatEnergy, coolEnergy, heatDuration, coolDuration
@@ -13106,7 +13233,6 @@ class tgraphcanvas(FigureCanvas):
     def univariateinfo(self):
         try:
             #pylint: disable=E0611
-            from scipy.interpolate import UnivariateSpline
             Xpoints,Ypoints = self.findpoints()  #from lowest point to avoid many coeficients
             equ = UnivariateSpline(Xpoints, Ypoints)
             coeffs = equ.get_coeffs().tolist()
@@ -13245,7 +13371,6 @@ class tgraphcanvas(FigureCanvas):
                         res = "%.8f * log(%.8f * t %s %.8f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Error in lnRegression:",None) + " lnRegression() " + str(e),getattr(exc_tb, 'tb_lineno', '?'))
             if power == 2:
@@ -13262,7 +13387,6 @@ class tgraphcanvas(FigureCanvas):
     def univariate(self):
         try:
             #pylint: disable=E0611
-            from scipy.interpolate import UnivariateSpline
             Xpoints,Ypoints = self.findpoints()
 
             func = UnivariateSpline(Xpoints, Ypoints)
@@ -13282,7 +13406,6 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " univariate() " + str(e),getattr(exc_tb, 'tb_lineno', '?'))
             return
@@ -13533,7 +13656,6 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(QApplication.translate("Message","Points saved", None))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " savepoints() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -13556,7 +13678,6 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(QApplication.translate("Message","Points loaded", None))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadpoints() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -13646,7 +13767,6 @@ class tgraphcanvas(FigureCanvas):
     def redrawdesigner(self):
         if aw.qmc.designerflag:
             #pylint: disable=E0611
-            from scipy.interpolate import UnivariateSpline
             #reset (clear) plot
             self.ax_lines_clear()
 
@@ -13967,7 +14087,6 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " on_motion() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             self.unrarefy_designer()
@@ -13975,7 +14094,6 @@ class tgraphcanvas(FigureCanvas):
 
     def findTPdes(self):
         try:
-            from scipy.interpolate import UnivariateSpline
             funcBT = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
             timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
             btvals = funcBT(timez).tolist()
@@ -14136,7 +14254,6 @@ class tgraphcanvas(FigureCanvas):
     def convert_designer(self):
         try:
             #pylint: disable=E0611
-            from scipy.interpolate import UnivariateSpline
             #prevents accidentally deleting a modified profile.
             self.fileDirtySignal.emit()
             #create functions
@@ -15170,7 +15287,6 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " edit_parameters() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-#            traceback.print_exc(file=sys.stdout)
 
 
 ########################################################################################
@@ -15382,9 +15498,62 @@ class ApplicationWindow(QMainWindow):
     adjustSVSignal = pyqtSignal(int)
     updateSerialLogSignal = pyqtSignal()
     fireslideractionSignal = pyqtSignal(int)
+    moveButtonSignal = pyqtSignal(str)
+    
+    __slots__ = [ 'locale_str', 'app', 'superusermode', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
+        'plus_paidUntil', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
+        'eventaction_running_threads', 'qtbase_additional_locales', 'qtbase_locales', 'curFile', 'MaxRecentFiles', 'recentFileActs', 'recentSettingActs',
+        'recentThemeActs', 'applicationDirectory', 'helpdialog', 'redrawTimer', 'lastLoadedProfile', 'lastLoadedBackground',
+        'analysisresultsanno', 'segmentresultsanno', 'largeLCDs_dialog', 'LargeLCDsFlag', 'largeDeltaLCDs_dialog', 'LargeDeltaLCDsFlag', 'largePIDLCDs_dialog',
+        'LargePIDLCDsFlag', 'largeExtraLCDs_dialog', 'LargeExtraLCDsFlag', 'largePhasesLCDs_dialog', 'LargePhasesLCDsFlag', 'WebLCDs', 'WebLCDsPort',
+        'WebLCDsAlerts', 'EventsDlg_activeTab', 'graphColorDlg_activeTab', 'PID_DlgControl_activeTab', 'HUDDlg_activeTab', 'editGraphDlg_activeTab',
+        'backgroundDlg_activeTab', 'DeviceAssignmentDlg_activeTab', 'AlarmDlg_activeTab', 'resetqsettings', 'settingspath', 'wheelpath', 'profilepath',
+        'userprofilepath', 'printer', 'main_widget', 'defaultdpi', 'dpi', 'qmc', 'HottopControlActive', 'AsyncSamplingAction', 'wheeldialog',
+        'simulator', 'simulatorpath', 'comparator', 'HUD', 'showHUD', 'HUDfunction', 'stack', 'eventsbuttonflag', 'minieventsflag', 'seriallogflag',
+        'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'ws', 'scale', 'color', 'extraser', 'extracomport', 'extrabaudrate',
+        'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
+        'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
+        'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
+        'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventslideractions', 'eventslidercommands', 'eventslideroffsets',
+        'eventsliderfactors', 'eventslidermin', 'eventsMaxValue', 'eventslidermax', 'eventslidersflags', 'eventsliderBernoulli', 'eventslidercoarse',
+        'eventslidertemp', 'eventsliderunits', 'eventslidermoved', 'SVslidermoved', 'eventquantifieractive', 'eventquantifiersource', 'eventquantifierSV',
+        'eventquantifiermin', 'eventquantifiermax', 'eventquantifiercoarse', 'eventquantifieraction', 'clusterEventsFlag', 'eventquantifierlinspaces', 
+        'eventquantifiersteps', 'eventquantifierthresholdfine', 'eventquantifierthresholdcoarse', 'lastdigitizedvalue', 'lastdigitizedtemp',
+        'readingslcdsflags', 'logoimgalpha', 'logoimgflag', 'logofilename', 'redrawOnResize', 'searchtextartisansettings', 'fileMenu', 'editMenu',
+        'RoastMenu', 'ConfMenu', 'ToolkitMenu', 'viewMenu', 'helpMenu', 'newRoastMenu', 'fileLoadAction', 'openRecentMenu', 'importMenu',
+        'fileSaveAction', 'fileSaveCopyAsAction', 'exportMenu', 'convMenu', 'saveGraphMenu', 'reportMenu', 'htmlAction', 'productionMenu',
+        'productionWebAction', 'productionCsvAction', 'productionExcelAction', 'rankingMenu', 'rankingWebAction', 'rankingCsvAction', 'rankingExcelAction',
+        'savestatisticsAction', 'printAction', 'quitAction', 'cutAction', 'copyAction', 'pasteAction', 'editGraphAction', 'backgroundAction',
+        'flavorAction', 'switchAction', 'switchETBTAction', 'machineMenu', 'deviceAction', 'commportAction', 'calibrateDelayAction', 'hudAction',
+        'eventsAction', 'alarmAction', 'phasesGraphAction', 'StatisticsAction', 'WindowconfigAction', 'colorsAction', 'themeMenu', 'autosaveAction',
+        'batchAction', 'temperatureConfMenu', 'FahrenheitAction', 'CelsiusAction', 'languageMenu', 'analyzeMenu', 'fitIdealautoAction',
+        'analyzeMenu', 'fitIdealx2Action', 'fitIdealx3Action', 'fitIdealx0Action', 'fitBkgndAction', 'clearresultsAction', 'roastCompareAction',
+        'designerAction', 'simulatorAction', 'wheeleditorAction', 'transformAction', 'temperatureMenu', 'ConvertToFahrenheitAction', 
+        'ConvertToCelsiusAction', 'controlsAction', 'readingsAction', 'buttonsAction', 'slidersAction', 'lcdsAction', 'deltalcdsAction',
+        'pidlcdsAction', 'extralcdsAction', 'phaseslcdsAction', 'fullscreenAction', 'loadSettingsAction', 'openRecentSettingMenu',
+        'saveAsSettingsAction', 'resetAction', 'messagelabel', 'button_font_size_pt', 'button_font_size', 'button_font_size_small', 'button_font_size_small_selected',
+        'button_font_size_tiny', 'button_font_size_micro', 'main_button_min_width', 'standard_button_min_width', 'small_button_min_width', 'tiny_button_min_width',
+        'pushbuttonstyles_simulator', 'pushbuttonstyles', 'standard_button_tiny_height', 'standard_button_small_height', 'standard_button_height',
+        'button_1', 'button_2', 'button_3', 'button_4', 'button_5', 'button_6', 'button_7', 'button_8', 'button_9', 'button_10', 'button_11', 'button_12',
+        'button_13',  'button_14', 'button_15', 'button_16', 'button_17', 'button_18', 'button_19', 'button_20', 'lcd1', 'lcd2', 'lcd3', 'lcd4', 'lcd5', 
+        'lcd6', 'lcd7', 'label2', 'label3', 'label4', 'label5', 'label6', 'label7', 'nLCDs', 'extraLCD1', 'extraLCD2', 'extraLCDlabel1', 'extraLCDlabel2',
+        'extraLCDframe1', 'extraLCDframe2', 'extraLCDvisibility1', 'extraLCDvisibility2', 'extraCurveVisibility1', 'extraCurveVisibility2',
+        'extraDelta1', 'extraDelta2', 'extraFill1', 'extraFill2', 'channel_tare_values', 'messagehist', 'eventlabel', 'eNumberSpinBox', 
+        'lineEvent', 'etypeComboBox', 'valueEdit', 'etimeline', 'buttonminiEvent', 'buttonlist', 'buttonStates', 'lastbuttonpressed', 'buttonlistmaxlen',
+        'buttonpalette_default_label', 'buttonpalette_label', 'buttonpalettemaxlen', 'buttonpalette_shortcuts', 'buttonsize', 'eventbuttontablecolumnwidths',
+        'lowerbuttondialogLayout', 'lowerbuttondialog', 'lowerbuttondialogLayout', 'e1buttonbarLayout', 'e1buttondialog', 'e2buttonbarLayout', 'e2buttondialog',
+        'e3buttonbarLayout', 'e3buttondialog', 'e4buttonbarLayout', 'e4buttondialog', 'keyboardmove', 'keyboardButtonList', 'keyboardmoveindex',
+        'keyboardmoveflag', 'lastkeyboardcmd', 'error_dlg', 'serial_dlg', 'message_dlg', 'ETname', 'BTname', 'level1frame', 'level1layout', 'EventsGroupLayout',
+        'LCD2frame', 'LCD3frame', 'LCD4frame', 'LCD5frame', 'LCD6frame', 'LCD7frame', 'TPlabel', 'TPlcd', 'TPlcdFrame', 'TP2DRYlabel', 'TP2DRYframe', 
+        'DRYlabel', 'DRYlcd', 'DRYlcdFrame', 'DRY2FCslabel', 'DRY2FCsframe', 'FCslabel', 'FCslcd', 'FCslcdFrame', 'AUClabel', 'AUClcd', 'AUClcdFrame',
+        'AUCLCD', 'phasesLCDs', 'extrabuttonsLayout', 'extrabuttondialogs', 'slider1', 'slider2', 'slider3', 'slider4', 'sliderLCD1', 'sliderLCD2', 'sliderLCD3',
+        'sliderLCD4', 'sliderGrpBox1', 'sliderGrpBox2', 'sliderGrpBox3', 'sliderGrpBox4', 'sliderSV', 'sliderLCDSV', 'sliderGrpBoxSV', 'leftlayout',
+        'sliderFrame', 'lcdFrame', 'midlayout', 'editgraphdialog' ]
+        
+        
 
     def __init__(self, parent = None, *, locale):
-
+    
         self.locale_str = locale
         self.app = app
         self.superusermode = False
@@ -15495,9 +15664,6 @@ class ApplicationWindow(QMainWindow):
             if not preference_dir.exists():
                 QDir().mkpath(preference_path)
             QDir().setCurrent(preference_path)
-
-        #checks executable directory. dirstruct() checks or creates: /profile/year/month directory to store profiles
-        #self.dirstruct()
 
 
         #defaults the users profile path to the standard profilepath (incl. month/year subdirectories)
@@ -16163,218 +16329,42 @@ class ApplicationWindow(QMainWindow):
         self.temperatureConfMenu.addAction(self.CelsiusAction)
 
         self.languageMenu = self.ConfMenu.addMenu(QApplication.translate("Menu", "Language", None))
-
-        self.ArabicLanguage = QAction("\u0627\u0644\u0639\u0631\u0628\u064a\u0629", self)
-        self.ArabicLanguage.setCheckable(True)
-        self.ArabicLanguage.triggered.connect(self.changelocale_ar)
-        self.languageMenu.addAction(self.ArabicLanguage)
-        if self.locale_str == "ar":
-            self.ArabicLanguage.setChecked(True)
-
-        self.DanishLanguage = QAction("Dansk", self)
-        self.DanishLanguage.setCheckable(True)
-        self.DanishLanguage.triggered.connect(self.changelocale_da)
-        self.languageMenu.addAction(self.DanishLanguage)
-        if self.locale_str == "da":
-            self.DanishLanguage.setChecked(True)
-
-        self.GermanLanguage = QAction("Deutsch", self)
-        self.GermanLanguage.setCheckable(True)
-        self.GermanLanguage.triggered.connect(self.changelocale_de)
-        self.languageMenu.addAction(self.GermanLanguage)
-        if self.locale_str == "de":
-            self.GermanLanguage.setChecked(True)
-
-        self.EnglishLanguage = QAction("English", self)
-        self.EnglishLanguage.setCheckable(True)
-        self.EnglishLanguage.triggered.connect(self.changelocale_en)
-        self.languageMenu.addAction(self.EnglishLanguage)
-        if self.locale_str in ["en", "en_US"]:
-            self.EnglishLanguage.setChecked(True)
-
-        self.SpanishLanguage = QAction("Espa\u00f1ol", self)
-        self.SpanishLanguage.setCheckable(True)
-        self.SpanishLanguage.triggered.connect(self.changelocale_es)
-        self.languageMenu.addAction(self.SpanishLanguage)
-        if self.locale_str == "es":
-            self.SpanishLanguage.setChecked(True)
-
-        self.FarsiLanguage = QAction("\u0641\u0627\u0631\u0633\u06cc", self)
-        self.FarsiLanguage.setCheckable(True)
-        self.FarsiLanguage.triggered.connect(self.changelocale_fa)
-        self.languageMenu.addAction(self.FarsiLanguage)
-        if self.locale_str == "fa":
-            self.FarsiLanguage.setChecked(True)
-
-        self.FrenchLanguage = QAction("Fran\u00e7ais", self)
-        self.FrenchLanguage.setCheckable(True)
-        self.FrenchLanguage.triggered.connect(self.changelocale_fr)
-        self.languageMenu.addAction(self.FrenchLanguage)
-        if self.locale_str == "fr":
-            self.FrenchLanguage.setChecked(True)
         
-        self.GaelicLanguage = QAction("G\u00e0idhlig na h-Alba", self)
-        self.GaelicLanguage.setCheckable(True)
-        self.GaelicLanguage.triggered.connect(self.changelocale_gd)
-        self.languageMenu.addAction(self.GaelicLanguage)
-        if self.locale_str == "gd":
-            self.GaelicLanguage.setChecked(True)
-
-        self.GreekLanguage = QAction("\u03b5\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac", self)
-        self.GreekLanguage.setCheckable(True)
-        self.GreekLanguage.triggered.connect(self.changelocale_el)
-        self.languageMenu.addAction(self.GreekLanguage)
-        if self.locale_str == "el":
-            self.GreekLanguage.setChecked(True)
-
-        self.HebrewLanguage = QAction("\u05e2\u05d1\u05e8\u05d9\u05ea", self)
-        self.HebrewLanguage.setCheckable(True)
-        self.HebrewLanguage.triggered.connect(self.changelocale_he)
-        self.languageMenu.addAction(self.HebrewLanguage)
-        if self.locale_str == "he":
-            self.HebrewLanguage.setChecked(True)
-
-        self.IndonesianLanguage = QAction("Indonesia", self)
-        self.IndonesianLanguage.setCheckable(True)
-        self.IndonesianLanguage.triggered.connect(self.changelocale_id)
-        self.languageMenu.addAction(self.IndonesianLanguage)
-        if self.locale_str == "id":
-            self.IndonesianLanguage.setChecked(True)
-
-        self.ItalianLanguage = QAction("Italiano", self)
-        self.ItalianLanguage.setCheckable(True)
-        self.ItalianLanguage.triggered.connect(self.changelocale_it)
-        self.languageMenu.addAction(self.ItalianLanguage)
-        if self.locale_str == "it":
-            self.ItalianLanguage.setChecked(True)
-
-        self.JapaneseLanguage = QAction("\u65e5\u672c\u8a9e", self)
-        self.JapaneseLanguage.setCheckable(True)
-        self.JapaneseLanguage.triggered.connect(self.changelocale_ja)
-        self.languageMenu.addAction(self.JapaneseLanguage)
-        if self.locale_str == "ja":
-            self.JapaneseLanguage.setChecked(True)
-
-        self.KoreanLanguage = QAction("\ud55c\uad6d\uc758", self)
-        self.KoreanLanguage.setCheckable(True)
-        self.KoreanLanguage.triggered.connect(self.changelocale_ko)
-        self.languageMenu.addAction(self.KoreanLanguage)
-        if self.locale_str == "ko":
-            self.KoreanLanguage.setChecked(True)
-
-        self.LatvianLanguage = QAction("Latviete", self)
-        self.LatvianLanguage.setCheckable(True)
-        self.LatvianLanguage.triggered.connect(self.changelocale_lv)
-        self.languageMenu.addAction(self.LatvianLanguage)
-        if self.locale_str == "lv":
-            self.LatvianLanguage.setChecked(True)
-
-        self.HungarianLanguage = QAction("Magyar", self)
-        self.HungarianLanguage.setCheckable(True)
-        self.HungarianLanguage.triggered.connect(self.changelocale_hu)
-        self.languageMenu.addAction(self.HungarianLanguage)
-        if self.locale_str == "hu":
-            self.HungarianLanguage.setChecked(True)
-
-        self.DutchLanguage = QAction("Nederlands", self)
-        self.DutchLanguage.setCheckable(True)
-        self.DutchLanguage.triggered.connect(self.changelocale_nl)
-        self.languageMenu.addAction(self.DutchLanguage)
-        if self.locale_str == "nl":
-            self.DutchLanguage.setChecked(True)
-
-        self.NorwegianLanguage = QAction("Norsk", self)
-        self.NorwegianLanguage.setCheckable(True)
-        self.NorwegianLanguage.triggered.connect(self.changelocale_no)
-        self.languageMenu.addAction(self.NorwegianLanguage)
-        if self.locale_str == "no":
-            self.NorwegianLanguage.setChecked(True)
-
-        self.PolishLanguage = QAction("Polski", self)
-        self.PolishLanguage.setCheckable(True)
-        self.PolishLanguage.triggered.connect(self.changelocale_pl)
-        self.languageMenu.addAction(self.PolishLanguage)
-        if self.locale_str == "pl":
-            self.PolishLanguage.setChecked(True)
-
-        self.PortugueseLanguage = QAction("Portugu\xeas", self)
-        self.PortugueseLanguage.setCheckable(True)
-        self.PortugueseLanguage.triggered.connect(self.changelocale_pt)
-        self.languageMenu.addAction(self.PortugueseLanguage)
-        if self.locale_str == "pt":
-            self.PortugueseLanguage.setChecked(True)
-
-        self.PortugueseBrasilLanguage = QAction("Portugu\u00EAs do Brasil", self)
-        self.PortugueseBrasilLanguage.setCheckable(True)
-        self.PortugueseBrasilLanguage.triggered.connect(self.changelocale_pt_BR)
-        self.languageMenu.addAction(self.PortugueseBrasilLanguage)
-        if self.locale_str == "pt_BR":
-            self.PortugueseBrasilLanguage.setChecked(True)
-
-        self.RussianLanguage = QAction("\u0420\u0443\u0441\u0441\u043a\u0438\u0439", self)
-        self.RussianLanguage.setCheckable(True)
-        self.RussianLanguage.triggered.connect(self.changelocale_ru)
-        self.languageMenu.addAction(self.RussianLanguage)
-        if self.locale_str == "ru":
-            self.RussianLanguage.setChecked(True)
-
-        self.SlovakLanguage = QAction("Slov\u00e1k", self)
-        self.SlovakLanguage.setCheckable(True)
-        self.SlovakLanguage.triggered.connect(self.changelocale_sk)
-        self.languageMenu.addAction(self.SlovakLanguage)
-        if self.locale_str == "sk":
-            self.SlovakLanguage.setChecked(True)
-
-        self.FinishLanguage = QAction("Suomalainen", self)
-        self.FinishLanguage.setCheckable(True)
-        self.FinishLanguage.triggered.connect(self.changelocale_fi)
-        self.languageMenu.addAction(self.FinishLanguage)
-        if self.locale_str == "fi":
-            self.FinishLanguage.setChecked(True)
-
-        self.SwedishLanguage = QAction("Svenska", self)
-        self.SwedishLanguage.setCheckable(True)
-        self.SwedishLanguage.triggered.connect(self.changelocale_sv)
-        self.languageMenu.addAction(self.SwedishLanguage)
-        if self.locale_str == "sv":
-            self.SwedishLanguage.setChecked(True)
-
-        self.ThaiLanguage = QAction("Thai", self)
-        self.ThaiLanguage.setCheckable(True)
-        self.ThaiLanguage.triggered.connect(self.changelocale_th)
-        self.languageMenu.addAction(self.ThaiLanguage)
-        if self.locale_str == "th":
-            self.ThaiLanguage.setChecked(True)
-
-        self.TurkishLanguage = QAction("T\xfcrk\u00e7e", self)
-        self.TurkishLanguage.setCheckable(True)
-        self.TurkishLanguage.triggered.connect(self.changelocale_tr)
-        self.languageMenu.addAction(self.TurkishLanguage)
-        if self.locale_str == "tr":
-            self.TurkishLanguage.setChecked(True)
-
-        self.VietnameseLanguage = QAction("Ti\u1EBFng Vi\u1EC7t", self)
-        self.VietnameseLanguage.setCheckable(True)
-        self.VietnameseLanguage.triggered.connect(self.changelocale_vi)
-        self.languageMenu.addAction(self.VietnameseLanguage)
-        if self.locale_str == "vi":
-            self.VietnameseLanguage.setChecked(True)
-
-        # simplified Chinese
-        self.ChineseChinaLanguage = QAction("\u7b80\u4f53\u4e2d\u6587", self)
-        self.ChineseChinaLanguage.setCheckable(True)
-        self.ChineseChinaLanguage.triggered.connect(self.changelocale_zh_CN)
-        self.languageMenu.addAction(self.ChineseChinaLanguage)
-        if self.locale_str == "zh_CN":
-            self.ChineseChinaLanguage.setChecked(True)
-
-        # traditional Chinese
-        self.ChineseTaiwanLanguage = QAction("\u7e41\u9ad4\u4e2d\u6587", self)
-        self.ChineseTaiwanLanguage.setCheckable(True)
-        self.ChineseTaiwanLanguage.triggered.connect(self.changelocale_zh_TW)
-        self.languageMenu.addAction(self.ChineseTaiwanLanguage)
-        if self.locale_str == "zh_TW":
-            self.ChineseTaiwanLanguage.setChecked(True)
+        # language_menu_actions holds a dict associating iso2 locale strings to language menu actions
+        self.language_menu_actions = {}
+        
+        for iso, name in [
+                ("ar", "\u0627\u0644\u0639\u0631\u0628\u064a\u0629"),
+                ("da", "Dansk"),
+                ("de", "Deutsch"),
+                ("en", "English"),
+                ("es", "Espa\u00f1ol"),
+                ("fa", "\u0641\u0627\u0631\u0633\u06cc"),
+                ("fr", "Fran\u00e7ais"),
+                ("gd", "G\u00e0idhlig na h-Alba"),
+                ("el", "\u03b5\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac"),
+                ("he", "\u05e2\u05d1\u05e8\u05d9\u05ea"),
+                ("id", "Indonesia"),
+                ("it", "Italiano"),
+                ("jp", "\u65e5\u672c\u8a9e"),
+                ("ko", "\ud55c\uad6d\uc758"),
+                ("lv", "Latviete"),
+                ("hu", "Magyar"),
+                ("nl", "Nederlands"),
+                ("no", "Norsk"),
+                ("pl", "Polski"),
+                ("pt", "Portugu\xeas"),
+                ("pt_BR", "Portugu\u00EAs do Brasil"),
+                ("ru", "\u0420\u0443\u0441\u0441\u043a\u0438\u0439"),
+                ("sk", "Slov\u00e1k"),
+                ("fi", "Suomalainen"),
+                ("sv", "Svenska"),
+                ("th", "Thai"),
+                ("tr", "T\xfcrk\u00e7e"),
+                ("vi", "Ti\u1EBFng Vi\u1EC7t"),
+                ("zh_CN", "\u7b80\u4f53\u4e2d\u6587"),
+                ("zh_TW", "\u7e41\u9ad4\u4e2d\u6587")]:
+            self.addLanguage(iso, name)
 
 
         # TOOLKIT menu
@@ -16650,7 +16640,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: '#147bb3';
-                    background: white;
+                    background-color: white;
                 }
                 QPushButton:pressed {
                     color: 116D98;
@@ -16658,7 +16648,7 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:hover:!pressed {
                     color: #1985ba;
-                    background: #F5F5F5;
+                    background-color: #F5F5F5;
                 }
             """,
             "ON":    """
@@ -16668,7 +16658,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: #cc0f50;
-                    background: white;
+                    background-color: white;
 
                 }
                 QPushButton:pressed {
@@ -16677,7 +16667,7 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:hover:!pressed {
                     color: #d4336a;
-                    background: #F5F5F5;
+                    background-color: #F5F5F5;
                 }
             """,
             "STOP":     """
@@ -16687,11 +16677,11 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: #147bb3;
-                    background: white;
+                    background-color: white;
                 }
                 QPushButton:!enabled {
                     color: #EFEFEF;
-                    background: darkgrey;
+                    background-color: darkgrey;
                 }
                 QPushButton:pressed {
                     color: #116999;
@@ -16699,7 +16689,7 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:hover:!pressed {
                     color: #1985ba;
-                    background: #F5F5F5;
+                    background-color: #F5F5F5;
                 }
             """,
             "START":    """
@@ -16709,11 +16699,11 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: yellow;
-                    background: #ff3d00;
+                    background-color: #ff3d00;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
-                    background: #E0E0E0;
+                    background-color: #E0E0E0;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
@@ -16735,11 +16725,11 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background: #2298c7;
+                    background-color: #2298c7;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
-                    background: lightgrey;
+                    background-color: lightgrey;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
@@ -16747,7 +16737,7 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background: #43a7cf;
+                    background-color: #43a7cf;
                 }
             """,
             "OFF":    """
@@ -16757,7 +16747,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background: '#147bb3';
+                    background-color: '#147bb3';
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
@@ -16765,7 +16755,7 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background: #1985ba;
+                    background-color: #1985ba;
                 }
             """,
             "ON":    """
@@ -16775,7 +16765,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background: #cc0f50;
+                    background-color: #cc0f50;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
@@ -16783,7 +16773,7 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background: #d4336a;
+                    background-color: #d4336a;
                 }
             """,
             "STOP":     """
@@ -16793,11 +16783,11 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background: #147bb3;
+                    background-color: #147bb3;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
-                    background: #E0E0E0;
+                    background-color: #E0E0E0;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
@@ -16805,7 +16795,7 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background: #1985ba;
+                    background-color: #1985ba;
                 }
             """,
             "START":    """
@@ -16815,11 +16805,11 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: yellow;
-                    background: #ff3d00;
+                    background-color: #ff3d00;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
-                    background: #E0E0E0;
+                    background-color: #E0E0E0;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
@@ -16838,7 +16828,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:flat{
                     color: darkgrey;
@@ -16854,11 +16844,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background:""" + self.createGradient('#116999') + """ ;
+                    background-color:""" + self.createGradient('#116999') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#1985ba') + """ ;
+                    background-color:""" + self.createGradient('#1985ba') + """ ;
                 }
             """,
             "DRY END":    """
@@ -16868,7 +16858,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#66b8d7') + """ ;
+                    background-color:""" + self.createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
                     color: #BDBDBD;
@@ -16884,11 +16874,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#43a7cf') + """ ;
+                    background-color:""" + self.createGradient('#43a7cf') + """ ;
                 }
             """,
             "FC START":    """
@@ -16898,7 +16888,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#66b8d7') + """ ;
+                    background-color:""" + self.createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
                     color: #BDBDBD;
@@ -16914,11 +16904,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#43a7cf') + """ ;
+                    background-color:""" + self.createGradient('#43a7cf') + """ ;
                 }
             """,
             "FC END":    """
@@ -16928,7 +16918,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#66b8d7') + """ ;
+                    background-color:""" + self.createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
                     color: #BDBDBD;
@@ -16944,11 +16934,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#43a7cf') + """ ;
+                    background-color:""" + self.createGradient('#43a7cf') + """ ;
                 }
             """,
             "SC START":    """
@@ -16958,7 +16948,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#66b8d7') + """ ;
+                    background-color:""" + self.createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
                     color: #BDBDBD;
@@ -16974,11 +16964,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#43a7cf') + """ ;
+                    background-color:""" + self.createGradient('#43a7cf') + """ ;
                 }
             """,
             "SC END":    """
@@ -16988,7 +16978,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#66b8d7') + """ ;
+                    background-color:""" + self.createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
                     color: #BDBDBD;
@@ -17004,11 +16994,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#43a7cf') + """ ;
+                    background-color:""" + self.createGradient('#43a7cf') + """ ;
                 }
             """,
             "DROP":    """
@@ -17018,7 +17008,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:flat{
                     color: darkgrey;
@@ -17034,11 +17024,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background:""" + self.createGradient('#116999') + """ ;
+                    background-color:""" + self.createGradient('#116999') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#1985ba') + """ ;
+                    background-color:""" + self.createGradient('#1985ba') + """ ;
                 }
             """,
             "COOL END":    """
@@ -17048,7 +17038,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#66b8d7') + """ ;
+                    background-color:""" + self.createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
                     color: #BDBDBD;
@@ -17064,11 +17054,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#43a7cf') + """ ;
+                    background-color:""" + self.createGradient('#43a7cf') + """ ;
                 }
             """,
             "EVENT":    """
@@ -17078,15 +17068,15 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#bdbdbd') + """ ;
+                    background-color:""" + self.createGradient('#bdbdbd') + """ ;
                 }
                 QPushButton:pressed {
                     color: white;
-                    background:""" + self.createGradient('#757575') + """ ;
+                    background-color:""" + self.createGradient('#757575') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#9e9e9e') + """ ;
+                    background-color:""" + self.createGradient('#9e9e9e') + """ ;
                 }
             """,
             "PID":     """
@@ -17096,11 +17086,11 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background: #2298c7;
+                    background-color: #2298c7;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
-                    background: lightgrey;
+                    background-color: lightgrey;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
@@ -17108,7 +17098,7 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background: #43a7cf;
+                    background-color: #43a7cf;
                 }
             """,
             "PIDactive":     """
@@ -17118,11 +17108,11 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background: #54b5ff;
+                    background-color: #54b5ff;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
-                    background: lightgrey;
+                    background-color: lightgrey;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
@@ -17130,7 +17120,7 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background: #77cafd;
+                    background-color: #77cafd;
                 }
             """,
             "SV +":     """
@@ -17140,15 +17130,15 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#db5785') + """ ;
+                    background-color:""" + self.createGradient('#db5785') + """ ;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background:""" + self.createGradient('#d4336a') + """ ;
+                    background-color:""" + self.createGradient('#d4336a') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#e480a2') + """ ;
+                    background-color:""" + self.createGradient('#e480a2') + """ ;
                                      }
             """,
             "SV -":     """
@@ -17158,15 +17148,15 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#64b7d8') + """ ;
+                    background-color:""" + self.createGradient('#64b7d8') + """ ;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background:""" + self.createGradient('#43a7cf') + """ ;
+                    background-color:""" + self.createGradient('#43a7cf') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#85cae1') + """ ;
+                    background-color:""" + self.createGradient('#85cae1') + """ ;
                 }
             """,
 
@@ -17177,11 +17167,11 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background: #2298c7;
+                    background-color: #2298c7;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
-                    background: #E0E0E0;
+                    background-color: #E0E0E0;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
@@ -17189,7 +17179,7 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background: #43a7cf;
+                    background-color: #43a7cf;
                 }
             """,
             "HUD_ON":     """
@@ -17199,11 +17189,11 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background: #54b5ff;
+                    background-color: #54b5ff;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
-                    background: #E0E0E0;
+                    background-color: #E0E0E0;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
@@ -17211,7 +17201,7 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background: #77cafd;
+                    background-color: #77cafd;
                 }
             """,
             "SELECTED":     """
@@ -17221,7 +17211,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small_selected + """;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#d4336a') + """ ;
+                    background-color:""" + self.createGradient('#d4336a') + """ ;
                 }
                 QPushButton:flat{
                     color: darkgrey;
@@ -17237,11 +17227,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: white;
-                    background:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#cc0f50') + """ ;
+                    background-color:""" + self.createGradient('#cc0f50') + """ ;
                 }
             """,
             "SELECTED_MAIN":     """
@@ -17251,7 +17241,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small_selected + """;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#c00b40') + """ ;
+                    background-color:""" + self.createGradient('#c00b40') + """ ;
                 }
                 QPushButton:flat{
                     color: darkgrey;
@@ -17267,11 +17257,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: white;
-                    background:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#c70d49') + """ ;
+                    background-color:""" + self.createGradient('#c70d49') + """ ;
                 }
             """,
             "SELECTED_MAIN_LARGE":     """
@@ -17281,7 +17271,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#c00b40') + """ ;
+                    background-color:""" + self.createGradient('#c00b40') + """ ;
                 }
                 QPushButton:flat{
                     color: darkgrey;
@@ -17297,11 +17287,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: white;
-                    background:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#c70d49') + """ ;
+                    background-color:""" + self.createGradient('#c70d49') + """ ;
                 }
             """
             }
@@ -17323,8 +17313,8 @@ class ApplicationWindow(QMainWindow):
         self.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None))
         self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
         self.button_1.setGraphicsEffect(self.makeShadow())
-        self.button_1.pressed.connect(self.button1Pressed)
-        self.button_1.released.connect(self.button1Released)
+        self.button_1.pressed.connect(self.mainButtonPressed)
+        self.button_1.released.connect(self.mainButtonReleased)
         self.button_1.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.button_1.setMinimumHeight(self.standard_button_height)
         self.button_1.clicked.connect(self.qmc.ToggleMonitor)
@@ -17337,8 +17327,8 @@ class ApplicationWindow(QMainWindow):
         self.button_2.setToolTip(QApplication.translate("Tooltip", "Start recording", None))
         self.button_2.setStyleSheet(self.pushbuttonstyles["STOP"])
         self.button_2.setGraphicsEffect(self.makeShadow())
-        self.button_2.pressed.connect(self.button2Pressed)
-        self.button_2.released.connect(self.button2Released)
+        self.button_2.pressed.connect(self.mainButtonPressed)
+        self.button_2.released.connect(self.mainButtonReleased)
         self.button_2.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         self.button_2.setMinimumHeight(self.standard_button_height)
@@ -17384,8 +17374,8 @@ class ApplicationWindow(QMainWindow):
         self.button_7.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
         self.button_7.setGraphicsEffect(self.makeShadow())
-        self.button_7.pressed.connect(self.button7Pressed)
-        self.button_7.released.connect(self.button7Released)
+        self.button_7.pressed.connect(self.mainButtonPressed)
+        self.button_7.released.connect(self.mainButtonReleased)
         self.button_7.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.button_7.setMinimumHeight(self.standard_button_height)
         self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None))
@@ -17414,8 +17404,8 @@ class ApplicationWindow(QMainWindow):
         self.button_10.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.button_10.setStyleSheet(self.pushbuttonstyles["PID"])
         self.button_10.setGraphicsEffect(self.makeShadow())
-        self.button_10.pressed.connect(self.button10Pressed)
-        self.button_10.released.connect(self.button10Released)
+        self.button_10.pressed.connect(self.mainButtonPressed)
+        self.button_10.released.connect(self.mainButtonReleased)
         self.button_10.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.button_10.setMinimumHeight(self.standard_button_height)
         self.button_10.clicked.connect(self.PIDcontrol)
@@ -17886,6 +17876,17 @@ class ApplicationWindow(QMainWindow):
         LCDlayout.addWidget(w)
         LCDlayout.setAlignment(w,Qt.AlignmentFlag.AlignRight)
 
+        self.LCD4frame = QFrame()
+        w = self.makeLCDbox(self.label4,self.lcd4,self.LCD4frame)
+        LCDlayout.addWidget(w)
+        LCDlayout.setAlignment(w,Qt.AlignmentFlag.AlignRight)
+        self.LCD4frame.setVisible(False) # by default this one is not visible
+
+        self.LCD5frame = QFrame()
+        w = self.makeLCDbox(self.label5,self.lcd5,self.LCD5frame)
+        LCDlayout.addWidget(w)
+        LCDlayout.setAlignment(w,Qt.AlignmentFlag.AlignRight)
+
         self.LCD6frame = QFrame()
         w = self.makeLCDbox(self.label6,self.lcd6,self.LCD6frame)
         LCDlayout.addWidget(w)
@@ -17897,17 +17898,6 @@ class ApplicationWindow(QMainWindow):
         LCDlayout.addWidget(w)
         LCDlayout.setAlignment(w,Qt.AlignmentFlag.AlignRight)
         self.LCD7frame.setVisible(False)
-
-        self.LCD4frame = QFrame()
-        w = self.makeLCDbox(self.label4,self.lcd4,self.LCD4frame)
-        LCDlayout.addWidget(w)
-        LCDlayout.setAlignment(w,Qt.AlignmentFlag.AlignRight)
-        self.LCD4frame.setVisible(False) # by default this one is not visible
-
-        self.LCD5frame = QFrame()
-        w = self.makeLCDbox(self.label5,self.lcd5,self.LCD5frame)
-        LCDlayout.addWidget(w)
-        LCDlayout.setAlignment(w,Qt.AlignmentFlag.AlignRight)
 
         #add extra LCDs
         for i in range(self.nLCDS):
@@ -18285,6 +18275,7 @@ class ApplicationWindow(QMainWindow):
         self.adjustSVSignal.connect(self.adjustPIDsv)
         self.updateSerialLogSignal.connect(self.updateSerialLog)
         self.fireslideractionSignal.connect(self.fireslideraction)
+        self.moveButtonSignal.connect(self.moveKbutton)
 
         if sys.platform.startswith("darwin"):
             # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
@@ -18295,6 +18286,16 @@ class ApplicationWindow(QMainWindow):
         
         QTimer.singleShot(2000,self.donate)
 
+        QTimer.singleShot(0,lambda : _log.info("startup time: %.2f", libtime.process_time() - startup_time))
+
+    def addLanguage(self, locale, menu_entry):
+        languageAction = QAction(menu_entry, self)
+        languageAction.setCheckable(True)
+        languageAction.triggered.connect(self.change_local_action)
+        self.language_menu_actions[locale] = languageAction
+        self.languageMenu.addAction(languageAction)
+        if self.locale_str == locale:
+            languageAction.setChecked(True)
 
     def sendLog(self) -> None:
         _log.info("sendLog()")
@@ -18366,7 +18367,6 @@ class ApplicationWindow(QMainWindow):
             gen = generator.Generator(outfile)
             gen.flatten(message)
         QDesktopServices.openUrl(QUrl.fromLocalFile(tmpfile))
-
 
     def updateWindowTitle(self):
         try:
@@ -18574,62 +18574,33 @@ class ApplicationWindow(QMainWindow):
         validator = MyQDoubleValidator(bot,top,dec,w)
         validator.setLocale(QLocale.c())
         return validator
-
-    def buttonPressed(self, button):
-        button.setGraphicsEffect(self.makeShadow(strong=True))
-
-    def buttonReleased(self,button):
-        button.setGraphicsEffect(self.makeShadow())
-
+    
     @pyqtSlot()
-    def button1Pressed(self):
-        self.buttonPressed(self.button_1)
+    def mainButtonPressed(self):
+        self.sender().setGraphicsEffect(self.makeShadow(strong=True))
+        
     @pyqtSlot()
-    def button2Pressed(self):
-        self.buttonPressed(self.button_2)
-    @pyqtSlot()
-    def button7Pressed(self):
-        self.buttonPressed(self.button_7)
-    @pyqtSlot()
-    def button10Pressed(self):
-        self.buttonPressed(self.button_10)
-
-    @pyqtSlot()
-    def button1Released(self):
-        self.buttonReleased(self.button_1)
-    @pyqtSlot()
-    def button2Released(self):
-        self.buttonReleased(self.button_2)
-    @pyqtSlot()
-    def button7Released(self):
-        self.buttonReleased(self.button_7)
-    @pyqtSlot()
-    def button10Released(self):
-        self.buttonReleased(self.button_10)
-
-    def createGradient(self,rgb, tint_factor=0.1, shade_factor=0.1, reverse=False):
-        default_gradient = 'light_to_dark'  # set this to either 'dark_to_light' or 'light_to_dark'
-        if reverse == True:
-            if default_gradient == 'dark_to_light':
-                cdir = 'light2dark'
-            else:
-                cdir = 'dark2light'
-        else:
-            if default_gradient == 'dark_to_light':
-                cdir = 'dark2light'
-            else:
-                cdir = 'light2dark'
-        if cdir == 'dark2light':
-            res = "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[1] + ", stop: 1 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[0] +");"
-        else:    # light2dark
-            res = "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[0] + ", stop: 1 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[1] +");"
-        return res
+    def mainButtonReleased(self):
+        self.sender().setGraphicsEffect(self.makeShadow())
+        
+    # creates QLinearGradient style from light to dark by default, or from dark to light if reverse is True
+    @functools.lru_cache
+    def createGradient(self, rgb, tint_factor=0.1, shade_factor=0.1, reverse=False):
+        light_grad,dark_grad = self.createRGBGradient(rgb,tint_factor,shade_factor)
+        QLinearGradient_style_fstring = "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {grad_start}, stop: 1 {grad_end});"
+        if reverse:
+            # dark to light
+            return QLinearGradient_style_fstring.format(grad_start=dark_grad,grad_end=light_grad)
+        # light to dark (default)
+        return QLinearGradient_style_fstring.format(grad_start=light_grad,grad_end=dark_grad)
 
     @staticmethod
     def createRGBGradient(rgb, tint_factor=0.3, shade_factor=0.3):
-        from matplotlib import colors
         try:
-            if rgb[0:1] == "#":   # hex input like "#ffaa00"
+            if isinstance(rgb, QColor):
+                r,g,b,_ = rgb.getRgbF()
+                rgb_tuple = (r,g,b)
+            elif rgb[0:1] == "#":   # hex input like "#ffaa00"
                 rgb_tuple = tuple(int(rgb[i:i+2], 16)/255 for i in (1, 3 ,5))
             else:                 # color name
                 rgb_tuple = colors.hex2color(colors.cnames[rgb])
@@ -18639,10 +18610,9 @@ class ApplicationWindow(QMainWindow):
             lighter_rgb = '#%02x%02x%02x' % (tuple([int(255 * (x + (1 - x) * tint_factor)) for x in rgb_tuple])) # pylint: disable=consider-using-generator
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createRGBGradient(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-            lighter_rgb = darker_rgb = "000000"
+            lighter_rgb = darker_rgb = "#000000"
         return lighter_rgb,darker_rgb
 
     # for use in widgets that expects a double via a aw.createCLocalDoubleValidator that accepts both,
@@ -18786,7 +18756,6 @@ class ApplicationWindow(QMainWindow):
                         a.setIcon(ntb._icon(subscription_icon)) # pylint: disable=protected-access
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updatePlusStatus(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -19058,7 +19027,6 @@ class ApplicationWindow(QMainWindow):
             self.updateNewMenuRecentRoasts()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-            #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addRecentRoast(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -19537,7 +19505,6 @@ class ApplicationWindow(QMainWindow):
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " getcolorPairsToCheck() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -19570,7 +19537,6 @@ class ApplicationWindow(QMainWindow):
             cDiff = deltaE(c1_rgb, c2_rgb, input_space="sRGB255", uniform_space="CIELab")
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " colorDifference() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -19606,7 +19572,6 @@ class ApplicationWindow(QMainWindow):
 #                    print("checkColors", str(c[0]), "/", str(c[2]), "  Okay", str(c[1]), str(c[3]), str(val))  #debugprint
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkColors() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -19631,7 +19596,6 @@ class ApplicationWindow(QMainWindow):
             nc = str(QColor(nc_greyscale).name())
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " convertToGreyscale() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return nc
@@ -19911,7 +19875,6 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.zgrid = auto_grid
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " autoAdjustAxis() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -21228,7 +21191,6 @@ class ApplicationWindow(QMainWindow):
                 FCs = "--:--"
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return TP,TPlabel,DRY,DRYlabel,FCs,FCslabel,TP2DRYlabel,DRY2FCslabel,TP2DRYframeTooltip,DRY2FCsframeTooltip,phasesLCDsTooltip
@@ -21291,7 +21253,6 @@ class ApplicationWindow(QMainWindow):
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -21706,9 +21667,7 @@ class ApplicationWindow(QMainWindow):
                 if aw.simulator and not action in [2,3,20]:  # 2 (Call Program) 3 (Multiple Event), 20 (Artisan Command)
                     # disable all communicating commands in simulation mode
                     return
-
-                if action in [8,9,10]:
-                    from artisanlib.hottop import setHottop
+                
                 cmd_str = str(cmd)
 
                 # we add {BT}, {ET}, {time} substitutions for Serial/CallProgram/MODBUS/S7/WebSocket command actions
@@ -22893,6 +22852,15 @@ class ApplicationWindow(QMainWindow):
                                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(self.pidcontrol.svLookahead))
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+                            # keyboard(<bool>) enable/disable keyboard mode
+                            elif cs.startswith("keyboard(") and cs.endswith(")"):
+                                try:
+                                    value = cs[len("keyboard("):-1]
+                                    if ((value.lower() in ("yes", "true", "t", "1") and self.qmc.flagstart and self.keyboardmoveflag == 0) or 
+                                        (value.lower() not in ("yes", "true", "t", "1") and self.keyboardmoveflag == 1)):
+                                        self.moveButtonSignal.emit("enter")
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
                                                     
                 elif action == 21: # RC Command
                     # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
@@ -23253,13 +23221,13 @@ class ApplicationWindow(QMainWindow):
         square_style = "border-radius:0px;"
         if aw.buttonsize == 0:
             # tiny
-            buttonstyle = """min-width:""" + self.tiny_button_min_width + """;margin:0;padding:0px;border-style:solid;border-color:darkgrey;border-width:0;font-size:""" + self.button_font_size_micro + """; font-weight: bold;"""
+            buttonstyle = """min-width:""" + self.tiny_button_min_width + """;margin:0px;padding:0px;border-style:solid;border-color:darkgrey;border-width:0px;font-size:""" + self.button_font_size_micro + """; font-weight: bold;"""
         elif aw.buttonsize == 2:
             # large
-            buttonstyle = """min-width:""" + self.standard_button_min_width + """;margin:0;padding:0px;border-style:solid;border-color:darkgrey;border-width:0;font-size:""" + self.button_font_size_small + """; font-weight: bold;"""
+            buttonstyle = """min-width:""" + self.standard_button_min_width + """;margin:0px;padding:0px;border-style:solid;border-color:darkgrey;border-width:0px;font-size:""" + self.button_font_size_small + """; font-weight: bold;"""
         else:
             # small (default)
-            buttonstyle = """min-width:""" + self.small_button_min_width + """;margin:0;padding:0px;border-style:solid;border-color:darkgrey;border-width:0;font-size:""" + self.button_font_size_tiny + """; font-weight: bold;"""
+            buttonstyle = """min-width:""" + self.small_button_min_width + """;margin:0px;padding:0px;border-style:solid;border-color:darkgrey;border-width:0px;font-size:""" + self.button_font_size_tiny + """; font-weight: bold;"""
         ##
         if len(self.extraeventbuttonround) > tee:
             if self.extraeventbuttonround[tee] == 1: # left-side rounded
@@ -24287,7 +24255,8 @@ class ApplicationWindow(QMainWindow):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
-    def moveKbutton(self,kcommand):
+    @pyqtSlot(str)
+    def moveKbutton(self, kcommand):
         #"Enter" toggles ON/OFF keyboard
         if kcommand =="enter" and self.qmc.flagstart:
             if self.keyboardmoveflag == 0:
@@ -24325,9 +24294,9 @@ class ApplicationWindow(QMainWindow):
                 else:
                     nextcmd = self.nextActiveButton(self.keyboardmoveindex)
                 # activate the button at index nextcmd
-                if self.keyboardButtonStyles[nextcmd] in ["CHARGE","DROP"]:
+                if self.keyboardButtonStyles[nextcmd] in ["CHARGE", "DROP"]:
                     self.keyboardButtonList[nextcmd].setStyleSheet(self.pushbuttonstyles["SELECTED_MAIN"])
-                if self.keyboardButtonStyles[nextcmd] in ["ON"]:
+                if self.keyboardButtonStyles[nextcmd] in ["ON", "HUD_ON"]:
                     self.keyboardButtonList[nextcmd].setStyleSheet(self.pushbuttonstyles["SELECTED_MAIN_LARGE"])
                 else:
                     self.keyboardButtonList[nextcmd].setStyleSheet(self.pushbuttonstyles["SELECTED"])
@@ -24697,7 +24666,6 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.fig.canvas.draw()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " changeEventNumber() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
@@ -24941,7 +24909,6 @@ class ApplicationWindow(QMainWindow):
                     self.loadFile(fileName)
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fileLoad() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -24990,6 +24957,7 @@ class ApplicationWindow(QMainWindow):
                 self.updatePhasesLCDs()
                 message = QApplication.translate("Message","{0}  loaded ", None).format(filename)
                 self.sendmessage(message)
+                _log.info("profile loaded: %s", filename)
 
                 if aw is not None:
                     aw.updatePlusStatus()
@@ -25021,7 +24989,6 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None) + " fileload() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-            #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " loadFile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
@@ -25215,7 +25182,6 @@ class ApplicationWindow(QMainWindow):
 
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-            #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " calcVirtualdevices() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         return False
@@ -25443,16 +25409,14 @@ class ApplicationWindow(QMainWindow):
                 if not aw.curFile and len(self.qmc.timex) < 10: # if no foreground is loaded, autoadjustAxis
                     aw.autoAdjustAxis(True)
 
-                if len(self.qmc.timeB) > backgroundDrop:
-                    message =  QApplication.translate("Message", "Background {0} loaded successfully {1}",None).format(filename,stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]]))
-                else:
-                    message =  QApplication.translate("Message", "Background {0} loaded successfully {1}",None).format(filename,"")
+                message = QApplication.translate("Message", "Background {0} loaded successfully {1}",None).format(filename, "")
                 self.sendmessage(message)
                 self.qmc.backgroundpath = str(filename)
                 if "roastUUID" in profile:
                     self.qmc.backgroundUUID = profile["roastUUID"]
                 else:
                     self.qmc.backgroundUUID = None
+                _log.info("background profile loaded: %s", filename)
             else:
                 self.sendmessage(QApplication.translate("Message", "Invalid artisan format",None))
         except IOError as e:
@@ -25575,7 +25539,6 @@ class ApplicationWindow(QMainWindow):
             self.qmc.redraw()
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importCSV() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -25687,7 +25650,6 @@ class ApplicationWindow(QMainWindow):
             return True
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportJSON() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
@@ -25829,7 +25791,6 @@ class ApplicationWindow(QMainWindow):
             return True
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportPilot() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
@@ -25905,7 +25866,6 @@ class ApplicationWindow(QMainWindow):
             return True
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportRoastLogger() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
@@ -25926,7 +25886,6 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.redraw()
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importJSON() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -25941,7 +25900,6 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.fileDirtySignal.emit()
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importRoastLogger() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -26333,7 +26291,6 @@ class ApplicationWindow(QMainWindow):
             return False
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportCSV() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
@@ -26504,7 +26461,6 @@ class ApplicationWindow(QMainWindow):
             return False
         except Exception as ex:
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportExcel() {0}").format(str(ex)),exc_tb.tb_lineno)
             return False
@@ -27351,7 +27307,6 @@ class ApplicationWindow(QMainWindow):
             return True
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             # we don't report errors on settingsLoad
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(aw,QApplication.translate("Error Message", "Exception:",None) + " setProfile()",str(ex) + "@line " + str(getattr(exc_tb, 'tb_lineno', '?')))
@@ -27930,6 +27885,7 @@ class ApplicationWindow(QMainWindow):
                     # we save the file and set the filename
                     self.serialize(filename,pf)
                     self.sendmessage(QApplication.translate("Message","Profile saved", None))
+                    _log.info("profile saved: %s", filename)
                     if not copy:
                         self.setCurrentFile(filename)
                         aw.curFile = filename
@@ -29965,7 +29921,6 @@ class ApplicationWindow(QMainWindow):
             return False
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startWebLCDs() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             self.stopWebLCDs()
@@ -30199,7 +30154,6 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.etypes[3] = self.qmc.l_eventtype4dots.get_label()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fetchCurveStyles() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -31166,7 +31120,6 @@ class ApplicationWindow(QMainWindow):
                 self.fullscreenAction.setChecked(False)
             self.showNormal()
         if aw.qmc.device == 53:
-            from artisanlib.hottop import stopHottop
             stopHottop()
         if self.qmc.flagon:
             self.qmc.ToggleMonitor()
@@ -31207,6 +31160,10 @@ class ApplicationWindow(QMainWindow):
             _log.exception(e)
         try:
             aw.qmc.closePhidgetOUTPUTs()
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+        try:
+            aw.qmc.closePhidgetAMBIENTs()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         aw.qmc.stopPhidgetManager()
@@ -31766,7 +31723,6 @@ class ApplicationWindow(QMainWindow):
                     aw.sendmessage(QApplication.translate("Message","Excel Production Report exported to {0}", None).format(filename))
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-#                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " productionExcelReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -32299,7 +32255,7 @@ class ApplicationWindow(QMainWindow):
                 AUC_count = 0
                 loss = 0
                 loss_count = 0
-                colors = 0
+                colors_list = 0
                 colors_count = 0
                 cuppings = 0
                 cuppings_count = 0
@@ -32331,7 +32287,7 @@ class ApplicationWindow(QMainWindow):
                     pd = self.profileProductionData(p)
                     c += 1
                     try:
-                        cl = next(color) # here to keep colors in sync with the pct graph colors
+                        cl = next(color) # here to keep colors_list in sync with the pct graph colors_list
                     except Exception: # pylint: disable=broad-except
                         color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
                         cl = next(color)
@@ -32339,7 +32295,6 @@ class ApplicationWindow(QMainWindow):
                         rd = self.profileRankingData(p)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-#                        traceback.print_exc(file=sys.stdout)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                         continue
@@ -32402,7 +32357,7 @@ class ApplicationWindow(QMainWindow):
                             loss += l
                             loss_count += 1
                     if "color" in rd and rd["color"] > 0:
-                        colors += rd["color"]
+                        colors_list += rd["color"]
                         colors_count += 1
                     if rd["cupping"] > 0:
                         cuppings += rd["cupping"]
@@ -32497,7 +32452,6 @@ class ApplicationWindow(QMainWindow):
 
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
-#                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -32630,7 +32584,6 @@ class ApplicationWindow(QMainWindow):
 
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-#                        traceback.print_exc(file=sys.stdout)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -32709,7 +32662,6 @@ class ApplicationWindow(QMainWindow):
                             rd = self.profileRankingData(p)
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
-#                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                             i += 1   #avoid a blank line
@@ -32778,7 +32730,6 @@ class ApplicationWindow(QMainWindow):
 
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-#                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -32815,7 +32766,7 @@ class ApplicationWindow(QMainWindow):
                     DEV_percent_avg = ('{0:.1f}'.format(DEV_percent / DEV_percent_count) if DEV_percent > 0 and DEV_percent_count > 0 else ""),
                     AUC_avg = ('{0:.1f}'.format(AUC / AUC_count) if AUC > 0 and AUC_count > 0 else ""),
                     loss_avg = ('{0:.1f}'.format(loss / loss_count) if loss_count > 0 and loss > 0 else ""),
-                    colors_avg = ('{0:.1f}'.format(colors / colors_count) if colors > 0 and colors_count > 0 else ""),
+                    colors_avg = ('{0:.1f}'.format(colors_list / colors_count) if colors_list > 0 and colors_count > 0 else ""),
                     cup_avg = ('{0:.2f}'.format(cuppings / cuppings_count) if cuppings > 0 and cuppings_count > 0 else ""),
                     energy_avg = ('{0:.2f}'.format(energies / energies_count) if energies > 0 and energies_count > 0 else ""),
                     co2_avg = ('{0:.2f}'.format(co2s / co2s_count) if co2s > 0 and co2s_count > 0 else ""),
@@ -33031,7 +32982,6 @@ class ApplicationWindow(QMainWindow):
 
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
-#                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -33102,7 +33052,6 @@ class ApplicationWindow(QMainWindow):
                     QApplication.beep()
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-#                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -33394,7 +33343,6 @@ class ApplicationWindow(QMainWindow):
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " htmlReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -33926,7 +33874,6 @@ class ApplicationWindow(QMainWindow):
                 delta += self.calcAUC(rtbt,timex,temp1,i,temp2)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ts() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return int(round(delta/60.)), int(round(ET/60.)), int(round(BT/60.)), AUCbegin_idx
@@ -34111,7 +34058,6 @@ class ApplicationWindow(QMainWindow):
                 update_str += '<br/><br/>' + QApplication.translate("About", "You will see a notice here once a new official release is available.",None)
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkUpdate() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             update_str = QApplication.translate("About", "There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.",None)
@@ -34312,7 +34258,6 @@ class ApplicationWindow(QMainWindow):
             self.HottopControlOn()
 
     def HottopControlOff(self):
-        from artisanlib.hottop import releaseHottopControl
         res = releaseHottopControl()
         if res:
             if self.HottopControlActive:
@@ -34322,7 +34267,6 @@ class ApplicationWindow(QMainWindow):
 
     def HottopControlOn(self):
         if aw.superusermode: # Hottop control mode can for now activated only in super user mode
-            from artisanlib.hottop import takeHottopControl, setHottop, startHottop, isHottopLoopRunning
             if not isHottopLoopRunning():
                 startHottop(0.6,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
             res = takeHottopControl()
@@ -34494,7 +34438,6 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadSettings() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -34701,7 +34644,6 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadSettings_theme() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -34958,206 +34900,17 @@ class ApplicationWindow(QMainWindow):
                                     QApplication.translate("Message", "Alarms are not available for device None",None))
 
     def switchLanguageFlag(self,loc,value):
-        if loc in ["en", "en_US"]:
-            self.EnglishLanguage.setChecked(value)
-        elif loc == "ar":
-            self.ArabicLanguage.setChecked(value)
-        elif loc == "de":
-            self.GermanLanguage.setChecked(value)
-        elif loc == "el":
-            self.GreekLanguage.setChecked(value)
-        elif loc == "es":
-            self.SpanishLanguage.setChecked(value)
-        elif loc == "fa":
-            self.FarsiLanguage.setChecked(value)
-        elif loc == "fi":
-            self.FinishLanguage.setChecked(value)
-        elif loc == "fr":
-            self.FrenchLanguage.setChecked(value)
-        elif loc == "he":
-            self.HebrewLanguage.setChecked(value)
-        elif loc == "hu":
-            self.HungarianLanguage.setChecked(value)
-        elif loc == "id":
-            self.IndonesianLanguage.setChecked(value)
-        elif loc == "it":
-            self.ItalianLanguage.setChecked(value)
-        elif loc == "ja":
-            self.JapaneseLanguage.setChecked(value)
-        elif loc == "ko":
-            self.KoreanLanguage.setChecked(value)
-        elif loc == "nl":
-            self.DutchLanguage.setChecked(value)
-        elif loc == "no":
-            self.NorwegianLanguage.setChecked(value)
-        elif loc == "pt":
-            self.PortugueseLanguage.setChecked(value)
-        elif loc == "pt_BR":
-            self.PortugueseBrasilLanguage.setChecked(value)
-        elif loc == "pl":
-            self.PolishLanguage.setChecked(value)
-        elif loc == "ru":
-            self.RussianLanguage.setChecked(value)
-        elif loc == "sv":
-            self.SwedishLanguage.setChecked(value)
-        elif loc == "th":
-            self.ThaiLanguage.setChecked(value)
-        elif loc == "tr":
-            self.TurkishLanguage.setChecked(value)
-        elif loc == "zh_CN":
-            self.ChineseChinaLanguage.setChecked(value)
-        elif loc == "zh_TW":
-            self.ChineseTaiwanLanguage.setChecked(value)
+        try:
+            self.language_menu_actions[loc].setChecked(value)
+        except Exception as e:
+            _log.exception(e)
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def changelocale_ar(self,_=False):
-        self.changelocale("ar")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_da(self,_=False):
-        self.changelocale("da")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_de(self,_=False):
-        self.changelocale("de")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_el(self,_=False):
-        self.changelocale("el")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_en(self,_=False):
-        self.changelocale("en")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_es(self,_=False):
-        self.changelocale("es")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_fa(self,_=False):
-        self.changelocale("fa")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_fi(self,_=False):
-        self.changelocale("fi")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_fr(self,_=False):
-        self.changelocale("fr")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_gd(self,_=False):
-        self.changelocale("gd")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_he(self,_=False):
-        self.changelocale("he")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_hu(self,_=False):
-        self.changelocale("hu")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_id(self,_=False):
-        self.changelocale("id")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_it(self,_=False):
-        self.changelocale("it")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_ja(self,_=False):
-        self.changelocale("ja")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_ko(self,_=False):
-        self.changelocale("ko")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_lv(self,_=False):
-        self.changelocale("lv")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_nl(self,_=False):
-        self.changelocale("nl")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_no(self,_=False):
-        self.changelocale("no")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_pt(self,_=False):
-        self.changelocale("pt")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_pt_BR(self,_=False):
-        self.changelocale("pt_BR")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_pl(self,_=False):
-        self.changelocale("pl")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_ru(self,_=False):
-        self.changelocale("ru")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_sk(self,_=False):
-        self.changelocale("sk")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_sv(self,_=False):
-        self.changelocale("sv")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_th(self,_=False):
-        self.changelocale("th")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_tr(self,_=False):
-        self.changelocale("tr")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_vi(self,_=False):
-        self.changelocale("vi")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_zh_CN(self,_=False):
-        self.changelocale("zh_CN")
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def changelocale_zh_TW(self,_=False):
-        self.changelocale("zh_TW")
+    def change_local_action(self,_=False):
+        sender_action = self.sender()
+        new_locale = next((local for local, action in self.language_menu_actions.items() if sender_action == action), "en")
+        self.changelocale(new_locale)
 
     def changelocale(self,languagelocale):
         if self.locale_str != languagelocale:
@@ -35175,6 +34928,9 @@ class ApplicationWindow(QMainWindow):
                 self.close()
             else:
                 self.switchLanguageFlag(languagelocale,False)
+        else:
+            # if the current selected language is selected it got unflagged. Tick it again!
+            self.switchLanguageFlag(self.locale_str, True)
 
     # takes the weight of the green and roasted coffee as floats and
     # returns the weight loss in percentage as float
@@ -35272,7 +35028,6 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importK202(): {0}").format(str(ex)))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK202() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -35352,7 +35107,6 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importK204(): {0}").format(str(ex)))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK204() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -35548,7 +35302,6 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importPilot(): {0}").format(str(ex)))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.sendmessage(QApplication.translate("Message","Import Probat Pilot failed", None))
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importPilot() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -35602,7 +35355,6 @@ class ApplicationWindow(QMainWindow):
 
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " {1} {0}").format(str(ex),message),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -35638,7 +35390,6 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " {1}: {0}").format(str(ex),message))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " {1} {0}").format(str(ex),message),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -35738,7 +35489,6 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importHH506RA(): {0}").format(str(ex)))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importHH506RA() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 

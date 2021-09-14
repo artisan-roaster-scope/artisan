@@ -56,6 +56,12 @@ except Exception:
 _log: Final = logging.getLogger(__name__)
 
 class RoastProfile():
+    __slots__ = ['aw', 'visible', 'aligned', 'active', 'color', 'gray', 'label', 'title', 'curve_visibilities', 'event_visibility', 'zorder',
+        'zorder_offsets', 'alpha', 'alpha_dim_factor', 'timeoffset', 'max_DeltaET', 'max_DeltaBT', 'startTimeIdx', 'endTimeIdx', 'min_time', 'max_time',
+        'UUID', 'filepath', 'timeindex', 'timex', 'temp1', 'temp2', 'E1', 'E2', 'E3', 'E4', 'stemp1', 'stemp2', 'delta1', 'delta2', 'events1',
+        'events2', 'events_timex', 'l_temp1', 'l_temp2', 'l_delta1', 'l_delta2', 'l_mainEvents1', 'l_mainEvents2', 'l_events1', 'l_events2',
+        'l_events3', 'l_events4', 'ambientTemp', 'metadata', 'specialevents', 'specialeventstype', 'specialeventsvalue', 'TP']
+    
     def __init__(self, aw, profile, filepath, color):
         self.aw = aw
         # state:
@@ -162,8 +168,8 @@ class RoastProfile():
                         self.timeindex[i] = self.aw.qmc.timearray2index(self.timex,times[i])
                     else:
                         self.timeindex[i] = 0
-            except Exception: # pylint: disable=broad-except
-                pass
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
             ###########      END OLD PROFILE FORMAT
             
         # temperature conversion
@@ -359,8 +365,8 @@ class RoastProfile():
                             self.E3.append((etime,evalue))
                         elif etype == 3:
                             self.E4.append((etime,evalue))
-                except Exception: # pylint: disable=broad-except
-                    pass
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
             # add a last event at DROP/END to extend the lines to the end of roast
             end = (self.timex[-1] if self.timeindex[6] == 0 else self.timex[self.timeindex[6]])
             if self.E1: 
@@ -675,6 +681,11 @@ class CompareTableWidget(QTableWidget):
         return []
 
 class roastCompareDlg(ArtisanDialog):
+
+    __slots__ = [ 'foreground', 'background', 'maxentries', 'basecolors', 'profiles', 'label_number', 'l_align', 'legend', 'legendloc_pos', 'addButton',
+        'deleteButton', 'alignnames', 'alignComboBox', 'etypes', 'eventsComboBox', 'cb', 'model', 'button_7_org_state_hidden', 'button_1_org_state_hidden',
+        'button_2_org_state_hidden', 'button_10_org_state_hidden', 'button_18_org_state_hidden', 'pick_handler_id' ]
+    
     def __init__(self, parent = None, aw = None, foreground = None, background = None):
         super().__init__(parent, aw)
         
@@ -1151,11 +1162,8 @@ class roastCompareDlg(ArtisanDialog):
                     if tooltip != "":
                         tooltip += "\n"
                     tooltip += profile.metadata["cuppingnotes"].strip()
-            except Exception: # pylint: disable=broad-except
-#                import traceback
-#                import sys
-#                traceback.print_exc(file=sys.stdout)
-                pass
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
         return tooltip.strip()
     
     def createProfileTable(self):
@@ -1198,6 +1206,7 @@ class roastCompareDlg(ArtisanDialog):
             self.profileTable.setAutoScroll(False) # disable scrolling to selected cell
 
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " createProfileTable() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
     

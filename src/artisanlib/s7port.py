@@ -43,6 +43,12 @@ _log: Final = logging.getLogger(__name__)
 
 
 class s7port():
+
+    __slots__ = [ 'aw', 'readRetries', 'channels', 'host', 'port', 'rack', 'slot', 'lastReadResult', 'area', 'db_nr', 'start', 'type', 'mode',
+        'div', 'optimizer', 'fetch_max_blocks', 'activeRegisters', 'readingsCache', 'PID_area', 'PID_db_nr', 'PID_SV_register', 'PID_p_register',
+        'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action', 'PIDmultiplier', 'SVtype', 'SVmultiplier', 'COMsemaphore',
+        'areas', 'last_request_timestamp', 'min_time_between_requests', 'is_connected', 'plc', 'commError', 'libLoaded' ]
+    
     def __init__(self,aw):
         self.aw = aw
         

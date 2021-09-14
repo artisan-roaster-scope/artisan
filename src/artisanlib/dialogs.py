@@ -34,6 +34,9 @@ except Exception:
 from artisanlib.widgets import MyQComboBox
 
 class ArtisanDialog(QDialog):
+
+    __slots__ = ['aw', 'dialogbuttons']
+    
     def __init__(self, parent=None, aw = None):
         super().__init__(parent)
         self.aw = aw # the Artisan application window
@@ -108,6 +111,9 @@ class ArtisanResizeablDialog(ArtisanDialog):
             self.setWindowFlags(windowFlags)
 
 class ArtisanMessageBox(QMessageBox):
+    
+    __slots__ = ['timeout', 'currentTime']
+    
     def __init__(self, parent = None, title=None, text=None, timeout=0, modal=True):
         super().__init__(parent)
         self.setWindowTitle(title)
@@ -116,6 +122,7 @@ class ArtisanMessageBox(QMessageBox):
         self.setIcon(QMessageBox.Icon.Information)
         self.setStandardButtons(QMessageBox.StandardButton.Ok)
         self.setDefaultButton(QMessageBox.StandardButton.Ok)
+        
         self.timeout = timeout # configured timeout, defaults to 0 (no timeout)
         self.currentTime = 0 # counts seconds after timer start
         
@@ -167,6 +174,9 @@ class HelpDlg(ArtisanDialog):
         settings.setValue("HelpGeometry",self.saveGeometry())
 
 class ArtisanInputDialog(ArtisanDialog):
+    
+    __slots__ = ['url', "inputLine"]
+    
     def __init__(self, parent = None, aw = None, title="",label=""):
         super().__init__(parent, aw)
         
@@ -206,6 +216,9 @@ class ArtisanInputDialog(ArtisanDialog):
             self.inputLine.setText(urls[0].toString())
 
 class ArtisanComboBoxDialog(ArtisanDialog):
+    
+    __slots__ = ['idx', "comboBox"]
+    
     def __init__(self, parent = None, aw = None, title="",label="",choices=None,default=-1):
         super().__init__(parent, aw)
         

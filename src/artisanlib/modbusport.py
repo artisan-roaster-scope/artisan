@@ -100,6 +100,13 @@ def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,wordorde
 # pymodbus version
 class modbusport():
     """ this class handles the communications with all the modbus devices"""
+    
+    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_write_delay', 'readRetries', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits', 
+        'timeout', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
+        'channels', 'inputSlaves', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputCodes', 'inputDivs',
+        'inputModes', 'optimizer', 'fetch_max_blocks', 'reset_socket', 'activeRegisters', 'readingsCache', 'SVmultiplier', 'PIDmultiplier',
+        'byteorderLittle', 'wordorderLittle', 'master', 'COMsemaphore', 'host', 'port', 'type', 'lastReadResult', 'commError' ]
+    
     def __init__(self,aw):
         self.aw = aw
         
