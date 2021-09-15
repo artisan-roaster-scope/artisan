@@ -1,0 +1,25 @@
+######
+# platform specifics
+#
+pywin32==301 #228
+#
+# pyinstaller now installed from our own build
+#pyinstaller==4.0 # 3.5 works # v3.6 and v4.0 on Windows breaks on some machines, v3.5 has a security issue but only in --onefile mode
+# NOTE: pyinstaller 3.5 is NOT compatible with Python3.8
+# pyinstaller 3.6 issue: https://github.com/pyinstaller/pyinstaller/issues/4213
+#
+######
+# packages that differ per platform:
+#
+gevent==21.1.2 # 20.9.0 # 1.5.0 is not compatible with Python 3.8
+gevent-websocket==0.10.1
+numpy==1.21.1 # 1.20.3
+scipy==1.7.0 # 1.6.3 # depends on numpy thus we have to put it after numpy
+matplotlib==3.4.2 # 3.3.4 # 3.4.1 requires pyinstaller > 4.2 # currently pyinstaller up to 4.0 is not compatible with MPL 3.3.x
+wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
+colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
+PyQt5==5.15.3 #5.14.2
+openpyxl==3.0.7 # 3.0.6
+keyring==23.0.1 #21.8.0 # 21.5.0 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
+lxml==4.6.3
+prettytable==2.1.0 # 0.7.2 # >1.0.0 fail to be packed by py2app, but a monkey patch in main.py helps

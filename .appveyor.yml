@@ -9,6 +9,8 @@ clone_depth: 1
 
 environment:
   matrix:
+  - job_name: windows_legacy
+    appveyor_build_worker_image: Visual Studio 2019
   - job_name: windows
     appveyor_build_worker_image: Visual Studio 2019
   - job_name: macos
@@ -38,11 +40,78 @@ for:
 -
   matrix:
     only:
-      - job_name: windows
+      - job_name: windows_legacy
     fast_finish: false
 
   environment:
     PYTHON: "C:\\Python38-x64"
+  #  PYINSTALLER_VER: "4.3"
+    UPLOADTOOL_BODY:
+      "WARNING: pre-release builds may not work. Use at your own risk."
+
+  install:
+    - echo "Windows Legacy Install"
+    - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+    - echo "Python Version"
+    - python -V
+    - "%PYTHON%\\python.exe -m pip install --upgrade pip"
+    - "%PYTHON%\\python.exe -m pip install wheel"
+    - "%PYTHON%\\python.exe -m pip install .ci\\pyinstaller-4.3-py3-none-any.whl"
+  #  # start: build the pyinstaller bootloader and install (using the default VS 2015)
+  #  - curl -L -O https://github.com/pyinstaller/pyinstaller/releases/download/v%PYINSTALLER_VER%/PyInstaller-%PYINSTALLER_VER%.tar.gz
+  #  - tar xzf PyInstaller-%PYINSTALLER_VER%.tar.gz
+  #  - del PyInstaller-%PYINSTALLER_VER%.tar.gz
+  #  - cd pyinstaller-%PYINSTALLER_VER%\bootloader
+  #  - "%PYTHON%\\python.exe ./waf all --target-arch=64bit"
+  #  - cd ..
+  #  - "%PYTHON%\\python.exe setup.py install"
+  #  - cd ..
+  #  # end: build the pyinstaller bootloader and install
+    - "%PYTHON%\\python.exe -m pip install -r src\\requirements.txt"
+    - "%PYTHON%\\python.exe -m pip install -r src\\requirements-win-legacy.txt"
+    - curl -L -O https://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x64.exe
+    - curl -k -L -O https://netcologne.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
+    - 7z x snap7-full-1.4.2.7z
+    - copy snap7-full-1.4.2\build\bin\win64\snap7.dll c:\windows
+    - curl -k -L -O https://netcologne.dl.sourceforge.net/project/libusb-win32/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip
+    - 7z x libusb-win32-bin-1.2.6.0.zip
+    - copy libusb-win32-bin-1.2.6.0\bin\amd64\libusb0.dll C:\Windows\SysWOW64
+
+  build_script:
+    - echo "Windows Legacy Build"
+    - cmd: cd src
+
+    # downgrade artisan-win.spec to use python 3.8
+    - ps: gc artisan-win.spec | %{ $_ -replace "PYTHON = r'c\:\\python39-x64'", "PYTHON = r'c:\python38-x64'" } | out-file newfile -encoding ascii
+    - ps: move -force newfile artisan-win.spec
+
+    # update the __revision__ field with the left seven of the GIT commit hash
+    - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
+    - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '0'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
+    - ps: move -force newfile artisanlib/__init__.py
+
+    # run the install script
+    - cmd: build-win3-pi.bat LEGACY
+    - cmd: copy ..\LICENSE LICENSE.txt
+    - cmd: 7z a artisan-win-legacy-%ARTISAN_VERSION%.zip Setup*.exe LICENSE.txt README.txt
+
+#  artifacts:
+#    - path: 'src\artisan-*.zip'
+
+  deploy_script:
+    - cmd: curl -L -O https://github.com/roasterdave/uploadtool/raw/master/upload.sh
+    - cmd: bash upload.sh artisan-*.zip
+
+
+-
+  matrix:
+    only:
+      - job_name: windows
+    fast_finish: false
+
+  environment:
+    PYTHON: "C:\\Python39-x64"
+  #  PYINSTALLER_VER: "4.3"
     UPLOADTOOL_BODY:
       "WARNING: pre-release builds may not work. Use at your own risk."
 
@@ -74,22 +143,15 @@ for:
     - curl -k -L -O https://netcologne.dl.sourceforge.net/project/libusb-win32/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip
     - 7z x libusb-win32-bin-1.2.6.0.zip
     - copy libusb-win32-bin-1.2.6.0\bin\amd64\libusb0.dll C:\Windows\SysWOW64
-  ## Phidget Python lib no installed via pip
-  #  - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
-  #  - 7z x Phidget22Python.zip
-  #  - cd Phidget22Python
-  #  - python setup.py install
-  #  - cd ..
 
   build_script:
     - echo "Windows Build"
     - cmd: cd src
+    # update the __revision__ field with the left seven of the GIT commit hash
     - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
     - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '0'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
     - ps: move -force newfile artisanlib/__init__.py
-    - cmd: FOR /F "usebackq delims==" %%a IN (`python -c "import artisanlib; print(artisanlib.__version__)"`) DO (set ARTISAN_VERSION=%%~a)
-    - ps: gc setup-install3-pi.nsi | %{ $_ -replace "!define PRODUCT_VERSION.*", "!define PRODUCT_VERSION ""$Env:ARTISAN_VERSION.0""" } | out-file newfile -encoding ascii -force
-    - ps: move -force newfile setup-install3-pi.nsi
+    # run the install script
     - cmd: build-win3-pi.bat
     - cmd: copy ..\LICENSE LICENSE.txt
     - cmd: 7z a artisan-win-%ARTISAN_VERSION%.zip Setup*.exe LICENSE.txt README.txt
@@ -122,8 +184,10 @@ for:
   install:
     - echo "MacOS Install"
     - chmod +x .ci/*.sh
+    # update the __revision__ field with the left seven of the GIT commit hash
     - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
     - sed -i'' -e "s/__revision__ = '0'/__revision__ = '$GIT_VERSION'/" src/artisanlib/__init__.py
+    # run the install script
     - .ci/install-${ARTISAN_OS}.sh
 
   build_script:
@@ -157,8 +221,10 @@ for:
   install:
     - echo "Linux Install"
     - chmod +x .ci/*.sh
+    # update the __revision__ field with the left seven of the GIT commit hash
     - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
     - sed -i'' -e "s/__revision__ = '0'/__revision__ = '$GIT_VERSION'/" src/artisanlib/__init__.py
+    # run the install script
     - .ci/install-${ARTISAN_OS}.sh
 
   build_script:

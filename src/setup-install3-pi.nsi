@@ -91,13 +91,18 @@ RequestExecutionLevel admin
 ; HM NIS Edit Wizard helper defines
 !define pyinstallerOutputDir 'dist/artisan'
 !define PRODUCT_NAME "Artisan"
-!define PRODUCT_VERSION "2.4.7.0"
 !define PRODUCT_PUBLISHER "The Artisan Team"
 !define PRODUCT_WEB_SITE "https://github.com/artisan-roaster-scope/artisan/blob/master/README.md"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\artisan.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
+;Special commandline options
+;Product version can be defined on the command line '/DPRODUCT_VERSION=ww.xx.yy.zz' 
+;  and will override the version explicitly set below.
+!define /ifndef PRODUCT_VERSION "0.0.0.0"  
+!define /ifndef SIGN "False"
+!define /ifndef LEGACY "False"
 
 Caption "${PRODUCT_NAME} Installer"
 VIProductVersion ${PRODUCT_VERSION}
@@ -148,7 +153,17 @@ InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
 
+!include WinVer.nsh
+
 Function .onInit
+
+  ;Include option '/DLEGACY="True"' on the command line for legacy Windows builds.
+  ${If} ${LEGACY} == "False"
+  ${AndIfNot} ${AtLeastWin8}
+    MessageBox mb_iconStop "Artisan requires Windows 8 or later to install and run." 
+    Abort
+  ${EndIf}
+    
   !insertmacro IsRunning
 
   ${If} ${RunningX64}
@@ -215,7 +230,13 @@ Section -AdditionalIcons
 SectionEnd
 
 Section -Post
-  WriteUninstaller "$INSTDIR\uninst.exe"
+  ;The generated uninst.exe file needs to be redirected when signing so the signed uninstaller is packed. Include '/DSign="True"' on the command line.
+  !if ${Sign} S== "True"
+    WriteUninstaller "$%TEMP%\uninst.exe"
+  !else
+    WriteUninstaller "$INSTDIR\uninst.exe"
+  !endif
+
   WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\artisan.exe"
   WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "Path" "$INSTDIR"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
