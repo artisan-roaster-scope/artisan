@@ -41,6 +41,7 @@ import warnings
 import string as libstring
 import html as htmllib
 import numpy
+from urllib import parse
 from scipy.signal import savgol_filter
 from scipy.interpolate import UnivariateSpline
 import subprocess
@@ -62,9 +63,8 @@ import signal
 import functools
 import logging.config
 signal.signal(signal.SIGINT, signal.SIG_DFL)
-from urllib import parse
-from json import load as json_load, dumps as json_dumps
-from requests import post as request_post            
+from json import load as json_load, dumps as json_dumps 
+import requests
 from yaml import safe_load as yaml_load
 from typing import Final
 from unidecode import unidecode
@@ -307,7 +307,11 @@ class Artisan(QtSingleApplication):
                 try:
                     query = QUrlQuery(url.query())
                     if query.hasQueryItem("url"):
-                        QTimer.singleShot(5,lambda: aw.importExternalURL(aw.artisanURLextractor,url=QUrl(query.queryItemValue("url"))))
+                        query_url = QUrl(requests.utils.unquote(query.queryItemValue("url")))
+                        if bool(aw.comparator):
+                            QTimer.singleShot(5,lambda: aw.comparator.addProfileFromURL(aw.artisanURLextractor,query_url))
+                        else:
+                            QTimer.singleShot(5,lambda: aw.importExternalURL(aw.artisanURLextractor,url=query_url))
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
             elif url.scheme() == "file":
@@ -3252,7 +3256,7 @@ class tgraphcanvas(FigureCanvas):
                     payload['alert']['title'] = alertTitle
                 if alertTimeout:
                     payload['alert']['timeout'] = alertTimeout
-            request_post(url, data=json_dumps(payload),headers=headers,timeout=0.3)
+            requests.post(url, data=json_dumps(payload),headers=headers,timeout=0.3)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
@@ -13590,8 +13594,8 @@ class tgraphcanvas(FigureCanvas):
             try:
                 # only show first line in
                 error = error.splitlines()[0]
-            except Exception: # pylint: disable=broad-except
-                pass
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
             if self.flagon: # don't send message here, but cache it and send it from updategraphics from within the GUI thread
                 self.temporary_error = error
             else:
@@ -23401,6 +23405,7 @@ class ApplicationWindow(QMainWindow):
         try:
             #### lock shared resources #####
             aw.qmc.messagesemaphore.acquire(1)
+            _log.debug(message)
             if style is not None and style != "":
                 aw.messagelabel.setStyleSheet(style)
             else:
@@ -23912,7 +23917,7 @@ class ApplicationWindow(QMainWindow):
                 elif k == 79:                       #O (toggle background showfull flag)
                     self.toggleBackroundShowfullFlag()
                 elif k == 72:                       #H
-                    if not self.qmc.designerflag:
+                    if not self.qmc.designerflag and not bool(aw.comparator):
                         if alt_modifier and platf != 'Windows' or ((control_shift_modifier or control_alt_modifier) and platf == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
                             self.deleteBackground()
                             if not self.qmc.flagon:
@@ -23931,19 +23936,20 @@ class ApplicationWindow(QMainWindow):
                                 self.qmc.timealign(redraw=False)
                                 self.qmc.redraw()
                 elif k == 75:                       #K
-                    if not aw.qmc.flagon:
+                    if not aw.qmc.flagon and not self.qmc.designerflag and not bool(aw.comparator):
                         if control_alt_modifier:
                             aw.clearResults()
                         elif control_modifier:
                             aw.analysisfitCurvesALL()
                 elif k == 76:                       #L
-                    filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Alarms",None),ext="*.alrm")
-                    if len(filename) == 0:
-                        return
-                    try:
-                        aw.loadAlarms(filename)
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
+                    if not self.qmc.designerflag and not bool(aw.comparator):
+                        filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Alarms",None),ext="*.alrm")
+                        if len(filename) == 0:
+                            return
+                        try:
+                            aw.loadAlarms(filename)
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
                 elif k == 80:                       #P
                     # switch PID mode
                     if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
@@ -24055,16 +24061,17 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
                         aw.qmc.redraw(recomputeAllDeltas=False,sampling=aw.qmc.flagon)
                 elif k == 65:                     #letter A (automatic save)
-                    if not app.artisanviewerMode and self.qmc.flagon:
+                    if not app.artisanviewerMode and self.qmc.flagon and not self.qmc.designerflag and not bool(aw.comparator):
                         self.automaticsave()
                 elif k == 68:                     #letter D (toggle xy between temp and RoR scale)
-                    self.qmc.fmt_data_RoR = not (self.qmc.fmt_data_RoR)
-                    # force redraw crosslines if active
-                    if aw.qmc.crossmarker:
-                        try:
-                            aw.ntb.mouse_move(mplLocationevent.lastevent)
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
+                    if not self.qmc.designerflag and not bool(aw.comparator):
+                        self.qmc.fmt_data_RoR = not (self.qmc.fmt_data_RoR)
+                        # force redraw crosslines if active
+                        if aw.qmc.crossmarker:
+                            try:
+                                aw.ntb.mouse_move(mplLocationevent.lastevent)
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.exception(e)
                 elif k == 67:                     #letter C (controls)
                     self.toggleControls()
                 elif k == 88:                     #letter X (readings)
@@ -24076,20 +24083,25 @@ class ApplicationWindow(QMainWindow):
                 elif k == 84 and not self.qmc.flagon:  #letter T (mouse cross)
                     self.qmc.togglecrosslines()
                 elif k == 81:  #letter q (quick entry of custom event 1)
-                    self.quickEventShortCut = (0,"")
-                    aw.sendmessage("%s"%aw.qmc.etypes[0])
+                    if not self.qmc.designerflag and not bool(aw.comparator):
+                        self.quickEventShortCut = (0,"")
+                        aw.sendmessage("%s"%aw.qmc.etypes[0])
                 elif k == 87:  #letter w (quick entry of custom event 2)
-                    self.quickEventShortCut = (1,"")
-                    aw.sendmessage("%s"%aw.qmc.etypes[1])
+                    if not self.qmc.designerflag and not bool(aw.comparator):
+                        self.quickEventShortCut = (1,"")
+                        aw.sendmessage("%s"%aw.qmc.etypes[1])
                 elif k == 69:  #letter e (quick entry of custom event 3)
-                    self.quickEventShortCut = (2,"")
-                    aw.sendmessage("%s"%aw.qmc.etypes[2])
+                    if not self.qmc.designerflag and not bool(aw.comparator):
+                        self.quickEventShortCut = (2,"")
+                        aw.sendmessage("%s"%aw.qmc.etypes[2])
                 elif k == 82:  #letter r (quick entry of custom event 4)
-                    self.quickEventShortCut = (3,"")
-                    aw.sendmessage("%s"%aw.qmc.etypes[3])
+                    if not self.qmc.designerflag and not bool(aw.comparator):
+                        self.quickEventShortCut = (3,"")
+                        aw.sendmessage("%s"%aw.qmc.etypes[3])
                 elif k == 86: #letter v (Set SV)
-                    self.quickEventShortCut = (4,"")
-                    aw.sendmessage("SV")
+                    if not self.qmc.designerflag and not bool(aw.comparator):
+                        self.quickEventShortCut = (4,"")
+                        aw.sendmessage("SV")
                 elif k == 66:  #letter b hides/shows extra rows of event buttons
                     if not app.artisanviewerMode:
                         self.toggleextraeventrows()
@@ -25391,7 +25403,6 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.timebackgroundindexupdate(times[:])
                 self.qmc.timeindexB = self.qmc.timeindexB + [0 for i in range(8-len(self.qmc.timeindexB))]
                 self.qmc.background_profile_sampling_interval = profile["samplinginterval"]
-                backgroundDrop = self.qmc.timeindexB[6]
                 try:
                     try:
                         self.qmc.TP_time_B = profile["computed"]["TP_time"]
@@ -28211,7 +28222,6 @@ class ApplicationWindow(QMainWindow):
 
     @staticmethod
     def artisanURLextractor(url, _):
-        import requests
         r = requests.get(url.toString(), 
             allow_redirects=True, 
             timeout=(4, 15),
@@ -28219,9 +28229,8 @@ class ApplicationWindow(QMainWindow):
 #            verify=False
             )
         return ast.literal_eval(r.text)
-#        from requests_file import FileAdapter  # @UnresolvedImport
 #        s = requests.Session()
-#        s.mount('file://', FileAdapter())
+#        s.mount('file://', requests.FileAdapter())
 #        resp = s.get(url.toString(), timeout=(4, 15), headers={"Accept-Encoding" : "gzip"})
 #        print(resp.text)
 #        return ast.literal_eval(resp.text)
@@ -34041,8 +34050,7 @@ class ApplicationWindow(QMainWindow):
     def checkUpdate(self, _=False):
         try:
             update_url = '<a href="https://artisan-scope.org">https://artisan-scope.org</a>'
-            from requests import get as request_get
-            r = request_get('https://api.github.com/repos/artisan-roaster-scope/artisan/releases/latest', timeout=(2,4))
+            r = requests.get('https://api.github.com/repos/artisan-roaster-scope/artisan/releases/latest', timeout=(2,4))
             tag_name = r.json()['tag_name']
             latest = re.search(r"[\d\.]+",tag_name).group(0)
             if latest > __version__:
@@ -35324,6 +35332,7 @@ class ApplicationWindow(QMainWindow):
     
     # url a QUrl
     def importExternalURL(self,extractor,message="",url=None):
+        _log.debug("importExternalURL(%s)", url)
         try:
             if url is None:
                 url = self.ArtisanOpenURLDialog(msg=message)
@@ -35332,10 +35341,14 @@ class ApplicationWindow(QMainWindow):
             
             res = aw.qmc.reset(redraw=False,soundOn=False)
             if res:
-                obj = extractor(url,aw)
-                if obj:
-                    res = self.setProfile(None,obj)
-                else:
+                try:
+                    obj = extractor(url,aw)
+                    if obj:
+                        res = self.setProfile(None,obj)
+                    else:
+                        res = None
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
                     res = None
             if res:
                 self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
@@ -35351,6 +35364,9 @@ class ApplicationWindow(QMainWindow):
                 #Plot everything
                 self.qmc.redraw()
                 message = QApplication.translate("Message","{0} imported", None).format(url.toString())
+                self.sendmessage(message)
+            else:
+                message = QApplication.translate("Message","an error occured on importing {0}", None).format(url.toString())
                 self.sendmessage(message)
 
         except Exception as ex: # pylint: disable=broad-except
