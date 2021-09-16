@@ -526,7 +526,7 @@ _log.info(
 
 
 if platf == 'Windows':
-    app.setWindowIcon(QIcon("artisan.png"))
+    app.setWindowIcon(QIcon(os.path.join(getAppPath(),"artisan.png")))
 #    try:
 #        # activate scaling for hiDPI screen support on Windows
 #        app.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
@@ -37190,7 +37190,7 @@ def main():
                     app.sendMessage(argv_file)
                     sys.exit(0)
                 # otherwise if an artisan://roast url open it in this instance, if not a url do normal file processing
-                elif re.match(r"artisan://roast",argv_file):
+                elif re.match(r"artisan://[roast|profile]",argv_file):
                     url = QUrl()
                     url.setUrl(argv_file)
                     app.open_url(url)
