@@ -199,8 +199,7 @@ import matplotlib.backends.qt_editor._formlayout as formlayout
 
 from matplotlib.patches import Polygon
 from matplotlib.transforms import Bbox
-from matplotlib.pyplot import imread
-        
+
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
@@ -9380,6 +9379,7 @@ class tgraphcanvas(FigureCanvas):
                 filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Image File",None),ext="*.png *.jpg")
             if len(filename) == 0:
                 return
+            from matplotlib.pyplot import imread
             aw.qmc.logoimg = imread(filename)
             aw.logofilename = filename
             aw.sendmessage(QApplication.translate("Message","Loaded watermark image {0}", None).format(filename))
