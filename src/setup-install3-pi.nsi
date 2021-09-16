@@ -159,8 +159,8 @@ Function .onInit
 
   ;Include option '/DLEGACY="True"' on the command line for legacy Windows builds.
   ${If} ${LEGACY} == "False"
-  ${AndIfNot} ${AtLeastWin8}
-    MessageBox mb_iconStop "Artisan requires Windows 8 or later to install and run." 
+  ${AndIfNot} ${AtLeastWin10}
+    MessageBox mb_iconStop "Artisan requires Windows 10 or later to install and run." 
     Abort
   ${EndIf}
     
