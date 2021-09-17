@@ -316,5 +316,4 @@ def stopHottop():
         process = None
 
 def isHottopLoopRunning():
-    global process # pylint: disable=global-statement
     return bool(process)

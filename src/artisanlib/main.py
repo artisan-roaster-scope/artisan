@@ -4273,7 +4273,7 @@ class tgraphcanvas(FigureCanvas):
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
                         try:
-                            if aw.ser.showFujiLCDs and self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid
+                            if aw.ser.showFujiLCDs and self.device in (0, 26):         #extra LCDs for Fuji or DTA pid
                                 pidsv = lcdformat%self.currentpidsv
                                 aw.lcd6.display(pidsv)
                                 pidduty = lcdformat%self.dutycycle
@@ -15482,7 +15482,6 @@ aw = None # assigned to the single instance of ApplicationWindow on creation
 artisanviewerFirstStart = False
 
 class ApplicationWindow(QMainWindow):
-    global app # pylint: disable=global-statement
 
     singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
     singleShotPhidgetsPulseOFFSerial = pyqtSignal(int,int,str,str)
@@ -20074,7 +20073,7 @@ class ApplicationWindow(QMainWindow):
     def showControlButton(self):
         res = False
         lcds = False
-        if aw.qmc.device in [0,26]: # FUJI, DTA
+        if aw.qmc.device in (0, 26): # FUJI, DTA
             res = True
             if aw.ser.showFujiLCDs:
                 lcds = True
@@ -22176,7 +22175,7 @@ class ApplicationWindow(QMainWindow):
                             ki = float(cmds[1])
                             kd = float(cmds[2])
                             #FUJI/DELTA pid
-                            if aw.qmc.device == 0 or aw.qmc.device == 26:
+                            if aw.qmc.device in (0, 26):
                                 # set-p-i-d currently only set from dialog
                                 if self.ser.controlETpid[0] == 0:
                                     # 1. get current PID
@@ -22698,7 +22697,7 @@ class ApplicationWindow(QMainWindow):
                                         ki = float(args[1])
                                         kd = float(args[2])
                                         #FUJI/DELTA pid
-                                        if self.qmc.device == 0 or self.qmc.device == 26:
+                                        if self.qmc.device in (0, 26):
                                             # set-p-i-d currently only set from dialog
                                             if self.ser.controlETpid[0] == 0: # PXG
                                                 # 1. get current PID
@@ -22740,7 +22739,7 @@ class ApplicationWindow(QMainWindow):
                             elif cs.startswith("pidRS(") and cs.endswith(")"):
                                 try:
                                     rs = int(eval(cs[len("pidRS("):-1])) # pylint: disable=eval-used
-                                    if self.qmc.device == 0 or self.qmc.device == 26:
+                                    if self.qmc.device in (0, 26):
                                         if self.ser.controlETpid[0] == 0: # PXG
                                             pass
                                         elif self.ser.controlETpid[0] == 1: # PRG
@@ -22765,7 +22764,7 @@ class ApplicationWindow(QMainWindow):
                             elif cs.startswith("pidSource(") and cs.endswith(")"):
                                 try:
                                     source = int(cs[len("pidSource("):-1])
-                                    if self.qmc.device != 0 and self.qmc.device != 26:
+                                    if self.qmc.device not in (0, 26):
                                         kp = aw.pidcontrol.pidKp
                                         ki = aw.pidcontrol.pidKi
                                         kd = aw.pidcontrol.pidKd
@@ -23707,7 +23706,7 @@ class ApplicationWindow(QMainWindow):
         if aw.largePhasesLCDs_dialog is not None:
             aw.largePhasesLCDs_dialog.updateVisiblitiesPhases()
         #
-        if aw.ser.showFujiLCDs and aw.qmc.device == 0 or aw.qmc.device == 26:         #extra LCDs for Fuji or DTA pid
+        if aw.ser.showFujiLCDs and aw.qmc.device in (0, 26):         #extra LCDs for Fuji or DTA pid
             aw.LCD6frame.setVisible(True)
             aw.LCD7frame.setVisible(True)
         else:
@@ -34290,7 +34289,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def PIDcontrol(self,_=False):
         #FUJI/DELTA pid
-        if self.qmc.device == 0 or self.qmc.device == 26:
+        if self.qmc.device in (0, 26):
             modifiers = QApplication.keyboardModifiers()
             if modifiers == Qt.KeyboardModifier.ControlModifier and self.qmc.device == 0:
                 # a right-click on the Control button will toggle PID Standby on and off
@@ -37127,7 +37126,7 @@ def initialize_locale(my_app) -> str:
     return locale
 
 def main():
-    global aw, app, artisanviewerFirstStart # pylint: disable=global-statement
+    global aw, artisanviewerFirstStart # pylint: disable=global-statement
 
     locale_str = initialize_locale(app)
     _log.info("locale: %s",locale_str)

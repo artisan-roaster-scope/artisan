@@ -98,7 +98,7 @@ class PhidgetManager():
                                 #   do nothing
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-            except Exception as e: # pylint: disable=broad-except
+            except Exception: # pylint: disable=broad-except
                 pass # channel might fail on channel.getHub() like the USB 1048 Phidgets
             self.attachedPhidgetChannels[channel] = state
         except Exception as e:  # pylint: disable=broad-except

@@ -741,7 +741,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 dryEndIndex = self.aw.findDryEnd(TP_index)
             self.charge_idx = self.aw.findBTbreak(0,dryEndIndex,offset=0.5)
             self.drop_idx = self.aw.findBTbreak(dryEndIndex,offset=0.2)
-            if self.drop_idx != 0 and self.drop_idx != self.aw.qmc.timeindex[6]:
+            if self.drop_idx not in (0, self.aw.qmc.timeindex[6]):
                 drop_str = stringfromseconds(self.aw.qmc.timex[self.drop_idx]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
         drylabel = QLabel("<b>" + QApplication.translate("Label", "DRY END",None) + "</b>")
         drylabel.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)

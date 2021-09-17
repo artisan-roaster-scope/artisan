@@ -188,7 +188,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.arduinoBTComboBox = QComboBox()
         self.arduinoBTComboBox.addItems(arduinoChannels)
         #check previous settings for radio button
-        if self.aw.qmc.device == 0 or self.aw.qmc.device == 26:   #if Fuji pid or Delta DTA pid
+        if self.aw.qmc.device in (0, 26):   #if Fuji pid or Delta DTA pid
             self.pidButton.setChecked(True)
         elif self.aw.qmc.device == 19:                       #if arduino
             self.arduinoButton.setChecked(True)
