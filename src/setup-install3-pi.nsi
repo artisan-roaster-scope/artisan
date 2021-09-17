@@ -1,4 +1,3 @@
-
 RequestExecutionLevel admin
 
 !macro APP_ASSOCIATE_URL FILECLASS DESCRIPTION COMMANDTEXT COMMAND
@@ -13,9 +12,7 @@ RequestExecutionLevel admin
   ; Backup the previously associated file class
   ReadRegStr $R0 HKCR ".${EXT}" ""
   WriteRegStr HKCR ".${EXT}" "${FILECLASS}_backup" "$R0"
- 
   WriteRegStr HKCR ".${EXT}" "" "${FILECLASS}"
- 
   WriteRegStr HKCR "${FILECLASS}" "" `${DESCRIPTION}`
   WriteRegStr HKCR "${FILECLASS}\DefaultIcon" "" `${ICON}`
   WriteRegStr HKCR "${FILECLASS}\shell" "" "open"
@@ -23,15 +20,45 @@ RequestExecutionLevel admin
   WriteRegStr HKCR "${FILECLASS}\shell\open\command" "" `${COMMAND}`
 !macroend
  
+!macro APP_UNASSOCIATE EXT FILECLASS
+  ; Backup the previously associated file class
+  ReadRegStr $R0 HKCR ".${EXT}" `${FILECLASS}_backup`
+  WriteRegStr HKCR ".${EXT}" "" "$R0"
+  DeleteRegKey HKCR `${FILECLASS}`
+!macroend
+ 
+!macro Rmdir_Wildcard dir uid
+  ; RMDIR with wildcard, dir in the form $INSTDIR\dir_with_wildcard, uid should be ${__LINE__}
+  FindFirst $0 $1 ${dir}
+  loop_${uid}:
+    StrCmp $1 "" endloop_${uid}
+    RMDIR /r "$INSTDIR\$1"
+    FindNext $0 $1
+    Goto loop_${uid}
+  endloop_${uid}:
+  FindClose $0
+!macroend
+
+!macro IsRunning 
+  Delete "$TEMP\25b241e1.tmp"
+  nsExec::Exec "cmd /c for /f $\"tokens=1,2$\" %i in ('tasklist') do (if /i %i EQU artisan.exe fsutil file createnew $TEMP\25b241e1.tmp 0)"
+  IfFileExists $TEMP\25b241e1.tmp 0 notRunning
+    ;we have at least one main window active
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Artisan was found to be running. Please close all instances then try the installer again." /SD IDOK
+    Delete "$TEMP\25b241e1.tmp"
+    Quit
+  notRunning:
+!macroEnd
+
+
+;Unused macros ------
 !macro APP_ASSOCIATE_EX EXT FILECLASS DESCRIPTION ICON VERB DEFAULTVERB SHELLNEW COMMANDTEXT COMMAND
   ; Backup the previously associated file class
   ReadRegStr $R0 HKCR ".${EXT}" ""
   WriteRegStr HKCR ".${EXT}" "${FILECLASS}_backup" "$R0"
- 
   WriteRegStr HKCR ".${EXT}" "" "${FILECLASS}"
   StrCmp "${SHELLNEW}" "0" +2
   WriteRegStr HKCR ".${EXT}\ShellNew" "NullFile" ""
- 
   WriteRegStr HKCR "${FILECLASS}" "" `${DESCRIPTION}`
   WriteRegStr HKCR "${FILECLASS}\DefaultIcon" "" `${ICON}`
   WriteRegStr HKCR "${FILECLASS}\shell" "" `${DEFAULTVERB}`
@@ -48,19 +75,10 @@ RequestExecutionLevel admin
   DeleteRegKey HKCR `${FILECLASS}\shell\${VERB}`
 !macroend
 
-!macro APP_UNASSOCIATE EXT FILECLASS
-  ; Backup the previously associated file class
-  ReadRegStr $R0 HKCR ".${EXT}" `${FILECLASS}_backup`
-  WriteRegStr HKCR ".${EXT}" "" "$R0"
- 
-  DeleteRegKey HKCR `${FILECLASS}`
-!macroend
- 
 !macro APP_ASSOCIATE_GETFILECLASS OUTPUT EXT
   ReadRegStr ${OUTPUT} HKCR ".${EXT}" ""
 !macroend
- 
- 
+
 ; !defines for use with SHChangeNotify
 !ifdef SHCNE_ASSOCCHANGED
 !undef SHCNE_ASSOCCHANGED
@@ -76,17 +94,8 @@ RequestExecutionLevel admin
 ; can update the shell.
   System::Call "shell32::SHChangeNotify(i,i,i,i) (${SHCNE_ASSOCCHANGED}, ${SHCNF_FLUSH}, 0, 0)"
 !macroend
+;End Unused macros ------
 
-!macro IsRunning 
-  Delete "$TEMP\25b241e1.tmp"
-  nsExec::Exec "cmd /c for /f $\"tokens=1,2$\" %i in ('tasklist') do (if /i %i EQU artisan.exe fsutil file createnew $TEMP\25b241e1.tmp 0)"
-  IfFileExists $TEMP\25b241e1.tmp 0 notRunning
-    ;we have at least one main window active
-    MessageBox MB_OK|MB_ICONEXCLAMATION "Artisan was found to be running. Please close all instances then try the installer again." /SD IDOK
-    Delete "$TEMP\25b241e1.tmp"
-    Quit
-  notRunning:
-!macroEnd
 
 ; HM NIS Edit Wizard helper defines
 !define pyinstallerOutputDir 'dist/artisan'
@@ -156,8 +165,6 @@ ShowUnInstDetails show
 !include WinVer.nsh
 
 Function .onInit
-
-  ;Include option '/DLEGACY="True"' on the command line for legacy Windows builds.
   ${If} ${LEGACY} == "False"
   ${AndIfNot} ${AtLeastWin10}
     MessageBox mb_iconStop "Artisan requires Windows 10 or later to install and run." 
@@ -181,27 +188,26 @@ Function .onInit
     Abort
   ${EndIf}
  
-;Run the uninstaller
-uninst:
-  ClearErrors
-  IfSilent mysilent nosilent
+  ;Run the uninstaller
+  uninst:
+    ClearErrors
+    IfSilent mysilent nosilent
+      
+  mysilent:
+    ExecWait '$R0 /S _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
+    IfErrors no_remove_uninstaller done
     
-mysilent:
-  ExecWait '$R0 /S _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
-  IfErrors no_remove_uninstaller done
-  
-nosilent:
-  ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file 
-  IfErrors no_remove_uninstaller done
+  nosilent:
+    ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file 
+    IfErrors no_remove_uninstaller done
+      
+  no_remove_uninstaller:
+      ;You can either use Delete /REBOOTOK in the uninstaller or add some code
+      ;here to remove the uninstaller. Use a registry key to check
+      ;whether the user has chosen to uninstall. If you are using an uninstaller
+      ;components page, make sure all sections are uninstalled.
     
-no_remove_uninstaller:
-    ;You can either use Delete /REBOOTOK in the uninstaller or add some code
-    ;here to remove the uninstaller. Use a registry key to check
-    ;whether the user has chosen to uninstall. If you are using an uninstaller
-    ;components page, make sure all sections are uninstalled.
-  
-done:
- 
+  done:
 FunctionEnd
 
 
@@ -216,10 +222,8 @@ Section "MainSection" SEC01
   CreateShortCut "$DESKTOP\Artisan.lnk" "$INSTDIR\artisan.exe"
 SectionEnd
 
-
 Section "Microsoft Visual C++ 2015 Redistributable Package (x64)" SEC02
-ExecWait '$INSTDIR\vc_redist.x64.exe /install /passive /norestart'
-
+  ExecWait '$INSTDIR\vc_redist.x64.exe /install /passive /norestart'
 SectionEnd
 
 Section -AdditionalIcons
@@ -297,50 +301,41 @@ Section Uninstall
   Delete "$INSTDIR\base_library.zip"
 
   RMDir /r "$INSTDIR\certifi"
+  RMDir /r "$INSTDIR\gevent"
+  RMDir /r "$INSTDIR\greenlet"
+  RMDir /r "$INSTDIR\Icons"
   RMDir /r "$INSTDIR\Include"
   RMDir /r "$INSTDIR\lib"
   RMDir /r "$INSTDIR\lib2to3"
+  RMDir /r "$INSTDIR\lxml"
   RMDir /r "$INSTDIR\Machines"
-  RMDir /r "$INSTDIR\Themes"
-  RMDir /r "$INSTDIR\Icons"
+  RMDir /r "$INSTDIR\matplotlib"
   RMDir /r "$INSTDIR\mpl-data"
-  RMDir /r "$INSTDIR\pytz"
+  RMDir /r "$INSTDIR\numpy"
   RMDir /r "$INSTDIR\openpyxl"
-  RMDir /r "$INSTDIR\PyQt5"
-  RMDir /r "$INSTDIR\qt5_plugins"
+  RMDir /r "$INSTDIR\PIL"
+  RMDir /r "$INSTDIR\pyinstaller"
+  RMDir /r "$INSTDIR\pytz"
+  RMDir /r "$INSTDIR\qt*_plugins"
+  RMDir /r "$INSTDIR\scipy"
   RMDir /r "$INSTDIR\tcl"
+  RMDir /r "$INSTDIR\tcl8"
+  RMDir /r "$INSTDIR\Themes"
+  RMDir /r "$INSTDIR\Themes"
   RMDir /r "$INSTDIR\tk"
   RMDir /r "$INSTDIR\translations"
-  RMDir /r "$INSTDIR\Wheels"
-  RMDir /r "$INSTDIR\Themes"
-
-  RMDir /r "$INSTDIR\gevent-1.4.0-py3.7.egg-info"
-  RMDir /r "$INSTDIR\gevent-1.4.0-py3.8.egg-info"
-  RMDir /r "$INSTDIR\gevent-1.5.0-py3.7.egg-info"
-  RMDir /r "$INSTDIR\gevent-1.5.0-py3.8.egg-info"
-  RMDir /r "$INSTDIR\gevent-20.9.0-py3.8.egg-info"
-  RMDir /r "$INSTDIR\gevent-21.1.2-py3.8.egg-info"
-  RMDir /r "$INSTDIR\lxml"
-
-  RMDir /r "$INSTDIR\PIL"
-  RMDir /r "$INSTDIR\importlib_metadata-1.7.0-py3.7.egg-info"
-  RMDir /r "$INSTDIR\importlib_metadata-2.0.0-py3.7.egg-info"
-  RMDir /r "$INSTDIR\importlib_metadata-4.0.1-py3.8.egg-info"
-  RMDir /r "$INSTDIR\importlib_metadata-4.6.1-py3.8.egg-info"
-  RMDir /r "$INSTDIR\importlib_metadata-4.6.3-py3.8.egg-info"
-
-  RMDir /r "$INSTDIR\keyring-23.0.1-py3.8.egg-info"
-  RMDir /r "$INSTDIR\prettytable-2.1.0-py3.8.egg-info"
-
-  RMDir /r "$INSTDIR\greenlet"
   RMDir /r "$INSTDIR\wcwidth"
-  RMDir /r "$INSTDIR\gevent"
-  RMDir /r "$INSTDIR\matplotlib"
-  RMDir /r "$INSTDIR\numpy"
-  RMDir /r "$INSTDIR\scipy"
-  RMDir /r "$INSTDIR\tcl8"
-  RMDir /r "$INSTDIR\zope"
+  RMDir /r "$INSTDIR\Wheels"
   RMDir /r "$INSTDIR\win32com"
+  RMDir /r "$INSTDIR\yaml"
+  RMDir /r "$INSTDIR\zope"
+
+  !insertmacro Rmdir_Wildcard "$INSTDIR\PyQt*" ${__LINE__}
+  !insertmacro Rmdir_Wildcard "$INSTDIR\gevent*.egg-info" ${__LINE__}
+  !insertmacro Rmdir_Wildcard "$INSTDIR\importlib_metadata*.egg-info" ${__LINE__}
+  !insertmacro Rmdir_Wildcard "$INSTDIR\keyring*.egg-info" ${__LINE__}
+  !insertmacro Rmdir_Wildcard "$INSTDIR\prettytable*.egg-info" ${__LINE__}
+
   Delete "$INSTDIR\artisan.png"
   Delete "$INSTDIR\LICENSE.txt"
   Delete "$INSTDIR\README.txt"
@@ -371,7 +366,6 @@ Section Uninstall
   Delete "$INSTDIR\jquery-1.11.1.min.js"
   Delete "$INSTDIR\qt.conf"
   Delete "$INSTDIR\vc_redist.x64.exe"
-  Delete "$INSTDIR\logging.yaml"
 
   SetShellVarContext all
   Delete "$SMPROGRAMS\Artisan\Uninstall.lnk"
