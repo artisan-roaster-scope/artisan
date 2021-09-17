@@ -8269,7 +8269,7 @@ class tgraphcanvas(FigureCanvas):
 #                            print("BT RoR std (old):",numpy.std([x for x in self.delta2[start:end] if x is not None]))
 #                            print("BT RoR std (new):",numpy.std(self.delta2))
 #                        except Exception as e: # pylint: disable=broad-except
-#                            print(e)
+#                            _log.exception(e)
                 
                 # CHARGE-DROP curve index limits
                 charge_idx = 0
@@ -9296,7 +9296,6 @@ class tgraphcanvas(FigureCanvas):
                 pattern = re.compile(r"([0-9]+)([A-Za-z]+[A-Za-z 0-9]+)",_ignorecase)
                 matches = pattern.split(matched.group('nominalstr'))
                 #example form of the matches list ['', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '']
-                #print(len(matches),matches)
                 replacestring = ""
                 j = 1
                 while (j < len(matches)):
@@ -15353,8 +15352,7 @@ class SampleThread(QThread):
                     timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
                     #read time, ET (t1) and BT (t2) TEMPERATURE
                     tx_org,t1,t2 = self.sample_main_device()
-                    timeAfterETBT = libtime.perf_counter() # the time the data of the main device was received
-                    etbt_time = timeAfterETBT - timeBeforeETBT
+                    etbt_time = libtime.perf_counter() - timeBeforeETBT
                     tx = tx_org + (etbt_time / 2.0) # we take the average between before and after
                     temp1_readings.append(t1)
                     temp2_readings.append(t2)
@@ -15399,7 +15397,7 @@ class SampleThread(QThread):
                     if libtime.perf_counter() < (next_tx + 0.25*interval):
                         # only if we still have the time in this sampling interval, we sample
 
-#                        print(datetime.datetime.now()) # use this to check for drifts
+#                        _log.debug(datetime.datetime.now()) # use this to check for drifts
 
                         #collect information
                         try:
@@ -23405,7 +23403,8 @@ class ApplicationWindow(QMainWindow):
         try:
             #### lock shared resources #####
             aw.qmc.messagesemaphore.acquire(1)
-            _log.debug(message)
+            if message:
+                _log.debug(message)
             if style is not None and style != "":
                 aw.messagelabel.setStyleSheet(style)
             else:
@@ -24818,11 +24817,11 @@ class ApplicationWindow(QMainWindow):
         dlg = ArtisanInputDialog(self,self,msg,QApplication.translate("Message", "URL",None))
         if dlg.exec():
             res = dlg.url
-#        try: # sip not supported on older PyQt versions (RPi!)
-#            sip.delete(dlg)
-#            #print(sip.isdeleted(dlg))
-#        except Exception: # pylint: disable=broad-except
-#            pass
+        try: # sip not supported on older PyQt versions (RPi!)
+            sip.delete(dlg)
+            #print(sip.isdeleted(dlg))
+        except Exception: # pylint: disable=broad-except
+            pass
         if res is None:
             return None
         url = QUrl(res,QUrl.ParsingMode.StrictMode)

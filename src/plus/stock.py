@@ -375,8 +375,8 @@ def coffee2beans(coffee):
         origin_str = c["origin"].strip()
         if len(origin_str) > 0 and origin_str != "null":
             origin = QApplication.translate("Countries", origin_str, None)
-    except Exception as e:  # pylint: disable=broad-except
-        _log.exception(e)
+    except Exception:  # pylint: disable=broad-except
+        pass
     if "label" in c:
         label = c["label"]
         if origin:
@@ -396,8 +396,8 @@ def coffee2beans(coffee):
             processing_str = processing_split[0]
         if len(processing_str) > 0 and processing_str != "null":
             processing = " {}".format(processing_str)
-    except Exception as e:  # pylint: disable=broad-except
-        _log.exception(e)
+    except Exception:  # pylint: disable=broad-except
+        pass
     grade = ""
     try:
         grade = " {}".format(c["grade"])
@@ -446,8 +446,8 @@ def coffee2beans(coffee):
                 year = ", {:d}".format(picked)
             else:
                 year = ", {:d}/{:d}".format(picked, landed)
-    except Exception as e:  # pylint: disable=broad-except
-        _log.exception(e)
+    except Exception:  # pylint: disable=broad-except
+        pass
     return "{}{}{}{}".format(origin, label, bean, year)
 
 
@@ -467,8 +467,8 @@ def getCoffees(weight_unit_idx, store=None):
                             origin = QApplication.translate(
                                 "Countries", origin_str, None
                             )
-                    except Exception as e:  # pylint: disable=broad-except
-                        _log.exception(e)
+                    except Exception:  # pylint: disable=broad-except
+                        pass
                     if origin != "":
                         try:
                             if "crop_date" in c:
@@ -761,23 +761,23 @@ def getBlendBlendDict(blend, weight=None):
                 del res["moisture"]
             else:
                 res["moisture"] = config.app_window.float2float(sum(moistures))
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception:  # pylint: disable=broad-except
+            pass
         try:
             if None in densities:
                 del res["density"]
             else:
                 res["density"] = int(round(sum(densities)))
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception:  # pylint: disable=broad-except
+            pass
         try:
             del res["screen_min"]
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception:  # pylint: disable=broad-except
+            pass
         try:
             del res["screen_max"]
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception:  # pylint: disable=broad-except
+            pass
         try:
             if None not in screen_mins and None not in screen_maxs:
                 sizes = screen_mins + screen_maxs
@@ -970,24 +970,24 @@ def getBlends(weight_unit_idx, store=None):
                                                 i["label"],
                                             )
                                             # pylint: disable=broad-except
-                                        except Exception as e:
-                                            _log.exception(e)
+                                        except Exception:
+                                            pass
                                     try:
                                         m = float(cd["moisture"])
                                         if m > 0:
                                             coffee_moisture[coffee] = m
                                             i["moisture"] = m
                                         # pylint: disable=broad-except
-                                    except Exception as e:
-                                        _log.exception(e)
+                                    except Exception:
+                                        pass
                                     try:
                                         d = int(cd["density"])
                                         if d > 0:
                                             coffee_density[coffee] = d
                                             i["density"] = d
                                         # pylint: disable=broad-except
-                                    except Exception as e:
-                                        _log.exception(e)
+                                    except Exception:
+                                        pass
                                     try:
                                         screen_size_min = int(
                                             cd["screen_size"]["min"]
@@ -998,8 +998,8 @@ def getBlends(weight_unit_idx, store=None):
                                             ] = screen_size_min
                                             i["screen_min"] = screen_size_min
                                         # pylint: disable=broad-except
-                                    except Exception as e:
-                                        _log.exception(e)
+                                    except Exception:
+                                        pass
                                     try:
                                         screen_size_max = int(
                                             cd["screen_size"]["max"]
@@ -1010,8 +1010,8 @@ def getBlends(weight_unit_idx, store=None):
                                             ] = screen_size_max
                                             i["screen_max"] = screen_size_max
                                         # pylint: disable=broad-except
-                                    except Exception as e:
-                                        _log.exception(e)
+                                    except Exception:
+                                        pass
                             # add data for replacements if any
                             if "replace_coffee" in i:
                                 replaceCoffee = i["replace_coffee"]
@@ -1054,8 +1054,8 @@ def getBlends(weight_unit_idx, store=None):
                                                     replaceCoffee
                                                 ] = m
                                             # pylint: disable=broad-except
-                                        except Exception as e:
-                                            _log.exception(e)
+                                        except Exception:
+                                            pass
                                         try:
                                             d = int(cd["density"])
                                             if d > 0:
@@ -1063,8 +1063,8 @@ def getBlends(weight_unit_idx, store=None):
                                                     replaceCoffee
                                                 ] = d
                                             # pylint: disable=broad-except
-                                        except Exception as e:
-                                            _log.exception(e)
+                                        except Exception:
+                                            pass
                                         try:
                                             screen_size_min = int(
                                                 cd["screen_size"]["min"]
@@ -1074,8 +1074,8 @@ def getBlends(weight_unit_idx, store=None):
                                                     replaceCoffee
                                                 ] = screen_size_min
                                             # pylint: disable=broad-except
-                                        except Exception as e:
-                                            _log.exception(e)
+                                        except Exception:
+                                            pass
                                         try:
                                             screen_size_max = int(
                                                 cd["screen_size"]["max"]
@@ -1192,7 +1192,7 @@ def getBlends(weight_unit_idx, store=None):
                                                 "screen_max"
                                             ]
                             replacementBlends.append((reach, new_blend))
-
+                            
                             # now check for (more) replacement blends
 
                             if reach > 0:
@@ -1203,6 +1203,7 @@ def getBlends(weight_unit_idx, store=None):
                                         coffee_stock[i["coffee"]]
                                         - reach * i["ratio"]
                                     )
+                            
                             # now we see if we can get further on activating
                             # some replacements we compute now a new
                             # replacement blend where components without stock
@@ -1211,7 +1212,7 @@ def getBlends(weight_unit_idx, store=None):
                             out_of_stock = False
                             for i in ingredients:
                                 if i["ratio"] > 0:
-                                    if coffee_stock[i["coffee"]] <= 0:
+                                    if coffee_stock[i["coffee"]] <= 0.01: # less then 10g is taken as zero to compensate numeric issues
                                         # this one needs a replacement
                                         if "replace_coffee" in i:
                                             # if that coffee is already used as

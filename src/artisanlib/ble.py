@@ -19,6 +19,7 @@
 
 import logging
 from typing import Final
+from enum import Enum
 
 try:
     #pylint: disable = E, W, R, C
@@ -32,16 +33,25 @@ except Exception:
 
 _log: Final = logging.getLogger(__name__)
 
+
+class BLE_CHAR_TYPE(Enum):
+    BLE_CHAR_NOTIFY = 'BLE_CHAR_NOTIFY'
+    BLE_CHAR_WRITE = 'BLE_CHAR_WRITE'
+    BLE_CHAR_NOTIFY_WRITE = 'BLE_CHAR_NOTIFY_WRITE'
+
+
 class BleInterface(QtCore.QObject):
-    weightChanged=QtCore.pyqtSignal(float)
-    batteryChanged=QtCore.pyqtSignal(int)
-    deviceDisconnected=QtCore.pyqtSignal()
+    weightChanged = QtCore.pyqtSignal(float)
+    batteryChanged = QtCore.pyqtSignal(int)
+    deviceDisconnected = QtCore.pyqtSignal()
     dataReceived = QtCore.pyqtSignal(QtCore.QByteArray)
     
     # the uuid_service_char_tuples is a list of tuples of the form (service_uuid, char_uuid)
     # with service_uuid the services to connect to and char_uuid the characteristic uuid we register for write
     # at this service
-    def __init__(self,uuid_service_char_tuples, processData, sendHeartbeat, sendStop, reset):
+    # if device_names are given, connections ar only made to devices with (partial-)matching names (fast)
+    # if device_names are not given, connections are made to every discovered device with the required UUIDs (slow)
+    def __init__(self, uuid_service_char_tuples, processData, sendHeartbeat, sendStop, reset, device_names=None):
         super().__init__()
         
         cp = QtBluetooth.QLowEnergyConnectionParameters()
@@ -49,10 +59,14 @@ class BleInterface(QtCore.QObject):
         _log.debug("min interval: %s", cp.minimumInterval())
         _log.debug("supervisionTimeout: %s", cp.supervisionTimeout())
         _log.debug("latency: %s", cp.latency())
-
-        self.UUID_SERVICE_CHAR_TUPLES = [(QtBluetooth.QBluetoothUuid(uuid_servive),QtBluetooth.QBluetoothUuid(uuid_char)) 
-            for (uuid_servive, uuid_char) in uuid_service_char_tuples]
         
+        self.device_names = device_names
+
+        self.UUID_SERVICE_CHAR_TUPLES=[]
+        for (uuid_servive, uuid_char_list) in uuid_service_char_tuples:
+            for (uuid_char, ble_write_type) in uuid_char_list:
+                self.UUID_SERVICE_CHAR_TUPLES.append((QtBluetooth.QBluetoothUuid(uuid_servive),(QtBluetooth.QBluetoothUuid(uuid_char),ble_write_type)) )
+
         self.service_uuid = None
         self.char_uuid = None
 
@@ -83,7 +97,7 @@ class BleInterface(QtCore.QObject):
         self.m_connected = False
         self.m_readTimer = None
         
-        self.dataReceived.connect(self.printDataReceived)
+        self.dataReceived.connect(self.dataReceivedProcessing)
         
 
     def removeDevice(self):
@@ -116,8 +130,8 @@ class BleInterface(QtCore.QObject):
 #--------
 
     @QtCore.pyqtSlot("QByteArray")
-    def printDataReceived(self,data=QtCore.QByteArray):
-#        print("received data:{data}".format(data =data))
+    def dataReceivedProcessing(self,data=QtCore.QByteArray):
+#        _log.debug("data received: %s", data)
         res_w, res_b = self.processData(self.write, data)
         if res_w is not None:
             self.weightChanged.emit(res_w)
@@ -129,7 +143,7 @@ class BleInterface(QtCore.QObject):
             self.m_service.readCharacteristic(self.m_readCharacteristic)
         
     def write(self,data=bytearray()):
-#        print("BLEInterface write :{datawrite}".format(datawrite=data))
+#        _log.debug("write data: %s", data)
         if (self.m_service and self.m_writeCharacteristic.isValid()):
             if (len(data) > 20):
                 sentBytes = 0
@@ -147,7 +161,11 @@ class BleInterface(QtCore.QObject):
             self.m_connected = connected
 #            self.connectedChanged.emit(connected)
             if self.m_connected:
+                if self.m_device:
+                    _log.info("connected to %s", self.m_device.name())
                 self.reset()
+            elif self.m_device:
+                _log.info("disconnected from %s", self.m_device.name())
 
     def heartbeat(self):
         if self.m_connected:
@@ -170,19 +188,28 @@ class BleInterface(QtCore.QObject):
         if self.m_service:
             for c in self.m_service.characteristics():
                 if c.isValid():
-                    # we register write only for the given char_uuid associated to the service uuid we are connected to
-                    if self.char_uuid == c.uuid():
-                        if c.properties() & QtBluetooth.QLowEnergyCharacteristic.WriteNoResponse or c.properties() & QtBluetooth.QLowEnergyCharacteristic.Write:
-                            self.m_writeCharacteristic = c
-                            self.update_connected(True)
-                            if c.properties() & QtBluetooth.QLowEnergyCharacteristic.WriteNoResponse:
-                                self.m_writemode=QtBluetooth.QLowEnergyService.WriteWithoutResponse
-                            else:
-                                self.m_writemode=QtBluetooth.QLowEnergyService.WriteWithResponse
-                    self.m_notificationDesc = c.descriptor(QtBluetooth.QBluetoothUuid(QtBluetooth.QBluetoothUuid.ClientCharacteristicConfiguration))
-                    if self.m_notificationDesc.isValid():
-                        self.m_service.descriptorWritten.connect(self.descriptorWrittenSlot)
-                        self.m_service.writeDescriptor(self.m_notificationDesc,self.ENABLE_NOTIFICATION_VALUE)
+                    for (uuid_char, ble_write_type) in self.char_uuid:
+                        # we register write only for the given char_uuid associated to the service uuid we are connected to
+                        if (c.uuid() == uuid_char and 
+                                (ble_write_type in (
+                                    BLE_CHAR_TYPE.BLE_CHAR_NOTIFY_WRITE,
+                                    BLE_CHAR_TYPE.BLE_CHAR_WRITE))):
+                            if ((c.properties() & QtBluetooth.QLowEnergyCharacteristic.WriteNoResponse) or 
+                                    (c.properties() & QtBluetooth.QLowEnergyCharacteristic.Write)):
+                                self.m_writeCharacteristic = c
+                                self.update_connected(True)
+                                if c.properties() & QtBluetooth.QLowEnergyCharacteristic.WriteNoResponse:
+                                    self.m_writemode=QtBluetooth.QLowEnergyService.WriteWithoutResponse
+                                else:
+                                    self.m_writemode=QtBluetooth.QLowEnergyService.WriteWithResponse
+                        if c.uuid() == uuid_char and (
+                                ble_write_type in (
+                                    BLE_CHAR_TYPE.BLE_CHAR_NOTIFY_WRITE,
+                                    BLE_CHAR_TYPE.BLE_CHAR_NOTIFY)):
+                            self.m_notificationDesc = c.descriptor(QtBluetooth.QBluetoothUuid(QtBluetooth.QBluetoothUuid.ClientCharacteristicConfiguration))
+                            if self.m_notificationDesc.isValid():
+                                self.m_service.descriptorWritten.connect(self.descriptorWrittenSlot)
+                                self.m_service.writeDescriptor(self.m_notificationDesc,self.ENABLE_NOTIFICATION_VALUE)
 
     @QtCore.pyqtSlot("QLowEnergyCharacteristic","QByteArray")
     def onCharacteristicChanged(self,_=QtBluetooth.QLowEnergyCharacteristic,value=QtCore.QByteArray):
@@ -204,16 +231,18 @@ class BleInterface(QtCore.QObject):
     def onServiceScanDone(self):
         _log.debug("onServiceScanDone()")
         for uuid in self.m_control.services():
-            service_uuid, char_uuid = next(((service_uuid, char_uuid) for (service_uuid, char_uuid) in self.UUID_SERVICE_CHAR_TUPLES if service_uuid == uuid), (None, None))
-            if service_uuid is not None:
-                _log.debug("createServiceObject(%s)", uuid.toString())
-                self.service_uuid = service_uuid
-                self.char_uuid = char_uuid
-                self.m_service = self.m_control.createServiceObject(uuid)
-                self.m_service.stateChanged.connect(self.onServiceStateChanged)
-                self.m_service.characteristicChanged.connect(self.onCharacteristicChanged)
-                self.m_service.characteristicRead.connect(self.onCharacteristicRead)
-                break
+            for (uuid_servive, (uuid_char, ble_write_type)) in self.UUID_SERVICE_CHAR_TUPLES:
+                if uuid_servive is not None:
+                    if uuid_servive == uuid:
+                        _log.debug("createServiceObject(%s)", uuid.toString())
+                        self.service_uuid = uuid_servive
+                        if not self.char_uuid:
+                            self.char_uuid = []
+                        self.char_uuid.append((uuid_char, ble_write_type))
+                        self.m_service = self.m_control.createServiceObject(uuid)
+                        self.m_service.stateChanged.connect(self.onServiceStateChanged)
+                        self.m_service.characteristicChanged.connect(self.onCharacteristicChanged)
+                        self.m_service.characteristicRead.connect(self.onCharacteristicRead)
         if self.m_service is not None and self.m_service.state() == QtBluetooth.QLowEnergyService.DiscoveryRequired:
             self.m_service.discoverDetails()
         else:
@@ -264,16 +293,24 @@ class BleInterface(QtCore.QObject):
 
     @QtCore.pyqtSlot("QBluetoothDeviceInfo")
     def addDevice(self, device):
-        _log.debug("addDevice(%s)", device.name())
+        _log.debug("addDevice()")
         if self.m_device is None and device.coreConfigurations() & QtBluetooth.QBluetoothDeviceInfo.LowEnergyCoreConfiguration:
             _log.debug("discovered LE Device name: %s,  address: %s", device.name(), device.address().toString())
             m_device = QtBluetooth.QBluetoothDeviceInfo(device)
-            for (uuid_service, _) in self.UUID_SERVICE_CHAR_TUPLES:
-                if self.deviceHasService(m_device, uuid_service):
-                    self.m_device = m_device
-                    # we found our device and stop scanning
-                    self.m_deviceDiscoveryAgent.stop()
-                    return
+            if self.device_names is None:
+                _log.debug("check device for matching services")
+                for (uuid_service, _) in self.UUID_SERVICE_CHAR_TUPLES:
+                    if self.deviceHasService(m_device, uuid_service):
+                        _log.debug("device service match")
+                        self.m_device = m_device
+                        # we found our device and stop scanning
+                        self.m_deviceDiscoveryAgent.stop()
+                        return
+            elif any((dn and dn in m_device.name()) for dn in self.device_names):
+                _log.debug("device name match")
+                self.m_device = m_device
+                # we found our device and stop scanning
+                self.m_deviceDiscoveryAgent.stop()
 
 #----------------
 
@@ -302,11 +339,22 @@ def main():
     from artisanlib.acaia import AcaiaBLE
     acaia = AcaiaBLE()
     ble = BleInterface(
-        [(acaia.SERVICE_UUID_LEGACY, acaia.CHAR_UUID_LEGACY), (acaia.SERVICE_UUID_CURRENT, acaia.CHAR_UUID_CURRENT)],
+        [(acaia.SERVICE_UUID_LEGACY,
+            [acaia.CHAR_UUID_LEGACY]),
+         (acaia.SERVICE_UUID,
+            [
+                acaia.CHAR_UUID, 
+                acaia.CHAR_UUID_WRITE
+            ])],
         acaia.processData,
         acaia.sendHeartbeat,
         acaia.sendStop,
-        acaia.reset)
+        acaia.reset,
+        [
+            acaia.DEVICE_NAME_LUNAR, 
+            acaia.DEVICE_NAME_PEARL, 
+            acaia.DEVICE_NAME_PEARL2021
+        ])
     ble.scanDevices()
     sys.exit(app.exec())
 
