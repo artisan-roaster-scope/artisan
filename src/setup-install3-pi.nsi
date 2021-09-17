@@ -316,7 +316,6 @@ Section Uninstall
   RMDir /r "$INSTDIR\PIL"
   RMDir /r "$INSTDIR\pyinstaller"
   RMDir /r "$INSTDIR\pytz"
-  RMDir /r "$INSTDIR\qt*_plugins"
   RMDir /r "$INSTDIR\scipy"
   RMDir /r "$INSTDIR\tcl"
   RMDir /r "$INSTDIR\tcl8"
@@ -331,6 +330,7 @@ Section Uninstall
   RMDir /r "$INSTDIR\zope"
 
   !insertmacro Rmdir_Wildcard "$INSTDIR\PyQt*" ${__LINE__}
+  !insertmacro Rmdir_Wildcard "$INSTDIR\qt*_plugins" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\gevent*.egg-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\importlib_metadata*.egg-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\keyring*.egg-info" ${__LINE__}
