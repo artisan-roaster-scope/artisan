@@ -13673,37 +13673,37 @@ Repeat Operation at the end: {0}</source>
         <translation type="obsolete">Jonossa oleva paisti lähetettäväksi artisan.plus-sivustoon</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="204"/>
+        <location filename="../plus/stock.py" line="202"/>
         <source>bag</source>
         <translation>laukku</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="205"/>
+        <location filename="../plus/stock.py" line="203"/>
         <source>box</source>
         <translation>laatikko</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="206"/>
+        <location filename="../plus/stock.py" line="204"/>
         <source>barrel</source>
         <translation>tynnyri</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="209"/>
+        <location filename="../plus/stock.py" line="207"/>
         <source>bags</source>
         <translation>laukut</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="210"/>
+        <location filename="../plus/stock.py" line="208"/>
         <source>boxes</source>
         <translation>laatikot</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="211"/>
+        <location filename="../plus/stock.py" line="209"/>
         <source>barrels</source>
         <translation>tynnyriä</translation>
     </message>
     <message>
-        <location filename="../plus/sync.py" line="631"/>
+        <location filename="../plus/sync.py" line="627"/>
         <source>Updated data received from artisan.plus</source>
         <translation>Päivitetty artisan.plus-sivustolta saatu data</translation>
     </message>

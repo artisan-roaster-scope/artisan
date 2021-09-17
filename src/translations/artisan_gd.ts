@@ -13703,37 +13703,37 @@ Repeat Operation at the end: {0}</source>
         <translation type="obsolete">Ròstadh ciudha airson a luchdachadh suas gu artisan.plus</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="204"/>
+        <location filename="../plus/stock.py" line="202"/>
         <source>bag</source>
         <translation>poca</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="205"/>
+        <location filename="../plus/stock.py" line="203"/>
         <source>box</source>
         <translation>bogsa</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="206"/>
+        <location filename="../plus/stock.py" line="204"/>
         <source>barrel</source>
         <translation>baraille</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="209"/>
+        <location filename="../plus/stock.py" line="207"/>
         <source>bags</source>
         <translation>pocannan</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="210"/>
+        <location filename="../plus/stock.py" line="208"/>
         <source>boxes</source>
         <translation>bogsaichean</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="211"/>
+        <location filename="../plus/stock.py" line="209"/>
         <source>barrels</source>
         <translation>baraillean</translation>
     </message>
     <message>
-        <location filename="../plus/sync.py" line="631"/>
+        <location filename="../plus/sync.py" line="627"/>
         <source>Updated data received from artisan.plus</source>
         <translation>Dàta ùraichte a fhuaireadh bho artisan.plus</translation>
     </message>

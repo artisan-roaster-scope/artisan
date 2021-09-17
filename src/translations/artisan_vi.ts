@@ -13666,37 +13666,37 @@ Repeat Operation at the end: {0}</source>
         <translation type="obsolete">Xếp hàng rang để tải lên Artian.plus</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="204"/>
+        <location filename="../plus/stock.py" line="202"/>
         <source>bag</source>
         <translation>túi</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="205"/>
+        <location filename="../plus/stock.py" line="203"/>
         <source>box</source>
         <translation>cái hộp</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="206"/>
+        <location filename="../plus/stock.py" line="204"/>
         <source>barrel</source>
         <translation>thùng</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="209"/>
+        <location filename="../plus/stock.py" line="207"/>
         <source>bags</source>
         <translation>túi</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="210"/>
+        <location filename="../plus/stock.py" line="208"/>
         <source>boxes</source>
         <translation>hộp</translation>
     </message>
     <message>
-        <location filename="../plus/stock.py" line="211"/>
+        <location filename="../plus/stock.py" line="209"/>
         <source>barrels</source>
         <translation>thùng</translation>
     </message>
     <message>
-        <location filename="../plus/sync.py" line="631"/>
+        <location filename="../plus/sync.py" line="627"/>
         <source>Updated data received from artisan.plus</source>
         <translation>Dữ liệu cập nhật nhận được từ Artian.plus</translation>
     </message>

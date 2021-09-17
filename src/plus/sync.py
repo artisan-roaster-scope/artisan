@@ -287,7 +287,6 @@ def clearSyncRecordHash():
 # if provided, roast_record is assumed to be a full roast record
 # as provided by roast.getRoast()
 def syncRecordUpdated(roast_record=None):
-    global cached_sync_record_hash  # pylint: disable=global-statement
     try:
         _log.debug("syncRecordUpdated(%s)", roast_record)
         sync_record_semaphore.acquire(1)
@@ -308,7 +307,6 @@ def syncRecordUpdated(roast_record=None):
 # the result is the roast_record with all unchanged attributes, which do not
 # need to synced on updates, removed
 def diffCachedSyncRecord(roast_record):
-    global cached_sync_record  # pylint: disable=global-statement
     try:
         _log.debug("diffCachedSyncRecord()")
         sync_record_semaphore.acquire(1)
@@ -387,7 +385,6 @@ def setApplidedServerUpdatesModifiedAt(modified_at):
 
 def getApplidedServerUpdatesModifiedAt():
     # pylint: disable=global-statement
-    global applied_server_updates_modified_at
     try:
         _log.debug("getApplidedServerUpdatesModifiedAt()")
         applied_server_updates_modified_at_semaphore.acquire(1)
@@ -404,7 +401,6 @@ def getApplidedServerUpdatesModifiedAt():
 # variables directly
 # if the contained UUID
 def applyServerUpdates(data):
-    global cached_sync_record  # pylint: disable=global-statement
     dirty = False
     title_changed = False
     try:

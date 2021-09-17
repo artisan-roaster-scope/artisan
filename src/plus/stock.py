@@ -68,7 +68,6 @@ def update() -> None:
 
 
 def update_blocking() -> None:
-    global stock  # pylint: disable=global-statement
     _log.debug("update_blocking()")
     if stock is None:
         load()
@@ -127,7 +126,6 @@ def fetch() -> bool:
 
 # save stock data to local file cache
 def save() -> None:
-    global stock  # pylint: disable=global-statement
     _log.debug("save()")
     try:
         stock_semaphore.acquire(1)
@@ -305,7 +303,6 @@ def getStoreId(store):
 
 # returns the list of stores defined in stock
 def getStores(acquire_lock=True):
-    global stock  # pylint: disable=global-statement
     _log.debug("getStores()")
     try:
         if acquire_lock:
@@ -452,7 +449,6 @@ def coffee2beans(coffee):
 
 
 def getCoffees(weight_unit_idx, store=None):
-    global stock  # pylint: disable=global-statement
     _log.debug("getCoffees(%s,%s)", weight_unit_idx, store)
     try:
         stock_semaphore.acquire(1)
@@ -570,7 +566,6 @@ def getCoffeeStockPosition(coffeeId, stockId, coffees):
 
 # returns the coffee and stock dicts of the given coffeeId and storeId or None
 def getCoffeeStore(coffeeId, storeId, acquire_lock=True):
-    global stock  # pylint: disable=global-statement
     try:
         if acquire_lock:
             stock_semaphore.acquire(1)
@@ -872,7 +867,6 @@ def blend2beans(blend, weight_unit_idx, weightIn=0):
 #            replaceMaxAmount,replacementBlends]>
 #       for blends with replacement coffees defined
 def getBlends(weight_unit_idx, store=None):
-    global stock  # pylint: disable=global-statement
     _log.debug("getBlends(%s,%s)", weight_unit_idx, store)
     try:
         stock_semaphore.acquire(1)
