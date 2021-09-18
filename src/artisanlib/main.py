@@ -8303,16 +8303,19 @@ class tgraphcanvas(FigureCanvas):
                         #count (as length of the list) and collect their times for each different type. Each type will have a different plot heigh
                         netypes=[[],[],[],[]]
                         for i in range(Nevents):
-                            tx = self.timex[self.specialevents[i]]
-                            if self.foregroundShowFullflag or ((self.timeindex[0] > -1 and tx >= self.timex[self.timeindex[0]]) and (self.timeindex[6] > 0 and tx <= self.timex[self.timeindex[6]])):
-                                if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
-                                    netypes[0].append(self.timex[self.specialevents[i]])
-                                elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
-                                    netypes[1].append(self.timex[self.specialevents[i]])
-                                elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
-                                    netypes[2].append(self.timex[self.specialevents[i]])
-                                elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
-                                    netypes[3].append(self.timex[self.specialevents[i]])
+                            try:
+                                tx = self.timex[self.specialevents[i]]
+                                if self.foregroundShowFullflag or ((self.timeindex[0] > -1 and tx >= self.timex[self.timeindex[0]]) and (self.timeindex[6] > 0 and tx <= self.timex[self.timeindex[6]])):
+                                    if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
+                                        netypes[0].append(tx)
+                                    elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
+                                        netypes[1].append(tx)
+                                    elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
+                                        netypes[2].append(tx)
+                                    elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
+                                        netypes[3].append(tx)
+                            except Exception as e:  # pylint: disable=broad-except
+                                _log.debug(e)
 
                         letters = "".join((char1,char2,char3,char4))   #"NPDF" first letter for each type (None, Power, Damper, Fan)
                         rotating_colors = [self.palette["rect2"],self.palette["rect3"]] #rotating rotating_colors
@@ -8330,54 +8333,57 @@ class tgraphcanvas(FigureCanvas):
                                 pass
                             elif aw.qmc.showEtypes[self.specialeventstype[i]]:
                                 event_idx = int(self.specialevents[i])
-                                if not self.flagstart and not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
-                                    continue
-                            
-                                firstletter = self.etypes[self.specialeventstype[i]][0]
-                                secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
-
-                                #some times ET is not drawn (ET = 0) when using device NONE
-                                if aw.qmc.ETcurve or aw.qmc.BTcurve:
-                                    # plot events on BT when showeventsonbt is true
-                                    if aw.qmc.showeventsonbt and aw.qmc.BTcurve:
-                                        col = self.palette["bt"]
-                                        if aw.qmc.flagon:
-                                            temps = self.temp2
+                                try:
+                                    if not self.flagstart and not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
+                                        continue
+                                
+                                    firstletter = self.etypes[self.specialeventstype[i]][0]
+                                    secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
+    
+                                    #some times ET is not drawn (ET = 0) when using device NONE
+                                    if aw.qmc.ETcurve or aw.qmc.BTcurve:
+                                        # plot events on BT when showeventsonbt is true
+                                        if aw.qmc.showeventsonbt and aw.qmc.BTcurve:
+                                            col = self.palette["bt"]
+                                            if aw.qmc.flagon:
+                                                temps = self.temp2
+                                            else:
+                                                temps = self.stemp2
+                                        elif (aw.qmc.ETcurve and self.temp1[event_idx] >= self.temp2[event_idx]) or (not aw.qmc.BTcurve):
+                                            col = self.palette["et"]
+                                            if aw.qmc.flagon:
+                                                temps = self.temp1
+                                            else:
+                                                temps = self.stemp1
                                         else:
-                                            temps = self.stemp2
-                                    elif (aw.qmc.ETcurve and self.temp1[event_idx] >= self.temp2[event_idx]) or (not aw.qmc.BTcurve):
-                                        col = self.palette["et"]
-                                        if aw.qmc.flagon:
-                                            temps = self.temp1
+                                            col = self.palette["bt"]
+                                            if aw.qmc.flagon:
+                                                temps = self.temp2
+                                            else:
+                                                temps = self.stemp2
+    #                                    fcolor=self.EvalueColor[self.specialeventstype[i]]
+                                        if platf == 'Windows':
+                                            vert_offset = 5.0
                                         else:
-                                            temps = self.stemp1
-                                    else:
-                                        col = self.palette["bt"]
-                                        if aw.qmc.flagon:
-                                            temps = self.temp2
-                                        else:
-                                            temps = self.stemp2
-#                                    fcolor=self.EvalueColor[self.specialeventstype[i]]
-                                    if platf == 'Windows':
-                                        vert_offset = 5.0
-                                    else:
-                                        vert_offset = 2.5
-                                    anno = self.ax.annotate(firstletter + secondletter,
-                                                     xy=(self.timex[event_idx],
-                                                     temps[event_idx]),
-                                                     xytext=(self.timex[event_idx],row[firstletter] + vert_offset),
-                                                     alpha=1.,
-                                                     va="center", ha="left",
-                                                     bbox=dict(boxstyle='square,pad=0.1', fc=self.palette["specialeventbox"], ec='none'),
-                                                     path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
-                                                     color=self.palette["specialeventtext"],
-                                                     arrowprops=dict(arrowstyle='-',color=col,alpha=0.4,relpos=(0,0)),
-                                                     fontsize="xx-small",
-                                                     fontproperties=fontprop_small)
-                                    try:
-                                        anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                    except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                        pass
+                                            vert_offset = 2.5
+                                        anno = self.ax.annotate(firstletter + secondletter,
+                                                         xy=(self.timex[event_idx],
+                                                         temps[event_idx]),
+                                                         xytext=(self.timex[event_idx],row[firstletter] + vert_offset),
+                                                         alpha=1.,
+                                                         va="center", ha="left",
+                                                         bbox=dict(boxstyle='square,pad=0.1', fc=self.palette["specialeventbox"], ec='none'),
+                                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
+                                                         color=self.palette["specialeventtext"],
+                                                         arrowprops=dict(arrowstyle='-',color=col,alpha=0.4,relpos=(0,0)),
+                                                         fontsize="xx-small",
+                                                         fontproperties=fontprop_small)
+                                        try:
+                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
+                                            pass
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
 
                     elif self.eventsGraphflag in [2,3,4]: # in this mode we have to generate the plots even if Nevents=0 to avoid redraw issues resulting from an incorrect number of plot count
                         self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
@@ -8394,161 +8400,162 @@ class tgraphcanvas(FigureCanvas):
                         eventannotationprop.set_size("x-small")
                         for i in range(Nevents):
                             pos = max(0,int(round((self.specialeventsvalue[i]-1)*10)))
-                            if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
+                            try:
                                 tx = self.timex[self.specialevents[i]]
-                                if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
-                                    # don't draw event lines before CHARGE if foregroundShowFullflag is not set
-                                    continue
-                                self.E1timex.append(tx)
-                                if self.clampEvents: # in clamp mode we render also event values higher than 100:
-                                    self.E1values.append(pos)
-                                else:
-                                    self.E1values.append((pos*event_pos_factor)+event_pos_offset)
-                                E1_nonempty = True
-                                E1_last = i
-                                try:
-                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.specialeventannovisibilities[0]:
-                                        E1_annotation = self.parseSpecialeventannotation(self.specialeventannotations[0], i)
-                                        temp = self.E1values[-1]
-                                        anno = self.ax.annotate(E1_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
-                                                    alpha=.9,
-                                                    color=self.palette["text"],
-                                                    va="bottom", ha="left",
-                                                    fontproperties=eventannotationprop,
-                                                    path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
-                                                    )
-                                        self.l_eventtype1annos.append(anno)
-                                        try:
-                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                            pass
-                                        try:
-                                            overlap = self.checkOverlap(anno) #, i, E1_annotation)
-                                            if overlap:
-                                                anno.remove()
-                                        except Exception: # pylint: disable=broad-except
-                                            pass
-                                except Exception as ex: # pylint: disable=broad-except
-                                    _log.exception(ex)
-                                    _, _, exc_tb = sys.exc_info()
-                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-                            elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
-                                tx = self.timex[self.specialevents[i]]
-                                if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
-                                    # don't draw event lines before CHARGE if foregroundShowFullflag is not set
-                                    continue
-                                self.E2timex.append(tx)
-                                if self.clampEvents: # in clamp mode we render also event values higher than 100:
-                                    self.E2values.append(pos)
-                                else:
-                                    self.E2values.append((pos*event_pos_factor)+event_pos_offset)
-                                E2_nonempty = True
-                                E2_last = i
-                                try:
-                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.specialeventannovisibilities[1]:
-                                        E2_annotation = self.parseSpecialeventannotation(self.specialeventannotations[1], i)
-                                        temp = self.E2values[-1]
-                                        anno = self.ax.annotate(E2_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
-                                                    alpha=.9,
-                                                    color=self.palette["text"],
-                                                    va="bottom", ha="left",
-                                                    fontproperties=eventannotationprop,
-                                                    path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
-                                                    )
-                                        self.l_eventtype2annos.append(anno)
-                                        try:
-                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                            pass
-                                        try:
-                                            overlap = self.checkOverlap(anno) #, i, E2_annotation)
-                                            if overlap:
-                                                anno.remove()
-                                        except Exception: # pylint: disable=broad-except
-                                            pass
-
-                                except Exception as ex: # pylint: disable=broad-except
-                                    _log.exception(ex)
-                                    _, _, exc_tb = sys.exc_info()
-                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-                            elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
-                                tx = self.timex[self.specialevents[i]]
-                                if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
-                                    # don't draw event lines before CHARGE if foregroundShowFullflag is not set
-                                    continue
-                                self.E3timex.append(tx)
-                                if self.clampEvents: # in clamp mode we render also event values higher than 100:
-                                    self.E3values.append(pos)
-                                else:
-                                    self.E3values.append((pos*event_pos_factor)+event_pos_offset)
-                                E3_nonempty = True
-                                E3_last = i
-                                try:
-                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.specialeventannovisibilities[2]:
-                                        E3_annotation = self.parseSpecialeventannotation(self.specialeventannotations[2], i)
-                                        temp = self.E3values[-1]
-                                        anno = self.ax.annotate(E3_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
-                                                    alpha=.9,
-                                                    color=self.palette["text"],
-                                                    va="bottom", ha="left",
-                                                    fontproperties=eventannotationprop,
-                                                    path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
-                                                    )
-                                        self.l_eventtype3annos.append(anno)
-                                        try:
-                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                            pass
-                                        try:
-                                            overlap = self.checkOverlap(anno) #, i, E3_annotation)
-                                            if overlap:
-                                                anno.remove()
-                                        except Exception: # pylint: disable=broad-except
-                                            pass
-                                except Exception as ex: # pylint: disable=broad-except
-                                    _log.exception(ex)
-                                    _, _, exc_tb = sys.exc_info()
-                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-                            elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
-                                tx = self.timex[self.specialevents[i]]
-                                if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
-                                    # don't draw event lines before CHARGE if foregroundShowFullflag is not set
-                                    continue
-                                self.E4timex.append(tx)
-                                if self.clampEvents: # in clamp mode we render also event values higher than 100:
-                                    self.E4values.append(pos)
-                                else:
-                                    self.E4values.append((pos*event_pos_factor)+event_pos_offset)
-                                E4_nonempty = True
-                                E4_last = i
-                                try:
-                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.specialeventannovisibilities[3]:
-                                        E4_annotation = self.parseSpecialeventannotation(self.specialeventannotations[3], i)
-                                        temp = self.E4values[-1]
-                                        anno = self.ax.annotate(E4_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
-                                                    alpha=.9,
-                                                    color=self.palette["text"],
-                                                    va="bottom", ha="left",
-                                                    fontproperties=eventannotationprop,
-                                                    path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
-                                                    )
-                                        self.l_eventtype4annos.append(anno)
-                                        try:
-                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                            pass
-                                        try:
-                                            overlap = self.checkOverlap(anno) #, i, E4_annotation)
-                                            if overlap:
-                                                anno.remove()
-                                        except Exception: # pylint: disable=broad-except
-                                            pass
-                                except Exception as ex: # pylint: disable=broad-except
-                                    _log.exception(ex)
-                                    _, _, exc_tb = sys.exc_info()
-                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-
-#                        every = None
+                                if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
+                                    if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                        # don't draw event lines before CHARGE if foregroundShowFullflag is not set
+                                        continue
+                                    self.E1timex.append(tx)
+                                    if self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                        self.E1values.append(pos)
+                                    else:
+                                        self.E1values.append((pos*event_pos_factor)+event_pos_offset)
+                                    E1_nonempty = True
+                                    E1_last = i
+                                    try:
+                                        if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.specialeventannovisibilities[0]:
+                                            E1_annotation = self.parseSpecialeventannotation(self.specialeventannotations[0], i)
+                                            temp = self.E1values[-1]
+                                            anno = self.ax.annotate(E1_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
+                                                        alpha=.9,
+                                                        color=self.palette["text"],
+                                                        va="bottom", ha="left",
+                                                        fontproperties=eventannotationprop,
+                                                        path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
+                                                        )
+                                            self.l_eventtype1annos.append(anno)
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                                            try:
+                                                overlap = self.checkOverlap(anno) #, i, E1_annotation)
+                                                if overlap:
+                                                    anno.remove()
+                                            except Exception: # pylint: disable=broad-except
+                                                pass
+                                    except Exception as ex: # pylint: disable=broad-except
+                                        _log.exception(ex)
+                                        _, _, exc_tb = sys.exc_info()
+                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+                                elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
+                                    tx = self.timex[self.specialevents[i]]
+                                    if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                        # don't draw event lines before CHARGE if foregroundShowFullflag is not set
+                                        continue
+                                    self.E2timex.append(tx)
+                                    if self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                        self.E2values.append(pos)
+                                    else:
+                                        self.E2values.append((pos*event_pos_factor)+event_pos_offset)
+                                    E2_nonempty = True
+                                    E2_last = i
+                                    try:
+                                        if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.specialeventannovisibilities[1]:
+                                            E2_annotation = self.parseSpecialeventannotation(self.specialeventannotations[1], i)
+                                            temp = self.E2values[-1]
+                                            anno = self.ax.annotate(E2_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
+                                                        alpha=.9,
+                                                        color=self.palette["text"],
+                                                        va="bottom", ha="left",
+                                                        fontproperties=eventannotationprop,
+                                                        path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
+                                                        )
+                                            self.l_eventtype2annos.append(anno)
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                                            try:
+                                                overlap = self.checkOverlap(anno) #, i, E2_annotation)
+                                                if overlap:
+                                                    anno.remove()
+                                            except Exception: # pylint: disable=broad-except
+                                                pass
+    
+                                    except Exception as ex: # pylint: disable=broad-except
+                                        _log.exception(ex)
+                                        _, _, exc_tb = sys.exc_info()
+                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+                                elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
+                                    tx = self.timex[self.specialevents[i]]
+                                    if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                        # don't draw event lines before CHARGE if foregroundShowFullflag is not set
+                                        continue
+                                    self.E3timex.append(tx)
+                                    if self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                        self.E3values.append(pos)
+                                    else:
+                                        self.E3values.append((pos*event_pos_factor)+event_pos_offset)
+                                    E3_nonempty = True
+                                    E3_last = i
+                                    try:
+                                        if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.specialeventannovisibilities[2]:
+                                            E3_annotation = self.parseSpecialeventannotation(self.specialeventannotations[2], i)
+                                            temp = self.E3values[-1]
+                                            anno = self.ax.annotate(E3_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
+                                                        alpha=.9,
+                                                        color=self.palette["text"],
+                                                        va="bottom", ha="left",
+                                                        fontproperties=eventannotationprop,
+                                                        path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
+                                                        )
+                                            self.l_eventtype3annos.append(anno)
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                                            try:
+                                                overlap = self.checkOverlap(anno) #, i, E3_annotation)
+                                                if overlap:
+                                                    anno.remove()
+                                            except Exception: # pylint: disable=broad-except
+                                                pass
+                                    except Exception as ex: # pylint: disable=broad-except
+                                        _log.exception(ex)
+                                        _, _, exc_tb = sys.exc_info()
+                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+                                elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
+                                    tx = self.timex[self.specialevents[i]]
+                                    if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                        # don't draw event lines before CHARGE if foregroundShowFullflag is not set
+                                        continue
+                                    self.E4timex.append(tx)
+                                    if self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                        self.E4values.append(pos)
+                                    else:
+                                        self.E4values.append((pos*event_pos_factor)+event_pos_offset)
+                                    E4_nonempty = True
+                                    E4_last = i
+                                    try:
+                                        if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.specialeventannovisibilities[3]:
+                                            E4_annotation = self.parseSpecialeventannotation(self.specialeventannotations[3], i)
+                                            temp = self.E4values[-1]
+                                            anno = self.ax.annotate(E4_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
+                                                        alpha=.9,
+                                                        color=self.palette["text"],
+                                                        va="bottom", ha="left",
+                                                        fontproperties=eventannotationprop,
+                                                        path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
+                                                        )
+                                            self.l_eventtype4annos.append(anno)
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                                            try:
+                                                overlap = self.checkOverlap(anno) #, i, E4_annotation)
+                                                if overlap:
+                                                    anno.remove()
+                                            except Exception: # pylint: disable=broad-except
+                                                pass
+                                    except Exception as ex: # pylint: disable=broad-except
+                                        _log.exception(ex)
+                                        _, _, exc_tb = sys.exc_info()
+                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.exception(e)
 
                         if len(self.E1timex) > 0 and len(self.E1values) == len(self.E1timex):
                             pos = max(0,int(round((self.specialeventsvalue[E1_last]-1)*10)))
@@ -8656,129 +8663,132 @@ class tgraphcanvas(FigureCanvas):
                             evalues = [self.E1values[:],self.E2values[:],self.E3values[:],self.E4values[:]]
                         for i in range(Nevents):
                             event_idx = int(self.specialevents[i])
-                            if self.specialeventstype[i] == 4 or self.eventsGraphflag in [0,3,4]:
-                                if self.specialeventstype[i] < 4 and (not aw.qmc.renderEventsDescr or len(self.specialeventsStrings[i].strip()) == 0):
-                                    etype = self.etypesf(self.specialeventstype[i])
-                                    firstletter = str(etype[0])
-                                    secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
-                                    if aw.eventslidertemp[self.specialeventstype[i]]:
-                                        thirdletter = self.mode # postfix
-                                    else:
-                                        thirdletter = aw.eventsliderunits[self.specialeventstype[i]] # postfix
-                                else:
-                                    firstletter = self.specialeventsStrings[i].strip()[:aw.qmc.eventslabelschars]
-                                    if firstletter == "":
-                                        firstletter = "E"
-                                    secondletter = ""
-                                    thirdletter = ""
-                                if self.mode == "F":
-                                    height = 50
-                                else:
-                                    height = 20
-
-                                #some times ET is not drawn (ET = 0) when using device NONE
-                                # plot events on BT when showeventsonbt is true
-                                if not aw.qmc.showeventsonbt and self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])] and aw.qmc.ETcurve:
-                                    if aw.qmc.flagon:
-                                        temp = self.temp1[int(self.specialevents[i])]
-                                    else:
-                                        temp = self.stemp1[int(self.specialevents[i])]
-                                elif aw.qmc.BTcurve:
-                                    if aw.qmc.flagon:
-                                        temp = self.temp2[int(self.specialevents[i])]
-                                    else:
-                                        temp = self.stemp2[int(self.specialevents[i])]
-                                else:
-                                    temp = None
-
-                                # plot events on BT when showeventsonbt is true
-                                if aw.qmc.showeventsonbt and temp != None and aw.qmc.BTcurve:
-                                    if aw.qmc.flagon:
-                                        temp = self.temp2[int(self.specialevents[i])]
-                                    else:
-                                        temp = self.stemp2[int(self.specialevents[i])]
-
-                                if not self.flagstart and not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
-                                    continue
-
-                                if self.eventsGraphflag == 4 and self.specialeventstype[i] < 4 and aw.qmc.showEtypes[self.specialeventstype[i]]:
-                                    temp = evalues[self.specialeventstype[i]][0]
-                                    evalues[self.specialeventstype[i]] = evalues[self.specialeventstype[i]][1:]
-                                
-                                if temp != None and aw.qmc.showEtypes[self.specialeventstype[i]]:
-                                    if self.specialeventstype[i] == 0:
-                                        boxstyle = 'roundtooth,pad=0.4'
-                                        boxcolor = self.EvalueColor[0]
-                                        textcolor = self.EvalueTextColor[0]
-                                    elif self.specialeventstype[i] == 1:
-                                        boxstyle = 'round,pad=0.3,rounding_size=0.8'
-                                        boxcolor = self.EvalueColor[1]
-                                        textcolor = self.EvalueTextColor[1]
-                                    elif self.specialeventstype[i] == 2:
-                                        boxstyle = 'sawtooth,pad=0.3,tooth_size=0.2'
-                                        boxcolor = self.EvalueColor[2]
-                                        textcolor = self.EvalueTextColor[2]
-                                    elif self.specialeventstype[i] == 3:
-                                        boxstyle = 'round4,pad=0.3,rounding_size=0.15'
-                                        boxcolor = self.EvalueColor[3]
-                                        textcolor = self.EvalueTextColor[3]
-                                    elif self.specialeventstype[i] == 4:
-                                        boxstyle = 'square,pad=0.1'
-                                        boxcolor = self.palette["specialeventbox"]
-                                        textcolor = self.palette["specialeventtext"]
-                                    if self.eventsGraphflag in [0,3] or self.specialeventstype[i] > 3:
-                                        if i in self.l_event_flags_pos_dict:
-                                            xytext = self.l_event_flags_pos_dict[i]
-                                        elif i in self.l_event_flags_dict:
-                                            xytext = self.l_event_flags_dict[i].xyann
+                            try:
+                                if self.specialeventstype[i] == 4 or self.eventsGraphflag in [0,3,4]:
+                                    if self.specialeventstype[i] < 4 and (not aw.qmc.renderEventsDescr or len(self.specialeventsStrings[i].strip()) == 0):
+                                        etype = self.etypesf(self.specialeventstype[i])
+                                        firstletter = str(etype[0])
+                                        secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
+                                        if aw.eventslidertemp[self.specialeventstype[i]]:
+                                            thirdletter = self.mode # postfix
                                         else:
-                                            xytext = (self.timex[int(self.specialevents[i])],temp+height)
-                                        anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
-                                                     xytext=xytext,
-                                                     alpha=0.9,
-                                                     color=textcolor,
-                                                     va="center", ha="center",
-                                                     arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4), # ,relpos=(0,0)
-                                                     bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
-                                                     fontproperties=fontprop_small,
-                                                     path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
-                                                     )
-                                        try:
-                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                            anno.draggable(use_blit=True)
-                                            anno.set_picker(aw.draggable_text_box_picker)
-                                        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                            pass
-                                        # register draggable flag annotation to be re-created after re-positioning on redraw
-                                        self.l_event_flags_dict[i] = anno
-                                        if not aw.qmc.showeventsonbt and aw.qmc.ETcurve:
-                                            self.l_eteventannos.append(anno)
+                                            thirdletter = aw.eventsliderunits[self.specialeventstype[i]] # postfix
+                                    else:
+                                        firstletter = self.specialeventsStrings[i].strip()[:aw.qmc.eventslabelschars]
+                                        if firstletter == "":
+                                            firstletter = "E"
+                                        secondletter = ""
+                                        thirdletter = ""
+                                    if self.mode == "F":
+                                        height = 50
+                                    else:
+                                        height = 20
+    
+                                    #some times ET is not drawn (ET = 0) when using device NONE
+                                    # plot events on BT when showeventsonbt is true
+                                    if not aw.qmc.showeventsonbt and self.temp1[event_idx] > self.temp2[event_idx] and aw.qmc.ETcurve:
+                                        if aw.qmc.flagon:
+                                            temp = self.temp1[event_idx]
                                         else:
-                                            self.l_bteventannos.append(anno)
-                                    elif self.eventsGraphflag == 4:
-                                        if thirdletter != "":
-                                            firstletter = ""
-                                        anno = self.ax.annotate(firstletter + secondletter + thirdletter, xy=(self.timex[int(self.specialevents[i])], temp),
-                                                     xytext=(self.timex[int(self.specialevents[i])],temp),
-                                                     alpha=0.9,
-                                                     color=textcolor,
-                                                     va="center", ha="center",
-                                                     bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
-                                                     fontproperties=fontprop_small,
-                                                     path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
-                                                     )
+                                            temp = self.stemp1[event_idx]
+                                    elif aw.qmc.BTcurve:
+                                        if aw.qmc.flagon:
+                                            temp = self.temp2[event_idx]
+                                        else:
+                                            temp = self.stemp2[event_idx]
+                                    else:
+                                        temp = None
+    
+                                    # plot events on BT when showeventsonbt is true
+                                    if aw.qmc.showeventsonbt and temp != None and aw.qmc.BTcurve:
+                                        if aw.qmc.flagon:
+                                            temp = self.temp2[event_idx]
+                                        else:
+                                            temp = self.stemp2[event_idx]
+    
+                                    if not self.flagstart and not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
+                                        continue
+    
+                                    if self.eventsGraphflag == 4 and self.specialeventstype[i] < 4 and aw.qmc.showEtypes[self.specialeventstype[i]]:
+                                        temp = evalues[self.specialeventstype[i]][0]
+                                        evalues[self.specialeventstype[i]] = evalues[self.specialeventstype[i]][1:]
+                                    
+                                    if temp != None and aw.qmc.showEtypes[self.specialeventstype[i]]:
                                         if self.specialeventstype[i] == 0:
-                                            self.l_eventtype1annos.append(anno)
+                                            boxstyle = 'roundtooth,pad=0.4'
+                                            boxcolor = self.EvalueColor[0]
+                                            textcolor = self.EvalueTextColor[0]
                                         elif self.specialeventstype[i] == 1:
-                                            self.l_eventtype2annos.append(anno)
+                                            boxstyle = 'round,pad=0.3,rounding_size=0.8'
+                                            boxcolor = self.EvalueColor[1]
+                                            textcolor = self.EvalueTextColor[1]
                                         elif self.specialeventstype[i] == 2:
-                                            self.l_eventtype3annos.append(anno)
+                                            boxstyle = 'sawtooth,pad=0.3,tooth_size=0.2'
+                                            boxcolor = self.EvalueColor[2]
+                                            textcolor = self.EvalueTextColor[2]
                                         elif self.specialeventstype[i] == 3:
-                                            self.l_eventtype4annos.append(anno)
-                                        try:
-                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                            pass
+                                            boxstyle = 'round4,pad=0.3,rounding_size=0.15'
+                                            boxcolor = self.EvalueColor[3]
+                                            textcolor = self.EvalueTextColor[3]
+                                        elif self.specialeventstype[i] == 4:
+                                            boxstyle = 'square,pad=0.1'
+                                            boxcolor = self.palette["specialeventbox"]
+                                            textcolor = self.palette["specialeventtext"]
+                                        if self.eventsGraphflag in [0,3] or self.specialeventstype[i] > 3:
+                                            if i in self.l_event_flags_pos_dict:
+                                                xytext = self.l_event_flags_pos_dict[i]
+                                            elif i in self.l_event_flags_dict:
+                                                xytext = self.l_event_flags_dict[i].xyann
+                                            else:
+                                                xytext = (self.timex[event_idx],temp+height)
+                                            anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[event_idx], temp),
+                                                         xytext=xytext,
+                                                         alpha=0.9,
+                                                         color=textcolor,
+                                                         va="center", ha="center",
+                                                         arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4), # ,relpos=(0,0)
+                                                         bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
+                                                         fontproperties=fontprop_small,
+                                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
+                                                         )
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                                anno.draggable(use_blit=True)
+                                                anno.set_picker(aw.draggable_text_box_picker)
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                                            # register draggable flag annotation to be re-created after re-positioning on redraw
+                                            self.l_event_flags_dict[i] = anno
+                                            if not aw.qmc.showeventsonbt and aw.qmc.ETcurve:
+                                                self.l_eteventannos.append(anno)
+                                            else:
+                                                self.l_bteventannos.append(anno)
+                                        elif self.eventsGraphflag == 4:
+                                            if thirdletter != "":
+                                                firstletter = ""
+                                            anno = self.ax.annotate(firstletter + secondletter + thirdletter, xy=(self.timex[event_idx], temp),
+                                                         xytext=(self.timex[event_idx],temp),
+                                                         alpha=0.9,
+                                                         color=textcolor,
+                                                         va="center", ha="center",
+                                                         bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
+                                                         fontproperties=fontprop_small,
+                                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
+                                                         )
+                                            if self.specialeventstype[i] == 0:
+                                                self.l_eventtype1annos.append(anno)
+                                            elif self.specialeventstype[i] == 1:
+                                                self.l_eventtype2annos.append(anno)
+                                            elif self.specialeventstype[i] == 2:
+                                                self.l_eventtype3annos.append(anno)
+                                            elif self.specialeventstype[i] == 3:
+                                                self.l_eventtype4annos.append(anno)
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                            except Exception as e:
+                                _log.exception(e) # pylint: disable=broad-except
 
                 #plot delta ET (self.delta1) and delta BT (self.delta2)
                 if self.DeltaETflag or self.DeltaBTflag:

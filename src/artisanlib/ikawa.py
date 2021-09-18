@@ -8,6 +8,8 @@ import os
 import io
 import csv
 import re
+import logging
+from typing import Final
 
 try:
     #pylint: disable = E, W, R, C
@@ -19,6 +21,9 @@ except Exception:
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
+
+
+_log: Final = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
 def extractProfileIkawaCSV(file,_):
@@ -126,13 +131,13 @@ def extractProfileIkawaCSV(file,_):
                             fan_event = True
                             v = v/10. + 1
                             specialeventsvalue.append(v)
-                            specialevents.append(i)
+                            specialevents.append(i-1)
                             specialeventstype.append(0)
                             specialeventsStrings.append("{}".format(fan) + "%")
                     else:
                         fan_last = None
-                except Exception: # pylint: disable=broad-except
-                    pass
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
             if "heater power (%)" in item or "heater" in item:
                 try:
                     if "heater power (%)" in item:
@@ -156,13 +161,13 @@ def extractProfileIkawaCSV(file,_):
                             heater_event = True
                             v = v/10. + 1
                             specialeventsvalue.append(v)
-                            specialevents.append(i)
+                            specialevents.append(i-1)
                             specialeventstype.append(3)
                             specialeventsStrings.append("{}".format(heater) + "%")
                     else:
                         heater_last = None
-                except Exception: # pylint: disable=broad-except
-                    pass
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
     
     res["mode"] = 'C'
             
