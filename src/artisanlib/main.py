@@ -5919,8 +5919,8 @@ class tgraphcanvas(FigureCanvas):
                         for i in range(len(timeshiftexpressions)):
                             if timeshiftexpressions[i] not in mathdictionary:
                                 mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]
-                except Exception: # pylint: disable=broad-except
-                    pass
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
 
                 #background symbols just in case there was no profile loaded but a background loaded.
                 if len(self.timeB) > 0:
@@ -5942,8 +5942,9 @@ class tgraphcanvas(FigureCanvas):
                         pass
                     if propagate_error and any((((k in me) if k not in (["Y1","x","t","b"] if ("max" in me) else ["Y1","t","b"]) else False) for k,v in mathdictionary.items() if (v == -1 and not (k in main_events)))):
                         # if any variable is bound to the error value -1 we return -1 for the full formula
-                        return -1
-                    res = float(eval(me,{"__builtins__":None},mathdictionary)) # pylint: disable=eval-used
+                        res = -1
+                    else:
+                        res = float(eval(me,{"__builtins__":None},mathdictionary)) # pylint: disable=eval-used
                 except TypeError:
                     res = -1
                 except ValueError:
@@ -5963,7 +5964,7 @@ class tgraphcanvas(FigureCanvas):
                 return res
 
             except Exception as e: # pylint: disable=broad-except
-#                traceback.print_exc(file=sys.stdout)
+                _log.exception(e)
 
                 #if plotter
                 if equeditnumber:
@@ -19712,7 +19713,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.palette["messages"] = 'white'
         else:
             self.qmc.palette["messages"] = 'black'
-        self.sendmessage("")
+        self.sendmessage("", append=False)
         self.ntb.setMinimumHeight(50)
 
         aw.sliderFrame.setStyleSheet("QGroupBox {background-color:" + str(canvas_color) + ";"
@@ -37160,6 +37161,10 @@ def main():
     else:
         QApplication.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
     aw.settingsLoad()
+    
+    # inform the user the debug logging is on
+    if debugLogLevelActive():
+        aw.sendmessage(QApplication.translate("Message", "debug logging ON"))
 
     # swap BT/ET lcds on startup
     if aw.qmc.swaplcds:
