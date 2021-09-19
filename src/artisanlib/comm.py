@@ -137,7 +137,7 @@ class YoctoThread(threading.Thread):
     
     def run(self):
         errmsg = YRefParam()
-        while not self._stopevent.isSet():
+        while not self._stopevent.is_set():
             YAPI.UpdateDeviceList(errmsg)  # traps plug/unplug events
             YAPI.Sleep(500, errmsg)  # traps others events
 

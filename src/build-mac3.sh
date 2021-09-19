@@ -32,6 +32,12 @@ else
     export QT_SRC_PATH=~/Qt5.15.2/5.15.2/clang_64
     export PYUIC=pyuic5
     export PYRCC=pyrcc5
+
+#    export QT_PATH=${PYTHONPATH}/site-packages/PyQt6/Qt6
+#    export QT_SRC_PATH=~/Qt5.15.2/5.15.2/clang_64
+#    export PYUIC=pyuic6
+#    export PYRCC=pyrcc6
+
     export MACOSX_DEPLOYMENT_TARGET=10.15
     export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
 fi

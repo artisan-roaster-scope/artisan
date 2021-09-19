@@ -435,10 +435,10 @@ sync_record_attributes: List[str] = (
 # if applied, r is assumed to contain the complete roast data as returned
 # by roast.getRoast()
 def getSyncRecord(r: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], str]:
+    _log.info("getSyncRecord()")
+    m = hashlib.sha256()
+    d: Dict[str, Any] = {}
     try:
-        _log.info("getSyncRecord()")
-        m = hashlib.sha256()
-        d: Dict[str, Any] = {}
         if r is None:
             r = getRoast()
         # we take only the value of attributes to be synced back

@@ -108,7 +108,8 @@ def fromFtoC(Ffloat: Optional[float]) -> Optional[float]:
 
 def temp2C(temp: Optional[float]) -> Optional[float]:
     if (
-        temp is not None and config.app_window.qmc.mode == "F"
+        temp is not None and config.app_window is not None and config.app_window.qmc is not None and
+            config.app_window.qmc.mode == "F"
     ):  # @UndefinedVariable
         return fromFtoC(temp)  # @UndefinedVariable
     return temp
@@ -178,7 +179,7 @@ def limittime(tx: Optional[float]) -> Optional[float]:
 def limittext(maxlen: int, s: Optional[str]) -> Optional[str]:
     if s is not None:
         if len(s) > maxlen:
-            return s[:maxlen] + ".."
+            return f"{s[:maxlen]}.."
         return s
     return s
 
@@ -315,40 +316,16 @@ def getLanguage() -> str:
 
 
 def storeLink(plus_store) -> str:
-    return (
-        config.web_base_url
-        + "/"
-        + getLanguage()
-        + "/stores;id="
-        + str(plus_store)
-    )
+    return f"{config.web_base_url}/{getLanguage()}/stores;id={plus_store}"
 
 
 def coffeeLink(plus_coffee) -> str:
-    return (
-        config.web_base_url
-        + "/"
-        + getLanguage()
-        + "/coffees;id="
-        + str(plus_coffee)
-    )
+    return f"{config.web_base_url}/{getLanguage()}/coffees;id={plus_coffee}"
 
 
 def blendLink(plus_blend) -> str:
-    return (
-        config.web_base_url
-        + "/"
-        + getLanguage()
-        + "/blends;id="
-        + str(plus_blend)
-    )
+    return f"{config.web_base_url}/{getLanguage()}/blends;id={plus_blend}"
 
 
 def roastLink(plus_roast) -> str:
-    return (
-        config.web_base_url
-        + "/"
-        + getLanguage()
-        + "/roasts;id="
-        + str(plus_roast)
-    )
+    return f"{config.web_base_url}/{getLanguage()}/roasts;id={plus_roast}"

@@ -227,9 +227,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                 if success:
                     config.connected = success
                     config.app_window.sendmessageSignal.emit(
-                        config.app_window.plus_account
-                        + " "
-                        + QApplication.translate("Plus", "authentified", None),
+                        f'{config.app_window.plus_account} {QApplication.translate("Plus", "authentified", None)}',
                         True,
                         None,
                     )  # @UndefinedVariable
@@ -267,7 +265,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                             config.app_window.plus_account is not None
                         ):  # @UndefinedVariable
                             message = (
-                                config.app_window.plus_account + " " + message
+                                f"{config.app_window.plus_account} {message}"
                             )  # @UndefinedVariable
                         config.app_window.sendmessageSignal.emit(
                             message, True, None

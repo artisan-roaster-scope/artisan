@@ -10,6 +10,7 @@ import math
 import functools
 from pathlib import Path
 from typing import Final, Optional
+from matplotlib import colors
 
 import urllib.parse as urlparse  # @Reimport
 import urllib.request as urllib  # @Reimport
@@ -27,9 +28,11 @@ application_organization_domain: Final = "artisan-scope.org"
 try:
     #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QStandardPaths, QCoreApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QColor  # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:
     #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QStandardPaths, QCoreApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QColor  # @UnusedImport @Reimport  @UnresolvedImport
 
 
 deltaLabelPrefix = "<html>&Delta;&thinsp;</html>" # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
@@ -84,6 +87,12 @@ def cmd2str(c):
     return str(c,"latin1")
 def s2a(s):
     return s.encode('ascii','ignore').decode("ascii")
+
+# returns the prefix of length l of s and adds eclipse
+def abbrevString(s,l):
+    if len(s) > l:
+        return f"{s[:l-1]}..."
+    return s
 
 # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
 def stringfromseconds(seconds_raw, leadingzero=True):
@@ -340,6 +349,37 @@ def getDirectory(
     except Exception:  # pylint: disable=broad-except
         pass
     return str(fp)
+
+
+        
+# creates QLinearGradient style from light to dark by default, or from dark to light if reverse is True
+@functools.lru_cache
+def createGradient(rgb, tint_factor=0.1, shade_factor=0.1, reverse=False):
+    light_grad,dark_grad = createRGBGradient(rgb,tint_factor,shade_factor)
+    if reverse:
+        # dark to light
+        return f"QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {dark_grad}, stop: 1 {light_grad});"
+    # light to dark (default)
+    return f"QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {light_grad}, stop: 1 {dark_grad});"
+
+def createRGBGradient(rgb, tint_factor=0.3, shade_factor=0.3):
+    try:
+        if isinstance(rgb, QColor):
+            r,g,b,_ = rgb.getRgbF()
+            rgb_tuple = (r,g,b)
+        elif rgb[0:1] == "#":   # hex input like "#ffaa00"
+            rgb_tuple = tuple(int(rgb[i:i+2], 16)/255 for i in (1, 3 ,5))
+        else:                 # color name
+            rgb_tuple = colors.hex2color(colors.cnames[rgb])
+        #ref: https://stackoverflow.com/questions/6615002/given-an-rgb-value-how-do-i-create-a-tint-or-shade
+        r,g,b = tuple(int(255 * (x * (1 - shade_factor))) for x in rgb_tuple)
+        darker_rgb = f"#{r:x}{g:x}{b:x}"
+        r,g,b = tuple(int(255 * (x + (1 - x) * tint_factor)) for x in rgb_tuple)
+        lighter_rgb = f"#{r:x}{g:x}{b:x}"
+    except Exception as e: # pylint: disable=broad-except
+        _log.exception(e)
+        lighter_rgb = darker_rgb = "#000000"
+    return lighter_rgb,darker_rgb
 
 
 # Logging

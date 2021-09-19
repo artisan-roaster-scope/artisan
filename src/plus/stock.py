@@ -277,7 +277,7 @@ def renderAmount(amount, default_unit=None, target_unit_idx=0):
             ]  # @UndefinedVariable
             if target_unit_idx == 2 and not (abs(abs(w) - 1.00) < 0.01):
                 # lb => lbs if |w|>1
-                target_unit += "s"
+                target_unit = f"{target_unit}s"
         if w > 9:
             w = int(round(w))  # we truncate all decimals
         else:
@@ -377,7 +377,7 @@ def coffee2beans(coffee):
     if "label" in c:
         label = c["label"]
         if origin:
-            label = " " + label
+            label = f" {label}"
     else:
         label = ""
     processing = ""
@@ -420,7 +420,7 @@ def coffee2beans(coffee):
         _log.exception(e)
     bean = "{}{}{}".format(processing, grade, varietals)
     if bean:
-        bean = "," + bean
+        bean = f",{bean}"
     year = ""
     try:
         cy = c["crop_date"]
@@ -477,7 +477,7 @@ def getCoffees(weight_unit_idx, store=None):
                                     origin += " {:d}".format(cy["picked"][0])
                         except Exception as e:  # pylint: disable=broad-except
                             _log.exception(e)
-                        origin += ", "
+                        origin = f"{origin}, "
                     if "label" in c:
                         label = c["label"]
                     else:
@@ -505,29 +505,16 @@ def getCoffees(weight_unit_idx, store=None):
                                             if store:
                                                 loc = ""
                                             else:
-                                                loc = location + ", "
+                                                loc = f"{location}, "
                                             res[
-                                                origin
-                                                + label
-                                                + " ("
-                                                + loc
-                                                + renderAmount(
-                                                    amount,
-                                                    default_unit,
-                                                    weight_unit_idx,
-                                                )
-                                                + ")"
+                                                f"{origin}{label} ({loc}{renderAmount(amount,default_unit,weight_unit_idx)})"
                                             ] = [c, s]
                                     else:
                                         if store:
-                                            res[origin + label] = [c, s]
+                                            res[f"{origin}{label}"] = [c, s]
                                         else:
                                             res[
-                                                origin
-                                                + label
-                                                + " ("
-                                                + location
-                                                + ")"
+                                                f"{origin}{label} ({location})"
                                             ] = [c, s]
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
@@ -1394,7 +1381,7 @@ def getBlends(weight_unit_idx, store=None):
                             if store or location_label == "":
                                 loc = ""
                             else:
-                                loc = location_label + ", "
+                                loc = f"{location_label}, "
                             if amount == 0:
                                 amount_str = "-"
                             else:
@@ -1402,13 +1389,8 @@ def getBlends(weight_unit_idx, store=None):
                                     amount, target_unit_idx=weight_unit_idx
                                 )
                             if max_replacement_amount > 0:
-                                amount_str += "/" + renderAmount(
-                                    max_replacement_amount,
-                                    target_unit_idx=weight_unit_idx,
-                                )
-                            label = (
-                                blend["label"] + " (" + loc + amount_str + ")"
-                            )
+                                amount_str = f"{amount_str}/{renderAmount(max_replacement_amount,target_unit_idx=weight_unit_idx)}"
+                            label = f'{blend["label"]} ({loc}{amount_str})'
                             # we filter all items from replacementBlends with
                             # empty amount and the first original blend
                             replacementBlends = [
@@ -1453,7 +1435,7 @@ def matchBlendDict(blendSpec, blendDict, sameLabel=True):
             and len(blendSpec["ingredients"]) > 0
         ):
             return all(
-                [
+                (
                     i1["coffee"] == i2["coffee"] and i1["ratio"] == i2["ratio"]
                     for (i1, i2) in (
                         zip(
@@ -1461,7 +1443,7 @@ def matchBlendDict(blendSpec, blendDict, sameLabel=True):
                             blendDict["ingredients"],
                         )
                     )
-                ]
+                )
             )
         return False
     return False

@@ -46,7 +46,7 @@ register_semaphore = QSemaphore(1)
 
 uuid_cache_path = getDirectory(config.uuid_cache, share=True)
 uuid_cache_path_lock = getDirectory(
-    config.uuid_cache + "_lock", share=True
+    f"{config.uuid_cache}_lock", share=True
 )
 
 
@@ -195,7 +195,7 @@ def scanDir(path: Optional[str] = None):
             )  # @UndefinedVariable
         else:
             currentDictory = Path(path)
-        for currentFile in currentDictory.glob("*." + config.profile_ext):
+        for currentFile in currentDictory.glob(f"*.{config.profile_ext}"):
             d = config.app_window.deserialize(
                 currentFile
             )  # @UndefinedVariable

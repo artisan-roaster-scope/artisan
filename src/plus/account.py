@@ -55,7 +55,7 @@ account_cache_semaphore = QSemaphore(1)
 # by a file lock
 account_cache_path = getDirectory(config.account_cache, share=True)
 account_cache_lock_path = getDirectory(
-    config.account_cache + "_lock", share=True
+    f"{config.account_cache}_lock", share=True
 )
 
 

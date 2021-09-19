@@ -78,19 +78,11 @@ class Login(ArtisanDialog):
         self.remember = remember_credentials
 
         self.linkRegister = QLabel(
-            '<small><a href="'
-            + config.register_url
-            + '">'
-            + QApplication.translate("Plus", "Register", None)
-            + "</a></small>"
+            f'<small><a href="{config.register_url}">{QApplication.translate("Plus", "Register", None)}</a></small>'
         )
         self.linkRegister.setOpenExternalLinks(True)
         self.linkResetPassword = QLabel(
-            '<small><a href="'
-            + config.reset_passwd_url
-            + '">'
-            + QApplication.translate("Plus", "Reset Password", None)
-            + "</a></small>"
+            f'<small><a href="{config.reset_passwd_url}">{QApplication.translate("Plus", "Reset Password", None)}</a></small>'
         )
         self.linkResetPassword.setOpenExternalLinks(True)
 

@@ -60,7 +60,6 @@ import zipfile
 import tempfile
 import traceback
 import signal
-import functools
 import logging.config
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 from json import load as json_load, dumps as json_dumps 
@@ -185,7 +184,7 @@ from functools import reduce as freduce
 mpl.use('Qt5Agg')
 
 from matplotlib.figure import Figure
-from matplotlib import rcParams, patches, transforms, ticker, colors
+from matplotlib import rcParams, patches, transforms, ticker
 import matplotlib.patheffects as PathEffects
 
 import matplotlib.backends.backend_pdf # @UnusedImport
@@ -217,7 +216,7 @@ from artisanlib.util import (appFrozen, stringp, uchr, decodeLocal, encodeLocal,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toBool, toStringList, toMap, removeAll, application_name, application_viewer_name, application_organization_name,
         application_organization_domain, getDataDirectory, getAppPath, getResourcePath, getDirectory, debugLogLevelToggle,
-        debugLogLevelActive, setDebugLogLevel)
+        debugLogLevelActive, setDebugLogLevel, abbrevString, createGradient)
 
 from artisanlib.qtsingleapplication import QtSingleApplication
 
@@ -1038,7 +1037,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1045_async = False
         self.phidget1045_changeTrigger = 0
         self.phidget1045_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
-        self.phidget1045_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1045_changeTriggersValues))
+        self.phidget1045_changeTriggersStrings = list(map(lambda x:f"{x}C",self.phidget1045_changeTriggersValues))
         # add 0.02C and 0.05C change triggers
         self.phidget1045_changeTriggersValues.insert(1,0.05)
         self.phidget1045_changeTriggersValues.insert(1,0.02)
@@ -1054,7 +1053,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1200_wireValues: Final = ["2-wire", "3-wire","4-wire"]
         self.phidget1200_changeTrigger = 0
         self.phidget1200_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
-        self.phidget1200_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1200_changeTriggersValues))
+        self.phidget1200_changeTriggersStrings = list(map(lambda x:f"{x}C",self.phidget1200_changeTriggersValues))
         # add 0.02C and 0.05C change triggers
         self.phidget1200_changeTriggersValues.insert(1,0.05)
         self.phidget1200_changeTriggersValues.insert(1,0.02)
@@ -2610,13 +2609,6 @@ class tgraphcanvas(FigureCanvas):
         self.deltaBTsamples = int(max(1,self.deltaBTspan / interval))
         self.deltaETsamples = int(max(1,self.deltaETspan / interval))
 
-    # returns the prefix of length l of s and adds eclipse
-    @staticmethod
-    def abbrevString(s,l):
-        if len(s) > l:
-            return s[:l-1] + "..."
-        return s
-
     def updateBackground(self):
         if not self.block_update and aw.qmc.ax is not None:
             try:
@@ -2825,7 +2817,7 @@ class tgraphcanvas(FigureCanvas):
                     prev_title_text = self.title_artist.get_text()
                     if ax_width_for_title <= self.title_width:
                         chars = max(3,int(ax_width_for_title / (self.title_width / len(self.title_text))) - 2)
-                        self.title_artist.set_text(self.title_text[:chars].strip() + "...")
+                        self.title_artist.set_text(f"{self.title_text[:chars].strip()}...")
                     else:
                         self.title_artist.set_text(self.title_text)
                     if prev_title_text != self.title_artist.get_text():
@@ -2837,7 +2829,7 @@ class tgraphcanvas(FigureCanvas):
                     prev_xlabel_text = self.xlabel_artist.get_text()
                     if ax_width <= self.xlabel_width:
                         chars = max(3,int(ax_width / (self.xlabel_width / len(self.xlabel_text))) - 2)
-                        self.xlabel_artist.set_text(self.xlabel_text[:chars].strip() + "...")
+                        self.xlabel_artist.set_text(f"{self.xlabel_text[:chars].strip()}...")
                     else:
                         self.xlabel_artist.set_text(self.xlabel_text)
                     if prev_xlabel_text != self.xlabel_artist.get_text():
@@ -2997,10 +2989,10 @@ class tgraphcanvas(FigureCanvas):
                                 self.backgroundeventmessage += " | "
                             else:
                                 self.backgroundeventmessage += "Background: "
-                            self.backgroundeventmessage += self.Betypesf(self.backgroundEtypes[i]) + " = " + self.eventsvalues(self.backgroundEvalues[i])
+                            self.backgroundeventmessage = f"{self.backgroundeventmessage}{self.Betypesf(self.backgroundEtypes[i])} = {self.eventsvalues(self.backgroundEvalues[i])}"
                             if aw.qmc.renderEventsDescr and self.backgroundEStrings[i] and self.backgroundEStrings[i]!="":
-                                self.backgroundeventmessage += " (" + self.backgroundEStrings[i].strip()[:aw.qmc.eventslabelschars] + ")"
-                            self.backgroundeventmessage += " @ " + stringfromseconds(self.timeB[self.backgroundEvents[i]] - start) + " " + str(aw.float2float(self.temp2B[self.backgroundEvents[i]],digits)) + aw.qmc.mode
+                                self.backgroundeventmessage = f"{self.backgroundeventmessage} ({self.backgroundEStrings[i].strip()[:aw.qmc.eventslabelschars]})"
+                            self.backgroundeventmessage = f"{self.backgroundeventmessage} @ {(stringfromseconds(self.timeB[self.backgroundEvents[i]] - start))} {aw.float2float(self.temp2B[self.backgroundEvents[i]],digits)}{aw.qmc.mode}"
                             self.starteventmessagetimer()
                             break
                 elif event.artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
@@ -3013,8 +3005,8 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 start = 0
                             if len(self.eventmessage) != 0:
-                                self.eventmessage += " | "
-                            self.eventmessage += self.etypesf(self.specialeventstype[i]) + " = " + self.eventsvalues(self.specialeventsvalue[i])
+                                self.eventmessage = f"{self.eventmessage} | "
+                            self.eventmessage = f"{self.eventmessage}{self.etypesf(self.specialeventstype[i])} = {self.eventsvalues(self.specialeventsvalue[i])}"                            
                             if aw.qmc.renderEventsDescr and self.specialeventsStrings[i] and self.specialeventsStrings[i]!="":
                                 self.eventmessage += " (" + self.specialeventsStrings[i].strip()[:aw.qmc.eventslabelschars] + ")"
                             self.eventmessage += " @ " + stringfromseconds(self.timex[self.specialevents[i]] - start) + " " + str(aw.float2float(self.temp2[self.specialevents[i]],digits)) + aw.qmc.mode
@@ -3236,7 +3228,7 @@ class tgraphcanvas(FigureCanvas):
     @staticmethod
     def updateWebLCDs(bt=None, et=None, time=None, alertTitle=None, alertText=None, alertTimeout=None):
         try:
-            url = "http://127.0.0.1:" + str(aw.WebLCDsPort) + "/send"
+            url = f"http://127.0.0.1:{aw.WebLCDsPort}/send"
             headers = {'content-type': 'application/json'}
             payload = {'data': {}}
             if not (bt is None and et is None) and aw.qmc.flagon and not aw.qmc.flagstart:
@@ -3688,8 +3680,7 @@ class tgraphcanvas(FigureCanvas):
                                 errormessage = "ERROR: length of %s (=%i) does not have the necessary length (=%i)"%(location[indexerror],lengths[indexerror],nxdevices)
                                 errormessage += "\nPlease Reset: Extra devices"
                             else:
-                                string = location[0] + "= " + str(lengths[0]) + " " + location[1] + "= " + str(lengths[1]) + " "
-                                string += location[2] + "= " + str(lengths[2])
+                                string = f"{location[0]}= {lengths[0]} {location[1]}= {lengths[1]} {location[2]}= {lengths[2]}"
                                 errormessage = "ERROR: extra devices lengths don't match: %s"%string
                                 errormessage += "\nPlease Reset: Extra devices"
                             raise Exception(errormessage)
@@ -5376,8 +5367,8 @@ class tgraphcanvas(FigureCanvas):
                 mathdictionary["R2"] = self.rateofchange2 # BT RoR
 
                 for d in range(len(self.RTextratemp1)):
-                    mathdictionary["Y%i"%(d*2+3)] = self.RTextratemp1[d]
-                    mathdictionary["Y%i"%(d*2+4)] = self.RTextratemp2[d]
+                    mathdictionary[f"Y{(d*2+3):.0f}"] = self.RTextratemp1[d]
+                    mathdictionary[f"Y{(d*2+4):.0f}"] = self.RTextratemp2[d]
                 if str(RTsname) not in mathdictionary:
                     mathdictionary[str(RTsname)] = float(RTsval)
 
@@ -5497,7 +5488,7 @@ class tgraphcanvas(FigureCanvas):
                                 seconddigitstr = ""
                                 if i+2 < mlen and mathexpression[i+2].isdigit():
                                     offset = 1
-                                    nint = int(mathexpression[i+1]+mathexpression[i+2])  # two digits Ynumber int
+                                    nint = int(f"{mathexpression[i+1]}{mathexpression[i+2]}")  # two digits Ynumber int
                                 else:
                                     offset = 0
                                     nint = int(mathexpression[i+1])                      # one digit Ynumber int
@@ -5509,7 +5500,7 @@ class tgraphcanvas(FigureCanvas):
                                     #timeshift with two digits
                                     if mathexpression[i+offset+5].isdigit():
                                         seconddigitstr = mathexpression[i+offset+5]
-                                        mathexpression = mathexpression[:i+offset+5]+mathexpression[i+offset+6:]
+                                        mathexpression = f"{mathexpression[:i+offset+5]}{mathexpression[i+offset+6:]}"
                                         Yshiftval = 10*Yshiftval + int(seconddigitstr)
 
                                     if nint == 1: #ET
@@ -5526,7 +5517,7 @@ class tgraphcanvas(FigureCanvas):
                                     val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
 
                                     #add expression and values found
-                                    evaltimeexpression = "Y{}{}{}{}{}".format(mathexpression[i+1:i+2+offset],evalsign*2,mathexpression[i+offset+4],seconddigitstr,evalsign)
+                                    evaltimeexpression = f"Y{mathexpression[i+1:i+2+offset]}{evalsign*2}{mathexpression[i+offset+4]}{seconddigitstr}{evalsign}"
                                     timeshiftexpressions.append(evaltimeexpression)
                                     timeshiftexpressionsvalues.append(val)
                                     #convert "Y2[+9]" to Ynumber compatible for python eval() to add to dictionary
@@ -5558,13 +5549,13 @@ class tgraphcanvas(FigureCanvas):
                                     literal_body = body
                                     for k, v in replacements.items():
                                         literal_body = literal_body.replace(k,v)
-                                    evaltimeexpression = "Y{}u{}u".format(mathexpression[i+1],literal_body) # curle brackets replaced by "u"
+                                    evaltimeexpression = f"Y{mathexpression[i+1]}u{literal_body}u" # curle brackets replaced by "u"
                                     timeshiftexpressions.append(evaltimeexpression)
                                     timeshiftexpressionsvalues.append(val)
                                     mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[end_idx+1:]))
                                 # Y + TWO digits. Y10-Y99 . 4+ extra devices. No timeshift
                                 elif i+2 < mlen and mathexpression[i+2].isdigit():
-                                    Yval.append(mathexpression[i+1]+mathexpression[i+2])
+                                    Yval.append(f"{mathexpression[i+1]}{mathexpression[i+2]}")
                                 # No timeshift Y1,Y2,Y3,etc.
                                 else:
                                     Yval.append(mathexpression[i+1])
@@ -5614,7 +5605,7 @@ class tgraphcanvas(FigureCanvas):
                                         if mathexpression[i+k+5].isdigit():
                                             seconddigit = int(mathexpression[i+k+5])
                                             seconddigitstr = mathexpression[i+k+5]
-                                            mathexpression = mathexpression[:i+k+5]+mathexpression[i+k+6:]
+                                            mathexpression = f"{mathexpression[:i+k+5]}{mathexpression[i+k+6:]}"
                                             Yshiftval = 10*Yshiftval + seconddigit
                                         if nint == 1: #DeltaET
                                             if k == 0:
@@ -5696,8 +5687,9 @@ class tgraphcanvas(FigureCanvas):
                                     val = self.eventsInternal2ExternalValue(self.specialeventsvalue[iii])
                                 else:
                                     val = 0
-                                if "E" + mathexpression[i+1] not in mathdictionary:
-                                    mathdictionary["E"+mathexpression[i+1]] = val
+                                e_string = f"E{mathexpression[i+1]}"
+                                if e_string not in mathdictionary:
+                                    mathdictionary[e_string] = val
 
                     # time timeshift of absolute time (not relative to CHARGE)
                     # t : to access the foreground profiles time (sample_timex)
@@ -5715,8 +5707,8 @@ class tgraphcanvas(FigureCanvas):
                             if mathexpression[i+4].isdigit():
                                 seconddigit = int(mathexpression[i+4])
                                 seconddigitstr = mathexpression[i+4]
-                                mathexpression = mathexpression[:i+4]+mathexpression[i+5:]
-                                Yshiftval = 10*Yshiftval + seconddigit
+                                mathexpression = f"{mathexpression[:i+4]}{mathexpression[i+5:]}"
+                                Yshiftval = f"{10*Yshiftval}{seconddigit}"
 
                             val, evalsign = self.shiftValueEvalsign(timex,index,sign,Yshiftval)
 
@@ -5768,8 +5760,9 @@ class tgraphcanvas(FigureCanvas):
                                         val = self.plotterequationresults[nint-1][index]
                                     else:
                                         val = -1000
-                                    if "P" + mathexpression[i+1] not in mathdictionary:
-                                        mathdictionary["P"+mathexpression[i+1]] = val
+                                    p_string = f"P{mathexpression[i+1]}"
+                                    if p_string not in mathdictionary:
+                                        mathdictionary[p_string] = val
 
                     #Background B1 = ETbackground; B2 = BTbackground
                     elif mathexpression[i] == "B":
@@ -5786,8 +5779,8 @@ class tgraphcanvas(FigureCanvas):
                                     if mathexpression[i+5].isdigit():
                                         seconddigit = int(mathexpression[i+5])
                                         seconddigitstr = mathexpression[i+5]
-                                        mathexpression = mathexpression[:i+5]+mathexpression[i+6:]
-                                        Yshiftval = 10*Yshiftval + seconddigit
+                                        mathexpression = f"{mathexpression[:i+5]}{mathexpression[i+6:]}"
+                                        Yshiftval = f"{10*Yshiftval}{seconddigit}"
 
                                     if not len(self.timeB):
                                         # no background, set to 0
@@ -5847,7 +5840,7 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     if not len(self.timeB):
                                         # no background, set to 0
-                                        mathdictionary["B"+mathexpression[i+1]] = 0
+                                        mathdictionary[f"B{mathexpression[i+1]}"] = 0
                                     else:
                                         if nint == 1:
                                             val = self.temp1B[bindex]
@@ -5861,7 +5854,7 @@ class tgraphcanvas(FigureCanvas):
                                             else:
                                                 val = self.temp2BX[n3][bindex]
 
-                                        mathdictionary["B"+mathexpression[i+1]] = val
+                                        mathdictionary[f"B{mathexpression[i+1]}"] = val
 
                     # Feedback from previous result. Stack = [10,9,8,7,6,5,4,3,2,1]
                     # holds the ten previous formula results (same window) in order.
@@ -5871,8 +5864,9 @@ class tgraphcanvas(FigureCanvas):
                             if mathexpression[i+1].isdigit():
                                 nint = int(mathexpression[i+1])
                                 val = self.plotterstack[-1*nint]
-                                if "F"+mathexpression[i+1] not in mathdictionary:
-                                    mathdictionary["F"+mathexpression[i+1]] = val
+                                f_string = f"F{mathexpression[i+1]}"
+                                if f_string not in mathdictionary:
+                                    mathdictionary[f_string] = val
 
                     # add channel tare values (T1 => ET, T2 => BT, T3 => E1c1, T4 => E1c2, T5 => E2c1,
                     # set by clicking on the corresponding LCD
@@ -5880,11 +5874,11 @@ class tgraphcanvas(FigureCanvas):
                         if i+1 < mlen:                          #check for out of range
                             nint = -1 #Enumber int
                             if i+2 < mlen and mathexpression[i+2].isdigit():
-                                nint = int(mathexpression[i+1]+mathexpression[i+2])-1
-                                mexpr = "T"+mathexpression[i+1]+mathexpression[i+2]
+                                nint = int(f"{mathexpression[i+1]}{mathexpression[i+2]}")-1
+                                mexpr = f"T{mathexpression[i+1]}{mathexpression[i+2]}"
                             elif mathexpression[i+1].isdigit():
                                 nint = int(mathexpression[i+1])-1
-                                mexpr = "T"+mathexpression[i+1]
+                                mexpr = f"T{mathexpression[i+1]}"
                             if nint != -1:
                                 if len(aw.channel_tare_values) > nint:
                                     mathdictionary[mexpr] = aw.channel_tare_values[nint]
@@ -5912,8 +5906,9 @@ class tgraphcanvas(FigureCanvas):
 
                         #add Ys and their value to math dictionary
                         for i in range(len(Yval)):
-                            if "Y"+ Yval[i] not in mathdictionary:
-                                mathdictionary["Y"+ Yval[i]] = Y[int(Yval[i])-1]
+                            y_string = f"Y{Yval[i]}"
+                            if y_string not in mathdictionary:
+                                mathdictionary[y_string] = Y[int(Yval[i])-1]
 
                         #add other timeshifted expressions to the math dictionary: shifted t and P
                         for i in range(len(timeshiftexpressions)):
@@ -5968,9 +5963,7 @@ class tgraphcanvas(FigureCanvas):
 
                 #if plotter
                 if equeditnumber:
-                    e = str(e)
-                    e = "P" + str(equeditnumber) + ": " + e
-                    self.plottermessage = e
+                    self.plottermessage = f"P{equeditnumber}: {e}"
                     return -1
                 #if sample()
                 #virtual devices with symbolic may need 2 samples min.
@@ -6453,7 +6446,7 @@ class tgraphcanvas(FigureCanvas):
                 # reset color of last pressed button
                 if aw.lastbuttonpressed != -1:
                     buttonstyle = "min-width:75px;border-style:solid; border-radius:3;border-color:grey; border-width:1;"
-                    normalstyle = "QPushButton {" + buttonstyle + "font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[aw.lastbuttonpressed],aw.createGradient(aw.extraeventbuttoncolor[aw.lastbuttonpressed]))
+                    normalstyle = "QPushButton {" + buttonstyle + "font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[aw.lastbuttonpressed],createGradient(aw.extraeventbuttoncolor[aw.lastbuttonpressed]))
                     aw.buttonlist[aw.lastbuttonpressed].setStyleSheet(normalstyle)
                 # reset lastbuttonpressed
                 aw.lastbuttonpressed = -1
@@ -7249,7 +7242,7 @@ class tgraphcanvas(FigureCanvas):
         if backgroundtitle != "":
             if aw.qmc.graphfont in [1,9]: # if selected font is Humor we translate the unicode title into pure ascii
                 backgroundtitle = self.__to_ascii(backgroundtitle)
-            backgroundtitle = "\n" + aw.qmc.abbrevString(backgroundtitle,30)
+            backgroundtitle = f"\n{abbrevString(backgroundtitle,30)}"
             
         st_artist = self.fig.suptitle(backgroundtitle,
                 horizontalalignment="right",verticalalignment="top",
@@ -7329,13 +7322,15 @@ class tgraphcanvas(FigureCanvas):
         if self.DeltaETflag:
             self.l_delta1, = self.ax.plot(self.timex[start:end], self.delta1[start:end],transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-            linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "ET", None)))
+            linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],
+            label=aw.arabicReshape(f'{deltaLabelUTF8}{QApplication.translate("Label", "ET", None)}'))
 
     def drawDeltaBT(self,trans,start,end):
         if self.DeltaBTflag:
             self.l_delta2, = self.ax.plot(self.timex[start:end], self.delta2[start:end],transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-            linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "BT", None)))
+            linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],
+            label=aw.arabicReshape(f'{deltaLabelUTF8}{QApplication.translate("Label", "BT", None)}'))
 
     # if profileDataSemaphore lock cannot be fetched the redraw is not performed
     def lazyredraw(self, recomputeAllDeltas=True, smooth=True,sampling=False):
@@ -7468,7 +7463,7 @@ class tgraphcanvas(FigureCanvas):
                         if self.roastbatchnrB == 0:
                             titleB = self.titleB
                         else:
-                            titleB = self.roastbatchprefixB + str(self.roastbatchnrB) + " " + self.titleB
+                            titleB = f"{self.roastbatchprefixB}{self.roastbatchnrB} {self.titleB}"
                     elif __release_sponsor_domain__:
                         sponsor = QApplication.translate("About","sponsored by {}",None).format(__release_sponsor_domain__)
                         titleB = "\n{}".format(sponsor)
@@ -7515,7 +7510,8 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.flagstart:
                         y_label = self.delta_ax.set_ylabel("")
                     else:
-                        y_label = self.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)),color = self.palette["ylabel"],
+                        y_label = self.delta_ax.set_ylabel(f'{aw.qmc.mode}{aw.arabicReshape(QApplication.translate("Label", "/min", None))}',
+                            color = self.palette["ylabel"],
                             fontsize="large",
                             fontfamily=prop.get_family()                            
                             )
@@ -7850,7 +7846,7 @@ class tgraphcanvas(FigureCanvas):
                                 if not self.backgroundShowFullflag and event_idx < bcharge_idx or event_idx > bdrop_idx:
                                     continue
                                 if self.backgroundEtypes[p] < 4:
-                                    st1 = self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p])
+                                    st1 = f"{self.Betypesf(self.backgroundEtypes[p])[0]}{self.eventsvaluesShort(self.backgroundEvalues[p])}"
                                 else:
                                     st1 = self.backgroundEStrings[p].strip()[:aw.qmc.eventslabelschars]
                                     if len(st1) == 0:
@@ -8160,7 +8156,7 @@ class tgraphcanvas(FigureCanvas):
                                             boxcolor = self.palette["specialeventbox"]
                                             textcolor = self.palette["specialeventtext"]
                                         if self.eventsGraphflag in [0,3] or self.backgroundEtypes[i] > 3:
-                                            anno = self.ax.annotate(firstletter + secondletter, xy=(self.timeB[int(self.backgroundEvents[i])], Btemp),
+                                            anno = self.ax.annotate("f{firstletter}{secondletter}", xy=(self.timeB[int(self.backgroundEvents[i])], Btemp),
                                                          xytext=(self.timeB[int(self.backgroundEvents[i])],Btemp+height),
                                                          alpha=min(aw.qmc.backgroundalpha + 0.1, 1.0),
                                                          color=aw.qmc.palette["bgeventtext"],
@@ -8177,7 +8173,7 @@ class tgraphcanvas(FigureCanvas):
                                         elif self.eventsGraphflag == 4:
                                             if thirdletter != "":
                                                 firstletter = ""
-                                            anno = self.ax.annotate(firstletter + secondletter + thirdletter, xy=(self.timeB[int(self.backgroundEvents[i])], Btemp),
+                                            anno = self.ax.annotate(f"{firstletter}{secondletter}{thirdletter}", xy=(self.timeB[int(self.backgroundEvents[i])], Btemp),
                                                          xytext=(self.timeB[int(self.backgroundEvents[i])],Btemp),
                                                          alpha=min(aw.qmc.backgroundalpha + 0.3, 1.0),
                                                          color=aw.qmc.palette["bgeventtext"],
@@ -8366,7 +8362,7 @@ class tgraphcanvas(FigureCanvas):
                                             vert_offset = 5.0
                                         else:
                                             vert_offset = 2.5
-                                        anno = self.ax.annotate(firstletter + secondletter,
+                                        anno = self.ax.annotate(f"{firstletter}{secondletter}",
                                                          xy=(self.timex[event_idx],
                                                          temps[event_idx]),
                                                          xytext=(self.timex[event_idx],row[firstletter] + vert_offset),
@@ -8741,7 +8737,7 @@ class tgraphcanvas(FigureCanvas):
                                                 xytext = self.l_event_flags_dict[i].xyann
                                             else:
                                                 xytext = (self.timex[event_idx],temp+height)
-                                            anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[event_idx], temp),
+                                            anno = self.ax.annotate(f"{firstletter}{secondletter}", xy=(self.timex[event_idx], temp),
                                                          xytext=xytext,
                                                          alpha=0.9,
                                                          color=textcolor,
@@ -8766,7 +8762,7 @@ class tgraphcanvas(FigureCanvas):
                                         elif self.eventsGraphflag == 4:
                                             if thirdletter != "":
                                                 firstletter = ""
-                                            anno = self.ax.annotate(firstletter + secondletter + thirdletter, xy=(self.timex[event_idx], temp),
+                                            anno = self.ax.annotate(f"{firstletter}{secondletter}{thirdletter}", xy=(self.timex[event_idx], temp),
                                                          xytext=(self.timex[event_idx],temp),
                                                          alpha=0.9,
                                                          color=textcolor,
@@ -9247,11 +9243,11 @@ class tgraphcanvas(FigureCanvas):
                 ("preFCs", str(prefcs)),
                 ("DTR", str(dtr)),
                 ("mode", self.mode),
-                ("degmode", '\u00b0' + self.mode),
-                ("degmin", '\u00b0' + self.mode + '/min'),
+                ("degmode", f'\u00b0{self.mode}'),
+                ("degmin", f'\u00b0{self.mode}/min'),
                 ("deg", '\u00b0'),
-                ("R1degmin", delta1 + '\u00b0' + self.mode + '/min'),
-                ("R2degmin", delta2 + '\u00b0' + self.mode + '/min'),
+                ("R1degmin", f'{delta1}\u00b0{self.mode}/min'),
+                ("R2degmin", f'{delta2}\u00b0{self.mode}/min'),
                 ("R1", delta1),
                 ("R2", delta2),
                 ("squot", "'"),
@@ -9404,7 +9400,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             # build roast of the day string
             if aw.qmc.roastbatchnr != None and aw.qmc.roastbatchnr != 0 and aw.qmc.roastbatchpos != None and aw.qmc.roastbatchpos != 0:
-                roastoftheday = '\n' + str(aw.qmc.roastbatchpos)
+                roastoftheday = f"\n{aw.qmc.roastbatchpos}"
                 if self.locale_str == "en":
                     if aw.qmc.roastbatchpos > 3:
                         roastoftheday += 'th'
@@ -12512,9 +12508,9 @@ class tgraphcanvas(FigureCanvas):
                     msg = aw.qmc.roastdate.date().toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))
                     tm = aw.qmc.roastdate.time().toString()[:-3]
                     if tm != "00:00":
-                        msg += ", " + tm
+                        msg = f"{msg}, {tm}"
                     if aw.qmc.beans and aw.qmc.beans != "":
-                        msg += sep + aw.qmc.abbrevString(aw.qmc.beans,25)
+                        msg = f"{msg}{abbrevString(aw.qmc.beans,25)}"
                     if aw.qmc.weight[0]:
                         if aw.qmc.weight[2] in ["g","oz"]:
                             msg += sep + str(aw.float2float(aw.qmc.weight[0],0)) + aw.qmc.weight[2]
@@ -16728,7 +16724,6 @@ class ApplicationWindow(QMainWindow):
             """,
         }
 
-        # parking this green shade in case we want to use it later #00d55a
         self.pushbuttonstyles = {
             "RESET":     """
                 QPushButton {
@@ -16840,7 +16835,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background-color:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + createGradient('#147bb3') + """ ;
                 }
                 QPushButton:flat{
                     color: darkgrey;
@@ -16856,11 +16851,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background-color:""" + self.createGradient('#116999') + """ ;
+                    background-color:""" + createGradient('#116999') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#1985ba') + """ ;
+                    background-color:""" + createGradient('#1985ba') + """ ;
                 }
             """,
             "DRY END":    """
@@ -16870,7 +16865,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background-color:""" + self.createGradient('#66b8d7') + """ ;
+                    background-color:""" + createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
                     color: #BDBDBD;
@@ -16886,11 +16881,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background-color:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#43a7cf') + """ ;
+                    background-color:""" + createGradient('#43a7cf') + """ ;
                 }
             """,
             "FC START":    """
@@ -16900,7 +16895,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background-color:""" + self.createGradient('#66b8d7') + """ ;
+                    background-color:""" + createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
                     color: #BDBDBD;
@@ -16916,11 +16911,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background-color:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#43a7cf') + """ ;
+                    background-color:""" + createGradient('#43a7cf') + """ ;
                 }
             """,
             "FC END":    """
@@ -16930,7 +16925,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background-color:""" + self.createGradient('#66b8d7') + """ ;
+                    background-color:""" + createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
                     color: #BDBDBD;
@@ -16946,11 +16941,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background-color:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#43a7cf') + """ ;
+                    background-color:""" + createGradient('#43a7cf') + """ ;
                 }
             """,
             "SC START":    """
@@ -16960,7 +16955,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background-color:""" + self.createGradient('#66b8d7') + """ ;
+                    background-color:""" + createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
                     color: #BDBDBD;
@@ -16976,11 +16971,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background-color:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#43a7cf') + """ ;
+                    background-color:""" + createGradient('#43a7cf') + """ ;
                 }
             """,
             "SC END":    """
@@ -16990,7 +16985,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background-color:""" + self.createGradient('#66b8d7') + """ ;
+                    background-color:""" + createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
                     color: #BDBDBD;
@@ -17006,11 +17001,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background-color:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#43a7cf') + """ ;
+                    background-color:""" + createGradient('#43a7cf') + """ ;
                 }
             """,
             "DROP":    """
@@ -17020,7 +17015,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background-color:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + createGradient('#147bb3') + """ ;
                 }
                 QPushButton:flat{
                     color: darkgrey;
@@ -17036,11 +17031,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background-color:""" + self.createGradient('#116999') + """ ;
+                    background-color:""" + createGradient('#116999') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#1985ba') + """ ;
+                    background-color:""" + createGradient('#1985ba') + """ ;
                 }
             """,
             "COOL END":    """
@@ -17050,7 +17045,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background-color:""" + self.createGradient('#66b8d7') + """ ;
+                    background-color:""" + createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
                     color: #BDBDBD;
@@ -17066,11 +17061,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background-color:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#43a7cf') + """ ;
+                    background-color:""" + createGradient('#43a7cf') + """ ;
                 }
             """,
             "EVENT":    """
@@ -17080,15 +17075,15 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background-color:""" + self.createGradient('#bdbdbd') + """ ;
+                    background-color:""" + createGradient('#bdbdbd') + """ ;
                 }
                 QPushButton:pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#757575') + """ ;
+                    background-color:""" + createGradient('#757575') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#9e9e9e') + """ ;
+                    background-color:""" + createGradient('#9e9e9e') + """ ;
                 }
             """,
             "PID":     """
@@ -17142,15 +17137,15 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background-color:""" + self.createGradient('#db5785') + """ ;
+                    background-color:""" + createGradient('#db5785') + """ ;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background-color:""" + self.createGradient('#d4336a') + """ ;
+                    background-color:""" + createGradient('#d4336a') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#e480a2') + """ ;
+                    background-color:""" + createGradient('#e480a2') + """ ;
                                      }
             """,
             "SV -":     """
@@ -17160,15 +17155,15 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
                     color: white;
-                    background-color:""" + self.createGradient('#64b7d8') + """ ;
+                    background-color:""" + createGradient('#64b7d8') + """ ;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background-color:""" + self.createGradient('#43a7cf') + """ ;
+                    background-color:""" + createGradient('#43a7cf') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#85cae1') + """ ;
+                    background-color:""" + createGradient('#85cae1') + """ ;
                 }
             """,
 
@@ -17223,7 +17218,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small_selected + """;
                     font-weight: bold;
                     color: white;
-                    background-color:""" + self.createGradient('#d4336a') + """ ;
+                    background-color:""" + createGradient('#d4336a') + """ ;
                 }
                 QPushButton:flat{
                     color: darkgrey;
@@ -17239,11 +17234,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#cc0f50') + """ ;
+                    background-color:""" + createGradient('#cc0f50') + """ ;
                 }
             """,
             "SELECTED_MAIN":     """
@@ -17253,7 +17248,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size_small_selected + """;
                     font-weight: bold;
                     color: white;
-                    background-color:""" + self.createGradient('#c00b40') + """ ;
+                    background-color:""" + createGradient('#c00b40') + """ ;
                 }
                 QPushButton:flat{
                     color: darkgrey;
@@ -17269,11 +17264,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#c70d49') + """ ;
+                    background-color:""" + createGradient('#c70d49') + """ ;
                 }
             """,
             "SELECTED_MAIN_LARGE":     """
@@ -17283,7 +17278,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background-color:""" + self.createGradient('#c00b40') + """ ;
+                    background-color:""" + createGradient('#c00b40') + """ ;
                 }
                 QPushButton:flat{
                     color: darkgrey;
@@ -17299,11 +17294,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#147bb3') + """ ;
+                    background-color:""" + createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color:""" + self.createGradient('#c70d49') + """ ;
+                    background-color:""" + createGradient('#c70d49') + """ ;
                 }
             """
             }
@@ -17822,9 +17817,34 @@ class ApplicationWindow(QMainWindow):
                              self.qmc.mark2Cstart,self.qmc.mark2Cend,self.qmc.markDrop,self.qmc.markCoolEnd,self.qmc.EventRecord]
         # list of buttons that can be controlled via the keyboard
         # RESET -> HUD -> ON/OFF -> .. -> EVENT (RESET at index 0 is never used)
-        self.keyboardButtonList = [self.button_7, self.button_18,self.button_1,self.button_8,self.button_19,self.button_3,self.button_4,self.button_5,self.button_6,self.button_9,self.button_20,self.button_11]
+        self.keyboardButtonList = [
+            self.button_7,  # RESET
+            self.button_18, # HUD_ON
+            self.button_1,  # ON
+            self.button_8,  # CHARGE
+            self.button_19, # DRY END
+            self.button_3,  # FC START
+            self.button_4,  # FC END
+            self.button_5,  # SC START
+            self.button_6,  # SC END
+            self.button_9,  # DROP
+            self.button_20, # COOL END
+            self.button_11  # EVENT
+        ]
         # 0:RESET,1:HUD,2:ON/OFF,3:CHARGE,4:DRY,5:FCs,6:FCe,7:SCs,8:SCe,9:DROP,10:COOL,11:EVENT
-        self.keyboardButtonStyles = ["RESET","HUD_ON","ON","CHARGE","DRY END","FC START","FC END","SC START","SC END","DROP","COOL END","EVENT"]
+        self.keyboardButtonStyles = [
+            "RESET",
+            "HUD_ON",
+            "ON",
+            "CHARGE",
+            "DRY END",
+            "FC START",
+            "FC END",
+            "SC START",
+            "SC END",
+            "DROP",
+            "COOL END",
+            "EVENT"]
 
         #current function above
         self.keyboardmoveindex = 3
@@ -18594,38 +18614,6 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     def mainButtonReleased(self):
         self.sender().setGraphicsEffect(self.makeShadow())
-        
-    # creates QLinearGradient style from light to dark by default, or from dark to light if reverse is True
-    @functools.lru_cache
-    def createGradient(self, rgb, tint_factor=0.1, shade_factor=0.1, reverse=False):
-        light_grad,dark_grad = self.createRGBGradient(rgb,tint_factor,shade_factor)
-        QLinearGradient_style_fstring = "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {grad_start}, stop: 1 {grad_end});"
-        if reverse:
-            # dark to light
-            return QLinearGradient_style_fstring.format(grad_start=dark_grad,grad_end=light_grad)
-        # light to dark (default)
-        return QLinearGradient_style_fstring.format(grad_start=light_grad,grad_end=dark_grad)
-
-    @staticmethod
-    def createRGBGradient(rgb, tint_factor=0.3, shade_factor=0.3):
-        try:
-            if isinstance(rgb, QColor):
-                r,g,b,_ = rgb.getRgbF()
-                rgb_tuple = (r,g,b)
-            elif rgb[0:1] == "#":   # hex input like "#ffaa00"
-                rgb_tuple = tuple(int(rgb[i:i+2], 16)/255 for i in (1, 3 ,5))
-            else:                 # color name
-                rgb_tuple = colors.hex2color(colors.cnames[rgb])
-            #ref: https://stackoverflow.com/questions/6615002/given-an-rgb-value-how-do-i-create-a-tint-or-shade
-#            rgb_tuple = tuple(int(rgb[i:i+2], 16)/255 for i in (1, 3 ,5))
-            darker_rgb  = '#%02x%02x%02x' % (tuple([int(255 * (x * (1 - shade_factor))) for x in rgb_tuple])) # pylint: disable=consider-using-generator
-            lighter_rgb = '#%02x%02x%02x' % (tuple([int(255 * (x + (1 - x) * tint_factor)) for x in rgb_tuple])) # pylint: disable=consider-using-generator
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createRGBGradient(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-            lighter_rgb = darker_rgb = "#000000"
-        return lighter_rgb,darker_rgb
 
     # for use in widgets that expects a double via a aw.createCLocalDoubleValidator that accepts both,
     # one dot and several commas. If there is no dot, the last comma is interpreted as decimal separator and the others removed
@@ -19242,8 +19230,8 @@ class ApplicationWindow(QMainWindow):
                         import serial.tools.list_ports
                         comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
                         if platf == 'Darwin':
-                            ports = list([p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync', # pylint: disable=consider-using-generator
-                                '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem',"/dev/cu.Bluetooth-Incoming-Port","/dev/tty.Bluetooth-Incoming-Port"])])
+                            ports = [p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync', 
+                                '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem',"/dev/cu.Bluetooth-Incoming-Port","/dev/tty.Bluetooth-Incoming-Port"])]
                             ports = list(filter (lambda x: 'Bluetooth-Inc' not in x[0],ports))
                         else:
                             ports = list(comports)
@@ -23260,9 +23248,9 @@ class ApplicationWindow(QMainWindow):
             backgroundcolor = self.extraeventbuttontextcolor[tee]
         core_style = """color:%s;background:%s}"""
         #
-        plain_style = "QPushButton {" + buttonstyle + core_style%(color,self.createGradient(backgroundcolor))
-        pressed_style = "QPushButton:hover:pressed {" + buttonstyle + core_style%(color,self.createGradient(QColor(backgroundcolor).lighter(80).name()))
-        hover_style = "QPushButton:hover:!pressed {" + buttonstyle + core_style%(color,self.createGradient(QColor(backgroundcolor).lighter(110).name()))
+        plain_style = "QPushButton {" + buttonstyle + core_style%(color,createGradient(backgroundcolor))
+        pressed_style = "QPushButton:hover:pressed {" + buttonstyle + core_style%(color,createGradient(QColor(backgroundcolor).lighter(80).name()))
+        hover_style = "QPushButton:hover:!pressed {" + buttonstyle + core_style%(color,createGradient(QColor(backgroundcolor).lighter(110).name()))
         return plain_style + hover_style + pressed_style
 
     def setExtraEventButtonStyle(self, tee, style="normal"):
@@ -23414,18 +23402,18 @@ class ApplicationWindow(QMainWindow):
             #### lock shared resources #####
             aw.qmc.messagesemaphore.acquire(1)
             if message:
-                _log.debug(message)
+                _log.debug("message: %s", message)
             if style is not None and style != "":
                 aw.messagelabel.setStyleSheet(style)
             else:
-                aw.messagelabel.setStyleSheet("background-color:'transparent'; color: " + aw.qmc.palette["messages"] + ";")
+                aw.messagelabel.setStyleSheet(f"background-color:'transparent'; color: {aw.qmc.palette['messages']};")
             message = aw.arabicReshape(message)
             #keep a max of 100 messages
             if append:
                 if len(self.messagehist) > 99:
                     self.messagehist = self.messagehist[1:]
                 timez = QDateTime.currentDateTime().toString("hh:mm:ss.zzz ")    #zzz = miliseconds
-                self.messagehist.append(timez + message)
+                self.messagehist.append(f"{timez}{message}")
             self.messagelabel.setText(message)
             if repaint: # if repaint is executed in the main thread we receive "QWidget::repaint: Recursive repaint detected"
                 self.messagelabel.repaint()

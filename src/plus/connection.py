@@ -286,13 +286,7 @@ def getHeaders(
     authorized: bool = True, decompress: bool = True) -> Dict[str, str]:
     os, os_version = config.app_window.get_os()  # @UndefinedVariable
     headers = {
-        "user-agent": "Artisan/"
-        + __version__
-        + " ("
-        + os
-        + "; "
-        + os_version
-        + ")"
+        "user-agent": f"Artisan/{__version__} ({os}; {os_version})"
     }
     try:
         locale = config.app_window.locale_str
@@ -305,7 +299,7 @@ def getHeaders(
     if authorized:
         token = getToken()
         if token is not None:
-            headers["Authorization"] = "Bearer " + token
+            headers["Authorization"] = f"Bearer {token}"
     if decompress:
         headers[
             "Accept-Encoding"
