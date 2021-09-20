@@ -6825,6 +6825,7 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
+                    e = 0
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,1)
 
                 #Add 1Cs markers
