@@ -8262,9 +8262,10 @@ class tgraphcanvas(FigureCanvas):
 #                            start = start + 30 # avoiding the empty begin of heavy smoothed data
 #                            if end == 0:
 #                                end = min(len(self.delta2) -1,100)
+#                            print("ET RoR mean:",numpy.mean([x for x in self.delta1[start:end] if x is not None]))
+#                            print("ET RoR std:",numpy.std([x for x in self.delta1[start:end] if x is not None]))
 #                            print("BT RoR mean:",numpy.mean([x for x in self.delta2[start:end] if x is not None]))
-#                            print("BT RoR std (old):",numpy.std([x for x in self.delta2[start:end] if x is not None]))
-#                            print("BT RoR std (new):",numpy.std(self.delta2))
+#                            print("BT RoR std:",numpy.std([x for x in self.delta2[start:end] if x is not None]))
 #                        except Exception as e: # pylint: disable=broad-except
 #                            _log.exception(e)
                 
@@ -11029,6 +11030,8 @@ class tgraphcanvas(FigureCanvas):
                                     self.timeindex[0] = len(self.timex)-1
                                 else:
                                     message = QApplication.translate("Message","Not enough data collected yet. Try again in a few seconds", None)
+                                    aw.sendmessage(message)
+                                    return
                             if aw.pidcontrol.pidOnCHARGE and not aw.pidcontrol.pidActive: # Arduino/TC4, Hottop, MODBUS
                                 aw.pidcontrol.pidOn()
                         try:

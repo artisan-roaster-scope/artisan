@@ -62,6 +62,7 @@ from Phidget22.Devices.RCServo import RCServo # @UnusedWildImport
 from Phidget22.Devices.CurrentInput import CurrentInput # @UnusedWildImport
 from Phidget22.Devices.FrequencyCounter import FrequencyCounter # @UnusedWildImport
 from Phidget22.Devices.DCMotor import DCMotor # @UnusedWildImport
+from Phidget22.PhidgetException import PhidgetException
 
 from yoctopuce.yocto_api import YAPI, YRefParam
 
@@ -2844,6 +2845,7 @@ class serialport():
             if self.PhidgetIRSensor and self.PhidgetIRSensor.getAttached():
                 res = -1
                 ambient = -1
+                probe = -1
                 try:
                     if (deviceType == DeviceID.PHIDID_1045 and self.aw.qmc.phidget1045_async) or \
                         (deviceType in [DeviceID.PHIDID_1051,DeviceID.PHIDID_TMP1100] and self.aw.qmc.phidget1048_async[0]) or \
@@ -2885,41 +2887,46 @@ class serialport():
                     if self.aw.qmc.mode == "F":
                         probe = fromCtoF(probe)
                     res = probe
+                except PhidgetException:
+                    pass  # the value might be still unknown. This can happen right after attach.
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-                try:
-                    if self.PhidgetIRSensorIC is not None and self.PhidgetIRSensorIC.getAttached():
-                        ambient = self.PhidgetIRSensorIC.getTemperature()
-                        # we heavily average this ambient temperature IC readings not to introduce additional noise via emissivity calc to the IR reading
-                        if self.Phidget1045tempIRavg is None:
-                            self.Phidget1045tempIRavg = ambient
-                        else:
-                            self.Phidget1045tempIRavg = (20*self.Phidget1045tempIRavg + ambient) / 21.0
-                            ambient = self.Phidget1045tempIRavg
-                        if self.aw.qmc.mode == "F":
-                            ambient = fromCtoF(ambient)
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
-                if deviceType == DeviceID.PHIDID_TMP1200:
-                    ambient = res
-                if ambient == -1:
-                    return -1,-1
-                if deviceType == DeviceID.PHIDID_1045:
-                    return self.IRtemp(self.aw.qmc.phidget1045_emissivity,res,ambient),ambient
-                return res,ambient
+                if res != -1:
+                    try:
+                        if self.PhidgetIRSensorIC is not None and self.PhidgetIRSensorIC.getAttached():
+                            ambient = self.PhidgetIRSensorIC.getTemperature()
+                            # we heavily average this ambient temperature IC readings not to introduce additional noise via emissivity calc to the IR reading
+                            if self.Phidget1045tempIRavg is None:
+                                self.Phidget1045tempIRavg = ambient
+                            else:
+                                self.Phidget1045tempIRavg = (20*self.Phidget1045tempIRavg + ambient) / 21.0
+                                ambient = self.Phidget1045tempIRavg
+                            if self.aw.qmc.mode == "F":
+                                ambient = fromCtoF(ambient)
+                    except PhidgetException as e:
+                        pass # the value might be still unknown. This can happen right after attach.
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+                    if deviceType == DeviceID.PHIDID_TMP1200:
+                        ambient = res
+                    if ambient == -1:
+                        return -1,-1
+                    if deviceType == DeviceID.PHIDID_1045:
+                        return self.IRtemp(self.aw.qmc.phidget1045_emissivity,res,ambient),ambient
+                    return res, ambient
             if retry:
                 libtime.sleep(0.1)
                 return self.PHIDGET1045temperature(deviceType,retry=False,alternative_conf=alternative_conf)
             return -1,-1
         except Exception as ex: # pylint: disable=broad-except
-            _log.exception(e)
+            _log.exception(ex)
             try:
                 if self.PhidgetIRSensor and self.PhidgetIRSensor.getAttached():
                     self.PhidgetIRSensor.close()
                 if self.PhidgetIRSensorIC and self.PhidgetIRSensorIC.getAttached():
                     self.PhidgetIRSensorIC.close()
-            except Exception: # pylint: disable=broad-except
-                pass
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
             self.PhidgetIRSensor = None
             self.Phidget1045values = []
             self.Phidget1045lastvalue = -1
@@ -3123,12 +3130,16 @@ class serialport():
                         probe1 = self.phidget1048getSensorReading(mode*2,0)
                         if self.aw.qmc.mode == "F":
                             probe1 = fromCtoF(probe1)
+                    except PhidgetException as e:
+                        pass  # the value might be still unknown. This can happen right after attach.
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                     try:
                         probe2 = self.phidget1048getSensorReading(mode*2 + 1,1)
                         if self.aw.qmc.mode == "F":
                             probe2 = fromCtoF(probe2)
+                    except PhidgetException as e:
+                        pass  # the value might be still unknown. This can happen right after attach.
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                     return probe1, probe2
@@ -3138,6 +3149,8 @@ class serialport():
                         if self.aw.qmc.mode == "F":
                             at = fromCtoF(at)
                         return at,-1
+                    except PhidgetException as e:
+                        pass  # the value might be still unknown. This can happen right after attach.
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                         return -1,-1
@@ -3403,10 +3416,14 @@ class serialport():
                     probe1 = probe2 = -1
                     try:
                         probe1 = self.phidget1046getSensorReading(mode*2,0)
+                    except PhidgetException:
+                        pass  # the value might be still unknown. This can happen right after attach.
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                     try:
                         probe2 = self.phidget1046getSensorReading(mode*2+1,1)
+                    except PhidgetException as e:
+                        pass  # the value might be still unknown. This can happen right after attach.
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                     return probe1, probe2
@@ -4946,6 +4963,8 @@ class serialport():
                 probe = -1
                 try:
                     probe = self.phidget1018getSensorReading(0,0,deviceType,API)
+                except PhidgetException:
+                    pass  # the value might be still unknown. This can happen right after attach.
                 except Exception: # pylint: disable=broad-except
                     pass
                 return probe, -1
@@ -4953,11 +4972,15 @@ class serialport():
                 probe1 = probe2 = -1
                 try:
                     probe1 = self.phidget1018getSensorReading(mode*2,0,deviceType,API)
+                except PhidgetException:
+                    pass  # the value might be still unknown. This can happen right after attach.
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                 if not single:
                     try:
                         probe2 = self.phidget1018getSensorReading(mode*2 + 1,1,deviceType,API)
+                    except PhidgetException:
+                        pass  # the value might be still unknown. This can happen right after attach.
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                 return probe1, probe2
