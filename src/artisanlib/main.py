@@ -16618,17 +16618,13 @@ class ApplicationWindow(QMainWindow):
         # set a few broad style parameters
         self.button_font_size_pt = 13
         if platf == 'Windows':
-            self.button_font_size = str(self.button_font_size_pt - 2) + 'pt'
-            self.button_font_size_small = str(self.button_font_size_pt - 3) + 'pt'
-            self.button_font_size_small_selected = str(self.button_font_size_pt - 2) + 'pt'
-            self.button_font_size_tiny = str(self.button_font_size_pt - 4) + 'pt'
-            self.button_font_size_micro = str(self.button_font_size_pt - 5) + 'pt'
+            self.button_font_size = f"{self.button_font_size_pt - 2}pt"
         else:
-            self.button_font_size = str(self.button_font_size_pt) + 'pt'
-            self.button_font_size_small = str(self.button_font_size_pt - 3) + 'pt'
-            self.button_font_size_small_selected = str(self.button_font_size_pt - 2) + 'pt'
-            self.button_font_size_tiny = str(self.button_font_size_pt - 4) + 'pt'
-            self.button_font_size_micro = str(self.button_font_size_pt - 5) + 'pt'
+            self.button_font_size = f"{self.button_font_size_pt}pt"
+        self.button_font_size_small = f"{self.button_font_size_pt - 3}pt"
+        self.button_font_size_small_selected = f"{self.button_font_size_pt - 2}pt"
+        self.button_font_size_tiny = f"{self.button_font_size_pt - 4}pt"
+        self.button_font_size_micro = f"{self.button_font_size_pt - 5}pt"
 
         if platf == 'Windows':
             self.main_button_min_width = "110px"

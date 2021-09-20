@@ -30,7 +30,7 @@ import plus.stock
 import plus.controller
 
 #from artisanlib.suppress_errors import suppress_stdout_stderr
-from artisanlib.util import deltaLabelUTF8, appFrozen, stringfromseconds,stringtoseconds, toInt, toFloat
+from artisanlib.util import deltaLabelUTF8, appFrozen, stringfromseconds,stringtoseconds, toInt, toFloat, abbrevString
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
 from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit, MyTableWidgetItemNumber
 
@@ -1874,7 +1874,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 for i,l in sorted(zip(self.plus_blend_selected_spec["ingredients"],self.plus_blend_selected_spec_labels), key=lambda tup:tup[0]["ratio"],reverse = True)[:4]:
                     if line:
                         line = line + ", "
-                    c = '<a href="{0}"{2}>{1}</a>'.format(plus.util.coffeeLink(i["coffee"]),self.aw.qmc.abbrevString(l,18),dark_mode_link_color)
+                    c = '<a href="{0}"{2}>{1}</a>'.format(plus.util.coffeeLink(i["coffee"]),abbrevString(l,18),dark_mode_link_color)
                     line = line + str(int(round(i["ratio"]*100))) + "% " + c
             if line and len(line)>0 and self.plus_store_selected is not None and self.plus_store_selected_label is not None:
                 line = line + '  (<a href="{0}"{2}>{1}</a>)'.format(plus.util.storeLink(self.plus_store_selected),self.plus_store_selected_label,dark_mode_link_color)

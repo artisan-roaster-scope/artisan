@@ -358,9 +358,9 @@ def createGradient(rgb, tint_factor=0.1, shade_factor=0.1, reverse=False):
     light_grad,dark_grad = createRGBGradient(rgb,tint_factor,shade_factor)
     if reverse:
         # dark to light
-        return f"QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {dark_grad}, stop: 1 {light_grad});"
+        return f"QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {dark_grad}, stop: 1 {light_grad})"
     # light to dark (default)
-    return f"QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {light_grad}, stop: 1 {dark_grad});"
+    return f"QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {light_grad}, stop: 1 {dark_grad})"
 
 def createRGBGradient(rgb, tint_factor=0.3, shade_factor=0.3):
     try:
@@ -373,9 +373,9 @@ def createRGBGradient(rgb, tint_factor=0.3, shade_factor=0.3):
             rgb_tuple = colors.hex2color(colors.cnames[rgb])
         #ref: https://stackoverflow.com/questions/6615002/given-an-rgb-value-how-do-i-create-a-tint-or-shade
         r,g,b = tuple(int(255 * (x * (1 - shade_factor))) for x in rgb_tuple)
-        darker_rgb = f"#{r:x}{g:x}{b:x}"
+        darker_rgb = f"#{r:02x}{g:02x}{b:02x}"
         r,g,b = tuple(int(255 * (x + (1 - x) * tint_factor)) for x in rgb_tuple)
-        lighter_rgb = f"#{r:x}{g:x}{b:x}"
+        lighter_rgb = f"#{r:02x}{g:02x}{b:02x}"
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
         lighter_rgb = darker_rgb = "#000000"
