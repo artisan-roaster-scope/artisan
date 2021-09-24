@@ -17,7 +17,7 @@
 # Marko Luther, 2020
 
 ##########################################################################
-#####################     EXTRAS/HUD  EDIT DLG     #######################
+#####################     Curves DLG     #################################
 ##########################################################################
 
 import sys
@@ -38,7 +38,7 @@ try:
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QTableWidget, QTableWidgetItem) # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QTableWidgetItem, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:
     #pylint: disable = E, W, R, C
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication, QRegularExpression) # @UnusedImport @Reimport  @UnresolvedImport
@@ -46,7 +46,7 @@ except Exception:
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QTableWidget, QTableWidgetItem) # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QTableWidgetItem, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 ########################################################################################
@@ -272,7 +272,7 @@ class equDataDlg(ArtisanDialog):
 
 
 
-class HUDDlg(ArtisanDialog):
+class CurvesDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None, activeTab = 0):
         super().__init__(parent, aw)
         
@@ -292,7 +292,6 @@ class HUDDlg(ArtisanDialog):
         self.org_patheffects = self.aw.qmc.patheffects
         self.org_graphstyle = self.aw.qmc.graphstyle
         self.org_graphfont = self.aw.qmc.graphfont
-        self.org_HUDbuttonflag = self.aw.qmc.HUDbuttonflag
         self.org_filterDropOuts = self.aw.qmc.filterDropOuts
         self.org_dropSpikes = self.aw.qmc.dropSpikes
         self.org_dropDuplicates = self.aw.qmc.dropDuplicates
@@ -313,21 +312,6 @@ class HUDDlg(ArtisanDialog):
         self.org_BTname = self.aw.BTname
         self.org_foregroundShowFullflag = self.aw.qmc.foregroundShowFullflag
         
-        self.showHUDbutton = QCheckBox(QApplication.translate("Label", "HUD Button", None))
-        self.showHUDbutton.setChecked(self.aw.qmc.HUDbuttonflag)
-        self.showHUDbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.showHUDbutton.stateChanged.connect(self.showHUDbuttonToggle)
-        ETLabel = QLabel(QApplication.translate("Label", "ET Target 1",None))
-        ETLabel.setAlignment(Qt.AlignmentFlag.AlignRight)
-        BTLabel = QLabel(QApplication.translate("Label", "BT Target 1",None))
-        BTLabel.setAlignment(Qt.AlignmentFlag.AlignRight)        
-        ET2Label = QLabel(QApplication.translate("Label", "ET Target 2",None))
-        ET2Label.setAlignment(Qt.AlignmentFlag.AlignRight)
-        BT2Label = QLabel(QApplication.translate("Label", "BT Target 2",None))
-        BT2Label.setAlignment(Qt.AlignmentFlag.AlignRight)        
-        modeLabel = QLabel(QApplication.translate("Label", "Mode",None))
-        modeLabel.setAlignment(Qt.AlignmentFlag.AlignRight)
-        ETPIDLabel = QLabel(QApplication.translate("Label", "ET p-i-d 1",None))
         #delta ET
         self.DeltaET = QCheckBox()
         self.DeltaET.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -457,61 +441,10 @@ class HUDDlg(ArtisanDialog):
             pass
         self.deltaETspan.currentIndexChanged.connect(self.changeDeltaETspan)  #toggle
 
-        self.modeComboBox = QComboBox()
-        self.modeComboBox.setMaximumWidth(100)
-        self.modeComboBox.setMinimumWidth(55)
-        self.modeComboBox.addItems([QApplication.translate("ComboBox","metrics",None),
-                                    QApplication.translate("ComboBox","thermal",None)])
-        self.modeComboBox.setCurrentIndex(self.aw.HUDfunction)
-        self.ETlineEdit = QLineEdit(str(self.aw.qmc.ETtarget))
-        self.ETlineEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.BTlineEdit = QLineEdit(str(self.aw.qmc.BTtarget))
-        self.BTlineEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.ETlineEdit.setValidator(QIntValidator(0, 1000, self.ETlineEdit))
-        self.BTlineEdit.setValidator(QIntValidator(0, 1000, self.BTlineEdit))
-        self.ETlineEdit.setMaximumWidth(60)
-        self.BTlineEdit.setMaximumWidth(60)
-        self.ET2lineEdit = QLineEdit(str(self.aw.qmc.ET2target))
-        self.ET2lineEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.BT2lineEdit = QLineEdit(str(self.aw.qmc.BT2target))
-        self.BT2lineEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.ET2lineEdit.setValidator(QIntValidator(0, 1000, self.ET2lineEdit))
-        self.BT2lineEdit.setValidator(QIntValidator(0, 1000, self.BT2lineEdit))
-        self.ET2lineEdit.setMaximumWidth(60)
-        self.BT2lineEdit.setMaximumWidth(60)
-        self.ETpidP = QLineEdit(str(self.aw.qmc.hudETpid[0]))
-        self.ETpidP.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.ETpidI = QLineEdit(str(self.aw.qmc.hudETpid[1]))
-        self.ETpidI.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.ETpidD = QLineEdit(str(self.aw.qmc.hudETpid[2]))
-        self.ETpidD.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.ETpidP.setValidator(QIntValidator(0, 1000, self.ETpidP))
-        self.ETpidI.setValidator(QIntValidator(0, 1000, self.ETpidI))
-        self.ETpidD.setValidator(QIntValidator(0, 1000, self.ETpidD))
-        self.ETpidP.setMaximumWidth(60)
-        self.ETpidI.setMaximumWidth(60)
-        self.ETpidD.setMaximumWidth(60)
-
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.updatetargets)
         self.dialogbuttons.rejected.connect(self.close)
 
-        hudLayout = QGridLayout()
-        hudLayout.addWidget(BTLabel,0,0)
-        hudLayout.addWidget(self.BTlineEdit,0,1)
-        hudLayout.addWidget(BT2Label,0,2)
-        hudLayout.addWidget(self.BT2lineEdit,0,3)
-        hudLayout.addWidget(ETLabel,1,0)
-        hudLayout.addWidget(self.ETlineEdit,1,1)
-        hudLayout.addWidget(ET2Label,1,2)
-        hudLayout.addWidget(self.ET2lineEdit,1,3)
-        hudLayout.addWidget(ETPIDLabel,2,0)
-        hudLayout.addWidget(self.ETpidP,2,1)
-        hudLayout.addWidget(self.ETpidI,2,2)
-        hudLayout.addWidget(self.ETpidD,2,3)
-        hudLayout.addWidget(modeLabel,3,0)
-        hudLayout.addWidget(self.modeComboBox,3,1)
-        hudLayout.addWidget(self.showHUDbutton,3,3)
         rorBoxLayout = QHBoxLayout()
         rorBoxLayout.addWidget(self.DeltaET)
         rorBoxLayout.addWidget(DeltaETlabel)
@@ -589,20 +522,7 @@ class HUDDlg(ArtisanDialog):
         
         rorSymbolicFormulaGroupLayout = QGroupBox(QApplication.translate("GroupBox","Rate of Rise Symbolic Assignments",None))
         rorSymbolicFormulaGroupLayout.setLayout(rorSymbolicFormulas)
-        
-        hudHBox = QHBoxLayout()
-        hudHBox.addStretch()
-        hudHBox.addLayout(hudLayout)
-        hudHBox.addStretch()
-        hudGroupLayout = QGroupBox(QApplication.translate("GroupBox","Head Up Display",None))
-        hudGroupLayout.setLayout(hudHBox)  
-        if self.app.artisanviewerMode:
-            hudGroupLayout.setEnabled(False)
-        rorRoRAlgo = QHBoxLayout()
-        rorRoRAlgo.addWidget(self.PolyFitFlag) 
-        rorRoRAlgo.addSpacing(20)
-        rorRoRAlgo.addWidget(self.OptimalSmoothingFlag)
-        rorRoRAlgo.addStretch()   
+          
         inputFilter0 = QHBoxLayout()
         inputFilter0.addWidget(self.DropDuplicates)
         inputFilter0.addWidget(self.DropDuplicatesLimit)
@@ -613,30 +533,43 @@ class HUDDlg(ArtisanDialog):
         inputFilter1.addWidget(self.swapETBT)
         inputFilter2 = QHBoxLayout()
         inputFilter2.addWidget(self.MinMaxLimits)
-        inputFilter2.addStretch()
+        inputFilter2.addSpacing(20)
         inputFilter2.addWidget(minlabel)
         inputFilter2.addWidget(self.minLimit)
-        inputFilter2.addSpacing(20)
+        inputFilter2.addSpacing(15)
         inputFilter2.addWidget(maxlabel)
         inputFilter2.addWidget(self.maxLimit)
+        inputFilter2.addStretch()
         
         inputFilterVBox = QVBoxLayout()
         inputFilterVBox.addLayout(inputFilter0)
         inputFilterVBox.addLayout(inputFilter1)
-        inputFilterVBox.addLayout(inputFilter2) 
+        inputFilterVBox.addLayout(inputFilter2)
+        inputFilterVBox.addStretch() 
         inputFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Input Filter",None))
         inputFilterGroupLayout.setLayout(inputFilterVBox)
+        
+        inputFilter0.setContentsMargins(0,0,0,0)
+        inputFilter1.setContentsMargins(0,0,0,0)
+        inputFilter2.setContentsMargins(0,0,0,0)
+        
+        inputFilterVBox.setContentsMargins(7,7,7,7)
+        
         # Post Roast Group
         postRoastVBox = QVBoxLayout()
         postRoastVBox.addLayout(spikesLayout2)
         postRoastGroupLayout = QGroupBox(QApplication.translate("GroupBox","Curve Filter",None))
         postRoastGroupLayout.setLayout(postRoastVBox)
         
+        postRoastVBox.setContentsMargins(7,7,7,7)
+        
         # Render xGroup
         renderVBox = QVBoxLayout()
         renderVBox.addWidget(self.ShowFull)
         renderGroupLayout = QGroupBox(QApplication.translate("GroupBox","Display Filter",None))
-        renderGroupLayout.setLayout(renderVBox)    
+        renderGroupLayout.setLayout(renderVBox)
+        
+        renderVBox.setContentsMargins(7,7,7,7)
         
         #swapETBT flag
         self.rorFilter = QCheckBox(QApplication.translate("CheckBox", "Limits",None))
@@ -662,18 +595,33 @@ class HUDDlg(ArtisanDialog):
             self.rormaxLimit.setSuffix(" C/min")
         rorFilterHBox = QHBoxLayout()
         rorFilterHBox.addWidget(self.rorFilter)
-        rorFilterHBox.addStretch()
+        rorFilterHBox.addSpacing(20)
         rorFilterHBox.addWidget(rorminlabel)
         rorFilterHBox.addWidget(self.rorminLimit)
-        rorFilterHBox.addSpacing(20)
+        rorFilterHBox.addSpacing(15)
         rorFilterHBox.addWidget(rormaxlabel)
         rorFilterHBox.addWidget(self.rormaxLimit)
+        rorFilterHBox.addStretch()
+        rorFilterVBoxHLine = QFrame()
+        rorFilterVBoxHLine.setFrameStyle(QFrame.Shape.HLine)
+        rorFilterVBoxHLine.setFrameShadow(QFrame.Shadow.Sunken)
         rorFilterVBox = QVBoxLayout()
-        rorFilterVBox.addLayout(sensitivityLayout)
-        rorFilterVBox.addLayout(rorRoRAlgo)  
+        rorFilterVBox.addStretch()
+        rorFilterVBox.addWidget(self.PolyFitFlag)
+        rorFilterVBox.addWidget(self.OptimalSmoothingFlag)
+        rorFilterVBox.addWidget(rorFilterVBoxHLine)
         rorFilterVBox.addLayout(rorFilterHBox)
+        rorHBox = QHBoxLayout()
+        rorHBox.addLayout(sensitivityLayout)
+        rorHBox.addSpacing(12)
+        rorHBox.addLayout(rorFilterVBox)
         rorFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Rate of Rise Filter",None))
-        rorFilterGroupLayout.setLayout(rorFilterVBox)
+        rorFilterGroupLayout.setLayout(rorHBox)
+        
+        rorFilterHBox.setContentsMargins(0,0,0,0)
+        rorFilterHBox.setSpacing(2)
+        rorFilterVBox.setContentsMargins(0,0,0,0)
+        
         # path effects
         effectslabel = QLabel(QApplication.translate("Label", "Path Effects",None))
         self.PathEffects = QSpinBox()
@@ -727,14 +675,12 @@ class HUDDlg(ArtisanDialog):
         tab1UpperLayout.addWidget(inputFilterGroupLayout)
         tab1UpperLayout.addLayout(tab1UpperRightLayout)
         
+        tab1UpperRightLayout.setSpacing(5)
+        
         tab1Layout = QVBoxLayout()
         tab1Layout.addLayout(tab1UpperLayout)
         tab1Layout.addWidget(rorFilterGroupLayout)
         tab1Layout.addStretch()
-        #tab11
-        tab11Layout = QVBoxLayout()
-        tab11Layout.addWidget(hudGroupLayout)
-        tab11Layout.addStretch()
         #tab2
         #Equation plotter
 #        self.equlabel = QLabel(QApplication.translate("Label", "Y(x)",None))
@@ -1348,47 +1294,48 @@ class HUDDlg(ArtisanDialog):
 
         ############################  TABS LAYOUT
         self.TabWidget = QTabWidget()
+        # RoR
         C0Widget = QWidget()
         C0Widget.setLayout(tab0Layout)
-        tab0Layout.setContentsMargins(10,10,10,10)
-        C0Widget.setContentsMargins(0,10,0,10)
+        tab0Layout.setContentsMargins(5, 5, 5, 5) # L,T,R,B
+        C0Widget.setContentsMargins(0, 0, 0, 0)
         self.TabWidget.addTab(C0Widget,QApplication.translate("Tab","RoR",None))
+        # Filters
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        tab1Layout.setContentsMargins(10,10,10,10)
-        C1Widget.setContentsMargins(0,10,0,10)
+        tab1Layout.setContentsMargins(5, 5, 5, 0)
+        C1Widget.setContentsMargins(0, 0, 0, 0)
         self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","Filters",None))
-        C11Widget = QWidget()
-        C11Widget.setLayout(tab11Layout)
-        tab11Layout.setContentsMargins(10,10,10,10)
-        C11Widget.setContentsMargins(0,10,0,10)
-        self.TabWidget.addTab(C11Widget,QApplication.translate("Tab","HUD",None))
+        # Plotter
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        tab2Layout.setContentsMargins(10,10,10,10)
-        C2Widget.setContentsMargins(0,0,0,0)
+        tab2Layout.setContentsMargins(5, 5, 5, 0)
+        C2Widget.setContentsMargins(0, 0, 0, 0)
         self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","Plotter",None))
+        # Math
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        tab3Layout.setContentsMargins(10,10,10,10)
-        C3Widget.setContentsMargins(0,0,0,0)
+        tab3Layout.setContentsMargins(5, 5, 0, 5)
+        C3Widget.setContentsMargins(0, 0, 0, 0)
         self.TabWidget.addTab(C3Widget,QApplication.translate("Tab","Math",None))
+        # Analyzer
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        tab4Layout.setContentsMargins(10,10,10,10)
-        C3Widget.setContentsMargins(0,0,0,0)
+        tab4Layout.setContentsMargins(5, 5, 5, 0)
+        C3Widget.setContentsMargins(0, 0, 0, 0)
         self.TabWidget.addTab(C4Widget,QApplication.translate("Tab","Analyze",None))
+        # UI
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
-        tab5Layout.setContentsMargins(10,10,10,10)
-        C5Widget.setContentsMargins(0,10,0,0)
+        tab5Layout.setContentsMargins(5,5,5,0)
+        C5Widget.setContentsMargins(0,0,0,0)
         self.TabWidget.addTab(C5Widget,QApplication.translate("Tab","UI",None))
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
         buttonsLayout.addWidget(self.dialogbuttons)
         #incorporate layouts
         Slayout = QVBoxLayout()
-        Slayout.addWidget(self.TabWidget,1)
+        Slayout.addWidget(self.TabWidget)
         Slayout.addStretch()
         Slayout.addLayout(buttonsLayout)
         self.TabWidget.currentChanged.connect(self.tabSwitched)
@@ -1577,15 +1524,6 @@ class HUDDlg(ArtisanDialog):
             self.QRpic.setPixmap(QPixmap())
             self.aw.stopWebLCDs()
     
-    @pyqtSlot(int)
-    def showHUDbuttonToggle(self,i):
-        if i:
-            self.aw.qmc.HUDbuttonflag = True
-            if not self.app.artisanviewerMode:
-                self.aw.button_18.setVisible(True)
-        else:
-            self.aw.qmc.HUDbuttonflag = False
-            self.aw.button_18.setVisible(False)
 
     def changedpi(self):
         try:
@@ -2143,7 +2081,7 @@ class HUDDlg(ArtisanDialog):
     @pyqtSlot(int)
     def tabSwitched(self,i):
         self.closeHelp()
-        if i != 4:
+        if i != 3: # not Math tab
             if self.polyfitCheck.isChecked():
                 self.polyfitCheck.setChecked(False)
             if self.expvarCheck.isChecked():
@@ -2154,7 +2092,7 @@ class HUDDlg(ArtisanDialog):
                 self.interpCheck.setChecked(False)
             if self.univarCheck.isChecked():
                 self.univarCheck.setChecked(False)
-        else:
+        else: # Math tab
             self.collectCurves()
 
     # TODO: add background curves temp1B, temp2B, timeB, delta1B, delta2B (could be of different size!) # pylint: disable=fixme
@@ -2445,7 +2383,7 @@ class HUDDlg(ArtisanDialog):
         settings = QSettings()
         settings.setValue("CurvesPosition",self.frameGeometry().topLeft())
         
-        self.aw.HUDDlg_activeTab = self.TabWidget.currentIndex()
+        self.aw.CurveDlg_activeTab = self.TabWidget.currentIndex()
 
         #restore settings
         self.aw.qmc.DeltaETflag = self.org_DeltaET
@@ -2456,7 +2394,6 @@ class HUDDlg(ArtisanDialog):
         self.aw.qmc.patheffects = self.org_patheffects
         self.aw.qmc.graphstyle = self.org_graphstyle
         self.aw.qmc.graphfont = self.org_graphfont
-        self.aw.qmc.HUDbuttonflag = self.org_HUDbuttonflag
         self.aw.qmc.filterDropOuts = self.org_filterDropOuts
         self.aw.qmc.dropSpikes = self.org_dropSpikes
         self.aw.qmc.dropDuplicates = self.org_dropDuplicates
@@ -2493,7 +2430,7 @@ class HUDDlg(ArtisanDialog):
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue("CurvesPosition",self.frameGeometry().topLeft())
-        self.aw.HUDDlg_activeTab = self.TabWidget.currentIndex()
+        self.aw.CurveDlg_activeTab = self.TabWidget.currentIndex()
 
         self.aw.qmc.DeltaETfunction = str(self.DeltaETfunctionedit.text())
         self.aw.qmc.DeltaBTfunction = str(self.DeltaBTfunctionedit.text())
@@ -2527,24 +2464,6 @@ class HUDDlg(ArtisanDialog):
         self.aw.qmc.filterDropOut_tmin = int(self.minLimit.value())
         self.aw.qmc.filterDropOut_tmax = int(self.maxLimit.value())
         self.aw.qmc.foregroundShowFullflag = self.ShowFull.isChecked()
-        mode = self.modeComboBox.currentText()
-        if mode == QApplication.translate("ComboBox","metrics", None):
-            self.aw.HUDfunction = 0
-        elif mode == QApplication.translate("ComboBox","thermal", None):
-            self.aw.HUDfunction = 1
-        self.aw.qmc.ETtarget = int(str(self.ETlineEdit.text()))
-        self.aw.qmc.BTtarget = int(str(self.BTlineEdit.text()))
-        self.aw.qmc.ET2target = int(str(self.ET2lineEdit.text()))
-        self.aw.qmc.BT2target = int(str(self.BT2lineEdit.text()))
-        if self.aw.qmc.ETtarget > self.aw.qmc.ET2target: # swap such that ETtarget < ET2target
-            self.aw.qmc.ETtarget = int(str(self.ET2lineEdit.text()))
-            self.aw.qmc.ET2target = int(str(self.ETlineEdit.text()))
-        if self.aw.qmc.BTtarget > self.aw.qmc.BT2target: # swap such that BTtarget < BT2target
-            self.aw.qmc.BTtarget = int(str(self.BT2lineEdit.text()))
-            self.aw.qmc.BT2target = int(str(self.BTlineEdit.text()))
-        self.aw.qmc.hudETpid[0] = int(str(self.ETpidP.text()))
-        self.aw.qmc.hudETpid[1] = int(str(self.ETpidI.text()))
-        self.aw.qmc.hudETpid[2] = int(str(self.ETpidD.text()))
         self.aw.qmc.plotcurves[0] = str(self.equedit1.text())
         self.aw.qmc.plotcurves[1] = str(self.equedit2.text())
         self.aw.qmc.plotcurves[2] = str(self.equedit3.text())

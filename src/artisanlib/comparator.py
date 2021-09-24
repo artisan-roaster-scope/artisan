@@ -685,7 +685,7 @@ class roastCompareDlg(ArtisanDialog):
 
     __slots__ = [ 'foreground', 'background', 'maxentries', 'basecolors', 'profiles', 'label_number', 'l_align', 'legend', 'legendloc_pos', 'addButton',
         'deleteButton', 'alignnames', 'alignComboBox', 'etypes', 'eventsComboBox', 'cb', 'model', 'button_7_org_state_hidden', 'button_1_org_state_hidden',
-        'button_2_org_state_hidden', 'button_10_org_state_hidden', 'button_18_org_state_hidden', 'pick_handler_id' ]
+        'button_2_org_state_hidden', 'button_10_org_state_hidden', 'pick_handler_id' ]
     
     def __init__(self, parent = None, aw = None, foreground = None, background = None):
         super().__init__(parent, aw)
@@ -808,7 +808,6 @@ class roastCompareDlg(ArtisanDialog):
         self.button_1_org_state_hidden = self.aw.button_1.isHidden() # ON/OFF
         self.button_2_org_state_hidden = self.aw.button_2.isHidden() # START/STOP
         self.button_10_org_state_hidden = self.aw.button_10.isHidden() # CONTROL
-        self.button_18_org_state_hidden = self.aw.button_18.isHidden() # HUD
         
         self.disableButtons()
         self.aw.disableEditMenus(compare=True)
@@ -849,15 +848,12 @@ class roastCompareDlg(ArtisanDialog):
             self.aw.button_2.show() # START/STOP
         if not self.button_10_org_state_hidden:
             self.aw.button_10.show() # CONTROL
-        if not self.button_18_org_state_hidden:
-            self.aw.button_18.show() # HUD
         
     def disableButtons(self):
         self.aw.button_7.hide() # RESET
         self.aw.button_1.hide() # ON/OFF
         self.aw.button_2.hide() # START/STOP
         self.aw.button_10.hide() # CONTROL
-        self.aw.button_18.hide() # HUD
     
     ### DRAWING
     

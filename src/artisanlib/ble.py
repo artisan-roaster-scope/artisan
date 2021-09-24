@@ -169,7 +169,7 @@ class BleInterface(QtCore.QObject):
 
     def heartbeat(self):
         if self.m_connected:
-            _log.debug("send heartbeat")
+#            _log.debug("send heartbeat")
             self.sendHeartbeat(self.write)
             QtCore.QTimer.singleShot(2000,self.heartbeat)
 
@@ -293,9 +293,9 @@ class BleInterface(QtCore.QObject):
 
     @QtCore.pyqtSlot("QBluetoothDeviceInfo")
     def addDevice(self, device):
-        _log.debug("addDevice()")
+#        _log.debug("addDevice()")
         if self.m_device is None and device.coreConfigurations() & QtBluetooth.QBluetoothDeviceInfo.LowEnergyCoreConfiguration:
-            _log.debug("discovered LE Device name: %s,  address: %s", device.name(), device.address().toString())
+#            _log.debug("discovered LE Device name: %s,  address: %s", device.name(), device.address().toString())
             m_device = QtBluetooth.QBluetoothDeviceInfo(device)
             if self.device_names is None:
                 _log.debug("check device for matching services")

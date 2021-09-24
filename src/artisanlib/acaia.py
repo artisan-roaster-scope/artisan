@@ -264,7 +264,7 @@ class AcaiaBLE():
         # if value is fresh and reading is stable
         if value != self.weight: # and stable:
             self.weight = value
-            _log.debug("new weight: %s", self.weight)
+#            _log.debug("new weight: %s", self.weight)
         
         return self.EVENT_WEIGHT_LEN
     

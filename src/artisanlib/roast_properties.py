@@ -313,7 +313,7 @@ class volumeCalculatorDlg(ArtisanDialog):
     def ble_scan_failed(self):
         self.scale_weight = None
         self.scale_battery = None
-        self.scaleWeight.setText("")
+        self.scaleWeight.setText("----")
 
     pyqtSlot(float)
     def ble_weight_changed(self,w):
@@ -329,7 +329,7 @@ class volumeCalculatorDlg(ArtisanDialog):
             if self.scale_weight is not None and self.tare is not None:
                 self.scaleWeight.setText("{0:.1f}g".format(self.scale_weight - self.tare))
             else:
-                self.scaleWeight.setText("")
+                self.scaleWeight.setText("----")
         except Exception as e: # pylint: disable=broad-except # the dialog might have been closed already and thus the qlabel might not exist anymore
             _log.exception(e)
         
@@ -1479,6 +1479,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.ble.deviceDisconnected.connect(self.ble_scan_failed)
                     self.ble.weightChanged.connect(self.ble_weight_changed)
                     self.ble.batteryChanged.connect(self.ble_battery_changed)
+                    self.scaleWeight.setText("----")
                     self.ble.scanDevices()
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
@@ -1801,7 +1802,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 #        _log.debug("ble_scan_failed: %s", st)
         self.scale_weight = None
         self.scale_battery = None
-        self.scaleWeight.setText("")
+        self.scaleWeight.setText("----")
         if self.ble is not None:
             QTimer.singleShot(200, self.ble.scanDevices)
 
@@ -1842,7 +1843,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.scaleWeight.setText(v_formatted)
             self.updateScaleWeightAccumulated(self.scale_weight - tare)
         else:
-            self.scaleWeight.setText("")
+            self.scaleWeight.setText("----")
             self.updateScaleWeightAccumulated()
             
     def updateTemplateLine(self):
@@ -2655,8 +2656,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             # weight unit changed, we update the selected blend in plus mode
             if self.plus_blends_combo.currentIndex() > 0:
                 self.blendSelectionChanged(self.plus_blends_combo.currentIndex())
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception: # pylint: disable=broad-except
+            pass # self.plus_blends_combo might not be allocated
 
     @pyqtSlot(int)
     def changeVolumeUnit(self,i):
