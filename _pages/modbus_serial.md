@@ -47,12 +47,14 @@ Machine                         | Driver | Remarks
 [Garanti](/machines/garanti/) | CP210x
 [Golden Roasters](/machines/goldenroasters/) | CH34x
 [HARTANZAH](/machines/hartanzah/) | FTDI
+[Has Garanti](/machines/hasgaranti/) | FTDI
 [HB](/machines/hb/) | CP210x
 [KapoK](/machines/kapok/) | CH34x
 [NOR](/machines/nor/) | FTDI | CH34x (on N Series V.4 old machines)
 [Nordic](/machines/nordic/) | PL2303
 [Phoenix](/machines/phoenix/) | CH34x
 [Proaster](/machines/proaster/) | FTDI
+[Roastmax](/machines/roastmax/) | FTDI
 [Rolltech](/machines/rolltech/) | CH34x
 [Santoker](/machines/santoker/) | CP210x
 [Sedona](/machines/sedona/) | CP210x
