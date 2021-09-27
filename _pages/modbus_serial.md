@@ -31,7 +31,7 @@ You need to install the corresponding serial driver for the chipset of this conv
 
 .. table to be extended and corrected as we receive new information form you ..
 
-Machine                         | Driver | Remarks
+Machine                         | Driver | Remarks
 ------------------------------- | ------ | -----
 [Ambex](/machines/ambex/) | FTDI
 [Arc](/machines/arc/) | CP210x
@@ -42,19 +42,19 @@ Machine                         | Driver | Remarks
 [Coffeed](/machines/coffed/) | CH34x
 [Coffee Tech](/machines/coffeetech/) | FTDI
 [Dätgen](/machines/datgen/) | CH34x
-[Dongyi](/machines/dongyi/) | CP210x | FTDI on some older machines
+[Dongyi](/machines/dongyi/) | CP210x | FTDI on some older machines
 [Easyster](/machines/easyster/) | FTDI
 [Garanti](/machines/garanti/) | CP210x
 [Golden Roasters](/machines/goldenroasters/) | CH34x
-[HARTANZAH](/machines/hartanzah/) | FTDI
-[Has Garanti](/machines/hasgaranti/) | FTDI
+[HARTANZAH](/machines/hartanzah/) | FTDI
+[Has Garanti](/machines/hasgaranti/) | FTDI
 [HB](/machines/hb/) | CP210x
 [KapoK](/machines/kapok/) | CH34x
 [NOR](/machines/nor/) | FTDI | CH34x (on N Series V.4 old machines)
 [Nordic](/machines/nordic/) | PL2303
 [Phoenix](/machines/phoenix/) | CH34x
 [Proaster](/machines/proaster/) | FTDI
-[Roastmax](/machines/roastmax/) | FTDI
+[Roastmax](/machines/roastmax/) | FTDI
 [Rolltech](/machines/rolltech/) | CH34x
 [Santoker](/machines/santoker/) | CP210x
 [Sedona](/machines/sedona/) | CP210x
