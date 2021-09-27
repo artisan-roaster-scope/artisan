@@ -39,7 +39,7 @@ Data request messages have the following general form:
 
 All node tags can be configured in the WebSocket tab.
 
-The message id, the number `nnn`, is automatically generated. The corresponding response is expected to hold the same message id at its <Message ID> node. Multiple machines can be differentiated via the `<Machine ID>` node with the value taken from the `ID` setting.
+The message id, the number `nnn`, is automatically generated. The corresponding response is expected to hold the same message id at its `<Message ID>` node. Multiple machines can be differentiated via the `<Machine ID>` node with the value taken from the `ID` setting.
 
 If the `Data Request` field is non-empty, a corresponding request for data of the above form is send each sampling interval. This request is expected to be responded by a message holding data for all WebSocket inputs.
 
