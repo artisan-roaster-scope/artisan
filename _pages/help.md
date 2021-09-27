@@ -36,6 +36,8 @@ If you need support please check the [documentation](#documentation) or ask the 
    - [Homeroasters.org](https://homeroasters.org/){:target="_blank"}
    - [Kaffee Netz](https://www.kaffee-netz.de/forums/){:target="_blank"} (in German)
    - ...
+- [Tutorial videos](https://artisan-scope.org/docs/videos/)
+- [Tutorial documents](https://artisan-scope.org/docs/documents/)
 
 <br>
 
