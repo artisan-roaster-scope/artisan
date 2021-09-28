@@ -19949,42 +19949,38 @@ class ApplicationWindow(QMainWindow):
             r = (numpy.digitize([v],ls)[0]+aw.eventslidermin[i] - 1) / 10.
         return max(aw.eventslidermin[i]/10., min(aw.eventslidermax[i] / 10.,r))
 
-    def curveSimilarity2(self, exp=-1,analysis_starttime=0,analysis_endtime=0): # pylint: disable=no-self-use
+    def curveSimilarity2(self,exp=-1,analysis_starttime=0,analysis_endtime=0): # pylint: disable=no-self-use
         result = {}
         try:
             analysis_start = aw.qmc.time2index(analysis_starttime)
-            analysis_end = aw.qmc.time2index(analysis_endtime)
-            analysis_BT = aw.qmc.stemp2[analysis_start:analysis_end]
-            analysis_DeltaBT = aw.qmc.delta2[analysis_start:analysis_end]
-            if exp == 4:
+            analysis_end = aw.qmc.time2index(analysis_endtime) +1 # +1 was added 9/25
+            np_bt = numpy.array(aw.qmc.stemp2[analysis_start:analysis_end])
+            np_dbt = numpy.array(aw.qmc.delta2[analysis_start:analysis_end])
+            #compare to background curve?
+            if exp == 4:  
                 # create background BT and background delta BT arrays over the interval of interest
-                xarray = numpy.array(aw.qmc.timex[aw.time2index(analysis_starttime):aw.time2index(analysis_endtime)])
+                xarray = numpy.array(aw.qmc.timex[analysis_start:analysis_end])
                 # replace None entries with 0 in the background delta list
-                _delta2B = [0 if i is None else i for i in aw.qmc.delta2B]
-                analysis_DeltaBTB = numpy.array([self.qmc.timetemparray2temp(aw.qmc.timeB,_delta2B,x) for x in xarray])
-                analysis_BTB = numpy.array([self.qmc.timetemparray2temp(aw.qmc.timeB,aw.qmc.temp2B,x) for x in xarray])
+                _delta2B = [0 if x is None else x for x in aw.qmc.delta2B]
+                np_dbtb = numpy.array([self.qmc.timetemparray2temp(aw.qmc.timeB,_delta2B,x) for x in xarray])
+                np_btb = numpy.array([self.qmc.timetemparray2temp(aw.qmc.timeB,aw.qmc.temp2B,x) for x in xarray])
             else:
-                analysis_BTB = aw.qmc.stemp2B[analysis_start:analysis_end]
-                analysis_DeltaBTB = aw.qmc.delta2B[analysis_start:analysis_end]
+                np_btb = numpy.array(aw.qmc.stemp2B[analysis_start:analysis_end])
+                np_dbtb = numpy.array(aw.qmc.delta2B[analysis_start:analysis_end])
 
             # Replace None values in the Delta curves with the closest numeric value on the right
-            for i in range(len(analysis_DeltaBT) - 1, -1, -1):
-                if analysis_DeltaBT[i] is None:
+            for i in range(len(np_dbt) - 1, -1, -1):
+                if np_dbt[i] is None:
                     try:
-                        analysis_DeltaBT[i] = analysis_DeltaBT[i+1]
+                        np_dbt[i] = analysis_DeltaBT[i+1]
                     except Exception: # pylint: disable=broad-except
-                        analysis_DeltaBT[i] = 0
-            for i in range(len(analysis_DeltaBTB) - 1, -1, -1):
-                if analysis_DeltaBTB[i] is None:
+                        np_dbt[i] = 0
+            for i in range(len(np_dbtb) - 1, -1, -1):
+                if np_dbtb[i] is None:
                     try:
-                        analysis_DeltaBTB[i] = analysis_DeltaBTB[i+1]
+                        np_dbtb[i] = np_dbtb[i+1]
                     except Exception: # pylint: disable=broad-except
-                        analysis_DeltaBTB[i] = 0
-
-            np_bt = numpy.array(analysis_BT)
-            np_btb = numpy.array(analysis_BTB)
-            np_dbt = numpy.array(analysis_DeltaBT)
-            np_dbtb = numpy.array(analysis_DeltaBTB)
+                        np_dbtb[i] = 0
 
             #MSE
             mse_BT = numpy.mean(numpy.square(np_bt - np_btb))
@@ -20010,15 +20006,16 @@ class ApplicationWindow(QMainWindow):
                 # RoR at time of FCs, and Actual RoR versus Template RoR at FCs
                 RoR_FCs_act = aw.qmc.delta2[aw.qmc.timeindex[2]]
                 try:
-                    fcs_idx = numpy.where(np_dbt==aw.qmc.delta2[aw.qmc.timeindex[2]])
-                    RoR_FCs_templ = np_dbtb[fcs_idx[0][0]].item()  #it is possible for fcs_idx[0] to be a tuple so we take the first element
-                    RoR_FCs_delta = RoR_FCs_act - RoR_FCs_templ
-                    if (fcs_idx[0][-1] - fcs_idx[0][0]) != (len(fcs_idx[0]) - 1) or len(fcs_idx[0]) > 3:  #if there are multiple and discontiguous elements in fcs_idx
-                        #we don't have an accurate value
-                        #print(fcs_idx[0])
-                        RoR_FCs_delta = float('nan')
+                    #dave Need to clean up.  Better way to get the index value??  Maybe aw.qmc.timeindex[2]-analysis_start ??
+                    fcs_idx = aw.qmc.timeindex[2]-analysis_start                    
+                    RoR_FCs_delta = RoR_FCs_act - np_dbtb[fcs_idx]
+
+                    fcs_idx_oldway = numpy.asarray(np_dbt==aw.qmc.delta2[aw.qmc.timeindex[2]]).nonzero()
+                    if fcs_idx != fcs_idx_oldway[0][0]:
+                        _log.info("Mismatch with fcs_idx methods.  fcs_idx:{} fcs_idx_oldway:{}".format(fcs_idx, fcs_idx_oldway[0][0]))
                 except Exception: # pylint: disable=broad-except
                     RoR_FCs_delta = float('nan')
+                    _log.exception
 
                 #max and min difference between actual RoR and template RoR
                 maxdelta = numpy.max(np_dbt - np_dbtb)
@@ -20026,35 +20023,41 @@ class ApplicationWindow(QMainWindow):
 
                 # calculate the rise, crash and flick
                 #create array of differences between actual curve and the fit curve
-                deltas_all = numpy.array(np_dbt - np_dbtb)
+                deltas_all = numpy.array(np_dbt - np_dbtb, dtype=float)
                 #array indicating actual curve is greater than fit curve (+1) or is less than (-1)
-                signs_all = numpy.sign(deltas_all)
-                #array with start index of each interal between crossings
-                starts = numpy.r_[0, numpy.flatnonzero(~numpy.isclose(signs_all[1:], signs_all[:-1])) + 1]
-                #array with the length of each interal between crossings
-                lengths = numpy.diff(numpy.r_[starts, len(signs_all)])
-                #array indicating segment has actual greater than fit (+1) or actual less than fit (-1)
-                signs = signs_all[starts]
-                #array of max difference for each segment
-                maxdeltas = []
-                for i in range(len(starts)):
-                    maxdeltas.append(numpy.amax(numpy.absolute(deltas_all[starts[i]:starts[i]+lengths[i]])) * signs[i])
-                #array of lengths in seconds
-                seconds = lengths * self.qmc.profile_sampling_interval
+                signs_all = numpy.sign(deltas_all,dtype=float)
+                #array with start index of each interal between crossings plus the last interval's end sample
+                starts = numpy.r_[0, numpy.flatnonzero(~numpy.isclose(signs_all[1:], signs_all[:-1])) + 1.].astype(int)
 
                 # array of all the time index values
                 timeindexs_all = numpy.arange(analysis_start, analysis_end, 1)
                 # time indexes of the segements
                 timeindexs = timeindexs_all[starts]
+                
+                # array with all time values
+                times_all = numpy.array(aw.qmc.timex[analysis_start:analysis_end])
+                # array with start times
+                times = times_all[starts]
+                # add the ending (DROP) time to use when creating deltatimes
+                times = numpy.append(times,times_all[-1])
+                # array containing the delta times from segment start to end 
+                deltatimes = numpy.diff(times)
 
+                #array indicating segment has actual greater than fit (+1) or actual less than fit (-1)
+                signs = signs_all[starts]
+                #array of max difference for each segment
+                maxdeltas = []
+                for i in range(len(starts)-1):
+                    maxdeltas.append(numpy.amax(numpy.absolute(deltas_all[starts[i]:starts[i+1]])) * signs[i])
+                               
                 # thresholds
                 segtimethreshold = aw.qmc.segmentsamplesthreshold * self.qmc.profile_sampling_interval
                 segdeltathreshold = aw.qmc.segmentdeltathreshold
                 reductions = numpy.zeros_like(signs)
 
                 # mark segments that are insignificant and should be combined to the left
-                for i in range(len(starts)):
-                    if seconds[i] <= segtimethreshold or abs(maxdeltas[i]) <= segdeltathreshold:
+                for i in range(len(starts)-1):
+                    if deltatimes[i] <= segtimethreshold or abs(maxdeltas[i]) <= segdeltathreshold:
                         reductions[i] = 1
 
                 # extend the reduction to include the sample on the right when its sign matches the sign of the first segment in the reduction
@@ -20062,7 +20065,7 @@ class ApplicationWindow(QMainWindow):
                 prevreduction = 0
                 addtoprev = numpy.copy(reductions)   #can replace 'addtoprev[]' with change -in-place 'reductions[]' once debugged
                 addtoprev[0] = 0      #the first entry is never combined to the left.
-                for i in range(1,len(starts)):
+                for i in range(1,len(starts)-1):
                     # reductions = 1
                     if reductions[i] == 1:
                         prevreduction = 1
@@ -20076,59 +20079,55 @@ class ApplicationWindow(QMainWindow):
 
                 # generate the per segement arrays
                 _starts = numpy.zeros_like(starts)
-                _lengths = numpy.zeros_like(starts)
-                _seconds = numpy.zeros_like(starts)
-                addtoprev[0] = 0
+                _deltatimes = numpy.zeros_like(starts,dtype=float)
+                _starts[-1] = starts[-1]  #set the last value which is not really a start
                 lasti = 0
-                for i in range(0,len(starts)):
-                    if addtoprev[i] == 1 and i+1 < len(starts):
-                        _lengths[lasti] += lengths[i]
-                        _seconds[lasti] += seconds[i]
+                for i in range(0,len(starts)-1):
+                    if addtoprev[i] == 1 and i+1 < len(starts)-1:
+                        _deltatimes[lasti] += deltatimes[i]
                     elif addtoprev[i] == 1 :
-                        _lengths[lasti] += numpy.sum(lengths[i:])
-                        _seconds[lasti] += numpy.sum(seconds[i:])
+                        _deltatimes[lasti] += numpy.sum(deltatimes[i:])
                     else:
-                        _lengths[i] = lengths[i]
-                        _seconds[i] = seconds[i]
                         _starts[i] = starts[i]
+                        _deltatimes[i] = deltatimes[i]
                         lasti = i
                 mask = numpy.r_[0, numpy.flatnonzero(_starts)]
                 starts_seg = _starts[mask]
-                lengths_seg = _lengths[mask]
                 signs_seg = signs[mask]
-                seconds_seg = _seconds[mask]
+                deltatimes_seg = _deltatimes[mask]
                 timeindexs_seg = timeindexs[mask]
                 maxdeltas_seg = []
-                for i in range(len(mask)):
+                for i in range(len(mask)-1):
                     if i < len(mask) -1:
                         maxdeltas_seg.append(numpy.amax(numpy.absolute(maxdeltas[mask[i]:mask[i+1]])) * signs_seg[i])
                     else:
-                        maxdeltas_seg.append(numpy.amax(numpy.absolute(maxdeltas[mask[i]:])) * signs_seg[i])
+                        maxdeltas_seg.append(numpy.amax(numpy.absolute(maxdeltas[mask[i]:mask[-2]])) * signs_seg[i])
 
                 # Per segment metrics
-                segment_rmse_deltas = [] #segement root mean square error (difference)
-                segment_mse_deltas = []  #segement mean square error (difference)
-                segment_abc_deltas = []  #segemnt area between the curves
-                for i in range(len(starts_seg)):
-                    segment_deltas = deltas_all[starts_seg[i]:starts_seg[i]+lengths_seg[i]+1]
+                segment_rmse_deltas = [] #segment root mean square error (difference)
+                segment_mse_deltas = []  #segment mean square error (difference)
+                segment_abc_deltas = []  #segmnt area between the curves
+                segment_abc_deltas1 = []  #segment area between the curves
+                for i in range(len(starts_seg)-1):
+                    segment_deltas = deltas_all[starts_seg[i]:starts_seg[i+1]]
                     segment_abs_deltas = numpy.absolute(segment_deltas)
                     segment_rmse_deltas.append(numpy.sqrt(numpy.mean(numpy.square(segment_deltas))))
                     segment_mse_deltas.append(numpy.mean(numpy.square(segment_deltas)))
-                    segment_abc_deltas.append(numpy.sum((segment_abs_deltas[1:] + segment_abs_deltas[:-1]) * self.qmc.profile_sampling_interval /2))  #trapazoidal area height*(base1+base2)/2
-                    #segment_abc_deltas.append(numpy.trapz(segment_abs_deltas, dx=self.qmc.profile_sampling_interval))  #alternate method
+                    segment_times = times_all[starts_seg[i]:starts_seg[i+1]]
+                    segment_abc_deltas.append(numpy.trapz(segment_abs_deltas, x=segment_times))  #alternate method
 
                 # interval of interest metrics
                 ioi_start = self.eventtime2string(aw.qmc.timex[timeindexs_seg[0]] - aw.qmc.timex[aw.qmc.timeindex[0]])
-                ioi_seconds = (analysis_end - analysis_start) * self.qmc.profile_sampling_interval
+                ioi_seconds = analysis_endtime - analysis_starttime
                 ioi_duration = self.eventtime2string(ioi_seconds)
                 ioi_abs_deltas = numpy.absolute(deltas_all)
-                ioi_maxdelta = deltas_all[numpy.where(ioi_abs_deltas == numpy.amax(ioi_abs_deltas))[0][0]]
-#                ioi_mse_deltas = numpy.mean(numpy.square(deltas_all))
-                ioi_abc_deltas = numpy.sum((ioi_abs_deltas[1:] + ioi_abs_deltas[:-1]) * self.qmc.profile_sampling_interval /2)  #trapazoidal area height*(base1+base2)/2
+                #ioi_maxdelta = deltas_all[numpy.where(ioi_abs_deltas == numpy.amax(ioi_abs_deltas))[0][0]]
+                ioi_maxdelta = deltas_all[numpy.asarray(ioi_abs_deltas == numpy.amax(ioi_abs_deltas)).nonzero()[0][0]]
+                ioi_abc_deltas = numpy.sum(numpy.trapz(ioi_abs_deltas, x=times_all))
                 ioi_abcprime = ioi_abc_deltas / ioi_seconds
 
                 # general information
-                fitRoR = 60*(analysis_DeltaBTB[-1] - analysis_DeltaBTB[0]) / (aw.qmc.timex[timeindexs_all[-1]] - aw.qmc.timex[timeindexs_all[0]])
+                fitRoR = 60*(np_dbtb[-1] - np_dbtb[0]) / (aw.qmc.timex[timeindexs_all[-1]] - aw.qmc.timex[timeindexs_all[0]])
                 fitTypes = [QApplication.translate("Label","ln()",None),
                             "",
                             QApplication.translate("Label","x",None) + "\u00b2",
@@ -20148,18 +20147,14 @@ class ApplicationWindow(QMainWindow):
                                    QApplication.translate("Label","Swing",None),
                                    QApplication.translate("Label","ABC/secs",None)  ]
                 tbl.float_format = "5.2"
-                for i in range(len(mask)):
+                for i in range(len(mask)-1):
                     thistime = self.eventtime2string(aw.qmc.timex[timeindexs_seg[i]] - aw.qmc.timex[aw.qmc.timeindex[0]])
-                    duration = self.eventtime2string(seconds_seg[i])
+                    duration = self.eventtime2string(deltatimes_seg[i])
                     if i > 0:
                         swing = maxdeltas_seg[i] - maxdeltas_seg[i-1]
                     else:
                         swing = ""
-#                    if signs_seg[i] == 1:
-#                        abovebelow = QApplication.translate("Label","Above",None)
-#                    else:
-#                        abovebelow = QApplication.translate("Label","Below",None)
-                    abcprime = segment_abc_deltas[i] / seconds_seg[i]
+                    abcprime = segment_abc_deltas[i] / deltatimes_seg[i]
                     tbl.add_row([thistime, duration, maxdeltas_seg[i], swing, abcprime ])
                 if len(mask) > 1:
                     tbl.add_row(['~~~~~','~~~~~','~~~~~','~~~~~','~~~~~'])
@@ -20181,14 +20176,14 @@ class ApplicationWindow(QMainWindow):
                 tbl2.add_row([QApplication.translate("Label","Fit RoRoR (C/min/min)",None), fitRoR, QApplication.translate("Label","Actual RoR at FCs",None), RoR_FCs_act])
                 segmentresultstr += "{}{}".format("\n", tbl2.get_string(border=False,header=False))
 
-                # this table is here just to help with validation
-                if aw.superusermode and False:  #disabled # pylint: disable=condition-evals-to-constant
+                # this table is here to help with validation
+                if False:  #disabled # pylint: disable=condition-evals-to-constant
                     tbl3 = prettytable.PrettyTable()
-                    tbl3.field_names = ["Start","Duration","Length", "Max Delta","Sign","Reduction","TimeIndex"  ]
+                    tbl3.field_names = ["Start","Duration","Max Delta","Sign","Reduction","TimeIndex"  ]
                     tbl3.float_format = "5.2"
                     for i in range(len(maxdeltas)):
-                        thistime = self.eventtime2string(aw.qmc.timex[timeindexs[i]-aw.qmc.timeindex[0]])
-                        tbl3.add_row([thistime,seconds[i],lengths[i],maxdeltas[i],signs[i],reductions[i],timeindexs[i]])
+                        thistime = self.eventtime2string(aw.qmc.timex[timeindexs[i]]-aw.qmc.timex[aw.qmc.timeindex[0]])
+                        tbl3.add_row([thistime,deltatimes[i],maxdeltas[i],signs[i],reductions[i],timeindexs[i]])
                     segmentresultstr += "{}{}".format("\n", tbl3.get_string(border=False))
 
                 result['segmentresultstr'] = segmentresultstr
@@ -20216,6 +20211,7 @@ class ApplicationWindow(QMainWindow):
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " curveSimilatrity2(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+
         return result
 
     # computes the similarity between BT and backgroundBT as well as ET and backgroundET
