@@ -1279,12 +1279,12 @@ class PIDcontrol():
             if (self.aw.pidcontrol.externalPIDControl() == 1 and self.aw.modbus.PID_ON_action and self.aw.modbus.PID_ON_action != ""):
                 self.aw.eventaction(4,self.aw.modbus.PID_ON_action)
                 self.pidActive = True
-                self.aw.button_10.setStyleSheet(self.aw.pushbuttonstyles["PIDactive"])
+                self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles["PIDactive"])
             # S7 hardware PID
             elif (self.aw.pidcontrol.externalPIDControl() == 2 and self.aw.s7.PID_ON_action and self.aw.s7.PID_ON_action != ""):
                 self.aw.eventaction(15,self.aw.s7.PID_ON_action)
                 self.pidActive = True
-                self.aw.button_10.setStyleSheet(self.aw.pushbuttonstyles["PIDactive"]) 
+                self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles["PIDactive"]) 
             elif self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
                 if self.aw.ser.ArduinoIsInitialized:
                     self.confPID(self.pidKp,self.pidKi,self.pidKd,self.pidSource,self.pidCycle,self.aw.pidcontrol.pOnE) # first configure PID according to the actual settings
@@ -1297,7 +1297,7 @@ class PIDcontrol():
                             self.aw.ser.SP.write(str2cmd("PID;LIMIT;" + str(duty_min) + ";" + str(duty_max) + "\n"))
                             self.aw.ser.SP.write(str2cmd("PID;ON\n"))
                             self.pidActive = True
-                            self.aw.button_10.setStyleSheet(self.aw.pushbuttonstyles["PIDactive"])
+                            self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles["PIDactive"])
                             self.aw.sendmessage(QApplication.translate("Message","PID turned on", None))
                     finally:
                         if self.aw.ser.COMsemaphore.available() < 1:
@@ -1315,7 +1315,7 @@ class PIDcontrol():
 #                    self.aw.pidcontrol.setSV(self.aw.pidcontrol.svValue)
                 self.pidActive = True
                 self.aw.qmc.pid.on()
-                self.aw.button_10.setStyleSheet(self.aw.pushbuttonstyles["PIDactive"])
+                self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles["PIDactive"])
             if self.sv is None:
                 self.setSV(self.svValue)
 
@@ -1329,13 +1329,13 @@ class PIDcontrol():
         if (self.aw.pidcontrol.externalPIDControl() == 1 and self.aw.modbus.PID_OFF_action and self.aw.modbus.PID_OFF_action != ""):
             self.aw.eventaction(4,self.aw.modbus.PID_OFF_action)
             if not self.aw.HottopControlActive:
-                self.aw.button_10.setStyleSheet(self.aw.pushbuttonstyles["PID"])
+                self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles["PID"])
             self.pidActive = False  
         # S7 hardware PID
         elif (self.aw.pidcontrol.externalPIDControl() == 2 and self.aw.s7.PID_OFF_action and self.aw.s7.PID_OFF_action != ""):
             self.aw.eventaction(15,self.aw.s7.PID_OFF_action)
             if not self.aw.HottopControlActive:
-                self.aw.button_10.setStyleSheet(self.aw.pushbuttonstyles["PID"])
+                self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles["PID"])
             self.pidActive = False   
         # TC4 hardware PID
         elif self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag and self.aw.qmc.Controlbuttonflag: # ArduinoTC4 firmware PID
@@ -1352,7 +1352,7 @@ class PIDcontrol():
                     if self.aw.ser.COMsemaphore.available() < 1:
                         self.aw.ser.COMsemaphore.release(1)
                 if not self.aw.HottopControlActive:
-                    self.aw.button_10.setStyleSheet(self.aw.pushbuttonstyles["PID"])
+                    self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles["PID"])
                 self.pidActive = False
         # software PID
         elif self.aw.qmc.Controlbuttonflag:
@@ -1360,7 +1360,7 @@ class PIDcontrol():
             self.pidActive = False
             self.aw.qmc.pid.off()
             if not self.aw.HottopControlActive:
-                self.aw.button_10.setStyleSheet(self.aw.pushbuttonstyles["PID"])
+                self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles["PID"])
 
     @pyqtSlot(int)
     def sliderMinValueChanged(self,i):
@@ -1597,19 +1597,19 @@ class PIDcontrol():
     def activateONOFFeasySV(self,flag):
         if flag:
             if self.aw.qmc.flagon:
-                self.aw.button_12.setVisible(True)
-                self.aw.button_13.setVisible(True)
-                self.aw.button_14.setVisible(True)
-                self.aw.button_15.setVisible(True)
-                self.aw.button_16.setVisible(True)
-                self.aw.button_17.setVisible(True)
+                self.aw.buttonSVp5.setVisible(True)
+                self.aw.buttonSVp10.setVisible(True)
+                self.aw.buttonSVp20.setVisible(True)
+                self.aw.buttonSVm20.setVisible(True)
+                self.aw.buttonSVm10.setVisible(True)
+                self.aw.buttonSVm5.setVisible(True)
         else:
-            self.aw.button_12.setVisible(False)
-            self.aw.button_13.setVisible(False)
-            self.aw.button_14.setVisible(False)
-            self.aw.button_15.setVisible(False)
-            self.aw.button_16.setVisible(False)
-            self.aw.button_17.setVisible(False)
+            self.aw.buttonSVp5.setVisible(False)
+            self.aw.buttonSVp10.setVisible(False)
+            self.aw.buttonSVp20.setVisible(False)
+            self.aw.buttonSVm20.setVisible(False)
+            self.aw.buttonSVm10.setVisible(False)
+            self.aw.buttonSVm5.setVisible(False)
 
     # just store the p-i-d configuration
     def setPID(self,kp,ki,kd,source=None,cycle=None,pOnE=True):

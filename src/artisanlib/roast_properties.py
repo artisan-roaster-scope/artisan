@@ -1474,7 +1474,13 @@ class editGraphDlg(ArtisanResizeablDialog):
                         acaia.sendHeartbeat,
                         acaia.sendStop,
                         acaia.reset,
-                        [acaia.DEVICE_NAME_LUNAR, acaia.DEVICE_NAME_PEARL, acaia.DEVICE_NAME_PEARL2021])                          
+                        [
+                            acaia.DEVICE_NAME_LUNAR, 
+                            acaia.DEVICE_NAME_PEARL, 
+                            acaia.DEVICE_NAME_PEARL2021, 
+                            acaia.DEVICE_NAME_PEARLS, 
+                            acaia.DEVICE_NAME_OTHERS
+                        ])                          
                     # start BLE loop
                     self.ble.deviceDisconnected.connect(self.ble_scan_failed)
                     self.ble.weightChanged.connect(self.ble_weight_changed)

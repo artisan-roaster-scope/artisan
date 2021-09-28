@@ -1961,7 +1961,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             
             message = QApplication.translate("Message","Device not set", None)
             # by default switch PID buttons/LCDs off
-            self.aw.button_10.setVisible(False)
+            self.aw.buttonCONTROL.setVisible(False)
             self.aw.LCD6frame.setVisible(False)
             self.aw.LCD7frame.setVisible(False)
             self.aw.qmc.resetlinecountcaches()
@@ -2213,7 +2213,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         st += ". Sampling rate changed to 1 second"
                     # ensure that events button is shown
                     self.aw.eventsbuttonflag = 1
-                    self.aw.button_11.setVisible(True)
+                    self.aw.buttonEVENT.setVisible(True)
                     message = QApplication.translate("Message","Device set to {0}{1}", None).format(meter,st)
                 ##########################
                 ####  DEVICE 19 is the Arduino/TC4
@@ -2851,12 +2851,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     else:
                         self.aw.extratimeout.append(dsettings[4])
             if self.nonpidButton.isChecked():
-                self.aw.button_12.setVisible(False)
-                self.aw.button_13.setVisible(False)
-                self.aw.button_14.setVisible(False)
-                self.aw.button_15.setVisible(False)
-                self.aw.button_16.setVisible(False)
-                self.aw.button_17.setVisible(False)
+                self.aw.buttonSVp5.setVisible(False)
+                self.aw.buttonSVp10.setVisible(False)
+                self.aw.buttonSVp20.setVisible(False)
+                self.aw.buttonSVm20.setVisible(False)
+                self.aw.buttonSVm10.setVisible(False)
+                self.aw.buttonSVm5.setVisible(False)
                 self.aw.LCD6frame.setVisible(False)
                 self.aw.LCD7frame.setVisible(False)
             self.aw.qmc.ETfunction = str(self.ETfunctionedit.text())

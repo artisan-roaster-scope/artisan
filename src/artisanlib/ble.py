@@ -296,7 +296,7 @@ class BleInterface(QtCore.QObject):
 #        _log.debug("addDevice()")
         if self.m_device is None and device.coreConfigurations() & QtBluetooth.QBluetoothDeviceInfo.LowEnergyCoreConfiguration:
 #            _log.debug("discovered LE Device name: %s,  address: %s", device.name(), device.address().toString())
-            m_device = QtBluetooth.QBluetoothDeviceInfo(device)
+            m_device = QtBluetooth.QBluetoothDeviceInfo(device)            
             if self.device_names is None:
                 _log.debug("check device for matching services")
                 for (uuid_service, _) in self.UUID_SERVICE_CHAR_TUPLES:
@@ -353,7 +353,9 @@ def main():
         [
             acaia.DEVICE_NAME_LUNAR, 
             acaia.DEVICE_NAME_PEARL, 
-            acaia.DEVICE_NAME_PEARL2021
+            acaia.DEVICE_NAME_PEARL2021,
+            acaia.DEVICE_NAME_PEARLS,
+            acaia.DEVICE_NAME_OTHERS
         ])
     ble.scanDevices()
     sys.exit(app.exec())

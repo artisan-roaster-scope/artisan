@@ -2641,10 +2641,10 @@ class EventsDlg(ArtisanResizeablDialog):
     @pyqtSlot(int)
     def eventsbuttonflagChanged(self,_):
         if self.eventsbuttonflag.isChecked():
-            self.aw.button_11.setVisible(True)
+            self.aw.buttonEVENT.setVisible(True)
             self.aw.eventsbuttonflag = 1
         else:
-            self.aw.button_11.setVisible(False)
+            self.aw.buttonEVENT.setVisible(False)
             self.aw.eventsbuttonflag = 0
 
     @pyqtSlot(int)
@@ -2958,21 +2958,21 @@ class EventsDlg(ArtisanResizeablDialog):
             self.aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())]
             #save default buttons
             self.aw.qmc.buttonvisibility[0] = self.CHARGEbutton.isChecked()
-            self.aw.button_8.setVisible(bool(self.aw.qmc.buttonvisibility[0]))
+            self.aw.buttonCHARGE.setVisible(bool(self.aw.qmc.buttonvisibility[0]))
             self.aw.qmc.buttonvisibility[1] = self.DRYbutton.isChecked()
-            self.aw.button_19.setVisible(bool(self.aw.qmc.buttonvisibility[1]))
+            self.aw.buttonDRY.setVisible(bool(self.aw.qmc.buttonvisibility[1]))
             self.aw.qmc.buttonvisibility[2] = self.FCSbutton.isChecked()
-            self.aw.button_3.setVisible(bool(self.aw.qmc.buttonvisibility[2]))
+            self.aw.buttonFCs.setVisible(bool(self.aw.qmc.buttonvisibility[2]))
             self.aw.qmc.buttonvisibility[3] = self.FCEbutton.isChecked()
-            self.aw.button_4.setVisible(bool(self.aw.qmc.buttonvisibility[3]))
+            self.aw.buttonFCe.setVisible(bool(self.aw.qmc.buttonvisibility[3]))
             self.aw.qmc.buttonvisibility[4] = self.SCSbutton.isChecked()
-            self.aw.button_5.setVisible(bool(self.aw.qmc.buttonvisibility[4]))
+            self.aw.buttonSCs.setVisible(bool(self.aw.qmc.buttonvisibility[4]))
             self.aw.qmc.buttonvisibility[5] = self.SCEbutton.isChecked()
-            self.aw.button_6.setVisible(bool(self.aw.qmc.buttonvisibility[5]))
+            self.aw.buttonSCe.setVisible(bool(self.aw.qmc.buttonvisibility[5]))
             self.aw.qmc.buttonvisibility[6] = self.DROPbutton.isChecked()
-            self.aw.button_9.setVisible(bool(self.aw.qmc.buttonvisibility[6]))
+            self.aw.buttonDROP.setVisible(bool(self.aw.qmc.buttonvisibility[6]))
             self.aw.qmc.buttonvisibility[7] = self.COOLbutton.isChecked()
-            self.aw.button_20.setVisible(bool(self.aw.qmc.buttonvisibility[7]))
+            self.aw.buttonCOOL.setVisible(bool(self.aw.qmc.buttonvisibility[7]))
             #save sliders   
             self.saveSliderSettings()
             self.saveQuantifierSettings()

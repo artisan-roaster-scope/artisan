@@ -804,10 +804,10 @@ class roastCompareDlg(ArtisanDialog):
         
         self.redraw()
         
-        self.button_7_org_state_hidden = self.aw.button_7.isHidden() # RESET
-        self.button_1_org_state_hidden = self.aw.button_1.isHidden() # ON/OFF
-        self.button_2_org_state_hidden = self.aw.button_2.isHidden() # START/STOP
-        self.button_10_org_state_hidden = self.aw.button_10.isHidden() # CONTROL
+        self.buttonRESET_org_state_hidden = self.aw.buttonRESET.isHidden() # RESET
+        self.buttonONOFF_org_state_hidden = self.aw.buttonONOFF.isHidden() # ON/OFF
+        self.buttonSTARTSTOP_org_state_hidden = self.aw.buttonSTARTSTOP.isHidden() # START/STOP
+        self.buttonCONTROL_org_state_hidden = self.aw.buttonCONTROL.isHidden() # CONTROL
         
         self.disableButtons()
         self.aw.disableEditMenus(compare=True)
@@ -840,20 +840,20 @@ class roastCompareDlg(ArtisanDialog):
                 self.addProfiles(res)
     
     def enableButtons(self):
-        if not self.button_7_org_state_hidden:
-            self.aw.button_7.show() # RESET
-        if not self.button_1_org_state_hidden:
-            self.aw.button_1.show() # ON/OFF
-        if not self.button_2_org_state_hidden:
-            self.aw.button_2.show() # START/STOP
-        if not self.button_10_org_state_hidden:
-            self.aw.button_10.show() # CONTROL
+        if not self.buttonRESET_org_state_hidden:
+            self.aw.buttonRESET.show() # RESET
+        if not self.buttonONOFF_org_state_hidden:
+            self.aw.buttonONOFF.show() # ON/OFF
+        if not self.buttonSTARTSTOP_org_state_hidden:
+            self.aw.buttonSTARTSTOP.show() # START/STOP
+        if not self.buttonCONTROL_org_state_hidden:
+            self.aw.buttonCONTROL.show() # CONTROL
         
     def disableButtons(self):
-        self.aw.button_7.hide() # RESET
-        self.aw.button_1.hide() # ON/OFF
-        self.aw.button_2.hide() # START/STOP
-        self.aw.button_10.hide() # CONTROL
+        self.aw.buttonRESET.hide() # RESET
+        self.aw.buttonONOFF.hide() # ON/OFF
+        self.aw.buttonSTARTSTOP.hide() # START/STOP
+        self.aw.buttonCONTROL.hide() # CONTROL
     
     ### DRAWING
     

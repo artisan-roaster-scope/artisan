@@ -16,18 +16,23 @@
 # AUTHOR
 # Marko Luther, 2020
 
-from artisanlib.util import stringtoseconds
+from artisanlib.util import stringtoseconds, createGradient
+from typing import Optional
 
 try:
     #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QFontMetrics # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # @UnusedImport @Reimport  @UnresolvedImport
+        QByteArray, QPropertyAnimation, QEasingCurve) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
+        QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QFontMetrics, QColor, QCursor # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:
     #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QFontMetrics # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # @UnusedImport @Reimport  @UnresolvedImport
+        QByteArray, QPropertyAnimation, QEasingCurve) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
+        QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QFontMetrics, QColor, QCursor # @UnusedImport @Reimport  @UnresolvedImport
 
 class MyQComboBox(QComboBox):
     def __init__(self, *args, **kwargs):
@@ -235,3 +240,136 @@ class ClickableTextEdit(QTextEdit):
     def setNewPlainText(self, text):
         QTextEdit.setPlainText(self, text)
         self._changed = False
+
+
+# Event Buttons
+
+# selector is a stylesheet property selector like "[Selected=true]"
+# state is a stylesheet pseudo state restriction like ":!pressed:hover"
+# color and background are valid color string like "#e687a8", "white" or 
+#   "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #2b88ba, stop: 1 #126ea1)"
+# font_size is an integer interpreted in pt
+def pushButtonColorStyle(
+        class_name: str,
+        selector: str="",
+        state: str="",
+        color:Optional[str]=None,
+        background:Optional[str]=None,
+        font_size:Optional[int]=None):
+    color = ("" if color is None else f"color:{color};")
+    background = ("" if background is None else f"background-color:{background};")
+    font_size = ("" if font_size is None else f"font-size:{font_size}pt;")
+    return f"{class_name}{selector}{state}{{{color}{background}{font_size}}}"
+
+class EventPushButton(QPushButton):
+    def __init__(self, background_color, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.default_background_color = background_color
+        self.default_style = pushButtonColorStyle("*", 
+            selector="[Selected=false]", 
+            state=":!flat:!hover:!pressed", 
+            background=createGradient(background_color))
+        self.setStyleSheet(self.default_style)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.setProperty('Selected', False)
+    
+    def setSelected(self, b):
+        self.setProperty('Selected', b)
+        # Update the style
+        self.setStyle(self.style())
+                
+
+class MajorEventPushButton(EventPushButton):
+    def __init__(self, *args, background_color = '#147bb3', **kwargs):
+        super().__init__(background_color, *args, **kwargs)
+
+        
+class AnimatedMajorEventPushButton(MajorEventPushButton):
+    def __init__(self, *args, background_color = '#147bb3', **kwargs):
+        super().__init__(*args, background_color=background_color, **kwargs)
+        
+        # we make the dark animation color slightly darker than the background:
+        anim_dark_color = QColor(background_color).lighter(80)
+        # and the ligher
+        anim_light_color = QColor(anim_dark_color).lighter(180)
+        # we reduce the staturation slightly:
+        anim_light_color = QColor.fromHsv(
+            anim_light_color.hslHue(),
+            max(0,anim_light_color.saturation()-80),
+            anim_light_color.value(),
+            anim_light_color.alpha())
+        
+        selected_anim_dark_color = QColor("#d4336a").lighter(80)
+        selected_anim_light_color = QColor("#d4336a").lighter(120)
+        # we reduce the staturation slightly:
+        selected_anim_light_color = QColor.fromHsv(
+            selected_anim_light_color.hslHue(),
+            max(0,selected_anim_light_color.saturation()-70),
+            selected_anim_light_color.value(),
+            selected_anim_light_color.alpha())
+
+        byar = QByteArray()
+        byar.append('zcolor')
+        
+        self.animating = False
+
+        self.animation = QPropertyAnimation(self, byar)
+        self.animation.setStartValue(anim_dark_color)
+        self.animation.setKeyValueAt(0.2, anim_dark_color)
+        self.animation.setKeyValueAt(0.55, anim_light_color)
+        self.animation.setKeyValueAt(0.8, anim_dark_color)
+        self.animation.setEndValue(anim_dark_color) 
+        self.animation.setDuration(1200)
+        self.animation.setLoopCount(-1)
+        self.animation.setEasingCurve(QEasingCurve.OutInCubic)
+        
+        self.selected_animation = QPropertyAnimation(self, byar)
+        self.selected_animation.setStartValue(selected_anim_dark_color)
+        self.selected_animation.setKeyValueAt(0.2, selected_anim_dark_color)
+        self.selected_animation.setKeyValueAt(0.55, selected_anim_light_color)
+        self.selected_animation.setKeyValueAt(0.8, selected_anim_dark_color)
+        self.selected_animation.setEndValue(selected_anim_dark_color) 
+        self.selected_animation.setDuration(1200)
+        self.selected_animation.setLoopCount(-1)
+        self.selected_animation.setEasingCurve(QEasingCurve.OutInCubic)
+        
+        self.current_style = None
+    
+    def setSelected(self, b):
+        super().setSelected(b)
+        if self.animating:
+            # we stop the running animation and restart it to adjust to the changed selected state
+            self.stopAnimation()
+            self.startAnimation()
+    
+    def startAnimation(self):
+        self.current_style = self.styleSheet()
+        if self.property('Selected'):
+            self.selected_animation.start()
+        else:
+            self.animation.start()
+        self.animating = True
+    
+    def stopAnimation(self):
+        self.animation.stop()
+        self.selected_animation.stop()
+        self.setStyleSheet(self.current_style)
+        self.animating = False
+
+    # pylint: disable=no-self-use
+    def getBackColor(self):
+        return QColor()
+    
+    def setBackColor(self, color):
+        self.setStyleSheet(f"QPushButton:!flat:!pressed{{background-color:{color.name()};}}")
+        
+    zcolor = pyqtProperty(QColor, getBackColor, setBackColor)
+
+class MinorEventPushButton(EventPushButton):
+    def __init__(self, *args, background_color = '#66b8d7', **kwargs):
+        super().__init__(background_color, *args, **kwargs)
+
+class AuxEventPushButton(EventPushButton):
+    def __init__(self, *args, background_color = '#bdbdbd', **kwargs):
+        super().__init__(background_color, *args, **kwargs)

@@ -185,7 +185,7 @@ class wsport():
         if self.aw.seriallogflag:
             self.aw.addserial("wsport onError(): {}".format(err))
 
-    def onClose(self, _):
+    def onClose(self, *_):
         self.aw.sendmessage(QApplication.translate("Message","WebSocket disconnected", None))
         if self.aw.seriallogflag:
             self.aw.addserial("wsport onClose()")
