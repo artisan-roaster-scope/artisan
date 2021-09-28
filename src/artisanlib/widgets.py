@@ -187,6 +187,7 @@ class ClickableQLabel(QLabel):
             self.right_clicked.emit()
 
 class ClickableQGroupBox(QGroupBox):
+    clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
 
@@ -199,9 +200,15 @@ class ClickableQGroupBox(QGroupBox):
 
 class MyQLCDNumber(QLCDNumber):
     clicked = pyqtSignal()
+    left_clicked = pyqtSignal()
+    right_clicked = pyqtSignal()
 
-    def mousePressEvent(self, _event):
+    def mousePressEvent(self, event):
         self.clicked.emit()
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.left_clicked.emit()
+        elif event.button() == Qt.MouseButton.RightButton:
+            self.right_clicked.emit()
 
 
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost

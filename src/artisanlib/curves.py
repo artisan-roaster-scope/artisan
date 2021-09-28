@@ -2473,8 +2473,6 @@ class CurvesDlg(ArtisanDialog):
         self.aw.qmc.plotcurves[6] = str(self.equedit7.text())
         self.aw.qmc.plotcurves[7] = str(self.equedit8.text())
         self.aw.qmc.plotcurves[8] = str(self.equedit9.text())
-        string = QApplication.translate("Message","[ET target 1 = {0}] [BT target 1 = {1}] [ET target 2 = {2}] [BT target 2 = {3}]", None).format(str(self.aw.qmc.ETtarget),str(self.aw.qmc.BTtarget),str(self.aw.qmc.ET2target),str(self.aw.qmc.BT2target))
-        self.aw.sendmessage(string)
         self.aw.qmc.resetlinecountcaches()
         self.aw.qmc.resetlines()
         self.aw.qmc.redraw(recomputeAllDeltas=True)

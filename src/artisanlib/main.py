@@ -4215,11 +4215,9 @@ class tgraphcanvas(FigureCanvas):
                     if len(sample_timex):
                         if self.LCDdecimalplaces:
                             lcdformat = "%.1f"
-                        else:
-                            lcdformat = "%.0f"
-                        if aw.qmc.LCDdecimalplaces:
                             resLCD = "u.u"
                         else:
+                            lcdformat = "%.0f"
                             resLCD = "uu"
                         etstr = resLCD
                         try: # if sample_temp1 is None, which should never be the case, this fails
@@ -7241,29 +7239,85 @@ class tgraphcanvas(FigureCanvas):
 
     def drawET(self,temp):
         if aw.qmc.ETcurve:
-            self.l_temp1, = self.ax.plot(self.timex,temp,markersize=self.ETmarkersize,marker=self.ETmarker,
-                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-                linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
+            try:
+                if self.l_temp1 is not None:
+                    self.l_temp1.remove()
+            except Exception: # pylint: disable=broad-except
+                pass
+            self.l_temp1, = self.ax.plot(
+                self.timex,
+                temp,
+                markersize=self.ETmarkersize,
+                marker=self.ETmarker,
+                sketch_params=None,
+                path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
+                linewidth=self.ETlinewidth,
+                linestyle=self.ETlinestyle,
+                drawstyle=self.ETdrawstyle,
+                color=self.palette["et"],
+                label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
 
     def drawBT(self,temp):
         if aw.qmc.BTcurve:
-            self.l_temp2, = self.ax.plot(self.timex,temp,markersize=self.BTmarkersize,marker=self.BTmarker,
-                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-                linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
+            try:
+                if self.l_temp2 is not None:
+                    self.l_temp2.remove()
+            except Exception: # pylint: disable=broad-except
+                pass
+            self.l_temp2, = self.ax.plot(
+                self.timex,
+                temp,
+                markersize=self.BTmarkersize,
+                marker=self.BTmarker,
+                sketch_params=None,
+                path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
+                linewidth=self.BTlinewidth,
+                linestyle=self.BTlinestyle,
+                drawstyle=self.BTdrawstyle,
+                color=self.palette["bt"],
+                label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
 
     def drawDeltaET(self,trans,start,end):
         if self.DeltaETflag:
-            self.l_delta1, = self.ax.plot(self.timex[start:end], self.delta1[start:end],transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
-            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-            linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],
-            label=aw.arabicReshape(f'{deltaLabelUTF8}{QApplication.translate("Label", "ET", None)}'))
+            try:
+                if self.l_delta1 is not None:
+                    self.l_delta1.remove()
+            except Exception: # pylint: disable=broad-except
+                pass
+            self.l_delta1, = self.ax.plot(
+                self.timex[start:end],
+                self.delta1[start:end],
+                transform=trans,
+                markersize=self.ETdeltamarkersize,
+                marker=self.ETdeltamarker,
+                sketch_params=None,
+                path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
+                linewidth=self.ETdeltalinewidth,
+                linestyle=self.ETdeltalinestyle,
+                drawstyle=self.ETdeltadrawstyle,
+                color=self.palette["deltaet"],
+                label=aw.arabicReshape(f'{deltaLabelUTF8}{QApplication.translate("Label", "ET", None)}'))
 
     def drawDeltaBT(self,trans,start,end):
         if self.DeltaBTflag:
-            self.l_delta2, = self.ax.plot(self.timex[start:end], self.delta2[start:end],transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
-            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-            linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],
-            label=aw.arabicReshape(f'{deltaLabelUTF8}{QApplication.translate("Label", "BT", None)}'))
+            try:
+                if self.l_delta2 is not None:
+                    self.l_delta2.remove()
+            except Exception: # pylint: disable=broad-except
+                pass
+            self.l_delta2, = self.ax.plot(
+                self.timex[start:end],
+                self.delta2[start:end],
+                transform=trans,
+                markersize=self.BTdeltamarkersize,
+                marker=self.BTdeltamarker,
+                sketch_params=None,
+                path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
+                linewidth=self.BTdeltalinewidth,
+                linestyle=self.BTdeltalinestyle,
+                drawstyle=self.BTdeltadrawstyle,
+                color=self.palette["deltabt"],
+                label=aw.arabicReshape(f'{deltaLabelUTF8}{QApplication.translate("Label", "BT", None)}'))
 
     # if profileDataSemaphore lock cannot be fetched the redraw is not performed
     def lazyredraw(self, recomputeAllDeltas=True, smooth=True,sampling=False):
@@ -7661,6 +7715,11 @@ class tgraphcanvas(FigureCanvas):
                                     stemp3B = self.stemp2BX[n3]
                             if not self.backgroundShowFullflag:
                                 stemp3B = [None]*bcharge_idx + stemp3B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
+                            try:
+                                if self.l_back3 is not None:
+                                    self.l_back3.remove()
+                            except Exception: # pylint: disable=broad-except
+                                pass
                             self.l_back3, = self.ax.plot(self.extratimexB[n3], stemp3B, markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
                                                         sketch_params=None,path_effects=[],transform=trans,
                                                         linewidth=self.XTbacklinewidth,linestyle=self.XTbacklinestyle,drawstyle=self.XTbackdrawstyle,color=self.backgroundxtcolor,
@@ -7696,6 +7755,11 @@ class tgraphcanvas(FigureCanvas):
                                     stemp4B = self.stemp2BX[n4]
                             if not self.backgroundShowFullflag:
                                 stemp4B = [None]*bcharge_idx + stemp4B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
+                            try:
+                                if self.l_back4 is not None:
+                                    self.l_back4.remove()
+                            except Exception: # pylint: disable=broad-except
+                                pass                                
                             self.l_back4, = self.ax.plot(self.extratimexB[n4], stemp4B, markersize=self.YTbackmarkersize,marker=self.YTbackmarker,
                                                         sketch_params=None,path_effects=[],transform=trans,
                                                         linewidth=self.YTbacklinewidth,linestyle=self.YTbacklinestyle,drawstyle=self.YTbackdrawstyle,color=self.backgroundytcolor,
@@ -7711,6 +7775,11 @@ class tgraphcanvas(FigureCanvas):
                             temp_etb = [None]*bcharge_idx + self.stemp1B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
                     else:
                         temp_etb = [None]*len(self.timeB)
+                    try:
+                        if self.l_back1 is not None:
+                            self.l_back1.remove()
+                    except Exception: # pylint: disable=broad-except
+                        pass
                     self.l_back1, = self.ax.plot(self.timeB,temp_etb,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
                                                 sketch_params=None,path_effects=[],
                                                 linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
@@ -7723,6 +7792,11 @@ class tgraphcanvas(FigureCanvas):
                             temp_btb = [None]*bcharge_idx + self.stemp2B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
                     else:
                         temp_btb = [None]*len(self.timeB)
+                    try:
+                        if self.l_back2 is not None:
+                            self.l_back2.remove()
+                    except Exception: # pylint: disable=broad-except
+                        pass
                     self.l_back2, = self.ax.plot(self.timeB, temp_btb,markersize=self.BTbackmarkersize,marker=self.BTbackmarker,
                                                 linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
                                                 sketch_params=None,path_effects=[],
@@ -7759,13 +7833,43 @@ class tgraphcanvas(FigureCanvas):
                         if self.delta_ax:
                             trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
                             if self.DeltaETBflag and len(self.timeB) == len(self.delta1B):
-                                self.l_delta1B, = self.ax.plot(self.timeB, self.delta1B,transform=trans,markersize=self.ETBdeltamarkersize,
-                                sketch_params=None,path_effects=[],
-                                marker=self.ETBdeltamarker,linewidth=self.ETBdeltalinewidth,linestyle=self.ETBdeltalinestyle,drawstyle=self.ETBdeltadrawstyle,color=self.backgrounddeltaetcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaET", None)))
+                                try:
+                                    if self.l_delta1B is not None:
+                                        self.l_delta1B.remove()
+                                except Exception: # pylint: disable=broad-except
+                                    pass
+                                self.l_delta1B, = self.ax.plot(
+                                    self.timeB,
+                                    self.delta1B,
+                                    transform=trans,
+                                    markersize=self.ETBdeltamarkersize,
+                                    sketch_params=None,path_effects=[],
+                                    marker=self.ETBdeltamarker,
+                                    linewidth=self.ETBdeltalinewidth,
+                                    linestyle=self.ETBdeltalinestyle,
+                                    drawstyle=self.ETBdeltadrawstyle,
+                                    color=self.backgrounddeltaetcolor,
+                                    alpha=self.backgroundalpha,
+                                    label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaET", None)))
                             if self.DeltaBTBflag and len(self.timeB) == len(self.delta2B):
-                                self.l_delta2B, = self.ax.plot(self.timeB, self.delta2B,transform=trans,markersize=self.BTBdeltamarkersize,
-                                sketch_params=None,path_effects=[],
-                                marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaBT", None)))
+                                try:
+                                    if self.l_delta2B is not None:
+                                        self.l_delta2B.remove()
+                                except Exception: # pylint: disable=broad-except
+                                    pass
+                                self.l_delta2B, = self.ax.plot(
+                                    self.timeB,
+                                    self.delta2B,
+                                    transform=trans,
+                                    markersize=self.BTBdeltamarkersize,
+                                    sketch_params=None,path_effects=[],
+                                    marker=self.BTBdeltamarker,
+                                    linewidth=self.BTBdeltalinewidth,
+                                    linestyle=self.BTBdeltalinestyle,
+                                    drawstyle=self.BTBdeltadrawstyle,
+                                    color=self.backgrounddeltabtcolor,
+                                    alpha=self.backgroundalpha,
+                                    label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaBT", None)))
                     #check backgroundevents flag
                     if self.backgroundeventsflag:
                         if self.mode == "F":
@@ -8504,6 +8608,11 @@ class tgraphcanvas(FigureCanvas):
                             E1x = [None]
                             E1y = [None]
                             ds = "steps-post"
+                        try:
+                            if self.l_eventtype1dots is not None:
+                                self.l_eventtype1dots.remove()
+                        except Exception: # pylint: disable=broad-except
+                            pass
                         self.l_eventtype1dots, = self.ax.plot(E1x, E1y, color=self.EvalueColor[0],
                                                             marker = (self.EvalueMarker[0] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[0],
@@ -8528,6 +8637,11 @@ class tgraphcanvas(FigureCanvas):
                             E2x = [None]
                             E2y = [None]
                             ds = "steps-post"
+                        try:
+                            if self.l_eventtype2dots is not None:
+                                self.l_eventtype2dots.remove()
+                        except Exception: # pylint: disable=broad-except
+                            pass
                         self.l_eventtype2dots, = self.ax.plot(E2x, E2y, color=self.EvalueColor[1],
                                                             marker = (self.EvalueMarker[1] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[1],
@@ -8554,6 +8668,11 @@ class tgraphcanvas(FigureCanvas):
                             E3x = [None]
                             E3y = [None]
                             ds = "steps-post"
+                        try:
+                            if self.l_eventtype3dots is not None:
+                                self.l_eventtype3dots.remove()
+                        except Exception: # pylint: disable=broad-except
+                            pass
                         self.l_eventtype3dots, = self.ax.plot(E3x, E3y, color=self.EvalueColor[2],
                                                             marker = (self.EvalueMarker[2] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[2],
@@ -8580,6 +8699,11 @@ class tgraphcanvas(FigureCanvas):
                             E4x = [None]
                             E4y = [None]
                             ds = "steps-post"
+                        try:
+                            if self.l_eventtype4dots is not None:
+                                self.l_eventtype4dots.remove()
+                        except Exception: # pylint: disable=broad-except
+                            pass
                         self.l_eventtype4dots, = self.ax.plot(E4x, E4y, color=self.EvalueColor[3],
                                                             marker = (self.EvalueMarker[3] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[3],
@@ -8740,8 +8864,21 @@ class tgraphcanvas(FigureCanvas):
                         self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
                     
                 ##### Extra devices-curves
+                for l in self.extratemp1lines + self.extratemp2lines:
+                    try:
+                        if l is not None:
+                            l.remove()
+                    except Exception: # pylint: disable=broad-except
+                        pass
                 self.extratemp1lines,self.extratemp2lines = [],[]
-                for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                for i in range(min(
+                        len(self.extratimex),
+                        len(self.extratemp1),
+                        len(self.extradevicecolor1),
+                        len(self.extraname1),
+                        len(self.extratemp2),
+                        len(self.extradevicecolor2),
+                        len(self.extraname2))):
                     if self.extratimex[i] is not None and self.extratimex[i] and len(self.extratimex[i])>1:
                         timexi_lin = numpy.linspace(self.extratimex[i][0],self.extratimex[i][-1],len(self.extratimex[i]))
                     else:
@@ -14886,21 +15023,22 @@ def my_fedit(data, title="", comment="", icon=None, parent=None, apply=None):
             try:
                 # Set / Curves
                 for index, curve in enumerate(data):
-                    line = linedict[curvelabels[index]]
-                    (label, linestyle, drawstyle, linewidth, color, marker, markersize,
-                     markerfacecolor, markeredgecolor) = curve
-                    line.set_label(label)
-                    line.set_linestyle(linestyle)
-                    line.set_drawstyle(drawstyle)
-                    line.set_linewidth(linewidth)
-                    rgba = mcolors.to_rgba(color)
-                    line.set_alpha(None)
-                    line.set_color(rgba)
-                    if marker != 'none':
-                        line.set_marker(marker)
-                        line.set_markersize(markersize)
-                        line.set_markerfacecolor(markerfacecolor)
-                        line.set_markeredgecolor(markeredgecolor)
+                    if len(curvelabels) > index:
+                        line = linedict[curvelabels[index]]
+                        (label, linestyle, drawstyle, linewidth, color, marker, markersize,
+                         markerfacecolor, markeredgecolor) = curve
+                        line.set_label(label)
+                        line.set_linestyle(linestyle)
+                        line.set_drawstyle(drawstyle)
+                        line.set_linewidth(linewidth)
+                        rgba = mcolors.to_rgba(color)
+                        line.set_alpha(None)
+                        line.set_color(rgba)
+                        if marker != 'none':
+                            line.set_marker(marker)
+                            line.set_markersize(markersize)
+                            line.set_markerfacecolor(markerfacecolor)
+                            line.set_markeredgecolor(markeredgecolor)
                 # Redraw
                 figure.canvas.draw()
                 if not (axes.get_xlim() == orig_xlim and axes.get_ylim() == orig_ylim):
@@ -16547,10 +16685,10 @@ class ApplicationWindow(QMainWindow):
         #TODO: keep
         button_font_size_small_pt = self.button_font_size_pt - 3
         button_font_size_small_selected_pt = self.button_font_size_pt - 2
-        button_font_size_tiny_pt = self.button_font_size_pt - 4
-        button_font_size_micro_pt = self.button_font_size_pt - 5
+#        button_font_size_tiny_pt = self.button_font_size_pt - 4
+#        button_font_size_micro_pt = self.button_font_size_pt - 5
         if platf == 'Windows':
-            button_font_size_pt = self.button_font_size_pt - 2
+            self.button_font_size_pt = self.button_font_size_pt - 2
 
         # button width in px
         if platf == 'Windows':
@@ -16559,20 +16697,20 @@ class ApplicationWindow(QMainWindow):
             self.small_button_min_width_str = "75px"
             self.tiny_button_min_width_str = "60px"
             # TODO: keep
-            main_button_min_width_px: Final = 110
+#            self.main_button_min_width_px: Final = 110
             self.standard_button_min_width_px: Final = 90
-            small_button_min_width_px: Final = 75
-            tiny_button_min_width_px: Final = 60
+#            self.small_button_min_width_px: Final = 75
+            #self.tiny_button_min_width_px: Final = 60
         else:
             # TODO: remove
             self.main_button_min_width_str = "100px"
             self.small_button_min_width_str = "60px"
             self.tiny_button_min_width_str = "50px"
             # TODO: keep
-            main_button_min_width_px = 100
+#            self.main_button_min_width_px = 100
             self.standard_button_min_width_px = 75
-            small_button_min_width_px = 60
-            tiny_button_min_width_px = 50
+#            self.small_button_min_width_px = 60
+#            self.tiny_button_min_width_px = 50
         
         border_modern = "border-style:solid; border-radius:4;border-color:grey; border-width:0;" # modernize
 
@@ -16842,66 +16980,6 @@ class ApplicationWindow(QMainWindow):
                     color: white;
                     background-color:""" + createGradient('#85cae1') + """ ;
                 }
-            """,
-            "SELECTED":     """
-                QPushButton {
-                    min-width: """ + str(self.standard_button_min_width_px) + """px;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size_small_selected + """;
-                    font-weight: bold;
-                    color: white;
-                    background-color:""" + createGradient('#d4336a') + """ ;
-                }
-                QPushButton:flat{
-                    color: darkgrey;
-                    background-color: #f9e2ea;
-                }
-                QPushButton:flat:hover:!pressed{
-                    color: #F5F5F5;
-                    background-color: #e687a8;
-                }
-                QPushButton:flat:hover:pressed{
-                    color: #EEEEEE;
-                    background-color: #d4336a;
-                }
-                QPushButton:pressed {
-                    color: white;
-                    background-color:""" + createGradient('#147bb3') + """ ;
-                }
-                QPushButton:hover:!pressed {
-                    color: white;
-                    background-color:""" + createGradient('#cc0f50') + """ ;
-                }
-            """,
-            "SELECTED_MAIN":     """
-                QPushButton {
-                    min-width: """ + str(self.standard_button_min_width_px) + """px;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size_small_selected + """;
-                    font-weight: bold;
-                    color: white;
-                    background-color:""" + createGradient('#c00b40') + """ ;
-                }
-                QPushButton:flat{
-                    color: darkgrey;
-                    background-color: #f0b7cb;
-                }
-                QPushButton:flat:hover:!pressed{
-                    color: #F5F5F5;
-                    background-color: #db5785;
-                }
-                QPushButton:flat:hover:pressed{
-                    color: #EEEEEE;
-                    background-color: #cc0f50;
-                }
-                QPushButton:pressed {
-                    color: white;
-                    background-color:""" + createGradient('#147bb3') + """ ;
-                }
-                QPushButton:hover:!pressed {
-                    color: white;
-                    background-color:""" + createGradient('#c70d49') + """ ;
-                }
             """
             }
         # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
@@ -17096,11 +17174,15 @@ class ApplicationWindow(QMainWindow):
         self.lcd2 = self.ArtisanLCD() # Temperature ET
         self.lcd2.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.lcd2.customContextMenuRequested.connect(self.setTareET)
+        self.lcd2.left_clicked.connect(self.toggleETCurve)
         self.lcd3 = self.ArtisanLCD() # Temperature BT
         self.lcd3.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.lcd3.customContextMenuRequested.connect(self.setTareBT)
+        self.lcd3.left_clicked.connect(self.toggleBTCurve)
         self.lcd4 = self.ArtisanLCD() # rate of change ET
+        self.lcd4.left_clicked.connect(self.toggleDeltaETCurve)
         self.lcd5 = self.ArtisanLCD() # rate of change BT
+        self.lcd5.left_clicked.connect(self.toggleDeltaBTCurve)
         self.lcd6 = self.ArtisanLCD() # pid sv
         self.lcd7 = self.ArtisanLCD() # pid power % duty cycle
 
@@ -17192,9 +17274,11 @@ class ApplicationWindow(QMainWindow):
                 self.extraLCD1[i].display("--")
                 self.extraLCD2[i].display("--")
             self.extraLCD1[i].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            self.extraLCD1[i].left_clicked.connect(self.toggleExtraCurve1)
             self.extraLCD1[i].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             self.extraLCD1[i].customContextMenuRequested.connect(self.setTare_slot)
             self.extraLCD2[i].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            self.extraLCD2[i].left_clicked.connect(self.toggleExtraCurve2)
             self.extraLCD2[i].customContextMenuRequested.connect(self.setTare_slot)
             self.extraLCDframe2[i].setVisible(False)
             self.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
@@ -17873,6 +17957,46 @@ class ApplicationWindow(QMainWindow):
         QTimer.singleShot(2000,self.donate)
 
         QTimer.singleShot(0,lambda : _log.info("startup time: %.2f", libtime.process_time() - startup_time))
+
+    @pyqtSlot()
+    def toggleETCurve(self):
+        self.qmc.ETcurve = not self.qmc.ETcurve
+        self.qmc.redraw(recomputeAllDeltas=False,smooth=False,sampling=True)
+    
+    @pyqtSlot()
+    def toggleBTCurve(self):
+        self.qmc.BTcurve = not self.qmc.BTcurve
+        self.qmc.redraw(recomputeAllDeltas=False,smooth=False,sampling=True)
+    @pyqtSlot()
+    
+    def toggleDeltaETCurve(self):
+        self.qmc.DeltaETflag = not self.qmc.DeltaETflag
+        self.qmc.redraw(recomputeAllDeltas=False,smooth=False,sampling=True)
+    
+    @pyqtSlot()
+    def toggleDeltaBTCurve(self):
+        self.qmc.DeltaBTflag = not self.qmc.DeltaBTflag
+        self.qmc.redraw(recomputeAllDeltas=False,smooth=False,sampling=True)
+    
+    @pyqtSlot()
+    def toggleExtraCurve1(self):
+        try:
+            sender = self.sender()
+            i = self.extraLCD1.index(sender)
+            self.extraCurveVisibility1[i] = not self.extraCurveVisibility1[i]
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+        self.qmc.redraw(recomputeAllDeltas=False,smooth=False,sampling=True)
+    
+    @pyqtSlot()
+    def toggleExtraCurve2(self):
+        try:
+            sender = self.sender()
+            i = self.extraLCD2.index(sender)
+            self.extraCurveVisibility2[i] = not self.extraCurveVisibility2[i]
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+        self.qmc.redraw(recomputeAllDeltas=False,smooth=False,sampling=True)
 
     def addLanguage(self, locale, menu_entry):
         languageAction = QAction(menu_entry, self)
@@ -20183,7 +20307,7 @@ class ApplicationWindow(QMainWindow):
             aw.largeExtraLCDs_dialog.updateDecimals()
 
     def ArtisanLCD(self):
-        lcd = QLCDNumber()
+        lcd = MyQLCDNumber()
         lcd.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
         lcd.setFrameStyle(QFrame.Shadow.Plain)
         lcd.setSmallDecimalPoint(False)
@@ -23849,13 +23973,6 @@ class ApplicationWindow(QMainWindow):
                     nextcmd = self.nextActiveButton(self.keyboardmoveindex)
                 # activate the button at index nextcmd
                 self.keyboardButtonList[nextcmd].setSelected(True)
-                
-#                if self.keyboardButtonStyles[nextcmd] in ["CHARGE", "DROP"]:
-#                    self.keyboardButtonList[nextcmd].setStyleSheet(self.pushbuttonstyles["SELECTED_MAIN"])
-#                else:
-#                    self.keyboardButtonList[nextcmd].setStyleSheet(self.pushbuttonstyles["SELECTED"])
-#                # turn the style of the button at index self.keyboardmoveindex to standard
-#                self.keyboardButtonList[self.keyboardmoveindex].setStyleSheet(self.pushbuttonstyles[self.keyboardButtonStyles[self.keyboardmoveindex]])
                 self.keyboardButtonList[self.keyboardmoveindex].setSelected(False)
                 # update self.keyboardmoveindex
                 self.keyboardmoveindex = nextcmd
@@ -29484,7 +29601,7 @@ class ApplicationWindow(QMainWindow):
 
     def fetchCurveStyles(self):
         try:
-            if aw.qmc.l_temp1:
+            if aw.qmc.l_temp1 is not None:
                 self.qmc.ETlinestyle = aw.qmc.l_temp1.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 # otherwise the drawingstyle cannot be set back to default!
@@ -29497,7 +29614,7 @@ class ApplicationWindow(QMainWindow):
                 if not isinstance(m, (int)):
                     self.qmc.ETmarker = m
                 self.qmc.palette["et"] = self.getColor(aw.qmc.l_temp1)
-            if aw.qmc.l_temp2:
+            if aw.qmc.l_temp2 is not None:
                 self.qmc.BTlinestyle = aw.qmc.l_temp2.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.BTlinestyle == self.qmc.linestyle_default:
@@ -29510,7 +29627,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.BTmarker = m
                 self.qmc.BTmarkersize = aw.qmc.l_temp2.get_markersize()
                 self.qmc.palette["bt"] = self.getColor(aw.qmc.l_temp2)
-            if aw.qmc.l_delta1:
+            if aw.qmc.l_delta1 is not None:
                 self.qmc.ETdeltalinestyle = aw.qmc.l_delta1.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.ETdeltalinestyle == self.qmc.linestyle_default:
@@ -29523,7 +29640,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.ETdeltamarker = m
                 self.qmc.ETdeltamarkersize = aw.qmc.l_delta1.get_markersize()
                 self.qmc.palette["deltaet"] = self.getColor(aw.qmc.l_delta1)
-            if aw.qmc.l_delta2:
+            if aw.qmc.l_delta2 is not None:
                 self.qmc.BTdeltalinestyle = aw.qmc.l_delta2.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.BTdeltalinestyle == self.qmc.linestyle_default:
@@ -29536,7 +29653,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.BTdeltamarker = m
                 self.qmc.BTdeltamarkersize = aw.qmc.l_delta2.get_markersize()
                 self.qmc.palette["deltabt"] = self.getColor(aw.qmc.l_delta2)
-            if aw.qmc.l_back1:
+            if aw.qmc.l_back1 is not None:
                 self.qmc.ETbacklinestyle = aw.qmc.l_back1.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.ETbacklinestyle == self.qmc.linestyle_default:
@@ -29549,7 +29666,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.ETbackmarker = m
                 self.qmc.ETbackmarkersize = aw.qmc.l_back1.get_markersize()
                 self.qmc.backgroundmetcolor = self.getColor(aw.qmc.l_back1)
-            if aw.qmc.l_back2:
+            if aw.qmc.l_back2 is not None:
                 self.qmc.BTbacklinestyle = aw.qmc.l_back2.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.BTbacklinestyle == self.qmc.linestyle_default:
@@ -29562,7 +29679,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.BTbackmarker = m
                 self.qmc.BTbackmarkersize = aw.qmc.l_back2.get_markersize()
                 self.qmc.backgroundbtcolor = self.getColor(aw.qmc.l_back2)
-            if aw.qmc.l_back3:
+            if aw.qmc.l_back3 is not None:
                 self.qmc.XTbacklinestyle = aw.qmc.l_back3.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.XTbacklinestyle == self.qmc.linestyle_default:
@@ -29575,7 +29692,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.XTbackmarker = m
                 self.qmc.XTbackmarkersize = aw.qmc.l_back3.get_markersize()
                 self.qmc.backgroundxtcolor = self.getColor(aw.qmc.l_back3)
-            if aw.qmc.l_back4:
+            if aw.qmc.l_back4 is not None:
                 self.qmc.YTbacklinestyle = aw.qmc.l_back4.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.YTbacklinestyle == self.qmc.linestyle_default:
@@ -29588,7 +29705,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.YTbackmarker = m
                 self.qmc.YTbackmarkersize = aw.qmc.l_back4.get_markersize()
                 self.qmc.backgroundytcolor = self.getColor(aw.qmc.l_back4)
-            if aw.qmc.l_delta1B:
+            if aw.qmc.l_delta1B is not None:
                 self.qmc.ETBdeltalinestyle = aw.qmc.l_delta1B.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.ETBdeltalinestyle == self.qmc.linestyle_default:
@@ -29601,7 +29718,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.ETBdeltamarker = m
                 self.qmc.ETBdeltamarkersize = aw.qmc.l_delta1B.get_markersize()
                 self.qmc.backgrounddeltaetcolor = self.getColor(aw.qmc.l_delta1B)
-            if aw.qmc.l_delta2B:
+            if aw.qmc.l_delta2B is not None:
                 self.qmc.BTBdeltalinestyle = aw.qmc.l_delta2B.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.BTBdeltalinestyle == self.qmc.linestyle_default:
@@ -29616,7 +29733,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgrounddeltabtcolor = self.getColor(aw.qmc.l_delta2B)
             x1 = x2 = 0
             for i in range(len(aw.qmc.extradevices)):
-                if aw.extraCurveVisibility1[i]:
+                if len(aw.extraCurveVisibility1)>i and aw.extraCurveVisibility1[i] is not None:
                     l1 = aw.qmc.extratemp1lines[x1]
                     self.qmc.extralinestyles1[i] = l1.get_linestyle()
                     if self.qmc.extralinestyles1[i] == self.qmc.linestyle_default:
@@ -29632,7 +29749,7 @@ class ApplicationWindow(QMainWindow):
                     aw.setLabelColor(aw.extraLCDlabel1[i],QColor(aw.qmc.extradevicecolor1[i]))
                     aw.qmc.extraname1[i] = l1.get_label()
                     x1 = x1 + 1
-                if aw.extraCurveVisibility2[i]:
+                if len(aw.extraCurveVisibility2)> i and aw.extraCurveVisibility2[i] is not None:
                     l2 = aw.qmc.extratemp2lines[x2]
                     self.qmc.extralinestyles2[i] = l2.get_linestyle()
                     if self.qmc.extralinestyles2[i] == self.qmc.linestyle_default:
