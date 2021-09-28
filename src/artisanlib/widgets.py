@@ -24,14 +24,14 @@ try:
     from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # @UnusedImport @Reimport  @UnresolvedImport
         QByteArray, QPropertyAnimation, QEasingCurve) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
-        QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
+        QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QFontMetrics, QColor, QCursor # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:
     #pylint: disable = E, W, R, C
     from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # @UnusedImport @Reimport  @UnresolvedImport
         QByteArray, QPropertyAnimation, QEasingCurve) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
-        QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
+        QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QFontMetrics, QColor, QCursor # @UnusedImport @Reimport  @UnresolvedImport
 
 class MyQComboBox(QComboBox):
@@ -180,6 +180,7 @@ class ClickableQLabel(QLabel):
     right_clicked = pyqtSignal()
 
     def mousePressEvent(self, event):
+        super().mousePressEvent(event)
         self.clicked.emit()
         if event.button() == Qt.MouseButton.LeftButton:
             self.left_clicked.emit()
@@ -192,6 +193,7 @@ class ClickableQGroupBox(QGroupBox):
     right_clicked = pyqtSignal()
 
     def mousePressEvent(self, event):
+        super().mousePressEvent(event)
         self.clicked.emit()
         if event.button() == Qt.MouseButton.LeftButton:
             self.left_clicked.emit()
@@ -204,6 +206,20 @@ class MyQLCDNumber(QLCDNumber):
     right_clicked = pyqtSignal()
 
     def mousePressEvent(self, event):
+        super().mousePressEvent(event)
+        self.clicked.emit()
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.left_clicked.emit()
+        elif event.button() == Qt.MouseButton.RightButton:
+            self.right_clicked.emit()
+
+class ClickableLCDFrame(QFrame):
+    clicked = pyqtSignal()
+    left_clicked = pyqtSignal()
+    right_clicked = pyqtSignal()
+
+    def mousePressEvent(self, event):
+        super().mousePressEvent(event)
         self.clicked.emit()
         if event.button() == Qt.MouseButton.LeftButton:
             self.left_clicked.emit()

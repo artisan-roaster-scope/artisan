@@ -617,7 +617,7 @@ from artisanlib.autosave import autosaveDlg
 from artisanlib.platform import platformDlg
 from artisanlib.pid_control import FujiPID, PIDcontrol, DtaPID
 from artisanlib.widgets import (MyQLCDNumber, MajorEventPushButton, 
-    AnimatedMajorEventPushButton, MinorEventPushButton, AuxEventPushButton)
+    AnimatedMajorEventPushButton, MinorEventPushButton, AuxEventPushButton, ClickableLCDFrame)
 from artisanlib.hottop import (startHottop, stopHottop, setHottop,
     releaseHottopControl, takeHottopControl, isHottopLoopRunning)
 
@@ -9005,18 +9005,22 @@ class tgraphcanvas(FigureCanvas):
                         self.handles.append(self.l_eventtype4dots)
                         self.labels.append(aw.arabicReshape(self.etypesf(3)))
 
-                if not self.designerflag and aw.qmc.BTcurve:
-                    if self.flagstart: # no smoothed lines in this case, pass normal BT
-                        aw.qmc.l_annotations = self.place_annotations(aw.qmc.TPalarmtimeindex,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2)
-                    else:
+                if not self.designerflag:
+                    if aw.qmc.BTcurve:
+                        if self.flagstart: # no smoothed lines in this case, pass normal BT
+                            aw.qmc.l_annotations = self.place_annotations(aw.qmc.TPalarmtimeindex,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2)
+                        else:
+                            TP_index = aw.findTP()
+                            if aw.qmc.annotationsflag:
+                                aw.qmc.l_annotations = self.place_annotations(TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2)
+                            if self.timeindex[6]:
+                                self.writestatistics(TP_index)
+                        #add the time and temp annotations to the bt list
+                        for x in aw.qmc.l_annotations:
+                            self.l_bteventannos.append(x)
+                    elif self.timeindex[6]:
                         TP_index = aw.findTP()
-                        if aw.qmc.annotationsflag:
-                            aw.qmc.l_annotations = self.place_annotations(TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2)
-                        if self.timeindex[6]:
-                            self.writestatistics(TP_index)
-                    #add the time and temp annotations to the bt list
-                    for x in aw.qmc.l_annotations:
-                        self.l_bteventannos.append(x)
+                        self.writestatistics(TP_index)
 
                 if not sampling and not aw.qmc.flagon and self.timeindex[6] and aw.qmc.statssummary:
                     self.statsSummary()
@@ -17170,19 +17174,10 @@ class ApplicationWindow(QMainWindow):
         self.lcd1.clicked.connect(self.superusermodeLeftClicked)
         self.lcd1.setVisible(False)
 
-
         self.lcd2 = self.ArtisanLCD() # Temperature ET
-        self.lcd2.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.lcd2.customContextMenuRequested.connect(self.setTareET)
-        self.lcd2.left_clicked.connect(self.toggleETCurve)
         self.lcd3 = self.ArtisanLCD() # Temperature BT
-        self.lcd3.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.lcd3.customContextMenuRequested.connect(self.setTareBT)
-        self.lcd3.left_clicked.connect(self.toggleBTCurve)
         self.lcd4 = self.ArtisanLCD() # rate of change ET
-        self.lcd4.left_clicked.connect(self.toggleDeltaETCurve)
         self.lcd5 = self.ArtisanLCD() # rate of change BT
-        self.lcd5.left_clicked.connect(self.toggleDeltaBTCurve)
         self.lcd6 = self.ArtisanLCD() # pid sv
         self.lcd7 = self.ArtisanLCD() # pid power % duty cycle
 
@@ -17254,10 +17249,10 @@ class ApplicationWindow(QMainWindow):
         self.extraFill1,self.extraFill2 = [0]*self.nLCDS,[0]*self.nLCDS # alpha values 0-100 in % of fill between extra curve and x-axis
         for i in range(self.nLCDS):
             #configure LCDs
-            self.extraLCDframe1.append(QFrame())
+            self.extraLCDframe1.append(ClickableLCDFrame())
             self.extraLCD1.append(self.ArtisanLCD())
             self.extraLCDlabel1.append(QLabel())
-            self.extraLCDframe2.append(QFrame())
+            self.extraLCDframe2.append(ClickableLCDFrame())
             self.extraLCD2.append(self.ArtisanLCD())
             self.extraLCDlabel2.append(QLabel())
             self.extraLCDframe1[i].setVisible(False)
@@ -17273,13 +17268,12 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.extraLCD1[i].display("--")
                 self.extraLCD2[i].display("--")
-            self.extraLCD1[i].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-            self.extraLCD1[i].left_clicked.connect(self.toggleExtraCurve1)
-            self.extraLCD1[i].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-            self.extraLCD1[i].customContextMenuRequested.connect(self.setTare_slot)
-            self.extraLCD2[i].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-            self.extraLCD2[i].left_clicked.connect(self.toggleExtraCurve2)
-            self.extraLCD2[i].customContextMenuRequested.connect(self.setTare_slot)
+            self.extraLCDframe1[i].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            self.extraLCDframe1[i].customContextMenuRequested.connect(self.setTare_slot)
+            self.extraLCDframe1[i].left_clicked.connect(self.toggleExtraCurve1)
+            self.extraLCDframe2[i].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            self.extraLCDframe2[i].customContextMenuRequested.connect(self.setTare_slot)
+            self.extraLCDframe2[i].left_clicked.connect(self.toggleExtraCurve2)
             self.extraLCDframe2[i].setVisible(False)
             self.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             self.extraLCD2[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
@@ -17538,23 +17532,31 @@ class ApplicationWindow(QMainWindow):
         LCDlayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
 
         #place control buttons + LCDs inside vertical button layout manager
-        self.LCD2frame = QFrame()
+        self.LCD2frame = ClickableLCDFrame()
+        self.LCD2frame.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.LCD2frame.customContextMenuRequested.connect(self.setTareET)
+        self.LCD2frame.left_clicked.connect(self.toggleETCurve)
         w = self.makeLCDbox(self.label2,self.lcd2,self.LCD2frame)
         LCDlayout.addWidget(w)
         LCDlayout.setAlignment(w,Qt.AlignmentFlag.AlignRight)
 
-        self.LCD3frame = QFrame()
+        self.LCD3frame = ClickableLCDFrame()
+        self.LCD3frame.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.LCD3frame.customContextMenuRequested.connect(self.setTareBT)
+        self.LCD3frame.left_clicked.connect(self.toggleBTCurve)
         w = self.makeLCDbox(self.label3,self.lcd3,self.LCD3frame)
         LCDlayout.addWidget(w)
         LCDlayout.setAlignment(w,Qt.AlignmentFlag.AlignRight)
 
-        self.LCD4frame = QFrame()
+        self.LCD4frame = ClickableLCDFrame()
+        self.LCD4frame.left_clicked.connect(self.toggleDeltaETCurve)
         w = self.makeLCDbox(self.label4,self.lcd4,self.LCD4frame)
         LCDlayout.addWidget(w)
         LCDlayout.setAlignment(w,Qt.AlignmentFlag.AlignRight)
         self.LCD4frame.setVisible(False) # by default this one is not visible
 
-        self.LCD5frame = QFrame()
+        self.LCD5frame = ClickableLCDFrame()
+        self.LCD5frame.left_clicked.connect(self.toggleDeltaBTCurve)
         w = self.makeLCDbox(self.label5,self.lcd5,self.LCD5frame)
         LCDlayout.addWidget(w)
         LCDlayout.setAlignment(w,Qt.AlignmentFlag.AlignRight)
@@ -17961,42 +17963,42 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     def toggleETCurve(self):
         self.qmc.ETcurve = not self.qmc.ETcurve
-        self.qmc.redraw(recomputeAllDeltas=False,smooth=False,sampling=True)
+        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
     
     @pyqtSlot()
     def toggleBTCurve(self):
         self.qmc.BTcurve = not self.qmc.BTcurve
-        self.qmc.redraw(recomputeAllDeltas=False,smooth=False,sampling=True)
+        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
     @pyqtSlot()
     
     def toggleDeltaETCurve(self):
         self.qmc.DeltaETflag = not self.qmc.DeltaETflag
-        self.qmc.redraw(recomputeAllDeltas=False,smooth=False,sampling=True)
+        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
     
     @pyqtSlot()
     def toggleDeltaBTCurve(self):
         self.qmc.DeltaBTflag = not self.qmc.DeltaBTflag
-        self.qmc.redraw(recomputeAllDeltas=False,smooth=False,sampling=True)
+        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
     
     @pyqtSlot()
     def toggleExtraCurve1(self):
         try:
             sender = self.sender()
-            i = self.extraLCD1.index(sender)
+            i = self.extraLCDframe1.index(sender)
             self.extraCurveVisibility1[i] = not self.extraCurveVisibility1[i]
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-        self.qmc.redraw(recomputeAllDeltas=False,smooth=False,sampling=True)
+        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
     
     @pyqtSlot()
     def toggleExtraCurve2(self):
         try:
             sender = self.sender()
-            i = self.extraLCD2.index(sender)
+            i = self.extraLCDframe2.index(sender)
             self.extraCurveVisibility2[i] = not self.extraCurveVisibility2[i]
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-        self.qmc.redraw(recomputeAllDeltas=False,smooth=False,sampling=True)
+        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
 
     def addLanguage(self, locale, menu_entry):
         languageAction = QAction(menu_entry, self)
