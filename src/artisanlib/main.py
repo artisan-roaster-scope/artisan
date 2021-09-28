@@ -19972,7 +19972,7 @@ class ApplicationWindow(QMainWindow):
             for i in range(len(np_dbt) - 1, -1, -1):
                 if np_dbt[i] is None:
                     try:
-                        np_dbt[i] = analysis_DeltaBT[i+1]
+                        np_dbt[i] = np_dbt[i+1]
                     except Exception: # pylint: disable=broad-except
                         np_dbt[i] = 0
             for i in range(len(np_dbtb) - 1, -1, -1):
@@ -20007,15 +20007,14 @@ class ApplicationWindow(QMainWindow):
                 RoR_FCs_act = aw.qmc.delta2[aw.qmc.timeindex[2]]
                 try:
                     #dave Need to clean up.  Better way to get the index value??  Maybe aw.qmc.timeindex[2]-analysis_start ??
-                    fcs_idx = aw.qmc.timeindex[2]-analysis_start                    
+                    fcs_idx = aw.qmc.timeindex[2]-analysis_start                    +2
                     RoR_FCs_delta = RoR_FCs_act - np_dbtb[fcs_idx]
 
                     fcs_idx_oldway = numpy.asarray(np_dbt==aw.qmc.delta2[aw.qmc.timeindex[2]]).nonzero()
                     if fcs_idx != fcs_idx_oldway[0][0]:
-                        _log.info("Mismatch with fcs_idx methods.  fcs_idx:{} fcs_idx_oldway:{}".format(fcs_idx, fcs_idx_oldway[0][0]))
+                        _log.info("Mismatch with fcs_idx methods. fcs_idx:%s fcs_idx_oldway:%s",fcs_idx, fcs_idx_oldway[0][0])
                 except Exception: # pylint: disable=broad-except
                     RoR_FCs_delta = float('nan')
-                    _log.exception
 
                 #max and min difference between actual RoR and template RoR
                 maxdelta = numpy.max(np_dbt - np_dbtb)
@@ -20107,7 +20106,6 @@ class ApplicationWindow(QMainWindow):
                 segment_rmse_deltas = [] #segment root mean square error (difference)
                 segment_mse_deltas = []  #segment mean square error (difference)
                 segment_abc_deltas = []  #segmnt area between the curves
-                segment_abc_deltas1 = []  #segment area between the curves
                 for i in range(len(starts_seg)-1):
                     segment_deltas = deltas_all[starts_seg[i]:starts_seg[i+1]]
                     segment_abs_deltas = numpy.absolute(segment_deltas)
@@ -20177,7 +20175,7 @@ class ApplicationWindow(QMainWindow):
                 segmentresultstr += "{}{}".format("\n", tbl2.get_string(border=False,header=False))
 
                 # this table is here to help with validation
-                if False:  #disabled # pylint: disable=condition-evals-to-constant
+                if False:  # pylint: disable=condition-evals-to-constant
                     tbl3 = prettytable.PrettyTable()
                     tbl3.field_names = ["Start","Duration","Max Delta","Sign","Reduction","TimeIndex"  ]
                     tbl3.float_format = "5.2"
