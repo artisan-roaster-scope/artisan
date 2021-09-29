@@ -20152,9 +20152,9 @@ class ApplicationWindow(QMainWindow):
                             QApplication.translate("Label","Bkgnd",None), ""]
                 fitType = fitTypes[exp]
                 if aw.qmc.filterDropOuts:
-                    smoothspikes = "On"
+                    smoothspikes = QApplication.translate("Label","On",None)
                 else:
-                    smoothspikes = "Off"
+                    smoothspikes = QApplication.translate("Label","Off",None)
 
                 # build a table of results
                 tbl = prettytable.PrettyTable()
@@ -26984,6 +26984,11 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.deleteBackground() # delete a loaded background if any
             aw.autoAdjustAxis()
+            if "devices" in profile:
+                self.qmc.profile_meter = decodeLocal(profile["devices"][0])
+            else:
+                self.qmc.profile_meter = "Unknown"
+            _log.debug(self.profilequality())
             return True
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -26991,6 +26996,77 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(aw,QApplication.translate("Error Message", "Exception:",None) + " setProfile()",str(ex) + "@line " + str(getattr(exc_tb, 'tb_lineno', '?')))
             return False
+
+    def profilequality(self):
+        bt = numpy.array(aw.qmc.temp2)
+        tx = numpy.array(aw.qmc.timex)
+        profile_sampling_interval = aw.qmc.profile_sampling_interval
+
+        # Meter
+        # The meter is added to setProfile() as it was not previously read.  It useful here for trending.
+        #    The Meter device is written to the profile whenever it is saved, meaning that it can be changed
+        #     in the profile without warning and may not reflect the actual meter used to record the profile.
+        meter = aw.qmc.profile_meter
+
+        # Count the number of decimal places in a float
+        def ndec(num):
+            return len(re.sub(r'(?:[{0}]+$)', '', str(num)).split('.')[1])
+
+        # Total number of samples
+        totalSamples = len(aw.qmc.timex)
+        
+        # Calculate the average number of decimals in an array of floats
+        ndec_arr = numpy.array([ndec(x) for x in bt])
+        avgDecimal = numpy.average(ndec_arr)
+
+        # Count the number of consecutive duplicates
+        markdup = numpy.diff(bt).astype(bool)  # False (or 0) marks a duplicate
+        dups = numpy.count_nonzero(markdup==0)   # counts the 0s
+        blank = numpy.count_nonzero(bt==-1)  # counts missing values  
+
+        # Count skipped samples (missing timex)
+        tx_diff = numpy.diff(tx)
+        avg_sample = numpy.average(tx_diff)
+        longest_sample = numpy.max(tx_diff)
+        shortest_sample = numpy.min(tx_diff)
+        skipped_sample_time = 1.5*avg_sample
+        skipped = numpy.count_nonzero(tx_diff > skipped_sample_time)
+        bins = [0, 1*profile_sampling_interval, 1.5*profile_sampling_interval, 4**profile_sampling_interval, 1000]
+        hist = numpy.histogram(tx_diff,bins=bins)
+
+        # Aperiodic sample ratio
+        aperiodicRatio = avg_sample / profile_sampling_interval
+        
+        # Missing events
+        missingEvents = "Missing key events: "
+        lenLabel = len(missingEvents)
+        if aw.qmc.timeindex[0] == -1:
+            missingEvents += "CHARGE "
+        if aw.qmc.timeindex[2] == 0:
+            missingEvents += "FCs "
+        if aw.qmc.timeindex[6] == 0:
+            missingEvents += "DROP "
+        if len(missingEvents) == lenLabel:
+            missingEvents += "None "
+
+        # Output string
+        output =  "Profile quality metrics"
+        output += "\nTitle: {}".format(aw.qmc.title)
+        output += "\nMeter: {}".format(meter)
+        output += "\nAverage decimals: {:.2f}".format(avgDecimal)
+        output += "\nTotal Samples {}".format(totalSamples)
+        output += "\nDuplicate Samples: {}".format(dups)
+        output += "\nBlank Samples: {}".format(blank)
+        output += "\nSkipped Samples: {}  More than {:.2f} secs".format(skipped, skipped_sample_time)
+        output += "\nHistogram of Sample Times: {}  Bins: <1x, 1x-1.5x, 1.5x-4x, >4x Profile Sampling Interval".format(hist[0])
+        output += "\nShortest Sample Interval: {:.2f}".format(shortest_sample)
+        output += "\nLongest Sample Interval: {:.2f}".format(longest_sample)
+        output += "\nAverage Sample Time: {:.2f}".format(avg_sample)
+        output += "\nProfile Sampling Interval {:.2f}".format(profile_sampling_interval)
+        output += "\nAperiodic Samples Ratio: {:.2f}".format(aperiodicRatio)
+        output += "\n{}".format(missingEvents)
+
+        return output
 
     @staticmethod
     def weightVolumeDigits(v):
