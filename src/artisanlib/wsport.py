@@ -190,21 +190,23 @@ class wsport():
         if self.aw.seriallogflag:
             self.aw.addserial("wsport onClose()")
     
-    def onOpen(self, _):
+    def onOpen(self, *_):
         self.open_event.set() # unblock the connect action
         self.aw.sendmessage(QApplication.translate("Message","WebSocket connected", None))
         if self.aw.seriallogflag:
             self.aw.addserial("wsport onOpen()")
     
-    def onPing(self, _):
+    def onPing(self, *_):
         if self.aw.seriallogflag:
             self.aw.addserial("wsport onPing()")
     
-    def onPong(self, _):
+    def onPong(self, *_):
         if self.aw.seriallogflag:
             self.aw.addserial("wsport onPong()")
     
     def create(self):
+        # initialize readings
+        self.readings = [-1]*self.channels
         while self.active:
             try:
                 if self.aw.seriallogflag:
@@ -298,7 +300,8 @@ class wsport():
             if connected:
                 message_id = random.randint(1,99999)
                 request[self.id_node] = message_id
-                request[self.machine_node] = self.machineID
+                if self.machine_node:
+                    request[self.machine_node] = self.machineID
                 json_req = json.dumps(request)
                 if block:
                     e = self.registerRequest(message_id)

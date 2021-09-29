@@ -10884,6 +10884,12 @@ class tgraphcanvas(FigureCanvas):
             if not aw.qmc.title_show_always:
                 aw.qmc.setProfileTitle("")
             
+            # disable "green flag" menu:
+            try:
+                aw.ntb.disable_edit_curve_parameters()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+            
             # reset LCD timer color that might have been reset by the RS PID in monitoring mode:
             aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             aw.qmc.setTimerLargeLCDcolorSignal.emit(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"])
@@ -10988,6 +10994,12 @@ class tgraphcanvas(FigureCanvas):
             aw.phasesLCDs.hide()
             aw.AUCLCD.hide()
             aw.hideEventsMinieditor()
+            
+            # enable "green flag" menu:
+            try:
+                aw.ntb.enable_edit_curve_parameters()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -15100,12 +15112,13 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
 
 # add green flag menu on matplotlib v2.0 and later
+        self.edit_curve_parameters_action = None
         if len(self.actions()) > 0:
             # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
-            a = QAction(self._icon("qt4_editor_options.png"),QApplication.translate("Toolbar", 'Lines', None),self)
-            a.triggered.connect(self.my_edit_parameters)
-            a.setToolTip(QApplication.translate("Tooltip", 'Line styles', None))
-            self.insertAction(self.actions()[-1],a)
+            self.edit_curve_parameters_action = QAction(self._icon("qt4_editor_options.png"),QApplication.translate("Toolbar", 'Lines', None),self)
+            self.edit_curve_parameters_action.triggered.connect(self.my_edit_parameters)
+            self.edit_curve_parameters_action.setToolTip(QApplication.translate("Tooltip", 'Line styles', None))
+            self.insertAction(self.actions()[-1], self.edit_curve_parameters_action)
 
         # adjust for dark or light canvas and set hover/selection style
         for a in self.actions():
@@ -15151,6 +15164,14 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             # not yet monkey patched
             formlayout.fedit_org = formlayout.fedit
             formlayout.fedit = my_fedit
+            
+    def enable_edit_curve_parameters(self):
+        if self.edit_curve_parameters_action is not None:
+            self.edit_curve_parameters_action.setEnabled(True)
+    
+    def disable_edit_curve_parameters(self):
+        if self.edit_curve_parameters_action is not None:
+            self.edit_curve_parameters_action.setEnabled(False)
 
     # monkey patch matplotlib navigationbar zoom and pan to update background cache
     def release_pan_new(self, event):
@@ -19463,7 +19484,7 @@ class ApplicationWindow(QMainWindow):
 
                 if not aw.block_quantification_sampling_ticks[i]:
                     temp,_ = aw.quantifier2tempandtime(i)
-                    if temp: # corresponding curve is available
+                    if temp is not None: # corresponding curve is available
                         linespace = aw.eventquantifierlinspaces[i]
                         if aw.eventquantifiercoarse[i]:
                             linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdcoarse
@@ -19937,24 +19958,28 @@ class ApplicationWindow(QMainWindow):
                 temp = aw.qmc.on_temp2
         else:
             x = (aw.eventquantifiersource[i]-2)
-            if aw.qmc.flagstart or not aw.qmc.flagon:
-                timex = aw.qmc.extratimex[x // 2]
-            else:
-                timex = aw.qmc.on_extratimex[x // 2]
-            if x % 2 == 0:
-                # even
-                if len(aw.qmc.extratemp1) > (x/2):
-                    if aw.qmc.flagstart or not aw.qmc.flagon:
-                        temp = aw.qmc.extratemp1[x // 2]
-                    else:
-                        temp = aw.qmc.on_extratemp1[x // 2]
-            else:
-                # odd
-                if len(aw.qmc.extratemp2) > (x/2):
-                    if aw.qmc.flagstart or not aw.qmc.flagon:
-                        temp = aw.qmc.extratemp2[x // 2]
-                    else:
-                        temp = aw.qmc.on_extratemp2[x // 2]
+            try:
+                if aw.qmc.flagstart or not aw.qmc.flagon:
+                    timex = aw.qmc.extratimex[x // 2]
+                else:
+                    timex = aw.qmc.on_extratimex[x // 2]
+                if x % 2 == 0:
+                    # even
+                    if len(aw.qmc.extratemp1) > (x/2):
+                        if aw.qmc.flagstart or not aw.qmc.flagon:
+                            temp = aw.qmc.extratemp1[x // 2]
+                        else:
+                            temp = aw.qmc.on_extratemp1[x // 2]
+                else:
+                    # odd
+                    if len(aw.qmc.extratemp2) > (x/2):
+                        if aw.qmc.flagstart or not aw.qmc.flagon:
+                            temp = aw.qmc.extratemp2[x // 2]
+                        else:
+                            temp = aw.qmc.on_extratemp2[x // 2]
+            except Exception:
+                # timex might not have an index x // 2
+                pass
         return temp,timex
 
     # returns min/max 0/(aw.eventsMaxValue / 10) for values outside of the given linespace ls defining the interval
@@ -21361,34 +21386,35 @@ class ApplicationWindow(QMainWindow):
                 cmd_str = str(cmd)
 
                 # we add {BT}, {ET}, {time} substitutions for Serial/CallProgram/MODBUS/S7/WebSocket command actions
-                if action in [1,2,4,7,15,22] and (self.qmc.flagstart and len(self.qmc.timex) > 0 or (self.qmc.flagon and len(self.qmc.on_timex) > 0)):
-                    BT_subst = 0
-                    ET_subst = 0
+                if action in [1,2,4,7,15,22]:
+                    BT_subst = -1
+                    ET_subst = -1
                     timex = 0
-                    BTB_subst = 0
-                    ETB_subst = 0
-                    try:
-                        if self.qmc.flagstart and len(self.qmc.timex)>0:
-                            timex = self.qmc.timex[-1]
-                            if self.qmc.timeindex[0] != -1:
-                                timex -= self.qmc.timex[self.qmc.timeindex[0]]
-                            BT_subst = self.qmc.temp2[-1]
-                            ET_subst = self.qmc.temp1[-1]
-                            if self.qmc.background:
-                                btb = self.qmc.backgroundSmoothedBTat(timex)
-                                if btb != -1:
-                                    BTB_subst = btb
-                                etb = self.qmc.backgroundSmoothedETat(timex)
-                                if etb != -1:
-                                    ETB_subst = etb
-                        elif self.qmc.flagon:
-                            timex = self.qmc.on_timex[-1]
-                            if self.qmc.timeindex[0] != -1:
-                                timex -= self.qmc.on_timex[self.qmc.timeindex[0]]
-                            BT_subst = self.qmc.on_temp2[-1]
-                            ET_subst = self.qmc.on_temp1[-1]
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
+                    BTB_subst = -1
+                    ETB_subst = -1
+                    if (self.qmc.flagstart and len(self.qmc.timex) > 0 or (self.qmc.flagon and len(self.qmc.on_timex) > 0)):
+                        try:
+                            if self.qmc.flagstart and len(self.qmc.timex)>0:
+                                timex = self.qmc.timex[-1]
+                                if self.qmc.timeindex[0] != -1:
+                                    timex -= self.qmc.timex[self.qmc.timeindex[0]]
+                                BT_subst = self.qmc.temp2[-1]
+                                ET_subst = self.qmc.temp1[-1]
+                                if self.qmc.background:
+                                    btb = self.qmc.backgroundSmoothedBTat(timex)
+                                    if btb != -1:
+                                        BTB_subst = btb
+                                    etb = self.qmc.backgroundSmoothedETat(timex)
+                                    if etb != -1:
+                                        ETB_subst = etb
+                            elif self.qmc.flagon:
+                                timex = self.qmc.on_timex[-1]
+                                if self.qmc.timeindex[0] != -1:
+                                    timex -= self.qmc.on_timex[self.qmc.timeindex[0]]
+                                BT_subst = self.qmc.on_temp2[-1]
+                                ET_subst = self.qmc.on_temp1[-1]
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
                     try:
                         if action == 22:
                             # in JSON we have to do string substitution
