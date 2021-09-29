@@ -94,9 +94,6 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E4Annovisibility.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E4Annovisibility.setChecked(bool(self.aw.qmc.specialeventannovisibilities[3]))
 
-        E1EditLabel = QLabel()
-        E1EditLabel.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        E1EditLabel.setText(QApplication.translate("Label", "Event 1",None))
         self.E1Edit = QLineEdit(self.aw.qmc.specialeventannotations[0])
         self.E1Edit.setMinimumSize(self.E1Edit.sizeHint())
         self.E1Edit.textChanged.connect(self.changeSpecialeventEdit1)
@@ -104,9 +101,6 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E1Preview1 = QLabel(self.aw.qmc.parseSpecialeventannotation(self.E1Edit.text(),eventnum=0,applyto="preview",postFCs=False))
         self.E1Preview2 = QLabel(self.aw.qmc.parseSpecialeventannotation(self.E1Edit.text(),eventnum=0,applyto="preview",postFCs=True))
 
-        E2EditLabel = QLabel()
-        E2EditLabel.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        E2EditLabel.setText(QApplication.translate("Label", "Event 2",None))
         self.E2Edit = QLineEdit(self.aw.qmc.specialeventannotations[1])
         self.E2Edit.setMinimumSize(self.E2Edit.sizeHint())
         self.E2Edit.textChanged.connect(self.changeSpecialeventEdit2)
@@ -114,9 +108,6 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E2Preview1 = QLabel(self.aw.qmc.parseSpecialeventannotation(self.E2Edit.text(),eventnum=0,applyto="preview",postFCs=False))
         self.E2Preview2 = QLabel(self.aw.qmc.parseSpecialeventannotation(self.E2Edit.text(),eventnum=0,applyto="preview",postFCs=True))
 
-        E3EditLabel = QLabel()
-        E3EditLabel.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        E3EditLabel.setText(QApplication.translate("Label", "Event 3",None))
         self.E3Edit = QLineEdit(self.aw.qmc.specialeventannotations[2])
         self.E3Edit.setMinimumSize(self.E3Edit.sizeHint())
         self.E3Edit.textChanged.connect(self.changeSpecialeventEdit3)
@@ -124,9 +115,6 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E3Preview1 = QLabel(self.aw.qmc.parseSpecialeventannotation(self.E3Edit.text(),eventnum=0,applyto="preview",postFCs=False))
         self.E3Preview2 = QLabel(self.aw.qmc.parseSpecialeventannotation(self.E3Edit.text(),eventnum=0,applyto="preview",postFCs=True))
 
-        E4EditLabel = QLabel()
-        E4EditLabel.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        E4EditLabel.setText(QApplication.translate("Label", "Event 4",None))
         self.E4Edit = QLineEdit(self.aw.qmc.specialeventannotations[3])
         self.E4Edit.setMinimumSize(self.E4Edit.sizeHint())
         self.E4Edit.textChanged.connect(self.changeSpecialeventEdit4)

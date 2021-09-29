@@ -674,10 +674,14 @@ class tgraphcanvas(FigureCanvas):
     markCoolSignal = pyqtSignal()
     toggleMonitorSignal = pyqtSignal()
     toggleRecorderSignal = pyqtSignal()
-    processAlarmSignal = pyqtSignal(int,bool,int,str)
+    processAlarmSignal = pyqtSignal(int, bool, int, str)
     alarmsetSignal = pyqtSignal(int)
-    moveBackgroundSignal = pyqtSignal(str,int)
+    moveBackgroundSignal = pyqtSignal(str, int)
     eventRecordSignal = pyqtSignal(int)
+    showCurveSignal = pyqtSignal(str, bool)
+    showExtraCurveSignal = pyqtSignal(int, str, bool)
+    showEventsSignal = pyqtSignal(int, bool)
+    showBackgroundEventsSignal = pyqtSignal(bool)
     
     umlaute_dict : Final = {
        uchr(228): 'ae',  # U+00E4   \xc3\xa4
@@ -739,7 +743,7 @@ class tgraphcanvas(FigureCanvas):
         'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_sync_record_hash', 'beans', 'projectFlag', 'ETcurve', 'BTcurve',
         'ETlcd', 'BTlcd', 'swaplcds', 'LCDdecimalplaces', 'foregroundShowFullflag', 'DeltaETflag', 'DeltaBTflag', 'DeltaETlcdflag', 'DeltaBTlcdflag', 
         'swapdeltalcds', 'PIDbuttonflag', 'Controlbuttonflag', 'deltaETfilter', 'deltaBTfilter', 'curvefilter', 'deltaETspan', 'deltaBTspan',
-        'deltaETsamples', 'deltaBTsamples', 'profile_sampling_interval', 'background_profile_sampling_interval', 'optimalSmoothing', 'polyfitRoRcalc',
+        'deltaETsamples', 'deltaBTsamples', 'profile_sampling_interval', 'background_profile_sampling_interval', 'profile_meter', 'optimalSmoothing', 'polyfitRoRcalc',
         'patheffects', 'graphstyle', 'graphfont', 'buttonvisibility', 'buttonactions', 'buttonactionstrings', 'extrabuttonactions', 'extrabuttonactionstrings',
         'xextrabuttonactions', 'xextrabuttonactionstrings', 'autoChargeFlag', 'autoDropFlag', 'autoChargeIdx', 'autoDropIdx', 'markTPflag', 'autoTPIdx',
         'autoDRYflag', 'autoFCsFlag', 'autoCHARGEenabled', 'autoDRYenabled', 'autoFCsenabled', 'autoDROPenabled', 'autoDryIdx', 'autoFCsIdx', 'projectionconstant',
@@ -1727,7 +1731,8 @@ class tgraphcanvas(FigureCanvas):
         self.deltaETsamples = 6 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
         self.deltaBTsamples = 6 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
         self.profile_sampling_interval = None # will be updated on loading a profile
-        self.background_profile_sampling_interval = None # will be updated on loading a profile into the background
+        self.background_profile_sampling_interval = None # will be updated on loading a profile into the background        
+        self.profile_meter = "Unknown" # will be updated on loading a profile
 
         self.optimalSmoothing = False
         self.polyfitRoRcalc = True
@@ -2507,10 +2512,61 @@ class tgraphcanvas(FigureCanvas):
         self.alarmsetSignal.connect(self.selectAlarmSet)
         self.moveBackgroundSignal.connect(self.moveBackgroundAndRedraw)
         self.eventRecordSignal.connect(self.EventRecordSlot)
+        self.showCurveSignal.connect(self.showCurve)
+        self.showExtraCurveSignal.connect(self.showExtraCurve)
+        self.showEventsSignal.connect(self.showEvents)
+        self.showBackgroundEventsSignal.connect(self.showBackgroundEvents)
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
     #####################################################################################
+
+
+    @pyqtSlot(str, bool)
+    def showCurve(self, name: str, state: bool):
+        changed = False
+        if name == "ET" and self.ETcurve != state:
+            self.ETcurve = state
+            changed = True
+        elif name == "BT" and self.BTcurve != state:
+            self.BTcurve = state
+            changed = True
+        elif name == "DeltaET" and self.DeltaETflag != state:
+            self.DeltaETflag = state
+            changed = True
+        elif name == "DeltaBT" and self.DeltaBTflag != state:
+            self.DeltaBTflag = state
+            changed = True
+        elif name == "BackgroundET" and self.backgroundETcurve != state:
+            self.backgroundETcurve = state
+            changed = True
+        elif name == "BackgroundBT" and self.backgroundBTcurve != state:
+            self.backgroundBTcurve = state
+            changed = True
+        if changed:
+            self.redraw(recomputeAllDeltas=False,smooth=False)
+
+    @pyqtSlot(int, str, bool)
+    def showExtraCurve(self, extra_device: int, curve: str, state: bool):
+        if curve.strip() == "T1" and len(aw.extraCurveVisibility1) > extra_device and aw.extraCurveVisibility1[extra_device] != state:
+            aw.extraCurveVisibility1[extra_device] = state
+            self.redraw(recomputeAllDeltas=False,smooth=False)
+        elif curve.strip() == "T2" and len(aw.extraCurveVisibility2) > extra_device and aw.extraCurveVisibility2[extra_device] != state:
+            aw.extraCurveVisibility2[extra_device] = state
+            self.redraw(recomputeAllDeltas=False,smooth=False)
+
+    @pyqtSlot(int, bool)
+    def showEvents(self, event_type: int, state: bool):
+        event_type -= 1
+        if len(self.showEtypes) > event_type > 0 and self.showEtypes[event_type] != state:
+            self.showEtypes[event_type] = state
+            self.redraw(recomputeAllDeltas=False,smooth=False)
+
+    @pyqtSlot(bool)
+    def showBackgroundEvents(self, state: bool):
+        if state != self.backgroundeventsflag:
+            self.backgroundeventsflag = state
+            self.redraw(recomputeAllDeltas=False,smooth=False)
 
     def ax_lines_clear(self):
         if isinstance(self.ax.lines,list): # MPL < v3.5
@@ -15779,7 +15835,7 @@ class ApplicationWindow(QMainWindow):
             self.profilepath = QDir().homePath() + "/Documents/"
         else:
             self.profilepath = QDir().homePath()
-
+        
         # on the Mac preferences should be stored outside of applications in the users ~/Library/Preferences path
         if platf == 'Darwin':
             preference_path = QDir().homePath() + "/Library/Preferences//"
@@ -22577,7 +22633,46 @@ class ApplicationWindow(QMainWindow):
                                         self.moveButtonSignal.emit("enter")
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
-                                                    
+                            # showCurve(<name>, <bool>) with <name> one of { ET, BT, DeltaET, DeltaBT, BackgroundET, BackgroundBT}
+                            elif cs.startswith("showCurve(") and cs.endswith(")"):
+                                try:
+                                    args = cs[len("showCurve("):-1].split(",")
+                                    if len(args) == 2:
+                                        curve_name = args[0]
+                                        state = bool(eval(args[1])) # pylint: disable=eval-used
+                                        self.qmc.showCurveSignal.emit(curve_name, state)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # showExtraCurve(<extra_device>, <curve>, <bool>) with <extra_device> zero-based number of extra device, curve one of { T1, T2 }
+                            elif cs.startswith("showExtraCurve(") and cs.endswith(")"):
+                                try:
+                                    args = cs[len("showExtraCurve("):-1].split(",")
+                                    if len(args) == 3:
+                                        extra_device = int(args[0])
+                                        curve = args[1]
+                                        state = bool(eval(args[2])) # pylint: disable=eval-used
+                                        self.qmc.showExtraCurveSignal.emit(extra_device, curve, state)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # showEvents(<event>, <bool>) with <event_type> a number from [1, 5]
+                            elif cs.startswith("showEvents(") and cs.endswith(")"):
+                                try:
+                                    args = cs[len("showEvents("):-1].split(",")
+                                    if len(args) == 2:
+                                        event_type = int(args[0])
+                                        state = bool(eval(args[1])) # pylint: disable=eval-used
+                                        self.qmc.showEventsSignal.emit(event_type, state)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # showBackgroundEvents(<bool>)
+                            elif cs.startswith("showBackgroundEvents(") and cs.endswith(")"):
+                                try:
+                                    args = cs[len("showBackgroundEvents("):-1].split(",")
+                                    if len(args) == 1:
+                                        state = bool(eval(args[0])) # pylint: disable=eval-used
+                                        self.qmc.showBackgroundEventsSignal.emit(state)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
                 elif action == 21: # RC Command
                     # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
                     ##  pulse(ch,min,max[,sn]) : sets the min/max pulse width in microseconds
@@ -27023,7 +27118,8 @@ class ApplicationWindow(QMainWindow):
             QMessageBox.information(aw,QApplication.translate("Error Message", "Exception:",None) + " setProfile()",str(ex) + "@line " + str(getattr(exc_tb, 'tb_lineno', '?')))
             return False
 
-    def profilequality(self):
+    @staticmethod
+    def profilequality():
         bt = numpy.array(aw.qmc.temp2)
         tx = numpy.array(aw.qmc.timex)
         profile_sampling_interval = aw.qmc.profile_sampling_interval
