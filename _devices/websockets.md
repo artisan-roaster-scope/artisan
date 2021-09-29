@@ -105,6 +105,7 @@ if the `<json>` text respects the JSON format it is send to the connected WebSoc
 sets the last button state to either "pressed" if <expr> evalutes to 1 or True and "normal", otherwise
 
 Example Button Action:
+
 {% raw %}```
 read({{"command": "getRoasterState"}});button(_["data"]["state"] == "ready")
 ```{% endraw %}
