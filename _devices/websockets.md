@@ -104,14 +104,14 @@ if the `<json>` text respects the JSON format it is send to the connected WebSoc
 * `button(<expr>) :
 sets the last button state to either "pressed" if <expr> evalutes to 1 or True and "normal", otherwise
 
-Example Button Action:
+Example Custom Event Button Action:
 
 {% raw %}```
 read({{"command": "getRoasterState"}});button(_["data"]["state"] == "ready")
 ```{% endraw %}
-Send `getRoasterState` request on button perss and sets the button in "pressed" state if response indicate `ready').
+Send `getRoasterState` request on button press and sets the button in "pressed" state if response indicate "ready".
 
-The placeholder `{}` is substituted by the event value in button and slider actions.  However, if the `WebSocket Command` is used as button or  slider actinon where this substition takes place all regular brackets have to be escaped by duplicating them like in the following example
+The placeholder `{}` is substituted by the event value in custom event button and slider actions.  However, if the `WebSocket Command` is used as custom button or slider action (not as main button actions like for CHARGE, RESET, ...) where this substition takes place all regular brackets have to be escaped by duplicating them like in the following example
 
 {% raw %}```
 send(
@@ -121,11 +121,19 @@ send(
 )
 ```{% endraw %}
 
-The placeholders `{BT}`, `{ET}`, `{time}` substituted in WebSocket Command actions by the current bean temperature (BT), environmental temperature (ET) or the time in seconds (float). Again, if such a placeholder is used in a WebSocket Command, all JSON elements have to be wrapped in an extra set of brackets like in the following example.
+The placeholders `{BT}`, `{ET}`, `{time}` substituted in WebSocket Command actions by the current bean temperature (BT), environmental temperature (ET) or the time in seconds (float). Again, if such a placeholder is used in a WebSocket Command, all JSON elements have to be wrapped in an extra set of brackets as well as this placeholder substition like in the following example.
 
 ```
 {% raw %}
-send({{"command": "keepAlive", "params": {BT}}})
+send({{"command": "keepAlive", "params": {{BT}}}})
+{% endraw %}
+```
+
+A similar action for the CHARGE button would have to be written without that escaping as follows:
+
+```
+{% raw %}
+send({"command": "keepAlive", "params": {BT}})
 {% endraw %}
 ```
 
