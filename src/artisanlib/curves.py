@@ -2434,8 +2434,6 @@ class CurvesDlg(ArtisanDialog):
 
         self.aw.qmc.DeltaETfunction = str(self.DeltaETfunctionedit.text())
         self.aw.qmc.DeltaBTfunction = str(self.DeltaBTfunctionedit.text())
-        self.aw.LCD4frame.setVisible((self.aw.qmc.DeltaBTlcdflag if self.aw.qmc.swapdeltalcds else self.aw.qmc.DeltaETlcdflag))
-        self.aw.LCD5frame.setVisible((self.aw.qmc.DeltaETlcdflag if self.aw.qmc.swapdeltalcds else self.aw.qmc.DeltaBTlcdflag))
         if self.aw.largeDeltaLCDs_dialog is not None:
             self.aw.largeDeltaLCDs_dialog.updateVisiblitiesDeltaETBT()
         self.changeDecimalPlaceslcd()
@@ -2447,6 +2445,8 @@ class CurvesDlg(ArtisanDialog):
             self.aw.LCD4frame.setLayout(self.aw.LCD5frame.layout())
             self.aw.LCD5frame.setLayout(tmp.layout())
             self.aw.qmc.swapdeltalcds = swap
+        self.aw.LCD4frame.setVisible((self.aw.qmc.DeltaBTlcdflag if self.aw.qmc.swapdeltalcds else self.aw.qmc.DeltaETlcdflag))
+        self.aw.LCD5frame.setVisible((self.aw.qmc.DeltaETlcdflag if self.aw.qmc.swapdeltalcds else self.aw.qmc.DeltaBTlcdflag))
         # reflect swap or rename of ET/BT in large LCDs:
         if self.aw.largeLCDs_dialog is not None:
             self.aw.largeLCDs_dialog.reLayout()

@@ -740,7 +740,7 @@ class tgraphcanvas(FigureCanvas):
         'organization_setup', 'operator_setup', 'roastertype_setup', 'roastersize_setup', 'roasterheating_setup', 'drumspeed_setup', 'machinesetup_energy_ratings',
         'machinesetup', 'roastingnotes', 'cuppingnotes', 'roastdate', 'roastepoch', 'lastroastepoch', 'batchcounter', 'batchsequence', 'batchprefix', 'neverUpdateBatchCounter', 
         'roastbatchnr', 'roastbatchprefix', 'roastbatchpos', 'roasttzoffset', 'roastUUID', 'plus_default_store', 'plus_store', 'plus_store_label', 'plus_coffee',
-        'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_sync_record_hash', 'beans', 'projectFlag', 'ETcurve', 'BTcurve',
+        'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_sync_record_hash', 'beans', 'projectFlag', 'curveVisibilityCache', 'ETcurve', 'BTcurve',
         'ETlcd', 'BTlcd', 'swaplcds', 'LCDdecimalplaces', 'foregroundShowFullflag', 'DeltaETflag', 'DeltaBTflag', 'DeltaETlcdflag', 'DeltaBTlcdflag', 
         'swapdeltalcds', 'PIDbuttonflag', 'Controlbuttonflag', 'deltaETfilter', 'deltaBTfilter', 'curvefilter', 'deltaETspan', 'deltaBTspan',
         'deltaETsamples', 'deltaBTsamples', 'profile_sampling_interval', 'background_profile_sampling_interval', 'profile_meter', 'optimalSmoothing', 'polyfitRoRcalc',
@@ -1705,6 +1705,8 @@ class tgraphcanvas(FigureCanvas):
 
         self.beans = ""
 
+        self.curveVisibilityCache = None # caches the users curve visibility settings to be reset after recording
+        
         #flags to show projections, draw Delta ET, and draw Delta BT
         self.projectFlag = True
         self.ETcurve = True
@@ -9013,10 +9015,10 @@ class tgraphcanvas(FigureCanvas):
 
                 if self.DeltaETflag:
                     self.handles.append(self.l_delta1)
-                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + aw.ETname))
+                    self.labels.append(aw.arabicReshape(f"{deltaLabelMathPrefix}{aw.ETname}"))
                 if self.DeltaBTflag:
                     self.handles.append(self.l_delta2)
-                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + aw.BTname))
+                    self.labels.append(aw.arabicReshape(f"{deltaLabelMathPrefix}{aw.BTname}"))
 
                 nrdevices = len(self.extradevices)
 
@@ -10940,6 +10942,8 @@ class tgraphcanvas(FigureCanvas):
             if not aw.qmc.title_show_always:
                 aw.qmc.setProfileTitle("")
             
+            aw.cacheCurveVisibilities()
+            
             # disable "green flag" menu:
             try:
                 aw.ntb.disable_edit_curve_parameters()
@@ -11018,6 +11022,7 @@ class tgraphcanvas(FigureCanvas):
     def OffRecorder(self, autosave=True):
         try:
             aw.enableSaveActions()
+            aw.resetCurveVisibilities()
             self.flagstart = False
             if aw.simulator:
                 aw.buttonSTARTSTOP.setStyleSheet(aw.pushbuttonstyles_simulator["STOP"])
@@ -12313,7 +12318,7 @@ class tgraphcanvas(FigureCanvas):
                                 #some times ET is not drawn (ET = 0) when using device NONE
                                 # plot events on BT when showeventsonbt is true
                                 if aw.qmc.ETcurve and not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
-                                    anno = self.ax.annotate(firstletter + secondletter,
+                                    anno = self.ax.annotate(f"{firstletter}{secondletter}",
                                         xy=(self.timex[index],
                                         self.temp1[index]),
                                         xytext=(self.timex[index],row[etype]),
@@ -12325,7 +12330,7 @@ class tgraphcanvas(FigureCanvas):
                                         fontsize=fontsize,
                                         fontproperties=fontprop_small)
                                 elif aw.qmc.BTcurve:
-                                    anno = self.ax.annotate(firstletter + secondletter,
+                                    anno = self.ax.annotate(f"{firstletter}{secondletter}",
                                             xy=(self.timex[index],
                                             self.temp2[index]),
                                             xytext=(self.timex[index],row[etype]),
@@ -12396,7 +12401,7 @@ class tgraphcanvas(FigureCanvas):
                                         boxcolor = self.palette["specialeventbox"]
                                         textcolor = self.palette["specialeventtext"]
                                     if self.eventsGraphflag in [0,3] or self.specialeventstype[-1] > 3:
-                                        anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                                        anno = self.ax.annotate(f"{firstletter}{secondletter}", xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
                                                          color=textcolor,
                                                          va="center", ha="center",
                                                          arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4), #,relpos=(0,0)),
@@ -12408,7 +12413,7 @@ class tgraphcanvas(FigureCanvas):
                                     elif self.eventsGraphflag == 4:
                                         if thirdletter != "":
                                             firstletter = ""
-                                        anno = self.ax.annotate(firstletter + secondletter + thirdletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp),alpha=0.9,
+                                        anno = self.ax.annotate(f"{firstletter}{secondletter}{thirdletter}", xy=(self.timex[index], temp),xytext=(self.timex[index],temp),alpha=0.9,
                                                          color=textcolor,
                                                          va="center", ha="center",
                                                          bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
@@ -12510,7 +12515,7 @@ class tgraphcanvas(FigureCanvas):
                                 temp = self.temp1[index]
                             else:
                                 temp = self.temp2[index]
-                            anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                            anno = self.ax.annotate(f"{firstletter}{secondletter}", xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
                                              color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
                                              fontsize=fontsize,fontproperties=fontprop_small,backgroundcolor=aw.qmc.palette["specialeventbox"])
                             try:
@@ -12526,12 +12531,12 @@ class tgraphcanvas(FigureCanvas):
                             #some times ET is not drawn (ET = 0) when using device NONE
                             # plot events on BT when showeventsonbt is true
                             if aw.qmc.ETcurve and not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
-                                anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
+                                anno = self.ax.annotate(f"{firstletter}{secondletter}", xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
                                                  color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',
                                                  color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=fontsize,
                                                  fontproperties=fontprop_small,backgroundcolor=aw.qmc.palette["specialeventbox"])
                             elif aw.qmc.BTcurve:
-                                anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
+                                anno = self.ax.annotate(f"{firstletter}{secondletter}", xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
                                                  color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',
                                                  color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=fontsize,
                                                  fontproperties=fontprop_small,backgroundcolor=aw.qmc.palette["specialeventbox"])
@@ -12646,13 +12651,12 @@ class tgraphcanvas(FigureCanvas):
 
                     #end temperature
                     if self.locale_str == "ar":
-                        strline = ("C*min{2}=" + aw.arabicReshape(QApplication.translate("Label", "AUC", None)) \
-                                    + " " + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min", None)) \
-                                    + "{1}=" + aw.arabicReshape(QApplication.translate("Label", "RoR", None)) \
-                                    + " {0}=" + aw.arabicReshape(QApplication.translate("Label", "MET", None))) \
-                                    .format(ETmax, \
-                                    str(ror), \
-                                    str(int(tsb)))
+                        strline = (
+                                    f'C*min{int(tsb)}={aw.arabicReshape(QApplication.translate("Label", "AUC", None))}   '
+                                    f'{aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min", None))}'
+                                    f'{ror}=aw.arabicReshape(QApplication.translate("Label", "RoR", None))   '
+                                    f'{ETmax}=aw.arabicReshape(QApplication.translate("Label", "MET", None))'
+                                   )
                         if det is not None:
                             strline = ("%.1f/%.1f" % (det,dbt)) + self.mode + "=" + QApplication.translate("Label", "CM", None) + " " + strline
                         if FCperiod is not None:
@@ -12678,7 +12682,7 @@ class tgraphcanvas(FigureCanvas):
                     if tm != "00:00":
                         msg = f"{msg}, {tm}"
                     if aw.qmc.beans and aw.qmc.beans != "":
-                        msg = f"{msg}{abbrevString(aw.qmc.beans,25)}"
+                        msg = f"{msg} {abbrevString(aw.qmc.beans,25)}"
                     if aw.qmc.weight[0]:
                         if aw.qmc.weight[2] in ["g","oz"]:
                             msg += sep + str(aw.float2float(aw.qmc.weight[0],0)) + aw.qmc.weight[2]
@@ -13495,7 +13499,7 @@ class tgraphcanvas(FigureCanvas):
                     # initial bean temp set to greens_temp or ambient or a fixed temp
                     if aw.qmc.greens_temp > 0:
                         time_l = [charge]
-                        temp_l = [aw.qmc.greens_temp]                        
+                        temp_l = [aw.qmc.greens_temp]
                     elif aw.qmc.ambientTemp != None and aw.qmc.ambientTemp > 0:
                         time_l = [charge]
                         temp_l = [aw.qmc.ambientTemp]
@@ -18056,24 +18060,57 @@ class ApplicationWindow(QMainWindow):
 
         QTimer.singleShot(0,lambda : _log.info("startup time: %.2f", libtime.process_time() - startup_time))
 
+    # cache curve visibilities on recording start to be able to revert to users settings after recording
+    def cacheCurveVisibilities(self):
+        self.qmc.curveVisibilityCache = (
+            self.qmc.BTcurve,
+            self.qmc.ETcurve,
+            self.qmc.DeltaBTflag,
+            self.qmc.DeltaETflag,
+            self.extraCurveVisibility1,
+        	self.extraCurveVisibility2,
+        )
+
+    # revert curve visibilities to user settings after recording
+    def resetCurveVisibilities(self):
+        if self.qmc.curveVisibilityCache is not None:
+            (self.qmc.BTcurve,
+             self.qmc.ETcurve,
+             self.qmc.DeltaBTflag,
+             self.qmc.DeltaETflag,
+             self.extraCurveVisibility1,
+             self.extraCurveVisibility2) = self.qmc.curveVisibilityCache
+
     @pyqtSlot()
     def toggleETCurve(self):
-        self.qmc.ETcurve = not self.qmc.ETcurve
+        if self.qmc.swaplcds:
+            self.qmc.BTcurve = not self.qmc.BTcurve
+        else:
+            self.qmc.ETcurve = not self.qmc.ETcurve
         self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
     
     @pyqtSlot()
     def toggleBTCurve(self):
-        self.qmc.BTcurve = not self.qmc.BTcurve
+        if self.qmc.swaplcds:
+            self.qmc.ETcurve = not self.qmc.ETcurve
+        else:
+            self.qmc.BTcurve = not self.qmc.BTcurve
         self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
     @pyqtSlot()
     
     def toggleDeltaETCurve(self):
-        self.qmc.DeltaETflag = not self.qmc.DeltaETflag
+        if self.qmc.swapdeltalcds:
+            self.qmc.DeltaBTflag = not self.qmc.DeltaBTflag
+        else:
+            self.qmc.DeltaETflag = not self.qmc.DeltaETflag
         self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
     
     @pyqtSlot()
     def toggleDeltaBTCurve(self):
-        self.qmc.DeltaBTflag = not self.qmc.DeltaBTflag
+        if self.qmc.swapdeltalcds:
+            self.qmc.DeltaETflag = not self.qmc.DeltaETflag
+        else:
+            self.qmc.DeltaBTflag = not self.qmc.DeltaBTflag
         self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
     
     @pyqtSlot()
@@ -20274,15 +20311,14 @@ class ApplicationWindow(QMainWindow):
                 tbl2.add_row([QApplication.translate("Label","Fit RoRoR (C/min/min)",None), fitRoR, QApplication.translate("Label","Actual RoR at FCs",None), RoR_FCs_act])
                 segmentresultstr += "{}{}".format("\n", tbl2.get_string(border=False,header=False))
 
-                # this table is here to help with validation
-                if False:  # pylint: disable=condition-evals-to-constant
-                    tbl3 = prettytable.PrettyTable()
-                    tbl3.field_names = ["Start","Duration","Max Delta","Sign","Reduction","TimeIndex"  ]
-                    tbl3.float_format = "5.2"
-                    for i in range(len(maxdeltas)):
-                        thistime = self.eventtime2string(aw.qmc.timex[timeindexs[i]]-aw.qmc.timex[aw.qmc.timeindex[0]])
-                        tbl3.add_row([thistime,deltatimes[i],maxdeltas[i],signs[i],reductions[i],timeindexs[i]])
-                    segmentresultstr += "{}{}".format("\n", tbl3.get_string(border=False))
+#                # this table is here to help with validation
+#                tbl3 = prettytable.PrettyTable()
+#                tbl3.field_names = ["Start","Duration","Max Delta","Sign","Reduction","TimeIndex"  ]
+#                tbl3.float_format = "5.2"
+#                for i in range(len(maxdeltas)):
+#                    thistime = self.eventtime2string(aw.qmc.timex[timeindexs[i]]-aw.qmc.timex[aw.qmc.timeindex[0]])
+#                    tbl3.add_row([thistime,deltatimes[i],maxdeltas[i],signs[i],reductions[i],timeindexs[i]])
+#                segmentresultstr += "{}{}".format("\n", tbl3.get_string(border=False))
 
                 result['segmentresultstr'] = segmentresultstr
 
@@ -20442,45 +20478,6 @@ class ApplicationWindow(QMainWindow):
         else:
             self.slider4.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.slider4.clearFocus()
-
-#    @staticmethod
-#    def getAppPath():
-#        res = ""
-#        if platf in ['Darwin','Linux']:
-#            if appFrozen():
-#                res = QApplication.applicationDirPath() + "/../../../"
-#            else:
-#                res = os.path.dirname(os.path.realpath(__file__)) + "/../"
-#        elif platf == "Windows":
-#            if appFrozen():
-#                res = os.path.dirname(sys.executable) + "\\"
-#            else:
-#                res = os.path.dirname(os.path.realpath(__file__)) + "\\..\\"
-#        else:
-#            res = QApplication.applicationDirPath() + "/"
-#        return res
-#
-#    @staticmethod
-#    def getResourcePath():
-#        res = ""
-#        if platf == 'Darwin':
-#            if appFrozen():
-#                res = QApplication.applicationDirPath() + "/../Resources/"
-#            else:
-#                res = os.path.dirname(os.path.realpath(__file__)) + "/../includes/"
-#        elif platf == 'Linux':
-#            if appFrozen():
-#                res = QApplication.applicationDirPath() + "/"
-#            else:
-#                res = os.path.dirname(os.path.realpath(__file__)) + "/../includes/"
-#        elif platf == "Windows":
-#            if appFrozen():
-#                res = os.path.dirname(sys.executable) + "\\"
-#            else:
-#                res = os.path.dirname(os.path.realpath(__file__)) + "\\..\\includes\\"
-#        else:
-#            res = QApplication.applicationDirPath() + "/"
-#        return res
 
     def setFonts(self, redraw=True): # pylint: disable=no-self-use
         # try to select the right font for matplotlib according to the given locale and plattform
@@ -26458,6 +26455,7 @@ class ApplicationWindow(QMainWindow):
     #called by fileLoad()
     def setProfile(self,filename,profile,quiet=False):
         try:
+            updateRender = False
             #extra devices load and check
             if "extratimex" in profile:
                 if "extradevices" in profile:
@@ -27153,7 +27151,7 @@ class ApplicationWindow(QMainWindow):
         shortest_sample = numpy.min(tx_diff)
         skipped_sample_time = 1.5*avg_sample
         skipped = numpy.count_nonzero(tx_diff > skipped_sample_time)
-        bins = [0, 1*profile_sampling_interval, 1.5*profile_sampling_interval, 4**profile_sampling_interval, 1000]
+        bins = [0, 1*profile_sampling_interval, 1.5*profile_sampling_interval, 4*profile_sampling_interval, 9999]
         hist = numpy.histogram(tx_diff,bins=bins)
 
         # Aperiodic sample ratio
@@ -27172,22 +27170,22 @@ class ApplicationWindow(QMainWindow):
             missingEvents += "None "
 
         # Output string
-        output =  "Profile quality metrics"
-        output += "\nTitle: {}".format(aw.qmc.title)
-        output += "\nMeter: {}".format(meter)
-        output += "\nAverage decimals: {:.2f}".format(avgDecimal)
-        output += "\nTotal Samples {}".format(totalSamples)
-        output += "\nDuplicate Samples: {}".format(dups)
-        output += "\nBlank Samples: {}".format(blank)
-        output += "\nSkipped Samples: {}  More than {:.2f} secs".format(skipped, skipped_sample_time)
-        output += "\nHistogram of Sample Times: {}  Bins: <1x, 1x-1.5x, 1.5x-4x, >4x Profile Sampling Interval".format(hist[0])
-        output += "\nShortest Sample Interval: {:.2f}".format(shortest_sample)
-        output += "\nLongest Sample Interval: {:.2f}".format(longest_sample)
-        output += "\nAverage Sample Time: {:.2f}".format(avg_sample)
-        output += "\nProfile Sampling Interval {:.2f}".format(profile_sampling_interval)
-        output += "\nAperiodic Samples Ratio: {:.2f}".format(aperiodicRatio)
-        output += "\n{}".format(missingEvents)
-
+        output = (
+            f" Profile quality metrics"
+            f"\n  Title: {aw.qmc.title}"
+            f"\n  Meter: {meter}"
+            f"\n  Average decimals: {avgDecimal:.2f}"
+            f"\n  Total Samples {totalSamples}"
+            f"\n  Duplicate Samples: {dups}"
+            f"\n  Blank Samples: {blank}"
+            f"\n  Skipped Samples: {skipped}  (more than {skipped_sample_time:.2f} secs)"
+            f"\n  Histogram of Sample Times: {hist[0]}  Bins: <1x, 1x-1.5x, 1.5x-4x, >4x Profile Sampling Interval"
+            f"\n  Shortest Sample Interval: {shortest_sample:.2f}"
+            f"\n  Longest Sample Interval: {longest_sample:.2f}"
+            f"\n  Average Sample Time: {avg_sample:.2f}"
+            f"\n  Profile Sampling Interval {profile_sampling_interval:.2f}"
+            f"\n  Aperiodic Samples Ratio: {aperiodicRatio:.2f}"
+            f"\n  {missingEvents}")
         return output
 
     @staticmethod
