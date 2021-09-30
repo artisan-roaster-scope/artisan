@@ -662,7 +662,7 @@ def fetchServerUpdate(uuid: str, file=None):
             file_last_modified = None
 
         if file_last_modified is not None:
-            last_modified = f"?modified_at={(round(file_last_modified * 1000)):.0}"
+            last_modified = f"?modified_at={(round(file_last_modified * 1000)):.0f}"
         res = connection.getData(f"{config.roast_url}/{uuid}{last_modified}")
         status = res.status_code
         _log.debug("fetchServerUpdate() -> status: %s", status)

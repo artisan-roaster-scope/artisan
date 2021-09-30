@@ -3560,7 +3560,6 @@ class tgraphcanvas(FigureCanvas):
     # sample devices at interval self.delay miliseconds.
     # we can assume within the processing of sample_processing() that flagon=True
     def sample_processing(self, temp1_readings, temp2_readings, timex_readings):
-        _log.debug("sample_processing")
         ##### (try to) lock resources  #########
         gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,200) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
 #        gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
@@ -15515,7 +15514,6 @@ class SampleThread(QThread):
     
     # fetch the raw samples from the main and all extra devices once per interval
     def sample(self):
-        _log.debug("sample")
         gotlock = aw.qmc.samplingSemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
         if gotlock:
             try:
@@ -20149,7 +20147,7 @@ class ApplicationWindow(QMainWindow):
 
                     fcs_idx_oldway = numpy.asarray(np_dbt==aw.qmc.delta2[aw.qmc.timeindex[2]]).nonzero()
                     if fcs_idx != fcs_idx_oldway[0][0]:
-                        _log.info("Mismatch with fcs_idx methods. fcs_idx:%s fcs_idx_oldway:%s",fcs_idx, fcs_idx_oldway[0][0])
+                        _log.debug("Mismatch with fcs_idx methods. fcs_idx:%s fcs_idx_oldway:%s",fcs_idx, fcs_idx_oldway[0][0])
                 except Exception: # pylint: disable=broad-except
                     RoR_FCs_delta = float('nan')
 
