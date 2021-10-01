@@ -355,6 +355,7 @@ def main():
             acaia.DEVICE_NAME_PEARL, 
             acaia.DEVICE_NAME_PEARL2021,
             acaia.DEVICE_NAME_PEARLS,
+            acaia.DEVICE_NAME_LUNAR2021,
             acaia.DEVICE_NAME_OTHERS
         ])
     ble.scanDevices()

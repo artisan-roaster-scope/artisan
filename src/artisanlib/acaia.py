@@ -42,6 +42,9 @@ class AcaiaBLE():
     # Acaia Pearl S:
     DEVICE_NAME_PEARLS = "PEARLS"
     
+    # Acaia Lunar (2021):
+    DEVICE_NAME_LUNAR2021 = "LUNAR-"
+    
     # Others:
     DEVICE_NAME_OTHERS = "ACAIA"
     

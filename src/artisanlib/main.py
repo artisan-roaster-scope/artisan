@@ -2858,8 +2858,15 @@ class tgraphcanvas(FigureCanvas):
     def fit_titles(self):
         #truncate title and statistic line to width of axis system to avoid that the MPL canvas goes into miser mode
         try:
-            r = self.fig.canvas.get_renderer()
-            ax_width = self.ax.get_window_extent(renderer=r).width
+            r = None
+            try:
+                r = self.fig.canvas.get_renderer() # MPL fails on savePDF with 'FigureCanvasPdf' object has no attribute 'get_renderer'
+            except Exception: # pylint: disable=broad-except
+                pass
+            if r is None:
+                ax_width = self.ax.get_window_extent().width
+            else:
+                ax_width = self.ax.get_window_extent(renderer=r).width
             ax_width_for_title = ax_width - self.background_title_width
             redraw = False
             if self.title_text is not None and self.title_artist is not None and self.title_width is not None:
@@ -8362,7 +8369,7 @@ class tgraphcanvas(FigureCanvas):
 #                            print("BT RoR std:",numpy.std([x for x in self.delta2[start:end] if x is not None]))
 #                        except Exception as e: # pylint: disable=broad-except
 #                            _log.exception(e)
-                
+#                
                 # CHARGE-DROP curve index limits
                 charge_idx = 0
                 if self.timeindex[0] > -1:
@@ -9248,18 +9255,13 @@ class tgraphcanvas(FigureCanvas):
         return overlap
 
     def annoboxCorners(self,anno):
-        try:
-            f = self.ax.get_figure()
-            r = f.canvas.get_renderer()
-            anno.update_bbox_position_size(renderer=r)
-            bb = anno.get_window_extent(renderer=r) # bounding box in display space
-            bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
-            bbox = Bbox(bbox_data) # x0, y0, width, height
-            corners = (bbox.bounds[0],bbox.bounds[0]+bbox.bounds[2],bbox.bounds[1],bbox.bounds[1]+bbox.bounds[3])
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " annoboxCorners() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+        f = self.ax.get_figure()
+        r = f.canvas.get_renderer() # this can fail for PDF generation with 'FigureCanvasPdf' object has no attribute 'get_renderer'
+        anno.update_bbox_position_size(renderer=r)
+        bb = anno.get_window_extent(renderer=r) # bounding box in display space
+        bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
+        bbox = Bbox(bbox_data) # x0, y0, width, height
+        corners = (bbox.bounds[0],bbox.bounds[0]+bbox.bounds[2],bbox.bounds[1],bbox.bounds[1]+bbox.bounds[3])
         return corners  # x0, x1, y0, y1
 
     def parseSpecialeventannotation(self,eventanno, eventnum, applyto="foreground", postFCs=False):
@@ -9743,8 +9745,15 @@ class tgraphcanvas(FigureCanvas):
             warnings.simplefilter("ignore")
             t = self.ax.text(x_pos, y_pos, textstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,path_effects=[])
             f = self.ax.get_figure()
-            r = f.canvas.get_renderer()
-            t.update_bbox_position_size(renderer=r)
+            r = None
+            try:
+                r = f.canvas.get_renderer() # this might fail with 'FigureCanvasPdf' object has no attribute 'get_renderer' for PDF generation
+            except Exception: # pylint: disable=broad-except
+                pass
+            if r is None:
+                t.update_bbox_position_size()
+            else:
+                t.update_bbox_position_size(renderer=r)
             bb = t.get_window_extent(renderer=r) # bounding box in display space
             bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
             bbox = Bbox(bbox_data)
@@ -15019,7 +15028,10 @@ class tgraphcanvas(FigureCanvas):
                             if self.base_horizontalcrossline and self.base_verticalcrossline:
                                 aw.qmc.ax.draw_artist(self.base_horizontalcrossline)
                                 aw.qmc.ax.draw_artist(self.base_verticalcrossline)
-                            self.fig.canvas.blit(aw.qmc.ax.get_tightbbox(self.fig.canvas.get_renderer()))
+                            try:
+                                self.fig.canvas.blit(aw.qmc.ax.get_tightbbox(self.fig.canvas.get_renderer()))
+                            except Exception: # pylint: disable=broad-except
+                                pass
                         else:
                             self.updateBackground()
             finally:
@@ -18142,10 +18154,10 @@ class ApplicationWindow(QMainWindow):
 
     def sendLog(self) -> None:
         _log.info("sendLog()")
-    
+
         message = MIMEMultipart()
-        if plus.config.app_window.plus_email is not None:
-            message["From"] = plus.config.app_window.plus_email
+        if self.plus_email is not None:
+            message["From"] = self.plus_email
         message["To"] = "{}@{}".format(
             "logfile", "artisan.plus"
         )
