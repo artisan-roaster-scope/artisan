@@ -10560,8 +10560,8 @@ class tgraphcanvas(FigureCanvas):
             aw.update_extraeventbuttons_visibility()
             aw.updateExtraButtonsVisibility()
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
-            aw.pidcontrol.activateONOFFeasySV(aw.pidcontrol.svButtons and aw.buttonONOFF0.isVisible())
-            aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider and aw.buttonONOFF0.isVisible())
+            aw.pidcontrol.activateONOFFeasySV(aw.pidcontrol.svButtons and aw.buttonONOFF.isVisible())
+            aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider and aw.buttonONOFF.isVisible())
             self.block_update = False # unblock the updating of the bitblit canvas
             aw.updateReadingsLCDsVisibility() # this one triggers the resize and the recreation of the bitblit canvas
             self.threadserver.createSampleThread()
@@ -27350,19 +27350,19 @@ class ApplicationWindow(QMainWindow):
             computedProfile["AUCfromeventflag"] = int(aw.qmc.AUCbaseFlag)
             if (aw.qmc.AUCbegin == 0):
                 computedProfile["AUCbegin"] = "CHARGE"
-                if aw.qmc.AUCbaseFlag:  # base AUC is taken from BT at AUCbegin event
+                if aw.qmc.AUCbaseFlag and "CHARGE_BT" in computedProfile:  # base AUC is taken from BT at AUCbegin event
                     computedProfile["AUCbase"] = computedProfile["CHARGE_BT"]
             elif (aw.qmc.AUCbegin == 1):
                 computedProfile["AUCbegin"] = "TP"
-                if aw.qmc.AUCbaseFlag:  # base AUC is taken from BT at AUCbegin event
+                if aw.qmc.AUCbaseFlag and "TP_BT" in computedProfile:  # base AUC is taken from BT at AUCbegin event
                     computedProfile["AUCbase"] = computedProfile["TP_BT"]
             elif (aw.qmc.AUCbegin == 2):
                 computedProfile["AUCbegin"] = "DE"
-                if aw.qmc.AUCbaseFlag:  # base AUC is taken from BT at AUCbegin event
+                if aw.qmc.AUCbaseFlag and "DRY_BT" in computedProfile:  # base AUC is taken from BT at AUCbegin event
                     computedProfile["AUCbase"] = computedProfile["DRY_BT"]
             elif (aw.qmc.AUCbegin == 3):
                 computedProfile["AUCbegin"] = "FCs"
-                if aw.qmc.AUCbaseFlag:  # base AUC is taken from BT at AUCbegin event
+                if aw.qmc.AUCbaseFlag and "FCs_BT" in computedProfile:  # base AUC is taken from BT at AUCbegin event
                     computedProfile["AUCbase"] = computedProfile["FCs_BT"]
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
