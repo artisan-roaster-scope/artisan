@@ -8305,7 +8305,6 @@ class tgraphcanvas(FigureCanvas):
                             aw.qmc.l_background_annotations.extend(self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timeindex,TP_time=self.TP_time_B,TP_time_loaded=self.TP_time_B_loaded, draggable=False))
                         except Exception: # pylint: disable=broad-except
                             pass
-#                            traceback.print_exc(file=sys.stdout)
 
                     #show the analysis results if they exist
 #                    if len(self.analysisresultsstr) > 0:
@@ -8709,7 +8708,6 @@ class tgraphcanvas(FigureCanvas):
                         self.l_eventtype2dots, = self.ax.plot(E2x, E2y, color=self.EvalueColor[1],
                                                             marker = (self.EvalueMarker[1] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[1],
-#                                                            picker=2, # deprecated in MPL 3.3.x
                                                             picker=True,
                                                             pickradius=2,#markevery=every,
                                                             linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
@@ -8719,11 +8717,9 @@ class tgraphcanvas(FigureCanvas):
                                 pos = (pos*event_pos_factor)+event_pos_offset
                             if self.foregroundShowFullflag and (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E3_last]]):   #if cool exists and last event was earlier
                                 self.E3timex.append(self.timex[self.timeindex[7]]) #time of cool
-#                                self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E3_last]-1)*10))))]) #repeat last event value
                                 self.E3values.append(pos) #repeat last event value
                             elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E3_last]]):   #if drop exists and last event was earlier
                                 self.E3timex.append(self.timex[self.timeindex[6]]) #time of drop
-#                                self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E3_last]-1)*10))))]) #repeat last event value
                                 self.E3values.append(pos) #repeat last event value
                             E3x = self.E3timex
                             E3y = self.E3values
@@ -8740,7 +8736,6 @@ class tgraphcanvas(FigureCanvas):
                         self.l_eventtype3dots, = self.ax.plot(E3x, E3y, color=self.EvalueColor[2],
                                                             marker = (self.EvalueMarker[2] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[2],
-#                                                            picker=2, # deprecated in MPL 3.3.x
                                                             picker=True,
                                                             pickradius=2,#markevery=every,
                                                             linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
@@ -8750,11 +8745,9 @@ class tgraphcanvas(FigureCanvas):
                                 pos = (pos*event_pos_factor)+event_pos_offset
                             if self.foregroundShowFullflag and (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E4_last]]):   #if cool exists and last event was earlier
                                 self.E4timex.append(self.timex[self.timeindex[7]]) #time of cool
-#                                self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E4_last]-1)*10))))]) #repeat last event value
                                 self.E4values.append(pos) #repeat last event value
                             elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E4_last]]):   #if drop exists and last event was earlier
                                 self.E4timex.append(self.timex[self.timeindex[6]]) #time of drop
-#                                self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E4_last]-1)*10))))]) #repeat last event value
                                 self.E4values.append(pos) #repeat last event value
                             E4x = self.E4timex
                             E4y = self.E4values
@@ -8771,7 +8764,6 @@ class tgraphcanvas(FigureCanvas):
                         self.l_eventtype4dots, = self.ax.plot(E4x, E4y, color=self.EvalueColor[3],
                                                             marker = (self.EvalueMarker[3] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[3],
-#                                                            picker=2, # deprecated in MPL 3.3.x
                                                             picker=True,
                                                             pickradius=2,#markevery=every,
                                                             linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
@@ -10474,16 +10466,12 @@ class tgraphcanvas(FigureCanvas):
                 except Exception: # pylint: disable=broad-except
                     if aw.qmc.device in aw.qmc.phidgetDevices:
                         aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!",None))
-#                        _, _, exc_tb = sys.exc_info()
-#                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " addPhidgetServer() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.phidgetManager is None:
                 try:
                     self.phidgetManager = PhidgetManager()
                 except Exception: # pylint: disable=broad-except
                     if aw.qmc.device in aw.qmc.phidgetDevices:
                         aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!",None))
-#                        _, _, exc_tb = sys.exc_info()
-#                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startPhidgetManager() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             sys.stderr = _stderr
 
@@ -19941,14 +19929,6 @@ class ApplicationWindow(QMainWindow):
                         [0.001,         2.6417205e-4,   1.05668821e-3,  2.11337641e-3,  4.2267528e-3,   1.                   ]     # cm^3
                     ]
         return v*convtable[i][o]
-
-#    @pyqtSlot("QPoint")
-#    def superusermodeClicked(self,_):
-#        self.superusermode = not self.superusermode
-#        if self.superusermode:
-#            aw.sendmessage(QApplication.translate("Message","super on",None))
-#        else:
-#            aw.sendmessage(QApplication.translate("Message","super off",None))
             
     @pyqtSlot()
     def superusermodeLeftClicked(self):
@@ -27329,6 +27309,9 @@ class ApplicationWindow(QMainWindow):
                     computedProfile["total_ror"] = self.float2float(((computedProfile["DROP_BT"]-computedProfile["TP_BT"])/(computedProfile["DROP_time"]-computedProfile["TP_time"]))*60.)
                 if aw.qmc.timeindex[2] > 0 and aw.qmc.delta2:
                     computedProfile["fcs_ror"] = self.float2float(aw.qmc.delta2[aw.qmc.timeindex[2]])
+                computedProfile["dry_phase_delta_temp"] = self.float2float(ror[3])
+                computedProfile["mid_phase_delta_temp"] = self.float2float(ror[4])
+                computedProfile["finish_phase_delta_temp"] = self.float2float(ror[5])
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -31797,6 +31780,9 @@ class ApplicationWindow(QMainWindow):
             ["dry_phase_ror",       "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','Dry Phase RoR',None)        ],
             ["mid_phase_ror",       "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','Mid Phase RoR',None)        ],
             ["finish_phase_ror",    "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','Finish Phase RoR',None)     ],
+            ["dry_phase_delta_temp", "comp",  "float1",   "false",  "tmep", QApplication.translate('HTML Report Template','Dry Phase Delta BT',None)   ],            
+            ["mid_phase_delta_temp", "comp",  "float1",   "false",  "temp", QApplication.translate('HTML Report Template','Mid Phase Delta BT',None)   ],
+            ["finish_phase_delta_temp", "comp",  "float1",   "false",  "temp", QApplication.translate('HTML Report Template','Finish Phase Delta BT',None) ],
             ["dsd['computed']['finish_phase_ror'] * (dsd['computed']['finishphasetime'] / 60)", "eval", "float1", "false", "temp", QApplication.translate('HTML Report Template','Finish Phase Rise',None)],
             ["total_ror",           "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','Total RoR',None)            ],
             ["fcs_ror",             "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','FCs RoR',None)              ],
@@ -32978,9 +32964,15 @@ class ApplicationWindow(QMainWindow):
             ror = "--"
             if "total_ror" in cp:
                 ror = "%d%s%s%s"%(cp["total_ror"],uchr(176),aw.qmc.mode,QApplication.translate("Label", "/m",None))
-            if "set_density" in cp:
-                density = "%.1fg/l (set)"%cp["set_density"]
-            else:
+            try:
+                if  self.qmc.density[0] != 0.0 and self.qmc.density_roasted[0] != 0.0:
+                    percent = -1 * aw.weight_loss(self.qmc.density[0], self.qmc.density_roasted[0])
+                    density = self.volume_weight2html(self.qmc.density[0],self.qmc.density_roasted[0],"g/l",percent)
+                elif "set_density" in cp:
+                    density = "%.1fg/l (set)"%cp["set_density"]
+                else:
+                    density = "--"
+            except Exception: # pylint: disable=broad-except
                 density = "--"
             if  self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0:
                 weight = self.volume_weight2html(self.qmc.weight[0],self.qmc.weight[1],self.qmc.weight[2],cp["weight_loss"])
@@ -32990,16 +32982,6 @@ class ApplicationWindow(QMainWindow):
                 volume = self.volume_weight2html(self.qmc.volume[0],self.qmc.volume[1],self.qmc.volume[2],cp["volume_gain"])
             else:
                 volume = "--"
-#            if self.qmc.volume[0] != 0.0 and self.qmc.volume[1] != 0.0 and self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0:
-#                degree = str(self.roast_degree(cp["weight_loss"]))
-#                if "set_density" in cp:
-#                    if "green_density" in cp and "roasted_density" in cp:
-#                        density = "%.1fg/l (%s)<br>%.1fg/l (%s)"%(cp["green_density"],QApplication.translate("Label","greens"),cp["roasted_density"],QApplication.translate("Label","roasted"))
-#                elif "green_density" in cp and "roasted_density" in cp:
-#                    density = "%.1fg/l (%s)<br>%.1fg/l (%s)"%(cp["green_density"],QApplication.translate("Label","greens"),cp["roasted_density"],QApplication.translate("Label","roasted"))
-#            else:
-#                degree = "--"
-
             moisture = ""
             if "moisture_greens" in cp:
                 moisture = "%d%%"%cp["moisture_greens"]
@@ -33115,7 +33097,8 @@ class ApplicationWindow(QMainWindow):
                 charge_label=QApplication.translate("HTML Report Template", "CHARGE:", None),
                 charge=charge,
                 size_label=QApplication.translate("HTML Report Template", "Size:", None),
-                size="--" if aw.qmc.beansize_max == 0.0 else str(aw.qmc.beansize_max) + "mm",
+                size="--" if (aw.qmc.beansize_max == 0 and aw.qmc.beansize_min == 0) else (str(round(int(aw.qmc.beansize_min))) if aw.qmc.beansize_min != 0 else ""
+                    ) + ("/" if (aw.qmc.beansize_max != 0 and aw.qmc.beansize_min != 0) else "") + (str(round(int(aw.qmc.beansize_max))) if (aw.qmc.beansize_max != 0) else ""),
                 density_label=QApplication.translate("HTML Report Template", "Density:", None),
                 density=density,
                 moisture_label=QApplication.translate("HTML Report Template", "Moisture:", None),
@@ -33254,48 +33237,28 @@ class ApplicationWindow(QMainWindow):
                     dryphase = "%s (%d%%)"%(stringfromseconds(cp["dryphasetime"]),int(round(dryphasetime*100./totaltime)))
                     if "dry_phase_ror" in cp:
                         dryphase += "<br>%.1f%s%s/min"%(cp["dry_phase_ror"],uchr(176),aw.qmc.mode)
-                    if "dry_phase_AUC" in cp:
-                        dryphase += "<br>%dC*min"%(cp["dry_phase_AUC"])
-                        if ("AUCbegin" in cp and cp["AUCbegin"] != '' and "AUCbase" in cp):
-                            dryphase += " [%s,%d]"%(cp["AUCbegin"],round(cp["AUCbase"]))
-                        elif ("AUCbase" in cp):
-                            dryphase += " [%d]"%(round(cp["AUCbase"]))
-#                    if "dryphaseeval" in cp:
-#                        dryphase += "<br>" + decodeLocal(cp["dryphaseeval"])
+                    if "dry_phase_delta_temp" in cp:
+                        dryphase += "<br>%.1f%s%s"%(cp["dry_phase_delta_temp"],uchr(176),aw.qmc.mode)
                 #midphase
                 if "midphasetime" in cp:
                     midphasetime = cp["midphasetime"]
                     midphase = "%s (%d%%)"%(stringfromseconds(cp["midphasetime"]),int(round(midphasetime*100./totaltime)))
                     if "mid_phase_ror" in cp:
                         midphase += "<br>%.1f%s%s/min"%(cp["mid_phase_ror"],uchr(176),aw.qmc.mode)
-                    if "mid_phase_AUC" in cp:
-                        midphase += "<br>%dC*min"%(cp["mid_phase_AUC"])
-                        if ("AUCbegin" in cp and cp["AUCbegin"] != '' and "AUCbase" in cp):
-                            midphase += " [%s,%d]"%(cp["AUCbegin"],round(cp["AUCbase"]))
-                        elif ("AUCbase" in cp):
-                            midphase += " [%d]"%(round(cp["AUCbase"]))
-#                    if "midphaseeval" in cp:
-#                        midphase += "<br>" + decodeLocal(cp["midphaseeval"])
+                    if "mid_phase_delta_temp" in cp:
+                        midphase += "<br>%.1f%s%s"%(cp["mid_phase_delta_temp"],uchr(176),aw.qmc.mode)
                 #finishphase
                 if "finishphasetime" in cp:
                     finishphasetime = cp["finishphasetime"]
                     finishphase = "%s (%d%%)"%(stringfromseconds(cp["finishphasetime"]),int(round(finishphasetime*100./totaltime)))
                     if "finish_phase_ror" in cp:
                         finishphase += "<br>%.1f%s%s/min"%(cp["finish_phase_ror"],uchr(176),aw.qmc.mode)
-                    if "finish_phase_AUC" in cp:
-                        finishphase += "<br>%dC*min"%(cp["finish_phase_AUC"])
-                        if ("AUCbegin" in cp and cp["AUCbegin"] != '' and "AUCbase" in cp):
-                            finishphase += " [%s,%d]"%(cp["AUCbegin"],round(cp["AUCbase"]))
-                        elif ("AUCbase" in cp):
-                            finishphase += " [%d]"%(round(cp["AUCbase"]))
-#                    if "finishphaseeval" in cp:
-#                        finishphase += "<br>" + decodeLocal(cp["finishphaseeval"])
+                    if "finish_phase_delta_temp" in cp:
+                        finishphase += "<br>%.1f%s%s"%(cp["finish_phase_delta_temp"],uchr(176),aw.qmc.mode)
                 #coolphase
                 if "coolphasetime" in cp:
                     coolphasetime = cp["coolphasetime"]
                     coolphase = "%s (%d%%)"%(stringfromseconds(cp["coolphasetime"]),int(round(coolphasetime*100./totaltime)))
-#                    if "coolphaseeval" in cp:
-#                        coolphase += "<br>" + decodeLocal(cp["coolphaseeval"])
         return dryphase, midphase, finishphase, coolphase
 
     def event2html(self,cp,time_key,BT_key=None,prev_time_key=None):
