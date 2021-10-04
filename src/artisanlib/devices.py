@@ -54,26 +54,26 @@ except Exception:
 class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None, aw = None, activeTab = 0):
         super().__init__(parent,aw)
-        self.setWindowTitle(QApplication.translate("Form Caption","Device Assignment", None))
+        self.setWindowTitle(QApplication.translate("Form Caption","Device Assignment"))
         self.setModal(True)
 
         self.helpdialog = None
                     
         ################ TAB 1   WIDGETS
         #ETcurve
-        self.ETcurve = QCheckBox(QApplication.translate("CheckBox", "ET",None))
+        self.ETcurve = QCheckBox(QApplication.translate("CheckBox", "ET"))
         self.ETcurve.setChecked(self.aw.qmc.ETcurve)
         #BTcurve
-        self.BTcurve = QCheckBox(QApplication.translate("CheckBox", "BT",None))
+        self.BTcurve = QCheckBox(QApplication.translate("CheckBox", "BT"))
         self.BTcurve.setChecked(self.aw.qmc.BTcurve)
         #ETlcd
-        self.ETlcd = QCheckBox(QApplication.translate("CheckBox", "ET",None))
+        self.ETlcd = QCheckBox(QApplication.translate("CheckBox", "ET"))
         self.ETlcd.setChecked(self.aw.qmc.ETlcd)
         #BTlcd
-        self.BTlcd = QCheckBox(QApplication.translate("CheckBox", "BT",None))
+        self.BTlcd = QCheckBox(QApplication.translate("CheckBox", "BT"))
         self.BTlcd.setChecked(self.aw.qmc.BTlcd)
         #swaplcd
-        self.swaplcds = QCheckBox(QApplication.translate("CheckBox", "Swap",None))
+        self.swaplcds = QCheckBox(QApplication.translate("CheckBox", "Swap"))
         self.swaplcds.setChecked(self.aw.qmc.swaplcds)
         self.curveHBox = QHBoxLayout()
         self.curveHBox.setContentsMargins(10,5,10,5)
@@ -82,7 +82,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.curveHBox.addSpacing(10)
         self.curveHBox.addWidget(self.BTcurve)
         self.curveHBox.addStretch()
-        self.curves = QGroupBox(QApplication.translate("GroupBox","Curves",None))
+        self.curves = QGroupBox(QApplication.translate("GroupBox","Curves"))
         self.curves.setLayout(self.curveHBox)
         self.lcdHBox = QHBoxLayout()
         self.lcdHBox.setContentsMargins(0,5,0,5)
@@ -92,20 +92,20 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.lcdHBox.addWidget(self.BTlcd)
         self.lcdHBox.addSpacing(15)
         self.lcdHBox.addWidget(self.swaplcds)
-        self.lcds = QGroupBox(QApplication.translate("GroupBox","LCDs",None))
+        self.lcds = QGroupBox(QApplication.translate("GroupBox","LCDs"))
         self.lcds.setLayout(self.lcdHBox)
         
-        self.deviceLoggingFlag = QCheckBox(QApplication.translate("Label", "Logging", None))
+        self.deviceLoggingFlag = QCheckBox(QApplication.translate("Label", "Logging"))
         self.deviceLoggingFlag.setChecked(self.aw.qmc.device_logging)
         
-        self.controlButtonFlag = QCheckBox(QApplication.translate("Label", "Control", None))
+        self.controlButtonFlag = QCheckBox(QApplication.translate("Label", "Control"))
         self.controlButtonFlag.setChecked(self.aw.qmc.Controlbuttonflag)
         self.controlButtonFlag.stateChanged.connect(self.showControlbuttonToggle)
         
-        self.nonpidButton = QRadioButton(QApplication.translate("Radio Button","Meter", None))
-        self.pidButton = QRadioButton(QApplication.translate("Radio Button","PID", None))
-        self.arduinoButton = QRadioButton(QApplication.translate("Radio Button","TC4", None))
-        self.programButton = QRadioButton(QApplication.translate("Radio Button","Prog", None))
+        self.nonpidButton = QRadioButton(QApplication.translate("Radio Button","Meter"))
+        self.pidButton = QRadioButton(QApplication.translate("Radio Button","PID"))
+        self.arduinoButton = QRadioButton(QApplication.translate("Radio Button","TC4"))
+        self.programButton = QRadioButton(QApplication.translate("Radio Button","Prog"))
         #As a main device, don't show the devices that start with a "+"
         # devices with a first letter "+" are extra devices an depend on another device
         # each device provides 2 curves
@@ -130,10 +130,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.devicetypeComboBox.addItems(self.sorted_devices)
         self.programedit = QLineEdit(self.aw.ser.externalprogram)
         self.outprogramedit = QLineEdit(self.aw.ser.externaloutprogram)
-        self.outprogramFlag = QCheckBox(QApplication.translate("CheckBox", "Output",None))
+        self.outprogramFlag = QCheckBox(QApplication.translate("CheckBox", "Output"))
         self.outprogramFlag.setChecked(self.aw.ser.externaloutprogramFlag)
         self.outprogramFlag.stateChanged.connect(self.changeOutprogramFlag)         #toggle
-        selectprogrambutton =  QPushButton(QApplication.translate("Button","Select",None))
+        selectprogrambutton =  QPushButton(QApplication.translate("Button","Select"))
         selectprogrambutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         selectprogrambutton.clicked.connect(self.loadprogramname)
         
@@ -141,15 +141,15 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         db_help = QDialogButtonBox(QDialogButtonBox.StandardButton.Help)
         help_text_translated = db_help.button(QDialogButtonBox.StandardButton.Help).text()
         helpprogrambutton =  QPushButton(help_text_translated)
-        self.setButtonTranslations(helpprogrambutton,"Help",QApplication.translate("Button","Help", None))
+        self.setButtonTranslations(helpprogrambutton,"Help",QApplication.translate("Button","Help"))
         helpprogrambutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         helpprogrambutton.clicked.connect(self.showhelpprogram)
-        selectoutprogrambutton =  QPushButton(QApplication.translate("Button","Select",None))
+        selectoutprogrambutton =  QPushButton(QApplication.translate("Button","Select"))
         selectoutprogrambutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         selectoutprogrambutton.clicked.connect(self.loadoutprogramname)
         ###################################################
         # PID
-        controllabel =QLabel(QApplication.translate("Label", "Control ET",None))
+        controllabel =QLabel(QApplication.translate("Label", "Control ET"))
         self.controlpidtypeComboBox = QComboBox()
         self.controlpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR","Delta DTA","Fuji PXF"])
         cp = self.aw.ser.controlETpid[0]
@@ -157,12 +157,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.controlpidtypeComboBox.setCurrentIndex(cp)  #pid type is index 0
         else:
             self.controlpidtypeComboBox.setCurrentIndex(cp-1)  #pid type is index 0 PXF has an index offset of 1 as index 3 is not used
-        btlabel =QLabel(QApplication.translate("Label", "Read BT",None))
+        btlabel =QLabel(QApplication.translate("Label", "Read BT"))
         self.btpidtypeComboBox = QComboBox()
         self.btpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR","None","Delta DTA","Fuji PXF"])
         self.btpidtypeComboBox.setCurrentIndex(self.aw.ser.readBTpid[0]) #pid type is index 0
-        label1 = QLabel(QApplication.translate("Label", "Type",None))
-        label2 = QLabel(QApplication.translate("Label", "RS485 Unit ID",None))
+        label1 = QLabel(QApplication.translate("Label", "Type"))
+        label2 = QLabel(QApplication.translate("Label", "RS485 Unit ID"))
         #rs485 possible unit IDs (1-32); unit 0 is master (computer)
         unitids = list(map(str,list(range(1,33))))
         self.controlpidunitidComboBox = QComboBox()
@@ -173,18 +173,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.controlpidunitidComboBox.setCurrentIndex(unitids.index(str(self.aw.ser.controlETpid[1])))
         self.btpidunitidComboBox.setCurrentIndex(unitids.index(str(self.aw.ser.readBTpid[1])))
         #Show Fuji PID SV/% LCDs
-        self.showFujiLCDs = QCheckBox(QApplication.translate("CheckBox", "PID Duty/Power LCDs",None))
+        self.showFujiLCDs = QCheckBox(QApplication.translate("CheckBox", "PID Duty/Power LCDs"))
         self.showFujiLCDs.setChecked(self.aw.ser.showFujiLCDs)
         #Reuse Modbus port
-        self.useModbusPort = QCheckBox(QApplication.translate("CheckBox", "Modbus Port",None))
+        self.useModbusPort = QCheckBox(QApplication.translate("CheckBox", "Modbus Port"))
         self.useModbusPort.setChecked(self.aw.ser.useModbusPort)
         ####################################################
         #Arduino TC4 channel config
         arduinoChannels = ["None","1","2","3","4"]
-        arduinoETLabel =QLabel(QApplication.translate("Label", "ET Channel",None))
+        arduinoETLabel =QLabel(QApplication.translate("Label", "ET Channel"))
         self.arduinoETComboBox = QComboBox()
         self.arduinoETComboBox.addItems(arduinoChannels)
-        arduinoBTLabel =QLabel(QApplication.translate("Label", "BT Channel",None))
+        arduinoBTLabel =QLabel(QApplication.translate("Label", "BT Channel"))
         self.arduinoBTComboBox = QComboBox()
         self.arduinoBTComboBox.addItems(arduinoChannels)
         #check previous settings for radio button
@@ -210,16 +210,16 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.arduinoBTComboBox.setCurrentIndex(arduinoChannels.index(self.aw.ser.arduinoBTChannel))
         except Exception: # pylint: disable=broad-except
             pass
-        arduinoATLabel =QLabel(QApplication.translate("Label", "AT Channel",None))
+        arduinoATLabel =QLabel(QApplication.translate("Label", "AT Channel"))
         
         arduinoTemperatures = ["None","T1","T2","T3","T4","T5","T6"]
         self.arduinoATComboBox = QComboBox()
         self.arduinoATComboBox.addItems(arduinoTemperatures)
         self.arduinoATComboBox.setCurrentIndex(arduinoTemperatures.index(self.aw.ser.arduinoATChannel))
-        self.showControlButton = QCheckBox(QApplication.translate("CheckBox", "PID Firmware",None))
+        self.showControlButton = QCheckBox(QApplication.translate("CheckBox", "PID Firmware"))
         self.showControlButton.setChecked(self.aw.qmc.PIDbuttonflag)
         self.showControlButton.stateChanged.connect(self.PIDfirmwareToggle)
-        FILTLabel =QLabel(QApplication.translate("Label", "Filter",None))
+        FILTLabel =QLabel(QApplication.translate("Label", "Filter"))
         self.FILTspinBoxes = []
         for i in range(4):
             spinBox = QSpinBox()
@@ -235,12 +235,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.dialogbuttons.accepted.connect(self.okEvent)
         self.dialogbuttons.rejected.connect(self.cancelEvent)
         
-        labelETadvanced = QLabel(QApplication.translate("Label", "ET Y(x)",None))
-        labelBTadvanced = QLabel(QApplication.translate("Label", "BT Y(x)",None))
+        labelETadvanced = QLabel(QApplication.translate("Label", "ET Y(x)"))
+        labelBTadvanced = QLabel(QApplication.translate("Label", "BT Y(x)"))
         self.ETfunctionedit = QLineEdit(str(self.aw.qmc.ETfunction))
         self.BTfunctionedit = QLineEdit(str(self.aw.qmc.BTfunction))
         symbolicHelpButton = QPushButton(help_text_translated)
-        self.setButtonTranslations(symbolicHelpButton,"Help",QApplication.translate("Button","Help", None))
+        self.setButtonTranslations(symbolicHelpButton,"Help",QApplication.translate("Button","Help"))
         symbolicHelpButton.setMaximumSize(symbolicHelpButton.sizeHint())
         symbolicHelpButton.setMinimumSize(symbolicHelpButton.minimumSizeHint())
         symbolicHelpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -250,11 +250,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.devicetable = QTableWidget()
         self.devicetable.setTabKeyNavigation(True)
         self.createDeviceTable()
-        self.copydeviceTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
-        self.copydeviceTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
+        self.copydeviceTableButton = QPushButton(QApplication.translate("Button", "Copy Table"))
+        self.copydeviceTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text"))
         self.copydeviceTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.copydeviceTableButton.clicked.connect(self.copyDeviceTabletoClipboard)
-        self.addButton = QPushButton(QApplication.translate("Button","Add",None))
+        self.addButton = QPushButton(QApplication.translate("Button","Add"))
         self.addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.addButton.setMinimumWidth(100)
         #self.addButton.setMaximumWidth(100)
@@ -263,24 +263,24 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         db_reset = QDialogButtonBox(QDialogButtonBox.StandardButton.Reset)
         reset_text_translated = db_reset.button(QDialogButtonBox.StandardButton.Reset).text()
         resetButton =  QPushButton(reset_text_translated)
-        self.setButtonTranslations(resetButton,"Reset",QApplication.translate("Button","Reset", None))
+        self.setButtonTranslations(resetButton,"Reset",QApplication.translate("Button","Reset"))
         resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         resetButton.setMinimumWidth(100)
         resetButton.clicked.connect(self.resetextradevices)
         extradevHelpButton = QPushButton(help_text_translated)
-        self.setButtonTranslations(extradevHelpButton,"Help",QApplication.translate("Button","Help", None))
+        self.setButtonTranslations(extradevHelpButton,"Help",QApplication.translate("Button","Help"))
         extradevHelpButton.setMinimumWidth(100)
         extradevHelpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         extradevHelpButton.clicked.connect(self.showExtradevHelp)
-        self.delButton = QPushButton(QApplication.translate("Button","Delete",None))
+        self.delButton = QPushButton(QApplication.translate("Button","Delete"))
         self.delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.delButton.setMinimumWidth(100)
         #self.delButton.setMaximumWidth(100)
         self.delButton.clicked.connect(self.deldevice)
-        self.recalcButton = QPushButton(QApplication.translate("Button","Update Profile",None))
+        self.recalcButton = QPushButton(QApplication.translate("Button","Update Profile"))
         self.recalcButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.recalcButton.setMinimumWidth(100)
-        self.recalcButton.setToolTip(QApplication.translate("Tooltip","Recaclulates all Virtual Devices and updates their values in the profile",None))
+        self.recalcButton.setToolTip(QApplication.translate("Tooltip","Recaclulates all Virtual Devices and updates their values in the profile"))
         self.recalcButton.clicked.connect(self.updateVirtualdevicesinprofile_clicked)
         self.enableDisableAddDeleteButtons()
         ##########     LAYOUTS
@@ -303,7 +303,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
             
-            changeTriggersCombo.setMinimumContentsLength(3)
+            changeTriggersCombo.setMinimumContentsLength(2)
             changeTriggersCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
             changeTriggersCombo.setEnabled(bool(self.aw.qmc.phidget1048_async[i-1]))
             
@@ -359,10 +359,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidgetBox1048.addWidget(self.dataRateCombo1048,4,1,1,2)
         phidgetBox1048.setSpacing(1)
             
-        typeLabel = QLabel(QApplication.translate("Label","Type", None))
-        asyncLabel = QLabel(QApplication.translate("Label","Async", None))
-        changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None))
-        rateLabel = QLabel(QApplication.translate("Label","Rate", None))
+        typeLabel = QLabel(QApplication.translate("Label","Type"))
+        asyncLabel = QLabel(QApplication.translate("Label","Async"))
+        changeTriggerLabel = QLabel(QApplication.translate("Label","Change"))
+        rateLabel = QLabel(QApplication.translate("Label","Rate"))
         phidgetBox1048.addWidget(typeLabel,1,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1048.addWidget(asyncLabel,2,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1048.addWidget(changeTriggerLabel,3,0,Qt.AlignmentFlag.AlignRight)
@@ -405,9 +405,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.asyncCheckBoxe1045.stateChanged.connect(self.asyncFlagStateChanged1045)
         self.asyncCheckBoxe1045.setChecked(self.aw.qmc.phidget1045_async)
         phidgetBox1045.addWidget(self.asyncCheckBoxe1045,2,1)
-        asyncLabel = QLabel(QApplication.translate("Label","Async", None))
-        changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None))
-        rateLabel = QLabel(QApplication.translate("Label","Rate", None)) 
+        asyncLabel = QLabel(QApplication.translate("Label","Async"))
+        changeTriggerLabel = QLabel(QApplication.translate("Label","Change"))
+        rateLabel = QLabel(QApplication.translate("Label","Rate")) 
                 
         self.dataRateCombo1045 = QComboBox()
         self.dataRateCombo1045.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -426,7 +426,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if platform.system() == 'Darwin':
             self.dataRateCombo1045.setMaximumWidth(width)
         
-        EmissivityLabel = QLabel(QApplication.translate("Label","Emissivity", None))
+        EmissivityLabel = QLabel(QApplication.translate("Label","Emissivity"))
         self.emissivitySpinBox = QDoubleSpinBox()
         self.emissivitySpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.emissivitySpinBox.setRange(0.,1.)
@@ -488,12 +488,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
 
-            formulaCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
-            formulaCombo.setMinimumContentsLength(3)
-            width = formulaCombo.minimumSizeHint().width()
-            formulaCombo.setMinimumWidth(width)
-            if platform.system() == 'Darwin':
-                formulaCombo.setMaximumWidth(width)
+#            formulaCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
+#            formulaCombo.setMinimumContentsLength(3)
+#            width = formulaCombo.minimumSizeHint().width()
+#            formulaCombo.setMinimumWidth(width)
+#            if platform.system() == 'Darwin':
+#                formulaCombo.setMaximumWidth(width)
 
             self.formulaCombos1046.append(formulaCombo)
             phidgetBox1046.addWidget(formulaCombo,2,i)
@@ -527,10 +527,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidgetBox1046.addWidget(self.dataRateCombo1046,4,1,1,2)
         phidgetBox1046.setSpacing(5)
      
-        gainLabel = QLabel(QApplication.translate("Label","Gain", None))
-        formulaLabel = QLabel(QApplication.translate("Label","Wiring", None))
-        asyncLabel = QLabel(QApplication.translate("Label","Async", None))
-        rateLabel = QLabel(QApplication.translate("Label","Rate", None))
+        gainLabel = QLabel(QApplication.translate("Label","Gain"))
+        formulaLabel = QLabel(QApplication.translate("Label","Wiring"))
+        asyncLabel = QLabel(QApplication.translate("Label","Async"))
+        rateLabel = QLabel(QApplication.translate("Label","Rate"))
         phidgetBox1046.addWidget(gainLabel,1,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1046.addWidget(formulaLabel,2,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1046.addWidget(asyncLabel,3,0,Qt.AlignmentFlag.AlignRight)
@@ -688,17 +688,17 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 #        self.rateCombo1200_2.setMaximumWidth(width)
 #---
         
-        typeLabel = QLabel(QApplication.translate("Label","Type", None))
-        wireLabel = QLabel(QApplication.translate("Label","Wiring", None))
-        asyncLabel = QLabel(QApplication.translate("Label","Async", None))
-        changeLabel = QLabel(QApplication.translate("Label","Change", None))
-        rateLabel = QLabel(QApplication.translate("Label","Rate", None))
+        typeLabel = QLabel(QApplication.translate("Label","Type"))
+        wireLabel = QLabel(QApplication.translate("Label","Wiring"))
+        asyncLabel = QLabel(QApplication.translate("Label","Async"))
+        changeLabel = QLabel(QApplication.translate("Label","Change"))
+        rateLabel = QLabel(QApplication.translate("Label","Rate"))
         
-        typeLabel2 = QLabel(QApplication.translate("Label","Type", None))
-        wireLabel2 = QLabel(QApplication.translate("Label","Wiring", None))
-        asyncLabel2 = QLabel(QApplication.translate("Label","Async", None))
-        changeLabel2 = QLabel(QApplication.translate("Label","Change", None))
-        rateLabel2 = QLabel(QApplication.translate("Label","Rate", None))
+        typeLabel2 = QLabel(QApplication.translate("Label","Type"))
+        wireLabel2 = QLabel(QApplication.translate("Label","Wiring"))
+        asyncLabel2 = QLabel(QApplication.translate("Label","Async"))
+        changeLabel2 = QLabel(QApplication.translate("Label","Change"))
+        rateLabel2 = QLabel(QApplication.translate("Label","Rate"))
         
         phidgetBox1200.addWidget(typeLabel,1,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1200.addWidget(self.formulaCombo1200,1,1)
@@ -761,8 +761,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         
         
         # DAQ1400 VI
-        powerLabel = QLabel(QApplication.translate("Label","Power", None))
-        modeLabel = QLabel(QApplication.translate("Label","Mode", None))
+        powerLabel = QLabel(QApplication.translate("Label","Power"))
+        modeLabel = QLabel(QApplication.translate("Label","Mode"))
 
         self.powerCombo1400 = QComboBox()
         self.powerCombo1400.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -898,11 +898,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             rowLabel = QLabel(str(i-1))
             phidgetBox1018.addWidget(rowLabel,0,i)
 
-        asyncLabel = QLabel(QApplication.translate("Label","Async", None))
-        dataRateLabel = QLabel(QApplication.translate("Label","Rate", None))
-        changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None))
-        ratioLabel = QLabel(QApplication.translate("Label","Ratio", None))
-        rangeLabel = QLabel(QApplication.translate("Label","Range", None))
+        asyncLabel = QLabel(QApplication.translate("Label","Async"))
+        dataRateLabel = QLabel(QApplication.translate("Label","Rate"))
+        changeTriggerLabel = QLabel(QApplication.translate("Label","Change"))
+        ratioLabel = QLabel(QApplication.translate("Label","Ratio"))
+        rangeLabel = QLabel(QApplication.translate("Label","Range"))
         phidgetBox1018.addWidget(asyncLabel,2,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1018.addWidget(changeTriggerLabel,3,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1018.addWidget(dataRateLabel,4,0,Qt.AlignmentFlag.AlignRight)
@@ -916,17 +916,17 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.phidgetBoxRemoteFlag = QCheckBox()
         self.phidgetBoxRemoteFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.phidgetBoxRemoteFlag.setChecked(self.aw.qmc.phidgetRemoteFlag)
-        phidgetServerIdLabel = QLabel(QApplication.translate("Label","Host", None))
+        phidgetServerIdLabel = QLabel(QApplication.translate("Label","Host"))
         self.phidgetServerId = QLineEdit(self.aw.qmc.phidgetServerID)
         self.phidgetServerId.setMinimumWidth(200)
-        phidgetPasswordLabel = QLabel(QApplication.translate("Label","Password", None))
+        phidgetPasswordLabel = QLabel(QApplication.translate("Label","Password"))
         self.phidgetPassword = QLineEdit(self.aw.qmc.phidgetPassword)
         self.phidgetPassword.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
         self.phidgetPassword.setMinimumWidth(100)
-        phidgetPortLabel = QLabel(QApplication.translate("Label","Port", None))
+        phidgetPortLabel = QLabel(QApplication.translate("Label","Port"))
         self.phidgetPort = QLineEdit(str(self.aw.qmc.phidgetPort))
         self.phidgetPort.setMaximumWidth(70)
-        self.phidgetBoxRemoteOnlyFlag = QCheckBox(QApplication.translate("Label","Remote Only", None))
+        self.phidgetBoxRemoteOnlyFlag = QCheckBox(QApplication.translate("Label","Remote Only"))
         self.phidgetBoxRemoteOnlyFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.phidgetBoxRemoteOnlyFlag.setChecked(self.aw.qmc.phidgetRemoteOnlyFlag)
         phidgetServerBox = QHBoxLayout()
@@ -955,7 +955,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidgetNetworkGrid.addWidget(self.phidgetBoxRemoteOnlyFlag)
         phidgetNetworkGrid.setContentsMargins(0,0,0,0)
         phidgetNetworkGrid.setSpacing(20)
-        phidgetNetworkGroupBox = QGroupBox(QApplication.translate("GroupBox","Network",None))
+        phidgetNetworkGroupBox = QGroupBox(QApplication.translate("GroupBox","Network"))
         phidgetNetworkGroupBox.setLayout(phidgetNetworkGrid)
         phidget10451018HBox = QHBoxLayout()
         phidget10451018HBox.addWidget(phidget1045GroupBox)
@@ -972,9 +972,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.yoctoBoxRemoteFlag = QCheckBox()
         self.yoctoBoxRemoteFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.yoctoBoxRemoteFlag.setChecked(self.aw.qmc.yoctoRemoteFlag)
-        yoctoServerIdLabel = QLabel(QApplication.translate("Label","VirtualHub", None))
+        yoctoServerIdLabel = QLabel(QApplication.translate("Label","VirtualHub"))
         self.yoctoServerId = QLineEdit(self.aw.qmc.yoctoServerID)
-        YoctoEmissivityLabel = QLabel(QApplication.translate("Label","Emissivity", None))
+        YoctoEmissivityLabel = QLabel(QApplication.translate("Label","Emissivity"))
         self.yoctoEmissivitySpinBox = QDoubleSpinBox()
         self.yoctoEmissivitySpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.yoctoEmissivitySpinBox.setRange(0.,1.)
@@ -991,7 +991,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         yoctoNetworkGrid.addLayout(yoctoServerBox,0,1)
 #        yoctoNetworkGrid.setContentsMargins(10,10,10,10)
         yoctoNetworkGrid.setSpacing(20)
-        yoctoNetworkGroupBox = QGroupBox(QApplication.translate("GroupBox","Network",None))
+        yoctoNetworkGroupBox = QGroupBox(QApplication.translate("GroupBox","Network"))
         yoctoNetworkGroupBox.setLayout(yoctoNetworkGrid)
         yoctoIRGrid = QGridLayout()
         yoctoIRGrid.addWidget(YoctoEmissivityLabel,0,0)
@@ -1022,9 +1022,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         yoctoAsyncHorizontalLayout = QHBoxLayout()
         yoctoAsyncHorizontalLayout.addLayout(yoctoAsyncGrid)
         yoctoAsyncHorizontalLayout.addStretch()
-        yoctoAsyncGroupBox = QGroupBox(QApplication.translate("GroupBox","Async",None))
+        yoctoAsyncGroupBox = QGroupBox(QApplication.translate("GroupBox","Async"))
         yoctoAsyncGroupBox.setLayout(yoctoAsyncHorizontalLayout)
-        yoctoIRGroupBox = QGroupBox(QApplication.translate("GroupBox","IR",None))
+        yoctoIRGroupBox = QGroupBox(QApplication.translate("GroupBox","IR"))
         yoctoIRGroupBox.setLayout(yoctoIRHorizontalLayout)
         yoctoVBox = QVBoxLayout()
         yoctoVBox.addWidget(yoctoNetworkGroupBox)
@@ -1066,10 +1066,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.elevationSpinBox.setSingleStep(1)
         self.elevationSpinBox.setValue(self.aw.qmc.elevation)
         self.elevationSpinBox.setSuffix(" " + QApplication.translate("Label","MASL"))
-        temperatureDeviceLabel = QLabel(QApplication.translate("Label","Temperature",None))
-        humidityDeviceLabel = QLabel(QApplication.translate("Label","Humidity",None))
-        pressureDeviceLabel = QLabel(QApplication.translate("Label","Pressure",None))
-        elevationLabel = QLabel(QApplication.translate("Label","Elevation",None))
+        temperatureDeviceLabel = QLabel(QApplication.translate("Label","Temperature"))
+        humidityDeviceLabel = QLabel(QApplication.translate("Label","Humidity"))
+        pressureDeviceLabel = QLabel(QApplication.translate("Label","Pressure"))
+        elevationLabel = QLabel(QApplication.translate("Label","Elevation"))
         ambientGrid = QGridLayout()
         ambientGrid.addWidget(temperatureDeviceLabel,0,0)
         ambientGrid.addWidget(self.temperatureDeviceCombo,0,1)
@@ -1104,7 +1104,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         PIDBox.addLayout(PIDgrid)
         PIDBox.addStretch()
         PIDBox.setContentsMargins(5,0,5,5)
-        PIDGroupBox = QGroupBox(QApplication.translate("GroupBox","PID",None))
+        PIDGroupBox = QGroupBox(QApplication.translate("GroupBox","PID"))
         PIDGroupBox.setLayout(PIDBox)
         # create arduino box
         filtgrid = QGridLayout()
@@ -1131,7 +1131,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         arduinoBox = QVBoxLayout()
         arduinoBox.addLayout(arduinogridBox)
         arduinoBox.setContentsMargins(5,5,5,5)
-        arduinoGroupBox = QGroupBox(QApplication.translate("GroupBox","Arduino TC4",None))
+        arduinoGroupBox = QGroupBox(QApplication.translate("GroupBox","Arduino TC4"))
         arduinoGroupBox.setLayout(arduinoBox)
         arduinoBox.setContentsMargins(0,0,0,0)
         arduinoGroupBox.setContentsMargins(0,12,0,0)
@@ -1143,21 +1143,21 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         programlayout.addWidget(self.outprogramFlag,1,0)
         programlayout.addWidget(selectoutprogrambutton,1,1)
         programlayout.addWidget(self.outprogramedit,1,2)
-        programGroupBox = QGroupBox(QApplication.translate("GroupBox","External Program",None))
+        programGroupBox = QGroupBox(QApplication.translate("GroupBox","External Program"))
         programGroupBox.setLayout(programlayout)
         programlayout.setContentsMargins(5,10,5,5)
         programGroupBox.setContentsMargins(0,12,0,0)
         #ET BT symbolic adjustments/assignments Box
-        self.updateETBTButton = QPushButton(QApplication.translate("Button","Update Profile",None))
+        self.updateETBTButton = QPushButton(QApplication.translate("Button","Update Profile"))
         self.updateETBTButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.updateETBTButton.setToolTip(QApplication.translate("Tooltip","Recaclulates ET and BT and updates their values in the profile",None))
+        self.updateETBTButton.setToolTip(QApplication.translate("Tooltip","Recaclulates ET and BT and updates their values in the profile"))
         self.updateETBTButton.clicked.connect(self.updateETBTinprofile)
 
         adjustmentHelp = QHBoxLayout()
         adjustmentHelp.addWidget(self.updateETBTButton)
         adjustmentHelp.addStretch()
         adjustmentHelp.addWidget(symbolicHelpButton)
-        adjustmentGroupBox = QGroupBox(QApplication.translate("GroupBox","Symbolic Assignments",None))
+        adjustmentGroupBox = QGroupBox(QApplication.translate("GroupBox","Symbolic Assignments"))
         adjustmentsLayout = QVBoxLayout()
         adjustmentsLayout.addWidget(labelETadvanced)
         adjustmentsLayout.addWidget(self.ETfunctionedit)
@@ -1238,22 +1238,22 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT",None))
+        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT"))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra Devices",None))
+        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra Devices"))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab","Symb ET/BT",None))
+        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab","Symb ET/BT"))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab","Phidgets",None))
+        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab","Phidgets"))
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
-        self.TabWidget.addTab(C5Widget,QApplication.translate("Tab","Yoctopuce",None))
+        self.TabWidget.addTab(C5Widget,QApplication.translate("Tab","Yoctopuce"))
         C6Widget = QWidget()
         C6Widget.setLayout(tab6Layout)
-        self.TabWidget.addTab(C6Widget,QApplication.translate("Tab","Ambient",None))
+        self.TabWidget.addTab(C6Widget,QApplication.translate("Tab","Ambient"))
         self.TabWidget.currentChanged.connect(self.tabSwitched)
         #incorporate layouts
         Mlayout = QVBoxLayout()
@@ -1367,21 +1367,21 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.devicetable.clearSelection()
             self.devicetable.setRowCount(nddevices)
             self.devicetable.setColumnCount(columns)
-            self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device",None),
-                                                        QApplication.translate("Table", "Color 1",None),
-                                                        QApplication.translate("Table", "Color 2",None),
-                                                        QApplication.translate("Table", "Label 1",None),
-                                                        QApplication.translate("Table", "Label 2",None),
-                                                        QApplication.translate("Table", "y1(x)",None),
-                                                        QApplication.translate("Table", "y2(x)",None),
-                                                        QApplication.translate("Table", "LCD 1",None),
-                                                        QApplication.translate("Table", "LCD 2",None),
-                                                        QApplication.translate("Table", "Curve 1",None),
-                                                        QApplication.translate("Table", "Curve 2",None),
-                                                        deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis",None) + " 1",
-                                                        deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis",None) + " 2",
-                                                        QApplication.translate("Table", "Fill 1",None),
-                                                        QApplication.translate("Table", "Fill 2",None)])
+            self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device"),
+                                                        QApplication.translate("Table", "Color 1"),
+                                                        QApplication.translate("Table", "Color 2"),
+                                                        QApplication.translate("Table", "Label 1"),
+                                                        QApplication.translate("Table", "Label 2"),
+                                                        QApplication.translate("Table", "y1(x)"),
+                                                        QApplication.translate("Table", "y2(x)"),
+                                                        QApplication.translate("Table", "LCD 1"),
+                                                        QApplication.translate("Table", "LCD 2"),
+                                                        QApplication.translate("Table", "Curve 1"),
+                                                        QApplication.translate("Table", "Curve 2"),
+                                                        deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis") + " 1",
+                                                        deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis") + " 2",
+                                                        QApplication.translate("Table", "Fill 1"),
+                                                        QApplication.translate("Table", "Fill 2")])
             self.devicetable.setAlternatingRowColors(True)
             self.devicetable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
             self.devicetable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
@@ -1423,8 +1423,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         name2edit = QLineEdit(self.aw.qmc.extraname2[i])
                         mexpr1edit = QLineEdit(self.aw.qmc.extramathexpression1[i])
                         mexpr2edit = QLineEdit(self.aw.qmc.extramathexpression2[i])
-                        mexpr1edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + 2*x",None))
-                        mexpr2edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + x",None))
+                        mexpr1edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + 2*x"))
+                        mexpr2edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + x"))
                         LCD1visibilityComboBox =  QCheckBox()
                         if self.aw.extraLCDvisibility1[i]:
                             LCD1visibilityComboBox.setCheckState(Qt.CheckState.Checked)
@@ -1505,7 +1505,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         pass
         except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createDeviceTable(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " createDeviceTable(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def copyDeviceTabletoClipboard(self,_=False):
@@ -1564,7 +1564,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
         sys_clip.setText(clipboard)
-        self.aw.sendmessage(QApplication.translate("Message","Device table copied to clipboard",None))
+        self.aw.sendmessage(QApplication.translate("Message","Device table copied to clipboard"))
 
     @pyqtSlot(bool)
     def loadprogramname(self,_):
@@ -1612,7 +1612,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " adddevice(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " adddevice(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def deldevice(self,_):
@@ -1629,7 +1629,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.enableDisableAddDeleteButtons()
         except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " deldevice(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " deldevice(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def resetextradevices(self,_):
@@ -1643,7 +1643,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " resetextradevices(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " resetextradevices(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def delextradevice(self,x):
         try:
@@ -1729,7 +1729,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "delextradevice(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + "delextradevice(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def savedevicetable(self,redraw=True):
         try:
@@ -1779,7 +1779,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "savedevicetable(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + "savedevicetable(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def updateVirtualdevicesinprofile_clicked(self,_):
@@ -1793,7 +1793,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateVirtualdevicesinprofile(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + "updateVirtualdevicesinprofile(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def updateETBTinprofile(self,_):
@@ -1804,8 +1804,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if (nonempty_ETfunction or nonempty_BTfunction):
 
                 # confirm the action
-                string = QApplication.translate("Message", "Clicking YES will overwrite the existing ET and BT values in this profile with the symbolic values defined here.  Click CANCEL to abort.",None)
-                reply = QMessageBox.warning(self.aw,QApplication.translate("Message", "Caution - About to overwrite profile data",None),string,
+                string = QApplication.translate("Message", "Clicking YES will overwrite the existing ET and BT values in this profile with the symbolic values defined here.  Click CANCEL to abort.")
+                reply = QMessageBox.warning(self.aw,QApplication.translate("Message", "Caution - About to overwrite profile data"),string,
                             QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
                 if reply == QMessageBox.StandardButton.Cancel:
                     return
@@ -1815,8 +1815,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 etorbt = re.compile('Y1|Y2|T1|T2|R1|R2')
                 for j in range(len(self.aw.qmc.extradevices)):
                     if (re.search(etorbt,self.aw.qmc.extramathexpression1[j]) or re.search(etorbt,self.aw.qmc.extramathexpression2[j])):
-                        string = QApplication.translate("Message", "At least one Virtual Extra Device depends on ET or BT.  Do you want to update all the Virtual Extra Devices after ET and BT are updated?",None)
-                        reply = QMessageBox.warning(self.aw,QApplication.translate("Message", "Caution - About to overwrite profile data",None),string,
+                        string = QApplication.translate("Message", "At least one Virtual Extra Device depends on ET or BT.  Do you want to update all the Virtual Extra Devices after ET and BT are updated?")
+                        reply = QMessageBox.warning(self.aw,QApplication.translate("Message", "Caution - About to overwrite profile data"),string,
                                     QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No)
                         if reply == QMessageBox.StandardButton.Yes:
                             updatevirtualextradevices = True
@@ -1831,14 +1831,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     if updatevirtualextradevices:
                         self.updateVirtualdevicesinprofile(redraw=False)
                     self.aw.qmc.redraw(recomputeAllDeltas=True)
-                    self.aw.sendmessage(QApplication.translate("Message", "Symbolic values updated.",None))
+                    self.aw.sendmessage(QApplication.translate("Message", "Symbolic values updated."))
                 else:
-                    self.aw.sendmessage(QApplication.translate("Message", "Symbolic values were not updated.",None))
+                    self.aw.sendmessage(QApplication.translate("Message", "Symbolic values were not updated."))
             else:
-                self.aw.sendmessage(QApplication.translate("Message", "Nothing here to process.",None))
+                self.aw.sendmessage(QApplication.translate("Message", "Nothing here to process."))
         except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateETBTinprofile(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + "updateETBTinprofile(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(int)
     def updateLCDvisibility1(self,x):
@@ -1917,8 +1917,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.setLabelColor(self.aw.extraLCDlabel1[i],QColor(colorname))
                     self.devicetable.cellWidget(i,1).setStyleSheet("background-color: %s; color: %s"%(self.aw.qmc.extradevicecolor1[i], self.aw.labelBorW(self.aw.qmc.extradevicecolor1[i])))
                     self.devicetable.cellWidget(i,1).setText(colorname)
-                    self.aw.checkColors([(self.aw.qmc.extraname1[i], self.aw.qmc.extradevicecolor1[i], QApplication.translate("Label","Background",None), self.aw.qmc.palette['background'])])
-                    self.aw.checkColors([(self.aw.qmc.extraname1[i], self.aw.qmc.extradevicecolor1[i], QApplication.translate("Label","Legend bkgnd",None), self.aw.qmc.palette['background'])])
+                    self.aw.checkColors([(self.aw.qmc.extraname1[i], self.aw.qmc.extradevicecolor1[i], QApplication.translate("Label","Background"), self.aw.qmc.palette['background'])])
+                    self.aw.checkColors([(self.aw.qmc.extraname1[i], self.aw.qmc.extradevicecolor1[i], QApplication.translate("Label","Legend bkgnd"), self.aw.qmc.palette['background'])])
             #line 2
             elif l == 2:
                 # use native no buttons dialog on Mac OS X, blocks otherwise
@@ -1930,11 +1930,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.setLabelColor(self.aw.extraLCDlabel2[i],QColor(colorname))
                     self.devicetable.cellWidget(i,2).setStyleSheet("background-color: %s; color: %s"%(self.aw.qmc.extradevicecolor2[i], self.aw.labelBorW(self.aw.qmc.extradevicecolor2[i])))
                     self.devicetable.cellWidget(i,2).setText(colorname)
-                    self.aw.checkColors([(self.aw.qmc.extraname2[i], self.aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Background",None), self.aw.qmc.palette['background'])])
-                    self.aw.checkColors([(self.aw.qmc.extraname2[i], self.aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Legend bkgnd",None),self.aw.qmc.palette['background'])])
+                    self.aw.checkColors([(self.aw.qmc.extraname2[i], self.aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Background"), self.aw.qmc.palette['background'])])
+                    self.aw.checkColors([(self.aw.qmc.extraname2[i], self.aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Legend bkgnd"),self.aw.qmc.palette['background'])])
         except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setextracolor(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " setextracolor(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def close(self):
         self.closeHelp()
@@ -1959,7 +1959,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.savedevicetable(redraw=False)
             self.aw.qmc.devicetablecolumnwidths = [self.devicetable.columnWidth(c) for c in range(self.devicetable.columnCount())]
             
-            message = QApplication.translate("Message","Device not set", None)
+            message = QApplication.translate("Message","Device not set")
             # by default switch PID buttons/LCDs off
             self.aw.buttonCONTROL.setVisible(False)
             self.aw.LCD6frame.setVisible(False)
@@ -2031,7 +2031,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
                 message = QApplication.translate("Message","PID to control ET set to {0} {1}" + \
-                                                 " ; PID to read BT set to {2} {3}", None).format(str1,str(self.aw.ser.controlETpid[1]),str2,str(self.aw.ser.readBTpid[1]))
+                                                 " ; PID to read BT set to {2} {3}").format(str1,str(self.aw.ser.controlETpid[1]),str2,str(self.aw.ser.readBTpid[1]))
             elif self.arduinoButton.isChecked():
                 meter = "Arduino (TC4)"
                 self.aw.qmc.device = 19
@@ -2041,12 +2041,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.aw.ser.stopbits = 1
                 self.aw.ser.timeout = 1.0
                 self.aw.ser.ArduinoIsInitialized = 0 # ensure the Arduino gets reinitalized if settings changed
-                message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings", None).format(meter)
+                message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings").format(meter)
             elif self.programButton.isChecked():
                 meter = self.programedit.text()
                 self.aw.ser.externalprogram = meter
                 self.aw.qmc.device = 27
-                message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings", None).format(meter)
+                message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings").format(meter)
             elif self.nonpidButton.isChecked():
                 meter = str(self.devicetypeComboBox.currentText())
                 if meter == "Omega HH806AU":
@@ -2057,7 +2057,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'E'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 elif meter == "Omega HH506RA":
                     self.aw.qmc.device = 2
                     #self.aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
@@ -2067,7 +2067,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
                     self.aw.ser.HH506RAid = "X" # ensure the HH506RA gets reinitalized if settings changed
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 elif meter == "CENTER 309":
                     self.aw.qmc.device = 3
                     #self.aw.ser.comport = "COM4"
@@ -2076,7 +2076,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 elif meter == "CENTER 306":
                     self.aw.qmc.device = 4
                     #self.aw.ser.comport = "COM4"
@@ -2085,7 +2085,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 elif meter == "CENTER 305":
                     self.aw.qmc.device = 5
                     #self.aw.ser.comport = "COM4"
@@ -2094,7 +2094,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to CENTER 305, which is equivalent to CENTER 306. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to CENTER 305, which is equivalent to CENTER 306. Now, choose serial port").format(meter)
                 elif meter == "CENTER 304":
                     self.aw.qmc.device = 6
                     #self.aw.ser.comport = "COM4"
@@ -2103,7 +2103,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port").format(meter)
                 elif meter == "CENTER 303":
                     self.aw.qmc.device = 7
                     #self.aw.ser.comport = "COM4"
@@ -2112,7 +2112,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 elif meter == "CENTER 302":
                     self.aw.qmc.device = 8
                     #self.aw.ser.comport = "COM4"
@@ -2121,7 +2121,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port").format(meter)
                 elif meter == "CENTER 301":
                     self.aw.qmc.device = 9
                     #self.aw.ser.comport = "COM4"
@@ -2130,7 +2130,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port").format(meter)
                 elif meter == "CENTER 300":
                     self.aw.qmc.device = 10
                     #self.aw.ser.comport = "COM4"
@@ -2139,7 +2139,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port").format(meter)
                 elif meter == "VOLTCRAFT K204":
                     self.aw.qmc.device = 11
                     #self.aw.ser.comport = "COM4"
@@ -2148,7 +2148,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port").format(meter)
                 elif meter == "VOLTCRAFT K202":
                     self.aw.qmc.device = 12
                     #self.aw.ser.comport = "COM4"
@@ -2157,7 +2157,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 306. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 306. Now, choose serial port").format(meter)
                 elif meter == "VOLTCRAFT 300K":
                     self.aw.qmc.device = 13
                     #self.aw.ser.comport = "COM4"
@@ -2166,7 +2166,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 0.5
-                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port").format(meter)
                 elif meter == "VOLTCRAFT 302KJ":
                     self.aw.qmc.device = 14
                     #self.aw.ser.comport = "COM4"
@@ -2175,7 +2175,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port").format(meter)
                 elif meter == "EXTECH 421509":
                     self.aw.qmc.device = 15
                     #self.aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
@@ -2184,7 +2184,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'E'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to Omega HH506RA. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to Omega HH506RA. Now, choose serial port").format(meter)
                 elif meter == "Omega HH802U":
                     self.aw.qmc.device = 16
                     #self.aw.ser.comport = "COM11"
@@ -2193,7 +2193,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'E'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to Omega HH806AU. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to Omega HH806AU. Now, choose serial port").format(meter)
                 elif meter == "Omega HH309":
                     self.aw.qmc.device = 17
                     #self.aw.ser.comport = "COM4"
@@ -2202,11 +2202,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 #special device manual mode. No serial settings.
                 elif meter == "NONE":
                     self.aw.qmc.device = 18
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                     st = ""
                     if self.aw.qmc.delay != self.aw.qmc.min_delay:
                         self.aw.qmc.delay = self.aw.qmc.min_delay
@@ -2214,7 +2214,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     # ensure that events button is shown
                     self.aw.eventsbuttonflag = 1
                     self.aw.buttonEVENT.setVisible(True)
-                    message = QApplication.translate("Message","Device set to {0}{1}", None).format(meter,st)
+                    message = QApplication.translate("Message","Device set to {0}{1}").format(meter,st)
                 ##########################
                 ####  DEVICE 19 is the Arduino/TC4
                 ##########################
@@ -2226,7 +2226,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings").format(meter)
                 ##########################
                 ####  DEVICE 21 is +309_34 but +DEVICE cannot be set as main device
                 ##########################
@@ -2241,7 +2241,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings").format(meter)
 # +DEVICEs cannot be set as main device
                 ##########################
                 ####  DEVICE 24 is +VOLTCRAFT 204_34 but +DEVICE cannot be set as main device
@@ -2266,7 +2266,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose Modbus serial port or IP address", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose Modbus serial port or IP address").format(meter)
                 elif meter == "VOLTCRAFT K201":
                     self.aw.qmc.device = 30
                     #self.aw.ser.comport = "COM4"
@@ -2275,7 +2275,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 302. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 302. Now, choose serial port").format(meter)
                 elif meter == "Amprobe TMD-56":
                     self.aw.qmc.device = 31
                     #self.aw.ser.comport = "COM11"
@@ -2284,7 +2284,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'E'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to Omega HH806AU. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}, which is equivalent to Omega HH806AU. Now, choose serial port").format(meter)
                 ##########################
                 ####  DEVICE 32 is +ArduinoTC4 56 but +DEVICE cannot be set as main device
                 ##########################
@@ -2293,7 +2293,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 elif meter == "Phidget 1048 4xTC 01":
                     self.aw.qmc.device = 34
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 35 is +Phidget 1048 4xTC 23 but +DEVICE cannot be set as main device
                 ##########################
@@ -2302,7 +2302,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 elif meter == "Phidget 1046 4xRTD 01":
                     self.aw.qmc.device = 37
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 38 is +Phidget 1046 4xRTD 23 but +DEVICE cannot be set as main device
                 ##########################
@@ -2314,11 +2314,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 elif meter == "Phidget IO 01":
                     self.aw.qmc.device = 40
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 41 is +Phidget IO 23 but +DEVICE cannot be set as main device
                 ##########################
@@ -2333,13 +2333,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 elif meter == "Yocto Thermocouple":
                     self.aw.qmc.device = 45
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 elif meter == "Yocto PT100":
                     self.aw.qmc.device = 46
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 elif meter == "Phidget 1045 IR":
                     self.aw.qmc.device = 47
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 48 is an external program 34
                 ##########################
@@ -2348,7 +2348,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 elif meter == "DUMMY": # including a dummy serial device (can be used for serial commands)
                     self.aw.qmc.device = 50
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
@@ -2360,7 +2360,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 elif meter == "Phidget 1051 1xTC 01":
                     self.aw.qmc.device = 52
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 elif meter == "Hottop BT/ET":
                     self.aw.qmc.device = 53
                     #self.aw.ser.comport = "COM4"
@@ -2369,7 +2369,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 ####  DEVICE 54 is +Hottop HF but +DEVICE cannot be set as main device
                 ##########################
@@ -2381,7 +2381,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'E'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 ####  DEVICE 55 is +MODBUS_56 but +DEVICE cannot be set as main device
                 ##########################
@@ -2393,7 +2393,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 elif meter == "EXTECH 755":
                     self.aw.qmc.device = 57
@@ -2403,11 +2403,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 elif meter == "Phidget TMP1101 4xTC 01":
                     self.aw.qmc.device = 58
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 59 is +Phidget TMP1101 4xTC 23 but +DEVICE cannot be set as main device
                 ##########################
@@ -2417,15 +2417,15 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 elif meter == "Phidget TMP1100 1xTC":
                     self.aw.qmc.device = 61
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 elif meter == "Phidget 1011 IO 01":
                     self.aw.qmc.device = 62
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 elif meter == "Phidget HUB IO 01":
                     self.aw.qmc.device = 63
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ##########################
                 ####  DEVICE 64 is +Phidget HUB IO 23 but +DEVICE cannot be set as main device
@@ -2445,16 +2445,16 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 ##########################
                 elif meter == "Phidget TMP1200 1xRTD A":
                     self.aw.qmc.device = 68
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 elif meter == "Phidget IO Digital 01":
                     self.aw.qmc.device = 69
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 70 is +Phidget IO Digital 23 but +DEVICE cannot be set as main device
                 ##########################
@@ -2467,11 +2467,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 elif meter == "Phidget 1011 IO Digital 01":
                     self.aw.qmc.device = 73
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 elif meter == "Phidget HUB IO Digital 01":
                     self.aw.qmc.device = 74
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ##########################
                 ####  DEVICE 75 is +Phidget HUB IO Digital 23 but +DEVICE cannot be set as main device
@@ -2488,7 +2488,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 ##########################
                 ####  DEVICE 78 is +VOLTCRAFT PL-125-T4 34 but +DEVICE cannot be set as main device
@@ -2502,7 +2502,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 80 is +S7 34 but no serial setup
                 ##########################
@@ -2517,7 +2517,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 elif meter == "Aillio Bullet R1 BT/DT":
                     self.aw.qmc.device = 83
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 88 and 89 are an external program 78 and 910
                 ##########################
@@ -2529,43 +2529,43 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 elif meter == "Probat Middleware":
                     self.aw.qmc.device = 92
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 95 is Phidget DAQ1400 Current
                 ##########################
                 elif meter == "Phidget DAQ1400 Current":
                     self.aw.qmc.device = 95
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 96 is Phidget DAQ1400 Frequency
                 ##########################
                 elif meter == "Phidget DAQ1400 Frequency":
                     self.aw.qmc.device = 96
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 97 is Phidget DAQ1400 Digital
                 ##########################
                 elif meter == "Phidget DAQ1400 Digital":
                     self.aw.qmc.device = 97
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 98 is Phidget DAQ1400 Voltage
                 ##########################
                 elif meter == "Phidget DAQ1400 Voltage":
                     self.aw.qmc.device = 98
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 99 is Aillio Bullet R1 IBTS/DT
                 ##########################
                 elif meter == "Aillio Bullet R1 IBTS/DT":
                     self.aw.qmc.device = 99
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 100 are Yocto IR
                 ##########################
                 elif meter == "Yocto IR":
                     self.aw.qmc.device = 100
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 elif meter == "Behmor BT/CT":
                     self.aw.qmc.device = 101
                     #self.aw.ser.comport = "COM4"
@@ -2574,7 +2574,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 ####  DEVICE 102 Behmor 34 channel 3 and 4
                 ##########################
@@ -2586,7 +2586,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 ####  DEVICE 104 Behmor 56 channel 5 and 6
                 ##########################
@@ -2596,15 +2596,15 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 elif meter == "Phidget HUB IO 0":
                     self.aw.qmc.device = 106
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 elif meter == "Phidget HUB IO Digital 0":
                     self.aw.qmc.device = 107
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 elif meter == "Yocto 4-20ma Rx":
                     self.aw.qmc.device = 108
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 109 is +MODBUS_78 but +DEVICE cannot be set as main device
                 ##########################
@@ -2613,7 +2613,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 elif meter == "WebSocket":
                     self.aw.qmc.device = 111
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 112 is +WebSocket 34 but +DEVICE cannot be set as main device
                 ##########################
@@ -2631,7 +2631,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 0.8
-                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 ####  DEVICE 116 is +HB DT/IT
                 ##########################
@@ -2648,37 +2648,37 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ####  DEVICE 120 is Yocto 0-10V Rx
                 elif meter == "Yocto 0-10V Rx":
                     self.aw.qmc.device = 120
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ##########################
                 ####  DEVICE 121 is Yocto milliVolt Rx
                 elif meter == "Yocto milliVolt Rx":
                     self.aw.qmc.device = 121
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ##########################
                 ####  DEVICE 122 is Yocto Serial
                 elif meter == "Yocto Serial":
                     self.aw.qmc.device = 122
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ##########################
                 ####  DEVICE 123 is Phidget VCP1000
                 elif meter == "Phidget VCP1000":
                     self.aw.qmc.device = 123
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ##########################
                 ####  DEVICE 124 is Phidget VCP1001
                 elif meter == "Phidget VCP1001":
                     self.aw.qmc.device = 124
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ##########################
                 ####  DEVICE 125 is Phidget VCP1002
                 elif meter == "Phidget VCP1002":
                     self.aw.qmc.device = 125
-                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
 
                 # ADD DEVICE:
@@ -2970,14 +2970,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " device accept(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " device accept(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def showExtradevHelp(self):
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
-                QApplication.translate("Form Caption","Symbolic Formulas Help",None),
+                QApplication.translate("Form Caption","Symbolic Formulas Help"),
                 symbolic_help.content())
 
     @pyqtSlot(bool)
@@ -2985,7 +2985,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
-                QApplication.translate("Form Caption","Symbolic Formulas Help",None),
+                QApplication.translate("Form Caption","Symbolic Formulas Help"),
                 symbolic_help.content())
 
     @pyqtSlot(bool)
@@ -2993,7 +2993,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
-                QApplication.translate("Form Caption","External Programs Help",None),
+                QApplication.translate("Form Caption","External Programs Help"),
                 programs_help.content())
 
     def closeHelp(self):

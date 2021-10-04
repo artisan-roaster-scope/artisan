@@ -44,7 +44,7 @@ class profileTransformatorDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Profile Transposer",None))
+        self.setWindowTitle(QApplication.translate("Form Caption","Profile Transposer"))
         
         self.helpdialog = None
         
@@ -112,19 +112,19 @@ class profileTransformatorDlg(ArtisanDialog):
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Reset).clicked.connect(self.restore)
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Help).clicked.connect(self.openHelp)
         
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Apply),"Apply",QApplication.translate("Button","Apply", None))
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Reset),"Reset",QApplication.translate("Button","Reset", None))
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Help),"Help",QApplication.translate("Button","Help", None))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Apply),"Apply",QApplication.translate("Button","Apply"))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Reset),"Reset",QApplication.translate("Button","Reset"))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Help),"Help",QApplication.translate("Button","Help"))
         
         #buttons
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addWidget(self.dialogbuttons)
         
-        mappingLabel = QLabel(QApplication.translate("Label","Mapping",None))
+        mappingLabel = QLabel(QApplication.translate("Label","Mapping"))
         self.mappingModeComboBox = QComboBox()
-        self.mappingModeComboBox.addItems([QApplication.translate("ComboBox","discrete",None),
-                                              QApplication.translate("ComboBox","linear",None),
-                                              QApplication.translate("ComboBox","quadratic",None)])
+        self.mappingModeComboBox.addItems([QApplication.translate("ComboBox","discrete"),
+                                              QApplication.translate("ComboBox","linear"),
+                                              QApplication.translate("ComboBox","quadratic")])
         self.mappingModeComboBox.setCurrentIndex(self.aw.qmc.transMappingMode)
         self.mappingModeComboBox.currentIndexChanged.connect(self.changeMappingMode)
         
@@ -164,11 +164,11 @@ class profileTransformatorDlg(ArtisanDialog):
         tempLayout.addLayout(formulaHLayout)
         tempLayout.addStretch()
         
-        phasesGroupLayout = QGroupBox(QApplication.translate("Table","Phases",None))
+        phasesGroupLayout = QGroupBox(QApplication.translate("Table","Phases"))
         phasesGroupLayout.setLayout(phasesLayout)
-        timeGroupLayout = QGroupBox(QApplication.translate("Table","Time",None))
+        timeGroupLayout = QGroupBox(QApplication.translate("Table","Time"))
         timeGroupLayout.setLayout(timeLayout)
-        tempGroupLayout = QGroupBox(QApplication.translate("Table","BT",None))
+        tempGroupLayout = QGroupBox(QApplication.translate("Table","BT"))
         tempGroupLayout.setLayout(tempLayout)
         
         #main
@@ -555,7 +555,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
-                QApplication.translate("Form Caption","Profile Transposer Help",None),
+                QApplication.translate("Form Caption","Profile Transposer Help"),
                 transposer_help.content())
 
     def closeHelp(self):
@@ -900,12 +900,12 @@ class profileTransformatorDlg(ArtisanDialog):
         self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         self.timetable.horizontalHeader().setHighlightSections(False)
-        self.phasestable.setHorizontalHeaderLabels([QApplication.translate("Label","Drying",None),
-                                                         QApplication.translate("Label","Maillard",None),
-                                                         QApplication.translate("Label","Finishing",None)])
-        self.phasestable.setVerticalHeaderLabels([QApplication.translate("Table","Profile",None),
-                                                         QApplication.translate("Table","Target",None),
-                                                         QApplication.translate("Table","Result",None)])
+        self.phasestable.setHorizontalHeaderLabels([QApplication.translate("Label","Drying"),
+                                                         QApplication.translate("Label","Maillard"),
+                                                         QApplication.translate("Label","Finishing")])
+        self.phasestable.setVerticalHeaderLabels([QApplication.translate("Table","Profile"),
+                                                         QApplication.translate("Table","Target"),
+                                                         QApplication.translate("Table","Result")])
         self.phasestable.setShowGrid(True)
         self.phasestable.setAlternatingRowColors(True)
         self.phasestable.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -993,13 +993,13 @@ class profileTransformatorDlg(ArtisanDialog):
         self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         self.timetable.horizontalHeader().setHighlightSections(False)
-        self.timetable.setHorizontalHeaderLabels([QApplication.translate("Label","DRY END",None),
-                                                         QApplication.translate("Label","FC START",None),
-                                                         QApplication.translate("Label","SC START",None),
-                                                         QApplication.translate("Label","DROP",None)])
-        self.timetable.setVerticalHeaderLabels([QApplication.translate("Table","Profile",None),
-                                                         QApplication.translate("Table","Target",None),
-                                                         QApplication.translate("Table","Result",None)])
+        self.timetable.setHorizontalHeaderLabels([QApplication.translate("Label","DRY END"),
+                                                         QApplication.translate("Label","FC START"),
+                                                         QApplication.translate("Label","SC START"),
+                                                         QApplication.translate("Label","DROP")])
+        self.timetable.setVerticalHeaderLabels([QApplication.translate("Table","Profile"),
+                                                         QApplication.translate("Table","Target"),
+                                                         QApplication.translate("Table","Result")])
         self.timetable.setShowGrid(True)
         self.timetable.setAlternatingRowColors(False)
         self.timetable.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -1057,14 +1057,14 @@ class profileTransformatorDlg(ArtisanDialog):
         self.temptable.horizontalHeader().setStretchLastSection(False)
         self.temptable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         self.temptable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
-        self.temptable.setHorizontalHeaderLabels([QApplication.translate("Label","CHARGE",None),
-                                                         QApplication.translate("Label","DRY END",None),
-                                                         QApplication.translate("Label","FC START",None),
-                                                         QApplication.translate("Label","SC START",None),
-                                                         QApplication.translate("Label","DROP",None)])
-        self.temptable.setVerticalHeaderLabels([QApplication.translate("Table","Profile",None),
-                                                         QApplication.translate("Table","Target",None),
-                                                         QApplication.translate("Table","Result",None)])
+        self.temptable.setHorizontalHeaderLabels([QApplication.translate("Label","CHARGE"),
+                                                         QApplication.translate("Label","DRY END"),
+                                                         QApplication.translate("Label","FC START"),
+                                                         QApplication.translate("Label","SC START"),
+                                                         QApplication.translate("Label","DROP")])
+        self.temptable.setVerticalHeaderLabels([QApplication.translate("Table","Profile"),
+                                                         QApplication.translate("Table","Target"),
+                                                         QApplication.translate("Table","Result")])
         self.temptable.setShowGrid(True)
         self.temptable.setAlternatingRowColors(False)
         self.temptable.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)

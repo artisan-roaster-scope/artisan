@@ -85,7 +85,7 @@ ind = "    "     #indent
 nlind = "\n" + ind   #new line plus indent
 
 def translateStr(str, group='HelpDlg'):
-    t_str = "QApplication.translate('" + group + "','" + u(str) + "',None)"
+    t_str = "QApplication.translate('" + group + "','" + u(str) + "')"
     return t_str
 
 def generateRows(ws):

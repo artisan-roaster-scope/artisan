@@ -36,18 +36,18 @@ class calculatorDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Roast Calculator",None))
+        self.setWindowTitle(QApplication.translate("Form Caption","Roast Calculator"))
         
         settings = QSettings()
         if settings.contains("CalculatorGeometry"):
             self.restoreGeometry(settings.value("CalculatorGeometry"))
             
         #RATE OF CHANGE
-        self.result1 = QLabel(QApplication.translate("Label", "Enter two times along profile",None))
+        self.result1 = QLabel(QApplication.translate("Label", "Enter two times along profile"))
         self.result2 = QLabel()
         self.result2.setStyleSheet("background-color:'lightgrey';")
-        startlabel = QLabel(QApplication.translate("Label", "Start (00:00)",None))
-        endlabel = QLabel(QApplication.translate("Label", "End (00:00)",None))
+        startlabel = QLabel(QApplication.translate("Label", "Start (00:00)"))
+        endlabel = QLabel(QApplication.translate("Label", "End (00:00)"))
         self.startEdit = QLineEdit()
         self.endEdit = QLineEdit()
         regextime = QRegularExpression(r"^[0-5][0-9]:[0-5][0-9]$")
@@ -56,9 +56,9 @@ class calculatorDlg(ArtisanDialog):
         self.startEdit.editingFinished.connect(self.calculateRC)
         self.endEdit.editingFinished.connect(self.calculateRC)
         nevents = len(self.aw.qmc.specialevents)
-        events_found = [QApplication.translate("ComboBox","Event #0",None)]
+        events_found = [QApplication.translate("ComboBox","Event #0")]
         for i in range(nevents):
-            events_found.append(QApplication.translate("ComboBox","Event #{0}",None).format(str(i+1)))
+            events_found.append(QApplication.translate("ComboBox","Event #{0}").format(str(i+1)))
         self.eventAComboBox = QComboBox()
         self.eventAComboBox.addItems(events_found)
         self.eventAComboBox.currentIndexChanged.connect(self.calcEventRC)
@@ -66,8 +66,8 @@ class calculatorDlg(ArtisanDialog):
         self.eventBComboBox.addItems(events_found)
         self.eventBComboBox.currentIndexChanged.connect(self.calcEventRC)
         #TEMPERATURE CONVERSION
-        flabel = QLabel(QApplication.translate("Label", "Fahrenheit",None))
-        clabel = QLabel(QApplication.translate("Label", "Celsius",None))
+        flabel = QLabel(QApplication.translate("Label", "Fahrenheit"))
+        clabel = QLabel(QApplication.translate("Label", "Celsius"))
         self.faEdit = QLineEdit()
         self.ceEdit = QLineEdit()
         self.faEdit.setValidator(self.aw.createCLocaleDoubleValidator(-999999., 9999999., 2, self.faEdit))
@@ -96,12 +96,12 @@ class calculatorDlg(ArtisanDialog):
         self.WoutEdit.editingFinished.connect(self.convertWeightOtoI)
         #VOLUME CONVERSION
         self.VinComboBox = QComboBox()
-        volumeunits = [QApplication.translate("ComboBox","liter",None),
-                       QApplication.translate("ComboBox","gallon",None),
-                       QApplication.translate("ComboBox","quart",None),
-                       QApplication.translate("ComboBox","pint",None),
-                       QApplication.translate("ComboBox","cup",None),
-                       QApplication.translate("ComboBox","cm^3",None)]
+        volumeunits = [QApplication.translate("ComboBox","liter"),
+                       QApplication.translate("ComboBox","gallon"),
+                       QApplication.translate("ComboBox","quart"),
+                       QApplication.translate("ComboBox","pint"),
+                       QApplication.translate("ComboBox","cup"),
+                       QApplication.translate("ComboBox","cm^3")]
         self.VinComboBox.addItems(volumeunits)
         self.VinComboBox.setMaximumWidth(80)
         self.VinComboBox.setMinimumWidth(80)
@@ -121,10 +121,10 @@ class calculatorDlg(ArtisanDialog):
         self.VinEdit.editingFinished.connect(self.convertVolumeItoO)
         self.VoutEdit.editingFinished.connect(self.convertVolumeOtoI)
         #EXTRACTION YIELD
-        yieldlabel = QLabel(QApplication.translate("Label", "Yield (%)",None))
-        groundslabel = QLabel(QApplication.translate("Label", "Grounds (g)",None))
-        tdslabel = QLabel(QApplication.translate("Label", "TDS (%)",None))
-        coffeelabel = QLabel(QApplication.translate("Label", "Coffee (g)",None))
+        yieldlabel = QLabel(QApplication.translate("Label", "Yield (%)"))
+        groundslabel = QLabel(QApplication.translate("Label", "Grounds (g)"))
+        tdslabel = QLabel(QApplication.translate("Label", "TDS (%)"))
+        coffeelabel = QLabel(QApplication.translate("Label", "Coffee (g)"))
         self.groundsEdit = QLineEdit()
         self.coffeeEdit = QLineEdit()
         self.tdsEdit = QLineEdit()
@@ -177,15 +177,15 @@ class calculatorDlg(ArtisanDialog):
         extractionLayout.addWidget(yieldlabel,0,3)
         extractionLayout.addWidget(self.yieldEdit,1,3)
         
-        RoCGroup = QGroupBox(QApplication.translate("GroupBox","Rate of Change",None))
+        RoCGroup = QGroupBox(QApplication.translate("GroupBox","Rate of Change"))
         RoCGroup.setLayout(rclayout)
-        tempConvGroup = QGroupBox(QApplication.translate("GroupBox","Temperature Conversion",None))
+        tempConvGroup = QGroupBox(QApplication.translate("GroupBox","Temperature Conversion"))
         tempConvGroup.setLayout(tempLayout)
-        weightConvGroup = QGroupBox(QApplication.translate("GroupBox","Weight Conversion",None))
+        weightConvGroup = QGroupBox(QApplication.translate("GroupBox","Weight Conversion"))
         weightConvGroup.setLayout(weightLayout)
-        volumeConvGroup = QGroupBox(QApplication.translate("GroupBox","Volume Conversion",None))
+        volumeConvGroup = QGroupBox(QApplication.translate("GroupBox","Volume Conversion"))
         volumeConvGroup.setLayout(volumeLayout)
-        extractionYieldGroup = QGroupBox(QApplication.translate("GroupBox","Extraction Yield",None))
+        extractionYieldGroup = QGroupBox(QApplication.translate("GroupBox","Extraction Yield"))
         extractionYieldGroup.setLayout(extractionLayout)
         #left side
         leftSide = QVBoxLayout()
@@ -232,11 +232,11 @@ class calculatorDlg(ArtisanDialog):
             starttime = stringtoseconds(str(self.startEdit.text()))
             endtime = stringtoseconds(str(self.endEdit.text()))
             if starttime == -1 or endtime == -1:
-                self.result1.setText(QApplication.translate("Label", "Time syntax error. Time not valid",None))
+                self.result1.setText(QApplication.translate("Label", "Time syntax error. Time not valid"))
                 self.result2.setText("")
                 return
             if  endtime > self.aw.qmc.timex[-1] or endtime < starttime:
-                self.result1.setText(QApplication.translate("Label", "Error: End time smaller than Start time",None))
+                self.result1.setText(QApplication.translate("Label", "Error: End time smaller than Start time"))
                 self.result2.setText("")
                 return
             if self.aw.qmc.timeindex[0] != -1:
@@ -253,12 +253,12 @@ class calculatorDlg(ArtisanDialog):
             else:
                 deltaseconds = deltatemperature/deltatime
             deltaminutes = deltaseconds*60.
-            string1 = QApplication.translate("Label", "Best approximation was made from {0} to {1}",None).format(stringfromseconds(self.aw.qmc.timex[startindex]- start),stringfromseconds(self.aw.qmc.timex[endindex]- start))
-            string2 = QApplication.translate("Label", "<b>{0}</b> {1}/sec, <b>{2}</b> {3}/min",None).format("%.2f"%(deltaseconds),self.aw.qmc.mode,"%.2f"%(deltaminutes),self.aw.qmc.mode)
+            string1 = QApplication.translate("Label", "Best approximation was made from {0} to {1}").format(stringfromseconds(self.aw.qmc.timex[startindex]- start),stringfromseconds(self.aw.qmc.timex[endindex]- start))
+            string2 = QApplication.translate("Label", "<b>{0}</b> {1}/sec, <b>{2}</b> {3}/min").format("%.2f"%(deltaseconds),self.aw.qmc.mode,"%.2f"%(deltaminutes),self.aw.qmc.mode)
             self.result1.setText(string1)
             self.result2.setText(string2)
         else:
-            self.result1.setText(QApplication.translate("Label", "No profile found",None))
+            self.result1.setText(QApplication.translate("Label", "No profile found"))
             self.result2.setText("")
 
     @pyqtSlot()

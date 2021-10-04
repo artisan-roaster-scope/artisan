@@ -311,14 +311,14 @@ class FujiPID():
                 self.aw.fujipid.PXG4[pkey][0] = float(newPvalue)
                 self.aw.fujipid.PXG4[ikey][0] = float(newIvalue)
                 self.aw.fujipid.PXG4[dkey][0] = float(newDvalue)
-                message = QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
+                message = QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})"
                                                        ).format(str(k),str(newPvalue),str(newIvalue),str(newDvalue))
                 self.aw.sendmessage(message)
             else:
                 lp = len(p)
                 li = len(i)
                 ld = len(d)
-                message = QApplication.translate("StatusBar","pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) ",None
+                message = QApplication.translate("StatusBar","pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) "
                                                        ).format(str(k),str(lp),str(li),str(ld))
                 self.aw.sendmessage(message)
                 self.aw.qmc.adderror(message)
@@ -356,14 +356,14 @@ class FujiPID():
                 self.aw.fujipid.PXF[pkey][0] = float(newPvalue)
                 self.aw.fujipid.PXF[ikey][0] = float(newIvalue)
                 self.aw.fujipid.PXF[dkey][0] = float(newDvalue)
-                message = QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
+                message = QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})"
                                                        ).format(str(k),str(newPvalue),str(newIvalue),str(newDvalue))
                 self.aw.sendmessage(message)
             else:
                 lp = len(p)
                 li = len(i)
                 ld = len(d)
-                message = QApplication.translate("StatusBar","pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) ",None
+                message = QApplication.translate("StatusBar","pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) "
                                                        ).format(str(k),str(lp),str(li),str(ld))
                 self.aw.sendmessage(message)
                 self.aw.qmc.adderror(message)
@@ -441,7 +441,7 @@ class FujiPID():
                 r = self.aw.ser.sendFUJIcommand(command,8)
 
         if len(r) == 8:
-            message = QApplication.translate("StatusBar","{0} successfully sent to pid ",None).format(var)
+            message = QApplication.translate("StatusBar","{0} successfully sent to pid ").format(var)
             self.aw.sendmessage(message)
             if var == "p":
                 self.aw.fujipid.PXR["p"][0] = int(v)
@@ -450,7 +450,7 @@ class FujiPID():
             elif var == "d":
                 self.aw.fujipid.PXR["d"][0] = int(v)
         else:
-            message = QApplication.translate("StatusBar","setpid(): There was a problem setting {0}",None).format(var)
+            message = QApplication.translate("StatusBar","setpid(): There was a problem setting {0}").format(var)
             self.aw.sendmessage(message)
             self.aw.qmc.adderror(message)
                     
@@ -582,12 +582,12 @@ class FujiPID():
                 self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,flag)
                 if flag == 1:
                     self.aw.fujipid.rampsoak = True
-                    self.aw.sendmessage(QApplication.translate("Message","RS ON", None))
+                    self.aw.sendmessage(QApplication.translate("Message","RS ON"))
                 elif flag == 0:
                     self.aw.fujipid.rampsoak = False
-                    self.aw.sendmessage(QApplication.translate("Message","RS OFF", None))
+                    self.aw.sendmessage(QApplication.translate("Message","RS OFF"))
                 else:
-                    self.aw.sendmessage(QApplication.translate("Message","RS on HOLD", None))
+                    self.aw.sendmessage(QApplication.translate("Message","RS on HOLD"))
                 return True         
         elif register is not None:
             command = self.message2send(self.aw.ser.controlETpid[1],6,register,flag)
@@ -596,14 +596,14 @@ class FujiPID():
             if r == command:
                 if flag == 1:
                     self.aw.fujipid.rampsoak = True
-                    self.aw.sendmessage(QApplication.translate("Message","RS ON", None))
+                    self.aw.sendmessage(QApplication.translate("Message","RS ON"))
                 elif flag == 0:
                     self.aw.fujipid.rampsoak = False
-                    self.aw.sendmessage(QApplication.translate("Message","RS OFF", None))
+                    self.aw.sendmessage(QApplication.translate("Message","RS OFF"))
                 else:
-                    self.aw.sendmessage(QApplication.translate("Message","RS on HOLD", None))
+                    self.aw.sendmessage(QApplication.translate("Message","RS on HOLD"))
                 return True
-            self.aw.qmc.adderror(QApplication.translate("Error Message","RampSoak could not be changed",None))
+            self.aw.qmc.adderror(QApplication.translate("Error Message","RampSoak could not be changed"))
             return False
         return False
         
@@ -678,7 +678,7 @@ class FujiPID():
             elif self.aw.ser.controlETpid[0] == 4:
                 self.aw.fujipid.PXF["runstandby"][0] = flag
             return True
-        mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby()"
+        mssg = QApplication.translate("Error Message","Exception:") + " setONOFFstandby()"
         self.aw.qmc.adderror(mssg)
         return False
                 
@@ -717,7 +717,7 @@ class FujiPID():
             if self.aw.ser.useModbusPort or r == command:
                 if not silent:
                     # [Not sure the following will translate or even format properly... Need testing!]
-                    message = QApplication.translate("Message","PXG/PXF sv#{0} set to {1}",None).format(reg_dict["selectsv"][0],"%.1f" % float(value))
+                    message = QApplication.translate("Message","PXG/PXF sv#{0} set to {1}").format(reg_dict["selectsv"][0],"%.1f" % float(value))
                     self.aw.sendmessage(message)
                     reg_dict[svkey][0] = value
                     #record command as an Event 
@@ -727,7 +727,7 @@ class FujiPID():
                 if move:
                     self.aw.moveSVslider(value,setValue=False)
             else:
-                self.aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setsv()")
+                self.aw.qmc.adderror(QApplication.translate("Error Message","Exception:") + " setsv()")
         #Fuji PXR
         elif self.aw.ser.controlETpid[0] == 1:  
             if self.aw.ser.useModbusPort:
@@ -740,7 +740,7 @@ class FujiPID():
             if self.aw.ser.useModbusPort or r == command:
                 if not silent:
                     # [Not sure the following will translate or even format properly... Need testing!]
-                    message = QApplication.translate("Message","PXR sv set to {0}",None).format("%.1f" % float(value))
+                    message = QApplication.translate("Message","PXR sv set to {0}").format("%.1f" % float(value))
                     self.aw.fujipid.PXR["sv0"][0] = value
                     self.aw.sendmessage(message)
                     #record command as an Event 
@@ -750,7 +750,7 @@ class FujiPID():
                 if move:
                     self.aw.moveSVslider(value,setValue=False)
             else:
-                self.aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setPXRsv()")
+                self.aw.qmc.adderror(QApplication.translate("Error Message","Exception:") + " setPXRsv()")
 
     #used to set up or down SV by diff degrees from current sv setting; if move is True the SV slider is moved
     def adjustsv(self,diff,move=True):
@@ -787,7 +787,7 @@ class FujiPID():
                     command = self.message2send(self.aw.ser.controlETpid[1],6,reg_dict[svkey][1],newsv)
                     r = self.aw.ser.sendFUJIcommand(command,8)
                 if self.aw.ser.useModbusPort or len(r) == 8:
-                    message = QApplication.translate("Message","SV{0} changed from {1} to {2})",None).format(str(N),str(currentsv),str(newsv/10.))
+                    message = QApplication.translate("Message","SV{0} changed from {1} to {2})").format(str(N),str(currentsv),str(newsv/10.))
                     self.aw.sendmessage(message)
                     reg_dict[svkey][0] = newsv/10
                     #record command as an Event to replay (not binary as it needs to be stored in a text file)
@@ -797,7 +797,7 @@ class FujiPID():
                     if move:
                         self.aw.moveSVslider(newsv/10.,setValue=False)
                 else:
-                    msg = QApplication.translate("Message","Unable to set sv{0}",None).format(str(N))
+                    msg = QApplication.translate("Message","Unable to set sv{0}").format(str(N))
                     self.aw.sendmessage(msg)
             #   or if control pid is fuji PXR
             elif self.aw.ser.controlETpid[0] == 1:
@@ -808,7 +808,7 @@ class FujiPID():
                     command = self.message2send(self.aw.ser.controlETpid[1],6,self.PXR["sv0"][1],newsv)
                     r = self.aw.ser.sendFUJIcommand(command,8)
                 if self.aw.ser.useModbusPort or len(r) == 8:
-                    message = QApplication.translate("Message","SV changed from {0} to {1}",None).format(str(currentsv),str(newsv/10.))                           
+                    message = QApplication.translate("Message","SV changed from {0} to {1}").format(str(currentsv),str(newsv/10.))                           
                     self.aw.sendmessage(message)
                     self.PXR["sv0"][0] = newsv/10
                     #record command as an Event to replay (not binary as it needs to be stored in a text file)
@@ -818,9 +818,9 @@ class FujiPID():
                     if move:
                         self.aw.moveSVslider(newsv/10.,setValue=False)
                 else:
-                    self.aw.sendmessage(QApplication.translate("Message","Unable to set sv", None))
+                    self.aw.sendmessage(QApplication.translate("Message","Unable to set sv"))
         else:
-            self.aw.sendmessage(QApplication.translate("Message","Unable to set new sv", None))
+            self.aw.sendmessage(QApplication.translate("Message","Unable to set new sv"))
 
     #format of the input string Command: COMMAND::VALUE1::VALUE2::VALUE3::ETC
     def replay(self,CommandString):
@@ -864,7 +864,7 @@ class FujiPID():
                 soakkey = "segment" + str(i+1) + "soak"
                 if self.aw.ser.controlETpid[0] == 0:             #PXG4
                     if not n%4 or n > 16:
-                        self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PXG4 replaysetrs(): {0}").format(n))
+                        self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " PXG4 replaysetrs(): {0}").format(n))
                         return
                     if self.PXG4[svkey][0] != float(rs[i][0]):
                         self.PXG4[svkey][0] = float(rs[i][0])
@@ -880,7 +880,7 @@ class FujiPID():
                         changeflag = 0
                 elif self.aw.ser.controlETpid[0] == 1:           #PXR
                     if not n%4 or n > 8:
-                        self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PXR replaysetrs(): {0}").format(n))
+                        self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " PXR replaysetrs(): {0}").format(n))
                         return
                     if self.PXR[svkey][0] != float(rs[i][0]):
                         self.PXR[svkey][0] = float(rs[i][0])
@@ -895,7 +895,7 @@ class FujiPID():
                         self.setsegment((i+1), self.PXR[svkey][0], self.PXR[rampkey][0] ,self.PXR[soakkey][0])
                         changeflag = 0
             else:
-                self.aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " replaysetrs()")
+                self.aw.qmc.adderror(QApplication.translate("Error Message","Exception:") + " replaysetrs()")
                 return
         #start ramp soak ON
         self.setrampsoak(1)
@@ -982,7 +982,7 @@ class FujiPID():
             r3 = self.aw.ser.sendFUJIcommand(soakcommand,8)
         #check if OK
         if len(r1)!=8 or len(r2)!=8 or len(r3)!=8:
-            self.aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None))
+            self.aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID"))
 
     @staticmethod
     def dec2HexRaw(decimal):
@@ -1037,7 +1037,7 @@ class FujiPID():
             #conversion from hex to dec
             return s1
         #bad number of RX bytes 
-        errorcode = QApplication.translate("Error Message","pid.readoneword(): {0} RX bytes received (7 needed) for unit ID={1}",None).format(len(r),command[0])
+        errorcode = QApplication.translate("Error Message","pid.readoneword(): {0} RX bytes received (7 needed) for unit ID={1}").format(len(r),command[0])
         self.aw.qmc.adderror(errorcode)
         return -1
 
@@ -1298,7 +1298,7 @@ class PIDcontrol():
                             self.aw.ser.SP.write(str2cmd("PID;ON\n"))
                             self.pidActive = True
                             self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles["PIDactive"])
-                            self.aw.sendmessage(QApplication.translate("Message","PID turned on", None))
+                            self.aw.sendmessage(QApplication.translate("Message","PID turned on"))
                     finally:
                         if self.aw.ser.COMsemaphore.available() < 1:
                             self.aw.ser.COMsemaphore.release(1)
@@ -1320,7 +1320,7 @@ class PIDcontrol():
                 self.setSV(self.svValue)
 
     def pidOff(self):
-        self.aw.sendmessage(QApplication.translate("Message","PID OFF", None))
+        self.aw.sendmessage(QApplication.translate("Message","PID OFF"))
         self.aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"]))
         self.aw.qmc.setTimerLargeLCDcolorSignal.emit(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"])
         if self.aw.qmc.flagon and not self.aw.qmc.flagstart:
@@ -1347,7 +1347,7 @@ class PIDcontrol():
                         self.aw.ser.SP.reset_input_buffer() # self.aw.ser.SP.flushInput() # deprecated in v3
                         self.aw.ser.SP.reset_output_buffer() # self.aw.ser.SP.flushOutput() # deprecated in v3
                         self.aw.ser.SP.write(str2cmd("PID;OFF\n"))
-                        self.aw.sendmessage(QApplication.translate("Message","PID turned off", None))
+                        self.aw.sendmessage(QApplication.translate("Message","PID turned off"))
                 finally:
                     if self.aw.ser.COMsemaphore.available() < 1:
                         self.aw.ser.COMsemaphore.release(1)
@@ -1394,7 +1394,7 @@ class PIDcontrol():
                         # t is within the current segment
                         k = float(segment_start_sv - prev_segment_start_sv) / float(segment_end_time - prev_segment_end_time)                        
                         if self.current_ramp_segment != i+1:
-                            self.aw.sendmessage(QApplication.translate("Message","Ramp {0}: in {1} to SV {2}".format(i+1,stringfromseconds(self.svRamps[i]),self.svValues[i]), None))
+                            self.aw.sendmessage(QApplication.translate("Message","Ramp {0}: in {1} to SV {2}".format(i+1,stringfromseconds(self.svRamps[i]),self.svValues[i])))
                             self.current_ramp_segment = i+1
                         return prev_segment_start_sv + k*(t - prev_segment_end_time)
                 prev_segment_end_time = segment_end_time
@@ -1408,7 +1408,7 @@ class PIDcontrol():
                         # t is within the current segment
                         if self.current_soak_segment != i+1:
                             self.current_soak_segment = i+1
-                            self.aw.sendmessage(QApplication.translate("Message","Soak {0}: for {1} at SV {2}".format(i+1,stringfromseconds(self.svSoaks[i]),self.svValues[i]), None))
+                            self.aw.sendmessage(QApplication.translate("Message","Soak {0}: for {1} at SV {2}".format(i+1,stringfromseconds(self.svSoaks[i]),self.svValues[i])))
                         return prev_segment_start_sv
                 prev_segment_end_time = segment_end_time
                 prev_segment_start_sv = segment_start_sv
@@ -1416,7 +1416,7 @@ class PIDcontrol():
                     self.svTriggeredAlarms[i] = True
                     if self.svActions[i] > -1:
                         self.aw.qmc.processAlarmSignal.emit(0,self.svBeeps[i],self.svActions[i],self.svDescriptions[i])
-            self.aw.sendmessage(QApplication.translate("Message","Ramp/Soak pattern finished", None))
+            self.aw.sendmessage(QApplication.translate("Message","Ramp/Soak pattern finished"))
             self.aw.qmc.setLCDtime(0)       
             self.ramp_soak_engaged = 0 # stop the ramp/soak process
             return None
@@ -1502,7 +1502,7 @@ class PIDcontrol():
     
     def setSV(self,sv,move=True,init=False):
 #        if not move:            
-#            self.aw.sendmessage(QApplication.translate("Message","SV set to %s"%sv, None))
+#            self.aw.sendmessage(QApplication.translate("Message","SV set to %s"%sv))
         if (self.aw.pidcontrol.externalPIDControl() == 1): # MODBUS PID and Control ticked
             self.sv = max(0,sv)
             if move:
@@ -1629,13 +1629,13 @@ class PIDcontrol():
             self.pidKp = kp
             self.pidKi = ki
             self.pidKd = kd
-            self.aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
+            self.aw.sendmessage(QApplication.translate("Message","p-i-d values updated"))
         elif (self.aw.pidcontrol.externalPIDControl() == 2): # S7 (external) Control active
             self.aw.s7.setPID(kp,ki,kd,self.aw.s7.PIDmultiplier)
             self.pidKp = kp
             self.pidKi = ki
             self.pidKd = kd
-            self.aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
+            self.aw.sendmessage(QApplication.translate("Message","p-i-d values updated"))
         elif self.aw.qmc.device == 19 and self.aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
             if self.aw.ser.ArduinoIsInitialized:
                 try:
@@ -1657,7 +1657,7 @@ class PIDcontrol():
                         if cycle is not None:
                             libtime.sleep(.03)
                             self.aw.ser.SP.write(str2cmd("PID;CT;" + str(cycle) + "\n"))
-                        self.aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
+                        self.aw.sendmessage(QApplication.translate("Message","p-i-d values updated"))
                 finally:
                     if self.aw.ser.COMsemaphore.available() < 1:
                         self.aw.ser.COMsemaphore.release(1)
@@ -1668,7 +1668,7 @@ class PIDcontrol():
             self.pidKd = kd
             self.pOnE = pOnE
             self.aw.qmc.pid.setLimits((-100 if self.aw.pidcontrol.pidNegativeTarget else 0),(100 if self.aw.pidcontrol.pidPositiveTarget else 0))
-            self.aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
+            self.aw.sendmessage(QApplication.translate("Message","p-i-d values updated"))
 
 ###################################################################################
 ##########################  DTA PID CLASS DEFINITION  ############################

@@ -36,14 +36,14 @@ from artisanlib.util import deltaLabelUTF8
 class StatisticsDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
-        self.setWindowTitle(QApplication.translate("Form Caption","Statistics",None))
+        self.setWindowTitle(QApplication.translate("Form Caption","Statistics"))
         self.setModal(True)
-        self.timez = QCheckBox(QApplication.translate("CheckBox","Time",None))
-        self.bar = QCheckBox(QApplication.translate("CheckBox","Bar",None))
+        self.timez = QCheckBox(QApplication.translate("CheckBox","Time"))
+        self.bar = QCheckBox(QApplication.translate("CheckBox","Bar"))
         self.dt = QCheckBox(deltaLabelUTF8 + self.aw.qmc.mode)
-        self.ror = QCheckBox(self.aw.qmc.mode + QApplication.translate("CheckBox","/min",None))
-        self.area = QCheckBox(QApplication.translate("CheckBox","Characteristics",None))
-        self.ShowStatsSummary = QCheckBox(QApplication.translate("CheckBox", "Summary",None))
+        self.ror = QCheckBox(self.aw.qmc.mode + QApplication.translate("CheckBox","/min"))
+        self.area = QCheckBox(QApplication.translate("CheckBox","Characteristics"))
+        self.ShowStatsSummary = QCheckBox(QApplication.translate("CheckBox", "Summary"))
         self.ShowStatsSummary.setChecked(self.aw.qmc.statssummary)
         self.ShowStatsSummary.stateChanged.connect(self.changeStatsSummary)         #toggle
         #temp fix for possible bug self.aw.qmc.statisticsflags=[] > empty list out of range
@@ -84,18 +84,18 @@ class StatisticsDlg(ArtisanDialog):
         flagsLayout.addWidget(self.area,0,4)
         flagsLayout.addWidget(self.ShowStatsSummary,0,5)
         
-        beginlabel =QLabel(QApplication.translate("Label", "From",None))
+        beginlabel =QLabel(QApplication.translate("Label", "From"))
         beginitems = [
-                    QApplication.translate("Label","CHARGE",None),
-                    QApplication.translate("Label","TP",None),
-                    QApplication.translate("Label","DRY END",None),
-                    QApplication.translate("Label","FC START",None)]
+                    QApplication.translate("Label","CHARGE"),
+                    QApplication.translate("Label","TP"),
+                    QApplication.translate("Label","DRY END"),
+                    QApplication.translate("Label","FC START")]
         self.beginComboBox = QComboBox()
         self.beginComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.beginComboBox.setMaximumWidth(120)
         self.beginComboBox.addItems(beginitems)
         self.beginComboBox.setCurrentIndex(self.aw.qmc.AUCbegin)
-        baselabel =QLabel(QApplication.translate("Label", "Base",None))
+        baselabel =QLabel(QApplication.translate("Label", "Base"))
         self.baseedit = QSpinBox()
         self.baseedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.baseedit.setRange(0,999)
@@ -104,29 +104,29 @@ class StatisticsDlg(ArtisanDialog):
             self.baseedit.setSuffix(" F")
         else:
             self.baseedit.setSuffix(" C")
-        self.baseFlag = QCheckBox(QApplication.translate("CheckBox","From Event", None))
+        self.baseFlag = QCheckBox(QApplication.translate("CheckBox","From Event"))
         self.baseedit.setEnabled(not self.aw.qmc.AUCbaseFlag)
         self.baseFlag.setChecked(self.aw.qmc.AUCbaseFlag)
         self.baseFlag.stateChanged.connect(self.switchAUCbase)
-        targetlabel =QLabel(QApplication.translate("Label", "Target",None))
+        targetlabel =QLabel(QApplication.translate("Label", "Target"))
         self.targetedit = QSpinBox()
         self.targetedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.targetedit.setRange(0,9999)
         self.targetedit.setValue(self.aw.qmc.AUCtarget)
-        self.targetFlag = QCheckBox(QApplication.translate("CheckBox","Background", None))
+        self.targetFlag = QCheckBox(QApplication.translate("CheckBox","Background"))
         self.targetedit.setEnabled(not self.aw.qmc.AUCtargetFlag)
         self.targetFlag.setChecked(self.aw.qmc.AUCtargetFlag)
         self.targetFlag.stateChanged.connect(self.switchAUCtarget)
-        self.guideFlag = QCheckBox(QApplication.translate("CheckBox","Guide", None))
+        self.guideFlag = QCheckBox(QApplication.translate("CheckBox","Guide"))
         self.guideFlag.setChecked(self.aw.qmc.AUCguideFlag)
-        self.AUClcdFlag = QCheckBox(QApplication.translate("CheckBox","LCD", None))
+        self.AUClcdFlag = QCheckBox(QApplication.translate("CheckBox","LCD"))
         self.AUClcdFlag.setChecked(self.aw.qmc.AUClcdFlag)
         self.AUClcdFlag.stateChanged.connect(self.AUCLCFflagChanged)
-        self.AUCshowFlag = QCheckBox(QApplication.translate("CheckBox","Show Area", None))
+        self.AUCshowFlag = QCheckBox(QApplication.translate("CheckBox","Show Area"))
         self.AUCshowFlag.setChecked(self.aw.qmc.AUCshowFlag)
         self.AUCshowFlag.stateChanged.connect(self.changeAUCshowFlag)
 
-        statsmaxchrperlinelabel =QLabel(QApplication.translate("Label", "Max characters per line",None))
+        statsmaxchrperlinelabel =QLabel(QApplication.translate("Label", "Max characters per line"))
         self.statsmaxchrperlineedit = QSpinBox()
         self.statsmaxchrperlineedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.statsmaxchrperlineedit.setRange(1,120)
@@ -136,7 +136,7 @@ class StatisticsDlg(ArtisanDialog):
         statsmaxchrperlineHorizontal.addWidget(statsmaxchrperlinelabel)
         statsmaxchrperlineHorizontal.addWidget(self.statsmaxchrperlineedit)
         statsmaxchrperlineHorizontal.addStretch()
-        statsmaxchrperlineGroupLayout = QGroupBox(QApplication.translate("GroupBox","Stats Summary",None))
+        statsmaxchrperlineGroupLayout = QGroupBox(QApplication.translate("GroupBox","Stats Summary"))
         statsmaxchrperlineGroupLayout.setLayout(statsmaxchrperlineHorizontal)
 
         AUCgrid = QGridLayout()
@@ -163,9 +163,9 @@ class StatisticsDlg(ArtisanDialog):
         AUCvertical.addLayout(AUCgrid)
         AUCvertical.addLayout(aucFlagsLayout)
         AUCvertical.addStretch()
-        AUCgroupLayout = QGroupBox(QApplication.translate("GroupBox","AUC",None))
+        AUCgroupLayout = QGroupBox(QApplication.translate("GroupBox","AUC"))
         AUCgroupLayout.setLayout(AUCvertical)
-        displayGroupLayout = QGroupBox(QApplication.translate("GroupBox","Display",None))
+        displayGroupLayout = QGroupBox(QApplication.translate("GroupBox","Display"))
         displayGroupLayout.setLayout(flagsLayout)
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addWidget(self.dialogbuttons)

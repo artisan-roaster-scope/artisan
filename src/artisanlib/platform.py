@@ -34,7 +34,7 @@ class platformDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Artisan Platform", None))
+        self.setWindowTitle(QApplication.translate("Form Caption","Artisan Platform"))
         platformdic = {}
         platformdic["Architecture"] = str(platform.architecture())
         platformdic["Machine"] = str(platform.machine())

@@ -340,7 +340,7 @@ class LargeMainLCDs(LargeLCDs):
         else:
             self.resize(200,100)
         self.chooseLayout(self.width(),self.height())
-        self.setWindowTitle(QApplication.translate("Menu", "Main LCDs", None))
+        self.setWindowTitle(QApplication.translate("Menu", "Main LCDs"))
     
     def updateVisiblitiesETBT(self):
         self.updateVisibilities([self.aw.qmc.ETlcd],[self.aw.qmc.BTlcd])
@@ -488,7 +488,7 @@ class LargeDeltaLCDs(LargeLCDs):
             self.restoreGeometry(settings.value("DeltaLCDGeometry"))
         else:
             self.resize(100,200)
-        self.setWindowTitle(QApplication.translate("Menu", "Delta LCDs", None))
+        self.setWindowTitle(QApplication.translate("Menu", "Delta LCDs"))
         self.chooseLayout(self.width(),self.height())
     
     def makeLCDs(self):
@@ -535,13 +535,13 @@ class LargePIDLCDs(LargeLCDs):
             self.restoreGeometry(settings.value("PIDLCDGeometry"))
         else:
             self.resize(100,200)
-        self.setWindowTitle(QApplication.translate("Menu", "PID LCDs", None))
+        self.setWindowTitle(QApplication.translate("Menu", "PID LCDs"))
         self.chooseLayout(self.width(),self.height())
     
     def makeLCDs(self):
         self.lcds1styles = ["sv"]
         self.lcds1 = [self.makeLCD(self.lcds1styles[0])] # PID SV
-        label1Upper = self.makeLabel("<b>" + QApplication.translate("Label", "PID SV",None) + "</b> ")
+        label1Upper = self.makeLabel("<b>" + QApplication.translate("Label", "PID SV") + "</b> ")
         label1Lower = self.makeLabel(" ")
         self.lcds1labelsUpper = [label1Upper]
         self.lcds1labelsLower = [label1Lower]
@@ -549,7 +549,7 @@ class LargePIDLCDs(LargeLCDs):
         #
         self.lcds2styles = ["sv"]
         self.lcds2 = [self.makeLCD(self.lcds2styles[0])] # PID %
-        label2Upper = self.makeLabel("<b>" + QApplication.translate("Label", "PID %",None) + "</b> ")
+        label2Upper = self.makeLabel("<b>" + QApplication.translate("Label", "PID %") + "</b> ")
         label2Lower = self.makeLabel(" ")
         self.lcds2labelsUpper = [label2Upper]
         self.lcds2labelsLower = [label2Lower]
@@ -582,7 +582,7 @@ class LargeExtraLCDs(LargeLCDs):
         else:
             self.resize(100,200)
         self.chooseLayout(self.width(),self.height())
-        self.setWindowTitle(QApplication.translate("Menu", "Extra LCDs", None))
+        self.setWindowTitle(QApplication.translate("Menu", "Extra LCDs"))
     
     def makeLCDs(self):
         self.lcds1 = []
@@ -669,7 +669,7 @@ class LargePhasesLCDs(LargeLCDs):
         else:
             self.resize(100,200)
         self.chooseLayout(self.width(),self.height())
-        self.setWindowTitle(QApplication.translate("Menu", "Phases LCDs", None))
+        self.setWindowTitle(QApplication.translate("Menu", "Phases LCDs"))
     
     @staticmethod
     def formatLabel(l):

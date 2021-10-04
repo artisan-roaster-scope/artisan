@@ -66,8 +66,8 @@ class ArtisanDialog(QDialog):
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setAutoDefault(False)
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocusPolicy(Qt.FocusPolicy.StrongFocus) # to add to tab focus switch
         for btn,txt,trans in [
-            (self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok),"OK", QApplication.translate("Button","OK", None)),
-            (self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel),"Cancel",QApplication.translate("Button","Cancel", None))]:
+            (self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok),"OK", QApplication.translate("Button","OK")),
+            (self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel),"Cancel",QApplication.translate("Button","Cancel"))]:
             self.setButtonTranslations(btn,txt,trans)
         # add additional CMD-. shortcut to close the dialog
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setShortcut(QKeySequence("Ctrl+."))
@@ -155,7 +155,7 @@ class HelpDlg(ArtisanDialog):
         self.dialogbuttons.accepted.connect(self.close)
 
         homeLabel = QLabel()
-        homeLabel.setText("{} {}".format(QApplication.translate("Label", "For more details visit", None),
+        homeLabel.setText("{} {}".format(QApplication.translate("Label", "For more details visit"),
                  "<a href='https://artisan-scope.org'>artisan-scope.org</a>"))
         homeLabel.setOpenExternalLinks(True)
         buttonLayout = QHBoxLayout()

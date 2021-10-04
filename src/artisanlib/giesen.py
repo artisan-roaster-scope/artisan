@@ -174,10 +174,10 @@ def extractProfileGiesenCSV(file,_):
         res["specialeventsStrings"] = specialeventsStrings
         if power_event or speed_event:
             # first set etypes to defaults
-            res["etypes"] = [QApplication.translate("ComboBox", "Air",None),
-                             QApplication.translate("ComboBox", "Drum",None),
-                             QApplication.translate("ComboBox", "Damper",None),
-                             QApplication.translate("ComboBox", "Burner",None),
+            res["etypes"] = [QApplication.translate("ComboBox", "Air"),
+                             QApplication.translate("ComboBox", "Drum"),
+                             QApplication.translate("ComboBox", "Damper"),
+                             QApplication.translate("ComboBox", "Burner"),
                              "--"]
             # update
             if speed_event:

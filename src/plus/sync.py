@@ -626,7 +626,7 @@ def applyServerUpdates(data):
             aw.qmc.fileDirty()
             aw.sendmessageSignal.emit(
                 QApplication.translate(
-                    "Plus", "Updated data received from artisan.plus", None
+                    "Plus", "Updated data received from artisan.plus"
                 ),
                 True,
                 None,

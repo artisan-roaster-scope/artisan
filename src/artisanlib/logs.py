@@ -38,9 +38,9 @@ class serialLogDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Serial Log", None))
-        self.serialcheckbox = QCheckBox(QApplication.translate("CheckBox","Serial Log ON/OFF", None))
-        self.serialcheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF logs serial communication",None))
+        self.setWindowTitle(QApplication.translate("Form Caption","Serial Log"))
+        self.serialcheckbox = QCheckBox(QApplication.translate("CheckBox","Serial Log ON/OFF"))
+        self.serialcheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF logs serial communication"))
         self.serialcheckbox.setChecked(self.aw.seriallogflag)
         self.serialcheckbox.stateChanged.connect(self.serialcheckboxChanged)
         self.serialEdit = QTextEdit()
@@ -82,7 +82,7 @@ class errorDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Error Log", None))
+        self.setWindowTitle(QApplication.translate("Form Caption","Error Log"))
         self.elabel = QLabel()
         self. errorEdit = QTextEdit()
         self.errorEdit.setReadOnly(True)
@@ -98,7 +98,7 @@ class errorDlg(ArtisanDialog):
         htmlerr = "".join(["<b>{}</b> {}<br><br>".format(lenl-i,m) for i,m in enumerate(reversed(self.aw.qmc.errorlog))])
         
         enumber = len(self.aw.qmc.errorlog)
-        labelstr =  "<b>"+ QApplication.translate("Label","Number of errors found {0}", None).format(str(enumber)) + "</b>"
+        labelstr =  "<b>"+ QApplication.translate("Label","Number of errors found {0}").format(str(enumber)) + "</b>"
         self.elabel.setText(labelstr)
         self.errorEdit.setHtml("version = " +__version__ +"<br><br>" + htmlerr)
         
@@ -115,7 +115,7 @@ class messageDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Message History", None))
+        self.setWindowTitle(QApplication.translate("Form Caption","Message History"))
         self.messageEdit = QTextEdit()
         self.messageEdit.setReadOnly(True)
         layout = QVBoxLayout()

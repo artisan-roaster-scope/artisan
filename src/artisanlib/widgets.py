@@ -333,7 +333,7 @@ class AnimatedMajorEventPushButton(MajorEventPushButton):
             selected_anim_light_color.alpha())
 
         byar = QByteArray()
-        byar.append('zcolor')
+        byar.append(b'zcolor')
         
         self.animating = False
 
@@ -345,7 +345,7 @@ class AnimatedMajorEventPushButton(MajorEventPushButton):
         self.animation.setEndValue(anim_dark_color) 
         self.animation.setDuration(1200)
         self.animation.setLoopCount(-1)
-        self.animation.setEasingCurve(QEasingCurve.OutInCubic)
+        self.animation.setEasingCurve(QEasingCurve.Type.OutInCubic)
         
         self.selected_animation = QPropertyAnimation(self, byar)
         self.selected_animation.setStartValue(selected_anim_dark_color)
@@ -355,7 +355,7 @@ class AnimatedMajorEventPushButton(MajorEventPushButton):
         self.selected_animation.setEndValue(selected_anim_dark_color) 
         self.selected_animation.setDuration(1200)
         self.selected_animation.setLoopCount(-1)
-        self.selected_animation.setEasingCurve(QEasingCurve.OutInCubic)
+        self.selected_animation.setEasingCurve(QEasingCurve.Type.OutInCubic)
         
         self.current_style = None
     

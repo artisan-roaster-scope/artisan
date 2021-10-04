@@ -75,7 +75,7 @@ DATA_FILES = [
     ("../PlugIns/platforms", [QTDIR + r'/plugins/platforms/libqcocoa.dylib']), # qt5
 #    ("../PlugIns/platforms", [QTDIR + r'/plugins/platforms/libqoffscreen.dylib']), # qt5
 #    ("../PlugIns/platforms", [QTDIR + r'/plugins/platforms/libqminimal.dylib']), # qt5
-    ("../PlugIns/printsupport", [QTDIR + r'/plugins/printsupport/libcocoaprintersupport.dylib']), # qt5/# standard
+#    ("../PlugIns/printsupport", [QTDIR + r'/plugins/printsupport/libcocoaprintersupport.dylib']), # Qt5/#  not available in Qt6
     ("../PlugIns/styles", [QTDIR + r'/plugins/styles/libqmacstyle.dylib']), # QT 5.10 and later requires this (not available on 5.8)
 #    ("../PlugIns/platformthemes", [QTDIR + r'/plugins/platformthemes/libqxdgdesktopportal.dylib']), # unclear what this is for (not available before 5.12)
 
@@ -215,16 +215,17 @@ OPTIONS = {
     'arch': 'x86_64',
     'matplotlib_backends': '-', # '-' for imported or explicit "Qt5Agg, PDF, PS, SVG"
     'includes': ['serial',
-                 'PyQt5',
-                 'PyQt5.QtCore',
-                 'PyQt5.QtGui',
-                 'PyQt5.QtWidgets',
-                 'PyQt5.QtSvg',
-                 'PyQt5.QtDBus',
-                 'PyQt5.QtNetwork',
-                 'PyQt5.QtPrintSupport',
-                 'PyQt5.QtBluetooth',
-                 'PyQt5.QtConcurrent',
+# not needed?
+#                 'PyQt5',
+#                 'PyQt5.QtCore',
+#                 'PyQt5.QtGui',
+#                 'PyQt5.QtWidgets',
+#                 'PyQt5.QtSvg',
+#                 'PyQt5.QtDBus',
+#                 'PyQt5.QtNetwork',
+#                 'PyQt5.QtPrintSupport',
+#                 'PyQt5.QtBluetooth',
+#                 'PyQt5.QtConcurrent',
                  ],
     'excludes' :  ['tkinter','curses', # 'sqlite3',
                 ],
@@ -306,21 +307,22 @@ except:
     
 
             
-# for Qt5
+# for Qt
 print('*** Removing unused Qt frameworks ***')
 
-# QT frameworks to keep:
-Qt_frameworks = [
-    'QtCore.framework',
-    'QtGui.framework',
-    'QtWidgets.framework',
-    'QtSvg.framework',
-    'QtPrintSupport.framework',
-    'QtNetwork.framework',
-    'QtDBus.framework',
-    'QtBluetooth.framework',
-    'QtConcurrent.framework'
+# QT modules to keep frameworks:
+Qt_modules = [
+    'QtCore',
+    'QtGui',
+    'QtWidgets',
+    'QtSvg',
+    'QtPrintSupport',
+    'QtNetwork',
+    'QtDBus',
+    'QtBluetooth',
+    'QtConcurrent'
 ]
+Qt_frameworks = [module + ".framework" for module in Qt_modules]
 for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/'):
     for d in dirs:
         if d.startswith("Qt") and d.endswith(".framework") and d not in Qt_frameworks:
@@ -329,20 +331,62 @@ for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/'):
 
 # remove doublicate Qt installation
 
-#try:
-#    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.7/PyQt5/Qt",shell = True)
-#except:
-#    pass
-try:
-    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.8/PyQt5/Qt5",shell = True)
-    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.8/PyQt5/Qt",shell = True)
-except:
-    pass
-try:
-    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.9/PyQt5/Qt5",shell = True)
-    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.9/PyQt5/Qt",shell = True)
-except:
-    pass
+for python_version in ["python3.8", "python3.9", "python3.10"]:
+    rootdir = f"./Artisan.app/Contents/Resources/lib/{python_version}"
+    if os.path.isdir(f"{rootdir}/PyQt6"):
+        # if PyQt6 exists we remove PyQt5 completely
+        try:
+            subprocess.check_call(f"rm -rf {rootdir}/PyQt5",shell = True)
+        except:
+            pass
+    # remove Qt artefacts
+    for qt_dir in ["PyQt5/Qt5", "PyQt5/Qt", "PyQt6/Qt6", "PyQt6/Qt", "PyQt6/bindings", "PyQt6/lupdate", "PyQt6/uic"]:
+        try:
+            subprocess.check_call(f"rm -rf {rootdir}/{qt_dir}",shell = True)
+        except:
+            pass
+    # remove unused PyQt libs (not in Qt_frameworks)
+    for qt_dir in ["PyQt5", "PyQt6"]:
+        for subdir, dirs, files in os.walk(f"{rootdir}/{qt_dir}"):
+            for file in files:
+                if file.endswith('.abi3.so') or file.endswith('.pyi'):
+                    if file.split(".")[0] not in Qt_modules:
+                        file_path = os.path.join(subdir, file)
+                        subprocess.check_call(f"rm -rf {file_path}",shell = True)
+
+qt_plugin_dirs = [
+    "iconengines",
+    "imageformats",
+    "platforms",
+    "printsupport",
+    "styles"
+]
+qt_plugin_files = [
+    "libqsvgicon.dylib",
+    "libqgif.dylib",
+    "libqicns.dylib",
+    "libqico.dylib",
+    "libqjpeg.dylib",
+    "libqmacjp2.dylib",
+	"libqsvg.dylib",
+    "libqtga.dylib",
+    "libqwbmp.dylib",
+    "libqwebp.dylib",
+    "libqcocoa.dylib",
+    "libcocoaprintersupport.dylib",
+    "libqmacstyle.dylib"
+]
+# remove Qt PlugIns not used
+for root,dirs,files in os.walk('./Artisan.app/Contents/PlugIns/'):
+    for d in dirs:
+        if d not in qt_plugin_dirs:
+            subprocess.check_call("rm -rf " + os.path.join(root,d),shell = True)
+        else:
+            for subdir, dirs, files in os.walk(os.path.join(root,d)):
+                for file in files:
+                    if not (file in qt_plugin_files):
+                        file_path = os.path.join(subdir, file)
+                        subprocess.check_call(f"rm -rf {file_path}",shell = True)
 
 
 # remove duplicate mpl_data folder

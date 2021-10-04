@@ -78,11 +78,11 @@ class Login(ArtisanDialog):
         self.remember = remember_credentials
 
         self.linkRegister = QLabel(
-            f'<small><a href="{config.register_url}">{QApplication.translate("Plus", "Register", None)}</a></small>'
+            f'<small><a href="{config.register_url}">{QApplication.translate("Plus", "Register")}</a></small>'
         )
         self.linkRegister.setOpenExternalLinks(True)
         self.linkResetPassword = QLabel(
-            f'<small><a href="{config.reset_passwd_url}">{QApplication.translate("Plus", "Reset Password", None)}</a></small>'
+            f'<small><a href="{config.reset_passwd_url}">{QApplication.translate("Plus", "Reset Password")}</a></small>'
         )
         self.linkResetPassword.setOpenExternalLinks(True)
 
@@ -92,12 +92,12 @@ class Login(ArtisanDialog):
         self.setButtonTranslations(
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok),
             "OK",
-            QApplication.translate("Button", "OK", None),
+            QApplication.translate("Button", "OK"),
         )
         self.setButtonTranslations(
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel),
             "Cancel",
-            QApplication.translate("Button", "Cancel", None),
+            QApplication.translate("Button", "Cancel"),
         )
 
         self.dialogbuttons.accepted.connect(self.setCredentials) # type: ignore
@@ -119,12 +119,12 @@ class Login(ArtisanDialog):
         self.textPass = QLineEdit(self)
         self.textPass.setEchoMode(QLineEdit.EchoMode.Password)
         self.textPass.setPlaceholderText(
-            QApplication.translate("Plus", "Password", None)
+            QApplication.translate("Plus", "Password")
         )
 
         self.textName = QLineEdit(self)
         self.textName.setPlaceholderText(
-            QApplication.translate("Plus", "Email", None)
+            QApplication.translate("Plus", "Email")
         )
         self.textName.textChanged.connect(self.textChanged)  # type: ignore
         if email is not None:
@@ -133,7 +133,7 @@ class Login(ArtisanDialog):
         self.textPass.textChanged.connect(self.textChanged)  # type: ignore
 
         self.rememberCheckbox = QCheckBox(
-            QApplication.translate("Plus", "Remember", None)
+            QApplication.translate("Plus", "Remember")
         )
         self.rememberCheckbox.setChecked(self.remember)
         self.rememberCheckbox.stateChanged.connect(self.rememberCheckChanged)  # type: ignore

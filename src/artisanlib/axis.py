@@ -39,20 +39,20 @@ except Exception:
 class WindowsDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
-        self.setWindowTitle(QApplication.translate("Form Caption","Axes",None))
+        self.setWindowTitle(QApplication.translate("Form Caption","Axes"))
         self.setModal(True)
-        xlimitLabel = QLabel(QApplication.translate("Label", "Max",None))
-        xlimitLabel_min = QLabel(QApplication.translate("Label", "Min",None))
-        ylimitLabel = QLabel(QApplication.translate("Label", "Max",None))
-        ylimitLabel_min = QLabel(QApplication.translate("Label", "Min",None))
-        zlimitLabel = QLabel(QApplication.translate("Label", "Max",None))
-        zlimitLabel_min = QLabel(QApplication.translate("Label", "Min",None))
-        step100Label = QLabel(QApplication.translate("Label", "100% Event Step",None))
+        xlimitLabel = QLabel(QApplication.translate("Label", "Max"))
+        xlimitLabel_min = QLabel(QApplication.translate("Label", "Min"))
+        ylimitLabel = QLabel(QApplication.translate("Label", "Max"))
+        ylimitLabel_min = QLabel(QApplication.translate("Label", "Min"))
+        zlimitLabel = QLabel(QApplication.translate("Label", "Max"))
+        zlimitLabel_min = QLabel(QApplication.translate("Label", "Min"))
+        step100Label = QLabel(QApplication.translate("Label", "100% Event Step"))
         self.step100Edit = QLineEdit()
         self.step100Edit.setMaximumWidth(55)
         self.step100Edit.setValidator(QIntValidator(self.aw.qmc.ylimit_min_max, 999999, self.step100Edit))
         self.step100Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.step100Edit.setToolTip(QApplication.translate("Tooltip", "100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty", None))
+        self.step100Edit.setToolTip(QApplication.translate("Tooltip", "100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty"))
         self.xlimitEdit = QLineEdit()
         self.xlimitEdit.setMaximumWidth(50)
         self.xlimitEdit.setMinimumWidth(50)
@@ -95,21 +95,21 @@ class WindowsDlg(ArtisanDialog):
         self.zlimitEdit_min.setText(str(self.aw.qmc.zlimit_min))
         self.legendComboBox = QComboBox()
         self.legendComboBox.setMaximumWidth(160)
-        legendlocs = ["",#QApplication.translate("ComboBox", "none",None),
-                      QApplication.translate("ComboBox", "upper right",None),
-                      QApplication.translate("ComboBox", "upper left",None),
-                      QApplication.translate("ComboBox", "lower left",None),
-                      QApplication.translate("ComboBox", "lower right",None),
-                      QApplication.translate("ComboBox", "right",None),
-                      QApplication.translate("ComboBox", "center left",None),
-                      QApplication.translate("ComboBox", "center right",None),
-                      QApplication.translate("ComboBox", "lower center",None),
-                      QApplication.translate("ComboBox", "upper center",None),
-                      QApplication.translate("ComboBox", "center",None)]
+        legendlocs = ["",#QApplication.translate("ComboBox", "none"),
+                      QApplication.translate("ComboBox", "upper right"),
+                      QApplication.translate("ComboBox", "upper left"),
+                      QApplication.translate("ComboBox", "lower left"),
+                      QApplication.translate("ComboBox", "lower right"),
+                      QApplication.translate("ComboBox", "right"),
+                      QApplication.translate("ComboBox", "center left"),
+                      QApplication.translate("ComboBox", "center right"),
+                      QApplication.translate("ComboBox", "lower center"),
+                      QApplication.translate("ComboBox", "upper center"),
+                      QApplication.translate("ComboBox", "center")]
         self.legendComboBox.addItems(legendlocs)
         self.legendComboBox.setCurrentIndex(self.aw.qmc.legendloc)
         self.legendComboBox.currentIndexChanged.connect(self.changelegendloc)
-        resettimelabel = QLabel(QApplication.translate("Label", "Max",None))
+        resettimelabel = QLabel(QApplication.translate("Label", "Max"))
         self.resetEdit = QLineEdit()
         self.resetEdit.setMaximumWidth(50)
         self.resetEdit.setMinimumWidth(50)
@@ -117,47 +117,47 @@ class WindowsDlg(ArtisanDialog):
         regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         self.resetEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.resetEdit.setText(stringfromseconds(self.aw.qmc.resetmaxtime))
-        self.resetEdit.setToolTip(QApplication.translate("Tooltip", "Time axis max on RESET", None))
+        self.resetEdit.setToolTip(QApplication.translate("Tooltip", "Time axis max on RESET"))
         # CHARGE min
-        chargeminlabel = QLabel(QApplication.translate("Label", "RESET",None) + " " + QApplication.translate("Label", "Min",None))
+        chargeminlabel = QLabel(QApplication.translate("Label", "RESET") + " " + QApplication.translate("Label", "Min"))
         self.chargeminEdit = QLineEdit()
         self.chargeminEdit.setMaximumWidth(50)
         self.chargeminEdit.setMinimumWidth(50)
         self.chargeminEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.chargeminEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.chargeminEdit.setText(stringfromseconds(self.aw.qmc.chargemintime))
-        self.chargeminEdit.setToolTip(QApplication.translate("Tooltip", "Time axis min on RESET", None))
+        self.chargeminEdit.setToolTip(QApplication.translate("Tooltip", "Time axis min on RESET"))
         
         # fixmaxtime flag
-        self.fixmaxtimeFlag = QCheckBox(QApplication.translate("CheckBox", "Expand",None))
+        self.fixmaxtimeFlag = QCheckBox(QApplication.translate("CheckBox", "Expand"))
         self.fixmaxtimeFlag.setChecked(not self.aw.qmc.fixmaxtime)
-        self.fixmaxtimeFlag.setToolTip(QApplication.translate("Tooltip", "Automatically extend the time axis by 3min on need", None))
+        self.fixmaxtimeFlag.setToolTip(QApplication.translate("Tooltip", "Automatically extend the time axis by 3min on need"))
         # locktimex flag
-        self.locktimexFlag = QCheckBox(QApplication.translate("CheckBox", "Lock",None))
+        self.locktimexFlag = QCheckBox(QApplication.translate("CheckBox", "Lock"))
         self.locktimexFlag.setChecked(self.aw.qmc.locktimex)
         self.locktimexFlag.stateChanged.connect(self.lockTimexFlagChanged)
-        self.locktimexFlag.setToolTip(QApplication.translate("Tooltip", "Do not set time axis min and max from profile on load", None))
+        self.locktimexFlag.setToolTip(QApplication.translate("Tooltip", "Do not set time axis min and max from profile on load"))
         # autotimex flag
-        self.autotimexFlag = QCheckBox(QApplication.translate("CheckBox", "Auto",None))
+        self.autotimexFlag = QCheckBox(QApplication.translate("CheckBox", "Auto"))
         self.autotimexFlag.setChecked(self.aw.qmc.autotimex)
         self.autotimexFlag.stateChanged.connect(self.autoTimexFlagChanged)
-        self.autotimexFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set time axis min and max from profile CHARGE/DROP events", None))
-        autoButton = QPushButton(QApplication.translate("Button","Calc",None))
+        self.autotimexFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set time axis min and max from profile CHARGE/DROP events"))
+        autoButton = QPushButton(QApplication.translate("Button","Calc"))
         autoButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         autoButton.clicked.connect(self.autoAxis)
         # time axis steps
-        timegridlabel = QLabel(QApplication.translate("Label", "Step",None))
+        timegridlabel = QLabel(QApplication.translate("Label", "Step"))
         self.xaxislencombobox = QComboBox()
         timelocs =   [
                       "",
-                      QApplication.translate("ComboBox", "1 minute",None),
-                      QApplication.translate("ComboBox", "2 minutes",None),
-                      QApplication.translate("ComboBox", "3 minutes",None),
-                      QApplication.translate("ComboBox", "4 minutes",None),
-                      QApplication.translate("ComboBox", "5 minutes",None),
-                      QApplication.translate("ComboBox", "10 minutes",None),
-                      QApplication.translate("ComboBox", "30 minutes",None),
-                      QApplication.translate("ComboBox", "1 hour",None)]
+                      QApplication.translate("ComboBox", "1 minute"),
+                      QApplication.translate("ComboBox", "2 minutes"),
+                      QApplication.translate("ComboBox", "3 minutes"),
+                      QApplication.translate("ComboBox", "4 minutes"),
+                      QApplication.translate("ComboBox", "5 minutes"),
+                      QApplication.translate("ComboBox", "10 minutes"),
+                      QApplication.translate("ComboBox", "30 minutes"),
+                      QApplication.translate("ComboBox", "1 hour")]
         self.xaxislencombobox.addItems(timelocs)
         
         self.xaxislencombobox.setMinimumContentsLength(6)
@@ -173,15 +173,15 @@ class WindowsDlg(ArtisanDialog):
         except Exception: # pylint: disable=broad-except
             self.xaxislencombobox.setCurrentIndex(0)
         self.xaxislencombobox.currentIndexChanged.connect(self.xaxislenloc)
-        self.timeGridCheckBox = QCheckBox(QApplication.translate("CheckBox","Time",None))
+        self.timeGridCheckBox = QCheckBox(QApplication.translate("CheckBox","Time"))
         self.timeGridCheckBox.setChecked(self.aw.qmc.time_grid)
-        self.timeGridCheckBox.setToolTip(QApplication.translate("Tooltip", "Show time grid", None))
+        self.timeGridCheckBox.setToolTip(QApplication.translate("Tooltip", "Show time grid"))
         self.timeGridCheckBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.tempGridCheckBox = QCheckBox(QApplication.translate("CheckBox","Temp",None))
-        self.tempGridCheckBox.setToolTip(QApplication.translate("Tooltip", "Show temperature grid", None))
+        self.tempGridCheckBox = QCheckBox(QApplication.translate("CheckBox","Temp"))
+        self.tempGridCheckBox.setToolTip(QApplication.translate("Tooltip", "Show temperature grid"))
         self.tempGridCheckBox.setChecked(self.aw.qmc.temp_grid)
         self.tempGridCheckBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        ygridlabel = QLabel(QApplication.translate("Label", "Step",None))
+        ygridlabel = QLabel(QApplication.translate("Label", "Step"))
         self.ygridSpinBox = QSpinBox()
         self.ygridSpinBox.setRange(0,500)
         self.ygridSpinBox.setSingleStep(5)
@@ -189,7 +189,7 @@ class WindowsDlg(ArtisanDialog):
         self.ygridSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.ygridSpinBox.editingFinished.connect(self.changeygrid)
         self.ygridSpinBox.setMaximumWidth(60)
-        zgridlabel = QLabel(QApplication.translate("Label", "Step",None))
+        zgridlabel = QLabel(QApplication.translate("Label", "Step"))
         self.zgridSpinBox = QSpinBox()
         self.zgridSpinBox.setRange(0,100)
         self.zgridSpinBox.setSingleStep(1)
@@ -198,35 +198,35 @@ class WindowsDlg(ArtisanDialog):
         self.zgridSpinBox.editingFinished.connect(self.changezgrid)
         self.zgridSpinBox.setMaximumWidth(60)
         
-        self.autodeltaxLabel = QLabel(QApplication.translate("CheckBox", "Auto",None))
-        self.autodeltaxETFlag = QCheckBox(deltaLabelUTF8 + QApplication.translate("CheckBox", "ET",None))
+        self.autodeltaxLabel = QLabel(QApplication.translate("CheckBox", "Auto"))
+        self.autodeltaxETFlag = QCheckBox(deltaLabelUTF8 + QApplication.translate("CheckBox", "ET"))
         self.autodeltaxETFlag.setChecked(self.aw.qmc.autodeltaxET)
-        self.autodeltaxBTFlag = QCheckBox(deltaLabelUTF8 + QApplication.translate("CheckBox", "BT",None))
+        self.autodeltaxBTFlag = QCheckBox(deltaLabelUTF8 + QApplication.translate("CheckBox", "BT"))
         self.autodeltaxBTFlag.setChecked(self.aw.qmc.autodeltaxBT)
-        self.autodeltaxETFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set delta axis max from DeltaET", None))
-        self.autodeltaxBTFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set delta axis max from DeltaBT", None))
-        autoDeltaButton = QPushButton(QApplication.translate("Button","Calc",None))
+        self.autodeltaxETFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set delta axis max from DeltaET"))
+        self.autodeltaxBTFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set delta axis max from DeltaBT"))
+        autoDeltaButton = QPushButton(QApplication.translate("Button","Calc"))
         autoDeltaButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         autoDeltaButton.clicked.connect(self.autoDeltaAxis)
 
-        linestylegridlabel = QLabel(QApplication.translate("Label", "Style",None))
+        linestylegridlabel = QLabel(QApplication.translate("Label", "Style"))
         self.gridstylecombobox = QComboBox()
-        gridstyles = [QApplication.translate("ComboBox", "solid",None),
-                      QApplication.translate("ComboBox", "dashed",None),
-                      QApplication.translate("ComboBox", "dashed-dot",None),
-                      QApplication.translate("ComboBox", "dotted",None),
-                      QApplication.translate("ComboBox", "None",None)]
+        gridstyles = [QApplication.translate("ComboBox", "solid"),
+                      QApplication.translate("ComboBox", "dashed"),
+                      QApplication.translate("ComboBox", "dashed-dot"),
+                      QApplication.translate("ComboBox", "dotted"),
+                      QApplication.translate("ComboBox", "None")]
         self.gridstylecombobox.addItems(gridstyles) 
         self.gridstylecombobox.setCurrentIndex(self.aw.qmc.gridlinestyle)
         self.gridstylecombobox.currentIndexChanged.connect(self.changegridstyle)
-        gridthicknesslabel = QLabel(QApplication.translate("Label", "Width",None))
+        gridthicknesslabel = QLabel(QApplication.translate("Label", "Width"))
         self.gridwidthSpinBox = QSpinBox()
         self.gridwidthSpinBox.setRange(1,5)
         self.gridwidthSpinBox.setValue(self.aw.qmc.gridthickness)
         self.gridwidthSpinBox.valueChanged.connect(self.changegridwidth)
         self.gridwidthSpinBox.setMaximumWidth(40)
         self.gridwidthSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
-        gridalphalabel = QLabel(QApplication.translate("Label", "Opaqueness",None))
+        gridalphalabel = QLabel(QApplication.translate("Label", "Opaqueness"))
         self.gridalphaSpinBox = QSpinBox()
         self.gridalphaSpinBox.setRange(1,10)
         self.gridalphaSpinBox.setValue(int(self.aw.qmc.gridalpha*10))
@@ -240,9 +240,9 @@ class WindowsDlg(ArtisanDialog):
         
         resetButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
         resetButton.clicked.connect(self.reset)
-        self.setButtonTranslations(resetButton,"Restore Defaults",QApplication.translate("Button","Restore Defaults", None))
+        self.setButtonTranslations(resetButton,"Restore Defaults",QApplication.translate("Button","Restore Defaults"))
             
-        self.loadAxisFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load from profile",None))
+        self.loadAxisFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load from profile"))
         self.loadAxisFromProfile.setChecked(self.aw.qmc.loadaxisfromprofile)
         
         hline = QFrame()
@@ -343,15 +343,15 @@ class WindowsDlg(ArtisanDialog):
         graphgridlayout.addWidget(self.tempGridCheckBox,2,1,Qt.AlignmentFlag.AlignLeft)
         graphgridlayout.addWidget(gridalphalabel,2,2,Qt.AlignmentFlag.AlignRight)
         graphgridlayout.addWidget(self.gridalphaSpinBox,2,3,Qt.AlignmentFlag.AlignLeft)
-        xGroupLayout = QGroupBox(QApplication.translate("GroupBox","Time Axis",None))
+        xGroupLayout = QGroupBox(QApplication.translate("GroupBox","Time Axis"))
         xGroupLayout.setLayout(xlayout)
-        yGroupLayout = QGroupBox(QApplication.translate("GroupBox","Temperature Axis",None))
+        yGroupLayout = QGroupBox(QApplication.translate("GroupBox","Temperature Axis"))
         yGroupLayout.setLayout(ylayoutVbox)
-        zGroupLayout = QGroupBox(deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis",None))
+        zGroupLayout = QGroupBox(deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis"))
         zGroupLayout.setLayout(zlayoutVbox)
-        legendLayout = QGroupBox(QApplication.translate("GroupBox","Legend Location",None))
+        legendLayout = QGroupBox(QApplication.translate("GroupBox","Legend Location"))
         legendLayout.setLayout(legentlayout)
-        GridGroupLayout = QGroupBox(QApplication.translate("GroupBox","Grid",None))
+        GridGroupLayout = QGroupBox(QApplication.translate("GroupBox","Grid"))
         GridGroupLayout.setLayout(graphgridlayout)
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(self.loadAxisFromProfile)
@@ -613,7 +613,7 @@ class WindowsDlg(ArtisanDialog):
         self.aw.qmc.autodeltaxBT = self.autodeltaxBTFlag.isChecked()
         self.aw.autoAdjustAxis()
         self.aw.qmc.redraw(recomputeAllDeltas=False)
-        string = QApplication.translate("Message","xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})",None).format(str(self.ylimitEdit_min.text()),str(self.ylimitEdit.text()),str(self.xlimitEdit_min.text()),str(self.xlimitEdit.text()),str(self.zlimitEdit_min.text()),str(self.zlimitEdit.text()))                                   
+        string = QApplication.translate("Message","xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})").format(str(self.ylimitEdit_min.text()),str(self.ylimitEdit.text()),str(self.xlimitEdit_min.text()),str(self.xlimitEdit.text()),str(self.zlimitEdit_min.text()),str(self.zlimitEdit.text()))                                   
         self.aw.sendmessage(string)
         self.close()
     

@@ -199,14 +199,14 @@ def list2blend(blend_list):
 # coffee and blend stock access and rendering
 
 unit_translations_singular = {
-    "bag": QApplication.translate("Plus", "bag", None),
-    "box": QApplication.translate("Plus", "box", None),
-    "barrel": QApplication.translate("Plus", "barrel", None),
+    "bag": QApplication.translate("Plus", "bag"),
+    "box": QApplication.translate("Plus", "box"),
+    "barrel": QApplication.translate("Plus", "barrel"),
 }
 unit_translations_plural = {
-    "bag": QApplication.translate("Plus", "bags", None),
-    "box": QApplication.translate("Plus", "boxes", None),
-    "barrel": QApplication.translate("Plus", "barrels", None),
+    "bag": QApplication.translate("Plus", "bags"),
+    "box": QApplication.translate("Plus", "boxes"),
+    "barrel": QApplication.translate("Plus", "barrels"),
 }
 
 
@@ -371,7 +371,7 @@ def coffee2beans(coffee):
     try:
         origin_str = c["origin"].strip()
         if len(origin_str) > 0 and origin_str != "null":
-            origin = QApplication.translate("Countries", origin_str, None)
+            origin = QApplication.translate("Countries", origin_str)
     except Exception:  # pylint: disable=broad-except
         pass
     if "label" in c:
@@ -461,7 +461,7 @@ def getCoffees(weight_unit_idx, store=None):
                         origin_str = c["origin"].strip()
                         if len(origin_str) > 0 and origin_str != "null":
                             origin = QApplication.translate(
-                                "Countries", origin_str, None
+                                "Countries", origin_str
                             )
                     except Exception:  # pylint: disable=broad-except
                         pass

@@ -32,18 +32,18 @@ except Exception:
 class SamplingDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
-        self.setWindowTitle(QApplication.translate("Message","Sampling", None))
+        self.setWindowTitle(QApplication.translate("Message","Sampling"))
         self.setModal(True)
         
         self.org_delay = self.aw.qmc.delay
         self.org_flagKeepON = self.aw.qmc.flagKeepON
         self.org_flagOpenCompleted = self.aw.qmc.flagOpenCompleted
         
-        self.keepOnFlag = QCheckBox(QApplication.translate("Label","Keep ON", None))
+        self.keepOnFlag = QCheckBox(QApplication.translate("Label","Keep ON"))
         self.keepOnFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.keepOnFlag.setChecked(bool(self.aw.qmc.flagKeepON))
         
-        self.openCompletedFlag = QCheckBox(QApplication.translate("Label","Open Completed Roast in Viewer", None))
+        self.openCompletedFlag = QCheckBox(QApplication.translate("Label","Open Completed Roast in Viewer"))
         self.openCompletedFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.openCompletedFlag.setChecked(bool(self.aw.qmc.flagOpenCompleted))
         
@@ -116,7 +116,7 @@ class SamplingDlg(ArtisanDialog):
         self.aw.qmc.flagOpenCompleted = bool(self.openCompletedFlag.isChecked())
         self.aw.qmc.delay = int(self.interval.value()*1000.)
         if self.aw.qmc.delay < self.aw.qmc.default_delay:
-            QMessageBox.warning(self.aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None)) 
+            QMessageBox.warning(self.aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.")) 
         self.storeSettings() 
         self.aw.closeEventSettings()
         self.accept()
