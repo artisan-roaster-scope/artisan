@@ -117,6 +117,10 @@ If you need support please check the [documentation](#documentation) or ask the 
 **10) Does Artisan run under iOS on my iPad?**  
 : No, not directly and this will unlikely change. However, you can have Artisan to display TIME/ET/BT as [WebLCDs](https://artisan-roasterscope.blogspot.com/2016/03/lcds.html){:target="_blank"} introduced in Artisan v0.9) on any Web browser in the network (incl. an iPad). This does not give you the graph nor does it allow you to use the Artisan event buttons or sliders. Still the computer running Artisan (eg. a simple [Raspberry Pi](https://www.raspberrypi.org/)) could share its screen (by running a VNC server which is setup by default on the Raspberry Pi) over the network to an iPad. That way it looks like Artisan is running on the iPad, while the iPad is just acting as an external wireless display to the computer in the network running Artisan.
 
+<a name="FAQ-Setup-11"></a>
+**11) I have troubles connecting Artisan to my Phidgets setup. I installed the latest Phidgets driver and the Phidget Control Panel is showing the modules and readings correctly. However, in Artisan cannot connect to the Phidgets hardware and does not display any readings. What is wrong?**  
+: By default, the Phidget driver does connect only one app to the Phdigets hardware. As you have already the Phidgets Control Panel open (which counts as one app) and connected via the driver to the hardware, no other app (like Artisan) can connect at the same time. Just close the Phidgets Control Panel and to allow Artisan to connect to the hardware.
+
 <br>
 
 <a name="FAQ-Recording"></a>
