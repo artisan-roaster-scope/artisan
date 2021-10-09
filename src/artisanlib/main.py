@@ -20178,7 +20178,7 @@ class ApplicationWindow(QMainWindow):
                 RoR_FCs_act = aw.qmc.delta2[aw.qmc.timeindex[2]]
                 try:
                     #dave Need to clean up.  Better way to get the index value??  Maybe aw.qmc.timeindex[2]-analysis_start ??
-                    fcs_idx = aw.qmc.timeindex[2]-analysis_start                    +2
+                    fcs_idx = aw.qmc.timeindex[2]-analysis_start
                     RoR_FCs_delta = RoR_FCs_act - np_dbtb[fcs_idx]
 
                     fcs_idx_oldway = numpy.asarray(np_dbt==aw.qmc.delta2[aw.qmc.timeindex[2]]).nonzero()

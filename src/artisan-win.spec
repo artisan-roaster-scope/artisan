@@ -2,7 +2,6 @@
 
 block_cipher = None
 
-
 import os
 if os.environ.get('APPVEYOR'):
   ARTISAN_SRC = r'C:\projects\artisan\src'
@@ -44,9 +43,6 @@ a = Analysis(['artisan.py'],
 
 pyz = PYZ(a.pure, a.zipped_data,cipher=block_cipher)
 
-
-
-
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
@@ -55,6 +51,7 @@ exe = EXE(pyz,
           strip=False, # =True fails
           upx=True, # not installed
           icon='artisan.ico',
+          version='version_info-win.txt',
           console=False) # was True
 
 coll = COLLECT(exe,
@@ -114,7 +111,6 @@ os.system('copy "' + SNAP7_BIN + r'\snap7.dll" ' + TARGET)
 # copy libusb0.1 lib
 
 os.system('copy "' + LIBUSB_BIN + r'\libusb0.dll" ' + TARGET)
-
 
 for fn in [
     'artisan.png',

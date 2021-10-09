@@ -23,3 +23,4 @@ openpyxl==3.0.7 # 3.0.6
 keyring==23.1.0 #23.0.1 # 21.5.0 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
 lxml==4.6.3
 prettytable==2.2.0 #2.1.0 # >1.0.0 fail to be packed by py2app, but a monkey patch in main.py helps
+pyinstaller-versionfile==2.0.0
