@@ -29,6 +29,7 @@ import threading
 import platform
 import wquantiles
 import logging
+import warnings
 from typing import Final
 
 from artisanlib.util import cmd2str, RoRfromCtoF, appFrozen, fromCtoF, fromFtoC, hex2int, str2cmd, toFloat
@@ -542,7 +543,7 @@ class serialport():
         #update ET SV LCD 6
         self.aw.qmc.currentpidsv = self.aw.fujipid.readcurrentsv()
         #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         # get the temperature for ET. self.aw.fujipid.gettemperature(unitID)
         t1 = self.aw.fujipid.gettemperature(self.controlETpid[0],self.controlETpid[1])/10.  #Need to divide by 10 because using 1 decimal point in Fuji (ie. received 843 = 84.3)
         #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None 3 = DTA)
@@ -564,7 +565,7 @@ class serialport():
             dc = self.aw.fujipid.readdutycycle()
             if dc != -1: # on wrong reading we just keep the previous one
                 self.aw.qmc.dutycycle = max(0,min(100,dc))
-            self.aw.qmc.dutycycleTX = self.aw.qmc.timeclock.elapsed()/1000.
+            self.aw.qmc.dutycycleTX = self.aw.qmc.timeclock.elapsedMilli()
         except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message","") + " fujitemperature() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -576,12 +577,12 @@ class serialport():
             #return saved readings from device 0
             return self.aw.qmc.dutycycleTX, self.aw.qmc.dutycycle, self.aw.qmc.currentpidsv
         if not self.aw.pidcontrol.pidActive:
-            return self.aw.qmc.timeclock.elapsed()/1000.,-1,-1
+            return self.aw.qmc.timeclock.elapsedMilli(),-1,-1
         if (self.aw.qmc.device == 19 and not self.aw.pidcontrol.externalPIDControl()) or \
                 (self.aw.qmc.device == 53) or \
                 (self.aw.qmc.device == 29 and not self.aw.pidcontrol.externalPIDControl()):
                 # TC4, HOTTOP or MODBUS with Artisan Software PID
-            return self.aw.qmc.timeclock.elapsed()/1000., min(100,max(-100,self.aw.qmc.pid.getDuty())), self.aw.qmc.pid.target
+            return self.aw.qmc.timeclock.elapsedMilli(), min(100,max(-100,self.aw.qmc.pid.getDuty())), self.aw.qmc.pid.target
         if self.aw.pidcontrol.sv is not None:
             sv = self.aw.pidcontrol.sv
         else:
@@ -590,7 +591,7 @@ class serialport():
             duty = -1
         else:
             duty = min(100,max(-100,self.aw.qmc.pid.getDuty()))
-        return self.aw.qmc.timeclock.elapsed()/1000.,duty,sv
+        return self.aw.qmc.timeclock.elapsedMilli(),duty,sv
 
     def DTAtemperature(self):
         ###########################################################
@@ -608,7 +609,7 @@ class serialport():
         command = self.aw.dtapid.message2send(self.controlETpid[1],3,self.aw.dtapid.dtamem["pv"][1],1)
         #read
         t1 = self.sendDTAcommand(command)
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None 3 = DTA)
         if self.readBTpid[0] < 2:                    
             t2 = self.aw.fujipid.gettemperature(self.readBTpid[0],self.readBTpid[1])/10.
@@ -708,7 +709,7 @@ class serialport():
                 p = subprocess.Popen([os.path.expanduser(c) for c in shlex.split(self.aw.ser.externalprogram)],env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo) # pylint: disable=consider-using-with
             output = p.communicate()[0].decode('UTF-8')
             
-            tx = self.aw.qmc.timeclock.elapsed()/1000.
+            tx = self.aw.qmc.timeclock.elapsedMilli()
             if "," in output:
                 parts = output.split(",")
                 if len(parts) > 2:
@@ -730,278 +731,289 @@ class serialport():
                 return tx,float(parts[0].strip()),float(parts[1].strip())
             return tx,0.,float(output)
         except Exception as e: # pylint: disable=broad-except
-            tx = self.aw.qmc.timeclock.elapsed()/1000.
+            tx = self.aw.qmc.timeclock.elapsedMilli()
             _, _, exc_tb = sys.exc_info() 
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " callprogram(): {0} ").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             self.aw.qmc.adderror((QApplication.translate("Error Message", "callprogram() received:") + " {0} ").format(str(output)),getattr(exc_tb, 'tb_lineno', '?'))
             return tx,0.,0.
             
     def callprogram_34(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t1 = self.aw.qmc.program_t3
         t2 = self.aw.qmc.program_t4
         return tx,t2,t1
 
     def callprogram_56(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t1 = self.aw.qmc.program_t5
         t2 = self.aw.qmc.program_t6
         return tx,t2,t1
 
     def callprogram_78(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t1 = self.aw.qmc.program_t7
         t2 = self.aw.qmc.program_t8
         return tx,t2,t1
 
     def callprogram_910(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t1 = self.aw.qmc.program_t9
         t2 = self.aw.qmc.program_t10
         return tx,t2,t1
 
     def slider_01(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t1 = self.aw.slider1.value()
         t2 = self.aw.slider2.value()
         return tx,t2,t1
 
     def slider_23(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t1 = self.aw.slider3.value()
         t2 = self.aw.slider4.value()
         return tx,t2,t1
 
     def virtual(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         return tx,1.,1.
 
     def HH506RA(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.HH506RAtemperature()
         return tx,t2,t1
 
     def HH806AU(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.HH806AUtemperature()
         return tx,t2,t1
 
     def AmprobeTMD56(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.HH806AUtemperature()
         return tx,t2,t1 
 
     def MastechMS6514(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.MS6514temperature()
         return tx,t2,t1 
 
     def DT301(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.DT301temperature()
         return tx,t2,t1 
 
     def HH806W(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.HH806Wtemperature()
         return tx,t2,t1
     
     def DUMMY(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         return tx,0,0
         
     def PHIDGET1045(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
-        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_1045)
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_1045)
+        if tx_async is not None:
+            tx = tx_async
         return tx,a,t
 
     def PHIDGET1048(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,0)
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
 
     def PHIDGET1048_34(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,1)
         return tx,t1,t2
 
     def PHIDGET1048_AT(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,2)
         return tx,t1,t2
 
     def PHIDGET1046(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.PHIDGET1046temperature(0)
         return tx,t1,t2
 
     def PHIDGET1046_34(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.PHIDGET1046temperature(1)
         return tx,t1,t2
         
     def PHIDGET1051(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
-        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_1051)
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_1051)
+        if tx_async is not None:
+            tx = tx_async
         return tx,a,t
         
     def PHIDGET1011(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1011,0,"voltage")
         return tx,v1,v2
                 
     def PHIDGET1018(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0,"voltage")
         return tx,v1,v2
 
     def PHIDGET1018_34(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1,"voltage")
         return tx,v1,v2
 
     def PHIDGET1018_56(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2,"voltage")
         return tx,v1,v2
 
     def PHIDGET1018_78(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,"voltage")
         return tx,v1,v2
         
     def PHIDGET1011_D(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1011,0,"digital")
         return tx,v1,v2
         
     def PHIDGET1018_D(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0,"digital")
         return tx,v1,v2
 
     def PHIDGET1018_D_34(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1,"digital")
         return tx,v1,v2
 
     def PHIDGET1018_D_56(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2,"digital")
         return tx,v1,v2
 
     def PHIDGET1018_D_78(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,"digital")
         return tx,v1,v2
         
     def PHIDGET_HUB0000_D(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,"digital")
         return tx,v1,v2
 
     def PHIDGET_HUB0000_D_34(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1,"digital")
         return tx,v1,v2
 
     def PHIDGET_HUB0000_D_56(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,"digital")
         return tx,v1,v2   
         
     def PHIDGET_HUB0000_D_0(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,API="digital",retry=False,single=True)
         return tx,v1,v2     
 
     def PHIDGET_TMP1101(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,0)
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
         
     def PHIDGET_TMP1101_34(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,1)
         return tx,t1,t2
             
     def PHIDGET_TMP1101_AT(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,2)
         return tx,t1,t2
 
     def PHIDGET_TMP1100(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
-        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1100)
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1100)
+        if tx_async is not None:
+            tx = tx_async
         return tx,a,t
 
     def PHIDGET_TMP1200(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
-        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200)
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200)
+        # in async mode we take the time of arrival (or the median over all of them if more than one)
+        if tx_async is not None:
+            tx = tx_async
         return tx,a,t
 
     def PHIDGET_TMP1200_2(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
-        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200,alternative_conf=True)
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200,alternative_conf=True)
+        if tx_async is not None:
+            tx = tx_async
         return tx,a,t
         
     def PHIDGET_HUB0000(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1  = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,"voltage")
         return tx,v1,v2
 
     def PHIDGET_HUB0000_34(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1,"voltage")
         return tx,v1,v2
 
     def PHIDGET_HUB0000_56(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,"voltage")
         return tx,v1,v2
         
     def PHIDGET_HUB0000_0(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1  = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,API="voltage",retry=False,single=True)
         return tx,v1,v2
 
     def PHIDGET_DAQ1400_CURRENT(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"current")
         return tx,v1,v2
 
     def PHIDGET_DAQ1400_FREQUENCY(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"frequency")
         return tx,v1,v2
 
     def PHIDGET_DAQ1400_DIGITAL(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"digital")
         return tx,v1,v2
 
     def PHIDGET_DAQ1400_VOLTAGE(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"voltage")
         return tx,v1,v2
     
     def PHIDGET_VCP1000(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_VCP1000, 0, "voltage", single=True)
         return tx,v1,v2
 
     def PHIDGET_VCP1001(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_VCP1001, 0, "voltage", single=True)
         return tx,v1,v2
 
     def PHIDGET_VCP1002(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_VCP1002, 0, "voltage", single=True)
         return tx,v1,v2
 
     def HOTTOP_BTET(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.HOTTOPtemperatures()
         self.aw.qmc.hottop_TX = tx
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
@@ -1010,27 +1022,27 @@ class serialport():
         return self.aw.qmc.hottop_TX,self.aw.qmc.hottop_MAIN_FAN,self.aw.qmc.hottop_HEATER # time, Fan (chan2), Heater (chan1)
         
     def BEHMOR_BTET(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.BEHMORtemperatures(8,9)
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
     
     def BEHMOR_34(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.BEHMORtemperatures(10,11)
         return tx,t1,t2 # time, chan2, chan1
 
     def BEHMOR_56(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.BEHMORtemperatures(1,2)
         return tx,t1,t2 # time, chan2, chan1
 
     def BEHMOR_78(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.BEHMORtemperatures(3,4)
         return tx,t1,t2 # time, chan2, chan1
     
     def VICTOR86B(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t,_= self.HHM28multimeter()  #NOTE: val and symbols are type strings
         if "L" in t:  #L = Out of Range
             return tx, -1, -1
@@ -1038,27 +1050,27 @@ class serialport():
 
     # if force the optimizer is deactivated to ensure fetching fresh readings
     def S7(self,force=False):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.S7read(0,force)
         return tx,t2,t1
     
     def S7_34(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.S7read(1)
         return tx,t2,t1
         
     def S7_56(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.S7read(2)
         return tx,t2,t1
 
     def S7_78(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.S7read(3)
         return tx,t2,t1
 
     def S7_910(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.S7read(4)
         return tx,t2,t1
 
@@ -1066,7 +1078,7 @@ class serialport():
         if self.R1 is None:
             from artisanlib.aillio import AillioR1
             self.R1 = AillioR1()
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         try:
             #removed batchcounter to address issue #667
             #if self.aw.qmc.batchcounter != -1:
@@ -1098,7 +1110,7 @@ class serialport():
 
     def R1_BTIBTS(self):
         self.R1_DTBT()
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         # DT is being used as IBTS.
         return tx, self.aw.qmc.R1_BT, self.aw.qmc.R1_DT
 
@@ -1120,7 +1132,7 @@ class serialport():
     
     # if force the optimizer is deactivated to ensure fetching fresh readings
     def MODBUS(self,force=False):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.MODBUSread(force)
         return tx,t2,t1
 
@@ -1134,17 +1146,17 @@ class serialport():
         return self.aw.qmc.extraMODBUStx,self.aw.qmc.extraMODBUStemps[7],self.aw.qmc.extraMODBUStemps[6]
 
     def HH802U(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.HH806AUtemperature()
         return tx,t2,t1
 
     def HH309(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER309temperature()
         return tx,t2,t1
 
     def CENTER309(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER309temperature()
         return tx,t2,t1
 
@@ -1158,42 +1170,42 @@ class serialport():
         return self.CENTER309_34()
 
     def CENTER306(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER306temperature()
         return tx,t2,t1
 
     def CENTER305(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER306temperature()
         return tx,t2,t1
 
     def CENTER304(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER309temperature()
         return tx,t2,t1
 
     def CENTER303(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER303temperature()
         return tx,t2,t1
 
     def CENTER302(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER302temperature()
         return tx,t2,t1
 
     def CENTER301(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER303temperature()
         return tx,t2,t1
 
     def CENTER300(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER302temperature()
         return tx,t2,t1
 
     def VOLTCRAFTK204(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER309temperature()
         return tx,t2,t1
 
@@ -1203,27 +1215,27 @@ class serialport():
         return self.aw.qmc.extra309TX,self.aw.qmc.extra309T4,self.aw.qmc.extra309T3
 
     def VOLTCRAFTK201(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER302temperature()
         return tx,t2,t1
 
     def VOLTCRAFTK202(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER306temperature()
         return tx,t2,t1
 
     def VOLTCRAFT300K(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER302temperature()
         return tx,t2,t1
 
     def VOLTCRAFT302KJ(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER303temperature()
         return tx,t2,t1
 
     def VOLTCRAFTPL125T2(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.VOLTCRAFTPL125T2temperature()
         return tx,t2,t1
 
@@ -1237,51 +1249,51 @@ class serialport():
         return self.aw.qmc.extraPL125T4TX,self.aw.qmc.extraPL125T4T4,self.aw.qmc.extraPL125T4T3
 
     def EXTECH421509(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.HH506RAtemperature()
         return tx,t2,t1
 
     def NONE(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.NONEtmp()
         return tx,t2,t1
 
     def ARDUINOTC4(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.ARDUINOTC4temperature()
         return tx,t2,t1
 
     def ARDUINOTC4_34(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t1 = self.aw.qmc.extraArduinoT1
         t2 = self.aw.qmc.extraArduinoT2
         return tx,t2,t1
 
     def ARDUINOTC4_56(self): # heater / fan DUTY %
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t1 = self.aw.qmc.extraArduinoT3
         t2 = self.aw.qmc.extraArduinoT4
         return tx,t2,t1
 
     def ARDUINOTC4_78(self): # PID SV / internal temp
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t1 = self.aw.qmc.extraArduinoT5
         t2 = self.aw.qmc.extraArduinoT6
         return tx,t2,t1
     
     def HB_BTET(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.ARDUINOTC4temperature("1300")
         return tx,t2,t1
     
     def HB_DTIT(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         self.SP = self.aw.ser.SP # we link to the serial port object of the main device
         t2,t1 = self.ARDUINOTC4temperature("2400")
         return tx,t2,t1
 
     def HB_AT(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t = self.aw.qmc.extraArduinoT6
         return tx,t,t
     
@@ -1336,57 +1348,57 @@ class serialport():
         return self.aw.ws.readings[mode*2+1],self.aw.ws.readings[mode*2]
     
     def WS(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.WSread(0)
         return tx,t2,t1
     
     def WS_34(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.WSread(1)
         return tx,t2,t1
         
     def WS_56(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.WSread(2)
         return tx,t2,t1
 
     def WS_78(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.WSread(3)
         return tx,t2,t1
 
     def WS_910(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.WSread(4)
         return tx,t2,t1
     
     def YOCTO_thermo(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.YOCTOtemperatures(0)
         return tx,v1,v2
         
     def YOCTO_generic(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.YOCTOtemperatures(4)
         return tx,v1,v2
 
     def YOCTO_pt100(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.YOCTOtemperatures(1)
         return tx,v1,v2
 
     def YOCTO_IR(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.YOCTOtemperatures(2)
         return tx,v2,v1
 
     def TEVA18B(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.TEVA18Btemperature()
         return tx,t2,t1
         
     def EXTECH755(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.EXTECH755pressure()
         return tx,t2,t1
 
@@ -1451,7 +1463,7 @@ class serialport():
 
     #multimeter
     def HHM28(self):
-        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         val,symbols= self.HHM28multimeter()  #NOTE: val and symbols are type strings
         #temporary fix to display the output
         self.aw.sendmessage(val + symbols)
@@ -2148,7 +2160,7 @@ class serialport():
                 res[i] = self.processChannelData(res[i],self.aw.modbus.inputDivs[i],self.aw.modbus.inputModes[i])
         
         self.aw.qmc.extraMODBUStemps = res[:]
-        self.aw.qmc.extraMODBUStx = self.aw.qmc.timeclock.elapsed()/1000.
+        self.aw.qmc.extraMODBUStx = self.aw.qmc.timeclock.elapsedMilli()
         return res[1], res[0]
 
     def NONEtmp(self):
@@ -2455,7 +2467,7 @@ class serialport():
                     libtime.sleep(0.05)
                     r = r + self.SP.read(26 - len(r))                
                 if len(r) == 26 and hex2int(r[0],r[1]) == 43605: # filter out bad/strange data
-                    self.aw.qmc.extraPL125T4TX = self.aw.qmc.timeclock.elapsed()/1000.
+                    self.aw.qmc.extraPL125T4TX = self.aw.qmc.timeclock.elapsedMilli()
                     #extract T1
                     T1 = hex2int(r[23],r[22])/10.# select byte 23 and 22
                     #extract T2
@@ -2614,7 +2626,7 @@ class serialport():
                     #save these variables if using T3 and T4
                     self.aw.qmc.extra309T3 = T3
                     self.aw.qmc.extra309T4 = T4
-                    self.aw.qmc.extra309TX = self.aw.qmc.timeclock.elapsed()/1000.
+                    self.aw.qmc.extra309TX = self.aw.qmc.timeclock.elapsedMilli()
                     return T1,T2
                 if retry:
                     return self.CENTER309temperature(retry=retry-1)
@@ -2653,7 +2665,7 @@ class serialport():
         try:
             #### lock shared resources #####
             self.Phidget1045semaphore.acquire(1)
-            self.Phidget1045values.append((t,libtime.time()))
+            self.Phidget1045values.append((t, self.aw.qmc.timeclock.elapsedMilli()))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         finally:
@@ -2846,6 +2858,7 @@ class serialport():
                 res = -1
                 ambient = -1
                 probe = -1
+                tx = None
                 try:
                     if (deviceType == DeviceID.PHIDID_1045 and self.aw.qmc.phidget1045_async) or \
                         (deviceType in [DeviceID.PHIDID_1051,DeviceID.PHIDID_TMP1100] and self.aw.qmc.phidget1048_async[0]) or \
@@ -2854,24 +2867,33 @@ class serialport():
                         try:
                             #### lock shared resources #####
                             self.Phidget1045semaphore.acquire(1)
-                            now = libtime.time()
+                            now = self.aw.qmc.timeclock.elapsedMilli()
                             start_of_interval = now-self.aw.qmc.delay/1000
                             # 1. just consider async readings taken within the previous sampling interval
                             # and associate them with the (arrivial) time since the begin of that interval
-                            valid_readings = [(r,t - start_of_interval) for (r,t) in self.Phidget1045values if t > start_of_interval]
+                            valid_readings = [(r,t) for (r,t) in self.Phidget1045values if t > start_of_interval]
                             if len(valid_readings) > 0:
+                                                                
                                 # 2. calculate the value
-                                # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
-                                readings = [r for (r,t) in valid_readings]
-                                weights = [t for (r,t) in valid_readings]
-                                async_res = wquantiles.median(numpy.array(readings),numpy.array(weights))
+                                
+#                                # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
+                                readings = numpy.array([r for (r,_) in valid_readings])
+                                times = numpy.array([t for (_,t) in valid_readings])
+                                tx = numpy.average(times, weights=times)
 
-#                                # alternative to the use of the median is to use a polyfit which seems to perform a little worse
-#                                with warnings.catch_warnings():
-#                                    warnings.simplefilter('ignore')
-#                                    # using stable polyfit from numpy polyfit module
-#                                LS_fit = numpy.polynomial.polynomial.polyfit(weights, readings, 1)
-#                                res2 = LS_fit[1]*weights[-1]+LS_fit[0]
+                                # average by calculating the weighted median
+#                                async_res = wquantiles.median(readings, times)
+
+                                # alternative to the use of the median is to use a polyfit
+                                with warnings.catch_warnings():
+                                    warnings.simplefilter('ignore')
+                                    # using stable polyfit from numpy polyfit module
+                                    if len(readings)>1:
+                                        LS_fit = numpy.polynomial.polynomial.polyfit(times, readings, 1)
+                                        tx = (valid_readings[-2][1] + valid_readings[-1][1])/2.0
+                                        async_res = LS_fit[1]*tx+LS_fit[0]
+                                    else:
+                                        async_res = readings[-1]
                                 
                                 # 3. consume old readings
                                 self.Phidget1045values = []
@@ -2918,14 +2940,14 @@ class serialport():
                     if deviceType == DeviceID.PHIDID_TMP1200:
                         ambient = res
                     if ambient == -1:
-                        return -1,-1
+                        return -1,-1, None
                     if deviceType == DeviceID.PHIDID_1045:
-                        return self.IRtemp(self.aw.qmc.phidget1045_emissivity,res,ambient),ambient
-                    return res, ambient
+                        return self.IRtemp(self.aw.qmc.phidget1045_emissivity,res,ambient), ambient, tx
+                    return res, ambient, tx
             if retry:
                 libtime.sleep(0.1)
                 return self.PHIDGET1045temperature(deviceType,retry=False,alternative_conf=alternative_conf)
-            return -1,-1
+            return -1,-1, None
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             try:
@@ -2942,7 +2964,7 @@ class serialport():
             self.Phidget1045tempIRavg = None
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " PHIDGET1045temperature() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-            return -1,-1
+            return -1, -1, None
 
 #----
 

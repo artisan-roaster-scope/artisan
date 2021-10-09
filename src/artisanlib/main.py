@@ -123,7 +123,7 @@ if pyqtversion < 6:
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnusedImport
                              QSlider, QStackedWidget, # @Reimport @UnusedImport
                              QColorDialog, QFrame, QProgressDialog, # @Reimport @UnusedImport
-                             QStyleFactory, QMenu, QLayout) # @Reimport @UnusedImport
+                             QStyleFactory, QMenu, QLayout, QSystemTrayIcon) # @Reimport @UnusedImport
     from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport @UnusedImport
                                 QKeySequence, # @UnusedImport
                                 QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport @UnusedImport
@@ -141,7 +141,7 @@ else:
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport
                              QSlider,  # @Reimport @UnresolvedImport
                              QColorDialog, QFrame, QProgressDialog, # @Reimport @UnresolvedImport
-                             QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport
+                             QStyleFactory, QMenu, QLayout, QSystemTrayIcon) # @Reimport @UnresolvedImport
     from PyQt6.QtGui import (QAction, QImageReader, QWindow,  # @Reimport @UnresolvedImport # pylint: disable=import-error
                                 QKeySequence, # @Reimport s@UnresolvedImport
                                 QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport @UnresolvedImport
@@ -969,7 +969,7 @@ class tgraphcanvas(FigureCanvas):
         # default delay between readings in miliseconds
         self.default_delay: Final = 3000 # default 3s
         self.delay = self.default_delay
-        self.min_delay = 500 # 1000
+        self.min_delay = 250 # 500 # 1000
 
         # extra event sampling interval in miliseconds. If 0, then extra sampling commands are sent "in sync" with the standard sampling commands
         self.extra_event_sampling_delay = 0 # sync, 0.5s, 1.0s, 1.5s,.., 5s => 0, 500, 1000, 1500, ..
@@ -1064,8 +1064,12 @@ class tgraphcanvas(FigureCanvas):
         # add 0.02C and 0.05C change triggers
         self.phidget1200_changeTriggersValues.insert(1,0.05)
         self.phidget1200_changeTriggersValues.insert(1,0.02)
+        self.phidget1200_changeTriggersValues.insert(1,0.01)
+        self.phidget1200_changeTriggersValues.insert(1,0.005)
         self.phidget1200_changeTriggersStrings.insert(1,"0.05C")
         self.phidget1200_changeTriggersStrings.insert(1,"0.02C")
+        self.phidget1200_changeTriggersStrings.insert(1,"0.01C")
+        self.phidget1200_changeTriggersStrings.insert(1,"0.005C")
         self.phidget1200_dataRate = 250
         self.phidget1200_dataRatesStrings: Final = ["250ms","500ms","750ms","1s"]
         self.phidget1200_dataRatesValues: Final = [250,500,700,1024]
@@ -1728,10 +1732,12 @@ class tgraphcanvas(FigureCanvas):
         self.deltaETfilter = 7 # => corresponds to 3 on the user interface
         self.deltaBTfilter = 7 # => corresponds to 3 on the user interface
         self.curvefilter = 3 # => corresponds to 1 on the user interface
-        self.deltaETspan = 20 # the time period taken to compute one deltaET value (1-30sec)
-        self.deltaBTspan = 20 # the time period taken to compute one deltaBT value (1-30sec)
-        self.deltaETsamples = 6 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
-        self.deltaBTsamples = 6 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
+        # a deltaET span of 0 indicates that the delta RoR is computed by two suceeding readings
+        self.deltaETspan = 20 # the time period taken to compute one deltaET value (1-30sec) # deltaETspan >= 0
+        self.deltaBTspan = 20 # the time period taken to compute one deltaBT value (1-30sec) # deltaBTspan >= 0
+        # deltaETsamples == 1 (sample) implies that the delta RoR is computed from only two readings:
+        self.deltaETsamples: int = 6 # the number of samples that make up the delta span, to be used in the delta computations (>= 1!)
+        self.deltaBTsamples: int = 6 # the number of samples that make up the delta span, to be used in the delta computations (>= 1!)
         self.profile_sampling_interval = None # will be updated on loading a profile
         self.background_profile_sampling_interval = None # will be updated on loading a profile into the background        
         self.profile_meter = "Unknown" # will be updated on loading a profile
@@ -2651,13 +2657,14 @@ class tgraphcanvas(FigureCanvas):
 
     # update the aw.qmc.deltaBTspan and deltaETspan from the given sampling interval, aw.qmc.deltaETsamples and aw.qmc.deltaBTsamples
     # interval is expected in seconds (either from the profile on load or from the sampling interval set for recording)
+    # both deltaBTsamples and deltaETsamples are at least one
     def updateDeltaSamples(self):
         if self.flagstart or self.profile_sampling_interval is None:
             interval = self.delay / 1000.
         else:
             interval = self.profile_sampling_interval
-        self.deltaBTsamples = int(max(1,self.deltaBTspan / interval))
-        self.deltaETsamples = int(max(1,self.deltaETspan / interval))
+        self.deltaBTsamples = max(1,int(self.deltaBTspan / interval))
+        self.deltaETsamples = max(1,int(self.deltaETspan / interval))
 
     def updateBackground(self):
         if not self.block_update and aw.qmc.ax is not None:
@@ -3887,7 +3894,7 @@ class tgraphcanvas(FigureCanvas):
                                 aw.qmc.rateofchange1 = 0.
                         else: # normal data received
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            left_index = min(len(sample_ctimex1),len(sample_tstemp1),max(2,(aw.qmc.deltaETsamples + 1)))
+                            left_index = min(len(sample_ctimex1),len(sample_tstemp1),max(2, aw.qmc.deltaETsamples + 1))
                             # ****** Instead of basing the estimate on the window extremal points,
                             #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
                             if aw.qmc.polyfitRoRcalc:
@@ -3922,7 +3929,7 @@ class tgraphcanvas(FigureCanvas):
                                 aw.qmc.rateofchange2 = 0.
                         else: # normal data received
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            left_index = min(len(sample_ctimex2),len(sample_tstemp2),max(2,(aw.qmc.deltaBTsamples + 1)))
+                            left_index = min(len(sample_ctimex2),len(sample_tstemp2),max(2, aw.qmc.deltaBTsamples + 1))
                             # ****** Instead of basing the estimate on the window extremal points,
                             #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
                             if aw.qmc.polyfitRoRcalc:
@@ -6947,7 +6954,7 @@ class tgraphcanvas(FigureCanvas):
             return deltas
     
     # computes the RoR over the time and temperature arrays tx and temp via polynoms of degree 1 at index i using a window of wsize
-    # the window size wsize needs to be at least 2 (two succeeding readings)
+    # the window size wsize needs to be at least 1 (two succeeding readings)
     @staticmethod
     def polyRoR(tx, temp, wsize, i):
         if i == 0: # we duplicate the first possible RoR value instead of returning a 0
@@ -6962,9 +6969,10 @@ class tgraphcanvas(FigureCanvas):
             return 0
             
     @staticmethod
-    def arrayRoR(tx, temp, wsize):
+    # with window size wsize=1 the RoR is computed over suceeding readings
+    def arrayRoR(tx, temp, wsize): # with wsize >=1
         res = (temp[wsize:] - temp[:-wsize]) / ((tx[wsize:] - tx[:-wsize])/60.)
-        # length compensation done downstream, no necessary here!
+        # length compensation done downstream, not necessary here!
         return res
 
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
@@ -6983,11 +6991,11 @@ class tgraphcanvas(FigureCanvas):
             else:
                 roast_end_idx = lt
             if deltaBTsamples is None:
-                dsBT = max(2,(aw.qmc.deltaBTsamples)) # now as in sample()
+                dsBT = max(1, aw.qmc.deltaBTsamples) # now as in sample_processing()
             else:
                 dsBT = deltaBTsamples
             if deltaETsamples is None:
-                dsET = max(2,(aw.qmc.deltaETsamples)) # now as in sample()
+                dsET = max(1, aw.qmc.deltaETsamples) # now as in sample_processing()
             else:
                 dsET = deltaETsamples
             if timex_lin is not None:
@@ -7002,7 +7010,7 @@ class tgraphcanvas(FigureCanvas):
                     if optimalSmoothing and self.polyfitRoRcalc:
                         # optimal RoR computation using polynoms with out timeshift
                         if dsET % 2 == 0:
-                            dsETs = dsET+1 # the savgol_filter expectes odd window length
+                            dsETs = dsET+1 # the savgol_filter expectes odd window length of >=1
                         else:
                             dsETs = dsET
                         if len(nt1) > dsETs:
@@ -7038,7 +7046,7 @@ class tgraphcanvas(FigureCanvas):
                         if self.polyfitRoRcalc:
                             try:
                                 # variant using incremental polyfit RoR computation
-                                z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))]
+                                z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))] # windows size dsET needs to be at least 2
                             except Exception: # pylint: disable=broad-except
                                 # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                 # https://github.com/numpy/numpy/issues/16744
@@ -7887,11 +7895,11 @@ class tgraphcanvas(FigureCanvas):
                             if aw.qmc.background_profile_sampling_interval is None:
                                 dsET = None
                             else:
-                                dsET = int(max(2,aw.qmc.deltaETspan / aw.qmc.background_profile_sampling_interval))
+                                dsET = max(1,int(aw.qmc.deltaETspan / aw.qmc.background_profile_sampling_interval))
                             if aw.qmc.background_profile_sampling_interval is None:
                                 dsBT = None
                             else:
-                                dsBT = int(max(2,aw.qmc.deltaBTspan / aw.qmc.background_profile_sampling_interval))
+                                dsBT = max(1,int(aw.qmc.deltaBTspan / aw.qmc.background_profile_sampling_interval))
                             self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin,deltaETsamples=dsET,deltaBTsamples=dsBT)
                         ##### DeltaETB,DeltaBTB curves
                         if self.delta_ax:
@@ -8366,9 +8374,15 @@ class tgraphcanvas(FigureCanvas):
 #                            print("ET RoR std:",numpy.std([x for x in self.delta1[start:end] if x is not None]))
 #                            print("BT RoR mean:",numpy.mean([x for x in self.delta2[start:end] if x is not None]))
 #                            print("BT RoR std:",numpy.std([x for x in self.delta2[start:end] if x is not None]))
+#                            print("BT mean:",numpy.mean([x for x in self.temp2[start:end] if x is not None]))
+#                            print("BT std:",numpy.std([x for x in self.temp2[start:end] if x is not None]))
+#                            max_BT = numpy.max([x for x in self.temp2[start:end] if x is not None])
+#                            min_BT = numpy.max([x for x in self.temp2[start:end] if x is not None])
+#                            mean_BT = numpy.mean([x for x in self.temp2[start:end] if x is not None])
+#                            print("BT max delta:", max(mean_BT - min_BT,max_BT - mean_BT))
 #                        except Exception as e: # pylint: disable=broad-except
 #                            _log.exception(e)
-#                
+                
                 # CHARGE-DROP curve index limits
                 charge_idx = 0
                 if self.timeindex[0] > -1:
@@ -15486,12 +15500,12 @@ class SampleThread(QThread):
                 if aw.qmc.swapETBT:
                     return tx,float(t2),float(t1)
                 return tx,float(t1),float(t2)
-            tx = aw.qmc.timeclock.elapsed()/1000.
+            tx = aw.qmc.timeclock.elapsedMilli()
             t1,t2 = aw.simulator.read((tx if aw.qmc.flagstart else 0))
             return tx,float(t1),float(t2)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-            tx = aw.qmc.timeclock.elapsed()/1000.
+            tx = aw.qmc.timeclock.elapsedMilli()
             return tx,-1.0,-1.0
 
     @staticmethod
@@ -15500,12 +15514,12 @@ class SampleThread(QThread):
             if aw.simulator is None:
                 tx,t1,t2 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
             else:
-                tx = aw.qmc.timeclock.elapsed()/1000.
+                tx = aw.qmc.timeclock.elapsedMilli()
                 t1,t2 = aw.simulator.readextra(i,(tx if aw.qmc.flagstart else 0))
             return tx,float(t1),float(t2)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-            tx = aw.qmc.timeclock.elapsed()/1000.
+            tx = aw.qmc.timeclock.elapsedMilli()
             return tx,-1.0,-1.0
     
     # fetch the raw samples from the main and all extra devices once per interval
@@ -15527,10 +15541,13 @@ class SampleThread(QThread):
                     
                     #### first retrieve readings from the main device
                     timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
-                    #read time, ET (t1) and BT (t2) TEMPERATURE
-                    tx_org,t1,t2 = self.sample_main_device()
+#                    #read time, ET (t1) and BT (t2) TEMPERATURE
+#                    tx_org,t1,t2 = self.sample_main_device()
+#                    etbt_time = libtime.perf_counter() - timeBeforeETBT
+#                    tx = tx_org + (etbt_time / 2.0) # we take the average between before and after
+# instead of estimating the real time of the sample, let the device implementation decide (mostly, the time the request was send should be accurate enough)
+                    tx,t1,t2 = self.sample_main_device()
                     etbt_time = libtime.perf_counter() - timeBeforeETBT
-                    tx = tx_org + (etbt_time / 2.0) # we take the average between before and after
                     temp1_readings.append(t1)
                     temp2_readings.append(t2)
                     timex_readings.append(tx)
@@ -15541,9 +15558,10 @@ class SampleThread(QThread):
                         temp1_readings.append(extrat1)
                         temp2_readings.append(extrat2)
                         timex_readings.append(extratx)
+                    total_time = libtime.perf_counter() - timeBeforeETBT
                     
                     _log.debug("sample(): ET/BT time => %.4f", etbt_time)
-                    _log.debug("sample(): total time => %.4f", (libtime.perf_counter() - timeBeforeETBT))
+                    _log.debug("sample(): total time => %.4f", total_time)
 
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
@@ -15552,7 +15570,21 @@ class SampleThread(QThread):
                     aw.qmc.samplingSemaphore.release(1)
                 self.sample_processingSignal.emit(temp1_readings, temp2_readings, timex_readings)
 
-
+    # libtime.sleep is accurate only up to 0-5ms
+    # using a hyprid approach using sleep() and busy-wait based on the time.perf_counter()
+    @staticmethod
+    def accurate_delay(delay):
+        ''' Function to provide accurate time delay in seconds
+        '''
+        _ = libtime.perf_counter() + delay  
+        # use the standard sleep until one 2ms before the timeout
+        if delay > 5e-3:
+            libtime.sleep(delay - 5e-3)
+        # continous with a busy sleep
+        while libtime.perf_counter() < _:
+#            pass # this raises CPU to 100%
+            libtime.sleep(1/100000) # this is a good compromise with increased accuracy vs time.sleep() avoiding a 100% CPU load
+        
     def run(self):
         try:
             aw.qmc.flagsamplingthreadrunning = True
@@ -15561,34 +15593,26 @@ class SampleThread(QThread):
             aw.qmc.afterTP = False
             if not aw.qmc.flagon:
                 return
-
+    
             # initialize digitizer
             aw.lastdigitizedvalue = [None,None,None,None] # last digitized value per quantifier
             aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
-
+    
             interval = aw.qmc.delay/1000.
-            next_tx = libtime.perf_counter()
+            next_time = libtime.time() + interval
             while True:
+#                libtime.sleep(max(0, next_time - libtime.time())) # sleep is not very accurate
+                self.accurate_delay(max(0, next_time - libtime.time())) # more accurate, but keeps the CPU busy
                 if aw.qmc.flagon:
-                    # if we are already beyond 1/4 of the next sampling we skip this one
-                    if libtime.perf_counter() < (next_tx + 0.25*interval):
-                        # only if we still have the time in this sampling interval, we sample
 
-#                        _log.debug(datetime.datetime.now()) # use this to check for drifts
+#                    _log.info(datetime.datetime.now()) # use this to check for drifts
 
-                        #collect information
-                        try:
-                            aw.qmc.flagsampling = True # we signal that we are sampling
-                            self.sample()
-                        finally:
-                            aw.qmc.flagsampling = False # we signal that we are done with sampling
-
-                    # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
-                    # apply sampling interval here
-                    if aw.qmc.flagon:
-                        next_tx += interval
-                        now = libtime.perf_counter()
-                        libtime.sleep(max(0.2,next_tx - now)) # the 200ms here to allow other threads to intercept
+                    #collect information
+                    try:
+                        aw.qmc.flagsampling = True # we signal that we are sampling
+                        self.sample()
+                    finally:
+                        aw.qmc.flagsampling = False # we signal that we are done with sampling
                 else:
                     aw.qmc.flagsampling = False # we signal that we are done with sampling
                     try:
@@ -15599,11 +15623,14 @@ class SampleThread(QThread):
                         pass
                     self.quit()
                     break  #thread ends
+                # skip tasks if we are behind schedule:
+                next_time += (libtime.time() - next_time) // interval * interval + interval
         finally:
             aw.qmc.flagsampling = False # we signal that we are done with sampling
             aw.qmc.flagsamplingthreadrunning = False
             if sys.platform.startswith("darwin"):
                 del pool
+
 
 #########################################################################################################
 ###     Artisan thread Server
@@ -18042,6 +18069,12 @@ class ApplicationWindow(QMainWindow):
         self.updateSerialLogSignal.connect(self.updateSerialLog)
         self.fireslideractionSignal.connect(self.fireslideraction)
         self.moveButtonSignal.connect(self.moveKbutton)
+        
+        # add a system tray icon
+        self.tray_icon = QSystemTrayIcon(self)
+        self.updateTrayIcon()
+        self.tray_icon.show()
+#        self.sendNotificationMessage("test1","test")
 
         if sys.platform.startswith("darwin"):
             # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
@@ -18054,6 +18087,20 @@ class ApplicationWindow(QMainWindow):
 
         QTimer.singleShot(0,lambda : _log.info("startup time: %.2f", libtime.process_time() - startup_time))
 
+    def sendNotificationMessage(self,title,message):
+        self.tray_icon.showMessage(title, message,
+            QSystemTrayIcon.NoIcon, # QSystemTrayIcon.Information,
+            30000
+        )
+        
+    def updateTrayIcon(self):
+        basedir = os.path.join(getResourcePath(),"Icons")
+        if darkdetect.isDark():
+            p = os.path.join(basedir, "artisan-dark.svg")
+        else:
+            p = os.path.join(basedir, "artisan-blue.svg")
+        self.tray_icon.setIcon(QIcon(p))
+    
     # cache curve visibilities on recording start to be able to revert to users settings after recording
     def cacheCurveVisibilities(self):
         self.qmc.curveVisibilityCache = (
@@ -18369,6 +18416,7 @@ class ApplicationWindow(QMainWindow):
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Type.ApplicationPaletteChange:  # called if the palette changed (switch between dark and light mode on macOS)
             self.updateCanvasColors()
+            self.updateTrayIcon()
             return True
         return super().eventFilter(obj, event)
 
@@ -31003,7 +31051,7 @@ class ApplicationWindow(QMainWindow):
     def closeApp(self):
         aw.quitAction.setEnabled(False)
         try:
-            if aw.qmc.checkSaved(): # if not canceled
+            if self.qmc.checkSaved(): # if not canceled
                 flagKeepON = aw.qmc.flagKeepON
                 aw.qmc.flagKeepON = False # temporarily turn keepOn off
                 self.stopActivities()
@@ -36420,11 +36468,11 @@ class ApplicationWindow(QMainWindow):
             if aw.qmc.background_profile_sampling_interval is None:
                 dsET = None
             else:
-                dsET = int(max(1,aw.qmc.deltaETspan / aw.qmc.background_profile_sampling_interval))
+                dsET = max(1,int(aw.qmc.deltaETspan / aw.qmc.background_profile_sampling_interval))
             if aw.qmc.background_profile_sampling_interval is None:
                 dsBT = None
             else:
-                dsBT = int(max(1,aw.qmc.deltaBTspan / aw.qmc.background_profile_sampling_interval))
+                dsBT = max(1,int(aw.qmc.deltaBTspan / aw.qmc.background_profile_sampling_interval))
             aw.qmc.delta1B, aw.qmc.delta2B = aw.qmc.recomputeDeltas(aw.qmc.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin,deltaETsamples=dsET,deltaBTsamples=dsBT)
 
             #populate delta ET (aw.qmc.delta1) and delta BT (aw.qmc.delta2)

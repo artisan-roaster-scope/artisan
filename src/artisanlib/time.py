@@ -36,5 +36,8 @@ class ArtisanTime():
         
     def elapsed(self):
         return (time.perf_counter() - self.clock)*self.base
+        
+    def elapsedMilli(self):
+        return (time.perf_counter() - self.clock)
 
     

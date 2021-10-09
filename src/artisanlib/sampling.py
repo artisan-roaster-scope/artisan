@@ -51,7 +51,7 @@ class SamplingDlg(ArtisanDialog):
         self.interval.setSingleStep(1)
         self.interval.setValue(self.aw.qmc.delay/1000.)
         self.interval.setRange(self.aw.qmc.min_delay/1000.,40.)
-        self.interval.setDecimals(1)
+        self.interval.setDecimals(2)
         self.interval.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.interval.setSuffix("s")
         

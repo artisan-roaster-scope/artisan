@@ -425,7 +425,7 @@ class CurvesDlg(ArtisanDialog):
         self.projectCheck.stateChanged.connect(self.changeProjection) #toggle
         
         deltaSpanLabel = QLabel(QApplication.translate("Label", "Delta Span"))
-        self.spanitems = range(1,31)
+        self.spanitems = range(0,31)
         self.deltaBTspan = QComboBox()
         self.deltaBTspan.addItems([str(i) + "s" for i in self.spanitems])
         try:

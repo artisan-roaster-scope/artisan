@@ -340,7 +340,8 @@ for python_version in ["python3.8", "python3.9", "python3.10"]:
         except:
             pass
     # remove Qt artefacts
-    for qt_dir in ["PyQt5/Qt5", "PyQt5/Qt", "PyQt6/Qt6", "PyQt6/Qt", "PyQt6/bindings", "PyQt6/lupdate", "PyQt6/uic"]:
+    for qt_dir in ["PyQt5/Qt5", "PyQt5/Qt", "PyQt5/bindings", "PyQt5/uic", 
+            "PyQt6/Qt6", "PyQt6/Qt", "PyQt6/bindings", "PyQt6/lupdate", "PyQt6/uic"]:
         try:
             subprocess.check_call(f"rm -rf {rootdir}/{qt_dir}",shell = True)
         except:
