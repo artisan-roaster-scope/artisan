@@ -18095,7 +18095,7 @@ class ApplicationWindow(QMainWindow):
         
     def updateTrayIcon(self):
         basedir = os.path.join(getResourcePath(),"Icons")
-        if darkdetect.isDark():
+        if sys.platform.startswith("darwin") and darkdetect.isDark():
             p = os.path.join(basedir, "artisan-dark.svg")
         else:
             p = os.path.join(basedir, "artisan-blue.svg")
