@@ -16797,7 +16797,7 @@ class ApplicationWindow(QMainWindow):
         # set a few broad style parameters
         self.button_font_size_pt = 13
         
-        #TODO: delete
+        #TODO: delete # pylint: disable=fixme
         if platf == 'Windows':
             self.button_font_size = f"{self.button_font_size_pt - 2}pt"
         else:
@@ -16807,7 +16807,7 @@ class ApplicationWindow(QMainWindow):
         self.button_font_size_tiny = f"{self.button_font_size_pt - 4}pt"
         self.button_font_size_micro = f"{self.button_font_size_pt - 5}pt"
 
-        #TODO: keep
+        #TODO: keep # pylint: disable=fixme
         button_font_size_small_pt = self.button_font_size_pt - 3
         button_font_size_small_selected_pt = self.button_font_size_pt - 2
 #        button_font_size_tiny_pt = self.button_font_size_pt - 4
@@ -16817,21 +16817,21 @@ class ApplicationWindow(QMainWindow):
 
         # button width in px
         if platf == 'Windows':
-            # TODO: remove
+            # TODO: remove # pylint: disable=fixme
             self.main_button_min_width_str = "110px"
             self.small_button_min_width_str = "75px"
             self.tiny_button_min_width_str = "60px"
-            # TODO: keep
+            # TODO: keep # pylint: disable=fixme
 #            self.main_button_min_width_px: Final = 110
             self.standard_button_min_width_px: Final = 90
 #            self.small_button_min_width_px: Final = 75
             #self.tiny_button_min_width_px: Final = 60
         else:
-            # TODO: remove
+            # TODO: remove # pylint: disable=fixme
             self.main_button_min_width_str = "100px"
             self.small_button_min_width_str = "60px"
             self.tiny_button_min_width_str = "50px"
-            # TODO: keep
+            # TODO: keep # pylint: disable=fixme
 #            self.main_button_min_width_px = 100
             self.standard_button_min_width_px = 75
 #            self.small_button_min_width_px = 60
@@ -18077,7 +18077,7 @@ class ApplicationWindow(QMainWindow):
         
 # test menu and notification:
         menu = QMenu(self)
-        exitAction = menu.addAction("Exit")
+        menu.addAction("Exit")
         self.tray_icon.setContextMenu(menu)
         self.sendNotificationMessage("test1",'test')
 
