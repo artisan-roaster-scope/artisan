@@ -29,7 +29,6 @@ import threading
 import platform
 import wquantiles
 import logging
-import warnings
 from typing import Final
 
 from artisanlib.util import cmd2str, RoRfromCtoF, appFrozen, fromCtoF, fromFtoC, hex2int, str2cmd, toFloat
