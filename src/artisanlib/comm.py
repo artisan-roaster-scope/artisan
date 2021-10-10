@@ -944,10 +944,7 @@ class serialport():
 
     def PHIDGET_TMP1200(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
-        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200)
-        # in async mode we take the time of arrival (or the median over all of them if more than one)
-        if tx_async is not None:
-            tx = tx_async
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200)
         return tx,a,t
 
     def PHIDGET_TMP1200_2(self):
@@ -2858,7 +2855,6 @@ class serialport():
                 res = -1
                 ambient = -1
                 probe = -1
-                tx = None
                 try:
                     if (deviceType == DeviceID.PHIDID_1045 and self.aw.qmc.phidget1045_async) or \
                         (deviceType in [DeviceID.PHIDID_1051,DeviceID.PHIDID_TMP1100] and self.aw.qmc.phidget1048_async[0]) or \
@@ -2879,21 +2875,20 @@ class serialport():
 #                                # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
                                 readings = numpy.array([r for (r,_) in valid_readings])
                                 times = numpy.array([t for (_,t) in valid_readings])
-                                tx = numpy.average(times, weights=times)
 
                                 # average by calculating the weighted median
-#                                async_res = wquantiles.median(readings, times)
+                                async_res = wquantiles.median(readings, times)
 
-                                # alternative to the use of the median is to use a polyfit
-                                with warnings.catch_warnings():
-                                    warnings.simplefilter('ignore')
-                                    # using stable polyfit from numpy polyfit module
-                                    if len(readings)>1:
-                                        LS_fit = numpy.polynomial.polynomial.polyfit(times, readings, 1)
-                                        tx = (valid_readings[-2][1] + valid_readings[-1][1])/2.0
-                                        async_res = LS_fit[1]*tx+LS_fit[0]
-                                    else:
-                                        async_res = readings[-1]
+#                                # alternative to the use of the median is to use a polyfit
+#                                with warnings.catch_warnings():
+#                                    warnings.simplefilter('ignore')
+#                                    # using stable polyfit from numpy polyfit module
+#                                    if len(readings)>1:
+#                                        LS_fit = numpy.polynomial.polynomial.polyfit(times, readings, 1)
+#                                        tx = (valid_readings[-2][1] + valid_readings[-1][1])/2.0
+#                                        async_res = LS_fit[1]*tx+LS_fit[0]
+#                                    else:
+#                                        async_res = readings[-1]
                                 
                                 # 3. consume old readings
                                 self.Phidget1045values = []
@@ -2940,14 +2935,14 @@ class serialport():
                     if deviceType == DeviceID.PHIDID_TMP1200:
                         ambient = res
                     if ambient == -1:
-                        return -1,-1, None
+                        return -1,-1
                     if deviceType == DeviceID.PHIDID_1045:
-                        return self.IRtemp(self.aw.qmc.phidget1045_emissivity,res,ambient), ambient, tx
-                    return res, ambient, tx
+                        return self.IRtemp(self.aw.qmc.phidget1045_emissivity,res,ambient), ambient
+                    return res, ambient
             if retry:
                 libtime.sleep(0.1)
                 return self.PHIDGET1045temperature(deviceType,retry=False,alternative_conf=alternative_conf)
-            return -1,-1, None
+            return -1,-1
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             try:
@@ -2964,7 +2959,7 @@ class serialport():
             self.Phidget1045tempIRavg = None
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " PHIDGET1045temperature() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-            return -1, -1, None
+            return -1, -1
 
 #----
 

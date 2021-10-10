@@ -15577,13 +15577,13 @@ class SampleThread(QThread):
         ''' Function to provide accurate time delay in seconds
         '''
         _ = libtime.perf_counter() + delay  
-        # use the standard sleep until one 2ms before the timeout
+        # use the standard sleep until one 5ms before the timeout (Windows <10 might need a limit of 5.5ms)
         if delay > 5e-3:
             libtime.sleep(delay - 5e-3)
         # continous with a busy sleep
         while libtime.perf_counter() < _:
-#            pass # this raises CPU to 100%
-            libtime.sleep(1/100000) # this is a good compromise with increased accuracy vs time.sleep() avoiding a 100% CPU load
+            pass # this raises CPU to 100%
+#            libtime.sleep(1/100000) # this is a compromise with increased accuracy vs time.sleep() avoiding a 100% CPU load
         
     def run(self):
         try:
@@ -15599,10 +15599,10 @@ class SampleThread(QThread):
             aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
     
             interval = aw.qmc.delay/1000.
-            next_time = libtime.time() + interval
+            next_time = libtime.perf_counter() + interval
             while True:
 #                libtime.sleep(max(0, next_time - libtime.time())) # sleep is not very accurate
-                self.accurate_delay(max(0, next_time - libtime.time())) # more accurate, but keeps the CPU busy
+                self.accurate_delay(max(0, next_time - libtime.perf_counter())) # more accurate, but keeps the CPU busy
                 if aw.qmc.flagon:
 
 #                    _log.info(datetime.datetime.now()) # use this to check for drifts
@@ -15624,7 +15624,7 @@ class SampleThread(QThread):
                     self.quit()
                     break  #thread ends
                 # skip tasks if we are behind schedule:
-                next_time += (libtime.time() - next_time) // interval * interval + interval
+                next_time += (libtime.perf_counter() - next_time) // interval * interval + interval
         finally:
             aw.qmc.flagsampling = False # we signal that we are done with sampling
             aw.qmc.flagsamplingthreadrunning = False
@@ -15644,7 +15644,7 @@ class Athreadserver(QWidget):
 
             #connect graphics to GUI thread
             sthread.sample_processingSignal.connect(aw.qmc.sample_processing)
-            sthread.start(QThread.Priority.TimeCriticalPriority) # QThread.Priority.HighPriority, QThread.Priority.HighestPriority
+            sthread.start(QThread.Priority.TimeCriticalPriority) # TimeCriticalPriority > QThread.Priority.HighestPriority > QThread.Priority.HighPriority
             sthread.wait(300)    #needed in some Win OS
 
 
@@ -18074,7 +18074,12 @@ class ApplicationWindow(QMainWindow):
         self.tray_icon = QSystemTrayIcon(self)
         self.updateTrayIcon()
         self.tray_icon.show()
-#        self.sendNotificationMessage("test1","test")
+        
+# test menu and notification:
+        menu = QMenu(self)
+        exitAction = menu.addAction("Exit")
+        self.tray_icon.setContextMenu(menu)
+        self.sendNotificationMessage("test1",'test')
 
         if sys.platform.startswith("darwin"):
             # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
@@ -18100,6 +18105,7 @@ class ApplicationWindow(QMainWindow):
         else:
             p = os.path.join(basedir, "artisan-blue.svg")
         self.tray_icon.setIcon(QIcon(p))
+        self.tray_icon.setToolTip("Artisan Notifications")
     
     # cache curve visibilities on recording start to be able to revert to users settings after recording
     def cacheCurveVisibilities(self):
