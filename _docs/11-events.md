@@ -17,7 +17,7 @@ Creating Events allows you to record data to be shown on your roast graph with e
 Artisan’s standard buttons are as follows:
 ![Artisan buttons](/assets/images/gsg/standard buttons.png)
 
-The buttons above contain key time points in your roast and after using the trier in the roaster, you would push the button when the event occurs. The buttons table can down be downloaded using the Copy Table button. Pushing these buttons during a roast will add data to your roast log.  You can find the data under `Roast` >> `Properties`, `Data` tab.  The Data and Events tabs can be downloaded using the Copy Table button on those dialogs.  You can change the button sizes - tiny, small and large.  
+The buttons above contain key time points in your roast and after using the trier in the roaster, you would push the button when the event occurs. The buttons table can down be downloaded using the Copy Table button. Pushing these buttons during a roast will add data to your roast log.  You can find the data under `Roast` >> `Properties`, `Data` tab.  The Data and Events tabs can be downloaded using the Copy Table button on those dialogs. The custom event buttons themself come in three sizes (tiny, small and larger). This can be configured in the buttons tab of the Events dialog (menu Config >> Events, 2nd tab).  
 
 ![button sizes](/assets/images/gsg/buttton sizes.png)
 
