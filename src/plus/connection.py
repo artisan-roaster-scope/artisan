@@ -36,16 +36,7 @@ import datetime
 import gzip
 import json
 import platform
-import requests
 import logging
-
-if platform.system().startswith("Windows"):
-    import keyring.backends.Windows  # @UnusedImport
-elif platform.system() == "Darwin":
-    import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
-else:
-    import keyring.backends.SecretService  # @UnusedImport
-import keyring  # @Reimport # imported last to make py2app work
 
 from plus import config, account, util
 
@@ -110,6 +101,15 @@ def clearCredentials(remove_from_keychain: bool = True) -> None:
             and remove_from_keychain
         ):  # @UndefinedVariable
             try:
+            
+                if platform.system().startswith("Windows"):
+                    import keyring.backends.Windows  # @UnusedImport
+                elif platform.system() == "Darwin":
+                    import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
+                else:
+                    import keyring.backends.SecretService  # @UnusedImport
+                import keyring  # @Reimport # imported last to make py2app work
+            
                 keyring.delete_password(
                     config.app_name, config.app_window.plus_account
                 )  # @UndefinedVariable
@@ -131,6 +131,14 @@ def clearCredentials(remove_from_keychain: bool = True) -> None:
 
 def setKeyring() -> None:
     try:
+        if platform.system().startswith("Windows"):
+            import keyring.backends.Windows  # @UnusedImport
+        elif platform.system() == "Darwin":
+            import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
+        else:
+            import keyring.backends.SecretService  # @UnusedImport
+        import keyring  # @Reimport # imported last to make py2app work
+    
         # HACK set keyring backend explicitly
         if platform.system().startswith("Windows"):
             keyring.set_keyring(
@@ -158,6 +166,7 @@ def extractUserInfo(res, attr: str, default):
 # returns True on successful authentification
 def authentify() -> bool:
     _log.info("authentify()")
+    import requests # @Reimport
     try:
         if (
             config.app_window is not None
@@ -167,6 +176,14 @@ def authentify() -> bool:
             if config.passwd is None:
                 setKeyring()
                 try:
+                    if platform.system().startswith("Windows"):
+                        import keyring.backends.Windows  # @UnusedImport
+                    elif platform.system() == "Darwin":
+                        import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
+                    else:
+                        import keyring.backends.SecretService  # @UnusedImport
+                    import keyring  # @Reimport # imported last to make py2app work
+
                     config.passwd = keyring.get_password(
                         config.app_name, config.app_window.plus_account
                     )  # @UndefinedVariable
@@ -341,6 +358,7 @@ def postData(
     jsondata = json.dumps(data).encode("utf8")
     _log.debug("-> size %s", len(jsondata))
     headers, postdata = getHeadersAndData(authorized, compress, jsondata)
+    import requests
     r = requests.post(
         url,
         headers=headers,
@@ -371,6 +389,7 @@ def getData(url: str, authorized: bool = True) -> Any:
     _log.info("getData(%s,%s)", url, authorized)
     headers = getHeaders(authorized)
     #    _log.debug("-> request headers %s",headers)
+    import requests
     r = requests.get(
         url,
         headers=headers,
@@ -387,6 +406,7 @@ def getData(url: str, authorized: bool = True) -> Any:
         # we re-authentify by renewing the session token and try again
         authentify()
         headers = getHeaders(authorized)  # recreate header with new token
+        import requests # @Reimport
         r = requests.get(
             url,
             headers=headers,

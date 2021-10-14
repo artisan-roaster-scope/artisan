@@ -34,9 +34,7 @@ except Exception:
 
 from artisanlib.util import getDirectory
 from plus import config, util, roast, connection, sync, controller
-from requests.exceptions import ConnectionError as RequestsConnectionError
 from typing import Any, Dict, Final
-import persistqueue
 import threading
 import time
 import logging
@@ -47,11 +45,7 @@ queue_path = getDirectory(config.outbox_cache, share=True)
 
 app = QCoreApplication.instance()
 
-queue = persistqueue.SQLiteQueue(
-    queue_path, multithreading=True, auto_commit=False
-)
-# we keep items in the queue if not explicit marked as task_done:
-# auto_commit=False
+queue = None # holdes the persistqueue.SQLiteQueue, initialized by start()
 
 # queue entries are dictionaries with entries
 #   url   : the URL to send the request to
@@ -86,6 +80,7 @@ class Concur(threading.Thread):
 
     def run(self):
         _log.debug("run()")
+        from requests.exceptions import ConnectionError as RequestsConnectionError
         time.sleep(config.queue_start_delay)
         self.resume()  # unpause self
         item = None
@@ -229,7 +224,19 @@ def start():
             "start(): queue not started in ArtisanViewer mode"
         )
     else:
+        global queue  # pylint: disable=global-statement
         global worker_thread  # pylint: disable=global-statement
+        
+        if queue is None:
+            # we initialize the queue
+            import persistqueue
+            queue = persistqueue.SQLiteQueue(
+                queue_path, multithreading=True, auto_commit=False
+            )
+            # we keep items in the queue if not explicit marked as task_done:
+            # auto_commit=False
+
+        
         _log.info("start()")
         _log.debug("-> qsize: %s", queue.qsize())
         if worker_thread is None:
@@ -254,6 +261,7 @@ def stop():
 # this is used to add only items to the queue that are registered already in
 # the sync cache but not yet uploaded as they are still in the queue
 def full_roast_in_queue(roast_id: str) -> bool:
+    import persistqueue
     q = persistqueue.SQLiteQueue(
         queue_path, multithreading=True, auto_commit=False
     )

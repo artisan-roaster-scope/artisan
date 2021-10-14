@@ -34,11 +34,7 @@ except Exception:
 from pathlib import Path
 from artisanlib.util import getDirectory
 from plus import config, util, connection, controller, roast
-import dbm
 import os
-import portalocker
-import requests
-import shelve
 import logging
 from typing import Final
 
@@ -69,6 +65,8 @@ def getSyncPath(lock: bool = False):
 
 def addSyncShelve(uuid: str, modified_at, fh):
     _log.debug("addSyncShelve(%s,%s,_fh_)", uuid, modified_at)
+    import dbm
+    import shelve
     try:
         with shelve.open(getSyncPath()) as db:
             db[uuid] = modified_at
@@ -111,6 +109,7 @@ def addSyncShelve(uuid: str, modified_at, fh):
 # for the given uuid, assuming it holds the last timepoint modifications were
 # last synced with the server
 def addSync(uuid, modified_at):
+    import portalocker
     try:
         sync_cache_semaphore.acquire(1)
         _log.debug("addSync(%s,%s)", str(uuid), str(modified_at))
@@ -139,6 +138,8 @@ def addSync(uuid, modified_at):
 # returns None if given uuid is not registered for syncing, otherwise the
 # last modified_at timestamp in EPOC milliseconds
 def getSync(uuid):
+    import portalocker
+    import shelve
     try:
         sync_cache_semaphore.acquire(1)
         _log.debug("getSync(%s)", str(uuid))
@@ -192,6 +193,8 @@ def getSync(uuid):
 
 
 def delSync(uuid):
+    import portalocker
+    import shelve
     try:
         sync_cache_semaphore.acquire(1)
         _log.debug("delSync(%s)", str(uuid))
@@ -643,6 +646,7 @@ def applyServerUpdates(data):
 # Properties Dialog and update the plus icon
 def fetchServerUpdate(uuid: str, file=None):
     aw = config.app_window
+    import requests
     try:
         _log.debug(
             ("fetchServerUpdate() -> requesting update"

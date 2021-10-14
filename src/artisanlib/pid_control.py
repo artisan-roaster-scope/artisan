@@ -29,6 +29,8 @@
 
 import time as libtime
 import numpy
+import logging
+from typing import Final
 
 from artisanlib.util import decs2string, fromCtoF, fromFtoC, hex2int, str2cmd, stringfromseconds
 
@@ -40,6 +42,9 @@ except Exception:
     #pylint: disable = E, W, R, C
     from PyQt5.QtCore import pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+
+
+_log: Final = logging.getLogger(__name__)
 
 class FujiPID():
     def __init__(self,aw):
@@ -1188,10 +1193,8 @@ class PIDcontrol():
                     self.aw.block_quantification_sampling_ticks[slidernr] = self.aw.sampling_ticks_to_block_quantifiction
                     cool = int(round(numpy.interp(vn,[-100,0],[self.aw.eventslidermax[slidernr],self.aw.eventslidermin[slidernr]])))
                     self.aw.qmc.temporarymovenegativeslider = (slidernr,cool)
-            except Exception: # pylint: disable=broad-except
-#                import traceback
-#                traceback.print_exc(file=sys.stdout)
-                pass
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
         self.lastEnergy = v
 
     def conv2celsius(self):
@@ -1213,8 +1216,8 @@ class PIDcontrol():
                 for j in range(len(self.RS_svValues[n])):
                     if self.RS_svValues[n][j] != 0:
                         self.RS_svValues[n][j] = fromFtoC(self.RS_svValues[n][j])
-        except Exception: # pylint: disable=broad-except
-            pass
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
                 self.aw.qmc.rampSoakSemaphore.release(1)
@@ -1238,8 +1241,8 @@ class PIDcontrol():
                 for j in range(len(self.RS_svValues[n])):
                     if self.RS_svValues[n][j] != 0:
                         self.RS_svValues[n][j] = fromCtoF(self.RS_svValues[n][j])
-        except Exception: # pylint: disable=broad-except
-            pass
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
                 self.aw.qmc.rampSoakSemaphore.release(1)
@@ -1312,7 +1315,6 @@ class PIDcontrol():
                 self.aw.qmc.pid.setControl(self.aw.pidcontrol.setEnergy)
                 if self.aw.pidcontrol.svMode == 0:
                     self.aw.pidcontrol.setSV(self.aw.sliderSV.value())
-#                    self.aw.pidcontrol.setSV(self.aw.pidcontrol.svValue)
                 self.pidActive = True
                 self.aw.qmc.pid.on()
                 self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles["PIDactive"])
@@ -1551,8 +1553,8 @@ class PIDcontrol():
                 self.svActions = self.RS_svActions[n]
                 self.svBeeps = self.RS_svBeeps[n]
                 self.svDescriptions = self.RS_svDescriptions[n]
-        except Exception: # pylint: disable=broad-except
-            pass
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
                 self.aw.qmc.rampSoakSemaphore.release(1)
@@ -1562,7 +1564,8 @@ class PIDcontrol():
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             return self.RS_svLabels.index(label)
-        except Exception: # pylint: disable=broad-except
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             return None
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
@@ -1583,7 +1586,7 @@ class PIDcontrol():
             if self.aw.pidcontrol.sv is not None:
                 sv = self.aw.pidcontrol.sv
             else:
-                sv = self.svSliderMin
+                sv = min(self.svSliderMax, max(self.svSliderMin, self.aw.pidcontrol.svValue))
             self.aw.updateSVSliderLCD(sv)
             self.aw.sliderSV.setValue(sv)
             self.aw.sliderSV.blockSignals(False)

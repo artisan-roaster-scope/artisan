@@ -7,6 +7,7 @@ Author: https://github.com/IARI
 Original Source: http://stackoverflow.com/questions/12712360/qtsingleapplication-for-pyside-or-pyqt
 Original Author: user763305
 Notes: Modified for PyQt5; further modified to remove blocking sockets remaining from died server
+Updated to support QT6
 '''
 
 import sys

@@ -18,7 +18,6 @@
 
 import os
 import sys
-import prettytable
 import logging
 from typing import Final
 
@@ -28,7 +27,6 @@ from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import (MyQComboBox, MyTableWidgetItemNumber, MyTableWidgetItemQCheckBox,
                                 MyTableWidgetItemQComboBox, MyTableWidgetItemQLineEdit, MyTableWidgetItemQTime)
 
-from help import alarms_help
 
 try:
     #pylint: disable = E, W, R, C
@@ -997,6 +995,7 @@ class AlarmDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def copyAlarmTabletoClipboard(self,_=False):
+        import prettytable
         nrows = self.alarmtable.rowCount() 
         ncols = self.alarmtable.columnCount()
         clipboard = ""
@@ -1051,6 +1050,7 @@ class AlarmDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def showAlarmbuttonhelp(self,_=False):
+        from help import alarms_help
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog

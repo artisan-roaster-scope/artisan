@@ -18,16 +18,13 @@
 
 import os
 import sys
-import math
 import re
-import binascii
 import time as libtime
 import numpy
+import math
 import shlex
-import subprocess
 import threading
 import platform
-import wquantiles
 import logging
 from typing import Final
 
@@ -534,6 +531,7 @@ class serialport():
                 self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
+                import binascii
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)                
                 self.aw.addserial("Fuji: " + settings + " || Tx = " + cmd2str(binascii.hexlify(binstring)) + " || Rx = " + cmd2str(binascii.hexlify(r)))
 
@@ -689,6 +687,7 @@ class serialport():
 
 
     def callprogram(self):
+        import subprocess
         try:
 #            output = os.popen(self.aw.ser.externalprogram,"r").readline()
             # we try to set the users standard environment, replacing the one pointing to the restrictive python build in Artisan
@@ -1451,6 +1450,7 @@ class serialport():
         finally:
             # note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
+                import binascii
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize) + "," + str(
                     self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 self.aw.addserial(
@@ -1858,6 +1858,7 @@ class serialport():
         finally:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
+                import binascii
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 self.aw.addserial("MS6514: " + settings + " || Rx = " + cmd2str(binascii.hexlify(r))) 
 
@@ -1903,6 +1904,7 @@ class serialport():
         finally:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
+                import binascii
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 self.aw.addserial("DT301: " + settings + " || Rx = " + cmd2str(binascii.hexlify(data))) 
 
@@ -2020,6 +2022,7 @@ class serialport():
         finally:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
+                import binascii
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 self.aw.addserial("H806: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str(binascii.hexlify(r)))
 
@@ -2079,6 +2082,7 @@ class serialport():
         finally:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
+                import binascii
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 self.aw.addserial("H806Wtemperature: " + settings + " || Rx = " + binascii.hexlify(r))
 
@@ -2281,10 +2285,12 @@ class serialport():
         finally:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
+                import binascii
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 self.aw.addserial("H506: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str(binascii.hexlify(r)))
 
     def CENTER302temperature(self,retry=2):
+        import binascii
         try:
             command = str2cmd("\x41")
             r = ""
@@ -2338,6 +2344,7 @@ class serialport():
                 self.aw.addserial("CENTER302: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
     def CENTER303temperature(self,retry=2):
+        import binascii
         try:
             command = str2cmd("\x41")
             r = ""
@@ -2442,6 +2449,7 @@ class serialport():
         finally:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
+                import binascii
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 self.aw.addserial("VOLTCRAFTPL125T2: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
@@ -2489,11 +2497,13 @@ class serialport():
         finally:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
+                import binascii
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 self.aw.addserial("VOLTCRAFTPL125T4: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
 
     def CENTER306temperature(self,retry=2):
+        import binascii
         try:
             command = str2cmd("\x41")
             r = ""
@@ -2638,6 +2648,7 @@ class serialport():
         finally:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
+                import binascii
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 self.aw.addserial("CENTER309: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
@@ -2876,6 +2887,7 @@ class serialport():
                                 times = numpy.array([t for (_,t) in valid_readings])
 
                                 # average by calculating the weighted median
+                                import wquantiles
                                 async_res = wquantiles.median(readings, times)
 
 #                                # alternative to the use of the median is to use a polyfit
@@ -2990,6 +3002,7 @@ class serialport():
                     # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
                     readings = [r for (r,t) in valid_readings]
                     weights = [t for (r,t) in valid_readings]
+                    import wquantiles
                     res = wquantiles.median(numpy.array(readings),numpy.array(weights))
 #                    res = numpy.median(numpy.array(readings))
                     # 3. consume old readings
@@ -3304,6 +3317,7 @@ class serialport():
                     # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
                     readings = [r for (r, _) in valid_readings]
                     weights = [t for (_, t) in valid_readings]
+                    import wquantiles
                     res = wquantiles.median(numpy.array(readings),numpy.array(weights))
                     # 3. consume old readings
                     self.Phidget1046values[channel] = []
@@ -4686,6 +4700,7 @@ class serialport():
                         # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
                         readings = [r for (r,t) in valid_readings]
                         weights = [t for (r,t) in valid_readings]
+                        import wquantiles
                         res = wquantiles.median(numpy.array(readings),numpy.array(weights))
                         # 3. consume old readings
                         self.PhidgetIOvalues[i] = []
@@ -5245,6 +5260,7 @@ class serialport():
                                 # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
                                 readings = [r for (r,t) in valid_readings]
                                 weights = [t for (r,t) in valid_readings]
+                                import wquantiles
                                 probe1 = wquantiles.median(numpy.array(readings),numpy.array(weights))
                                 # 3. consume old readings
                                 self.YOCTOvalues[0] = []
@@ -5294,6 +5310,7 @@ class serialport():
                                 # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
                                 readings = [r for (r,t) in valid_readings]
                                 weights = [t for (r,t) in valid_readings]
+                                import wquantiles # @Reimport
                                 probe2 = wquantiles.median(numpy.array(readings),numpy.array(weights))
                                 # 3. consume old readings
                                 self.YOCTOvalues[1] = []
@@ -5605,6 +5622,7 @@ class serialport():
         return -1
 
     def TEVA18Btemperature(self):
+        import binascii
         try:
             r = ""
             run = 1

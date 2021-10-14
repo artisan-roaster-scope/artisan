@@ -34,52 +34,6 @@ QTDIR = os.environ["QT_PATH"] + r'/'
 APP = ['artisan.py']
 
 DATA_FILES = [
-    ("./LICENSE.txt", [r"../LICENSE"]),
-    
-#    ("../Resources/qt_plugins/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
-##    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqdds.dylib']),  # not on Qt5.8.x
-#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqgif.dylib']),
-#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqicns.dylib']),
-#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqico.dylib']),
-##    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqjp2.dylib']),  # not on Qt5.6.x
-#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqjpeg.dylib']),
-#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqmacjp2.dylib']),
-##    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqmng.dylib']), # not on Qt5.6.x
-#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
-#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqtga.dylib']),
-##    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqtiff.dylib']),  # produces a strip error
-#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqwbmp.dylib']),
-#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqwebp.dylib']),
-#    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqcocoa.dylib']), # qt5
-##    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqoffscreen.dylib']), # qt5
-##    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqminimal.dylib']), # qt5
-#    ("../Resources/qt_plugins/printsupport", [QTDIR + r'/plugins/printsupport/libcocoaprintersupport.dylib']), # qt5/# standard
-#    ("../Resources/qt_plugins/styles", [QTDIR + r'/plugins/styles/libqmacstyle.dylib']), # QT 5.10 and later requires this (not available on 5.8)
-##    ("../Resources/qt_plugins/platformthemes", [QTDIR + r'/plugins/platformthemes/libqxdgdesktopportal.dylib']), # unclear what this is for (not available before 5.12)
-
-# for now make a copy of the plugins in the default Qt directory to make Qt happy:
-    ("../PlugIns/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
-#    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqdds.dylib']),  # not on Qt5.8.x
-    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqgif.dylib']),
-    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqicns.dylib']),
-    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqico.dylib']),
-#    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqjp2.dylib']),  # not on Qt5.6.x
-    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqjpeg.dylib']),
-    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqmacjp2.dylib']),
-#    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqmng.dylib']), # not on Qt5.6.x
-    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
-    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqtga.dylib']),
-#    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqtiff.dylib']),  # produces a strip error
-    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqwbmp.dylib']),
-    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqwebp.dylib']),
-    ("../PlugIns/platforms", [QTDIR + r'/plugins/platforms/libqcocoa.dylib']), # qt5
-#    ("../PlugIns/platforms", [QTDIR + r'/plugins/platforms/libqoffscreen.dylib']), # qt5
-#    ("../PlugIns/platforms", [QTDIR + r'/plugins/platforms/libqminimal.dylib']), # qt5
-#    ("../PlugIns/printsupport", [QTDIR + r'/plugins/printsupport/libcocoaprintersupport.dylib']), # Qt5/#  not available in Qt6
-    ("../PlugIns/styles", [QTDIR + r'/plugins/styles/libqmacstyle.dylib']), # QT 5.10 and later requires this (not available on 5.8)
-#    ("../PlugIns/platformthemes", [QTDIR + r'/plugins/platformthemes/libqxdgdesktopportal.dylib']), # unclear what this is for (not available before 5.12)
-
-
 # standard QT translation needed to get the Application menu bar and 
 # the standard dialog elements translated
     ("../translations", [QTDIR + r'/translations/qtbase_ar.qm']),
@@ -190,23 +144,8 @@ OPTIONS = {
     'strip': False,
 #    'xref': True,
     'argv_emulation': False, # this would confuses GUI processing
-# this does not work on Python3.4/PyQt5 for unknown reasons (seems only work for Qt4)
-#    'qt_plugins': [
-#                    'iconengines/libqsvgicon.dylib',
-#                    'imageformats/libqsvg.dylib',
-#                    'imageformats/libqjpeg.dylib',
-#                    'imageformats/libqgif.dylib',
-#                    'imageformats/libqtiff.dylib',
-#                    'platforms/libqcocoa.dylib',  # qt5
-#                    'platforms/libqminimal.dylib',  # qt5
-#                    'platforms/libqoffscreen.dylib'],  # qt5
     'semi_standalone': False,
     'site_packages': True,
-# this seems not to work
-#    'dylib_excludes': ['phonon','QtDeclarative','QtDesigner',
-#                    'QtHelp','QtMultimedia',
-#                    'QtOpenGL','QtScript','QtScriptTools',
-#                    'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
     'packages': ['yoctopuce','gevent','openpyxl','numpy','scipy','certifi',
         'matplotlib','PIL', 'lxml', 'snap7'], # MPL and PIL added for mpl v3.3.x
     'optimize':  2,
@@ -214,19 +153,7 @@ OPTIONS = {
     'iconfile': 'artisan.icns',
     'arch': 'x86_64',
     'matplotlib_backends': '-', # '-' for imported or explicit "Qt5Agg, PDF, PS, SVG"
-    'includes': ['serial',
-# not needed?
-#                 'PyQt5',
-#                 'PyQt5.QtCore',
-#                 'PyQt5.QtGui',
-#                 'PyQt5.QtWidgets',
-#                 'PyQt5.QtSvg',
-#                 'PyQt5.QtDBus',
-#                 'PyQt5.QtNetwork',
-#                 'PyQt5.QtPrintSupport',
-#                 'PyQt5.QtBluetooth',
-#                 'PyQt5.QtConcurrent',
-                 ],
+    'includes': ['serial'],
     'excludes' :  ['tkinter','curses', # 'sqlite3',
                 ],
     'plist'    : plist}
@@ -320,40 +247,19 @@ Qt_modules = [
     'QtNetwork',
     'QtDBus',
     'QtBluetooth',
-    'QtConcurrent'
+    'QtConcurrent',
+# needed for QtWebEngine HTML2PDF export:
+    'QtWebEngineWidgets',
+    'QtWebEngineCore',
+    'QtWebEngine',
+    'QtQuick',
+    'QtQuickWidgets',
+    'QtQml',
+    'QtQmlModels',
+    'QtWebChannel',
+    'QtPositioning'
 ]
 Qt_frameworks = [module + ".framework" for module in Qt_modules]
-for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/'):
-    for d in dirs:
-        if d.startswith("Qt") and d.endswith(".framework") and d not in Qt_frameworks:
-#            print("dir",os.path.join(root,d))
-            subprocess.check_call("rm -rf " + os.path.join(root,d),shell = True)
-
-# remove doublicate Qt installation
-
-for python_version in ["python3.8", "python3.9", "python3.10"]:
-    rootdir = f"./Artisan.app/Contents/Resources/lib/{python_version}"
-    if os.path.isdir(f"{rootdir}/PyQt6"):
-        # if PyQt6 exists we remove PyQt5 completely
-        try:
-            subprocess.check_call(f"rm -rf {rootdir}/PyQt5",shell = True)
-        except:
-            pass
-    # remove Qt artefacts
-    for qt_dir in ["PyQt5/Qt5", "PyQt5/Qt", "PyQt5/bindings", "PyQt5/uic", 
-            "PyQt6/Qt6", "PyQt6/Qt", "PyQt6/bindings", "PyQt6/lupdate", "PyQt6/uic"]:
-        try:
-            subprocess.check_call(f"rm -rf {rootdir}/{qt_dir}",shell = True)
-        except:
-            pass
-    # remove unused PyQt libs (not in Qt_frameworks)
-    for qt_dir in ["PyQt5", "PyQt6"]:
-        for subdir, dirs, files in os.walk(f"{rootdir}/{qt_dir}"):
-            for file in files:
-                if file.endswith('.abi3.so') or file.endswith('.pyi'):
-                    if file.split(".")[0] not in Qt_modules:
-                        file_path = os.path.join(subdir, file)
-                        subprocess.check_call(f"rm -rf {file_path}",shell = True)
 
 qt_plugin_dirs = [
     "iconengines",
@@ -377,17 +283,61 @@ qt_plugin_files = [
     "libcocoaprintersupport.dylib",
     "libqmacstyle.dylib"
 ]
-# remove Qt PlugIns not used
-for root,dirs,files in os.walk('./Artisan.app/Contents/PlugIns/'):
-    for d in dirs:
-        if d not in qt_plugin_dirs:
-            subprocess.check_call("rm -rf " + os.path.join(root,d),shell = True)
-        else:
-            for subdir, dirs, files in os.walk(os.path.join(root,d)):
-                for file in files:
-                    if not (file in qt_plugin_files):
+
+for python_version in ["python3.8", "python3.9", "python3.10"]:
+    rootdir = f"./Artisan.app/Contents/Resources/lib/{python_version}"
+
+    if os.path.isdir(f"{rootdir}/PyQt6"):
+        # if PyQt6 exists we remove PyQt5 completely
+        try:
+            subprocess.check_call(f"rm -rf {rootdir}/PyQt5",shell = True)
+        except:
+            pass
+    # remove Qt artefacts
+    for qt_dir in [
+            "PyQt5/Qt",
+            "PyQt5/bindings",
+            "PyQt5/uic", 
+            "PyQt5/Qt5/translations",
+            "PyQt5/Qt5/qml",
+            "PyQt6/Qt",
+            "PyQt6/bindings",
+            "PyQt6/lupdate",
+            "PyQt6/uic",
+            "PyQt6/Qt6/translations",
+            "PyQt6/Qt6/qml"
+        ]:
+        try:
+            subprocess.check_call(f"rm -rf {rootdir}/{qt_dir}",shell = True)
+        except:
+            pass
+    # remove unused PyQt libs (not in Qt_modules)
+    for pyqt_dir in ["PyQt5", "PyQt6"]:
+        for subdir, dirs, files in os.walk(f"{rootdir}/{pyqt_dir}"):
+            for file in files:
+                if file.endswith('.abi3.so') or file.endswith('.pyi'):
+                    if file.split(".")[0] not in Qt_modules:
                         file_path = os.path.join(subdir, file)
                         subprocess.check_call(f"rm -rf {file_path}",shell = True)
+    # remove unused Qt frameworks libs (not in Qt_modules_frameworks)
+    for qt_dir in ["PyQt5/Qt5/lib", "PyQt6/Qt6/lib"]:
+        for subdir, dirs, files in os.walk(f"{rootdir}/{qt_dir}"):
+            for dir in dirs:
+                if dir.startswith("Qt") and dir.endswith(".framework") and dir not in Qt_frameworks:
+                    file_path = os.path.join(subdir, dir)
+                    subprocess.check_call(f"rm -rf {file_path}",shell = True)
+    # remove unused plugins
+    for qt_dir in ["PyQt5/Qt5/plugins", "PyQt6/Qt6/plugins"]:
+        for root, dirs, _ in os.walk(f"{rootdir}/{qt_dir}"):
+            for d in dirs:
+                if d not in qt_plugin_dirs:
+                    subprocess.check_call("rm -rf " + os.path.join(root,d),shell = True)
+                else:
+                    for subdir, _, files in os.walk(os.path.join(root,d)):
+                        for file in files:
+                            if not (file in qt_plugin_files):
+                                file_path = os.path.join(subdir, file)
+                                subprocess.check_call(f"rm -rf {file_path}",shell = True)
 
 
 # remove duplicate mpl_data folder

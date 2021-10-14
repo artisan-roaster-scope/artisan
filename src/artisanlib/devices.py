@@ -20,7 +20,6 @@ import sys
 import time as libtime
 import re
 import platform
-import prettytable
 import logging
 from typing import Final
 
@@ -28,8 +27,6 @@ from artisanlib.util import deltaLabelUTF8
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import MyQComboBox
 
-from help import programs_help
-from help import symbolic_help
 
 _log: Final = logging.getLogger(__name__)
 
@@ -1509,6 +1506,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def copyDeviceTabletoClipboard(self,_=False):
+        import prettytable
         nrows = self.devicetable.rowCount() 
         ncols = self.devicetable.columnCount()
         clipboard = ""
@@ -2974,6 +2972,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def showExtradevHelp(self):
+        from help import symbolic_help
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
@@ -2982,6 +2981,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def showSymbolicHelp(self):
+        from help import symbolic_help
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
@@ -2990,6 +2990,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def showhelpprogram(self,_=False):
+        from help import programs_help
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog

@@ -45,7 +45,7 @@ fi
 
 export PATH=$PYTHON/bin:$PYTHON/lib:$PATH
 export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH
-export DYLD_FRAMEWORK_PATH=$QT_PATH/lib
+#export DYLD_FRAMEWORK_PATH=$QT_PATH/lib # with this line all Qt libs are copied into Contents/Frameworks. Why?
 
 
 # ui / qrc

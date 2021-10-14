@@ -35,10 +35,7 @@ from pathlib import Path
 from artisanlib.util import getDirectory
 from plus import config
 
-import dbm
 import os
-import portalocker
-import shelve
 import logging
 from typing import Optional, Final
 
@@ -61,6 +58,8 @@ account_cache_lock_path = getDirectory(
 
 def setAccountShelve(account_id: str, fh) -> Optional[int]:
     _log.debug("setAccountShelve(%s,_fh_)", account_id)
+    import dbm
+    import shelve
     try:
         with shelve.open(account_cache_path) as db:
             if account_id in db:
@@ -112,6 +111,7 @@ def setAccountShelve(account_id: str, fh) -> Optional[int]:
 # register the given account_id and assign it a fresh number if not yet
 # registered returns the number associated to account_id or None on error
 def setAccount(account_id: str) -> Optional[int]:
+    import portalocker
     try:
         account_cache_semaphore.acquire(1)
         _log.debug("setAccount(%s)", account_id)

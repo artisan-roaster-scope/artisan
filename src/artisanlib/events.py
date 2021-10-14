@@ -18,15 +18,11 @@
 
 import sys
 import platform
-import prettytable
 
 from artisanlib.util import uchr
 from artisanlib.dialogs import ArtisanResizeablDialog, ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 
-from help import eventannotations_help
-from help import eventbuttons_help
-from help import eventsliders_help
 
 try:
     #pylint: disable = E, W, R, C
@@ -2302,6 +2298,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def copyEventButtonTabletoClipboard(self,_=False):
+        import prettytable
         nrows = self.eventbuttontable.rowCount() 
         ncols = self.eventbuttontable.columnCount() - 1 #there is a dummy column at the end on the right
         clipboard = ""
@@ -3044,6 +3041,11 @@ class EventsDlg(ArtisanResizeablDialog):
             #save special event annotations
             self.saveAnnotationsSettings()
             self.aw.closeEventSettings()
+            # restart PhidgetManager
+            try:
+                self.aw.qmc.restartPhidgetManager()
+            except Exception: # pylint: disable=broad-except
+                pass
         except Exception as e: # pylint: disable=broad-except
             #import traceback
             #traceback.print_exc(file=sys.stdout)
@@ -3059,6 +3061,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def showEventbuttonhelp(self,_=False):
+        from help import eventbuttons_help
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
@@ -3067,6 +3070,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def showSliderHelp(self,_=False):
+        from help import eventsliders_help
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
@@ -3075,6 +3079,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def showEventannotationhelp(self,_=False):
+        from help import eventannotations_help
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog

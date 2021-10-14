@@ -24,8 +24,6 @@ from artisanlib.util import toFloat, uchr
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
 from artisanlib.comm import serialport
 
-from help import modbus_help
-from help import s7_help
 
 try:
     #pylint: disable = E, W, R, C
@@ -1765,12 +1763,14 @@ class comportDlg(ArtisanResizeablDialog):
     @pyqtSlot(bool)
     def showModbusbuttonhelp(self,_=False):
         if self.TabWidget.currentIndex() == 2:
+            from help import modbus_help
             self.helpdialog = self.aw.showHelpDialog(
                     self,            # this dialog as parent
                     self.helpdialog, # the existing help dialog
                     QApplication.translate("Form Caption","MODBUS Help"),
                     modbus_help.content())
         elif self.TabWidget.currentIndex() == 3:
+            from help import s7_help
             self.helpdialog = self.aw.showHelpDialog(
                     self,            # this dialog as parent
                     self.helpdialog, # the existing help dialog

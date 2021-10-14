@@ -1,19 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 
-import time as libtime
-startup_time = libtime.process_time()
-
-from artisanlib import __version__
-from artisanlib import __revision__
-from artisanlib import __build__
-
-from artisanlib import __release_sponsor_name__
-from artisanlib import __release_sponsor_domain__
-from artisanlib import __release_sponsor_url__
-
-
-
 # ABOUT
 # This program shows how to plot the temperature and its rate of change from a
 # Fuji PID or a thermocouple meter.
@@ -31,6 +18,18 @@ from artisanlib import __release_sponsor_url__
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import time as libtime
+startup_time = libtime.process_time()
+
+from artisanlib import __version__
+from artisanlib import __revision__
+from artisanlib import __build__
+
+from artisanlib import __release_sponsor_name__
+from artisanlib import __release_sponsor_domain__
+from artisanlib import __release_sponsor_url__
+
+
 import os
 import sys  # @UnusedImport
 import ast
@@ -38,39 +37,22 @@ import platform
 import math
 import datetime
 import warnings
-import string as libstring
-import html as htmllib
 import numpy
-from urllib import parse
-from scipy.signal import savgol_filter
-from scipy.interpolate import UnivariateSpline
-import subprocess
-import binascii
-import codecs
-import uuid
 import threading
 import multiprocessing
 import re
-import textwrap
-import natsort
 import gc
-import csv
 import io
-import zipfile
-import tempfile
-import traceback
+
+# links CTR-C signals to the system default (ignore)
 import signal
+signal.signal(signal.SIGINT, signal.SIG_DFL) 
+
 import logging.config
-signal.signal(signal.SIGINT, signal.SIG_DFL)
-from json import load as json_load, dumps as json_dumps 
-import requests
 from yaml import safe_load as yaml_load
 from typing import Final
-from unidecode import unidecode
-from email import encoders, generator
-from email.mime.base import MIMEBase
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+
+from functools import reduce as freduce
 
 ## MONKEY PATCH BEGIN: importlib.metadata fix for macOS builds with py2app that fails to set proper metadata for prettytable >0.7.2 and thus fail
 ## on import with importlib.metadata.PackageNotFoundError: prettytable on __version__ = importlib_metadata.version(__name__)
@@ -85,7 +67,6 @@ except Exception: # pylint: disable=broad-except
     pass
 ## MONKEY PATCH END:
 
-import prettytable  # @UnresolvedImport
 
 try:
     #pylint: disable = E, W, R, C
@@ -133,6 +114,7 @@ if pyqtversion < 6:
                               qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport @UnusedImport
                               QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnusedImport
     from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @UnusedImport # pylint: disable=unused-import
+    from PyQt5.QtWebEngineWidgets import QWebEngineView # @UnusedImport @UnusedImport # pylint: disable=unused-import
     from PyQt5 import sip # @UnusedImport
 else:
     from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport @UnresolvedImport # pylint: disable=import-error
@@ -143,14 +125,15 @@ else:
                              QColorDialog, QFrame, QProgressDialog, # @Reimport @UnresolvedImport
                              QStyleFactory, QMenu, QLayout, QSystemTrayIcon) # @Reimport @UnresolvedImport
     from PyQt6.QtGui import (QAction, QImageReader, QWindow,  # @Reimport @UnresolvedImport # pylint: disable=import-error
-                                QKeySequence, # @Reimport s@UnresolvedImport
+                                QKeySequence,  # @Reimport @UnresolvedImport
                                 QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport @UnresolvedImport
                                 QRegularExpressionValidator,QDoubleValidator, QPainter ,QCursor)  # @Reimport @UnresolvedImport
     from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport @UnresolvedImport # pylint: disable=import-error
     from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport @UnresolvedImport # pylint: disable=import-error
-                              qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport @UnresolvedImport
+                              qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @Reimport @UnresolvedImport
                               QRegularExpression, QDate, QUrl, QDir, Qt, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnresolvedImport
     from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @Reimport @UnusedImport @UnresolvedImport # pylint: disable=import-error
+    from PyQt6.QtWebEngineWidgets import QWebEngineView # @Reimport  @UnusedImport @UnresolvedImport # pylint: disable=disable=import-error
     from PyQt6 import sip # @Reimport @UnusedImport @UnresolvedImport # pylint: disable=import-error
 
 from artisanlib.suppress_errors import suppress_stdout_stderr
@@ -180,15 +163,12 @@ if mpl_version[0] > 2 and mpl_version[1] > 2:
 
 svgsupport = next((x for x in QImageReader.supportedImageFormats() if x == b'svg'),None)
 
-from functools import reduce as freduce
 mpl.use('Qt5Agg')
 
 from matplotlib.figure import Figure
 from matplotlib import rcParams, patches, transforms, ticker
 import matplotlib.patheffects as PathEffects
 
-import matplotlib.backends.backend_pdf # @UnusedImport
-import matplotlib.backends.backend_svg # @UnusedImport
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar # @Reimport
 from matplotlib.backend_bases import LocationEvent as mplLocationevent
@@ -208,7 +188,6 @@ except Exception: # pylint: disable=broad-except
     pass
 
 
-import unicodedata # @UnresolvedImport
 
 import artisanlib.arabic_reshaper
 from artisanlib.util import (appFrozen, stringp, uchr, decodeLocal, encodeLocal, s2a, fill_gaps, 
@@ -216,7 +195,7 @@ from artisanlib.util import (appFrozen, stringp, uchr, decodeLocal, encodeLocal,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toBool, toStringList, toMap, removeAll, application_name, application_viewer_name, application_organization_name,
         application_organization_domain, getDataDirectory, getAppPath, getResourcePath, getDirectory, debugLogLevelToggle,
-        debugLogLevelActive, setDebugLogLevel, abbrevString, createGradient)
+        debugLogLevelActive, setDebugLogLevel, abbrevString, createGradient, natsort)
 
 from artisanlib.qtsingleapplication import QtSingleApplication
 
@@ -225,7 +204,7 @@ from Phidget22.Phidget import Phidget as PhidgetDriver
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
 from Phidget22.Devices.Log import Log as PhidgetLog
 from Phidget22.LogLevel import LogLevel as PhidgetLogLevel
-from Phidget22. VoltageRange import VoltageRange
+from Phidget22.VoltageRange import VoltageRange
 
 try:
     # spanning a second multiprocessing instance (Hottop server) on macOS falils to import the YAPI interface
@@ -305,6 +284,7 @@ class Artisan(QtSingleApplication):
                 try:
                     query = QUrlQuery(url.query())
                     if query.hasQueryItem("url"):
+                        import requests
                         query_url = QUrl(requests.utils.unquote(query.queryItemValue("url")))
                         if bool(aw.comparator):
                             QTimer.singleShot(5,lambda: aw.comparator.addProfileFromURL(aw.artisanURLextractor,query_url))
@@ -540,10 +520,6 @@ if sys.platform.startswith("darwin"):
     import appnope  # @UnresolvedImport # pylint: disable=import-error
     # import module to detect if OS X dark mode is active or not
     import darkdetect # @UnresolvedImport # pylint: disable=import-error
-    # to establish a thread pool on OS X
-    import objc  # @UnresolvedImport @UnusedImport # pylint: disable=import-error,unused-import
-    import Foundation  # @UnresolvedImport  # pylint: disable=import-error
-#   list_ports module patched for P3k from new pyserial GitHub repository
 
 #def __dependencies_for_freezing():
 #    # pylint: disable=import-error,no-name-in-module,unused-import
@@ -580,52 +556,20 @@ from artisanlib.modbusport import modbusport
 from artisanlib.phidgets import PhidgetManager
 from artisanlib.slider_style import artisan_slider_style
 from artisanlib.event_button_style import artisan_event_button_style
-from artisanlib.cropster import extractProfileCropsterXLS
-from artisanlib.giesen import extractProfileGiesenCSV
-from artisanlib.petroncini import extractProfilePetronciniCSV
-from artisanlib.ikawa import extractProfileIkawaCSV
-from artisanlib.rubase import extractProfileRubaseCSV
-from artisanlib.roastpath import extractProfileRoastPathHTML
-from artisanlib.roastlog import extractProfileRoastLog
-from artisanlib.aillio import extractProfileRoastWorld,extractProfileRoasTime
 from artisanlib.simulator import Simulator
-from artisanlib.transposer import profileTransformatorDlg
-from artisanlib.comparator import roastCompareDlg
 from artisanlib.dialogs import ArtisanMessageBox, HelpDlg, ArtisanInputDialog, ArtisanComboBoxDialog
 from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs)
 from artisanlib.logs import (serialLogDlg, errorDlg, messageDlg)
-from artisanlib.events import EventsDlg, customEventDlg
-from artisanlib.curves import CurvesDlg
-from artisanlib.devices import DeviceAssignmentDlg
-from artisanlib.ports import comportDlg
 from artisanlib.comm import serialport, colorport, scaleport
-from artisanlib.alarms import AlarmDlg
-from artisanlib.background import backgroundDlg
-from artisanlib.cup_profile import flavorDlg
 from artisanlib.pid_dialogs import (PXRpidDlgControl, PXG4pidDlgControl, 
     PID_DlgControl, DTApidDlgControl)
-from artisanlib.designer import designerconfigDlg, pointDlg
-from artisanlib.sampling import SamplingDlg
-from artisanlib.wheels import WheelDlg
-from artisanlib.colors import graphColorDlg
-from artisanlib.statistics import StatisticsDlg
-from artisanlib.phases import phasesGraphDlg
-from artisanlib.calculator import calculatorDlg
-from artisanlib.axis import WindowsDlg
-from artisanlib.batches import batchDlg
-from artisanlib.autosave import autosaveDlg
-from artisanlib.platform import platformDlg
 from artisanlib.pid_control import FujiPID, PIDcontrol, DtaPID
 from artisanlib.widgets import (MyQLCDNumber, MajorEventPushButton, 
     AnimatedMajorEventPushButton, MinorEventPushButton, AuxEventPushButton, ClickableLCDFrame)
-from artisanlib.hottop import (startHottop, stopHottop, setHottop,
-    releaseHottopControl, takeHottopControl, isHottopLoopRunning)
 
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
-from help import keyboardshortcuts_help
 
-from artisanlib.roast_properties import editGraphDlg
 
 # import artisan.plus module
 import plus.config
@@ -772,7 +716,7 @@ class tgraphcanvas(FigureCanvas):
         'endofx', 'startofx', 'resetmaxtime', 'chargemintime', 'fixmaxtime', 'locktimex', 'autotimex', 'autodeltaxET', 'autodeltaxBT', 'locktimex_start',
         'locktimex_end', 'xgrid', 'ygrid', 'zgrid', 'gridstyles', 'gridlinestyle', 'gridthickness', 'gridalpha', 'xrotation',
         'statisticsheight', 'statisticsupper', 'statisticslower', 'autosaveflag', 'autosaveprefix', 'autosavepath', 'autosavealsopath',
-        'autosaveaddtorecentfilesflag', 'autosaveimage', 'autosaveimageformat', 'ystep_down', 'ystep_up', 'backgroundETcurve', 'backgroundBTcurve',
+        'autosaveaddtorecentfilesflag', 'autosaveimage', 'autosaveimageformat', 'autoasaveimageformat_types', 'ystep_down', 'ystep_up', 'backgroundETcurve', 'backgroundBTcurve',
         'l_temp1', 'l_temp2', 'l_delta1', 'l_delta2', 'l_back1', 'l_back2', 'l_back3', 'l_back4', 'l_delta1B', 'l_delta2B', 'l_BTprojection',
         'l_ETprojection', 'l_AUCguide', 'l_horizontalcrossline', 'l_verticalcrossline', 'l_timeline', 'legend', 'l_eventtype1dots', 'l_eventtype2dots',
         'l_eventtype3dots', 'l_eventtype4dots', 'l_eteventannos', 'l_bteventannos', 'l_eventtype1annos', 'l_eventtype2annos', 'l_eventtype3annos',
@@ -2100,6 +2044,8 @@ class tgraphcanvas(FigureCanvas):
         self.autosaveaddtorecentfilesflag = False
 
         self.autosaveimage = False # if true save an image along alog files
+        
+        self.autoasaveimageformat_types = ["PDF", "PDF Report", "SVG", "PNG", "JPEG", "BMP", "CSV", "JSON"]
         self.autosaveimageformat = "PDF" # one of the supported image file formats PDF, SVG, PNG, JPEG, BMP, CSV, JSON
 
         #used to place correct height of text to avoid placing text over text (annotations)
@@ -2865,55 +2811,56 @@ class tgraphcanvas(FigureCanvas):
     def fit_titles(self):
         #truncate title and statistic line to width of axis system to avoid that the MPL canvas goes into miser mode
         try:
-            r = None
-            try:
-                r = self.fig.canvas.get_renderer() # MPL fails on savePDF with 'FigureCanvasPdf' object has no attribute 'get_renderer'
-            except Exception: # pylint: disable=broad-except
-                pass
-            if r is None:
-                ax_width = self.ax.get_window_extent().width
-            else:
-                ax_width = self.ax.get_window_extent(renderer=r).width
-            ax_width_for_title = ax_width - self.background_title_width
-            redraw = False
-            if self.title_text is not None and self.title_artist is not None and self.title_width is not None:
+            if self.ax is not None:
+                r = None
                 try:
-                    prev_title_text = self.title_artist.get_text()
-                    if ax_width_for_title <= self.title_width:
-                        chars = max(3,int(ax_width_for_title / (self.title_width / len(self.title_text))) - 2)
-                        self.title_artist.set_text(f"{self.title_text[:chars].strip()}...")
-                    else:
-                        self.title_artist.set_text(self.title_text)
-                    if prev_title_text != self.title_artist.get_text():
-                        redraw = True
+                    r = self.fig.canvas.get_renderer() # MPL fails on savePDF with 'FigureCanvasPdf' object has no attribute 'get_renderer'
+                except Exception: # pylint: disable=broad-except
+                    pass
+                if r is None:
+                    ax_width = self.ax.get_window_extent().width
+                else:
+                    ax_width = self.ax.get_window_extent(renderer=r).width
+                ax_width_for_title = ax_width - self.background_title_width
+                redraw = False
+                if self.title_text is not None and self.title_artist is not None and self.title_width is not None:
+                    try:
+                        prev_title_text = self.title_artist.get_text()
+                        if ax_width_for_title <= self.title_width:
+                            chars = max(3,int(ax_width_for_title / (self.title_width / len(self.title_text))) - 2)
+                            self.title_artist.set_text(f"{self.title_text[:chars].strip()}...")
+                        else:
+                            self.title_artist.set_text(self.title_text)
+                        if prev_title_text != self.title_artist.get_text():
+                            redraw = True
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+                if self.xlabel_text is not None and self.xlabel_artist is not None and self.xlabel_width is not None:
+                    try:
+                        prev_xlabel_text = self.xlabel_artist.get_text()
+                        if ax_width <= self.xlabel_width:
+                            chars = max(3,int(ax_width / (self.xlabel_width / len(self.xlabel_text))) - 2)
+                            self.xlabel_artist.set_text(f"{self.xlabel_text[:chars].strip()}...")
+                        else:
+                            self.xlabel_artist.set_text(self.xlabel_text)
+                        if prev_xlabel_text != self.xlabel_artist.get_text():
+                            redraw = True
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+                try:
+                    if redraw:
+                        # Temporarily disconnect any callbacks to the draw event...
+                        # (To avoid recursion)
+                        func_handles = self.fig.canvas.callbacks.callbacks["draw_event"]
+                        self.fig.canvas.callbacks.callbacks["draw_event"] = {}
+                        # Re-draw the figure..
+                        with warnings.catch_warnings():
+                            warnings.simplefilter("ignore")
+                            self.fig.canvas.draw()
+                        # Reset the draw event callbacks
+                        self.fig.canvas.callbacks.callbacks["draw_event"] = func_handles
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-            if self.xlabel_text is not None and self.xlabel_artist is not None and self.xlabel_width is not None:
-                try:
-                    prev_xlabel_text = self.xlabel_artist.get_text()
-                    if ax_width <= self.xlabel_width:
-                        chars = max(3,int(ax_width / (self.xlabel_width / len(self.xlabel_text))) - 2)
-                        self.xlabel_artist.set_text(f"{self.xlabel_text[:chars].strip()}...")
-                    else:
-                        self.xlabel_artist.set_text(self.xlabel_text)
-                    if prev_xlabel_text != self.xlabel_artist.get_text():
-                        redraw = True
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
-            try:
-                if redraw:
-                    # Temporarily disconnect any callbacks to the draw event...
-                    # (To avoid recursion)
-                    func_handles = self.fig.canvas.callbacks.callbacks["draw_event"]
-                    self.fig.canvas.callbacks.callbacks["draw_event"] = {}
-                    # Re-draw the figure..
-                    with warnings.catch_warnings():
-                        warnings.simplefilter("ignore")
-                        self.fig.canvas.draw()
-                    # Reset the draw event callbacks
-                    self.fig.canvas.callbacks.callbacks["draw_event"] = func_handles
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
     
@@ -2949,7 +2896,7 @@ class tgraphcanvas(FigureCanvas):
     def onpick(self,event):
         try:
             # display MET information by clicking on the MET marker
-            if isinstance(event.artist, matplotlib.text.Annotation) and self.showmet and event.artist in [self.met_annotate]:
+            if isinstance(event.artist, mpl.text.Annotation) and self.showmet and event.artist in [self.met_annotate]:
                 if self.met_timex_temp1_delta[2] is not None and self.met_timex_temp1_delta[2] >= 0:
                     met_time_str = str(self.met_timex_temp1_delta[2])
                     met_time_msg = QApplication.translate("Message","seconds before FCs")
@@ -2966,21 +2913,21 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
 
             # the analysis results were clicked
-            elif aw.analysisresultsanno is not None and isinstance(event.artist, matplotlib.text.Annotation) and event.artist in [aw.analysisresultsanno]:
+            elif aw.analysisresultsanno is not None and isinstance(event.artist, mpl.text.Annotation) and event.artist in [aw.analysisresultsanno]:
                 self.analysispickflag = True
 
             # the segment results were clicked
-            elif aw.segmentresultsanno is not None and isinstance(event.artist, matplotlib.text.Annotation) and event.artist in [aw.segmentresultsanno]:
+            elif aw.segmentresultsanno is not None and isinstance(event.artist, mpl.text.Annotation) and event.artist in [aw.segmentresultsanno]:
                 self.segmentpickflag = True
 
             # toggle visibility of graph lines by clicking on the legend
-            elif self.legend is not None and event.artist != self.legend and isinstance(event.artist, (matplotlib.lines.Line2D, matplotlib.text.Text)) \
+            elif self.legend is not None and event.artist != self.legend and isinstance(event.artist, (mpl.lines.Line2D, mpl.text.Text)) \
                 and event.artist not in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots] \
                 and event.artist not in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
                 idx = None
                 # deltaLabelMathPrefix (legend label)
                 # deltaLabelUTF8 (artist)
-                if isinstance(event.artist, matplotlib.text.Text):
+                if isinstance(event.artist, mpl.text.Text):
                     try:
                         label = event.artist.get_text()
                         idx = self.labels.index(label)
@@ -3033,7 +2980,7 @@ class tgraphcanvas(FigureCanvas):
                             
 
             # show event information by clicking on event lines in step, step+ and combo modes
-            elif isinstance(event.artist, matplotlib.lines.Line2D):
+            elif isinstance(event.artist, mpl.lines.Line2D):
                 if isinstance(event.ind, (int)):
                     ind = event.ind
                 else:
@@ -3128,7 +3075,7 @@ class tgraphcanvas(FigureCanvas):
                     func = func_ref()
                     if func.__self__ is not None: # a bound method
                         c = func.__self__.__class__
-                        if c == matplotlib.offsetbox.DraggableAnnotation:
+                        if c == mpl.offsetbox.DraggableAnnotation:
                             cids.append(cid)
             # disconnecting all established motion_notify_event_handlers of DraggableAnnotations
             for cid in cids:
@@ -3273,6 +3220,7 @@ class tgraphcanvas(FigureCanvas):
             self.redraw(recomputeAllDeltas=(action.key[0] in [0,6])) # on moving CHARGE or DROP, we have to recompute the Deltas
         else:
             # add a special event at the current timepoint
+            from artisanlib.events import customEventDlg
             dlg = customEventDlg(aw,aw,action.key[1])
             if dlg.exec():
                 self.specialevents.append(action.key[1]) # absolut time index
@@ -3315,6 +3263,8 @@ class tgraphcanvas(FigureCanvas):
                     payload['alert']['title'] = alertTitle
                 if alertTimeout:
                     payload['alert']['timeout'] = alertTimeout
+            import requests
+            from json import dumps as json_dumps
             requests.post(url, data=json_dumps(payload),headers=headers,timeout=0.3)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -4107,6 +4057,7 @@ class tgraphcanvas(FigureCanvas):
                     #output ET, BT, ETB, BTB to output program
                     if aw.ser.externaloutprogramFlag:
                         try:
+                            import subprocess
                             if aw.qmc.background:
                                 if aw.qmc.timeindex[0] != -1:
                                     j = aw.qmc.backgroundtime2index(tx - sample_timex[aw.qmc.timeindex[0]])
@@ -7025,6 +6976,7 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     nt1_lin = numpy.interp(lin1, tx_roast, nt1) # resample data in nt1 to linear spaced time
                                 dist = (lin1[-1] - lin1[0]) / (len(lin1) - 1)
+                                from scipy.signal import savgol_filter # @Reimport
                                 z1 = savgol_filter(nt1_lin, dsETs, 1, deriv=1,delta=dsET)
                                 z1 = z1 * (60./dist) * dsETs
                             except Exception: # pylint: disable=broad-except
@@ -7100,6 +7052,7 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     nt2_lin = numpy.interp(lin2, tx_roast, nt2) # resample data in nt2 to linear spaced time
                                 dist = (lin2[-1] - lin2[0]) / (len(lin2) - 1)
+                                from scipy.signal import savgol_filter # @Reimport
                                 z2 = savgol_filter(nt2_lin, dsBTs, 1, deriv=1,delta=dsBTs)
                                 z2 = z2 * (60./dist) * dsBTs
                             except Exception: # pylint: disable=broad-except
@@ -9537,6 +9490,7 @@ class tgraphcanvas(FigureCanvas):
 
     #add stats summmary to graph
     def statsSummary(self):
+        import textwrap
         try:
             skipline = '\n'
             statstr_segments = []
@@ -10087,6 +10041,7 @@ class tgraphcanvas(FigureCanvas):
             aw.setLCDsBW()
 
         if color == 3:
+            from artisanlib.colors import graphColorDlg
             dialog = graphColorDlg(aw,aw,aw.graphColorDlg_activeTab)
             if dialog.exec():
                 aw.graphColorDlg_activeTab = dialog.TabWidget.currentIndex()
@@ -10461,7 +10416,47 @@ class tgraphcanvas(FigureCanvas):
     @staticmethod
     def deviceLLogINFO():
         PhidgetLog.setLevel(PhidgetLogLevel.PHIDGET_LOG_INFO)
+    
+    # returns True if any device (main or extra) is a Phidget, ambient sensor or button/slider actions contain Phidget commands
+    # the PhidgetManager which makes Phidgets accessible is only started if PhdigetsConfigured returns True
+    def PhidgetsConfigured(self):
+        
+        # searching sets is faster than lists
+        phidget_device_ids = set(self.phidgetDevices)
+        
+        # collecting all device ids in use (from main or extra)
+        device_ids_in_use = self.extradevices[:]
+        device_ids_in_use.append(self.device)
+        
+        # collecting ambient device ids in use (ids 1 and 3 indicate Phidgets modules)
+        ambient_device_ids = [
+            self.ambient_temperature_device,
+            self.ambient_humidity_device,
+            self.ambient_pressure_device]
+        
+        # IO Command, PWM Command, VOUT Command, RC Command
+        # Note that those commands could also trigger Yoctopuce actions
+        main_button_phidget_action_ids = { 5, 11, 12, 19 }
+        
+        # Note that the ids for the same Command types are different here:
+        custom_button_phidget_action_ids = { 6, 13, 14, 21 }
+        
+        # Note that the ids for the same Command types are different here:
+        slider_phidget_action_ids = { 9, 10, 11, 17 }
+        
+        return (
+            any(i in phidget_device_ids for i in device_ids_in_use) or                    # phidget main/extra device
+            any(i in [1, 3] for i in ambient_device_ids) or                               # phidget ambient device
+            any(i in main_button_phidget_action_ids for i in self.buttonactions) or       # phidget actions in event button commands (CHARGE, .., COOL)
+            any(i in main_button_phidget_action_ids for i in self.extrabuttonactions) or  # phidget actions in main event button commandss (ON, OFF, SAMPLE)
+            any(i in main_button_phidget_action_ids for i in self.xextrabuttonactions) or # phidget actions in special event commands (RESET, START)
+            any(i in custom_button_phidget_action_ids for i in aw.extraeventsactions) or  # phidget actions in custom event buttons commands
+            any(i in slider_phidget_action_ids for i in aw.eventslideractions))           # phidget actions in slider commands
+    
 
+    # the PhidgetManager needs to run to allow Phidgets to attach
+    # the PhidgetManager is only started if self.PhidgetsConfigured() returns True signaling
+    # that Phidget modules are configured as main/extra devices, ambient devices, or in button/slider actions
     def startPhidgetManager(self):
         # this is needed to surpress the message on the ignored Exception
         #                            # Phidget that is raised on starting the PhidgetManager without installed
@@ -10469,23 +10464,29 @@ class tgraphcanvas(FigureCanvas):
         _stderr = sys.stderr
         sys.stderr = object
         try:
-            PhidgetLog.enable(PhidgetLogLevel.PHIDGET_LOG_DEBUG, self.device_log_file)
-            PhidgetLog.enableRotating()
-        except Exception: # pylint: disable=broad-except
-            pass # logging might already be enabled
-        try:
-            if self.phidgetRemoteFlag:
-                try:
-                    self.addPhidgetServer()
-                except Exception: # pylint: disable=broad-except
-                    if aw.qmc.device in aw.qmc.phidgetDevices:
-                        aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!"))
-            if self.phidgetManager is None:
-                try:
-                    self.phidgetManager = PhidgetManager()
-                except Exception: # pylint: disable=broad-except
-                    if aw.qmc.device in aw.qmc.phidgetDevices:
-                        aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!"))
+            if self.PhidgetsConfigured():
+                # Phidget server is only started if any device or action addressing Phidgets is configured
+                if self.phidgetManager is None:
+                    try:
+                        PhidgetLog.enable(PhidgetLogLevel.PHIDGET_LOG_DEBUG, self.device_log_file)
+                        PhidgetLog.enableRotating()
+                        _log.info("phidgetLog started")
+                    except Exception: # pylint: disable=broad-except
+                        pass # logging might already be enabled
+                if self.phidgetRemoteFlag:
+                    try:
+                        self.addPhidgetServer()
+                        _log.info("phidgetServer started")
+                    except Exception: # pylint: disable=broad-except
+                        if aw.qmc.device in aw.qmc.phidgetDevices:
+                            aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!"))
+                if self.phidgetManager is None:
+                    try:
+                        self.phidgetManager = PhidgetManager()
+                        _log.info("phidgetManager started")
+                    except Exception: # pylint: disable=broad-except
+                        if aw.qmc.device in aw.qmc.phidgetDevices:
+                            aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!"))
         finally:
             sys.stderr = _stderr
 
@@ -10525,6 +10526,7 @@ class tgraphcanvas(FigureCanvas):
                 return
 
             if not bool(aw.simulator) and aw.qmc.device == 53:
+                from artisanlib.hottop import startHottop
                 startHottop(0.6,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
             try:
                 aw.eventactionx(aw.qmc.extrabuttonactions[0],aw.qmc.extrabuttonactionstrings[0])
@@ -10555,6 +10557,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 aw.buttonONOFF.setStyleSheet(aw.pushbuttonstyles["ON"])
             QApplication.processEvents()
+            
             aw.buttonONOFF.setText(QApplication.translate("Button", "OFF")) # text means click to turn OFF (it is ON)
             aw.buttonONOFF.setToolTip(QApplication.translate("Tooltip", "Stop monitoring"))
             aw.buttonSTARTSTOP.setEnabled(True) # ensure that the START button is enabled
@@ -10609,7 +10612,7 @@ class tgraphcanvas(FigureCanvas):
             # reset the canvas color when it was set by an alarm but never reset
             if "canvas_alt" in aw.qmc.palette:
                 aw.qmc.palette["canvas"] = aw.qmc.palette["canvas_alt"]
-                aw.updateCanvasColors()
+                aw.updateCanvasColors(checkColors=False)
             #enable RESET button:
             aw.buttonRESET.setStyleSheet(aw.pushbuttonstyles["RESET"])
             aw.buttonRESET.setEnabled(True)
@@ -11878,6 +11881,7 @@ class tgraphcanvas(FigureCanvas):
                         self.incBatchCounter()
                         # generate UUID
                         if self.roastUUID is None: # there might be already one assigned by undo and redo the markDROP!
+                            import uuid
                             self.roastUUID = uuid.uuid4().hex
                         if self.device != 18 or aw.simulator is not None:
                             if self.autoDropIdx:
@@ -12714,7 +12718,7 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " writecharacteristics() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    # calculates self.statisticstimes values and returns dryEndIndex as well as the calcuated statisticstimes array of length 5
+    # calculates self.statisticstimes values and returns dryEndIndex as well as the calculated statisticstimes array of length 5
     def calcStatistics(self,TP_index):
         statisticstimes = [0,0,0,0,0]
         try:
@@ -12724,29 +12728,31 @@ class tgraphcanvas(FigureCanvas):
             else:
                 #find when dry phase ends
                 dryEndIndex = aw.findDryEnd(TP_index)
-            dryEndTime = self.timex[dryEndIndex]
-
-            #if DROP
-            if self.timeindex[6] and self.timeindex[2]:
-                totaltime = self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]
-                if totaltime == 0:
-                    return dryEndIndex, statisticstimes
-
-                statisticstimes[0] = totaltime
-                dryphasetime = dryEndTime - self.timex[self.timeindex[0]] # aw.float2float(dryEndTime - self.timex[self.timeindex[0]])
-                midphasetime = self.timex[self.timeindex[2]] - dryEndTime # aw.float2float(self.timex[self.timeindex[2]] - dryEndTime)
-                finishphasetime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]] # aw.float2float(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
-
-                if self.timeindex[7]:
-                    coolphasetime = self.timex[self.timeindex[7]] - self.timex[self.timeindex[6]] # int(round(self.timex[self.timeindex[7]] - self.timex[self.timeindex[6]]))
-                else:
-                    coolphasetime = 0
-
-                statisticstimes[1] = dryphasetime
-                statisticstimes[2] = midphasetime
-                statisticstimes[3] = finishphasetime
-                statisticstimes[4] = coolphasetime
-            return dryEndIndex, statisticstimes
+            if len(self.timex) > dryEndIndex:
+                dryEndTime = self.timex[dryEndIndex]
+    
+                #if DROP
+                if self.timeindex[6] and self.timeindex[2]:
+                    totaltime = self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]
+                    if totaltime == 0:
+                        return dryEndIndex, statisticstimes
+    
+                    statisticstimes[0] = totaltime
+                    dryphasetime = dryEndTime - self.timex[self.timeindex[0]] # aw.float2float(dryEndTime - self.timex[self.timeindex[0]])
+                    midphasetime = self.timex[self.timeindex[2]] - dryEndTime # aw.float2float(self.timex[self.timeindex[2]] - dryEndTime)
+                    finishphasetime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]] # aw.float2float(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
+    
+                    if self.timeindex[7]:
+                        coolphasetime = self.timex[self.timeindex[7]] - self.timex[self.timeindex[6]] # int(round(self.timex[self.timeindex[7]] - self.timex[self.timeindex[6]]))
+                    else:
+                        coolphasetime = 0
+    
+                    statisticstimes[1] = dryphasetime
+                    statisticstimes[2] = midphasetime
+                    statisticstimes[3] = finishphasetime
+                    statisticstimes[4] = coolphasetime
+                return dryEndIndex, statisticstimes
+            return self.timeindex[1], statisticstimes
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             return self.timeindex[1], statisticstimes
@@ -13418,6 +13424,7 @@ class tgraphcanvas(FigureCanvas):
     #collects info about the univariate interpolation
     def univariateinfo(self):
         try:
+            from scipy.interpolate import UnivariateSpline
             #pylint: disable=E0611
             Xpoints,Ypoints = self.findpoints()  #from lowest point to avoid many coeficients
             equ = UnivariateSpline(Xpoints, Ypoints)
@@ -13568,6 +13575,7 @@ class tgraphcanvas(FigureCanvas):
     #interpolation type
     def univariate(self):
         try:
+            from scipy.interpolate import UnivariateSpline
             #pylint: disable=E0611
             Xpoints,Ypoints = self.findpoints()
 
@@ -13833,6 +13841,7 @@ class tgraphcanvas(FigureCanvas):
                 obj["temp1"] = self.temp1
                 obj["temp2"] = self.temp2
                 obj["timeindex"] = self.timeindex
+                import codecs # @Reimport
                 with codecs.open(filename, 'w+', encoding='utf-8') as f:
                     f.write(repr(obj))
                 aw.sendmessage(QApplication.translate("Message","Points saved"))
@@ -13848,6 +13857,7 @@ class tgraphcanvas(FigureCanvas):
             filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message", "Load Points"),ext="*.adsg")
             obj = None
             if os.path.exists(filename):
+                import codecs # @Reimport
                 with codecs.open(filename, 'rb', encoding='utf-8') as f:
                     obj=ast.literal_eval(f.read())
             if obj and "timex" in obj and "temp1" in obj and "temp2" in obj:
@@ -13996,6 +14006,7 @@ class tgraphcanvas(FigureCanvas):
 
             timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
             try:
+                from scipy.interpolate import UnivariateSpline
                 func = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
                 btvals = func(timez).tolist()
                 func2 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
@@ -14276,6 +14287,7 @@ class tgraphcanvas(FigureCanvas):
 
     def findTPdes(self):
         try:
+            from scipy.interpolate import UnivariateSpline
             funcBT = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
             timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
             btvals = funcBT(timez).tolist()
@@ -14312,6 +14324,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.timeindex[0] > -1:
                     offset = self.timex[self.timeindex[0]]
                 values = [self.currentx-offset, self.currenty]
+                from artisanlib.designer import pointDlg
                 dlg = pointDlg(parent=aw, aw=aw, values=values)
                 if dlg.exec():
                     self.currentx = values[0] + offset
@@ -14435,6 +14448,7 @@ class tgraphcanvas(FigureCanvas):
     #converts from a designer profile to a normal profile
     def convert_designer(self):
         try:
+            from scipy.interpolate import UnivariateSpline
             #pylint: disable=E0611
             #prevents accidentally deleting a modified profile.
             self.fileDirtySignal.emit()
@@ -14541,6 +14555,7 @@ class tgraphcanvas(FigureCanvas):
     @pyqtSlot()
     @pyqtSlot(bool)
     def desconfig(self, _=False): # pylint: disable=no-self-use
+        from artisanlib.designer import designerconfigDlg
         dialog = designerconfigDlg(aw,aw)
         dialog.show()
 
@@ -15043,6 +15058,7 @@ class tgraphcanvas(FigureCanvas):
         if self.locale_str.startswith("de"):
             for k in self.umlaute_dict.keys():
                 utf8_string = utf8_string.replace(k, self.umlaute_dict[k])
+        from unidecode import unidecode
         return unidecode(utf8_string)
 
 
@@ -15490,6 +15506,14 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
 class SampleThread(QThread):
     sample_processingSignal = pyqtSignal(list,list,list)
+            
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        if str(platform.system()).startswith("Windows"):
+            self.accurate_delay_cutoff = 10e-3
+        else:
+            self.accurate_delay_cutoff = 5e-3
 
     @staticmethod
     def sample_main_device():
@@ -15572,14 +15596,13 @@ class SampleThread(QThread):
 
     # libtime.sleep is accurate only up to 0-5ms
     # using a hyprid approach using sleep() and busy-wait based on the time.perf_counter()
-    @staticmethod
-    def accurate_delay(delay):
+    def accurate_delay(self, delay):
         ''' Function to provide accurate time delay in seconds
         '''
         _ = libtime.perf_counter() + delay  
         # use the standard sleep until one 5ms before the timeout (Windows <10 might need a limit of 5.5ms)
-        if delay > 5e-3:
-            libtime.sleep(delay - 5e-3)
+        if delay > self.accurate_delay_cutoff:
+            libtime.sleep(delay - self.accurate_delay_cutoff)
         # continous with a busy sleep
         while libtime.perf_counter() < _:
             pass # this raises CPU to 100%
@@ -15589,7 +15612,8 @@ class SampleThread(QThread):
         try:
             aw.qmc.flagsamplingthreadrunning = True
             if sys.platform.startswith("darwin"):
-                pool = Foundation.NSAutoreleasePool.alloc().init()  # @UndefinedVariable # pylint: disable=maybe-no-member
+                from Foundation import NSAutoreleasePool  # @UnresolvedImport  # pylint: disable=import-error
+                pool = NSAutoreleasePool.alloc().init()  # @UndefinedVariable # pylint: disable=maybe-no-member
             aw.qmc.afterTP = False
             if not aw.qmc.flagon:
                 return
@@ -15599,11 +15623,14 @@ class SampleThread(QThread):
             aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
     
             interval = aw.qmc.delay/1000.
-            next_time = libtime.perf_counter() + interval
+            next_time = None
             while True:
-#                libtime.sleep(max(0, next_time - libtime.time())) # sleep is not very accurate
-                self.accurate_delay(max(0, next_time - libtime.perf_counter())) # more accurate, but keeps the CPU busy
                 if aw.qmc.flagon:
+                    if next_time is None:
+                        next_time = libtime.perf_counter() + interval
+                    else:
+#                        libtime.sleep(max(0, next_time - libtime.time())) # sleep is not very accurate
+                        self.accurate_delay(max(0, next_time - libtime.perf_counter())) # more accurate, but keeps the CPU busy
 
 #                    _log.info(datetime.datetime.now()) # use this to check for drifts
 
@@ -15753,7 +15780,7 @@ class ApplicationWindow(QMainWindow):
         'DRYlabel', 'DRYlcd', 'DRYlcdFrame', 'DRY2FCslabel', 'DRY2FCsframe', 'FCslabel', 'FCslcd', 'FCslcdFrame', 'AUClabel', 'AUClcd', 'AUClcdFrame',
         'AUCLCD', 'phasesLCDs', 'extrabuttonsLayout', 'extrabuttondialogs', 'slider1', 'slider2', 'slider3', 'slider4', 'sliderLCD1', 'sliderLCD2', 'sliderLCD3',
         'sliderLCD4', 'sliderGrpBox1', 'sliderGrpBox2', 'sliderGrpBox3', 'sliderGrpBox4', 'sliderSV', 'sliderLCDSV', 'sliderGrpBoxSV', 'leftlayout',
-        'sliderFrame', 'lcdFrame', 'midlayout', 'editgraphdialog' ]
+        'sliderFrame', 'lcdFrame', 'midlayout', 'editgraphdialog', 'html_loader' ]
         
         
 
@@ -15784,7 +15811,11 @@ class ApplicationWindow(QMainWindow):
         self.quickEventShortCut = None
         # this is None if inactive, or holds a tuple (n,s) with n a number {1,..,4} indicating the custom event number
         # and s a string of length 0 (no digit yet), length 1 (if first digit is typed) or 2 (both digits are typed) indicating the value (00-99)
-
+        
+        # html2pdf() state:
+        self.html_loader = None # holds the QWebEngineView during HTML2PDF generation in self.html2pdf()
+        self.pdf_page_layout = None # holds the QPageLayout used during HTML2PDF generation in self.html2pdf()
+        self.pdf_rendering = False # True while PDF is rendered by QWebEngineView
 
         self.eventaction_running_threads = []
 
@@ -16281,6 +16312,10 @@ class ApplicationWindow(QMainWindow):
         fileConvertPDFAction.triggered.connect(self.fileConvertPDF)
         self.convMenu.addAction(fileConvertPDFAction)
 
+        fileConvertReportPDFAction = QAction(QApplication.translate("Menu", "Roast Report PDF..."), self)
+        fileConvertReportPDFAction.triggered.connect(self.fileConvertReportPDF)
+        self.convMenu.addAction(fileConvertReportPDFAction)
+
         self.fileMenu.addSeparator()
 
         self.saveGraphMenu = self.fileMenu.addMenu(QApplication.translate("Menu", "Save Graph"))
@@ -16338,17 +16373,29 @@ class ApplicationWindow(QMainWindow):
         self.saveGraphMenu.addAction(instagramSizeAction)
 
         self.reportMenu = self.fileMenu.addMenu(QApplication.translate("Menu", "Report"))
+        
+        
+        self.roastReportMenu = self.reportMenu.addMenu(QApplication.translate("Menu", "Roast"))
 
-        self.htmlAction = QAction(QApplication.translate("Menu", "Roast"), self)
+        self.htmlAction = QAction(QApplication.translate("Menu", "Web..."), self)
         self.htmlAction.triggered.connect(self.htmlReport)
         self.htmlAction.setShortcut("Ctrl+R")
-        self.reportMenu.addAction(self.htmlAction)
+        self.roastReportMenu.addAction(self.htmlAction)
+        
+        self.roastReportPDFAction = QAction(QApplication.translate("Menu", "PDF..."), self)
+        self.roastReportPDFAction.triggered.connect(self.pdfReport)
+        self.roastReportMenu.addAction(self.roastReportPDFAction)
+        
 
         self.productionMenu = self.reportMenu.addMenu(QApplication.translate("Menu", "Batches"))
-
+        
         self.productionWebAction = QAction(QApplication.translate("Menu", "Web..."), self)
-        self.productionWebAction.triggered.connect(self.productionReport)
+        self.productionWebAction.triggered.connect(self.productionHTMLReport)
         self.productionMenu.addAction(self.productionWebAction)
+        
+        self.productionPDFAction = QAction(QApplication.translate("Menu", "PDF..."), self)
+        self.productionPDFAction.triggered.connect(self.productionPDFReport)
+        self.productionMenu.addAction(self.productionPDFAction)
 
         self.productionCsvAction = QAction(QApplication.translate("Menu", "CSV..."), self)
         self.productionCsvAction.triggered.connect(self.productionCSVReport)
@@ -16361,8 +16408,12 @@ class ApplicationWindow(QMainWindow):
         self.rankingMenu = self.reportMenu.addMenu(QApplication.translate("Menu", "Ranking"))
 
         self.rankingWebAction = QAction(QApplication.translate("Menu", "Web..."), self)
-        self.rankingWebAction.triggered.connect(self.rankingReport)
+        self.rankingWebAction.triggered.connect(self.rankingHTMLReport)
         self.rankingMenu.addAction(self.rankingWebAction)
+        
+        self.rankingPDFAction = QAction(QApplication.translate("Menu", "PDF..."), self)
+        self.rankingPDFAction.triggered.connect(self.rankingPDFReport)
+        self.rankingMenu.addAction(self.rankingPDFAction)
 
         self.rankingCsvAction = QAction(QApplication.translate("Menu", "CSV..."), self)
         self.rankingCsvAction.triggered.connect(self.rankingCSVReport)
@@ -18192,6 +18243,11 @@ class ApplicationWindow(QMainWindow):
     def sendLog(self) -> None:
         _log.info("sendLog()")
 
+        from email import encoders, generator
+        from email.mime.base import MIMEBase
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.text import MIMEText
+
         message = MIMEMultipart()
         if self.plus_email is not None:
             message["From"] = self.plus_email
@@ -18660,6 +18716,7 @@ class ApplicationWindow(QMainWindow):
 
             modifiers = QApplication.keyboardModifiers()
             if modifiers == Qt.KeyboardModifier.AltModifier:  #alt click
+                import prettytable  # @UnresolvedImport
                 tbl = prettytable.PrettyTable()
                 re_strip = re.compile('[\u2009]')  #thin space is not read properly by prettytable
                 fields = []
@@ -18965,6 +19022,7 @@ class ApplicationWindow(QMainWindow):
         aw.settooltip()
 
     def populateListMenu(self,resourceName,ext,triggered,menu,addMenu = True,forceSubmenu=False):
+    
         one_added = False
         res = {}
         for root,dirs,files in os.walk(os.path.join(getResourcePath(),resourceName)):
@@ -18998,7 +19056,12 @@ class ApplicationWindow(QMainWindow):
                 else:
                     submenu_title = k.replace('&','&&') # a & in a menu entry is not displayed, but "&&" is displayed as "&"
                     submenu = menu.addMenu(submenu_title)
-                    sorted_subentries = natsort.natsorted(res[k],key=lambda x: x[0])
+
+# avoid slow importing natsort
+#                    import natsort
+#                    sorted_subentries = natsort.natsorted(res[k],key=lambda x: x[0])
+                    sorted_subentries = sorted(res[k],key=lambda x: natsort(x[0]))
+                    
                     for e in sorted_subentries: #res[k]:
                         a = QAction(self, visible=True, triggered=triggered)
                         a.setData((e[1],str(k)))
@@ -19065,137 +19128,140 @@ class ApplicationWindow(QMainWindow):
                         else:
                             self.sendmessage(QApplication.translate("Message","Action canceled"))
                     else:
+                        res = True
                         self.qmc.machinesetup = action.text()
+                    if res:
+                        QTimer.singleShot(700, self.qmc.startPhidgetManager)
                 else:
                     self.qmc.machinesetup = action.text()
                     res = True
-                    if self.qmc.device == 29 and self.modbus.type in [3,4]: # MODBUS TCP or UDP
-                        host,res = QInputDialog.getText(self,
-                            QApplication.translate("Message", "Machine"),
-                            QApplication.translate("Message", "Network name or IP address"),text=self.modbus.host) #"127.0.0.1"
-                        if res:
-                            self.modbus.host = host
-                    elif self.qmc.device == 79: # S7
-                        host,res = QInputDialog.getText(self,
-                            QApplication.translate("Message", "Machine"),
-                            QApplication.translate("Message", "Network name or IP address"),text=self.s7.host) #"127.0.0.1"
-                        if res:
-                            self.s7.host = host
-                    elif self.qmc.device == 111: # WebSocket
-                        host,res = QInputDialog.getText(self,
-                            QApplication.translate("Message", "Machine"),
-                            QApplication.translate("Message", "Network name or IP address"),text=self.ws.host) #"127.0.0.1"
-                        if res:
-                            self.ws.host = host
-                    elif self.qmc.device in [0,9,19,53,101,115] or (self.qmc.device == 29 and self.modbus.type in [0,1,2]): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial
-                        import serial.tools.list_ports
-                        comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
-                        if platf == 'Darwin':
-                            ports = [p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync', 
-                                '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem',"/dev/cu.Bluetooth-Incoming-Port","/dev/tty.Bluetooth-Incoming-Port"])]
-                            ports = list(filter (lambda x: 'Bluetooth-Inc' not in x[0],ports))
-                        else:
-                            ports = list(comports)
-                        if self.ser.comport not in [p[0] for p in ports]:
-                            ports.append([self.ser.comport,"",""])
-                        ports = sorted(ports,key=lambda p: p[0])
-                        items = [(p[1] if (p[1] and p[1]!="n/a") else p[0]) for p in ports]
-                        current = 0
+                if self.qmc.device == 29 and self.modbus.type in [3,4]: # MODBUS TCP or UDP
+                    host,res = QInputDialog.getText(self,
+                        QApplication.translate("Message", "Machine"),
+                        QApplication.translate("Message", "Network name or IP address"),text=self.modbus.host) #"127.0.0.1"
+                    if res:
+                        self.modbus.host = host
+                elif self.qmc.device == 79: # S7
+                    host,res = QInputDialog.getText(self,
+                        QApplication.translate("Message", "Machine"),
+                        QApplication.translate("Message", "Network name or IP address"),text=self.s7.host) #"127.0.0.1"
+                    if res:
+                        self.s7.host = host
+                elif self.qmc.device == 111: # WebSocket
+                    host,res = QInputDialog.getText(self,
+                        QApplication.translate("Message", "Machine"),
+                        QApplication.translate("Message", "Network name or IP address"),text=self.ws.host) #"127.0.0.1"
+                    if res:
+                        self.ws.host = host
+                elif self.qmc.device in [0,9,19,53,101,115] or (self.qmc.device == 29 and self.modbus.type in [0,1,2]): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial
+                    import serial.tools.list_ports
+                    comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
+                    if platf == 'Darwin':
+                        ports = [p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync', 
+                            '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem',"/dev/cu.Bluetooth-Incoming-Port","/dev/tty.Bluetooth-Incoming-Port"])]
+                        ports = list(filter (lambda x: 'Bluetooth-Inc' not in x[0],ports))
+                    else:
+                        ports = list(comports)
+                    if self.ser.comport not in [p[0] for p in ports]:
+                        ports.append([self.ser.comport,"",""])
+                    ports = sorted(ports,key=lambda p: p[0])
+                    items = [(p[1] if (p[1] and p[1]!="n/a") else p[0]) for p in ports]
+                    current = 0
+                    try:
+                        current = [p[0] for p in ports].index(self.ser.comport)
+                    except Exception: # pylint: disable=broad-except
+                        pass
+                    if self.qmc.device == 53: # Hottop 2k+
                         try:
-                            current = [p[0] for p in ports].index(self.ser.comport)
+                            current = [p[0] for p in ports].index("FT230X Basic UART")
                         except Exception: # pylint: disable=broad-except
                             pass
-                        if self.qmc.device == 53: # Hottop 2k+
-                            try:
-                                current = [p[0] for p in ports].index("FT230X Basic UART")
-                            except Exception: # pylint: disable=broad-except
-                                pass
-                        port_name,res = QInputDialog.getItem(self,
-                            QApplication.translate("Message", "Port Configuration"),
-                            QApplication.translate("Message", "Comm Port"),
-                            items,
-                            current,
-                            False)
+                    port_name,res = QInputDialog.getItem(self,
+                        QApplication.translate("Message", "Port Configuration"),
+                        QApplication.translate("Message", "Comm Port"),
+                        items,
+                        current,
+                        False)
+                    if res:
+                        try:
+                            pos = items.index(port_name)
+                            if self.qmc.device == 29: # MODBUS serial
+                                self.modbus.comport = ports[pos][0]
+                            else: # Fuji or HOTTOP
+                                self.ser.comport = ports[pos][0]
+                        except Exception: # pylint: disable=broad-except
+                            pass
+                if res:
+                    if self.qmc.roastersize_setup == 0:
+                        batchsize,res = QInputDialog.getDouble(self, 
+                            QApplication.translate("Message", "Machine"),
+                            QApplication.translate("Message", "Machine Capacity (kg)"),
+                            0, # value
+                            0, # min
+                            999, # max
+                            1) # decimals
                         if res:
-                            try:
-                                pos = items.index(port_name)
-                                if self.qmc.device == 29: # MODBUS serial
-                                    self.modbus.comport = ports[pos][0]
-                                else: # Fuji or HOTTOP
-                                    self.ser.comport = ports[pos][0]
-                            except Exception: # pylint: disable=broad-except
-                                pass
-                    if res:
-                        if self.qmc.roastersize_setup == 0:
-                            batchsize,res = QInputDialog.getDouble(self, 
-                                QApplication.translate("Message", "Machine"),
-                                QApplication.translate("Message", "Machine Capacity (kg)"),
-                                0, # value
-                                0, # min
-                                999, # max
-                                1) # decimals
-                            if res:
-                                self.qmc.roastersize_setup = self.qmc.roastersize = batchsize
-                        else:
-                            res = self.qmc.roastersize_setup # roastersize_setup was loaded from machine setup
-                    if res:
-                        # size set, ask for heating
-                        if self.qmc.roasterheating_setup == 0:
-                            dlg = ArtisanComboBoxDialog(self,aw,QApplication.translate("Message", 
-                                    "Machine"),QApplication.translate("Label", "Heating"),self.qmc.heating_types,0)
-                            if dlg.exec():
-                                res = dlg.idx
-                            else:
-                                res = None
-                        else:
-                            res = self.qmc.roasterheating_setup
-                        if res is not None:
-                            self.qmc.roasterheating_setup = self.qmc.roasterheating = res
-                            # now check if the machine setup contains energy default ratings for the given batch size and energy rating
-                            if self.qmc.machinesetup_energy_ratings is not None:
-                                if self.qmc.roastersize_setup > 0 and self.qmc.roasterheating_setup > 0 and \
-                                    self.qmc.roasterheating_setup in self.qmc.machinesetup_energy_ratings:
-                                    heating_ratings = self.qmc.machinesetup_energy_ratings[self.qmc.roasterheating_setup]
-                                    if self.qmc.roastersize_setup in heating_ratings:
-                                        ratings = heating_ratings[self.qmc.roastersize_setup]
-                                        if "loadlabels" in ratings and len(ratings["loadlabels"]) == 4:
-                                            self.qmc.loadlabels_setup = ratings["loadlabels"]
-                                        if "loadratings" in ratings and len(ratings["loadratings"]) == 4:
-                                            self.qmc.loadratings_setup = ratings["loadratings"]
-                                        if "ratingunits" in ratings and len(ratings["ratingunits"]) == 4:
-                                            self.qmc.ratingunits_setup = ratings["ratingunits"]
-                                        if "sourcetypes" in ratings and len(ratings["sourcetypes"]) == 4:
-                                            self.qmc.sourcetypes_setup = ratings["sourcetypes"]
-                                        if "load_etypes" in ratings and len(ratings["load_etypes"]) == 4:
-                                            self.qmc.load_etypes_setup = ratings["load_etypes"]
-                                        if "presssure_percents" in ratings and len(ratings["presssure_percents"]) == 4:
-                                            self.qmc.presssure_percents_setup = ratings["presssure_percents"]
-                                        if "loadevent_zeropcts" in ratings and len(ratings["loadevent_zeropcts"]) == 4:
-                                            self.qmc.loadevent_zeropcts_setup = ratings["loadevent_zeropcts"]
-                                        if "loadevent_hundpcts" in ratings and len(ratings["loadevent_hundpcts"]) == 4:
-                                            self.qmc.loadevent_hundpcts_setup = ratings["loadevent_hundpcts"]
-                                        self.qmc.restoreEnergyLoadDefaults()
-                                        self.sendmessage(QApplication.translate("Message","Energy loads configured for {0} {1}kg").format(label,self.qmc.roastersize_setup))
-                            self.sendmessage(QApplication.translate("Message","Artisan configured for {0}").format(label))
-                            _log.info("Artisan configured for %s",label)
+                            self.qmc.roastersize_setup = self.qmc.roastersize = batchsize
+                    else:
+                        res = self.qmc.roastersize_setup # roastersize_setup was loaded from machine setup
+                if res:
+                    # size set, ask for heating
+                    if self.qmc.roasterheating_setup == 0:
+                        dlg = ArtisanComboBoxDialog(self,aw,QApplication.translate("Message", 
+                                "Machine"),QApplication.translate("Label", "Heating"),self.qmc.heating_types,0)
+                        if dlg.exec():
+                            res = dlg.idx
                         else:
                             res = None
-                    if res is None:
-                        # reset
-                        self.qmc.etypes= org_etypes
-                        self.qmc.device = org_device
-                        self.qmc.machinesetup = org_machinesetup
-                        self.modbus.host = org_modbus_host
-                        self.s7.host = org_s7_host
-                        self.ws.host = org_ws_host
-                        self.ser.comport = org_comport
-                        self.qmc.roastersize_setup = org_roastersize_setup
-                        self.qmc.roastersize = org_roastersize
-                        self.qmc.roasterheating_setup = org_roasterheating_setup
-                        self.qmc.roasterheating = org_roasterheating
-                        #
-                        self.sendmessage(QApplication.translate("Message","Action canceled"))
-                    self.establish_etypes()
+                    else:
+                        res = self.qmc.roasterheating_setup
+                    if res is not None:
+                        self.qmc.roasterheating_setup = self.qmc.roasterheating = res
+                        # now check if the machine setup contains energy default ratings for the given batch size and energy rating
+                        if self.qmc.machinesetup_energy_ratings is not None:
+                            if self.qmc.roastersize_setup > 0 and self.qmc.roasterheating_setup > 0 and \
+                                self.qmc.roasterheating_setup in self.qmc.machinesetup_energy_ratings:
+                                heating_ratings = self.qmc.machinesetup_energy_ratings[self.qmc.roasterheating_setup]
+                                if self.qmc.roastersize_setup in heating_ratings:
+                                    ratings = heating_ratings[self.qmc.roastersize_setup]
+                                    if "loadlabels" in ratings and len(ratings["loadlabels"]) == 4:
+                                        self.qmc.loadlabels_setup = ratings["loadlabels"]
+                                    if "loadratings" in ratings and len(ratings["loadratings"]) == 4:
+                                        self.qmc.loadratings_setup = ratings["loadratings"]
+                                    if "ratingunits" in ratings and len(ratings["ratingunits"]) == 4:
+                                        self.qmc.ratingunits_setup = ratings["ratingunits"]
+                                    if "sourcetypes" in ratings and len(ratings["sourcetypes"]) == 4:
+                                        self.qmc.sourcetypes_setup = ratings["sourcetypes"]
+                                    if "load_etypes" in ratings and len(ratings["load_etypes"]) == 4:
+                                        self.qmc.load_etypes_setup = ratings["load_etypes"]
+                                    if "presssure_percents" in ratings and len(ratings["presssure_percents"]) == 4:
+                                        self.qmc.presssure_percents_setup = ratings["presssure_percents"]
+                                    if "loadevent_zeropcts" in ratings and len(ratings["loadevent_zeropcts"]) == 4:
+                                        self.qmc.loadevent_zeropcts_setup = ratings["loadevent_zeropcts"]
+                                    if "loadevent_hundpcts" in ratings and len(ratings["loadevent_hundpcts"]) == 4:
+                                        self.qmc.loadevent_hundpcts_setup = ratings["loadevent_hundpcts"]
+                                    self.qmc.restoreEnergyLoadDefaults()
+                                    self.sendmessage(QApplication.translate("Message","Energy loads configured for {0} {1}kg").format(label,self.qmc.roastersize_setup))
+                        self.sendmessage(QApplication.translate("Message","Artisan configured for {0}").format(label))
+                        _log.info("Artisan configured for %s",label)
+                    else:
+                        res = None
+                if res is None:
+                    # reset
+                    self.qmc.etypes= org_etypes
+                    self.qmc.device = org_device
+                    self.qmc.machinesetup = org_machinesetup
+                    self.modbus.host = org_modbus_host
+                    self.s7.host = org_s7_host
+                    self.ws.host = org_ws_host
+                    self.ser.comport = org_comport
+                    self.qmc.roastersize_setup = org_roastersize_setup
+                    self.qmc.roastersize = org_roastersize
+                    self.qmc.roasterheating_setup = org_roasterheating_setup
+                    self.qmc.roasterheating = org_roasterheating
+                    #
+                    self.sendmessage(QApplication.translate("Message","Action canceled"))
+                self.establish_etypes()
 
 
     def populateThemeMenu(self):
@@ -19494,7 +19560,7 @@ class ApplicationWindow(QMainWindow):
         aw.lcd7.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
         aw.updateExtraLCDvisibility()
 
-    def updateCanvasColors(self):
+    def updateCanvasColors(self, checkColors=True):
         canvas_color = self.qmc.palette["canvas"]
         if canvas_color is not None and canvas_color != "None" and not QColor.isValidColor(canvas_color):
             # we re-initalize broken canvas color
@@ -19536,13 +19602,17 @@ class ApplicationWindow(QMainWindow):
         except Exception: # pylint: disable=broad-except
             pass
 
+        # whitep = True in darkmode (dark canvas)
         if str(canvas_color) == 'None':
             if sys.platform.startswith("darwin"):
                 whitep = darkdetect.isDark() and appFrozen()
             else:
                 whitep = False
         else:
-            whitep = self.colorDifference("white",canvas_color) > self.colorDifference("black",canvas_color)
+            if checkColors:
+                whitep = self.colorDifference("white",canvas_color) > self.colorDifference("black",canvas_color)
+            else:
+                whitep = bool(self.qmc.palette["messages"] == 'white')
 
         self.qmc.fig.patch.set_facecolor(str(canvas_color))
         self.setStyleSheet("QMainWindow{background-color:" + str(canvas_color) + ";"
@@ -19611,8 +19681,9 @@ class ApplicationWindow(QMainWindow):
         self.updateSliderColors()
         self.updatePhasesLCDsColors()
 
-        colorPairsToCheck = self.getcolorPairsToCheck()
-        self.checkColors(colorPairsToCheck)
+        if checkColors:
+            colorPairsToCheck = self.getcolorPairsToCheck()
+            self.checkColors(colorPairsToCheck)
 
 
     @staticmethod
@@ -19625,7 +19696,7 @@ class ApplicationWindow(QMainWindow):
 
                 if not aw.block_quantification_sampling_ticks[i]:
                     temp,_ = aw.quantifier2tempandtime(i)
-                    if temp is not None: # corresponding curve is available
+                    if temp is not None and len(temp)>0: # corresponding curve is available
                         linespace = aw.eventquantifierlinspaces[i]
                         if aw.eventquantifiercoarse[i]:
                             linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdcoarse
@@ -20315,6 +20386,7 @@ class ApplicationWindow(QMainWindow):
                     smoothspikes = QApplication.translate("Label","Off")
 
                 # build a table of results
+                import prettytable  # @UnresolvedImport
                 tbl = prettytable.PrettyTable()
                 tbl.field_names = [QApplication.translate("Label","Start"),
                                    QApplication.translate("Label","Duration"),
@@ -21526,6 +21598,7 @@ class ApplicationWindow(QMainWindow):
                     #example a2b_uu("Hello") sends Hello in binary format instead of ASCII
                     if "a2b_uu" in cmd_str:
                         cmd_str = cmd_str[(len("a2b_uu")+1):][:1]  # removes function-name + char ( and )
+                        import binascii
                         cmd_str_bin = binascii.a2b_uu(cmd_str)
                     if cmd_str_bin:
                         self.ser.sendTXcommand(cmd_str_bin)
@@ -21918,14 +21991,17 @@ class ApplicationWindow(QMainWindow):
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " callProgram(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                 elif action == 8: # HOTTOP Heater
+                    from artisanlib.hottop import setHottop
                     setHottop(heater=int(cmd))
                 elif action == 9: # HOTTOP Main Fan
+                    from artisanlib.hottop import setHottop # @Reimport
                     setHottop(main_fan=int(cmd))
                 elif action == 10: # HOTTOP Command (one of "heater", "fan", "motor", "solenoid", "stirrer")
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
                             cs = c.strip()
+                            from artisanlib.hottop import setHottop # @Reimport
                             if cs.startswith("heater"):
                                 try:
                                     cmds = eval(cs[len('heater'):]) # pylint: disable=eval-used
@@ -22965,6 +23041,7 @@ class ApplicationWindow(QMainWindow):
             if platf in ['Darwin', 'Linux']:
                 command = ['bash', '-c', 'source ~/.bash_profile ~/.bash_login ~/.profile 2>/dev/null && env']
                 try:
+                    import subprocess
                     with subprocess.Popen(command, stdout = subprocess.PIPE) as proc:
                         for line in proc.stdout:
                             if isinstance(line, bytes):
@@ -22996,6 +23073,7 @@ class ApplicationWindow(QMainWindow):
         cmd_str_parts = self.re_split(cmd_str) # this preserves quoted strings ('this "is a" test' => ['this','is a','test'])
         if len(cmd_str_parts) > 0:
             try:
+                import subprocess
                 cmd = cmd_str_parts[0].strip()
                 qd = QDir(cmd)
                 current = QDir.current()
@@ -23587,6 +23665,7 @@ class ApplicationWindow(QMainWindow):
         self.saveGraphMenu.setEnabled(True)
         self.importMenu.setEnabled(True) # roast
         self.htmlAction.setEnabled(True)
+        self.roastReportPDFAction.setEnabled(True)
         self.reportMenu.setEnabled(True)
         self.productionMenu.setEnabled(True)
         self.rankingMenu.setEnabled(True)
@@ -23649,6 +23728,7 @@ class ApplicationWindow(QMainWindow):
         if not wheel and not compare and not sampling:
             self.saveGraphMenu.setEnabled(False)
         self.htmlAction.setEnabled(False)
+        self.roastReportPDFAction.setEnabled(False)
         self.reportMenu.setEnabled(False)
         self.productionMenu.setEnabled(False)
         self.rankingMenu.setEnabled(False)
@@ -24159,6 +24239,8 @@ class ApplicationWindow(QMainWindow):
 
     @staticmethod
     def removeDisallowedFilenameChars(filename):
+        import string as libstring
+        import unicodedata # @UnresolvedImport
         validFilenameChars = "-_.() %s%s" % (libstring.ascii_letters, libstring.digits)
         cleanedFilename = s2a(unicodedata.normalize('NFKD', filename))
         return ''.join(c for c in decodeLocal(cleanedFilename) if c in validFilenameChars)
@@ -24424,6 +24506,8 @@ class ApplicationWindow(QMainWindow):
                             other_filename_path = other_filename_path[0:-5]
                         if self.qmc.autosaveimageformat == "PDF":
                             self.saveVectorGraph(extension=".pdf",fname=other_filename_path)
+                        elif self.qmc.autosaveimageformat == "PDF Report":
+                            self.roastReport(pdf_filename=other_filename_path + ".pdf")
                         elif self.qmc.autosaveimageformat == "SVG":
                             self.saveVectorGraph(extension=".svg",fname=other_filename_path)
                         elif self.qmc.autosaveimageformat == "CSV":
@@ -24457,6 +24541,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def viewKshortcuts(self,_=False):
+        from help import keyboardshortcuts_help
         self.helpdialog = aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
@@ -25284,6 +25369,7 @@ class ApplicationWindow(QMainWindow):
 
     #read Artisan CSV
     def importCSV(self,filename):
+        import csv
         try:
             with io.open(filename, 'r', newline="",encoding='utf-8') as csvFile:
                 data = csv.reader(csvFile,delimiter='\t')
@@ -25635,6 +25721,7 @@ class ApplicationWindow(QMainWindow):
 
     #Write readings to RoastLogger CSV file
     def exportRoastLogger(self,filename):
+        import csv
         try:
             with open(filename, 'w', encoding='utf-8') as outfile:
                 outfile.write("Log created at 09:00:00 "+ self.qmc.roastdate.date().toString("dd'/'MM'/'yyyy") + "\n")
@@ -25712,6 +25799,7 @@ class ApplicationWindow(QMainWindow):
 
     def importJSON(self,filename):
         try:
+            from json import load as json_load
             with io.open(filename, 'r', encoding='utf-8') as infile:
                 obj = json_load(infile)
                 res = self.setProfile(filename,obj)
@@ -25779,6 +25867,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " resetExtraDevices(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def importRoastLoggerEnc(self,filename,enc='utf-8'):
+        import csv
         roastlogger_action_section = ""
         # use io.open instead of open to have encoding support on Python 2
         with io.open(filename, 'r', encoding=enc) as infile:
@@ -26030,6 +26119,7 @@ class ApplicationWindow(QMainWindow):
 
     #Write readings to Artisan csv file
     def exportCSV(self,filename):
+        import csv
         try:
             if len(self.qmc.timex) > 0:
                 CHARGE = self.qmc.timex[self.qmc.timeindex[0]]
@@ -26307,6 +26397,7 @@ class ApplicationWindow(QMainWindow):
     @staticmethod
     def serialize(filename, obj):
         fn = str(filename)
+        import codecs # @Reimport
         with codecs.open(fn, 'w+', encoding='utf-8') as f:
             f.write(repr(obj))
 #PLUS
@@ -26325,6 +26416,7 @@ class ApplicationWindow(QMainWindow):
             obj = None
             fn = str(filename)
             if os.path.exists(fn):
+                import codecs
                 with codecs.open(fn, 'rb', encoding='utf-8') as f:
                     obj=ast.literal_eval(f.read()) # pylint: disable=eval-used
 #PLUS
@@ -26875,6 +26967,7 @@ class ApplicationWindow(QMainWindow):
             if "roastUUID" in profile:
                 self.qmc.roastUUID = decodeLocal(profile["roastUUID"])
             else:
+                import uuid
                 self.qmc.roastUUID = uuid.uuid4().hex # generate UUID
                 self.qmc.fileDirtySignal.emit()
             if "roastbatchnr" in profile:
@@ -27622,6 +27715,7 @@ class ApplicationWindow(QMainWindow):
             profile["roastbatchprefix"] = encodeLocal(self.qmc.roastbatchprefix)
             profile["roastbatchpos"] = self.qmc.roastbatchpos
             if self.qmc.roastUUID is None:
+                import uuid
                 self.qmc.roastUUID = uuid.uuid4().hex # generate UUID
             profile["roastUUID"] = self.qmc.roastUUID
             profile["beansize"] = str(self.qmc.beansize)
@@ -27794,6 +27888,7 @@ class ApplicationWindow(QMainWindow):
                 if pf:
                     # if the copy flag is set, we generate a new roastUUID
                     if copy:
+                        import uuid
                         pf["roastUUID"] = uuid.uuid4().hex # generate UUID
 
                     sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
@@ -28024,6 +28119,49 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     def fileConvertPDF(self):
         self.fileConvertIMG(".pdf")
+        
+    @pyqtSlot()
+    def fileConvertReportPDF(self):
+        self.fileConvertReport(".pdf")
+
+    def fileConvertReport(self,ext):
+        files = self.ArtisanOpenFilesDialog(ext="*.alog")
+        if files and len(files) > 0:
+            loaded_profile = self.curFile
+            self.saveExtradeviceSettings()
+            outdir = self.ArtisanExistingDirectoryDialog()
+            progress = QProgressDialog(QApplication.translate("Message", "Converting..."), None, 0, len(files), self)
+            progress.setCancelButton(None)
+            progress.setWindowModality(Qt.WindowModality.WindowModal)
+            progress.setAutoClose(True)
+            progress.show()
+            i = 1
+            flag_temp = aw.qmc.roastpropertiesflag
+            for f in files:
+                try:
+                    progress.setValue(i)
+                    QApplication.processEvents()
+                    fname = str(QFileInfo(f).fileName())
+                    fconv = str(QDir(outdir).filePath(fname + str(ext)))
+                    if not os.path.exists(fconv):
+                        aw.qmc.reset(redraw=False,soundOn=False)
+                        self.setProfile(f,self.deserialize(f),quiet=True)
+                        self.qmc.redraw()
+                        self.roastReport(pdf_filename=fconv, batch_process=True)
+                    else:
+                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.").format(fconv,fname + str(ext)))
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+                i += 1
+                aw.qmc.fileCleanSignal.emit()
+                aw.qmc.reset(soundOn=False)
+                self.restoreExtradeviceSettings()
+            self.releaseQWebEngineView()
+            if loaded_profile:
+                self.loadFile(loaded_profile, quiet=True)
+            aw.qmc.roastpropertiesflag = flag_temp
+            progress.cancel()
+            progress = None
 
     def fileConvertIMG(self,ext):
         files = self.ArtisanOpenFilesDialog(ext="*.alog")
@@ -28130,6 +28268,7 @@ class ApplicationWindow(QMainWindow):
 
     @staticmethod
     def artisanURLextractor(url, _):
+        import requests
         r = requests.get(url.toString(), 
             allow_redirects=True, 
             timeout=(4, 15),
@@ -29783,7 +29922,7 @@ class ApplicationWindow(QMainWindow):
             
             # this one has done here, if it is done on start of the section the slider title colors are not set correctly on Linux and macOS
             if "canvas" in aw.qmc.palette:
-                aw.updateCanvasColors()
+                aw.updateCanvasColors(checkColors=False)
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -31005,6 +31144,7 @@ class ApplicationWindow(QMainWindow):
                 self.fullscreenAction.setChecked(False)
             self.showNormal()
         if aw.qmc.device == 53:
+            from artisanlib.hottop import stopHottop
             stopHottop()
         if self.qmc.flagon:
             self.qmc.ToggleMonitor()
@@ -31225,6 +31365,7 @@ class ApplicationWindow(QMainWindow):
         return res
 
     def productionData2htmlentry(self,data):
+        import string as libstring
         HTML_REPORT_TEMPLATE = """<tr>
 <td sorttable_customkey=\"$batch_num\">$batch</td>
 <td>$time</td>
@@ -31354,7 +31495,16 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def productionReport(self,_=False):
+    def productionPDFReport(self,_=False):
+        self.productionReport(pdf=True)
+    
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def productionHTMLReport(self,_=False):
+        self.productionReport()
+
+    def productionReport(self, pdf=False):
+        import string as libstring
         # get profile filenames
         files = self.reportFiles()
         try:
@@ -31406,6 +31556,7 @@ class ApplicationWindow(QMainWindow):
                         os.remove(filename)
                     except OSError:
                         pass
+                    import codecs
                     with codecs.open(filename, 'w', encoding='utf-8') as f:
                         for i in range(len(html)):
                             f.write(html[i])
@@ -31413,7 +31564,13 @@ class ApplicationWindow(QMainWindow):
                         full_path = "file://" + filename # Safari refuses to load the javascript lib (sorttable) otherwise
                     else:
                         full_path = "file:///" + filename # Explorer refuses to start otherwise
-                    QDesktopServices.openUrl(QUrl(full_path, QUrl.ParsingMode.TolerantMode))
+                    if pdf:
+                        # select file
+                        filename = self.ArtisanSaveFileDialog(msg="Export PDF",ext="*.pdf")
+                        if filename:
+                            self.html2pdf(full_path, filename, landscape=True)
+                    else:
+                        QDesktopServices.openUrl(QUrl(full_path, QUrl.ParsingMode.TolerantMode))
 
                 except IOError as e:
                     aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:") + " productionReport() {0}").format(str(e)))
@@ -31467,6 +31624,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def productionCSVReport(self,_=False):
+        import csv
         # get profile filenames
         profiles = self.reportFiles()
         if profiles and len(profiles) > 0:
@@ -32008,6 +32166,7 @@ class ApplicationWindow(QMainWindow):
         return (fmt.format(convertTemp(data[k],unit,aw.qmc.mode)) + (aw.qmc.mode if units else "") if k in data else "")
 
     def rankingData2htmlentry(self,production_data,ranking_data,plot_color=None):
+        import string as libstring
         HTML_REPORT_TEMPLATE = """<tr>
 <td$color_code>$batch</td>
 <td>$time</td>
@@ -32089,6 +32248,8 @@ class ApplicationWindow(QMainWindow):
         )
 
     def reportFiles(self):
+        import zipfile
+        import tempfile
         # get profile filenames
         selected_files = self.ArtisanOpenFilesDialog(ext="*.alog *.zip")      # added zip files
         files = []
@@ -32107,7 +32268,16 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def rankingReport(self,_=False):
+    def rankingPDFReport(self,_=False):
+        self.rankingReport(pdf=True)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def rankingHTMLReport(self,_=False):
+        self.rankingReport()
+    
+    def rankingReport(self, pdf=False):
+        import string as libstring
         # get profile filenames
         files = self.reportFiles()
         if files and len(files) > 0:
@@ -32407,7 +32577,7 @@ class ApplicationWindow(QMainWindow):
                             # we also have to remove those extra event annotations if in combo mode
                             if aw.qmc.eventsGraphflag == 4:
                                 for child in aw.qmc.ax.get_children():
-                                    if isinstance(child, matplotlib.text.Annotation):
+                                    if isinstance(child, mpl.text.Annotation):
                                         try:
                                             aw.qmc.ax.texts.remove(child)
                                         except Exception: # pylint: disable=broad-except
@@ -32668,6 +32838,7 @@ class ApplicationWindow(QMainWindow):
                         os.remove(filename)
                     except OSError:
                         pass
+                    import codecs # @Reimport
                     with codecs.open(filename, 'w', encoding='utf-8') as f:
                         for i in range(len(html)):
                             f.write(html[i])
@@ -32675,7 +32846,14 @@ class ApplicationWindow(QMainWindow):
                         full_path = "file://" + filename # Safari refuses to load the javascript lib (sorttable) otherwise
                     else:
                         full_path = "file:///" + filename # Explorer refuses to start otherwise
-                    QDesktopServices.openUrl(QUrl(full_path, QUrl.ParsingMode.TolerantMode))
+                    
+                    if pdf:
+                        # select file
+                        filename = self.ArtisanSaveFileDialog(msg="Export PDF",ext="*.pdf")
+                        if filename:
+                            self.html2pdf(full_path, filename, landscape=True)
+                    else:
+                        QDesktopServices.openUrl(QUrl(full_path, QUrl.ParsingMode.TolerantMode))
 
                 except IOError as e:
                     aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:") + " rankingReport() {0}").format(str(e)))
@@ -32683,6 +32861,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def rankingCSVReport(self,_=False): # get profile filenames
+        import csv
         profiles = self.reportFiles()
         if profiles and len(profiles) > 0:
             # select file
@@ -32943,10 +33122,122 @@ class ApplicationWindow(QMainWindow):
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " rankingExcelReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
-
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def pdfReport(self,_=False):
+        # select file
+        filename = self.ArtisanSaveFileDialog(msg="Export PDF",ext="*.pdf")
+        if filename:
+            self.roastReport(pdf_filename=filename)
+    
     @pyqtSlot()
     @pyqtSlot(bool)
     def htmlReport(self,_=False):
+        self.roastReport()
+
+    def releaseQWebEngineView(self):
+        try: # sip not supported on older PyQt versions (RPi!)
+            sip.delete(self.pdf_page_layout)
+            #print(sip.isdeleted(self.pdf_page_layout))
+        except Exception: # pylint: disable=broad-except
+            pass
+        self.pdf_page_layout = None
+        try: # sip not supported on older PyQt versions (RPi!)
+            sip.delete(self.html_loader)
+            #print(sip.isdeleted(self.html_loader))
+        except Exception: # pylint: disable=broad-except
+            pass
+        self.html_loader = None
+                
+    # if batch_process is True, the QWebEngineView() is created only if self.html_loader is not None and never deleted
+    # the caller is responsible to release that self.html_loader via releaseQWebEngineView()
+    def html2pdf(self, html_file, pdf_file, landscape=False, batch_process=False):
+        def release():
+            if batch_process and self.html_loader is not None:
+                try:
+                    self.html_loader.page().pdfPrintingFinished.disconnect()
+                except Exception:
+                    pass
+                try:
+                    self.html_loader.loadFinished.disconnect()
+                except Exception:
+                    pass
+                try:
+                    self.html_loader.renderProcessTerminated.disconnect()
+                except Exception:
+                    pass
+            else:
+                self.releaseQWebEngineView()
+            self.pdf_rendering = False
+        
+        @pyqtSlot(str,bool)
+        def printing_finished(_file:str, _success:bool):
+            release()
+        
+        @pyqtSlot(bool)
+        def emit_pdf(ok:bool):
+            if ok:
+                if self.html_loader is not None:
+                    page = self.html_loader.page()
+                    page.pdfPrintingFinished.connect(printing_finished)                    
+                    page.printToPdf(pdf_file, self.pdf_page_layout)
+                else:
+                    self.pdf_rendering = False
+            else:
+                self.pdf_rendering = False
+        
+        @pyqtSlot("QWebEnginePage::RenderProcessTerminationStatus", int)
+        def renderingTerminated(_terminationStatus, _exitCode):
+            release()
+        
+        try:
+            # we wait for a previous pdf conversion to terminate
+            while self.pdf_rendering:
+                QApplication.processEvents()
+                libtime.sleep(0.001)
+            self.pdf_rendering = True
+            if self.html_loader is None:
+                self.html_loader = QWebEngineView()
+                self.html_loader.setZoomFactor(1)
+            if self.pdf_page_layout is None:
+                # lazy imports
+                if pyqtversion < 6:
+                    from PyQt5.QtCore import QMarginsF   # @Reimport @UnusedImport
+                    from PyQt5.QtGui import QPageLayout, QPageSize, QPagedPaintDevice # @Reimport @UnusedImport
+                else:
+                    from PyQt6.QtCore import QMarginsF  # @Reimport @UnresolvedImport
+                    from PyQt6.QtGui import QPageLayout, QPageSize, QPagedPaintDevice  # @Reimport @UnresolvedImport
+                        
+                if QPrinter().paperSize() == QPagedPaintDevice.PageSize.Letter:
+                    # Letter
+                    ps = QPageSize(QPageSize.PageSizeId.Letter)
+                    pu = QPageLayout.Unit.Inch
+                    pm = QMarginsF(0.7, 0.7, 0.7, 0.7)
+                else:
+                    # A4
+                    ps = QPageSize(QPageSize.PageSizeId.A4)
+                    pu = QPageLayout.Unit.Millimeter
+                    pm = QMarginsF(15, 15, 15, 15)
+                if landscape:
+                    po = QPageLayout.Orientation.Landscape
+                else:
+                    po = QPageLayout.Orientation.Portrait
+                self.pdf_page_layout = QPageLayout(ps, po, pm, pu)
+            self.html_loader.renderProcessTerminated.connect(renderingTerminated)
+            self.html_loader.loadFinished.connect(emit_pdf)
+            self.html_loader.load(QUrl(html_file))
+            # busy wait for the pdf conversion to terminate
+            while self.pdf_rendering:
+                QApplication.processEvents()
+                libtime.sleep(0.001)
+        except Exception as e:
+            _log.exception(e)
+            
+    
+    # if batch_process is True and pdf_filename is given, the caller needs to cleanup the QWebEngineView by calling self.releaseQWebEngineView() the after processing all reports
+    def roastReport(self,pdf_filename=None, batch_process=False):
+        import html as htmllib
+        import string as libstring
         try:
             rcParams['path.effects'] = []
             with open(getResourcePath() + 'roast-template.htm', 'r', encoding='utf-8') as myfile:
@@ -33207,6 +33498,7 @@ class ApplicationWindow(QMainWindow):
                     os.remove(filename)
                 except OSError:
                     pass
+                import codecs # @Reimport
                 with codecs.open(filename, 'w', encoding='utf-8') as f:
                     for i in range(len(html)):
                         f.write(html[i])
@@ -33214,7 +33506,10 @@ class ApplicationWindow(QMainWindow):
                     full_path = "file://" + filename # Safari refuses to load the javascript lib (sorttable) otherwise
                 else:
                     full_path = "file:///" + filename # Explorer refuses to start otherwise
-                QDesktopServices.openUrl(QUrl(full_path, QUrl.ParsingMode.TolerantMode))
+                if pdf_filename:
+                    self.html2pdf(full_path,pdf_filename, batch_process=batch_process)
+                else:
+                    QDesktopServices.openUrl(QUrl(full_path, QUrl.ParsingMode.TolerantMode))
 
             except IOError as e:
                 _log.exception(e)
@@ -33799,6 +34094,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def viewplatform(self,_=False):
+        from artisanlib.platform import platformDlg
         platformDLG = platformDlg(self,self)
         platformDLG.setModal(False)
         platformDLG.show()
@@ -33906,6 +34202,7 @@ class ApplicationWindow(QMainWindow):
     def checkUpdate(self, _=False):
         try:
             update_url = '<a href="https://artisan-scope.org">https://artisan-scope.org</a>'
+            import requests
             r = requests.get('https://api.github.com/repos/artisan-roaster-scope/artisan/releases/latest', timeout=(2,4))
             tag_name = r.json()['tag_name']
             latest = re.search(r"[\d\.]+",tag_name).group(0)
@@ -33955,12 +34252,14 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def calibratedelay(self,_=False):
+        from artisanlib.sampling import SamplingDlg
         samplingDl = SamplingDlg(self,self)
         samplingDl.show()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def setcommport(self,_=False):
+        from artisanlib.ports import comportDlg
         dialog = comportDlg(self,self)
         if dialog.exec():
             # set serial port
@@ -34122,6 +34421,7 @@ class ApplicationWindow(QMainWindow):
             self.HottopControlOn()
 
     def HottopControlOff(self):
+        from artisanlib.hottop import releaseHottopControl
         res = releaseHottopControl()
         if res:
             if self.HottopControlActive:
@@ -34131,10 +34431,14 @@ class ApplicationWindow(QMainWindow):
 
     def HottopControlOn(self):
         if aw.superusermode: # Hottop control mode can for now activated only in super user mode
+            from artisanlib.hottop import isHottopLoopRunning
             if not isHottopLoopRunning():
+                from artisanlib.hottop import startHottop
                 startHottop(0.6,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
+            from artisanlib.hottop import takeHottopControl
             res = takeHottopControl()
             if res:
+                from artisanlib.hottop import setHottop
                 setHottop(drum_motor=True)
                 aw.buttonCONTROL.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
                 if not self.HottopControlActive:
@@ -34200,36 +34504,42 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def deviceassigment(self,_=False):
+        from artisanlib.devices import DeviceAssignmentDlg
         dialog = DeviceAssignmentDlg(self,self,self.DeviceAssignmentDlg_activeTab)
         dialog.show()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def showstatistics(self,_=False):
+        from artisanlib.statistics import StatisticsDlg
         dialog = StatisticsDlg(self,self)
         dialog.show()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def Windowconfig(self,_=False):
+        from artisanlib.axis import WindowsDlg
         dialog = WindowsDlg(self,self)
         dialog.show()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def autosaveconf(self,_=False):
+        from artisanlib.autosave import autosaveDlg
         dialog = autosaveDlg(self,self)
         dialog.show()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def batchconf(self,_=False):
+        from artisanlib.batches import batchDlg
         dialog = batchDlg(self,self)
         dialog.show()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def calculator(self,_=False):
+        from artisanlib.calculator import calculatorDlg
         dialog = calculatorDlg(self,self)
         dialog.setModal(False)
         dialog.show()
@@ -34582,6 +34892,7 @@ class ApplicationWindow(QMainWindow):
             # remove the standard fig axis to trigger their recreation
             self.qmc.ax = None
             self.qmc.delta_ax = None
+            from artisanlib.wheels import WheelDlg
             self.wheeldialog = WheelDlg(self,self)
         if self.qmc.wheelflag:
             aw.redrawOnResize = True
@@ -34608,6 +34919,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def background(self,_=False):
+        from artisanlib.background import backgroundDlg
         dialog = backgroundDlg(self,self,self.backgroundDlg_activeTab)
         dialog.show()
 
@@ -34711,6 +35023,7 @@ class ApplicationWindow(QMainWindow):
         self.hideLCDs(False)
         self.hideSliders(False)
         self.hideExtraButtons()
+        from artisanlib.cup_profile import flavorDlg
         dialog = flavorDlg(self,self)
         dialog.show()
 
@@ -34738,18 +35051,21 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def editgraph(self,_=False):
         if self.editgraphdialog != False: # Roast Properties dialog is not blocked!
+            from artisanlib.roast_properties import editGraphDlg
             self.editgraphdialog = editGraphDlg(self,self,self.editGraphDlg_activeTab)
             self.editgraphdialog.show()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def editphases(self,_=False):
+        from artisanlib.phases import phasesGraphDlg
         dialog = phasesGraphDlg(self,self)
         dialog.show()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def eventsconf(self,_=False):
+        from artisanlib.events import EventsDlg
         dialog = EventsDlg(self,self,self.EventsDlg_activeTab)
         dialog.show()
 
@@ -34757,6 +35073,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def alarmconfig(self,_=False):
         if self.qmc.device != 18 or aw.simulator is not None:
+            from artisanlib.alarms import AlarmDlg
             dialog = AlarmDlg(self,self,self.AlarmDlg_activeTab)
             dialog.show()
         else:
@@ -34815,6 +35132,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def importK202(self,_=False):
+        import csv
         try:
             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import K202 CSV"))
             if len(filename) == 0:
@@ -34880,6 +35198,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def importK204(self,_=False):
+        import csv
         try:
             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import K204 CSV"))
             if len(filename) == 0:
@@ -35156,6 +35475,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def importBullet(self,_=False):
         try:
+            from artisanlib.aillio import extractProfileRoasTime
             self.importExternal(extractProfileRoasTime,QApplication.translate("Message","Import Aillio RoasTime"),"*.json")
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -35164,7 +35484,8 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def importBulletURL(self,_=False):
         try:
-            self.importExternalURL(extractProfileRoastWorld,QApplication.translate("Message","Import Aillio Roast.World URL"))
+            from artisanlib.aillio import extractProfileRoastWorld
+            self.importExternalURL(extractProfileRoastWorld, QApplication.translate("Message","Import Aillio Roast.World URL"))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
     
@@ -35250,41 +35571,49 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def importCropster(self,_=False):
+        from artisanlib.cropster import extractProfileCropsterXLS
         self.importExternal(extractProfileCropsterXLS,QApplication.translate("Message","Import Cropster XLS"),"*.xls")
         
     @pyqtSlot()
     @pyqtSlot(bool)
     def importRoastLog(self,_=False):
+        from artisanlib.roastlog import extractProfileRoastLog
         self.importExternalURL(extractProfileRoastLog,QApplication.translate("Message","Import RoastLog URL"))
         
     @pyqtSlot()
     @pyqtSlot(bool)
     def importRoastPATH(self,_=False):
+        from artisanlib.roastpath import extractProfileRoastPathHTML
         self.importExternalURL(extractProfileRoastPathHTML,QApplication.translate("Message","Import RoastPATH URL"))
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importGiesen(self,_=False):
+        from artisanlib.giesen import extractProfileGiesenCSV
         self.importExternal(extractProfileGiesenCSV,QApplication.translate("Message","Import Giesen CSV"),"*.csv")
         
     @pyqtSlot()
     @pyqtSlot(bool)
     def importPetroncini(self,_=False):
+        from artisanlib.petroncini import extractProfilePetronciniCSV
         self.importExternal(extractProfilePetronciniCSV,QApplication.translate("Message","Import Petroncini CSV"),"*.csv")
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importIkawa(self,_=False):
+        from artisanlib.ikawa import extractProfileIkawaCSV
         self.importExternal(extractProfileIkawaCSV,QApplication.translate("Message","Import IKAWA CSV"),"*.csv")
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importRubase(self,_=False):
+        from artisanlib.rubase import extractProfileRubaseCSV
         self.importExternal(extractProfileRubaseCSV,QApplication.translate("Message","Import Rubase CSV"),"*.csv")
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importHH506RA(self,_=False):
+        import csv
         try:
             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import HH506RA CSV"))
             if len(filename) == 0:
@@ -35508,6 +35837,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def setCurves(self,_=False):
+        from artisanlib.curves import CurvesDlg
         curvesDlg = CurvesDlg(self,self,self.CurveDlg_activeTab)
         curvesDlg.show()
     
@@ -36040,6 +36370,7 @@ class ApplicationWindow(QMainWindow):
 
     def loadAlarms(self,filename):
         try:
+            from json import load as json_load
             with io.open(filename, 'r', encoding='utf-8') as infile:
                 alarms = json_load(infile)
             aw.qmc.alarmflag = alarms["alarmflags"]
@@ -36253,6 +36584,7 @@ class ApplicationWindow(QMainWindow):
                 progress.setValue(3)
 
             # build the results table
+            import prettytable  # @UnresolvedImport
             tbl = prettytable.PrettyTable()
             tbl.field_names = [" ",
                                QApplication.translate("Label","MSE BT"),
@@ -36584,6 +36916,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def transform(self,_=False):
+        from artisanlib.transposer import profileTransformatorDlg
         dialog = profileTransformatorDlg(self,self)
         dialog.show()
 
@@ -36605,6 +36938,7 @@ class ApplicationWindow(QMainWindow):
                     filenames = aw.reportFiles()
                 if filenames and len(filenames) > 0:
                     self.deleteBackground()
+                    from artisanlib.comparator import roastCompareDlg
                     self.comparator = roastCompareDlg(self,self,foreground,background)
                     self.comparator.addProfiles(filenames)
                     self.comparator.show()
@@ -36669,6 +37003,7 @@ def excepthook(excType, excValue, tracebackobj):
     """
     _log.error("Logging an uncaught exception",
                  exc_info=(excType, excValue, tracebackobj))
+    import traceback
     separator = '-' * 80
     logFile = "simple.log"
     notice = \
@@ -36905,8 +37240,9 @@ def main():
                     app.open_url(url)
             # on Linux (and RPi), local argv_file paths may contain percent encoded spaces %20 and a file:// URL prefix
             if platf == "Linux":
-                argv_file_decoded = parse.unquote_plus(argv_file)
-                u = QUrl(parse.unquote_plus(argv_file_decoded))
+                from urllib.parse import unquote_plus
+                argv_file_decoded = unquote_plus(argv_file)
+                u = QUrl(unquote_plus(argv_file_decoded))
                 if u.isLocalFile():
                     argv_file = u.toLocalFile()
                 else:
@@ -36967,7 +37303,8 @@ def main():
 #        except Exception: # pylint: disable=broad-except
 #            pass
 
-    aw.qmc.startPhidgetManager()
+    
+    QTimer.singleShot(700, aw.qmc.startPhidgetManager)
     
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):

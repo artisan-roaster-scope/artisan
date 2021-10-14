@@ -23,7 +23,6 @@
 import sys
 import platform
 import numpy
-import prettytable
 
 from artisanlib.util import (deltaLabelBigPrefix, deltaLabelPrefix, deltaLabelUTF8, 
                              stringtoseconds, stringfromseconds, toFloat)
@@ -237,6 +236,7 @@ class equDataDlg(ArtisanDialog):
             
     @pyqtSlot(bool)
     def copyDataTabletoClipboard(self,_=False):
+        import prettytable
         nrows = self.datatable.rowCount() 
         ncols = self.datatable.columnCount() - 1 #there is a dummy column at the end on the right
         clipboard = ""
@@ -1128,6 +1128,7 @@ class CurvesDlg(ArtisanDialog):
             pass
         self.styleComboBox.currentIndexChanged.connect(self.setappearance)
         self.resolutionSpinBox = QSpinBox()
+        self.resolutionSpinBox.setSuffix("%")
         self.resolutionSpinBox.setRange(40,300)
         self.resolutionSpinBox.setSingleStep(5)
         self.resolutionSpinBox.setValue(self.aw.dpi)

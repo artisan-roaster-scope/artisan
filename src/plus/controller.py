@@ -36,13 +36,7 @@ import threading
 import logging
 from typing import Final
 
-if platform.system().startswith("Windows"):
-    import keyring.backends.Windows  # @UnusedImport
-elif platform.system() == "Darwin":
-    import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
-else:
-    import keyring.backends.SecretService  # @UnusedImport
-import keyring  # @Reimport # imported last to make py2app work
+
 
 from plus import config, connection, stock, queue, sync, roast
 
@@ -133,6 +127,15 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
         try:
             connect_semaphore.acquire(1)
             if config.app_window is not None:
+            
+                if platform.system().startswith("Windows"):
+                    import keyring.backends.Windows  # @UnusedImport
+                elif platform.system() == "Darwin":
+                    import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
+                else:
+                    import keyring.backends.SecretService  # @UnusedImport
+                import keyring  # @Reimport # imported last to make py2app work            
+            
                 connection.setKeyring()
                 account = config.app_window.plus_account
                 if account is None:

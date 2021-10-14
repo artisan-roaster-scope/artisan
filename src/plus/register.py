@@ -33,10 +33,7 @@ from pathlib import Path
 from artisanlib.util import getDirectory
 from plus import config
 from typing import Optional, Final
-import dbm
 import os
-import portalocker
-import shelve
 import logging
 
 
@@ -52,6 +49,8 @@ uuid_cache_path_lock = getDirectory(
 
 def addPathShelve(uuid: str, path: str, fh) -> None:
     _log.debug("addPathShelve(%s,%s,_fh_)", uuid, path)
+    import dbm
+    import shelve
     try:
         with shelve.open(uuid_cache_path) as db:
             db[uuid] = str(path)
@@ -94,6 +93,7 @@ def addPathShelve(uuid: str, path: str, fh) -> None:
 # containing that uuid
 def addPath(uuid: str, path: str) -> None:
     _log.debug("addPath(%s,%s)", uuid, path)
+    import portalocker
     try:
         register_semaphore.acquire(1)
         _log.debug("addPath(%s,%s)", str(uuid), str(path))
@@ -124,6 +124,8 @@ def addPath(uuid: str, path: str) -> None:
 # returns None if given UUID is not registered, otherwise the registered path
 def getPath(uuid: str) -> Optional[str]:
     _log.debug("getPath(%s)", uuid)
+    import portalocker
+    import shelve
     try:
         register_semaphore.acquire(1)
         _log.debug("getPath(%s)", str(uuid))

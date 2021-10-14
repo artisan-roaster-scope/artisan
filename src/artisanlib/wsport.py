@@ -19,7 +19,6 @@
 import sys
 import time
 import threading
-import websocket
 
 import json
 import random
@@ -191,7 +190,8 @@ class wsport():
             self.aw.addserial("wsport onClose()")
     
     def onOpen(self, *_):
-        self.open_event.set() # unblock the connect action
+        if self.open_event is not None:
+            self.open_event.set() # unblock the connect action
         self.aw.sendmessage(QApplication.translate("Message","WebSocket connected"))
         if self.aw.seriallogflag:
             self.aw.addserial("wsport onOpen()")
@@ -205,6 +205,7 @@ class wsport():
             self.aw.addserial("wsport onPong()")
     
     def create(self):
+        import websocket
         # initialize readings
         self.readings = [-1]*self.channels
         while self.active:

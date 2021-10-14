@@ -17,7 +17,6 @@
 # Marko Luther, 2020
 
 from artisanlib.dialogs import ArtisanDialog
-from help import autosave_help
 
 try:
     #pylint: disable = E, W, R, C
@@ -68,10 +67,9 @@ class autosaveDlg(ArtisanDialog):
         self.autopdfcheckbox = QCheckBox()
         self.autopdfcheckbox.setToolTip(QApplication.translate("Tooltip", "Save image alongside .alog profiles"))
         self.autopdfcheckbox.setChecked(self.aw.qmc.autosaveimage)
-        imageTypes = ["PDF", "SVG", "PNG", "JPEG", "BMP", "CSV", "JSON"]
         self.imageTypesComboBox = QComboBox()
-        self.imageTypesComboBox.addItems(imageTypes)
-        self.imageTypesComboBox.setCurrentIndex(imageTypes.index(self.aw.qmc.autosaveimageformat))
+        self.imageTypesComboBox.addItems(self.aw.qmc.autoasaveimageformat_types)
+        self.imageTypesComboBox.setCurrentIndex(self.aw.qmc.autoasaveimageformat_types.index(self.aw.qmc.autosaveimageformat))
         prefixlabel = QLabel()
         prefixlabel.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
         prefixlabel.setText(QApplication.translate("Label", "File Name Prefix"))
@@ -134,6 +132,7 @@ class autosaveDlg(ArtisanDialog):
 
     @pyqtSlot(bool)
     def showautosavehelp(self,_=False):
+        from help import autosave_help
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog

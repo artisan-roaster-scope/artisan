@@ -19,7 +19,6 @@
 import sys
 import math
 import platform
-import prettytable
 import logging
 from typing import Final
 
@@ -34,7 +33,6 @@ from artisanlib.util import deltaLabelUTF8, appFrozen, stringfromseconds,stringt
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
 from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit, MyTableWidgetItemNumber
 
-from help import energy_help
 
 from uic import EnergyWidget
 from uic import SetupWidget
@@ -3351,6 +3349,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def copyEnergyDataTabletoClipboard(self,_=False):
+        import prettytable
         nrows = self.energy_ui.datatable.rowCount()
         ncols = self.energy_ui.datatable.columnCount()
         clipboard = ""
@@ -3653,6 +3652,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             
     @pyqtSlot(bool)
     def showenergyhelp(self,_=False):
+        from help import energy_help
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
@@ -4117,6 +4117,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def copyEventTabletoClipboard(self,_=False):
+        import prettytable
         nrows = self.eventtable.rowCount() 
         ncols = self.eventtable.columnCount()
         clipboard = ""
