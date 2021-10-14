@@ -358,7 +358,7 @@ def postData(
     jsondata = json.dumps(data).encode("utf8")
     _log.debug("-> size %s", len(jsondata))
     headers, postdata = getHeadersAndData(authorized, compress, jsondata)
-    import requests
+    import requests  # @Reimport
     r = requests.post(
         url,
         headers=headers,
@@ -389,7 +389,7 @@ def getData(url: str, authorized: bool = True) -> Any:
     _log.info("getData(%s,%s)", url, authorized)
     headers = getHeaders(authorized)
     #    _log.debug("-> request headers %s",headers)
-    import requests
+    import requests  # @Reimport
     r = requests.get(
         url,
         headers=headers,
@@ -406,7 +406,6 @@ def getData(url: str, authorized: bool = True) -> Any:
         # we re-authentify by renewing the session token and try again
         authentify()
         headers = getHeaders(authorized)  # recreate header with new token
-        import requests # @Reimport
         r = requests.get(
             url,
             headers=headers,
