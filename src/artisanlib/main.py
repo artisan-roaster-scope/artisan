@@ -133,7 +133,7 @@ else:
                               qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @Reimport @UnresolvedImport
                               QRegularExpression, QDate, QUrl, QDir, Qt, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnresolvedImport
     from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @Reimport @UnusedImport @UnresolvedImport # pylint: disable=import-error
-    from PyQt6.QtWebEngineWidgets import QWebEngineView # @Reimport  @UnusedImport @UnresolvedImport # pylint: disable=disable=import-error
+    from PyQt6.QtWebEngineWidgets import QWebEngineView # @Reimport  @UnusedImport @UnresolvedImport # pylint: disable=import-error
     from PyQt6 import sip # @Reimport @UnusedImport @UnresolvedImport # pylint: disable=import-error
 
 from artisanlib.suppress_errors import suppress_stdout_stderr
