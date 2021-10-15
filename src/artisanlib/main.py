@@ -26595,6 +26595,7 @@ class ApplicationWindow(QMainWindow):
                     # check for difference in the Data values between the profile and current settings
                     settingdev = ''.join([str(self.qmc.extradevices), str([encodeLocal(n) for n in self.qmc.extraname1]), str([encodeLocal(n) for n in self.qmc.extraname2]),
                                         str([encodeLocal(x) for x in self.qmc.extramathexpression1]), str([encodeLocal(x) for x in self.qmc.extramathexpression2]),
+                                        str([encodeLocal(x) for x in self.qmc.etypes])
                                         ])
                     # fix missing extramathexpression arrays on import
                     if "extramathexpression1" not in profile:
@@ -26604,6 +26605,7 @@ class ApplicationWindow(QMainWindow):
                     try:
                         profiledev = ''.join([str(profile["extradevices"]), str(profile["extraname1"]), str(profile["extraname2"]),
                                             str(profile["extramathexpression1"]), str(profile["extramathexpression2"]),
+                                            str(profile["etypes"])
                                             ])
                     except Exception: # pylint: disable=broad-except
                         profiledev = ''
@@ -28566,6 +28568,14 @@ class ApplicationWindow(QMainWindow):
                 # update minieditor event type ComboBox
                 aw.etypeComboBox.clear()
                 aw.etypeComboBox.addItems(self.qmc.etypes)
+            else:
+                # etypes have not been saved in the setting to presever the translations, we have to reset those to their default
+                self.qmc.etypes = [
+                    QApplication.translate("ComboBox", "Air"),
+                    QApplication.translate("ComboBox", "Drum"),
+                    QApplication.translate("ComboBox", "Damper"),
+                    QApplication.translate("ComboBox", "Burner")
+                ]               
             if settings.contains("eventsshowflag"):
                 self.qmc.eventsshowflag = toInt(settings.value("eventsshowflag",int(self.qmc.eventsshowflag)))
             if settings.contains("clampEvents"):
