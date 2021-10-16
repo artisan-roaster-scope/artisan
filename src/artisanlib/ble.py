@@ -191,9 +191,9 @@ class BleInterface(QtCore.QObject):
                     for (uuid_char, ble_write_type) in self.char_uuid:
                         # we register write only for the given char_uuid associated to the service uuid we are connected to
                         if (c.uuid() == uuid_char and 
-                                (ble_write_type in (
+                                ble_write_type in (
                                     BLE_CHAR_TYPE.BLE_CHAR_NOTIFY_WRITE,
-                                    BLE_CHAR_TYPE.BLE_CHAR_WRITE))):
+                                    BLE_CHAR_TYPE.BLE_CHAR_WRITE)):
                             if ((c.properties() & QtBluetooth.QLowEnergyCharacteristic.WriteNoResponse) or 
                                     (c.properties() & QtBluetooth.QLowEnergyCharacteristic.Write)):
                                 self.m_writeCharacteristic = c
@@ -202,7 +202,7 @@ class BleInterface(QtCore.QObject):
                                     self.m_writemode=QtBluetooth.QLowEnergyService.WriteWithoutResponse
                                 else:
                                     self.m_writemode=QtBluetooth.QLowEnergyService.WriteWithResponse
-                        if c.uuid() == uuid_char and (
+                        if (c.uuid() == uuid_char and
                                 ble_write_type in (
                                     BLE_CHAR_TYPE.BLE_CHAR_NOTIFY_WRITE,
                                     BLE_CHAR_TYPE.BLE_CHAR_NOTIFY)):
@@ -356,7 +356,7 @@ def main():
             acaia.DEVICE_NAME_PEARL2021,
             acaia.DEVICE_NAME_PEARLS,
             acaia.DEVICE_NAME_LUNAR2021,
-            acaia.DEVICE_NAME_OTHERS
+            acaia.DEVICE_NAME_PYXIS
         ])
     ble.scanDevices()
     sys.exit(app.exec())

@@ -6195,6 +6195,10 @@ class tgraphcanvas(FigureCanvas):
 
         if not self.checkSaved():
             return False
+        
+        # restore and clear extra device settings which might have been created on loading a profile with different extra devices settings configuration
+        aw.restoreExtraDeviceSettingsBackup()
+        
         if sampling and self.flagOpenCompleted and aw.curFile is not None:
             # always if ON is pressed while a profile is loaded, the profile is send to the Viewer
             # the file URL of the saved profile (if any) is send to the ArtisanViewer app to be openened if already running
@@ -16534,6 +16538,7 @@ class ApplicationWindow(QMainWindow):
 
         self.WindowconfigAction = QAction(QApplication.translate("Menu", "Axes..."), self)
         self.WindowconfigAction.triggered.connect(self.Windowconfig)
+        self.WindowconfigAction.setShortcut("Ctrl+Shift+A")
         self.ConfMenu.addAction(self.WindowconfigAction)
 
         self.ConfMenu.addSeparator()
@@ -18127,10 +18132,10 @@ class ApplicationWindow(QMainWindow):
         self.tray_icon.show()
         
 # test menu and notification:
-        menu = QMenu(self)
-        menu.addAction("Exit")
-        self.tray_icon.setContextMenu(menu)
-        self.sendNotificationMessage("test1",'test')
+#        menu = QMenu(self)
+#        menu.addAction("Exit")
+#        self.tray_icon.setContextMenu(menu)
+#        self.sendNotificationMessage("test1",'test')
 
         if sys.platform.startswith("darwin"):
             # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
@@ -19609,10 +19614,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 whitep = False
         else:
-            if checkColors:
-                whitep = self.colorDifference("white",canvas_color) > self.colorDifference("black",canvas_color)
-            else:
-                whitep = bool(self.qmc.palette["messages"] == 'white')
+            whitep = self.colorDifference("white",canvas_color) > self.colorDifference("black",canvas_color)
 
         self.qmc.fig.patch.set_facecolor(str(canvas_color))
         self.setStyleSheet("QMainWindow{background-color:" + str(canvas_color) + ";"
@@ -23289,6 +23291,7 @@ class ApplicationWindow(QMainWindow):
         if reply == QMessageBox.StandardButton.Reset :
             #raise flag. Next time app will open, the settings (bad settings) will not be loaded.
             self.resetqsettings = 1
+            self.clearExtraDeviceSettingsBackup()
             self.close()
         elif reply == QMessageBox.StandardButton.Cancel:
             return
@@ -26583,6 +26586,57 @@ class ApplicationWindow(QMainWindow):
             self.qmc.on_extractemp1.append([])
             self.qmc.on_extractimex2.append([])
             self.qmc.on_extractemp2.append([])
+    
+    @staticmethod
+    def getExtraDeviceSettingsPath():
+        return os.path.join(getDataDirectory(),"extra_devices_backup.aset")
+    
+    def createExtraDeviceSettingsBackup(self):
+        try:
+            filename = self.getExtraDeviceSettingsPath()
+            if not os.path.isfile(filename):
+                # we only backup the extra device settings if there is not an older available
+                settings = QSettings(filename, QSettings.Format.IniFormat)
+                settings.beginGroup("ExtraDev")
+                settings.setValue("extradevices",self.qmc.extradevices)
+                settings.setValue("extraname1",self.qmc.extraname1)
+                settings.setValue("extraname2",self.qmc.extraname2)
+                settings.setValue("extramathexpression1",self.qmc.extramathexpression1)
+                settings.setValue("extramathexpression2",self.qmc.extramathexpression2)
+                settings.endGroup()
+                settings.beginGroup("events")
+                settings.setValue("etypes",self.qmc.etypes)
+                settings.endGroup()
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+    
+    def clearExtraDeviceSettingsBackup(self):
+        filename = self.getExtraDeviceSettingsPath()
+        try:
+            os.unlink(filename)
+        except Exception:
+            pass
+      
+    def restoreExtraDeviceSettingsBackup(self):
+        try:
+            filename = self.getExtraDeviceSettingsPath()
+            if os.path.isfile(filename):
+                settings = QSettings(filename, QSettings.Format.IniFormat)
+                settings.beginGroup("ExtraDev")
+                self.qmc.extradevices = [toInt(x) for x in toList(settings.value("extradevices",self.qmc.extradevices))]
+                self.qmc.extraname1 = list(map(str,list(toStringList(settings.value("extraname1",self.qmc.extraname1)))))
+                self.qmc.extraname2 = list(map(str,list(toStringList(settings.value("extraname2",self.qmc.extraname2)))))
+                self.qmc.extramathexpression1 = list(map(str,list(toStringList(settings.value("extramathexpression1",self.qmc.extramathexpression1)))))
+                self.qmc.extramathexpression2 = list(map(str,list(toStringList(settings.value("extramathexpression2",self.qmc.extramathexpression2)))))
+                settings.endGroup()
+                settings.beginGroup("events")
+                self.qmc.etypes = toStringList(settings.value("etypes",self.qmc.etypes))
+                settings.endGroup()
+                # now remove the settings file
+                os.unlink(filename)
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+        
 
     #called by fileLoad()
     def setProfile(self,filename,profile,quiet=False):
@@ -26618,6 +26672,7 @@ class ApplicationWindow(QMainWindow):
                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel, QMessageBox.StandardButton.No)
                         if reply == QMessageBox.StandardButton.Yes:
                             if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
+                                self.createExtraDeviceSettingsBackup() # we make a backup of the core extra device settings before loading the profile, to be restored on next RESET
                                 updateRender = True
                                 aw.qmc.resetlinecountcaches()
                                 self.qmc.extradevices = profile["extradevices"]
@@ -28351,7 +28406,7 @@ class ApplicationWindow(QMainWindow):
                 if self.resetqsettings:
                     self.resetqsettings = 0
                     if "canvas" in aw.qmc.palette:
-                        aw.updateCanvasColors()
+                        aw.updateCanvasColors(checkColors=False)
                     # remove window geometry settings
                     for s in ["RoastGeometry","FlavorProperties","CalculatorGeometry","EventsGeometry", "CompareGeometry",
                         "BackgroundGeometry","LCDGeometry","DeltaLCDGeometry","ExtraLCDGeometry","PhasesLCDGeometry","AlarmsGeometry","DeviceAssignmentGeometry","PortsGeometry",

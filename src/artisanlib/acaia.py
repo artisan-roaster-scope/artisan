@@ -31,7 +31,6 @@ class AcaiaBLE():
     DEVICE_NAME_LUNAR = "ACAIA"
     SERVICE_UUID_LEGACY = "00001820-0000-1000-8000-00805f9b34fb"
     CHAR_UUID_LEGACY = ("00002a80-0000-1000-8000-00805f9b34fb", BLE_CHAR_TYPE.BLE_CHAR_NOTIFY_WRITE)
-    DEVICE_NAMES_LEGACY = ["PROCHBT001"]
     
     # Acaia Pearl (2021):
     DEVICE_NAME_PEARL2021 = "PEARL-"
@@ -45,8 +44,8 @@ class AcaiaBLE():
     # Acaia Lunar (2021):
     DEVICE_NAME_LUNAR2021 = "LUNAR-"
     
-    # Others:
-    DEVICE_NAME_OTHERS = "ACAIA"
+    # Acaia Pyxis:
+    DEVICE_NAME_PYXIS = "PYXIS"
     
     
     HEADER1      = 0xef
@@ -190,7 +189,6 @@ class AcaiaBLE():
         write(msg)
 
     # should be send every 3-5sec
-    # this seems not to be essential for the acaia. The Pearl disconnects from time to time, the Lunar never!?
     def sendHeartbeat(self,write):
         self.sendMessage(write,self.MSG_SYSTEM,b'\x02\x00')
 
@@ -295,7 +293,8 @@ class AcaiaBLE():
 #            print("minutes",payload[0])
 #            print("seconds",payload[1])
 #            print("mseconds",payload[2])
-        _log.debug("parseTimerEvent(_): %sm%s%sms",payload[0],payload[1],payload[2])
+        value = ((payload[0] & 0xff) * 60) + payload[1] + payload[2] / 10.
+        _log.debug("parseTimerEvent(_): %sm%s%sms, %s",payload[0],payload[1],payload[2], value)
         return self.EVENT_TIMER_LEN
     
     def parseAckEvent(self,payload):
