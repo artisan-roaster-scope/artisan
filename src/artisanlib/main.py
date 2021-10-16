@@ -15493,6 +15493,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 #                            line.set_drawstyle("steps-post")
                             
                 except Exception: # pylint: disable=broad-except
+#                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     pass
                 aw.fetchCurveStyles()
@@ -26603,6 +26604,37 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue("extraname2",self.qmc.extraname2)
                 settings.setValue("extramathexpression1",self.qmc.extramathexpression1)
                 settings.setValue("extramathexpression2",self.qmc.extramathexpression2)
+                settings.setValue("extradevicecolor1",self.qmc.extradevicecolor1)
+                settings.setValue("extradevicecolor2",self.qmc.extradevicecolor2)
+                settings.setValue("extraLCDvisibility1",self.extraLCDvisibility1)
+                settings.setValue("extraLCDvisibility2",self.extraLCDvisibility2)
+                settings.setValue("extraCurveVisibility1",self.extraCurveVisibility1)
+                settings.setValue("extraCurveVisibility2",self.extraCurveVisibility2)
+                settings.setValue("extraDelta1",self.extraDelta1)
+                settings.setValue("extraDelta2",self.extraDelta2)
+                settings.setValue("extraFill1",self.extraFill1)
+                settings.setValue("extraFill2",self.extraFill2)
+                settings.endGroup()
+                settings.beginGroup("CurveStyles")
+                settings.setValue("extralinestyles1",self.qmc.extralinestyles1)
+                settings.setValue("extralinestyles2",self.qmc.extralinestyles2)
+                settings.setValue("extradrawstyles1",self.qmc.extradrawstyles1)
+                settings.setValue("extradrawstyles2",self.qmc.extradrawstyles2)
+                settings.setValue("extralinewidths1",self.qmc.extralinewidths1)
+                settings.setValue("extralinewidths2",self.qmc.extralinewidths2)
+                settings.setValue("extramarkers1",self.qmc.extramarkers1)
+                settings.setValue("extramarkers2",self.qmc.extramarkers2)
+                settings.setValue("extramarkersizes1",self.qmc.extramarkersizes1)
+                settings.setValue("extramarkersizes2",self.qmc.extramarkersizes2)
+                settings.endGroup()
+                #save extra serial comm ports settings
+                settings.beginGroup("ExtraComm")
+                settings.setValue("extracomport",self.extracomport)
+                settings.setValue("extrabaudrate",self.extrabaudrate)
+                settings.setValue("extrabytesize",self.extrabytesize)
+                settings.setValue("extraparity",self.extraparity)
+                settings.setValue("extrastopbits",self.extrastopbits)
+                settings.setValue("extratimeout",self.extratimeout)
                 settings.endGroup()
                 settings.beginGroup("events")
                 settings.setValue("etypes",self.qmc.etypes)
@@ -26616,7 +26648,8 @@ class ApplicationWindow(QMainWindow):
             os.unlink(filename)
         except Exception:
             pass
-      
+    
+    # this should only be called from reset()
     def restoreExtraDeviceSettingsBackup(self):
         try:
             filename = self.getExtraDeviceSettingsPath()
@@ -26628,6 +26661,60 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extraname2 = list(map(str,list(toStringList(settings.value("extraname2",self.qmc.extraname2)))))
                 self.qmc.extramathexpression1 = list(map(str,list(toStringList(settings.value("extramathexpression1",self.qmc.extramathexpression1)))))
                 self.qmc.extramathexpression2 = list(map(str,list(toStringList(settings.value("extramathexpression2",self.qmc.extramathexpression2)))))
+                self.qmc.extradevicecolor1 = list(map(str,list(toStringList(settings.value("extradevicecolor1",self.qmc.extradevicecolor1)))))
+                self.qmc.extradevicecolor2 = list(map(str,list(toStringList(settings.value("extradevicecolor2",self.qmc.extradevicecolor2)))))
+                if settings.contains("extraLCDvisibility1"):
+                    self.extraLCDvisibility1 = [toBool(x) for x in toList(settings.value("extraLCDvisibility1",self.extraLCDvisibility1))]
+                if settings.contains("extraLCDvisibility2"):
+                    self.extraLCDvisibility2 = [toBool(x) for x in toList(settings.value("extraLCDvisibility2",self.extraLCDvisibility2))]
+                if settings.contains("extraCurveVisibility1"):
+                    self.extraCurveVisibility1 = [toBool(x) for x in toList(settings.value("extraCurveVisibility1",self.extraCurveVisibility1))]
+                if settings.contains("extraCurveVisibility2"):
+                    self.extraCurveVisibility2 = [toBool(x) for x in toList(settings.value("extraCurveVisibility2",self.extraCurveVisibility2))]
+                if settings.contains("extraDelta1"):
+                    self.extraDelta1 = [toBool(x) for x in toList(settings.value("extraDelta1",self.extraDelta1))]
+                if settings.contains("extraDelta2"):
+                    self.extraDelta2 = [toBool(x) for x in toList(settings.value("extraDelta2",self.extraDelta2))]
+                if settings.contains("extraFill1"):
+                    self.extraFill1 = [toInt(x) for x in toList(settings.value("extraFill1",self.extraFill1))]
+                if settings.contains("extraFill2"):
+                    self.extraFill2 = [toInt(x) for x in toList(settings.value("extraFill2",self.extraFill2))]
+                settings.endGroup()
+                settings.beginGroup("CurveStyles")
+                self.qmc.extralinestyles1 = list(map(str,list(toStringList(settings.value("extralinestyles1",self.qmc.extralinestyles1)))))
+                self.qmc.extralinestyles2 = list(map(str,list(toStringList(settings.value("extralinestyles2",self.qmc.extralinestyles2)))))
+                self.qmc.extradrawstyles1 = list(map(str,list(toStringList(settings.value("extradrawstyles1",self.qmc.extradrawstyles1)))))
+                self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default if s=='-' else s for s in self.qmc.extradrawstyles1]
+                self.qmc.extradrawstyles2 = list(map(str,list(toStringList(settings.value("extradrawstyles2",self.qmc.extradrawstyles2)))))
+                self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default if s=='-' else s for s in self.qmc.extradrawstyles2]
+                self.qmc.extralinewidths1 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extralinewidths1",self.qmc.extralinewidths1))]
+                self.qmc.extralinewidths2 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extralinewidths2",self.qmc.extralinewidths2))]
+                self.qmc.extramarkers1 = list(map(str,list(toStringList(settings.value("extramarkers1",self.qmc.extramarkers1)))))
+                self.qmc.extramarkers2 = list(map(str,list(toStringList(settings.value("extramarkers2",self.qmc.extramarkers2)))))
+                self.qmc.extramarkersizes1 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extramarkersizes1",self.qmc.extramarkersizes1))]
+                self.qmc.extramarkersizes2 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extramarkersizes2",self.qmc.extramarkersizes2))]
+                settings.endGroup()
+                # ensure that extra list length are of the size of the extradevices:
+                self.ensureCorrectExtraDeviceListLenght()
+                self.updateExtradeviceSettings()
+                settings.beginGroup("ExtraComm")
+                self.extracomport = list(map(str,list(toStringList(settings.value("extracomport",self.extracomport)))))
+                self.extrabaudrate = [toInt(x) for x in toList(settings.value("extrabaudrate",self.extrabaudrate))]
+                self.extrabytesize = [toInt(x) for x in toList(settings.value("extrabytesize",self.extrabytesize))]
+                self.extraparity = list(map(str,list(toStringList(settings.value("extraparity",self.extraparity)))))
+                self.extrastopbits = [toInt(x) for x in toList(settings.value("extrastopbits",self.extrastopbits))]
+                self.extratimeout = [aw.float2float(toFloat(x)) for x in toList(settings.value("extratimeout",self.extratimeout))]
+                lenextraports = len(self.extracomport)
+                self.extraser = [None]*lenextraports
+                #populate aw.extraser
+                for i in range(lenextraports):
+                    self.extraser[i] = serialport(self)
+                    self.extraser[i].comport = str(self.extracomport[i])
+                    self.extraser[i].baudrate = self.extrabaudrate[i]
+                    self.extraser[i].bytesize = self.extrabytesize[i]
+                    self.extraser[i].parity = str(self.extraparity[i])
+                    self.extraser[i].stopbits = self.extrastopbits[i]
+                    self.extraser[i].timeout = self.extratimeout[i]
                 settings.endGroup()
                 settings.beginGroup("events")
                 self.qmc.etypes = toStringList(settings.value("etypes",self.qmc.etypes))
@@ -26636,7 +26723,6 @@ class ApplicationWindow(QMainWindow):
                 os.unlink(filename)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-        
 
     #called by fileLoad()
     def setProfile(self,filename,profile,quiet=False):
@@ -26664,12 +26750,18 @@ class ApplicationWindow(QMainWindow):
                     except Exception: # pylint: disable=broad-except
                         profiledev = ''
                     if settingdev != profiledev:
-                        string = QApplication.translate("Message","To fully load this profile the extra device configuration needs to be modified.\n\nOverwrite your extra device definitions using the values from the profile?\n\nIt is advisable to save your current settings beforehand via menu Help >> Save Settings.")
-                        if quiet:
-                            reply = QMessageBox.StandardButton.Yes
-                        else:
-                            reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different set of extra devices"), string,
-                                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel, QMessageBox.StandardButton.No)
+
+# we don't ask the user to adjust or not the extra device setup. Instead, now we backup the current settings via createExtraDeviceSettingsBackup() always and reset back to the original state
+# on reset, thus we default to StandardButton.Yes instead of asking in the dialog:
+                        reply = QMessageBox.StandardButton.Yes
+                        
+#                        string = QApplication.translate("Message","To fully load this profile the extra device configuration needs to be modified.\n\nOverwrite your extra device definitions using the values from the profile?\n\nIt is advisable to save your current settings beforehand via menu Help >> Save Settings.")
+#                        if quiet:
+#                            reply = QMessageBox.StandardButton.Yes
+#                        else:
+#                            reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different set of extra devices"), string,
+#                                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel, QMessageBox.StandardButton.No)
+
                         if reply == QMessageBox.StandardButton.Yes:
                             if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
                                 self.createExtraDeviceSettingsBackup() # we make a backup of the core extra device settings before loading the profile, to be restored on next RESET
@@ -29620,9 +29712,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ETBdeltalinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETBdeltalinewidth",self.qmc.ETBdeltalinewidth))))
                 self.qmc.ETBdeltamarker = s2a(toString(settings.value("ETBdeltamarker",self.qmc.ETBdeltamarker)))
                 self.qmc.ETBdeltamarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETBdeltamarkersize",self.qmc.ETBdeltamarkersize))))
-
             settings.endGroup()
-
 
             # Extra com ports
             settings.beginGroup("ExtraComm")

@@ -6,7 +6,6 @@ pyobjc-core==7.3 # 7.1
 pyobjc-framework-Cocoa==7.3 # 7.1
 py2app==0.23 # we stay on 0.23 due to our darkmode patch which needs to be redone for later versions like 0.24 to avoid the patch to be overwritten
 # NOTE: py2app is installed again for builds from custom wheel via .ci/install-osx.sh to allow for dark mode support
-darkdetect==0.3.1 # 0.3.0 # detect if dark mode is active
 #
 ######
 # packages that differ per platform:
@@ -20,7 +19,7 @@ wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
 PyQt5==5.15.4 # 5.15.0 breaks custom event buttons. They only fire after a modal dialog has been opened. Very strange!
 PyQtWebEngine==5.15.4
-openpyxl==3.0.7 # 3.0.6
-keyring==23.1.0 # 23.0.1 # builds using 19.3.0 and 20.0.0 fail with py2app/pyinstaller, 21.21 seems to have fixed this
-prettytable==2.2.0 #2.1.0 # >1.0.0 fail to be packed, but a main.py monkey patch helps
+openpyxl==3.0.9 # 3.0.7
+keyring==23.2.1 # 23.1.0 # builds using 19.3.0 and 20.0.0 fail with py2app/pyinstaller, 21.21 seems to have fixed this
+prettytable==2.2.1 # 2.2.0 # >1.0.0 fail to be packed, but a main.py monkey patch helps
 # lxml== 4.6.3 # 4.6.2 # installed from source in .ci/install-osx.sh to make notarization happy

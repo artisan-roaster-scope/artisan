@@ -1354,7 +1354,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             columns = 15
             if self.devicetable is not None and self.devicetable.columnCount() == columns:
                 # rows have been already established
-                # save the current columnWidth to reset them afte table creation
+                # save the current columnWidth to reset them after table creation
                 self.aw.qmc.devicetablecolumnwidths = [self.devicetable.columnWidth(c) for c in range(self.devicetable.columnCount())]
 
             nddevices = len(self.aw.qmc.extradevices)
