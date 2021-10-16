@@ -28491,6 +28491,7 @@ class ApplicationWindow(QMainWindow):
                                 updateBatchCounter = False
                             updateBatchCounter = True
                     settings.endGroup()
+                self.clearExtraDeviceSettingsBackup() # on explicit settings load we remove the ExtraDeviceBackup to prevent later restoreExtraDeviceSettingsBackup()
             else:
                 settings = QSettings()
             if settings.contains("resetqsettings"):
