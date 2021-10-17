@@ -23381,7 +23381,8 @@ class ApplicationWindow(QMainWindow):
                 self.messagehist.append(f"{timez}{message}")
             self.messagelabel.setText(message)
             if repaint: # if repaint is executed in the main thread we receive "QWidget::repaint: Recursive repaint detected"
-                self.messagelabel.repaint()
+                with suppress_stdout_stderr():
+                    self.messagelabel.repaint()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         finally:
@@ -26506,6 +26507,7 @@ class ApplicationWindow(QMainWindow):
                 "extramarkers2"          : self.qmc.extramarkers2,
                 "extramarkersizes1"      : self.qmc.extramarkersizes1,
                 "extramarkersizes2"      : self.qmc.extramarkersizes2,
+                "etypes"                 : self.qmc.etypes
                 }
 
     def restoreExtradeviceSettings(self):
@@ -26534,6 +26536,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.extramarkers2        = self.org_extradevicesettings["extramarkers2"]
         self.qmc.extramarkersizes1    = self.org_extradevicesettings["extramarkersizes1"]
         self.qmc.extramarkersizes2    = self.org_extradevicesettings["extramarkersizes2"]
+        self.qmc.etypes               = self.org_extradevicesettings["etypes"]
         self.updateExtradeviceSettings()
 
     def updateExtradeviceSettings(self):
@@ -34820,6 +34823,8 @@ class ApplicationWindow(QMainWindow):
         if filename:
             aw.settingspath = filename
             aw.closeEventSettings(filename)
+            aw.clearExtraDeviceSettingsBackup() # after explicit saved settings we do not want those to be modified on RESET by a saved extra device settings backup
+            
             self.sendmessage(QApplication.translate("Message","Settings saved"))
             # update recentSettings menu
             settings = QSettings()
