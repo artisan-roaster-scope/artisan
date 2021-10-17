@@ -105,7 +105,7 @@ if pyqtversion < 6:
                              QSlider, QStackedWidget, # @Reimport @UnusedImport
                              QColorDialog, QFrame, QProgressDialog, # @Reimport @UnusedImport
                              QStyleFactory, QMenu, QLayout, QSystemTrayIcon) # @Reimport @UnusedImport
-    from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport @UnusedImport
+    from PyQt5.QtGui import (QImage, QImageReader, QWindow,  # @Reimport @UnusedImport
                                 QKeySequence, # @UnusedImport
                                 QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport @UnusedImport
                                 QRegularExpressionValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport @UnusedImport
@@ -124,8 +124,8 @@ else:
                              QSlider,  # @Reimport @UnresolvedImport
                              QColorDialog, QFrame, QProgressDialog, # @Reimport @UnresolvedImport
                              QStyleFactory, QMenu, QLayout, QSystemTrayIcon) # @Reimport @UnresolvedImport
-    from PyQt6.QtGui import (QAction, QImageReader, QWindow,  # @Reimport @UnresolvedImport # pylint: disable=import-error
-                                QKeySequence,  # @Reimport @UnresolvedImport
+    from PyQt6.QtGui import (QAction, QImage, QImageReader, QWindow,  # @Reimport @UnresolvedImport # pylint: disable=import-error
+                                QKeySequence, # @Reimport s@UnresolvedImport
                                 QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport @UnresolvedImport
                                 QRegularExpressionValidator,QDoubleValidator, QPainter ,QCursor)  # @Reimport @UnresolvedImport
     from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport @UnresolvedImport # pylint: disable=import-error
@@ -9475,6 +9475,16 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " placelogoimage() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
+    # Convert QImage to numpy array
+    def convertQImageToNumpyArray(self,img):
+        img = img.convertToFormat(QImage.Format.Format_RGBA8888)
+        width = img.width()
+        height = img.height()
+        imgsize = img.bits()
+        imgsize.setsize(img.byteCount())
+        arr = numpy.array(imgsize).reshape(height, width, int(32/8))
+        return arr
+
     #watermark image
     def logoloadfile(self,filename=None):
         try:
@@ -9482,12 +9492,18 @@ class tgraphcanvas(FigureCanvas):
                 filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Image File"),ext="*.png *.jpg")
             if len(filename) == 0:
                 return
-            from matplotlib.pyplot import imread
-            aw.qmc.logoimg = imread(filename)
-            aw.logofilename = filename
-            aw.sendmessage(QApplication.translate("Message","Loaded watermark image {0}").format(filename))
-            QTimer.singleShot(500, lambda : self.redraw(recomputeAllDeltas=False)) #some time needed before the redraw on artisan start with no profile loaded.  processevents() does not work here.
+            newImage = QImage()
+            if newImage.load(filename):
+                aw.qmc.logoimg = self.convertQImageToNumpyArray(newImage)
+                aw.logofilename = filename
+                aw.sendmessage(QApplication.translate("Message","Loaded watermark image {0}").format(filename))
+                QTimer.singleShot(500, lambda : self.redraw(recomputeAllDeltas=False)) #some time needed before the redraw on artisan start with no profile loaded.  processevents() does not work here.
+            else:
+                aw.sendmessage(QApplication.translate("Message","Unable to load watermark image {0}").format(filename))
+                _log.info("Unable to load watermark image %s", filename)
+                aw.logofilename = ""
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " logoloadfile() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             aw.logofilename = ""
@@ -20387,6 +20403,14 @@ class ApplicationWindow(QMainWindow):
                     smoothspikes = QApplication.translate("Label","On")
                 else:
                     smoothspikes = QApplication.translate("Label","Off")
+                if aw.qmc.optimalSmoothing:
+                    optimal= QApplication.translate("Label","On")
+                else:
+                    optimal = QApplication.translate("Label","Off")
+                if aw.qmc.polyfitRoRcalc:
+                    polyfit = QApplication.translate("Label","On")
+                else:
+                    polyfit = QApplication.translate("Label","Off")
 
                 # build a table of results
                 import prettytable  # @UnresolvedImport
@@ -20421,8 +20445,8 @@ class ApplicationWindow(QMainWindow):
                 tbl2.float_format = "5.2"
                 tbl2.add_row([QApplication.translate("Label","Curve Fit"), fitType, '', ''])
                 tbl2.add_row([QApplication.translate("Label","Samples Threshold"), aw.qmc.segmentsamplesthreshold, QApplication.translate("Label","Delta Threshold"), aw.qmc.segmentdeltathreshold])
-                tbl2.add_row([QApplication.translate("Label","Sample rate (secs)"), self.qmc.profile_sampling_interval, QApplication.translate("Label","Smooth Curves/Spikes"), str(int((aw.qmc.curvefilter-1)/2)) + "/" + str(smoothspikes) ])
-                tbl2.add_row([QApplication.translate("Label","Delta Span"), aw.qmc.deltaBTspan, QApplication.translate("Label","Delta Smoothing"), int((aw.qmc.deltaBTfilter-1)/2) ])
+                tbl2.add_row([QApplication.translate("Label","Sample rate (secs)"), self.qmc.profile_sampling_interval, QApplication.translate("Label","Smooth Curves/Spikes"), f'{str(int((aw.qmc.curvefilter-1)/2))}/{str(smoothspikes)}' ])
+                tbl2.add_row([QApplication.translate("Label","Delta Span/Smoothing"), f'{str(aw.qmc.deltaBTspan)}/{str(int((aw.qmc.deltaBTfilter-1)/2))}', QApplication.translate("Label","Polyfit/Optimal Smoothing"), f'{str(polyfit)}/{str(optimal)}'  ])
                 tbl2.add_row([QApplication.translate("Label","Fit RoRoR (C/min/min)"), fitRoR, QApplication.translate("Label","Actual RoR at FCs"), RoR_FCs_act])
                 segmentresultstr += "{}{}".format("\n", tbl2.get_string(border=False,header=False))
 
@@ -27450,6 +27474,25 @@ class ApplicationWindow(QMainWindow):
             missingEvents += "DROP "
         if len(missingEvents) == lenLabel:
             missingEvents += "None "
+            
+        # Are Special Events in order?
+        flag = 0
+        i = 1
+        while i < len(aw.qmc.specialevents):
+            if(aw.qmc.specialevents[i] < aw.qmc.specialevents[i - 1]):
+                flag = 1
+                break
+            i += 1
+        if flag:
+            speventsSorted = "Special Events: Out of order"
+        else:
+            speventsSorted = "Special Events: In sorted order"
+#        spevents = numpy.array(aw.qmc.specialevents)
+#        is_sorted = lambda spevents: numpy.all(spevents[:-1] <= spevents[1:])
+#        if is_sorted(spevents):
+#            speventsSorted = "Special Events: In sorted order"
+#        else:
+#            speventsSorted = "Special Events: Out of order"
 
         # Output string
         output = (
@@ -27457,7 +27500,7 @@ class ApplicationWindow(QMainWindow):
             f"\n  Title: {aw.qmc.title}"
             f"\n  Meter: {meter}"
             f"\n  Average decimals: {avgDecimal:.2f}"
-            f"\n  Total Samples {totalSamples}"
+            f"\n  Total Samples: {totalSamples}"
             f"\n  Duplicate Samples: {dups}"
             f"\n  Blank Samples: {blank}"
             f"\n  Skipped Samples: {skipped}  (more than {skipped_sample_time:.2f} secs)"
@@ -27465,9 +27508,11 @@ class ApplicationWindow(QMainWindow):
             f"\n  Shortest Sample Interval: {shortest_sample:.2f}"
             f"\n  Longest Sample Interval: {longest_sample:.2f}"
             f"\n  Average Sample Time: {avg_sample:.2f}"
-            f"\n  Profile Sampling Interval {profile_sampling_interval:.2f}"
+            f"\n  Profile Sampling Interval: {profile_sampling_interval:.2f}"
             f"\n  Aperiodic Samples Ratio: {aperiodicRatio:.2f}"
-            f"\n  {missingEvents}")
+            f"\n  {missingEvents}"
+            f"\n  {speventsSorted}"
+        )
         return output
 
     @staticmethod
