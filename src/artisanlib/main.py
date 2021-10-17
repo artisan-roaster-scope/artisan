@@ -9483,7 +9483,7 @@ class tgraphcanvas(FigureCanvas):
         height = img.height()
         imgsize = img.bits()
         imgsize.setsize(img.byteCount())
-        arr = numpy.array(imgsize).reshape(height, width, int(32/8))
+        arr = numpy.array(imgsize).reshape((height, width, int(32/8)))
         return arr
 
     #watermark image
