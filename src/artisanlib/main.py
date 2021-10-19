@@ -30,6 +30,25 @@ from artisanlib import __release_sponsor_domain__
 from artisanlib import __release_sponsor_url__
 
 
+## Profiling: use @profile annotations
+#import cProfile
+#import io
+#import pstats
+#def profile(func):
+#    def wrapper(*args, **kwargs):
+#        pr = cProfile.Profile()
+#        pr.enable()
+#        retval = func(*args, **kwargs)
+#        pr.disable()
+#        s = io.StringIO()
+#        sortby = pstats.SortKey.CUMULATIVE  # 'cumulative'
+#        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+#        ps.print_stats()
+#        print(s.getvalue())
+#        return retval
+#    return wrapper
+
+
 import os
 import sys  # @UnusedImport
 import ast
@@ -6573,7 +6592,7 @@ class tgraphcanvas(FigureCanvas):
                     a_mod = numpy.linspace(a[0],a[-1],len(a))
                 else:
                     a_mod = a_lin
-                b = numpy.interp(a_mod, a, b) # resample data in a to linear spaced time
+                b = numpy.interp(a_mod, a, b) # resample data to linear spaced time
             else:
                 a_mod = a
             # 3. filter spikes
@@ -6604,6 +6623,7 @@ class tgraphcanvas(FigureCanvas):
                             seq = b[max(0,i-window_len + 1):i+1]
                             # we need to surpress -1 drop out values from this
                             seq = list(filter(lambda item: item != -1,seq))
+                            
                             w = decay_weights[max(0,window_len-len(seq)):]  # preCond: len(decay_weights)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
                             if len(w) == 0:
                                 res.append(b[i]) # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
@@ -6924,18 +6944,107 @@ class tgraphcanvas(FigureCanvas):
             return 0
             
     @staticmethod
-    # with window size wsize=1 the RoR is computed over suceeding readings
+    # with window size wsize=1 the RoR is computed over suceeding readings; tx and temp assumed to be of type numpy.array
     def arrayRoR(tx, temp, wsize): # with wsize >=1
         res = (temp[wsize:] - temp[:-wsize]) / ((tx[wsize:] - tx[:-wsize])/60.)
         # length compensation done downstream, not necessary here!
         return res
+
+
+    # returns deltas and linearized timex;  both results can be None
+    # timex: the time array
+    # temp: the temperature array
+    # ds: the number of delta samples
+    # timex_lin: the linearized time array or None
+    # delta_symbolic_function: the symbolic function to be applied to the delta or None
+    # RTsname: the symbolic variable name of the delta
+    # deltaFilter: the deltaFilter setting
+    # roast_start_idx: the index of CHARGE
+    # roast_end_idx: the index of DROP
+    def computeDeltas(self, timex, temp, ds, optimalSmoothing, timex_lin, delta_symbolic_function, RTsname, deltaFilter, roast_start_idx, roast_end_idx):
+        if temp is not None:
+            with numpy.errstate(divide='ignore'):
+                lt = len(timex)
+                ntemp = numpy.array([0 if x is None else x for x in temp]) # ERROR None Type object not scriptable! t==None on ON
+                
+                if optimalSmoothing and self.polyfitRoRcalc:
+                    # optimal RoR computation using polynoms with out timeshift
+                    if ds % 2 == 0:
+                        dss = ds+1 # the savgol_filter expectes odd window length of >=1
+                    else:
+                        dss = ds
+                    if len(ntemp) > dss:
+                        try:
+                            # ntemp is not linearized yet:
+                            if timex_lin is None or len(timex_lin) != len(ntemp):
+                                timex_lin = numpy.linspace(timex[0],timex[-1],lt)
+                            lin = timex_lin
+                            ntemp_lin = numpy.interp(lin, timex, ntemp) # resample data in ntemp to linear spaced time
+                            dist = (lin[-1] - lin[0]) / (len(lin) - 1)
+                            from scipy.signal import savgol_filter # @Reimport
+                            z1 = savgol_filter(ntemp_lin, dss, 1, deriv=1, delta=dss)
+                            z1 = z1 * (60./dist) * dss
+                        except Exception: # pylint: disable=broad-except
+                            # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                            # https://github.com/numpy/numpy/issues/16744
+                            # original version just picking the corner values:
+                            z1 = self.arrayRoR(timex,ntemp,ds)
+                    else:
+                        # in this case we use the standard algo
+                        try:
+                            # variant using incremental polyfit RoR computation
+                            z1 = [self.polyRoR(timex,ntemp,ds,i) for i in range(len(ntemp))]
+                        except Exception: # pylint: disable=broad-except
+                            # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                            # https://github.com/numpy/numpy/issues/16744
+                            # original version just picking the corner values:
+                            z1 = self.arrayRoR(timex,ntemp,ds)
+                else:
+                    if self.polyfitRoRcalc:
+                        try:
+                            # variant using incremental polyfit RoR computation
+                            z1 = [self.polyRoR(timex,ntemp,ds,i) for i in range(len(ntemp))] # windows size ds needs to be at least 2
+                        except Exception: # pylint: disable=broad-except
+                            # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                            # https://github.com/numpy/numpy/issues/16744
+                            # original version just picking the corner values:
+                            z1 = self.arrayRoR(timex,ntemp,ds)
+                    else:
+                        z1 = self.arrayRoR(timex,ntemp,ds)
+            
+            ld1 = len(z1)
+            # make lists equal in length
+            if lt > ld1:
+                z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
+            # apply smybolic formula
+            if delta_symbolic_function is not None and len(delta_symbolic_function):
+                z1 = self.apply_symbolic_delta_formula(delta_symbolic_function,z1,timex,RTsname=RTsname)
+            # apply smoothing
+            if optimalSmoothing:
+                user_filter = deltaFilter
+            else:
+                user_filter = int(round(deltaFilter/2.))
+            delta1 = self.smooth_list(timex,z1,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
+            
+            # cut out the part after DROP and before CHARGE and remove values beyond the RoRlimit
+            delta1 = [
+                d if ((roast_start_idx <= i <= roast_end_idx) and (d is not None and (not aw.qmc.RoRlimitFlag or 
+                    max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit))))
+                else None
+                for i,d in enumerate(delta1)
+            ]
+            
+            if isinstance(delta1, (numpy.ndarray, numpy.generic)):
+                delta1 = delta1.tolist()
+            return delta1, timex_lin
+        return None, timex_lin
 
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
     # if t1 or t2 is not given (None), its RoR signal is not computed and None is returned instead
     # timex_lin: a linear spaced version of timex
     def recomputeDeltas(self,timex,CHARGEidx,DROPidx,t1,t2,optimalSmoothing=True,timex_lin=None,deltaETsamples=None,deltaBTsamples=None):
         try:
-            tx_roast = numpy.array(timex)
+            tx_roast = numpy.array(timex) # timex non-linearized as numpy array
             lt = len(tx_roast)
             if CHARGEidx > -1:
                 roast_start_idx = CHARGEidx
@@ -6958,159 +7067,28 @@ class tgraphcanvas(FigureCanvas):
                     timex_lin = numpy.array(timex_lin)
                 else:
                     timex_lin = None
-            if t1 is not None:
-                with numpy.errstate(divide='ignore'):
-                    nt1 = numpy.array([0 if x is None else x for x in t1]) # ERROR None Type object not scriptable! t==None on ON
-                    
-                    if optimalSmoothing and self.polyfitRoRcalc:
-                        # optimal RoR computation using polynoms with out timeshift
-                        if dsET % 2 == 0:
-                            dsETs = dsET+1 # the savgol_filter expectes odd window length of >=1
-                        else:
-                            dsETs = dsET
-                        if len(nt1) > dsETs:
-                            try:
-                                # nt1 is not linearized yet:
-                                if timex_lin is None or len(timex_lin) != len(nt1):
-                                    lin1 = numpy.linspace(timex[0],timex[-1],len(timex))
-                                else:
-                                    lin1 = timex_lin
-                                if lin1 is None:
-                                    nt1_lin = timex # we just run on the non-linear timex in this case
-                                else:
-                                    nt1_lin = numpy.interp(lin1, tx_roast, nt1) # resample data in nt1 to linear spaced time
-                                dist = (lin1[-1] - lin1[0]) / (len(lin1) - 1)
-                                from scipy.signal import savgol_filter # @Reimport
-                                z1 = savgol_filter(nt1_lin, dsETs, 1, deriv=1,delta=dsET)
-                                z1 = z1 * (60./dist) * dsETs
-                            except Exception: # pylint: disable=broad-except
-                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                # https://github.com/numpy/numpy/issues/16744
-                                # original version just picking the corner values:
-                                z1 = self.arrayRoR(tx_roast,nt1,dsET)
-                        else:
-                            # in this case we use the standard algo
-                            try:
-                                # variant using incremental polyfit RoR computation
-                                z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))]
-                            except Exception: # pylint: disable=broad-except
-                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                # https://github.com/numpy/numpy/issues/16744
-                                # original version just picking the corner values:
-                                z1 = self.arrayRoR(tx_roast,nt1,dsET)
-                    else:
-                        if self.polyfitRoRcalc:
-                            try:
-                                # variant using incremental polyfit RoR computation
-                                z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))] # windows size dsET needs to be at least 2
-                            except Exception: # pylint: disable=broad-except
-                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                # https://github.com/numpy/numpy/issues/16744
-                                # original version just picking the corner values:
-                                z1 = self.arrayRoR(tx_roast,nt1,dsET)
-                        else:
-                            z1 = self.arrayRoR(tx_roast,nt1,dsET)
-
-                ld1 = len(z1)
-                # make lists equal in length
-                if lt > ld1:
-                    z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
-                # apply smybolic formula
-                if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction):
-                    z1 = self.apply_symbolic_delta_formula(aw.qmc.DeltaETfunction,z1,timex,RTsname="R1")
-                # apply smoothing
-                if optimalSmoothing:
-                    user_filter = self.deltaETfilter
-                else:
-                    user_filter = int(round(self.deltaETfilter/2.))
-                delta1 = self.smooth_list(tx_roast,z1,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
-                delta1 = delta1[roast_start_idx:roast_end_idx]
-                # add None for parts before and after CHARGE/DROP
-                delta1 = numpy.concatenate(([None]*(roast_start_idx),delta1,[None]*(lt-roast_end_idx))) # ERROR: all input arrays must have the same number of dimensions
-                # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
-                if aw.qmc.RoRlimitFlag:
-                    # remove values beyond the RoRlimit
-                    delta1 = [d if d is not None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta1]
-                if isinstance(delta1, (numpy.ndarray, numpy.generic)):
-                    delta1 = delta1.tolist()
-            else:
-                delta1 = None
-            if t2 is not None:
-                with numpy.errstate(divide='ignore'):
-                    nt2 = numpy.array([0 if x is None else x for x in t2])
-                    if optimalSmoothing and self.polyfitRoRcalc:
-                        # optimal RoR computation using polynoms with out timeshift
-                        if dsBT % 2 == 0:
-                            dsBTs = dsBT+1 # the savgol_filter expectes odd window length
-                        else:
-                            dsBTs = dsBT
-                        if len(nt2) > dsBTs:
-                            try:
-                                # nt2 is not linearized yet:
-                                if timex_lin is None or len(timex_lin) != len(nt2):
-                                    lin2 = numpy.linspace(timex[0],timex[-1],len(timex))
-                                else:
-                                    lin2 = timex_lin
-                                if lin2 is None:
-                                    nt2_lin = timex # we just run on the non-linear timex in this case
-                                else:
-                                    nt2_lin = numpy.interp(lin2, tx_roast, nt2) # resample data in nt2 to linear spaced time
-                                dist = (lin2[-1] - lin2[0]) / (len(lin2) - 1)
-                                from scipy.signal import savgol_filter # @Reimport
-                                z2 = savgol_filter(nt2_lin, dsBTs, 1, deriv=1,delta=dsBTs)
-                                z2 = z2 * (60./dist) * dsBTs
-                            except Exception: # pylint: disable=broad-except
-                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                # https://github.com/numpy/numpy/issues/16744
-                                # original version just picking the corner values
-                                z2 = self.arrayRoR(tx_roast,nt2,dsBT)
-                        else:
-                            # in this case we use the standard algo
-                            try:
-                                z2 = [self.polyRoR(tx_roast,nt2,dsBT,i) for i in range(len(nt2))]
-                            except Exception: # pylint: disable=broad-except
-                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                # https://github.com/numpy/numpy/issues/16744
-                                # original version just picking the corner values
-                                z2 = self.arrayRoR(tx_roast,nt2,dsBT)
-                    else:
-                        if self.polyfitRoRcalc:
-                            try:
-                                # variant using incremental polyfit RoR computation
-                                z2 = [self.polyRoR(tx_roast,nt2,dsBT,i) for i in range(len(nt2))]
-                            except Exception: # pylint: disable=broad-except
-                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                # https://github.com/numpy/numpy/issues/16744
-                                # original version just picking the corner values
-                                z2 = self.arrayRoR(tx_roast,nt2,dsBT)
-                        else:
-                            z2 = self.arrayRoR(tx_roast,nt2,dsBT)
-
-                ld2 = len(z2)
-                
-                # make lists equal in length
-                if lt > ld2:
-                    z2 = numpy.append([z2[0] if ld2 else 0.]*(lt - ld2),z2)
-                # apply smybolic formula
-                if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
-                    z2 = self.apply_symbolic_delta_formula(aw.qmc.DeltaBTfunction,z2,timex,RTsname="R2")
-                # apply smoothing
-                if optimalSmoothing:
-                    user_filter = self.deltaBTfilter
-                else:
-                    user_filter = int(round(self.deltaBTfilter/2.))
-                delta2 = self.smooth_list(tx_roast,z2,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
-                delta2 = delta2[roast_start_idx:roast_end_idx]
-                # add None for parts before and after CHARGE/DROP
-                delta2 = numpy.concatenate(([None]*(roast_start_idx),delta2,[None]*(lt-roast_end_idx)))
-                # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
-                if aw.qmc.RoRlimitFlag:
-                    # remove values beyond the RoRlimit
-                    delta2 = [d if d is not None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta2]
-                if isinstance(delta2, (numpy.ndarray, numpy.generic)):
-                    delta2 = delta2.tolist()
-            else:
-                delta2 = None
+            delta1, timex_lin = self.computeDeltas(
+                    tx_roast,
+                    t1,
+                    dsET,
+                    optimalSmoothing,
+                    timex_lin,
+                    aw.qmc.DeltaETfunction,
+                    "R1",
+                    self.deltaETfilter,
+                    roast_start_idx,
+                    roast_end_idx)
+            delta2, _ = self.computeDeltas(
+                    tx_roast,
+                    t2,
+                    dsBT,
+                    optimalSmoothing,
+                    timex_lin,
+                    aw.qmc.DeltaBTfunction,
+                    "R2",
+                    self.deltaBTfilter,
+                    roast_start_idx,
+                    roast_end_idx)
 
             return delta1, delta2
         except Exception as e: # pylint: disable=broad-except
