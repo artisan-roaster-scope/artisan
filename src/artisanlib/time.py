@@ -17,6 +17,7 @@
 import time
 
 # higher resultion time signal (at least on Mac OS X)
+# base can change (eg. depending on the simulator mode)
 class ArtisanTime():
 
     __slots__ = ['clock','base']
@@ -27,6 +28,9 @@ class ArtisanTime():
     
     def setBase(self,b):
         self.base = b
+    
+    def getBase(self):
+        return self.base
 
     def setHMS(self,*_):
         self.start()
@@ -38,6 +42,6 @@ class ArtisanTime():
         return (time.perf_counter() - self.clock)*self.base
         
     def elapsedMilli(self):
-        return (time.perf_counter() - self.clock)
+        return (time.perf_counter() - self.clock)*self.base/1000.
 
     

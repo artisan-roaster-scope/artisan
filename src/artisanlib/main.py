@@ -15622,7 +15622,7 @@ class SampleThread(QThread):
             aw.lastdigitizedvalue = [None,None,None,None] # last digitized value per quantifier
             aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
     
-            interval = aw.qmc.delay/1000.
+            interval = aw.qmc.delay/aw.qmc.timeclock.getBase()
             next_time = None
             while True:
                 if aw.qmc.flagon:
@@ -30119,6 +30119,11 @@ class ApplicationWindow(QMainWindow):
                 self.stopWebLCDs()
                 self.WebLCDs = False
                 return False
+            return False
+        except ModuleNotFoundError:
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception: WebLCDs not supported by this build"))
+            self.stopWebLCDs()
+            self.WebLCDs = False
             return False
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
