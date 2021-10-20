@@ -1591,3 +1591,8 @@ class roastCompareDlg(ArtisanDialog):
             self.aw.qmc.timealign()
         self.enableButtons()
         self.aw.enableEditMenus()
+        # enable "green flag" menu:
+        try:
+            self.aw.ntb.enable_edit_curve_parameters()
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)

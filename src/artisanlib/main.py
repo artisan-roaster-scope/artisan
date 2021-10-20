@@ -10550,6 +10550,13 @@ class tgraphcanvas(FigureCanvas):
             #disable RESET button:
             aw.buttonRESET.setEnabled(False)
             aw.buttonRESET.setVisible(False)
+
+            # disable "green flag" menu:
+            try:
+                aw.ntb.disable_edit_curve_parameters()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+
             QApplication.processEvents()
             if aw.simulator:
                 aw.buttonONOFF.setStyleSheet(aw.pushbuttonstyles_simulator["ON"])
@@ -10617,6 +10624,13 @@ class tgraphcanvas(FigureCanvas):
             aw.buttonRESET.setEnabled(True)
             aw.buttonRESET.setVisible(True)
             aw.keyboardmoveflag = 0  #disable keyboard navigation
+            
+            # enable "green flag" menu:
+            try:
+                aw.ntb.enable_edit_curve_parameters()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+
             if aw.simulator:
                 aw.buttonONOFF.setStyleSheet(aw.pushbuttonstyles_simulator["OFF"])
             else:
@@ -37083,6 +37097,11 @@ class ApplicationWindow(QMainWindow):
                     filenames = aw.reportFiles()
                 if filenames and len(filenames) > 0:
                     self.deleteBackground()
+                    # disable "green flag" menu:
+                    try:
+                        aw.ntb.disable_edit_curve_parameters()
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
                     from artisanlib.comparator import roastCompareDlg
                     self.comparator = roastCompareDlg(self,self,foreground,background)
                     self.comparator.addProfiles(filenames)
