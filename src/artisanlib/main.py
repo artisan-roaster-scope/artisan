@@ -3949,7 +3949,7 @@ class tgraphcanvas(FigureCanvas):
                         sample_unfiltereddelta2.append(0.)
                         aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
 
-                    # limit displayed RoR (only before TP is recognized) # WHY?
+                    # limit displayed RoR #(only before TP is recognized) # WHY?
                     if aw.qmc.RoRlimitFlag: # not aw.qmc.TPalarmtimeindex and aw.qmc.RoRlimitFlag:
                         if not (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange1plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
                             rateofchange1plot = None
@@ -10505,17 +10505,18 @@ class tgraphcanvas(FigureCanvas):
 
     def OnMonitor(self):
         try:
-            self.startPhidgetManager()
-            # collect ambient data if any
-            if self.ambient_pressure_device or self.ambient_humidity_device or self.ambient_temperature_device:
-                self.ambiThread = QThread()
-                self.ambiWorker = AmbientWorker()
-                self.ambiWorker.moveToThread(self.ambiThread)
-                self.ambiThread.started.connect(self.ambiWorker.run)
-                self.ambiWorker.finished.connect(self.ambiThread.quit)
-                self.ambiWorker.finished.connect(self.ambiWorker.deleteLater)
-                self.ambiThread.finished.connect(self.ambiThread.deleteLater)
-                self.ambiThread.start()
+            if aw.simulator is None:
+                self.startPhidgetManager()
+                # collect ambient data if any
+                if self.ambient_pressure_device or self.ambient_humidity_device or self.ambient_temperature_device:
+                    self.ambiThread = QThread()
+                    self.ambiWorker = AmbientWorker()
+                    self.ambiWorker.moveToThread(self.ambiThread)
+                    self.ambiThread.started.connect(self.ambiWorker.run)
+                    self.ambiWorker.finished.connect(self.ambiThread.quit)
+                    self.ambiWorker.finished.connect(self.ambiWorker.deleteLater)
+                    self.ambiThread.finished.connect(self.ambiThread.deleteLater)
+                    self.ambiThread.start()
 
             self.generateNoneTempHints()
             self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
@@ -15549,7 +15550,7 @@ class SampleThread(QThread):
     @staticmethod
     def sample_extra_device(i):
         try:
-            if aw.simulator is None:
+            if aw.simulator is None or aw.qmc.extradevices[i] == 22: # the PID SV/DUTY we show from the computed readings
                 tx,t1,t2 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
             else:
                 tx = aw.qmc.timeclock.elapsedMilli()
@@ -16390,26 +16391,26 @@ class ApplicationWindow(QMainWindow):
         
         
         self.roastReportMenu = self.reportMenu.addMenu(QApplication.translate("Menu", "Roast"))
+        
+        self.roastReportPDFAction = QAction(QApplication.translate("Menu", "PDF..."), self)
+        self.roastReportPDFAction.triggered.connect(self.pdfReport)
+        self.roastReportMenu.addAction(self.roastReportPDFAction)
 
         self.htmlAction = QAction(QApplication.translate("Menu", "Web..."), self)
         self.htmlAction.triggered.connect(self.htmlReport)
         self.htmlAction.setShortcut("Ctrl+R")
         self.roastReportMenu.addAction(self.htmlAction)
         
-        self.roastReportPDFAction = QAction(QApplication.translate("Menu", "PDF..."), self)
-        self.roastReportPDFAction.triggered.connect(self.pdfReport)
-        self.roastReportMenu.addAction(self.roastReportPDFAction)
-        
 
         self.productionMenu = self.reportMenu.addMenu(QApplication.translate("Menu", "Batches"))
-        
-        self.productionWebAction = QAction(QApplication.translate("Menu", "Web..."), self)
-        self.productionWebAction.triggered.connect(self.productionHTMLReport)
-        self.productionMenu.addAction(self.productionWebAction)
         
         self.productionPDFAction = QAction(QApplication.translate("Menu", "PDF..."), self)
         self.productionPDFAction.triggered.connect(self.productionPDFReport)
         self.productionMenu.addAction(self.productionPDFAction)
+        
+        self.productionWebAction = QAction(QApplication.translate("Menu", "Web..."), self)
+        self.productionWebAction.triggered.connect(self.productionHTMLReport)
+        self.productionMenu.addAction(self.productionWebAction)
 
         self.productionCsvAction = QAction(QApplication.translate("Menu", "CSV..."), self)
         self.productionCsvAction.triggered.connect(self.productionCSVReport)
@@ -16420,14 +16421,14 @@ class ApplicationWindow(QMainWindow):
         self.productionMenu.addAction(self.productionExcelAction)
 
         self.rankingMenu = self.reportMenu.addMenu(QApplication.translate("Menu", "Ranking"))
-
-        self.rankingWebAction = QAction(QApplication.translate("Menu", "Web..."), self)
-        self.rankingWebAction.triggered.connect(self.rankingHTMLReport)
-        self.rankingMenu.addAction(self.rankingWebAction)
         
         self.rankingPDFAction = QAction(QApplication.translate("Menu", "PDF..."), self)
         self.rankingPDFAction.triggered.connect(self.rankingPDFReport)
         self.rankingMenu.addAction(self.rankingPDFAction)
+        
+        self.rankingWebAction = QAction(QApplication.translate("Menu", "Web..."), self)
+        self.rankingWebAction.triggered.connect(self.rankingHTMLReport)
+        self.rankingMenu.addAction(self.rankingWebAction)
 
         self.rankingCsvAction = QAction(QApplication.translate("Menu", "CSV..."), self)
         self.rankingCsvAction.triggered.connect(self.rankingCSVReport)

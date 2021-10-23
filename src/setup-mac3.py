@@ -16,7 +16,9 @@ Usage:
 #    g['MACOSX_DEPLOYMENT_TARGET'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
 #sysconfig.parse_makefile = my_parse_makefile
 
-import sys, os
+import sys
+import os
+import shutil
 import subprocess
 from setuptools import setup
 
@@ -90,7 +92,7 @@ DATA_FILES = [
     ("../translations", [r"translations/qtbase_pt_BR.qm"]), # from Qt 6.1
     ("../translations", [r"translations/qtbase_sv.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ("../translations", [r"translations/qtbase_zh_CN.qm"]), # from Qt 6.1
-    ("../Resources", [r"qt.conf"]),
+#    ("../Resources", [r"qt.conf"]), # uncomment in QT Framework variant
     ("../Resources", [r"artisanProfile.icns"]),
     ("../Resources", [r"artisanAlarms.icns"]),
     ("../Resources", [r"artisanPalettes.icns"]),
@@ -284,6 +286,24 @@ qt_plugin_files = [
     "libqmacstyle.dylib"
 ]
 
+
+# remove unused Qt frameworks libs (not in Qt_modules_frameworks)
+for subdir, dirs, files in os.walk("./Artisan.app/Contents/Frameworks"):
+    for dir in dirs:
+        if dir.startswith("Qt") and dir.endswith(".framework") and dir not in Qt_frameworks:
+            file_path = os.path.join(subdir, dir)
+            print(f"rm -rf {file_path}")
+            subprocess.check_call(f"rm -rf {file_path}",shell = True)
+
+
+# remove duplicate Qt plugins folder
+# (py2app v0.26.1 copes non-relocated PlugIns to the toplevel)
+try:
+    subprocess.check_call("rm -rf ./Artisan.app/Contents/plugins",shell = True)
+except:
+    pass
+
+
 for python_version in ["python3.8", "python3.9", "python3.10"]:
     rootdir = f"./Artisan.app/Contents/Resources/lib/{python_version}"
 
@@ -300,32 +320,43 @@ for python_version in ["python3.8", "python3.9", "python3.10"]:
             "PyQt5/uic", 
             "PyQt5/Qt5/translations",
             "PyQt5/Qt5/qml",
+            "PyQt5/Qt5/qsci",
+#            "PyQt5/Qt5/lib", # comment for the non-Framework variant
             "PyQt6/Qt",
             "PyQt6/bindings",
             "PyQt6/lupdate",
             "PyQt6/uic",
             "PyQt6/Qt6/translations",
             "PyQt6/Qt6/qml"
+            "PyQt6/Qt6/qsci",
+#            "PyQt6/Qt6/lib", # comment for the non-Framework variant
         ]:
         try:
             subprocess.check_call(f"rm -rf {rootdir}/{qt_dir}",shell = True)
-        except:
+        except Exception:
             pass
-    # remove unused PyQt libs (not in Qt_modules)
     for pyqt_dir in ["PyQt5", "PyQt6"]:
+        # remove unused PyQt libs (not in Qt_modules)
         for subdir, dirs, files in os.walk(f"{rootdir}/{pyqt_dir}"):
             for file in files:
+                if file.endswith('.pyi'):
+                    file_path = os.path.join(subdir, file)
+                    subprocess.check_call(f"rm -rf {file_path}",shell = True)
                 if file.endswith('.abi3.so') or file.endswith('.pyi'):
                     if file.split(".")[0] not in Qt_modules:
                         file_path = os.path.join(subdir, file)
                         subprocess.check_call(f"rm -rf {file_path}",shell = True)
+
+# uncomment for non-Framework variant
     # remove unused Qt frameworks libs (not in Qt_modules_frameworks)
     for qt_dir in ["PyQt5/Qt5/lib", "PyQt6/Qt6/lib"]:
-        for subdir, dirs, files in os.walk(f"{rootdir}/{qt_dir}"):
+        qt = f"{rootdir}/{qt_dir}"
+        for root, dirs, _ in os.walk(qt):
             for dir in dirs:
                 if dir.startswith("Qt") and dir.endswith(".framework") and dir not in Qt_frameworks:
-                    file_path = os.path.join(subdir, dir)
+                    file_path = os.path.join(qt, dir)
                     subprocess.check_call(f"rm -rf {file_path}",shell = True)
+
     # remove unused plugins
     for qt_dir in ["PyQt5/Qt5/plugins", "PyQt6/Qt6/plugins"]:
         for root, dirs, _ in os.walk(f"{rootdir}/{qt_dir}"):
@@ -338,6 +369,12 @@ for python_version in ["python3.8", "python3.9", "python3.10"]:
                             if not (file in qt_plugin_files):
                                 file_path = os.path.join(subdir, file)
                                 subprocess.check_call(f"rm -rf {file_path}",shell = True)
+# comment for non-Framework variant
+#        # move plugins directory from Resources/lib/python3.x/PyQtX/QtX/plugins to the root of the app
+#        try:
+#            shutil.move(f"{rootdir}/{qt_dir}", "./Artisan.app/Contents/PlugIns")
+#        except Exception:
+#            pass
 
 
 # remove duplicate mpl_data folder

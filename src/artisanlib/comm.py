@@ -578,8 +578,11 @@ class serialport():
         if (self.aw.qmc.device == 19 and not self.aw.pidcontrol.externalPIDControl()) or \
                 (self.aw.qmc.device == 53) or \
                 (self.aw.qmc.device == 29 and not self.aw.pidcontrol.externalPIDControl()):
-                # TC4, HOTTOP or MODBUS with Artisan Software PID
-            return self.aw.qmc.timeclock.elapsedMilli(), min(100,max(-100,self.aw.qmc.pid.getDuty())), self.aw.qmc.pid.target
+                # TC4 (19), HOTTOP (53) or MODBUS (29) with Artisan Software PID
+            duty = self.aw.qmc.pid.getDuty()
+            if duty is None:
+                duty = -1
+            return self.aw.qmc.timeclock.elapsedMilli(), min(100,max(-100,duty)), self.aw.qmc.pid.target
         if self.aw.pidcontrol.sv is not None:
             sv = self.aw.pidcontrol.sv
         else:
@@ -587,7 +590,10 @@ class serialport():
         if self.aw.qmc.device == 29: # external MODBUS PID
             duty = -1
         else:
-            duty = min(100,max(-100,self.aw.qmc.pid.getDuty()))
+            duty = self.aw.qmc.pid.getDuty()
+            if duty is None:
+                duty = -1
+            duty = min(100,max(-100,duty))
         return self.aw.qmc.timeclock.elapsedMilli(),duty,sv
 
     def DTAtemperature(self):
@@ -811,9 +817,7 @@ class serialport():
         
     def PHIDGET1045(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
-        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_1045)
-        if tx_async is not None:
-            tx = tx_async
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_1045)
         return tx,a,t
 
     def PHIDGET1048(self):
@@ -843,9 +847,7 @@ class serialport():
         
     def PHIDGET1051(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
-        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_1051)
-        if tx_async is not None:
-            tx = tx_async
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_1051)
         return tx,a,t
         
     def PHIDGET1011(self):
@@ -935,9 +937,7 @@ class serialport():
 
     def PHIDGET_TMP1100(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
-        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1100)
-        if tx_async is not None:
-            tx = tx_async
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1100)
         return tx,a,t
 
     def PHIDGET_TMP1200(self):
@@ -947,9 +947,7 @@ class serialport():
 
     def PHIDGET_TMP1200_2(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
-        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200,alternative_conf=True)
-        if tx_async is not None:
-            tx = tx_async
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200,alternative_conf=True)
         return tx,a,t
         
     def PHIDGET_HUB0000(self):
@@ -3990,6 +3988,10 @@ class serialport():
                     # we make this also accessible via its serial number + port
                     s = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort())
                     self.aw.ser.PhidgetAnalogOut[s] = self.aw.ser.PhidgetAnalogOut[None]
+            try:
+                self.aw.ser.PhidgetAnalogOut[s][channel].setEnabled(True) # the output on this device is always enabled
+            except Exception: # pylint: disable=broad-except
+                pass # the OUT1001/OUT1002 do not offer this API and are always enabled
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -4003,12 +4005,7 @@ class serialport():
             # set voltage output
             try:
                 if len(out) > channel and out[channel].getAttached():
-                    if value == 0:
-                        out[channel].setVoltage(0)
-                        out[channel].setEnabled(False)
-                    else:
-                        out[channel].setVoltage(value)
-                        out[channel].setEnabled(True)
+                    out[channel].setVoltage(value)
                     res = True
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
@@ -4041,7 +4038,10 @@ class serialport():
             for i in range(len(out)):
                 try:
                     if out[i].getAttached():
-                        out[i].setEnabled(False)
+                        try:
+                            out[i].setEnabled(False) # the output on this device is always enabled
+                        except Exception: # pylint: disable=broad-except
+                            pass # the OUT1001/OUT1002 do not offer this API and are always enabled
                         self.phidgetOUTdetached(out[i])
                     out[i].close()
                 except Exception as e: # pylint: disable=broad-except

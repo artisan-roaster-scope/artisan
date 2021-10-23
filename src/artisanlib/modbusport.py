@@ -439,7 +439,7 @@ class modbusport():
                             self.cacheReadings(code,slave,register,res.registers)
 
         except Exception as ex: # pylint: disable=broad-except
-            _log.exception(ex)
+            _log.debug(ex)
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -828,10 +828,6 @@ class modbusport():
     # if force the readings cache is ignored and fresh readings are requested
     def readSingleRegister(self,slave,register,code=3,force=False):
         _log.debug("readSingleRegister(%d,%d,%d,%s)", slave, register, code, force)
-#        import logging
-#        logging.basicConfig()
-#        log = logging.getLogger()
-#        log.setLevel(logging.DEBUG)
         if slave == 0:
             return None
         r = None

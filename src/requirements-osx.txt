@@ -12,7 +12,7 @@ py2app==0.23 # we stay on 0.23 due to our darkmode patch which needs to be redon
 #
 gevent==21.8.0 #21.1.2 # 1.5.0 is not compatible with Python 3.8
 gevent-websocket==0.10.1
-numpy==1.21.2 #1.21.1 # 1.16.2 fails on TravisCI; py2app fails with 1.16.5, 1.17.0-2
+numpy==1.21.3 # 1.21.2 # 1.16.2 fails on TravisCI; py2app fails with 1.16.5, 1.17.0-2
 scipy==1.7.1 #1.7.0  # depends on numpy thus we have to put it after numpy	
 matplotlib==3.4.3 # 3.4.2
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy

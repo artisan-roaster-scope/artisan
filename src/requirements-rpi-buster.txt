@@ -16,7 +16,7 @@ distro==1.6.0 #1.5.0
 #
 gevent==21.8.0 #21.1.2
 gevent-websocket==0.10.1
-numpy==1.21.2 #1.21.1
+numpy==1.21.3 # 1.21.2
 scipy==1.7.1 #1.7.0 # depends on numpy thus needs to be put after
 matplotlib==3.4.3 # 3.4.2 # 3.4.1  requires pyinstaller > 4.2 # 3.1.x requires Python 3.7, stretch comes with Python 3.5.3 only
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy

@@ -246,21 +246,21 @@ class AcaiaBLE():
         value = ((payload[3] & 0xff) << 24) + \
             ((payload[2] & 0xff) << 16) + ((payload[1] & 0xff) << 8) + (payload[0] & 0xff)
         
-        unit = payload[4]
+        div = payload[4]
 
-        if unit == 1:
+        if div == 1:
             value /= 10
-        elif unit == 2:
+        elif div == 2:
             value /= 100
-        elif unit == 3:
+        elif div == 3:
             value /= 1000
-        elif unit == 4:
+        elif div == 4:
             value /= 10000
         
         # convert received weight data to g
         if self.unit == 1: # kg
             value = value * 1000
-        elif self.unit == 5: # lbs
+        elif self.unit == 5: # oz
             value = value * 28.3495
         
         #stable = (payload[5] & 0x01) != 0x01
@@ -338,15 +338,17 @@ class AcaiaBLE():
                 
     def parseStatus(self,payload):
         _log.debug("parseStatus(_,_)")
+        
         # battery level (7 bits of first byte) + TIMER_START (1bit)
         if payload and len(payload) > 0:
-            self.battery = int(payload[0] & ~(1 << 7))
+            self.battery = int(payload[1] & ~(1 << 7))
             _log.debug("battery: %s%%", self.battery)
             #print("bat","{}%".format(self.battery))
         # unit (7 bits of second byte) + CD_START (1bit)
         if payload and len(payload) > 1:
-            self.unit = int(payload[1] & ~(1 << 7))
+            self.unit = int(payload[2] & 0x7F)
             _log.debug("unit: %s", self.unit)
+            
         # mode (7 bits of third byte) + tare (1bit)
         # sleep (4th byte), 0:off, 1:5sec, 2:10sec, 3:20sec, 4:30sec, 5:60sec
         # key disabled (5th byte), touch key setting 0: off , 1:On
