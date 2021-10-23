@@ -11663,11 +11663,6 @@ Fases LCDs</translation>
     </message>
     <message>
         <location filename="../artisanlib/cup_profile.py" line="86"/>
-        <source>deg/sec = {0}    deg/min = &lt;b&gt;{1}&lt;<byte value="x8"/>&gt;</source>
-        <translation type="obsolete">°/sec = {0}    °/min = &amp;lt;b&amp;gt;{1}&amp;lt;&amp;gt;</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/cup_profile.py" line="86"/>
         <source>Bars</source>
         <translation type="obsolete">Barras</translation>
     </message>

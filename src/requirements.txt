@@ -20,4 +20,5 @@ natsort==7.1.1 # 7.1.0
 xlrd==2.0.1 #1.2.0
 websocket-client==1.2.1 #1.1.0 # ATTENTION: API changed for all on_ methods that got a different argument on upgrade to v1.x from previous version (0.58.0)	
 PyYAML==6.0 # 5.4.1
-darkdetect==0.5.0 # 0.3.1 # detect if dark mode is active
+darkdetect==0.3.1 # detect if dark mode is active
+# darkdetect 0.4.0 and 0.5.0 fail in signed macOS builds as relative paths are not allowed in hardened runtimes PR#15
