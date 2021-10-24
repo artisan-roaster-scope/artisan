@@ -29,7 +29,6 @@ from artisanlib import __release_sponsor_name__
 from artisanlib import __release_sponsor_domain__
 from artisanlib import __release_sponsor_url__
 
-
 ## Profiling: use @profile annotations
 #import cProfile
 #import io
@@ -47,7 +46,6 @@ from artisanlib import __release_sponsor_url__
 #        print(s.getvalue())
 #        return retval
 #    return wrapper
-
 
 import os
 import sys  # @UnusedImport
@@ -3040,7 +3038,7 @@ class tgraphcanvas(FigureCanvas):
                                 start = 0
                             if len(self.eventmessage) != 0:
                                 self.eventmessage = f"{self.eventmessage} | "
-                            self.eventmessage = f"{self.eventmessage}{self.etypesf(self.specialeventstype[i])} = {self.eventsvalues(self.specialeventsvalue[i])}"                            
+                            self.eventmessage = f"{self.eventmessage}{self.etypesf(self.specialeventstype[i])} = {self.eventsvalues(self.specialeventsvalue[i])}"
                             if aw.qmc.renderEventsDescr and self.specialeventsStrings[i] and self.specialeventsStrings[i]!="":
                                 self.eventmessage = f"{self.eventmessage} ({self.specialeventsStrings[i].strip()[:aw.qmc.eventslabelschars]})"
                             self.eventmessage = f"{self.eventmessage} @ {stringfromseconds(self.timex[self.specialevents[i]] - start)} {aw.float2float(self.temp2[self.specialevents[i]],digits)}{aw.qmc.mode}"
@@ -8436,6 +8434,7 @@ class tgraphcanvas(FigureCanvas):
                         self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
                         E1_nonempty = E2_nonempty = E3_nonempty = E4_nonempty = False
                         E1_last = E2_last = E3_last = E4_last = 0  #not really necessary but guarantees that Ex_last is defined
+                        E1_CHARGE = E2_CHARGE = E3_CHARGE = E4_CHARGE = None # remember event value @CHARGE to add if not self.foregroundShowFullflag
                         event_pos_offset = self.eventpositionbars[0]
                         event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
                         #properties for the event annotations
@@ -8450,6 +8449,8 @@ class tgraphcanvas(FigureCanvas):
                                 tx = self.timex[self.specialevents[i]]
                                 if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
                                     if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                        if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
+                                            E1_CHARGE = pos # remember event value at CHARGE
                                         # don't draw event lines before CHARGE if foregroundShowFullflag is not set
                                         continue
                                     self.E1timex.append(tx)
@@ -8488,6 +8489,8 @@ class tgraphcanvas(FigureCanvas):
                                 elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
                                     tx = self.timex[self.specialevents[i]]
                                     if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                        if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
+                                            E2_CHARGE = pos # remember event value at CHARGE
                                         # don't draw event lines before CHARGE if foregroundShowFullflag is not set
                                         continue
                                     self.E2timex.append(tx)
@@ -8527,6 +8530,8 @@ class tgraphcanvas(FigureCanvas):
                                 elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
                                     tx = self.timex[self.specialevents[i]]
                                     if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                        if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
+                                            E3_CHARGE = pos # remember event value at CHARGE
                                         # don't draw event lines before CHARGE if foregroundShowFullflag is not set
                                         continue
                                     self.E3timex.append(tx)
@@ -8565,6 +8570,8 @@ class tgraphcanvas(FigureCanvas):
                                 elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
                                     tx = self.timex[self.specialevents[i]]
                                     if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                        if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
+                                            E4_CHARGE = pos # remember event value at CHARGE
                                         # don't draw event lines before CHARGE if foregroundShowFullflag is not set
                                         continue
                                     self.E4timex.append(tx)
@@ -8615,6 +8622,9 @@ class tgraphcanvas(FigureCanvas):
                                 self.E1values.append(pos) #repeat last event value
                             E1x = self.E1timex
                             E1y = self.E1values
+                            if E1_CHARGE is not None and len(E1y)>1 and E1y[0] != E1_CHARGE:
+                                E1x = [self.timex[self.timeindex[0]]] + E1x
+                                E1y = [E1_CHARGE] + E1y
                             ds = "steps-post"
                         else:
                             E1x = [None]
@@ -8644,6 +8654,9 @@ class tgraphcanvas(FigureCanvas):
                                 self.E2values.append(pos) #repeat last event value
                             E2x = self.E2timex
                             E2y = self.E2values
+                            if E2_CHARGE is not None and len(E2y)>1 and E2y[0] != E2_CHARGE:
+                                E2x = [self.timex[self.timeindex[0]]] + E2x
+                                E2y = [E2_CHARGE] + E2y
                             ds = "steps-post"
                         else:
                             E2x = [None]
@@ -8672,6 +8685,9 @@ class tgraphcanvas(FigureCanvas):
                                 self.E3values.append(pos) #repeat last event value
                             E3x = self.E3timex
                             E3y = self.E3values
+                            if E3_CHARGE is not None and len(E3y)>1 and E3y[0] != E3_CHARGE:
+                                E3x = [self.timex[self.timeindex[0]]] + E3x
+                                E3y = [E3_CHARGE] + E3y
                             ds = "steps-post"
                         else:
                             E3x = [None]
@@ -8692,7 +8708,8 @@ class tgraphcanvas(FigureCanvas):
                             pos = max(0,int(round((self.specialeventsvalue[E4_last]-1)*10)))
                             if not self.clampEvents: # in clamp mode we render also event values higher than 100:
                                 pos = (pos*event_pos_factor)+event_pos_offset
-                            if self.foregroundShowFullflag and (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E4_last]]):   #if cool exists and last event was earlier
+                            if self.foregroundShowFullflag and (self.timeindex[7] > 0 and 
+                                    aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E4_last]]):   #if cool exists and last event was earlier
                                 self.E4timex.append(self.timex[self.timeindex[7]]) #time of cool
                                 self.E4values.append(pos) #repeat last event value
                             elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E4_last]]):   #if drop exists and last event was earlier
@@ -8700,6 +8717,9 @@ class tgraphcanvas(FigureCanvas):
                                 self.E4values.append(pos) #repeat last event value
                             E4x = self.E4timex
                             E4y = self.E4values
+                            if E4_CHARGE is not None and len(E4y)>1 and E4y[0] != E4_CHARGE:
+                                E4x = [self.timex[self.timeindex[0]]] + E4x
+                                E4y = [E4_CHARGE] + E4y
                             ds = "steps-post"
                         else:
                             E4x = [None]
@@ -11217,8 +11237,8 @@ class tgraphcanvas(FigureCanvas):
                                     slidervalue = aw.slider3.value()
                                 elif slidernr == 3:
                                     slidervalue = aw.slider4.value()
-                                # only mark events that have not been marked before not to duplicate the event values
-                                if slidervalue != 0 and slidernr not in self.specialeventstype:
+                                # only mark events that are non-zero # and have not been marked before not to duplicate the event values
+                                if slidervalue != 0: #  and slidernr not in self.specialeventstype:
                                     value = aw.float2float((slidervalue + 10.0) / 10.0)
                                     # note that EventRecordAction avoids to generate events were type and value matches to the previously recorded one
                                     aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,takeLock=False,doupdategraphics=False)
