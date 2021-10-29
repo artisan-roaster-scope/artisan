@@ -5,41 +5,15 @@
    viewBox="0 0 21.993534 21.993534"
    id="svg1602"
    version="1.1"
-   sodipodi:docname="artisan-blue.svg"
-   inkscape:version="1.1 (c4e8f9e, 2021-05-24)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview2539"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     showgrid="false"
-     inkscape:zoom="21.459759"
-     inkscape:cx="12.488491"
-     inkscape:cy="10.997328"
-     inkscape:window-width="1233"
-     inkscape:window-height="812"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg1602" />
   <defs
      id="defs830" />
-  <rect
-     style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:#666666;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:4.81005;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
-     id="rect2661"
-     width="15.993176"
-     height="15.922567"
-     x="3.0001788"
-     y="3.0354834"
-     rx="4.5972843"
-     ry="4.9000149" />
+  <path
+     d="m 7.7641188,3.0011614 c 2.2779512,0.00887 4.5559022,-0.017741 6.8320792,0.014193 2.322304,0.1277355 4.328817,2.1803753 4.398007,4.5062274 0.0053,2.3577859 0.01952,4.7155722 -0.0071,7.0715832 -0.12951,2.322304 -2.185698,4.323494 -4.51155,4.392685 -2.35956,0.0053 -4.7191199,0.01952 -7.07868,-0.0071 C 5.0745752,18.851018 3.0698363,16.798378 3.0006461,14.470752 2.9935497,12.11474 2.9793569,9.7569543 3.0077426,7.3991685 3.1372523,5.0768646 5.1934403,3.0756738 7.5192923,3.0064837 l 0.1224132,-0.00532 z"
+     fill="var(--color-1, #2599c7)"
+     id="path1193"
+     style="fill:#4c97c3;fill-opacity:1;stroke-width:0.0133058" />
   <g
      id="g1596"
      transform="matrix(0.01951515,0,0,-0.01951515,1.0393088,20.926053)"

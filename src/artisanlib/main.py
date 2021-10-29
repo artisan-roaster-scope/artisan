@@ -498,6 +498,19 @@ app.setApplicationName(application_name)                                #needed 
 app.setOrganizationName(application_organization_name)                  #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationDomain(application_organization_domain)              #needed by QSettings() to store windows geometry in operating system
 
+# replace revision string with git hash when running from source
+if not appFrozen() and __revision__ == '0':
+    try:
+        import subprocess
+        uncommittedChanges = subprocess.run(['git','status', '--porcelain=v1'], capture_output=True).stdout  #number of uncommitted changes
+        if len(uncommittedChanges) > 0:
+            uc = '+'
+        else:
+            uc = ''
+        git_hash = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True).stdout.decode('ascii').strip()[:7]  #git hash
+        revision__ = f"{git_hash}{uc}"
+    except Exception: # pylint: disable=broad-except
+        pass
 
 # configure logging
 try:
@@ -4074,7 +4087,7 @@ class tgraphcanvas(FigureCanvas):
                     #output ET, BT, ETB, BTB to output program
                     if aw.ser.externaloutprogramFlag:
                         try:
-                            import subprocess
+                            import subprocess # @Reimport 
                             if aw.qmc.background:
                                 if aw.qmc.timeindex[0] != -1:
                                     j = aw.qmc.backgroundtime2index(tx - sample_timex[aw.qmc.timeindex[0]])
@@ -15766,6 +15779,7 @@ class ApplicationWindow(QMainWindow):
     updateSerialLogSignal = pyqtSignal()
     fireslideractionSignal = pyqtSignal(int)
     moveButtonSignal = pyqtSignal(str)
+    sendnotificationMessageSignal = pyqtSignal(str,str)
     
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
@@ -18156,11 +18170,12 @@ class ApplicationWindow(QMainWindow):
         self.updateSerialLogSignal.connect(self.updateSerialLog)
         self.fireslideractionSignal.connect(self.fireslideraction)
         self.moveButtonSignal.connect(self.moveKbutton)
+        self.sendnotificationMessageSignal.connect(self.sendNotificationMessage)
         
 #        # add a system tray icon
         self.tray_icon = QSystemTrayIcon(self)
-#        self.updateTrayIcon() # if no tray_icon is set notifications are still issued on macOS when run from source!
-#        self.tray_icon.show()
+        self.updateTrayIcon() # if no tray_icon is set notifications are still issued on macOS when run from source!
+        self.tray_icon.show() # if try_icon is not visible, notifications are not delivered
         
 # test menu and notification:
 #        menu = QMenu(self)
@@ -18180,19 +18195,36 @@ class ApplicationWindow(QMainWindow):
 
         QTimer.singleShot(0,lambda : _log.info("startup time: %.2f", libtime.process_time() - startup_time))
 
+    @pyqtSlot(str,str)
     def sendNotificationMessage(self,title,message):
         self.tray_icon.showMessage(title, message,
-            QSystemTrayIcon.NoIcon, # QSystemTrayIcon.Information,
-            30000
+#            QSystemTrayIcon.NoIcon, # NoIcon, Information, Warning, Critical
+            self.plusIcon()
+            # here one could also provide a custom QIcon, but this is not displayed in macOS
+#            10000
         )
-        
-    def updateTrayIcon(self):
+    
+    # returns the Artisan app icon as QIcon respecting darkmode
+    def plusIcon(self):
+        basedir = os.path.join(getResourcePath(),"Icons")
+        if sys.platform.startswith("darwin") and darkdetect.isDark():
+            p = os.path.join(basedir, "plus-connected.svg")
+        else:
+            p = os.path.join(basedir, "white_plus-connected.svg")
+        return QIcon(p)
+    
+    # returns the Artisan app icon as QIcon respecting darkmode
+    def artisanIcon(self):
         basedir = os.path.join(getResourcePath(),"Icons")
         if sys.platform.startswith("darwin") and darkdetect.isDark():
             p = os.path.join(basedir, "artisan-dark.svg")
         else:
-            p = os.path.join(basedir, "artisan-blue.svg")
-        self.tray_icon.setIcon(QIcon(p))
+            p = os.path.join(basedir, "artisan-blue-grey.svg")
+        return QIcon(p)
+        
+    def updateTrayIcon(self):
+        self.tray_icon.setIcon(self.artisanIcon())
+#        self.tray_icon.setIcon(self.plusIcon())
         self.tray_icon.setToolTip("Artisan Notifications")
     
     # cache curve visibilities on recording start to be able to revert to users settings after recording
@@ -21592,8 +21624,8 @@ class ApplicationWindow(QMainWindow):
                 
                 cmd_str = str(cmd)
 
-                # we add {BT}, {ET}, {time} substitutions for Serial/CallProgram/MODBUS/S7/WebSocket command actions
-                if action in [1,2,4,7,15,22]:
+                # we add {BT}, {ET}, {time} substitutions for Serial/CallProgram/MODBUS/S7/Artisan/WebSocket command actions
+                if action in [1,2,4,7,15,20,22]:
                     BT_subst = -1
                     ET_subst = -1
                     timex = 0
@@ -22560,6 +22592,23 @@ class ApplicationWindow(QMainWindow):
                                         self.sendmessageSignal.emit(message,True,None)
                                     except Exception as e: # pylint: disable=broad-except
                                         _log.exception(e)
+                            # notify(<t>[,<m>) with <t> the title of the notification and <m> an optional message
+                            elif cs.startswith('notify(') and cs.endswith(")"):
+                                try:
+                                    cs_split = cs[len('notify('):-1].split(',')
+                                    try:
+                                        title = str(eval(cs_split[0]))
+                                    except Exception: # pylint: disable=broad-except
+                                        title = str(cs_split[0])  
+                                    message = ""                                  
+                                    if len(cs_split) > 1:
+                                        try:
+                                            message = str(eval(cs_split[1]))
+                                        except Exception: # pylint: disable=broad-except
+                                            message = str(cs_split[1])
+                                    self.sendnotificationMessageSignal.emit(message, title)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
                             # setCanvasColor(<c>) with <c> the color in RGB-hex format like #ae12f7
                             elif cs.startswith("setCanvasColor(") and cs.endswith(")"):
                                 try:
@@ -23083,7 +23132,7 @@ class ApplicationWindow(QMainWindow):
             if platf in ['Darwin', 'Linux']:
                 command = ['bash', '-c', 'source ~/.bash_profile ~/.bash_login ~/.profile 2>/dev/null && env']
                 try:
-                    import subprocess
+                    import subprocess # @Reimport 
                     with subprocess.Popen(command, stdout = subprocess.PIPE) as proc:
                         for line in proc.stdout:
                             if isinstance(line, bytes):
@@ -23115,7 +23164,7 @@ class ApplicationWindow(QMainWindow):
         cmd_str_parts = self.re_split(cmd_str) # this preserves quoted strings ('this "is a" test' => ['this','is a','test'])
         if len(cmd_str_parts) > 0:
             try:
-                import subprocess
+                import subprocess # @Reimport
                 cmd = cmd_str_parts[0].strip()
                 qd = QDir(cmd)
                 current = QDir.current()
@@ -23302,7 +23351,10 @@ class ApplicationWindow(QMainWindow):
                 else:
                     # split on an octothorpe '#' that is not inside parentheses '()'
                     cmd = re.split(r"\#(?![^\(]*\))",self.extraeventsactionstrings[ee])[0].strip()
-                    cmd = cmd.format(*(tuple([actionvalue]*cmd.count("{}"))))
+                    try:
+                        cmd = cmd.format(*(tuple([actionvalue]*cmd.count("{}"))))
+                    except:
+                        pass
                     self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # remember the new value as the last value set for this event
                 self.block_quantification_sampling_ticks[etype] = self.sampling_ticks_to_block_quantifiction
