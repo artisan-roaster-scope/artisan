@@ -18157,16 +18157,17 @@ class ApplicationWindow(QMainWindow):
         self.fireslideractionSignal.connect(self.fireslideraction)
         self.moveButtonSignal.connect(self.moveKbutton)
         
-        # add a system tray icon
+#        # add a system tray icon
         self.tray_icon = QSystemTrayIcon(self)
-        self.updateTrayIcon()
-        self.tray_icon.show()
+#        self.updateTrayIcon() # if no tray_icon is set notifications are still issued on macOS when run from source!
+#        self.tray_icon.show()
         
 # test menu and notification:
 #        menu = QMenu(self)
 #        menu.addAction("Exit")
 #        self.tray_icon.setContextMenu(menu)
 #        self.sendNotificationMessage("test1",'test')
+        
 
         if sys.platform.startswith("darwin"):
             # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
@@ -23170,26 +23171,26 @@ class ApplicationWindow(QMainWindow):
     # n=0 : slider1; n=1 : slider2; n=2 : slider3; n=3 : slider4
     # updates corresponding eventslidervalues
     def moveslider(self,n,v,forceLCDupdate=False):
-        if self.eventslidermin[n] <= v <= self.eventslidermax[n]: #v >= 0 and v <= 100:
-            self.eventslidervalues[n] = v
-            # first update slider LCDs if needed
-            if n == 0 and (forceLCDupdate or self.slider1.value() != v):
-                self.updateSliderLCD(0,v)
-            elif n == 1 and (forceLCDupdate or self.slider2.value() != v):
-                self.updateSliderLCD(1,v)
-            elif n == 2 and (forceLCDupdate or self.slider3.value() != v):
-                self.updateSliderLCD(2,v)
-            elif n == 3 and (forceLCDupdate or self.slider4.value() != v):
-                self.updateSliderLCD(3,v)
-            # now move sliders to actual values if needed
-            if n == 0 and self.slider1.value() != v:
-                self.slider1.setValue(v)
-            elif n == 1 and self.slider2.value() != v:
-                self.slider2.setValue(v)
-            elif n == 2 and self.slider3.value() != v:
-                self.slider3.setValue(v)
-            elif n == 3 and self.slider4.value() != v:
-                self.slider4.setValue(v)
+        v = min(max(v,self.eventslidermin[n]),self.eventslidermax[n])
+        self.eventslidervalues[n] = v
+        # first update slider LCDs if needed
+        if n == 0 and (forceLCDupdate or self.slider1.value() != v):
+            self.updateSliderLCD(0,v)
+        elif n == 1 and (forceLCDupdate or self.slider2.value() != v):
+            self.updateSliderLCD(1,v)
+        elif n == 2 and (forceLCDupdate or self.slider3.value() != v):
+            self.updateSliderLCD(2,v)
+        elif n == 3 and (forceLCDupdate or self.slider4.value() != v):
+            self.updateSliderLCD(3,v)
+        # now move sliders to actual values if needed
+        if n == 0 and self.slider1.value() != v:
+            self.slider1.setValue(v)
+        elif n == 1 and self.slider2.value() != v:
+            self.slider2.setValue(v)
+        elif n == 2 and self.slider3.value() != v:
+            self.slider3.setValue(v)
+        elif n == 3 and self.slider4.value() != v:
+            self.slider4.setValue(v)
 
     def extraEventButtonStyle(self,tee,style="normal"):
         left_rounded_style = "border-top-left-radius:4px;border-bottom-left-radius:4px;"

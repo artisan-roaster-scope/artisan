@@ -209,6 +209,8 @@ class AcaiaBLE():
 
     def sendId(self,write):
         self.sendMessage(write,self.MSG_IDENTIFY,b'\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d')
+        # non-legacy id message
+        # self.sendMessage(write,self.MSG_IDENTIFY,b'\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x30\x31\x32\x33\x34')
 
     def sendEvent(self,write,payload):
         self.sendMessage(write,self.MSG_EVENT,bytes([len(payload)+1]) + payload)

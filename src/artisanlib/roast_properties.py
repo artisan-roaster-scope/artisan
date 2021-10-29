@@ -2657,6 +2657,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     le.setText("%g" % self.aw.float2floatWeightVolume(converted))
         self.calculated_density()
 #PLUS
+        self.populatePlusCoffeeBlendCombos() # update the plus stock popups to display the correct unit
         try:
             # weight unit changed, we update the selected blend in plus mode
             if self.plus_blends_combo.currentIndex() > 0:
