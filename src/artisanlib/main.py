@@ -508,7 +508,7 @@ if not appFrozen() and __revision__ == '0':
         else:
             uc = ''
         git_hash = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True).stdout.decode('ascii').strip()[:7]  #git hash
-        revision__ = f"{git_hash}{uc}"
+        __revision__ = f"{git_hash}{uc}"
     except Exception: # pylint: disable=broad-except
         pass
 
@@ -14290,13 +14290,6 @@ class tgraphcanvas(FigureCanvas):
                     midramp = self.temp2[self.timeindex[2]] - self.temp2[self.timeindex[1]]
                     finishramp = self.temp2[self.timeindex[6]] - self.temp2[self.timeindex[2]]
 
-                    ts1,_,_,_ = aw.ts(self.timeindex[0],self.timeindex[1])
-                    ts2,_,_,_ = aw.ts(self.timeindex[1],self.timeindex[2])
-                    ts3,_,_,_ = aw.ts(self.timeindex[2],self.timeindex[6])
-                    etbt1 = "%i"%(ts1)
-                    etbt2 = "%i"%(ts2)
-                    etbt3 = "%i"%(ts3)
-
                     min_bt,time_min_bt = self.findTPdes()
                     dryrampTP = self.temp2[self.timeindex[1]] - min_bt
                     dryphasetimeTP = self.timex[self.timeindex[1]] - time_min_bt
@@ -14317,12 +14310,12 @@ class tgraphcanvas(FigureCanvas):
                         finishroc = 0
 
                     margin = "&nbsp;&nbsp;&nbsp;"
-                    string1 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s %s %s</font>"%(self.palette["rect1"],
-                              margin,stringfromseconds(dryphasetime),margin, dryphaseP, margin,dryroc,margin,etbt1,margin)
-                    string2 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s %s %s</font>"%(self.palette["rect2"],
-                              margin,stringfromseconds(midphasetime),margin,midphaseP,margin,midroc,margin,etbt2,margin)
-                    string3 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s %s %s</font>"%(self.palette["rect3"],
-                              margin,stringfromseconds(finishphasetime),margin,finishphaseP,margin,finishroc,margin,etbt3,margin)
+                    string1 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s</font>"%(self.palette["rect1"],
+                              margin,stringfromseconds(dryphasetime),margin, dryphaseP, margin,dryroc,margin)
+                    string2 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s</font>"%(self.palette["rect2"],
+                              margin,stringfromseconds(midphasetime),margin,midphaseP,margin,midroc,margin)
+                    string3 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s</font>"%(self.palette["rect3"],
+                              margin,stringfromseconds(finishphasetime),margin,finishphaseP,margin,finishroc,margin)
                     aw.sendmessage(string1+string2+string3,append=False)
 
         except Exception as e: # pylint: disable=broad-except
@@ -27512,7 +27505,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.profile_meter = decodeLocal(profile["devices"][0])
             else:
                 self.qmc.profile_meter = "Unknown"
-            _log.debug(self.profilequality())
+            _log.debug(self.profileQuality(m,True))
             return True
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -27522,96 +27515,103 @@ class ApplicationWindow(QMainWindow):
             return False
 
     @staticmethod
-    def profilequality():
-        bt = numpy.array(aw.qmc.temp2)
-        tx = numpy.array(aw.qmc.timex)
-        profile_sampling_interval = aw.qmc.profile_sampling_interval
+    def profileQuality(profileMode='',checkDebugLevel=False):
+        # immediately return when not at debug log level
+        if checkDebugLevel and not debugLogLevelActive():
+            return ""
+        try:
+            if len(aw.qmc.timex) >0:
+                bt = numpy.array(aw.qmc.temp2)
+                tx = numpy.array(aw.qmc.timex)
+                profile_sampling_interval = aw.qmc.profile_sampling_interval
 
-        # Meter
-        # The meter is added to setProfile() as it was not previously read.  It useful here for trending.
-        #    The Meter device is written to the profile whenever it is saved, meaning that it can be changed
-        #     in the profile without warning and may not reflect the actual meter used to record the profile.
-        meter = aw.qmc.profile_meter
+                # Meter
+                # The meter is added to setProfile() as it was not previously read.  It useful here for trending.
+                #    The Meter device is written to the profile whenever it is saved, meaning that it can be changed
+                #     in the profile without warning and may not reflect the actual meter used to record the profile.
+                meter = aw.qmc.profile_meter
 
-        # Count the number of decimal places in a float
-        def ndec(num):
-            return len(re.sub(r'(?:[{0}]+$)', '', str(num)).split('.')[1])
+                # Count the number of decimal places in a float
+                def ndec(num):
+                    return len(re.sub(r'(?:[{0}]+$)', '', str(num)).split('.')[1])
 
-        # Total number of samples
-        totalSamples = len(aw.qmc.timex)
-        
-        # Calculate the average number of decimals in an array of floats
-        ndec_arr = numpy.array([ndec(x) for x in bt])
-        avgDecimal = numpy.average(ndec_arr)
+                # Total number of samples
+                totalSamples = len(aw.qmc.timex)
+                
+                # Calculate the average number of decimals in an array of floats
+                ndec_arr = numpy.array([ndec(x) for x in bt])
+                avgDecimal = numpy.average(ndec_arr)
+                str_modeChanged = ""
+                if profileMode in ['C','F'] and aw.qmc.mode != profileMode:
+                    str_modeChanged = "*Result not reliable, the temperature mode was changed"
 
-        # Count the number of consecutive duplicates
-        markdup = numpy.diff(bt).astype(bool)  # False (or 0) marks a duplicate
-        dups = numpy.count_nonzero(markdup==0)   # counts the 0s
-        blank = numpy.count_nonzero(bt==-1)  # counts missing values  
+                # Count the number of consecutive duplicates
+                markdup = numpy.diff(bt).astype(bool)  # False (or 0) marks a duplicate
+                dups = numpy.count_nonzero(markdup==0)   # counts the 0s
+                blank = numpy.count_nonzero(bt==-1)  # counts missing values  
 
-        # Count skipped samples (missing timex)
-        tx_diff = numpy.diff(tx)
-        avg_sample = numpy.average(tx_diff)
-        longest_sample = numpy.max(tx_diff)
-        shortest_sample = numpy.min(tx_diff)
-        skipped_sample_time = 1.5*avg_sample
-        skipped = numpy.count_nonzero(tx_diff > skipped_sample_time)
-        bins = [0, 1*profile_sampling_interval, 1.5*profile_sampling_interval, 4*profile_sampling_interval, 9999]
-        hist = numpy.histogram(tx_diff,bins=bins)
+                # Count skipped samples (missing timex)
+                tx_diff = numpy.diff(tx)
+                avg_sample = numpy.average(tx_diff)
+                longest_sample = numpy.max(tx_diff)
+                shortest_sample = numpy.min(tx_diff)
+                skipped_sample_time = 1.5*avg_sample
+                skipped = numpy.count_nonzero(tx_diff > skipped_sample_time)
+                bins = [0, 1*profile_sampling_interval, 1.5*profile_sampling_interval, 4*profile_sampling_interval, 9999]
+                hist = numpy.histogram(tx_diff,bins=bins)
 
-        # Aperiodic sample ratio
-        aperiodicRatio = avg_sample / profile_sampling_interval
-        
-        # Missing events
-        missingEvents = "Missing key events: "
-        lenLabel = len(missingEvents)
-        if aw.qmc.timeindex[0] == -1:
-            missingEvents += "CHARGE "
-        if aw.qmc.timeindex[2] == 0:
-            missingEvents += "FCs "
-        if aw.qmc.timeindex[6] == 0:
-            missingEvents += "DROP "
-        if len(missingEvents) == lenLabel:
-            missingEvents += "None "
-            
-        # Are Special Events in order?
-        flag = 0
-        i = 1
-        while i < len(aw.qmc.specialevents):
-            if(aw.qmc.specialevents[i] < aw.qmc.specialevents[i - 1]):
-                flag = 1
-                break
-            i += 1
-        if flag:
-            speventsSorted = "Special Events: Out of order"
-        else:
-            speventsSorted = "Special Events: In sorted order"
-#        spevents = numpy.array(aw.qmc.specialevents)
-#        is_sorted = lambda spevents: numpy.all(spevents[:-1] <= spevents[1:])
-#        if is_sorted(spevents):
-#            speventsSorted = "Special Events: In sorted order"
-#        else:
-#            speventsSorted = "Special Events: Out of order"
+                # Aperiodic sample ratio
+                aperiodicRatio = avg_sample / profile_sampling_interval
+                
+                # Missing events
+                missingEvents = "Missing key events: "
+                lenLabel = len(missingEvents)
+                if aw.qmc.timeindex[0] == -1:
+                    missingEvents += "CHARGE "
+                if aw.qmc.timeindex[2] == 0:
+                    missingEvents += "FCs "
+                if aw.qmc.timeindex[6] == 0:
+                    missingEvents += "DROP "
+                if len(missingEvents) == lenLabel:
+                    missingEvents += "None "
+                    
+                # Are Special Events in order?
+                flag = 0
+                i = 1
+                while i < len(aw.qmc.specialevents):
+                    if(aw.qmc.specialevents[i] < aw.qmc.specialevents[i - 1]):
+                        flag = 1
+                        break
+                    i += 1
+                if flag:
+                    speventsSorted = "Special Events: Out of order"
+                else:
+                    speventsSorted = "Special Events: In sorted order"
 
-        # Output string
-        output = (
-            f" Profile quality metrics"
-            f"\n  Title: {aw.qmc.title}"
-            f"\n  Meter: {meter}"
-            f"\n  Average decimals: {avgDecimal:.2f}"
-            f"\n  Total Samples: {totalSamples}"
-            f"\n  Duplicate Samples: {dups}"
-            f"\n  Blank Samples: {blank}"
-            f"\n  Skipped Samples: {skipped}  (more than {skipped_sample_time:.2f} secs)"
-            f"\n  Histogram of Sample Times: {hist[0]}  Bins: <1x, 1x-1.5x, 1.5x-4x, >4x Profile Sampling Interval"
-            f"\n  Shortest Sample Interval: {shortest_sample:.2f}"
-            f"\n  Longest Sample Interval: {longest_sample:.2f}"
-            f"\n  Average Sample Time: {avg_sample:.2f}"
-            f"\n  Profile Sampling Interval: {profile_sampling_interval:.2f}"
-            f"\n  Aperiodic Samples Ratio: {aperiodicRatio:.2f}"
-            f"\n  {missingEvents}"
-            f"\n  {speventsSorted}"
-        )
+                # Output string
+                output = (
+                    f"Profile quality metrics"
+                    f"\n  Title: {aw.qmc.title}"
+                    f"\n  Meter: {meter}"
+                    f"\n  Average decimals: {avgDecimal:.2f} {str_modeChanged}"
+                    f"\n  Total Samples: {totalSamples}"
+                    f"\n  Duplicate Samples: {dups}"
+                    f"\n  Blank Samples: {blank}"
+                    f"\n  Skipped Samples: {skipped}  (more than {skipped_sample_time:.2f} secs)"
+                    f"\n  Histogram of Sample Times: {hist[0]}  Bins: <1x, 1x-1.5x, 1.5x-4x, >4x Profile Sampling Interval"
+                    f"\n  Shortest Sample Interval: {shortest_sample:.2f}"
+                    f"\n  Longest Sample Interval: {longest_sample:.2f}"
+                    f"\n  Average Sample Time: {avg_sample:.2f}"
+                    f"\n  Profile Sampling Interval: {profile_sampling_interval:.2f}"
+                    f"\n  Aperiodic Samples Ratio: {aperiodicRatio:.2f}"
+                    f"\n  {missingEvents}"
+                    f"\n  {speventsSorted}"
+                )
+            else:
+                output = "Metrics not available: profile is zero length."
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+            output = "Metrics not available: exception"
         return output
 
     @staticmethod
