@@ -501,13 +501,13 @@ app.setOrganizationDomain(application_organization_domain)              #needed 
 # replace revision string with git hash when running from source
 if not appFrozen() and __revision__ == '0':
     try:
-        import subprocess
-        uncommittedChanges = subprocess.run(['git','status', '--porcelain=v1'], capture_output=True, check=True).stdout  #number of uncommitted changes
+        from subprocess import run as subprocessrun
+        uncommittedChanges = subprocessrun(['git','status', '--porcelain=v1'], capture_output=True, check=True).stdout  #number of uncommitted changes
         if len(uncommittedChanges) > 0:
             uc = '+'
         else:
             uc = ''
-        git_hash = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, check=True).stdout.decode('ascii').strip()[:7]  #git hash
+        git_hash = subprocessrun(['git', 'rev-parse', 'HEAD'], capture_output=True, check=True).stdout.decode('ascii').strip()[:7]  #git hash
         __revision__ = f"{git_hash}{uc}"
     except Exception: # pylint: disable=broad-except
         pass
@@ -2556,7 +2556,7 @@ class tgraphcanvas(FigureCanvas):
         if isinstance(self.ax.lines,list): # MPL < v3.5
             self.ax.lines = []
         else:
-            while self.ax.lines != []:
+            while len(self.ax.lines) > 0:
                 self.ax.lines[0].remove()
 
     # set current burner settings as defaults
@@ -4090,7 +4090,7 @@ class tgraphcanvas(FigureCanvas):
                     #output ET, BT, ETB, BTB to output program
                     if aw.ser.externaloutprogramFlag:
                         try:
-                            import subprocess # @Reimport 
+                            from subprocess import call as subprocesscall# @Reimport 
                             if aw.qmc.background:
                                 if aw.qmc.timeindex[0] != -1:
                                     j = aw.qmc.backgroundtime2index(tx - sample_timex[aw.qmc.timeindex[0]])
@@ -4101,7 +4101,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 ETB = -1
                                 BTB = -1
-                            subprocess.call([aw.ser.externaloutprogram,
+                            subprocesscall([aw.ser.externaloutprogram,
                                 '{0:.1f}'.format(sample_temp1[-1]),
                                 '{0:.1f}'.format(sample_temp2[-1]),
                                 '{0:.1f}'.format(ETB),
@@ -14163,13 +14163,16 @@ class tgraphcanvas(FigureCanvas):
             return
 
         self.setCursor(Qt.CursorShape.ClosedHandCursor)
-
-        if isinstance(event.ind, (int)):
-            self.indexpoint = event.ind
+        
+        if hasattr(event, 'ind'):
+            if isinstance(event.ind, (int)):
+                self.indexpoint = event.ind
+            else:
+                N = len(event.ind)
+                if not N: return
+                self.indexpoint = event.ind[0]
         else:
-            N = len(event.ind)
-            if not N: return
-            self.indexpoint = event.ind[0]
+            return
 
         self.mousepress = True
 
@@ -18199,7 +18202,8 @@ class ApplicationWindow(QMainWindow):
         )
     
     # returns the Artisan app icon as QIcon respecting darkmode
-    def plusIcon(self):
+    @staticmethod
+    def plusIcon():
         basedir = os.path.join(getResourcePath(),"Icons")
         if sys.platform.startswith("darwin") and darkdetect.isDark():
             p = os.path.join(basedir, "plus-connected.svg")
@@ -18208,7 +18212,8 @@ class ApplicationWindow(QMainWindow):
         return QIcon(p)
     
     # returns the Artisan app icon as QIcon respecting darkmode
-    def artisanIcon(self):
+    @staticmethod
+    def artisanIcon():
         basedir = os.path.join(getResourcePath(),"Icons")
         if sys.platform.startswith("darwin") and darkdetect.isDark():
             p = os.path.join(basedir, "artisan-dark.svg")
@@ -22591,13 +22596,13 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     cs_split = cs[len('notify('):-1].split(',')
                                     try:
-                                        title = str(eval(cs_split[0]))
+                                        title = str(eval(cs_split[0])) # pylint: disable=eval-used
                                     except Exception: # pylint: disable=broad-except
                                         title = str(cs_split[0])  
                                     message = ""                                  
                                     if len(cs_split) > 1:
                                         try:
-                                            message = str(eval(cs_split[1]))
+                                            message = str(eval(cs_split[1])) # pylint: disable=eval-used
                                         except Exception: # pylint: disable=broad-except
                                             message = str(cs_split[1])
                                     self.sendnotificationMessageSignal.emit(message, title)
@@ -23126,8 +23131,8 @@ class ApplicationWindow(QMainWindow):
             if platf in ['Darwin', 'Linux']:
                 command = ['bash', '-c', 'source ~/.bash_profile ~/.bash_login ~/.profile 2>/dev/null && env']
                 try:
-                    import subprocess # @Reimport 
-                    with subprocess.Popen(command, stdout = subprocess.PIPE) as proc:
+                    from subprocess import Popen as subprocessPopen, PIPE as subprocessPIPE # @Reimport 
+                    with subprocessPopen(command, stdout = subprocessPIPE) as proc:
                         for line in proc.stdout:
                             if isinstance(line, bytes):
                                 (k, _, value) = line.partition(b"=")
@@ -23347,7 +23352,7 @@ class ApplicationWindow(QMainWindow):
                     cmd = re.split(r"\#(?![^\(]*\))",self.extraeventsactionstrings[ee])[0].strip()
                     try:
                         cmd = cmd.format(*(tuple([actionvalue]*cmd.count("{}"))))
-                    except:
+                    except Exception: # pylint: disable=broad-except
                         pass
                     self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # remember the new value as the last value set for this event
