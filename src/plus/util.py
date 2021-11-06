@@ -315,6 +315,10 @@ def getLanguage() -> str:
 # Open Web Links
 
 
+def plusLink() -> str:
+    return f"{config.web_base_url}/{getLanguage()}/"
+
+
 def storeLink(plus_store) -> str:
     return f"{config.web_base_url}/{getLanguage()}/stores;id={plus_store}"
 
@@ -329,3 +333,7 @@ def blendLink(plus_blend) -> str:
 
 def roastLink(plus_roast) -> str:
     return f"{config.web_base_url}/{getLanguage()}/roasts;id={plus_roast}"
+
+
+def remindersLink() -> str:
+    return f"{config.web_base_url}/{getLanguage()}/reminders"

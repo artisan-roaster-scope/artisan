@@ -23,6 +23,8 @@
 import sys
 import platform
 import numpy
+import logging
+from typing import Final
 
 from artisanlib.util import (deltaLabelBigPrefix, deltaLabelPrefix, deltaLabelUTF8, 
                              stringtoseconds, stringfromseconds, toFloat)
@@ -47,6 +49,8 @@ except Exception:
                                  QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
                                  QTableWidget, QTableWidgetItem, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
 
+
+_log: Final = logging.getLogger(__name__)
 
 ########################################################################################
 #####################  PLOTTER DATA DLG  ###############################################
@@ -1140,6 +1144,12 @@ class CurvesDlg(ArtisanDialog):
         self.soundCheck.setChecked(self.aw.soundflag) 
         self.soundCheck.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.soundCheck.stateChanged.connect(self.soundset) #toggle
+        self.notifications = QCheckBox(QApplication.translate("CheckBox", "Notifications"))
+        self.notifications.setChecked(self.aw.notificationsflag) 
+        self.notifications.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        notifyLayout = QHBoxLayout()
+        notifyLayout.addWidget(self.notifications)
+        notifyLayout.addStretch()
         appLayout1 = QHBoxLayout()
         appLayout1.addLayout(pathEffectsLayout)
         appLayout1.addStretch()
@@ -1154,6 +1164,7 @@ class CurvesDlg(ArtisanDialog):
         appLayout = QVBoxLayout()
         appLayout.addLayout(appLayout1)
         appLayout.addLayout(appLayout2)
+        appLayout.addLayout(notifyLayout)
         appLayout.addStretch()
         appearanceGroupWidget = QGroupBox(QApplication.translate("GroupBox","Appearance"))
         appearanceGroupWidget.setLayout(appLayout)
@@ -2453,6 +2464,13 @@ class CurvesDlg(ArtisanDialog):
             self.aw.largeLCDs_dialog.reLayout()
         if self.aw.largeDeltaLCDs_dialog is not None:
             self.aw.largeDeltaLCDs_dialog.reLayout()
+        
+        self.aw.notificationsflag = self.notifications.isChecked()
+        if self.aw.notificationManager:
+            if self.aw.notificationsflag:
+                self.aw.notificationManager.showNotifications()
+            else:
+                self.aw.notificationManager.hideNotifications()
             
         self.aw.qmc.RoRlimitFlag = self.rorFilter.isChecked()
         self.aw.qmc.RoRlimitm = int(self.rorminLimit.value())

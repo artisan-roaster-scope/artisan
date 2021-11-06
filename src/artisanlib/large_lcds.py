@@ -355,7 +355,7 @@ class LargeMainLCDs(LargeLCDs):
     def updateValues(self, values1, values2, *args, **kwargs):
         super().updateValues(values1,values2,*args,**kwargs)
         if "time" in kwargs and kwargs["time"] is not None:
-            self.lcd0.display(**kwargs["time"])
+            self.lcd0.display(kwargs["time"])
     
     # create LCDs, LCD labels and LCD frames
     def makeLCDs(self):

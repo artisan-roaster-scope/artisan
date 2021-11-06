@@ -121,7 +121,7 @@ if pyqtversion < 6:
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnusedImport
                              QSlider, QStackedWidget, # @Reimport @UnusedImport
                              QColorDialog, QFrame, QProgressDialog, # @Reimport @UnusedImport
-                             QStyleFactory, QMenu, QLayout, QSystemTrayIcon) # @Reimport @UnusedImport
+                             QStyleFactory, QMenu, QLayout) # @Reimport @UnusedImport
     from PyQt5.QtGui import (QImage, QImageReader, QWindow,  # @Reimport @UnusedImport
                                 QKeySequence, # @UnusedImport
                                 QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport @UnusedImport
@@ -131,6 +131,7 @@ if pyqtversion < 6:
                               qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport @UnusedImport
                               QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnusedImport
     from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @UnusedImport # pylint: disable=unused-import
+    #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
     from PyQt5.QtWebEngineWidgets import QWebEngineView # @UnusedImport @UnusedImport # pylint: disable=unused-import
     from PyQt5 import sip # @UnusedImport
 else:
@@ -140,7 +141,7 @@ else:
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport
                              QSlider,  # @Reimport @UnresolvedImport
                              QColorDialog, QFrame, QProgressDialog, # @Reimport @UnresolvedImport
-                             QStyleFactory, QMenu, QLayout, QSystemTrayIcon) # @Reimport @UnresolvedImport
+                             QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport
     from PyQt6.QtGui import (QAction, QImage, QImageReader, QWindow,  # @Reimport @UnresolvedImport # pylint: disable=import-error
                                 QKeySequence, # @Reimport s@UnresolvedImport
                                 QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport @UnresolvedImport
@@ -150,6 +151,7 @@ else:
                               qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @Reimport @UnresolvedImport
                               QRegularExpression, QDate, QUrl, QDir, Qt, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnresolvedImport
     from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @Reimport @UnusedImport @UnresolvedImport # pylint: disable=import-error
+    #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
     from PyQt6.QtWebEngineWidgets import QWebEngineView # @Reimport  @UnusedImport @UnresolvedImport # pylint: disable=import-error
     from PyQt6 import sip # @Reimport @UnusedImport @UnresolvedImport # pylint: disable=import-error
 
@@ -217,10 +219,6 @@ from artisanlib.util import (appFrozen, stringp, uchr, decodeLocal, encodeLocal,
 from artisanlib.qtsingleapplication import QtSingleApplication
 
 
-from Phidget22.Phidget import Phidget as PhidgetDriver
-from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
-from Phidget22.Devices.Log import Log as PhidgetLog
-from Phidget22.LogLevel import LogLevel as PhidgetLogLevel
 from Phidget22.VoltageRange import VoltageRange
 
 try:
@@ -527,7 +525,8 @@ except Exception:
 
 _log: Final = logging.getLogger(__name__)
 _log.info(
-    "Artisan v%s (%s, %s)",
+    "%s v%s (%s, %s)",
+    ("ArtisanViewer" if app.artisanviewerMode else "Artisan"),
     str(__version__),
     str(__revision__),
     str(__build__),
@@ -599,6 +598,7 @@ from artisanlib.widgets import (MyQLCDNumber, MajorEventPushButton,
 
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
+from artisanlib.notifications import Notification, NotificationManager, NotificationType
 
 
 # import artisan.plus module
@@ -2746,6 +2746,7 @@ class tgraphcanvas(FigureCanvas):
             elif aw.qmc.ambientTemp == 0.0 and aw.qmc.device in [34,58]: # Phidget 1048 or TMP1101 channel 4 (use internal temp)
                 try:
                     if aw.ser.PhidgetTemperatureSensor is not None and aw.ser.PhidgetTemperatureSensor[0].getAttached():
+                        from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
                         ambient = PhidgetTemperatureSensor()
                         ambient.setDeviceSerialNumber(aw.ser.PhidgetTemperatureSensor[0].getDeviceSerialNumber())
                         if aw.qmc.device == 58:
@@ -10444,10 +10445,14 @@ class tgraphcanvas(FigureCanvas):
     
     @staticmethod
     def deviceLogDEBUG():
+        from Phidget22.Devices.Log import Log as PhidgetLog
+        from Phidget22.LogLevel import LogLevel as PhidgetLogLevel
         PhidgetLog.setLevel(PhidgetLogLevel.PHIDGET_LOG_VERBOSE)
     
     @staticmethod
     def deviceLLogINFO():
+        from Phidget22.Devices.Log import Log as PhidgetLog
+        from Phidget22.LogLevel import LogLevel as PhidgetLogLevel
         PhidgetLog.setLevel(PhidgetLogLevel.PHIDGET_LOG_INFO)
     
     # returns True if any device (main or extra) is a Phidget, ambient sensor or button/slider actions contain Phidget commands
@@ -10497,10 +10502,12 @@ class tgraphcanvas(FigureCanvas):
         _stderr = sys.stderr
         sys.stderr = object
         try:
-            if self.PhidgetsConfigured():
+            if not app.artisanviewerMode and self.PhidgetsConfigured():
                 # Phidget server is only started if any device or action addressing Phidgets is configured
                 if self.phidgetManager is None:
                     try:
+                        from Phidget22.Devices.Log import Log as PhidgetLog
+                        from Phidget22.LogLevel import LogLevel as PhidgetLogLevel
                         PhidgetLog.enable(PhidgetLogLevel.PHIDGET_LOG_DEBUG, self.device_log_file)
                         PhidgetLog.enableRotating()
                         _log.info("phidgetLog started")
@@ -10529,6 +10536,7 @@ class tgraphcanvas(FigureCanvas):
             self.phidgetManager = None
         self.removePhidgetServer()
         try:
+            from Phidget22.Devices.Log import Log as PhidgetLog
             PhidgetLog.disable()
         except Exception: # pylint: disable=broad-except
             pass
@@ -15776,7 +15784,7 @@ class ApplicationWindow(QMainWindow):
     updateSerialLogSignal = pyqtSignal()
     fireslideractionSignal = pyqtSignal(int)
     moveButtonSignal = pyqtSignal(str)
-    sendnotificationMessageSignal = pyqtSignal(str,str)
+    sendnotificationMessageSignal = pyqtSignal(str,str,NotificationType)
     
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
@@ -15840,7 +15848,7 @@ class ApplicationWindow(QMainWindow):
         self.plus_account = None # if set to a login string, Artisan plus features are enabled
         self.plus_remember_credentials = True # store plus account credentials in systems keychain
         self.plus_email = None # if self.plus_remember_credentials is ticked, we remember here the login to be pre-set as plus_account in the dialog
-        self.plus_language = "en" # one of ["en", "de", "it"] indicates the language setting of the plus_account used on the artisan.plus platform,
+        self.plus_language = "en" # one of ["en", "de", "it", ..] indicates the language setting of the plus_account used on the artisan.plus platform,
                 # used in links back to objects on the platform (see plus/util.py#storeLink() and similars)
         self.plus_subscription = None # one of [None, "HOME", "PRO"]
         self.plus_paidUntil = None # either None if unknown or otherwise a Date object with indicating the expiration date of the account
@@ -16029,6 +16037,8 @@ class ApplicationWindow(QMainWindow):
         self.pidcontrol = PIDcontrol(self)
 
         self.soundflag = 0
+        
+        self.notificationsflag = True # enable/disable notifications
 
         # recent roasts, an ordered list (first-in, first-out) of dictionaries holding partial roast-properties and a link to the background profile if any
         self.recentRoasts = []
@@ -18169,17 +18179,9 @@ class ApplicationWindow(QMainWindow):
         self.moveButtonSignal.connect(self.moveKbutton)
         self.sendnotificationMessageSignal.connect(self.sendNotificationMessage)
         
-#        # add a system tray icon
-        self.tray_icon = QSystemTrayIcon(self)
-        self.updateTrayIcon() # if no tray_icon is set notifications are still issued on macOS when run from source!
-        self.tray_icon.show() # if try_icon is not visible, notifications are not delivered
-        
-# test menu and notification:
-#        menu = QMenu(self)
-#        menu.addAction("Exit")
-#        self.tray_icon.setContextMenu(menu)
-#        self.sendNotificationMessage("test1",'test')
-        
+        self.notificationManager = None
+        if not app.artisanviewerMode:
+            self.notificationManager = NotificationManager()
 
         if sys.platform.startswith("darwin"):
             # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
@@ -18192,39 +18194,10 @@ class ApplicationWindow(QMainWindow):
 
         QTimer.singleShot(0,lambda : _log.info("startup time: %.2f", libtime.process_time() - startup_time))
 
-    @pyqtSlot(str,str)
-    def sendNotificationMessage(self,title,message):
-        self.tray_icon.showMessage(title, message,
-#            QSystemTrayIcon.NoIcon, # NoIcon, Information, Warning, Critical
-            self.plusIcon()
-            # here one could also provide a custom QIcon, but this is not displayed in macOS
-#            10000
-        )
-    
-    # returns the Artisan app icon as QIcon respecting darkmode
-    @staticmethod
-    def plusIcon():
-        basedir = os.path.join(getResourcePath(),"Icons")
-        if sys.platform.startswith("darwin") and darkdetect.isDark():
-            p = os.path.join(basedir, "plus-connected.svg")
-        else:
-            p = os.path.join(basedir, "white_plus-connected.svg")
-        return QIcon(p)
-    
-    # returns the Artisan app icon as QIcon respecting darkmode
-    @staticmethod
-    def artisanIcon():
-        basedir = os.path.join(getResourcePath(),"Icons")
-        if sys.platform.startswith("darwin") and darkdetect.isDark():
-            p = os.path.join(basedir, "artisan-dark.svg")
-        else:
-            p = os.path.join(basedir, "artisan-blue-grey.svg")
-        return QIcon(p)
-        
-    def updateTrayIcon(self):
-        self.tray_icon.setIcon(self.artisanIcon())
-#        self.tray_icon.setIcon(self.plusIcon())
-        self.tray_icon.setToolTip("Artisan Notifications")
+    @pyqtSlot(str,str,NotificationType)
+    def sendNotificationMessage(self, title, message, notification_type):
+        if self.notificationManager:
+            self.notificationManager.sendNotificationMessage(title.strip(), message.strip(), notification_type)
     
     # cache curve visibilities on recording start to be able to revert to users settings after recording
     def cacheCurveVisibilities(self):
@@ -19021,7 +18994,8 @@ class ApplicationWindow(QMainWindow):
         res = rr["title"] + " (" + "%g" % rr["weightIn"] +rr["weightUnit"]+")"
         return res
 
-    def newRecentRoast(self):
+    @pyqtSlot(bool)
+    def newRecentRoast(self, _checked:bool = False):
         action = self.sender()
         if action:
             modifiers = QApplication.keyboardModifiers()
@@ -19156,7 +19130,8 @@ class ApplicationWindow(QMainWindow):
     def populateMachineMenu(self):
         self.populateListMenu("Machines",".aset",self.openMachineSettings,self.machineMenu)
 
-    def openMachineSettings(self):
+    @pyqtSlot(bool)
+    def openMachineSettings(self, _checked:bool = False):
         action = self.sender()
         if action:
             label = (action.text() if action.data()[1] == "" else "{} {}".format(action.data()[1],action.text()))
@@ -19351,7 +19326,8 @@ class ApplicationWindow(QMainWindow):
         submenu.addAction(self.loadThemeAction)
         submenu.addAction(self.saveAsThemeAction)
 
-    def openThemeSettings(self):
+    @pyqtSlot(bool)
+    def openThemeSettings(self, _checked:bool = False):
         action = self.sender()
         if action:
             label = (action.text() if action.data()[1] == "" else "{} {}".format(action.data()[1],action.text()))
@@ -22605,7 +22581,20 @@ class ApplicationWindow(QMainWindow):
                                             message = str(eval(cs_split[1])) # pylint: disable=eval-used
                                         except Exception: # pylint: disable=broad-except
                                             message = str(cs_split[1])
-                                    self.sendnotificationMessageSignal.emit(message, title)
+                                    self.sendnotificationMessageSignal.emit(title, message, NotificationType.ARTISAN_USER)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # notifications(<bool>) enable/disable notifications
+                            if cs.startswith("notifications(") and cs.endswith(")"):
+                                try:
+                                    if aw.notificationManager:
+                                        value = cs[len("notifications("):-1]
+                                        if value.lower() in ("yes", "true", "t", "1"):
+                                            aw.notificationManager.enableNotifications()
+                                            aw.sendmessage(QApplication.translate("Message","Notifications on"))
+                                        else:
+                                            aw.notificationManager.disableNotifications()
+                                            aw.sendmessage(QApplication.translate("Message","Notifications off"))
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # setCanvasColor(<c>) with <c> the color in RGB-hex format like #ae12f7
@@ -24779,7 +24768,8 @@ class ApplicationWindow(QMainWindow):
         for j in range(numRecentFiles, self.MaxRecentFiles):
             self.recentFileActs[j].setVisible(False)
 
-    def openRecentFile(self):
+    @pyqtSlot(bool)
+    def openRecentFile(self, _checked:bool = False):
         action = self.sender()
         if action:
             filename = toString(action.data())
@@ -29582,6 +29572,32 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("Sound")
             self.soundflag = toInt(settings.value("Beep",self.soundflag))
             settings.endGroup()
+            settings.beginGroup("Notifications")
+            if self.notificationManager:
+                try:
+                    # reconstruct Notification objects from component lists
+                    titles = [toString(x) for x in toList(settings.value("titles", []))]
+                    messages = [toString(x) for x in toList(settings.value("messages", []))]
+                    types = [toInt(x) for x in toList(settings.value("types", []))]
+                    created = [toFloat(x) for x in toList(settings.value("created", []))]
+                    self.notificationManager.clearNotificationQueue()
+                    for i in range(len(titles)):
+                        n = Notification(
+                            titles[i],
+                            messages[i],
+                            NotificationType(types[i]),
+                            created[i])
+                        self.notificationManager.addNotificationItem(n)
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+            self.notificationsflag = toBool(settings.value("notificationsflag",self.notificationsflag))
+            if self.notificationManager:
+                if self.notificationsflag:
+                    self.notificationManager.showNotifications()
+                else:
+                    self.notificationManager.hideNotifications()
+            settings.endGroup()
+            
             #loads max-min temp limits of graph
             settings.beginGroup("Axis")
             if settings.contains("loadAxisFromProfile"):
@@ -30687,8 +30703,6 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("flavorstartangle",self.qmc.flavorstartangle)
             #save roast color system
             settings.setValue("colorsystem",self.qmc.color_system_idx)
-            #soundflag
-            settings.setValue("sound",self.soundflag)
             #watermark image
             settings.setValue("logofilename", self.logofilename)
             settings.setValue("logoimgalpha", self.logoimgalpha)
@@ -30987,6 +31001,26 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.beginGroup("Sound")
             settings.setValue("Beep",self.soundflag)
+            settings.endGroup()
+            settings.beginGroup("Notifications")
+            if self.notificationManager:
+                try:
+                    titles = []
+                    messages = []
+                    types = []
+                    created = []
+                    for n in self.notificationManager.getNotificationItems():
+                        titles.append(n.title)
+                        messages.append(n.message)
+                        types.append(n.type.value)
+                        created.append(n.created)
+                    settings.setValue("titles", titles)
+                    settings.setValue("messages", messages)
+                    settings.setValue("types", types)
+                    settings.setValue("created", created)
+                except Exception as e:
+                    _log.exception(e)
+            settings.setValue("notificationsflag",self.notificationsflag)
             settings.endGroup()
             settings.beginGroup("Axis")
             settings.setValue("loadAxisFromProfile",self.qmc.loadaxisfromprofile)
@@ -32626,7 +32660,7 @@ class ApplicationWindow(QMainWindow):
                         DEV_percent_count += 1
                     # -- recompute AUC with actual settings
                     try:
-                        AUCidx = max(0,aw.AUCstartidx(p["timeindex"],p["computed"]["TP_time"]))
+                        AUCidx = max(0,aw.AUCstartidx(p["timeindex"],p["computed"]["TP_idx"]))
                         if aw.qmc.AUCbaseFlag:
                             # we take the base temperature from the BT at st
                             rtbt = p["temp2"][AUCidx]
@@ -32884,7 +32918,7 @@ class ApplicationWindow(QMainWindow):
 
                 try:
                     # Create a roast phase visualization graph
-                    import matplotlib.pyplot as plt
+                    #import matplotlib.pyplot as plt
 
                     fig_height = 3.2       # in inches when there are 10 profiles, will be scaled for number of profiles
                     fig_width = 10         # in inches
@@ -32908,9 +32942,12 @@ class ApplicationWindow(QMainWindow):
                     prop.set_family(mpl.rcParams['font.family'])
 
                     # generate graph  ( not written to support MPL < v2.0 )
-                    fig = plt.figure(figsize=(fig_width, (fig_height * len(profiles)/10 + 0.2)))
+                    #fig = plt.figure(figsize=(fig_width, (fig_height * len(profiles)/10 + 0.2)))
+                    fig = Figure(figsize=(fig_width, (fig_height * len(profiles)/10 + 0.2)))
+                    
                     ax = fig.add_subplot(111, frameon=False)
-                    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+#                    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+                    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
 
                     # no grid or tick marks
                     ax.grid(False)
@@ -33023,6 +33060,7 @@ class ApplicationWindow(QMainWindow):
                     graph_image_pct = graph_image_pct + "?dummy=" + str(int(libtime.time()))
                     graph_image_pct = "<img alt='roast graph pct' style=\"width: 95%;\" src='" + graph_image_pct + "'>"
 
+#                    plt.close() # release memory
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                     _, _, exc_tb = sys.exc_info()
@@ -34137,7 +34175,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.l_AUCguide.set_visible(False)
 
     @staticmethod
-    def AUCstartidx( timeindex, TPindex):
+    def AUCstartidx(timeindex, TPindex):
         if aw.qmc.AUCbegin == 0 and timeindex[0] > -1: # start after CHARGE
             idx = timeindex[0]
         elif aw.qmc.AUCbegin == 1 and TPindex: # start ater TP
@@ -34384,6 +34422,7 @@ class ApplicationWindow(QMainWindow):
         name = (application_viewer_name if app.artisanviewerMode else application_name)
         otherlibs = ""
         try:
+            from Phidget22.Phidget import Phidget as PhidgetDriver
             phidgetlibversion = PhidgetDriver.getLibraryVersion()
             otherlibs += ", " + phidgetlibversion
         except Exception as e: # pylint: disable=broad-except
@@ -34871,7 +34910,8 @@ class ApplicationWindow(QMainWindow):
         for j in range(numRecentSettings, self.MaxRecentFiles):
             self.recentSettingActs[j].setVisible(False)
 
-    def openRecentSetting(self):
+    @pyqtSlot(bool)
+    def openRecentSetting(self, _checked:bool = False):
         action = self.sender()
         if action:
             fname = toString(action.data())
@@ -34939,7 +34979,8 @@ class ApplicationWindow(QMainWindow):
         for j in range(numRecentThemes, self.MaxRecentFiles):
             self.recentThemeActs[j].setVisible(False)
 
-    def openRecentTheme(self):
+    @pyqtSlot(bool)
+    def openRecentTheme(self, _checked:bool = False):
         action = self.sender()
         if action:
             fname = toString(action.data())

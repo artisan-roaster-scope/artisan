@@ -127,6 +127,7 @@ def content():
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','pidLookahead(<int>)'),QApplication.translate('HelpDlg','sets the PID lookahead')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','popup(<msg>[,<int>])'),QApplication.translate('HelpDlg','shows popup with message <msg> which optionally automatically closes after <int> seconds')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','message(<msg>)'),QApplication.translate('HelpDlg','shows message <msg> in the message line')])
+    tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','notifications(<bool>)'),QApplication.translate('HelpDlg','enables/disables notifications; while disabled issued notifications are ignored')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','notify(<title>,[<msg>])'),QApplication.translate('HelpDlg','sends notification with title <title> and optional message <msg>')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','setCanvasColor(<color>)'),QApplication.translate('HelpDlg','sets canvas color to the RGB-hex <color> like #27f1d3')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','resetCanvasColor'),QApplication.translate('HelpDlg','resets canvas color')])

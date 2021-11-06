@@ -55,8 +55,8 @@ def appFrozen():
             if getattr(sys, 'frozen', False):
                 # The application is frozen
                 ib = True
-    except Exception: # pylint: disable=broad-except
-        pass
+    except Exception as e: # pylint: disable=broad-except
+        _log.exception(e)
     return ib
 
 def decs2string(x):

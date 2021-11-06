@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="72pt"
+   height="72pt"
+   viewBox="0 0 25.400001 25.400001"
+   version="1.1"
+   id="svg8">
+  <defs
+     id="defs2">
+    <font-face
+       id="font-face4315"
+       font-weight="500"
+       descent="-211.91406"
+       ascent="905.27344"
+       cap-height="716.3086"
+       x-height="518.5547"
+       slope="0"
+       underline-thickness="73.242188"
+       underline-position="-105.95703"
+       units-per-em="1000"
+       panose-1="2 11 6 4 2 2 2 2 2 4"
+       font-size="52"
+       font-family="Arial"
+       stemv="0"
+       stemh="0"
+       accent-height="0"
+       ideographic="0"
+       alphabetic="0"
+       mathematical="0"
+       hanging="0"
+       v-ideographic="0"
+       v-alphabetic="0"
+       v-mathematical="0"
+       v-hanging="0"
+       strikethrough-position="0"
+       strikethrough-thickness="0"
+       overline-position="0"
+       overline-thickness="0">
+      <font-face-src>
+        <font-face-name
+           name="ArialMT" />
+      </font-face-src>
+    </font-face>
+  </defs>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-0.26754406)"
+     id="g4242">
+    <circle
+       id="circle4325"
+       r="12.636375"
+       cy="12.763623"
+       cx="12.967545"
+       style="fill:#2298c7;fill-opacity:1;stroke:none;stroke-width:0.55722821;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       id="path4327"
+       d="M 14.652378,11.078723 V 7.6092059 c 0,-0.875352 -0.709631,-1.584994 -1.585008,-1.584994 h -0.199683 c -0.875378,0 -1.585008,0.709642 -1.585008,1.584994 V 11.078723 H 7.8131537 c -0.8753835,0 -1.5850144,0.709626 -1.5850144,1.585041 v 0.199654 c 0,0.8754 0.7096309,1.585026 1.5850144,1.585026 h 3.4695253 v 3.469533 c 0,0.875399 0.70963,1.585041 1.585008,1.585041 h 0.199683 c 0.875377,0 1.585008,-0.709642 1.585008,-1.585041 v -3.469533 h 3.469542 c 0.87536,0 1.584991,-0.709626 1.584991,-1.585026 v -0.199654 c 0,-0.875415 -0.709631,-1.585041 -1.584991,-1.585041 z"
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.55722821;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+</svg>

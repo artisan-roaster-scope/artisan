@@ -815,9 +815,11 @@ class modbusport():
             if code in [1,2]:
                 if res is not None and res.bits[0]:
                     return 1
-                return 0 
+                return 0
             decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
             r = decoder.decode_16bit_uint()
+            _log.debug("  res.registers => %s", res.registers)
+            _log.debug("  decoder.decode_16bit_uint() => %s", r)
             return r
         return None
 
