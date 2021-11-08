@@ -28382,7 +28382,7 @@ class ApplicationWindow(QMainWindow):
                                 white_img = QPixmap(image.size())
                                 white_img.fill() # fills by default with Qt.GlobalColor.white
                                 painter = QPainter(white_img)
-                                painter.drawPixmap(0,0,image.width(),image.height(),self.image)
+                                painter.drawPixmap(0,0,image.width(),image.height(),image)
                                 image = white_img
                                 painter.end()
                                 del painter
