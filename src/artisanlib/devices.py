@@ -310,9 +310,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.asyncCheckBoxes1048.append(asyncFlag)
             asyncFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             asyncFlag.setChecked(True)
+            phidgetBox1048.addWidget(asyncFlag,2,i)
             asyncFlag.stateChanged.connect(self.asyncFlagStateChanged1048)
             asyncFlag.setChecked(self.aw.qmc.phidget1048_async[i-1])
-            phidgetBox1048.addWidget(asyncFlag,2,i)
             probeTypeCombo = QComboBox()
             probeTypeCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             model = probeTypeCombo.model()
@@ -397,11 +397,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         
         phidgetBox1045.addWidget(self.changeTriggerCombos1045,3,1)
         self.asyncCheckBoxe1045 = QCheckBox()
+        phidgetBox1045.addWidget(self.asyncCheckBoxe1045,2,1)
         self.asyncCheckBoxe1045.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.asyncCheckBoxe1045.setChecked(True)
         self.asyncCheckBoxe1045.stateChanged.connect(self.asyncFlagStateChanged1045)
         self.asyncCheckBoxe1045.setChecked(self.aw.qmc.phidget1045_async)
-        phidgetBox1045.addWidget(self.asyncCheckBoxe1045,2,1)
         asyncLabel = QLabel(QApplication.translate("Label","Async"))
         changeTriggerLabel = QLabel(QApplication.translate("Label","Change"))
         rateLabel = QLabel(QApplication.translate("Label","Rate")) 
@@ -878,11 +878,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         
 
             asyncFlag = QCheckBox()
+            self.asyncCheckBoxes.append(asyncFlag)
             asyncFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             asyncFlag.setChecked(True)
             asyncFlag.stateChanged.connect(self.asyncFlagStateChanged)
             asyncFlag.setChecked(self.aw.qmc.phidget1018_async[i-1])
-            self.asyncCheckBoxes.append(asyncFlag)
             phidgetBox1018.addWidget(asyncFlag,2,i)
 
             ratioFlag = QCheckBox()
