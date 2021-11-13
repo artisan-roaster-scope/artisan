@@ -27395,6 +27395,9 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.l_event_flags_pos_dict = {}
             if "legendloc_pos" in profile and self.qmc.loadaxisfromprofile:
                 try:
+                    # first set the profiles axis limits to have the transformations right
+                    self.qmc.ax.set_xlim(self.qmc.startofx, self.qmc.endofx)
+                    self.qmc.ax.set_ylim(self.qmc.ylimit_min, self.qmc.ylimit)
                     # if available we transform the custom legend position back from data into axis coordinates
                     legendloc_pos_data = numpy.array(profile["legendloc_pos"])
                     axis_to_data = self.qmc.ax.transAxes + self.qmc.ax.transData.inverted()
@@ -27402,8 +27405,8 @@ class ApplicationWindow(QMainWindow):
                     pos = data_to_axis.transform(legendloc_pos_data)
                     self.qmc.legendloc_pos = (pos[0],pos[1])
                     self.qmc.legend = None
-                except Exception: # pylint: disable=broad-except
-                    pass
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
 
 # we load external programs only from app settings
 #            if "externalprogram" in profile:
