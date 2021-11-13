@@ -10,6 +10,8 @@ from requests_file import FileAdapter  # @UnresolvedImport
 import re
 import json
 from lxml import html
+import logging
+from typing import Final
 
 try:
     #pylint: disable = E, W, R, C
@@ -19,6 +21,10 @@ except Exception:
     from PyQt5.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
+
+
+_log: Final = logging.getLogger(__name__)
+
 
 # returns a dict containing all profile information contained in the given RoastPATH document pointed by the given QUrl
 def extractProfileRoastPathHTML(url,_):
@@ -67,8 +73,8 @@ def extractProfileRoastPathHTML(url,_):
                         res["weight"] = [float(v),0,("Kg" if u.strip() == "kg" else "lb")]
                     elif m == "Organization":
                         res["organization"] = meta
-                except Exception: # pylint: disable=broad-except
-                    pass
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
         
         beans = ""
         for m in ["Nickname","Country","Region","Farm","Varietal","Process"]:
@@ -172,8 +178,8 @@ def extractProfileRoastPathHTML(url,_):
                             except Exception: # pylint: disable=broad-except
                                 specialeventsvalue.append(0)
                             specialeventsStrings.append(n["Note"])
-                        except Exception: # pylint: disable=broad-except
-                            pass
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
                 if len(specialevents) > 0:
                     res["specialevents"] = specialevents
                     res["specialeventstype"] = specialeventstype
@@ -276,9 +282,6 @@ def extractProfileRoastPathHTML(url,_):
                     res["extratemp1"].append([d["StandardValue"] for d in ror])
                     res["extratemp2"].append([-1]*len(timex))
 
-    except Exception: # pylint: disable=broad-except
-#        import traceback
-#        import sys
-#        traceback.print_exc(file=sys.stdout)
-        pass
+    except Exception as e: # pylint: disable=broad-except
+        _log.exception(e)
     return res

@@ -41,7 +41,7 @@ python3 -m pip install --upgrade pip
 # (an alternative could be to use pip install --user ..)
 # the lxml binaries are compiled with an SDK older than the 10.9 SDK which breaks the notarization
 # thus we force the compilation from source
-sudo -H python3 -m pip install --no-binary lxml lxml==4.6.3 # 4.6.2
+sudo -H python3 -m pip install --no-binary lxml lxml==4.6.4 # 4.6.3, 4.6.2
 sudo -H python3 -m pip install -r src/requirements.txt
 # use a custom py2app v0.23 with apptemplate main-x86_64 build for 
 # target 10.13 using MacOSX10.15.sdk build on macOS 10.15 to add dark-mode support to builds

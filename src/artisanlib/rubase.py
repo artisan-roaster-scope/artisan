@@ -6,6 +6,8 @@
 import os
 import io
 import csv
+import logging
+from typing import Final
 
 try:
     #pylint: disable = E, W, R, C
@@ -14,6 +16,8 @@ except:
     #pylint: disable = E, W, R, C
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
+
+_log: Final = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given Rubase CSV file
 def extractProfileRubaseCSV(file,aw):
@@ -143,8 +147,8 @@ def extractProfileRubaseCSV(file,aw):
                             specialeventsStrings.append("{}".format(float(item["Fan"])) + "%")
                     else:
                         fan_last = None
-                except Exception: # pylint: disable=broad-except
-                    pass
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
             if "Heater" in item:
                 try:
                     v = int(round(float(item["Heater"])))
@@ -170,8 +174,8 @@ def extractProfileRubaseCSV(file,aw):
                             specialeventsStrings.append("{}".format(float(item["Heater"])) + "%")
                     else:
                         heater_last = None
-                except Exception: # pylint: disable=broad-except
-                    pass
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
             i = i + 1
      
     # mark CHARGE

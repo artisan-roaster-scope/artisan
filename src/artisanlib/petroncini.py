@@ -6,6 +6,8 @@
 import io
 import csv
 import time as libtime
+import logging
+from typing import Final
 
 from artisanlib.util import fill_gaps, encodeLocal
 
@@ -17,6 +19,9 @@ except Exception:
     #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QDateTime, QDate, QTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+
+
+_log: Final = logging.getLogger(__name__)
 
 def replace_duplicates(data):
     lv = -1
@@ -128,8 +133,8 @@ def extractProfilePetronciniCSV(file,_):
                             specialeventsStrings.append(item["power"] + "%")
                     else:
                         power_last = None
-                except Exception:  # pylint: disable=broad-except
-                    pass
+                except Exception as e:  # pylint: disable=broad-except
+                    _log.exception(e)
             
     res["timex"] = timex
     res["temp1"] = replace_duplicates(temp1)

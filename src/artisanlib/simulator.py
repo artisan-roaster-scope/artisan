@@ -17,6 +17,11 @@
 # Marko Luther, 2020
 
 import numpy
+import logging
+from typing import Final
+
+
+_log: Final = logging.getLogger(__name__)
 
 class Simulator():
     def __init__(self, profile = None):
@@ -47,8 +52,8 @@ class Simulator():
             for i in range(len(self.extratimex)):
                 if len(self.extratimex[i]) > 0:
                     self.extratimex[i] = self.extratimex[i] - self.extratimex[i][0]
-        except Exception: # pylint: disable=broad-except
-            pass
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
     
     def read(self,tx):
         et = -1

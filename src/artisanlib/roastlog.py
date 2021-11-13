@@ -9,6 +9,8 @@ import requests
 from requests_file import FileAdapter  # @UnresolvedImport
 import re
 from lxml import html
+import logging
+from typing import Final
 
 try:
     #pylint: disable = E, W, R, C
@@ -19,6 +21,9 @@ except Exception:
 
 
 from artisanlib.util import encodeLocal, stringtoseconds
+
+
+_log: Final = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given RoastLog document pointed by the given QUrl
 def extractProfileRoastLog(url,_):
@@ -229,9 +234,6 @@ def extractProfileRoastLog(url,_):
                     res["specialeventstype"] = specialeventstype
                     res["specialeventsvalue"] = specialeventsvalue
                     res["specialeventsStrings"] = specialeventsStrings
-    except Exception: # pylint: disable=broad-except
-#        import traceback
-#        import sys
-#        traceback.print_exc(file=sys.stdout)
-        pass
+    except Exception as e: # pylint: disable=broad-except
+        _log.exception(e)
     return res

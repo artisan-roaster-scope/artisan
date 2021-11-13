@@ -18519,7 +18519,6 @@ class ApplicationWindow(QMainWindow):
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Type.ApplicationPaletteChange:  # called if the palette changed (switch between dark and light mode on macOS)
             self.updateCanvasColors()
-            self.updateTrayIcon()
             return True
         return super().eventFilter(obj, event)
 

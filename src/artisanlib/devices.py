@@ -307,11 +307,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.changeTriggerCombos1048.append(changeTriggersCombo)
             phidgetBox1048.addWidget(changeTriggersCombo,3,i)
             asyncFlag = QCheckBox()
+            self.asyncCheckBoxes1048.append(asyncFlag)
             asyncFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             asyncFlag.setChecked(True)
             asyncFlag.stateChanged.connect(self.asyncFlagStateChanged1048)
             asyncFlag.setChecked(self.aw.qmc.phidget1048_async[i-1])
-            self.asyncCheckBoxes1048.append(asyncFlag)
             phidgetBox1048.addWidget(asyncFlag,2,i)
             probeTypeCombo = QComboBox()
             probeTypeCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -1282,8 +1282,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             else:
                 # enable ChangeTrigger selection
                 self.changeTriggerCombos1048[i].setEnabled(True)
-        except Exception: # pylint: disable=broad-except
-            pass
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 
     @pyqtSlot(int)
     def asyncFlagStateChanged1045(self,x):
@@ -1322,8 +1322,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             else:
                 # enable ChangeTrigger and if that is 0 also DataRate selection
                 self.changeTriggerCombos[i].setEnabled(True)
-        except Exception: # pylint: disable=broad-except
-            pass
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 
     @staticmethod
     def createItems(strs):
@@ -1486,10 +1486,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         self.devicetable.setCellWidget(i,12,Delta2ComboBox)
                         self.devicetable.setCellWidget(i,13,Fill1SpinBox)
                         self.devicetable.setCellWidget(i,14,Fill2SpinBox)
-                    except Exception: # pylint: disable=broad-except
-#                        import traceback
-#                        traceback.print_exc(file=sys.stdout)
-                        pass
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
                 self.devicetable.resizeColumnsToContents()
                 self.devicetable.setColumnWidth(0,150)
                 header = self.devicetable.horizontalHeader()
@@ -2954,8 +2952,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             # restart PhidgetManager
             try:
                 self.aw.qmc.restartPhidgetManager()
-            except Exception: # pylint: disable=broad-except
-                pass
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 
             self.aw.qmc.redraw(recomputeAllDeltas=False)
             self.aw.sendmessage(message)

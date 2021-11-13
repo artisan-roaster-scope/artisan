@@ -18,6 +18,8 @@
 
 import sys
 import platform
+import logging
+from typing import Final
 
 from artisanlib.util import uchr
 from artisanlib.dialogs import ArtisanResizeablDialog, ArtisanDialog
@@ -39,6 +41,8 @@ except Exception:
                                  QPushButton, QSpinBox, QDoubleSpinBox, QWidget, QTabWidget, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGridLayout, QGroupBox, QTableWidget, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
 
+
+_log: Final = logging.getLogger(__name__)
 
 class EventsDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None, aw = None, activeTab = 0):
@@ -2604,8 +2608,8 @@ class EventsDlg(ArtisanResizeablDialog):
                 event_buttoncolor = self.extraeventbuttoncolor[selected_idx]
                 event_textcolor = self.extraeventbuttontextcolor[selected_idx]
                 event_label = self.extraeventslabels[selected_idx]
-            except Exception: # pylint: disable=broad-except
-                pass
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 
         if bindex >= 0:
             self.extraeventsdescriptions.insert(bindex,event_description)
@@ -3044,8 +3048,8 @@ class EventsDlg(ArtisanResizeablDialog):
             # restart PhidgetManager
             try:
                 self.aw.qmc.restartPhidgetManager()
-            except Exception: # pylint: disable=broad-except
-                pass
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
         except Exception as e: # pylint: disable=broad-except
             #import traceback
             #traceback.print_exc(file=sys.stdout)

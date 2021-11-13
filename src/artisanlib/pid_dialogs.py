@@ -18,6 +18,8 @@
 
 import sys
 import time as libtime
+import logging
+from typing import Final
 
 from artisanlib.util import stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanDialog
@@ -40,6 +42,8 @@ except Exception:
         QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QButtonGroup, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
         QTimeEdit, QLayout, QSizePolicy, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
 
+
+_log: Final = logging.getLogger(__name__)
 
 ############################################################################
 ######################## Artisan PID CONTROL DIALOG ########################
@@ -727,8 +731,8 @@ class PID_DlgControl(ArtisanDialog):
             self.setrampsoaks()
             self.aw.pidcontrol.rsfile = ""
             self.rsfile.setText(self.aw.pidcontrol.rsfile)
-        except Exception: # pylint: disable=broad-except
-            pass
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 
     def getRSnSVLabel(self,n):
         return self.RSnTab_LabelWidgets[n].text()
@@ -791,8 +795,7 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.qmc.rsfile = filename
             self.rsfile.setText(self.aw.qmc.rsfile)            
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " importrampsoaksJSON() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:

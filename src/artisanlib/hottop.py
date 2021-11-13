@@ -20,8 +20,12 @@ import multiprocessing as mp
 from multiprocessing.sharedctypes import Value
 from ctypes import c_bool, c_double
 import serial
+import logging
+from typing import Final
 
 import time
+
+_log: Final = logging.getLogger(__name__)
 
 process = None
 control = False # Hottop under control?
@@ -60,15 +64,15 @@ def openport(p):
     try:
         if not p.isOpen():
             p.open()
-    except Exception: # pylint: disable=broad-except
-        pass
+    except Exception as e: # pylint: disable=broad-except
+        _log.exception(e)
         
 def closeport(p):
     try:
         if p == None and p.isOpen():
             p.close()
-    except Exception: # pylint: disable=broad-except
-        pass
+    except Exception as e: # pylint: disable=broad-except
+        _log.exception(e)
         
 def gettemperatures(p,retry=True):
     BT = -1
@@ -113,8 +117,8 @@ def gettemperatures(p,retry=True):
                     DRUM_MOTOR = hex2int(r[17])
                     COOLING_MOTOR = hex2int(r[18])
                     CHAFF_TRAY = hex2int(r[19])
-    except Exception: # pylint: disable=broad-except
-        pass
+    except Exception as e: # pylint: disable=broad-except
+        _log.exception(e)
     return BT, ET, HEATER, FAN, MAIN_FAN, SOLENOID, DRUM_MOTOR, COOLING_MOTOR, CHAFF_TRAY
 
 def doWork(interval, comport, baudrate, bytesize, parity, stopbits, timeout,
@@ -191,11 +195,8 @@ def sendControl(p,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOT
             #p.flushOutput() # deprecated in v3
             p.reset_output_buffer()
             p.write(cmd) 
-    except Exception: # pylint: disable=broad-except
-#        import traceback
-#        import sys
-#        traceback.print_exc(file=sys.stdout)
-        pass
+    except Exception as e: # pylint: disable=broad-except
+        _log.exeption(e)
             
 # prefers set_value, and returns get_value if set_value is -1. If both are -1, returns 0
 def newValue(set_value,get_value):
@@ -305,7 +306,8 @@ def startHottop(interval=1,comport="COM4",baudrate=115200,bytesize=8,parity='N',
             xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xCONTROL))
         process.start()
         return True
-    except Exception: # pylint: disable=broad-except
+    except Exception as e: # pylint: disable=broad-except
+        _log.exception(e)
         return False
 
 def stopHottop():

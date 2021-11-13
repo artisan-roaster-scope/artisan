@@ -5,6 +5,8 @@
 
 import time as libtime
 import xlrd
+import logging
+from typing import Final
 
 try:
     #pylint: disable = E, W, R, C
@@ -16,6 +18,9 @@ except Exception:
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
+
+
+_log: Final = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given Cropster XLS file
 def extractProfileCropsterXLS(file,_):
@@ -946,10 +951,7 @@ def extractProfileCropsterXLS(file,_):
                         res["etypes"][0] = "Airflow"
                     if gas_event:
                         res["etypes"][3] = "Gas"
-        except Exception: # pylint: disable=broad-except
-#           import traceback
-#           import sys
-#           traceback.print_exc(file=sys.stdout)
-            pass
+        except Exception as e: # pylint: disable=broad-except
+            _log.debug(e)
     return res
                 

@@ -20,6 +20,10 @@
 
 import time
 import numpy
+import logging
+from typing import Final
+
+_log: Final = logging.getLogger(__name__)
 
 # expects a function control that takes a value from [<outMin>,<outMax>] to control the heater as called on each update()
 class PID():
@@ -160,11 +164,8 @@ class PID():
                         if self.lastOutput == None or int_output >= self.lastOutput + self.dutySteps or int_output <= self.lastOutput - self.dutySteps:
                             self.control(int_output)
                             self.lastOutput = output # kept to initialize Iterm on reactivating the PID   
-        except Exception: # pylint: disable=broad-except
-#            import sys
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-            pass
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
             
     # bring the PID to its initial state (to be called externally)
     def reset(self):

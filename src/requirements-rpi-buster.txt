@@ -28,7 +28,7 @@ cffi==1.14.4
 cryptography==3.4.7 #3.3.2
 keyring==23.2.1 # 23.1.0 #22.3.0 # versions beyond 23.0.1 require importlib_metadata >=v3.6 (RPi buster comes with v2.0)
 SecretStorage==3.3.0
-lxml==4.6.3
+lxml==4.6.4 #4.6.3
 prettytable==0.7.2 # >1.0.0 fail to be packed and the monkey patch in main.py does not help here due the old python version
 #
 # NOTES:

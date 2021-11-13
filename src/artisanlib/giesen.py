@@ -5,6 +5,8 @@
 
 import io
 import csv
+import logging
+from typing import Final
 
 try:
     #pylint: disable = E, W, R, C
@@ -14,6 +16,8 @@ except Exception:
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import fill_gaps
+
+_log: Final = logging.getLogger(__name__)
 
 def replace_duplicates(data):
     lv = -1
@@ -121,8 +125,8 @@ def extractProfileGiesenCSV(file,_):
                             specialeventsStrings.append(item["speed"] + "%")
                     else:
                         speed_last = None
-                except Exception: # pylint: disable=broad-except
-                    pass
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
             if "power" in item:
                 try:
                     v = float(item["power"])
@@ -148,8 +152,8 @@ def extractProfileGiesenCSV(file,_):
                             specialeventsStrings.append(item["power"] + "%")
                     else:
                         power_last = None
-                except Exception: # pylint: disable=broad-except
-                    pass
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
             
     res["timex"] = timex
     res["temp1"] = replace_duplicates(temp1)
