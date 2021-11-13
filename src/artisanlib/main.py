@@ -2363,7 +2363,7 @@ class tgraphcanvas(FigureCanvas):
         #Extras more info
         self.idx_met = None
         self.showmet = False
-        self.met_annotate = []
+        self.met_annotate = None
         self.met_timex_temp1_delta = None
         self.extendevents = True
         self.statssummary = False
@@ -2972,6 +2972,8 @@ class tgraphcanvas(FigureCanvas):
                         try:
                             for a in self.l_eteventannos:
                                 a.set_visible(not a.get_visible())
+                            if self.met_annotate != None:
+                                self.met_annotate.set_visible(not self.met_annotate.get_visible())
                         except Exception: # pylint: disable=broad-except
                             pass
                     if label==aw.BTname:
@@ -30409,7 +30411,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgrounddeltabtcolor = self.getColor(self.qmc.l_delta2B)
             x1 = x2 = 0
             for i in range(len(self.qmc.extradevices)):
-                if len(self.extraCurveVisibility1)>i and self.extraCurveVisibility1[i] is not None and len(self.qmc.extratemp1lines) > x1:
+                if len(self.extraCurveVisibility1)> i and self.extraCurveVisibility1[i] and len(self.qmc.extratemp1lines) > x1:
                     l1 = self.qmc.extratemp1lines[x1]
                     self.qmc.extralinestyles1[i] = l1.get_linestyle()
                     if self.qmc.extralinestyles1[i] == self.qmc.linestyle_default:
@@ -30425,7 +30427,7 @@ class ApplicationWindow(QMainWindow):
                     self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
                     self.qmc.extraname1[i] = l1.get_label()
                     x1 = x1 + 1
-                if len(self.extraCurveVisibility2)> i and self.extraCurveVisibility2[i] is not None and len(self.qmc.extratemp2lines) > x2:
+                if len(self.extraCurveVisibility2)> i and self.extraCurveVisibility2[i] and len(self.qmc.extratemp2lines) > x2:
                     l2 = self.qmc.extratemp2lines[x2]
                     self.qmc.extralinestyles2[i] = l2.get_linestyle()
                     if self.qmc.extralinestyles2[i] == self.qmc.linestyle_default:
