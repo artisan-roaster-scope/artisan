@@ -656,7 +656,7 @@ class tgraphcanvas(FigureCanvas):
     showExtraCurveSignal = pyqtSignal(int, str, bool)
     showEventsSignal = pyqtSignal(int, bool)
     showBackgroundEventsSignal = pyqtSignal(bool)
-    
+
     umlaute_dict : Final = {
        uchr(228): 'ae',  # U+00E4   \xc3\xa4
        uchr(246): 'oe',  # U+00F6   \xc3\xb6
