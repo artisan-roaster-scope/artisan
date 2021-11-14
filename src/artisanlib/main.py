@@ -2878,9 +2878,6 @@ class tgraphcanvas(FigureCanvas):
                             redraw = True
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-                # place and size the watermark image
-                if self.placelogoimage():
-                    redraw = True
                 try:
                     if redraw:
                         # Temporarily disconnect any callbacks to the draw event...
@@ -9136,6 +9133,9 @@ class tgraphcanvas(FigureCanvas):
                 # we create here the project line plots to have the accurate time axis after CHARGE
                 dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0
 
+                #watermark image
+                self.placelogoimage()
+
                 ############  ready to plot ############
 #                with warnings.catch_warnings():
 #                    warnings.simplefilter("ignore")
@@ -9449,13 +9449,13 @@ class tgraphcanvas(FigureCanvas):
 
         return eventanno
 
-    #watermark image, returns True when there is a valid watermark image to display
+    #watermark image
     def placelogoimage(self):
         if self.flagon and aw.logoimgflag:  #if hide during roast
-            return False
+            return
         try:
             if len(aw.logofilename) == 0 or self.logoimg is None:
-                return False
+                return
             img_height_pixels, img_width_pixels, _ = self.logoimg.shape
             img_aspect = img_height_pixels / img_width_pixels
             coord_axes_middle_Display = self.ax.transAxes.transform((.5,.5))
@@ -9483,12 +9483,11 @@ class tgraphcanvas(FigureCanvas):
                 except Exception: # pylint: disable=broad-except
                     pass
             self.ai = self.ax.imshow(self.logoimg, zorder=0, extent=extent, alpha=aw.logoimgalpha/10, aspect='auto', resample=False)
-            return True
+
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " placelogoimage() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-            return False
 
     # Convert QImage to numpy array
     @staticmethod
@@ -9513,7 +9512,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.logoimg = self.convertQImageToNumpyArray(newImage)
                 aw.logofilename = filename
                 aw.sendmessage(QApplication.translate("Message","Loaded watermark image {0}").format(filename))
-                self.redraw(recomputeAllDeltas=False)
+                QTimer.singleShot(500, lambda : self.redraw(recomputeAllDeltas=False)) #some time needed before the redraw on artisan start with no profile loaded.  processevents() does not work here.
             else:
                 aw.sendmessage(QApplication.translate("Message","Unable to load watermark image {0}").format(filename))
                 _log.info("Unable to load watermark image %s", filename)
@@ -36062,6 +36061,9 @@ class ApplicationWindow(QMainWindow):
                 else:
                     res_x = int(x*fig_dpi)
                     res_y = int(y*fig_dpi)
+                if len(aw.logofilename) > 0 or self.qmc.logoimg is not None:
+                    self.qmc.redraw()
+                    self.qmc.placelogoimage()
                 self.qmc.fig.savefig(filename,
                         dpi=fig_dpi,
                         backend="agg",
