@@ -26811,26 +26811,30 @@ class ApplicationWindow(QMainWindow):
         try:
             filename = self.getExtraDeviceSettingsPath()
             if os.path.isfile(filename):
-                settings = QSettings(filename, QSettings.Format.IniFormat)
-                settings.beginGroup("ExtraDev")
-                self.getExtraDeviceSettings(settings)
-                settings.endGroup()
-                
-                settings.beginGroup("CurveStyles")
-                self.getExtraDeviceCurveStyles(settings)
-                settings.endGroup()
-                
-                # ensure that extra list length are of the size of the extradevices:
-                self.ensureCorrectExtraDeviceListLenght()
-                self.updateExtradeviceSettings()
-                
-                settings.beginGroup("ExtraComm")
-                self.getExtraDeviceCommSettings(settings)
-                settings.endGroup()
-                
-                settings.beginGroup("events")
-                self.qmc.etypes = toStringList(settings.value("etypes",self.qmc.etypes))
-                settings.endGroup()
+                modifiers = QApplication.keyboardModifiers()
+                control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple key on macOS, Control key on Windows
+                alt_modifier = modifiers == Qt.KeyboardModifier.AltModifier # OPTION on macOS, ALT on Windows
+                if not control_modifier:
+                    settings = QSettings(filename, QSettings.Format.IniFormat)
+                    settings.beginGroup("ExtraDev")
+                    self.getExtraDeviceSettings(settings)
+                    settings.endGroup()
+                    
+                    settings.beginGroup("CurveStyles")
+                    self.getExtraDeviceCurveStyles(settings)
+                    settings.endGroup()
+                    
+                    # ensure that extra list length are of the size of the extradevices:
+                    self.ensureCorrectExtraDeviceListLenght()
+                    self.updateExtradeviceSettings()
+                    
+                    settings.beginGroup("ExtraComm")
+                    self.getExtraDeviceCommSettings(settings)
+                    settings.endGroup()
+                    
+                    settings.beginGroup("events")
+                    self.qmc.etypes = toStringList(settings.value("etypes",self.qmc.etypes))
+                    settings.endGroup()
                 # now remove the settings file
                 os.unlink(filename)
         except Exception as e: # pylint: disable=broad-except
@@ -26865,7 +26869,13 @@ class ApplicationWindow(QMainWindow):
 
 # we don't ask the user to adjust or not the extra device setup. Instead, now we backup the current settings via createExtraDeviceSettingsBackup() always and reset back to the original state
 # on reset, thus we default to StandardButton.Yes instead of asking in the dialog:
+
                         reply = QMessageBox.StandardButton.Yes
+                        modifiers = QApplication.keyboardModifiers()
+                        control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple key on macOS, Control key on Windows
+                        alt_modifier = modifiers == Qt.KeyboardModifier.AltModifier # OPTION on macOS, ALT on Windows
+                        if control_modifier:
+                            reply = QMessageBox.StandardButton.No
                         
 #                        string = QApplication.translate("Message","To fully load this profile the extra device configuration needs to be modified.\n\nOverwrite your extra device definitions using the values from the profile?\n\nIt is advisable to save your current settings beforehand via menu Help >> Save Settings.")
 #                        if quiet:
