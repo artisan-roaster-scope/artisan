@@ -26815,7 +26815,6 @@ class ApplicationWindow(QMainWindow):
             if os.path.isfile(filename):
                 modifiers = QApplication.keyboardModifiers()
                 control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple key on macOS, Control key on Windows
-                alt_modifier = modifiers == Qt.KeyboardModifier.AltModifier # OPTION on macOS, ALT on Windows
                 if not control_modifier:
                     settings = QSettings(filename, QSettings.Format.IniFormat)
                     settings.beginGroup("ExtraDev")
@@ -26875,7 +26874,6 @@ class ApplicationWindow(QMainWindow):
                         reply = QMessageBox.StandardButton.Yes
                         modifiers = QApplication.keyboardModifiers()
                         control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple key on macOS, Control key on Windows
-                        alt_modifier = modifiers == Qt.KeyboardModifier.AltModifier # OPTION on macOS, ALT on Windows
                         if control_modifier:
                             reply = QMessageBox.StandardButton.No
                         
