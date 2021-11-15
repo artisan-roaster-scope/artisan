@@ -28707,7 +28707,7 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.mode == "C" and old_mode == "F":
                 self.qmc.celsiusMode()
             
-            if settings.contains("DebugLogLevel"):
+            if filename is None and settings.contains("DebugLogLevel"):
                 try:
                     setDebugLogLevel(bool(toBool(settings.value("DebugLogLevel",False))))
                 except Exception: # pylint: disable=broad-except
