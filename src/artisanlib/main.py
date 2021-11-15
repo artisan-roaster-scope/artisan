@@ -13027,12 +13027,10 @@ class tgraphcanvas(FigureCanvas):
                 w = aw.qmc.weight[0]
             bean_weight = aw.convertWeight(w,aw.qmc.weight_units.index(aw.qmc.weight[2]),1) # to kg
                         
-            #reference: https://www.eia.gov/environment/emissions/co2_vol_mass.php
-            #           https://www.parliament.uk/globalassets/documents/post/postpn_383-carbon-footprint-electricity-generation.pdf
-            #           https://carbonpositivelife.com/co2-per-kwh-of-electricity/
-            #           https://www.eia.gov/tools/faqs/faq.php?id=74&t=11
+            #reference: https://www.eia.gov/environment/emissions/co2_vol_mass.php (dated 9/16/2021, accessed 11/15/2021) 
+            #           https://www.eia.gov/tools/faqs/faq.php?id=74&t=11 (referencing data from 2020, accessed 11/15/2021)
             # entries must match those in self.sourcenames
-            CO2kg_per_BTU = {0:6.307e-05, 1:5.307e-05, 2:2.938e-04}  # "LPG", "NG", "Elec"
+            CO2kg_per_BTU = {0:6.288e-05, 1:5.291e-05, 2:2.964e-04}  # "LPG", "NG", "Elec"
 
             eTypes = [""] + self.etypes[:][:4]
             
@@ -25112,8 +25110,10 @@ class ApplicationWindow(QMainWindow):
         try:
             if len(aw.qmc.timex)<=0:
                 self.sendmessage(QApplication.translate("Message", "No profile data.  ET/BT not recalculated"))
+                return False
             if not(len(self.qmc.temp1)==len(aw.qmc.temp2)==len(aw.qmc.timex)):
                 self.sendmessage(QApplication.translate("Message", "Problem with the profile data.  ET/BT not recalculated"))
+                return False
 
             # be sure there is an equation to process (already checked in devices.py, repeated here in case this is called from elsewhere)
             nonempty_ETfunction = bool(self.qmc.ETfunction is not None and len(self.qmc.ETfunction.strip()))
@@ -25121,6 +25121,8 @@ class ApplicationWindow(QMainWindow):
             if (nonempty_ETfunction or nonempty_BTfunction):
                 # set dirty
                 self.qmc.fileDirtySignal.emit()
+                self.curFile = None
+
 
                 # update ET and BT
                 newTemp1 = self.qmc.temp1.copy()
