@@ -3556,14 +3556,13 @@ class tgraphcanvas(FigureCanvas):
     
     # sample devices at interval self.delay miliseconds.
     # we can assume within the processing of sample_processing() that flagon=True
-    def sample_processing(self, temp1_readings, temp2_readings, timex_readings):
+    def sample_processing(self, local_flagstart, temp1_readings, temp2_readings, timex_readings):
         ##### (try to) lock resources  #########
         gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,200) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
 #        gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
         if gotlock:
             try:
                 # duplicate system state flag flagstart locally and only refer to this copy within this function to make it behaving uniquely (either append or overwrite mode)
-                local_flagstart = aw.qmc.flagstart
 
                 # initalize the arrays modified depending on the recording state
                 if local_flagstart:
@@ -6255,7 +6254,7 @@ class tgraphcanvas(FigureCanvas):
             #### lock shared resources #####
             aw.qmc.profileDataSemaphore.acquire(1)
             #reset time
-            aw.qmc.timeclock.start()
+            self.resetTimer()
 
             self.roastUUID = None # reset UUID
             aw.qmc.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
@@ -10546,6 +10545,15 @@ class tgraphcanvas(FigureCanvas):
         self.stopPhidgetManager()
         self.startPhidgetManager()
 
+    # this one is protected by the sampleSemaphore not to mess up with the timex during sampling
+    def resetTimer(self):
+        try:
+            self.samplingSemaphore.acquire(1)
+            self.timeclock.start()
+        finally:
+            if self.samplingSemaphore.available() < 1:
+                self.samplingSemaphore.release(1)
+    
     def OnMonitor(self):
         try:
             if aw.simulator is None:
@@ -10572,7 +10580,7 @@ class tgraphcanvas(FigureCanvas):
                 from artisanlib.hottop import startHottop
                 startHottop(0.6,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
             try:
-                aw.eventactionx(aw.qmc.extrabuttonactions[0],aw.qmc.extrabuttonactionstrings[0])
+                aw.eventactionx(self.extrabuttonactions[0],self.extrabuttonactionstrings[0])
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
@@ -10583,11 +10591,10 @@ class tgraphcanvas(FigureCanvas):
             self.temporaryalarmflag = -3
             self.alarmstate = [-1]*len(self.alarmflag)  #1- = not triggered; any other value = triggered; value indicates the index in self.timex at which the alarm was triggered
             #reset TPalarmtimeindex to trigger a new TP recognition during alarm processing
-            aw.qmc.TPalarmtimeindex = None
+            self.TPalarmtimeindex = None
 
-            self.timeclock.start()   #set time to the current computer time
             self.flagon = True
-            aw.qmc.redraw(True,sampling=True,smooth=aw.qmc.optimalSmoothing) # we need to re-smooth with standard smoothing if ON and optimal-smoothing is ticked
+            self.redraw(True,sampling=True,smooth=self.optimalSmoothing) # we need to re-smooth with standard smoothing if ON and optimal-smoothing is ticked
 
             if self.designerflag: return
             aw.sendmessage(QApplication.translate("Message","Scope monitoring..."))
@@ -10625,7 +10632,7 @@ class tgraphcanvas(FigureCanvas):
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " OnMonitor() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.adderror((QApplication.translate("Error Message", "Exception:") + " OnMonitor() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def OffMonitor(self):
         try:
@@ -10651,7 +10658,7 @@ class tgraphcanvas(FigureCanvas):
 #            if aw.qmc.device == 53:
 #                aw.HottopControlOff()
             # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
-            if aw.qmc.device == 0 and aw.fujipid.followBackground:
+            if self.device == 0 and aw.fujipid.followBackground:
                 if aw.fujipid.sv and aw.fujipid.sv > 0:
                     try:
                         aw.fujipid.setsv(0,silent=True)
@@ -10661,7 +10668,7 @@ class tgraphcanvas(FigureCanvas):
             QTimer.singleShot(5,self.disconnectProbes)
             # reset the canvas color when it was set by an alarm but never reset
             if "canvas_alt" in aw.qmc.palette:
-                aw.qmc.palette["canvas"] = aw.qmc.palette["canvas_alt"]
+                self.palette["canvas"] = self.palette["canvas_alt"]
                 aw.updateCanvasColors(checkColors=False)
             #enable RESET button:
             aw.buttonRESET.setStyleSheet(aw.pushbuttonstyles["RESET"])
@@ -11030,7 +11037,7 @@ class tgraphcanvas(FigureCanvas):
                 except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                     pass
 
-            self.timeclock.start()   #set time to the current computer time, otherwise the recorded timestamps append to the time on START after ON which might be long!
+            self.resetTimer() #reset time, otherwise the recorded timestamps append to the time on START after ON!
             self.flagstart = True
             self.timealign(redraw=True)
             # start Monitor if not yet running
@@ -15557,7 +15564,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 ########################################################################################
 
 class SampleThread(QThread):
-    sample_processingSignal = pyqtSignal(list,list,list)
+    sample_processingSignal = pyqtSignal(bool,list,list,list)
             
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -15642,9 +15649,10 @@ class SampleThread(QThread):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             finally:
+                local_flagstart = aw.qmc.flagstart # this need to catched within the samplingSemaphore and forwarded to the sample_processing()
                 if aw.qmc.samplingSemaphore.available() < 1:
                     aw.qmc.samplingSemaphore.release(1)
-                self.sample_processingSignal.emit(temp1_readings, temp2_readings, timex_readings)
+                self.sample_processingSignal.emit(local_flagstart, temp1_readings, temp2_readings, timex_readings)
 
     # libtime.sleep is accurate only up to 0-5ms
     # using a hyprid approach using sleep() and busy-wait based on the time.perf_counter()
@@ -18192,6 +18200,7 @@ class ApplicationWindow(QMainWindow):
         QTimer.singleShot(2000,self.donate)
 
         QTimer.singleShot(0,lambda : _log.info("startup time: %.2f", libtime.process_time() - startup_time))
+
 
     @pyqtSlot(str,str,NotificationType)
     def sendNotificationMessage(self, title, message, notification_type):
@@ -29585,31 +29594,32 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("Sound")
             self.soundflag = toInt(settings.value("Beep",self.soundflag))
             settings.endGroup()
-            settings.beginGroup("Notifications")
-            if self.notificationManager:
-                try:
-                    # reconstruct Notification objects from component lists
-                    titles = [toString(x) for x in toList(settings.value("titles", []))]
-                    messages = [toString(x) for x in toList(settings.value("messages", []))]
-                    types = [toInt(x) for x in toList(settings.value("types", []))]
-                    created = [toFloat(x) for x in toList(settings.value("created", []))]
-                    self.notificationManager.clearNotificationQueue()
-                    for i in range(len(titles)):
-                        n = Notification(
-                            titles[i],
-                            messages[i],
-                            NotificationType(types[i]),
-                            created[i])
-                        self.notificationManager.addNotificationItem(n)
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
-            self.notificationsflag = toBool(settings.value("notificationsflag",self.notificationsflag))
-            if self.notificationManager:
-                if self.notificationsflag:
-                    self.notificationManager.showNotifications()
-                else:
-                    self.notificationManager.hideNotifications()
-            settings.endGroup()
+            if filename is None:
+                settings.beginGroup("Notifications")
+                if self.notificationManager:
+                    try:
+                        # reconstruct Notification objects from component lists
+                        titles = [toString(x) for x in toList(settings.value("titles", []))]
+                        messages = [toString(x) for x in toList(settings.value("messages", []))]
+                        types = [toInt(x) for x in toList(settings.value("types", []))]
+                        created = [toFloat(x) for x in toList(settings.value("created", []))]
+                        self.notificationManager.clearNotificationQueue()
+                        for i in range(len(titles)):
+                            n = Notification(
+                                titles[i],
+                                messages[i],
+                                NotificationType(types[i]),
+                                created[i])
+                            self.notificationManager.addNotificationItem(n)
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+                self.notificationsflag = toBool(settings.value("notificationsflag",self.notificationsflag))
+                if self.notificationManager:
+                    if self.notificationsflag:
+                        self.notificationManager.showNotifications()
+                    else:
+                        self.notificationManager.hideNotifications()
+                settings.endGroup()
             
             #loads max-min temp limits of graph
             settings.beginGroup("Axis")
