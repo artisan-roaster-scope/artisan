@@ -1506,7 +1506,7 @@ class roastCompareDlg(ArtisanDialog):
         self.setProfileTableRow(len(self.profiles)-1)
     
     def addProfileFromURL(self,extractor,url):
-        _log.debug("addProfileFromURL(%s)", url)
+        _log.info("addProfileFromURL(%s)", url)
         try:
             obj = extractor(url,self.aw)
             if obj:

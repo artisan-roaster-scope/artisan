@@ -18,8 +18,8 @@
 
 try:
     #pylint: disable = E, W, R, C
-    from PyQt6.QtWidgets import QSystemTrayIcon, QApplication, QMenu, QAction # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QIcon, QDesktopServices # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import QSystemTrayIcon, QApplication, QMenu # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QIcon, QDesktopServices, QAction # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtCore import QTimer, pyqtSlot, QUrl, QObject # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:
     #pylint: disable = E, W, R, C

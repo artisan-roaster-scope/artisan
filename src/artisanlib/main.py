@@ -282,6 +282,7 @@ class Artisan(QtSingleApplication):
     #                                  if query is "background" Artisan is not raised to the foreground
     #                                  if query is "template" and the file has an .alog extension, the profile is loaded as background profile
     def open_url(self, url):
+        _log.debug("open_url(%s)", url)
         if not aw.qmc.flagon and not aw.qmc.designerflag and not aw.qmc.wheelflag and aw.qmc.flavorchart_plot is None: # only if not yet monitoring
             if url.scheme() == "artisan" and url.authority() in ['roast','template']:
                 # we try to resolve this one into a file URL and recurse
@@ -35794,7 +35795,7 @@ class ApplicationWindow(QMainWindow):
     
     # url a QUrl
     def importExternalURL(self,extractor,message="",url=None):
-        _log.debug("importExternalURL(%s)", url)
+        _log.info("importExternalURL(%s)", url)
         try:
             if url is None:
                 url = self.ArtisanOpenURLDialog(msg=message)
