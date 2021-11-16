@@ -7,9 +7,9 @@ distro==1.6.0 #1.5.0
 #
 gevent==21.8.0 #21.1.2 # 1.5.0 is not compatible with Python 3.8
 gevent-websocket==0.10.1
-numpy==1.21.3 # 1.21.2
+numpy==1.21.4 # 1.21.3
 scipy==1.7.2 #1.7.1 # 1.6.2 # depends on numpy thus we have to put it after numpy
-matplotlib==3.4.3 # 3.4.2 # 3.4.1 requires pyinstaller > 4.2 # MPL 3.3.x is not compatible with pyinstaller up to 4.0
+matplotlib==3.5.0 # 3.4.3 # 3.4.1 requires pyinstaller > 4.2 # MPL 3.3.x is not compatible with pyinstaller up to 4.0
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
 PyQt5==5.15.5 #5.14.2 # 5.15.0 seems not to install on Python 3.7.1

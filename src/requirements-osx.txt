@@ -12,13 +12,13 @@ py2app==0.23 # we stay on 0.23 due to our darkmode patch which needs to be redon
 #
 gevent==21.8.0 #21.1.2 # 1.5.0 is not compatible with Python 3.8
 gevent-websocket==0.10.1
-numpy==1.21.3 # 1.21.2 # 1.16.2 fails on TravisCI; py2app fails with 1.16.5, 1.17.0-2
+numpy==1.21.4 # 1.21.3 # 1.16.2 fails on TravisCI; py2app fails with 1.16.5, 1.17.0-2
 scipy==1.7.2 #1.7.1  # depends on numpy thus we have to put it after numpy	
-matplotlib==3.4.3 # 3.4.2
+matplotlib==3.5.0 # 3.4.3
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
 PyQt5==5.15.5 # 5.15.0 breaks custom event buttons. They only fire after a modal dialog has been opened. Very strange!
-PyQtWebEngine==5.15.5
+PyQtWebEngine==5.15.5 # PyQt6-WebEngine==
 openpyxl==3.0.9 # 3.0.7
 keyring==23.2.1 # 23.1.0 # builds using 19.3.0 and 20.0.0 fail with py2app/pyinstaller, 21.21 seems to have fixed this
 prettytable==2.2.1 # 2.2.0 # >1.0.0 fail to be packed, but a main.py monkey patch helps
