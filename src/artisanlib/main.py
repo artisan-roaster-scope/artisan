@@ -22006,7 +22006,7 @@ class ApplicationWindow(QMainWindow):
                                     self.setExtraEventButtonStyle(b, style="pressed")
                                 else:
                                     self.setExtraEventButtonStyle(b, style="normal")
-                            elif cs_a[0] == "sleep" and cs_len == 1: # in seconds
+                            elif cs_a[0] == "sleep" and cs_len == 2: # in seconds
                                 try:
                                     t = eval(cs_a[1]) # pylint: disable=eval-used
                                     if isinstance(t,(float,int)):
@@ -23943,7 +23943,7 @@ class ApplicationWindow(QMainWindow):
                     self.toggleForegroundShowfullFlag()
                 elif k == 79:                       #O (toggle background showfull flag)
                     self.toggleBackroundShowfullFlag()
-                elif k == 72:                       #H
+                elif k == 72:           #H
                     if not self.qmc.designerflag and not bool(aw.comparator):
                         if alt_modifier and platf != 'Windows' or ((control_shift_modifier or control_alt_modifier) and platf == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
                             self.deleteBackground()
