@@ -17226,13 +17226,13 @@ class ApplicationWindow(QMainWindow):
         # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
         if platf == 'Windows':
             default_button_height = QPushButton("Test").sizeHint().height()
-            self.standard_button_tiny_height = default_button_height * 1.1
-            self.standard_button_small_height = default_button_height * 1.5
-            self.standard_button_height = default_button_height * 2
+            self.standard_button_tiny_height = int(round(default_button_height * 1.1))
+            self.standard_button_small_height = int(round(default_button_height * 1.5))
+            self.standard_button_height = int(round(default_button_height * 2))
         else:
             self.standard_button_small_height = QPushButton("Test").sizeHint().height()
-            self.standard_button_tiny_height = self.standard_button_small_height * 0.8
-            self.standard_button_height = self.standard_button_small_height * 1.3
+            self.standard_button_tiny_height = int(round(self.standard_button_small_height * 0.8))
+            self.standard_button_height = int(round(self.standard_button_small_height * 1.3))
 
         #create ON/OFF buttons
 

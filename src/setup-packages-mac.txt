@@ -43,7 +43,7 @@ CHECK FOR UPDATES
 # pip install pip-review
 # sudo -H pip-review --local --interactive
 
-# cd /Library/Frameworks/Python.framework/Versions/3.9/bin
+# cd /Library/Frameworks/Python.framework/Versions/3.10/bin
 # sudo -H ./pip-review --local --interactive
 
 # check package dependencies using pipdeptree
