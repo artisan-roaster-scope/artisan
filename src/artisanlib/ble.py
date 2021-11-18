@@ -206,7 +206,7 @@ class BleInterface(QtCore.QObject):
                                     BLE_CHAR_TYPE.BLE_CHAR_NOTIFY_WRITE,
                                     BLE_CHAR_TYPE.BLE_CHAR_NOTIFY)):
                                     
-                            # TODO: remove this hack once PyQt6.1 is fixed:
+                            # remove this hack once PyQt6.1 is fixed:
                             # following line fails on PyQt6.1 as the constructor for QBluetoothUuid(DescriptorType) is missing
 #                            self.m_notificationDesc = c.descriptor(QtBluetooth.QBluetoothUuid(QtBluetooth.QBluetoothUuid.DescriptorType.ClientCharacteristicConfiguration))
                             # thus we use the string constructor for now
