@@ -74,7 +74,8 @@ class Notification():
 
 
 class NotificationManager(QObject):
-    __slots__: ( 'notification_timeout', 'notification_queue_max_length', 'notification_queue_max_age', 'tray_menu', 'tray_icon', 
+    
+    __slots__ = ( 'notification_timeout', 'notification_queue_max_length', 'notification_queue_max_age', 'tray_menu', 'tray_icon', 
                 'notifications_available', 'notifications_enabled', 'notifications_visible', 'notifications_queue', 'active_notification' )
 
     def __init__(self):
