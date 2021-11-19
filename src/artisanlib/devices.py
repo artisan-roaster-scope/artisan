@@ -300,9 +300,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
             
-            changeTriggersCombo.setMinimumContentsLength(2)
+            changeTriggersCombo.setMinimumContentsLength(1)
             changeTriggersCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
             changeTriggersCombo.setEnabled(bool(self.aw.qmc.phidget1048_async[i-1]))
+            width = changeTriggersCombo.minimumSizeHint().width()
+            changeTriggersCombo.setMinimumWidth(width)
+            if platform.system() == 'Darwin':
+                changeTriggersCombo.setMaximumWidth(width)
             
             self.changeTriggerCombos1048.append(changeTriggersCombo)
             phidgetBox1048.addWidget(changeTriggersCombo,3,i)
@@ -324,12 +328,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
                 
-            probeTypeCombo.setMinimumContentsLength(0)
+            probeTypeCombo.setMinimumContentsLength(1)
             probeTypeCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
-#            width = probeTypeCombo.minimumSizeHint().width()
-#            probeTypeCombo.setMinimumWidth(width)
-#            if platf == 'Darwin':
-#                probeTypeCombo.setMaximumWidth(width)
+            width = probeTypeCombo.minimumSizeHint().width()
+            probeTypeCombo.setMinimumWidth(width)
+            if platform.system() == 'Darwin':
+                probeTypeCombo.setMaximumWidth(width)
             
             self.probeTypeCombos.append(probeTypeCombo)
             phidgetBox1048.addWidget(probeTypeCombo,1,i)
@@ -390,10 +394,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.changeTriggerCombos1045.setCurrentIndex(self.aw.qmc.phidget1045_changeTriggersValues.index(self.aw.qmc.phidget1045_changeTrigger))
         except Exception: # pylint: disable=broad-except
             pass
-            
-        #self.changeTriggerCombos1045.setMaximumSize(65,100)
-        self.changeTriggerCombos1045.setMinimumContentsLength(4)
+        
+        self.changeTriggerCombos1045.setMinimumContentsLength(3)
         self.changeTriggerCombos1045.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
+        width = self.changeTriggerCombos1045.minimumSizeHint().width()
+        self.changeTriggerCombos1045.setMinimumWidth(width)
+        if platform.system() == 'Darwin':
+            self.changeTriggerCombos1045.setMaximumWidth(width)
         
         phidgetBox1045.addWidget(self.changeTriggerCombos1045,3,1)
         self.asyncCheckBoxe1045 = QCheckBox()
@@ -416,7 +423,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.dataRateCombo1045.setCurrentIndex(self.aw.qmc.phidget_dataRatesValues.index(self.aw.qmc.phidget1045_dataRate))
         except Exception: # pylint: disable=broad-except
             pass
-        self.dataRateCombo1045.setMinimumContentsLength(5)
+        self.dataRateCombo1045.setMinimumContentsLength(3)
         self.dataRateCombo1045.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
         width = self.dataRateCombo1045.minimumSizeHint().width()
         self.dataRateCombo1045.setMinimumWidth(width)
@@ -432,9 +439,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         phidgetBox1045.addWidget(asyncLabel,2,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1045.addWidget(changeTriggerLabel,3,0,Qt.AlignmentFlag.AlignRight)
-        phidgetBox1045.addWidget(rateLabel,4,0,Qt.AlignmentFlag.AlignRight) 
-        phidgetBox1045.addWidget(self.dataRateCombo1045,4,1)
+        phidgetBox1045.addWidget(rateLabel,4,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1045.addWidget(EmissivityLabel,5,0,Qt.AlignmentFlag.AlignRight)
+        phidgetBox1045.addWidget(self.dataRateCombo1045,4,1)
         phidgetBox1045.addWidget(self.emissivitySpinBox,5,1)
         phidget1045VBox = QVBoxLayout()
         phidget1045VBox.addStretch()
@@ -466,10 +473,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 pass
           
             gainCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
-            gainCombo.setMinimumContentsLength(2)
+            gainCombo.setMinimumContentsLength(1)
             width = gainCombo.minimumSizeHint().width()
             gainCombo.setMinimumWidth(width)
-#            gainCombo.setMaximumWidth(width)
+            if platform.system() == 'Darwin':
+                gainCombo.setMaximumWidth(width)
             
             self.gainCombos1046.append(gainCombo)
             phidgetBox1046.addWidget(gainCombo,1,i)
@@ -485,12 +493,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
 
-#            formulaCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
-#            formulaCombo.setMinimumContentsLength(3)
-#            width = formulaCombo.minimumSizeHint().width()
-#            formulaCombo.setMinimumWidth(width)
-#            if platform.system() == 'Darwin':
-#                formulaCombo.setMaximumWidth(width)
+            formulaCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
+            formulaCombo.setMinimumContentsLength(1)
+            width = formulaCombo.minimumSizeHint().width()
+            formulaCombo.setMinimumWidth(width)
+            if platform.system() == 'Darwin':
+                formulaCombo.setMaximumWidth(width)
 
             self.formulaCombos1046.append(formulaCombo)
             phidgetBox1046.addWidget(formulaCombo,2,i)
@@ -628,10 +636,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.formulaCombo1200_2.setCurrentIndex(self.aw.qmc.phidget1200_2_formula)
         except Exception: # pylint: disable=broad-except
             pass
-        self.formulaCombo1200_2.setMinimumContentsLength(5)
+        self.formulaCombo1200_2.setMinimumContentsLength(4)
         width = self.formulaCombo1200_2.minimumSizeHint().width()
         self.formulaCombo1200_2.setMinimumWidth(width)
-#        self.formulaCombo1200_2.setMaximumWidth(width)
         
         self.wireCombo1200_2 = QComboBox()
         self.wireCombo1200_2.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -643,7 +650,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.wireCombo1200_2.setCurrentIndex(self.aw.qmc.phidget1200_2_wire)
         except Exception: # pylint: disable=broad-except
             pass
-        self.wireCombo1200_2.setMinimumContentsLength(5)
+        self.wireCombo1200_2.setMinimumContentsLength(4)
         width = self.wireCombo1200_2.minimumSizeHint().width()
         self.wireCombo1200_2.setMinimumWidth(width)
 #        self.wireCombo1200_2.setMaximumWidth(width)
@@ -750,11 +757,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         
         phidgetGroupBoxLayout = QVBoxLayout()
         phidgetGroupBoxLayout.addWidget(phidget1200_tabs)
+           
+#        phidgetBox1200_2.setSpacing(1)
+        phidgetGroupBoxLayout.setContentsMargins(0,0,0,0) # left, top, right, bottom
         
         phidget1200GroupBox = QGroupBox("TMP1200 RTD")
-#        phidget1200GroupBox.setLayout(phidget1200VBox)
         phidget1200GroupBox.setLayout(phidgetGroupBoxLayout)
-        phidget1200GroupBox.setContentsMargins(0,10,0,0)
+        phidget1200GroupBox.setContentsMargins(0,2,0,0) # left, top, right, bottom
         
         
         # DAQ1400 VI
@@ -829,7 +838,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
             dataRatesCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
-            dataRatesCombo.setMinimumContentsLength(5)
+            dataRatesCombo.setMinimumContentsLength(4)
             width = dataRatesCombo.minimumSizeHint().width()
             dataRatesCombo.setMinimumWidth(width)
             if platform.system() == 'Darwin':
@@ -848,7 +857,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 changeTriggersCombo.setCurrentIndex(self.aw.qmc.phidget1018_changeTriggersValues.index(self.aw.qmc.phidget1018_changeTriggers[i-1]))
             except Exception: # pylint: disable=broad-except
                 pass
-            changeTriggersCombo.setMinimumContentsLength(5)
+            changeTriggersCombo.setMinimumContentsLength(4)
             changeTriggersCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
             width = changeTriggersCombo.minimumSizeHint().width()
             changeTriggersCombo.setMinimumWidth(width)
@@ -867,7 +876,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 voltageRangeCombo.setCurrentIndex(self.aw.qmc.phidgetVCP100x_voltageRangeValues.index(self.aw.qmc.phidgetVCP100x_voltageRanges[i-1]))
             except Exception: # pylint: disable=broad-except
                 pass
-            voltageRangeCombo.setMinimumContentsLength(5)
+            voltageRangeCombo.setMinimumContentsLength(4)
             voltageRangeCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
             width = voltageRangeCombo.minimumSizeHint().width()
             voltageRangeCombo.setMinimumWidth(width)

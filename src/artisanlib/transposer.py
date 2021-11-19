@@ -47,7 +47,7 @@ class profileTransformatorDlg(ArtisanDialog):
         
         self.helpdialog = None
         
-        self.regexpercent = QRegularExpression(r"^$|[0-9]?[0-9]?(\.[0-9])")
+        self.regexpercent = QRegularExpression(r"^$|[0-9]?[0-9]?(\.[0-9])?")
         self.regextime = QRegularExpression(r"^$|[0-9]?[0-9]:[0-5][0-9]")
         self.regextemp = QRegularExpression(r"^$|[0-9]?[0-9]?[0-9]?(\.[0-9])?")
         

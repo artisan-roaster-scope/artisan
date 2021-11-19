@@ -14125,51 +14125,53 @@ class tgraphcanvas(FigureCanvas):
 
     #CONTEXT MENU  = Right click
     def on_press(self,event):
-
-        if event.inaxes != self.ax: return
-        if event.button != 3: return   #select right click only
-
-
-        self.releaseMouse()
-        self.mousepress = False
-        self.setCursor(Qt.CursorShape.OpenHandCursor)
-
-        self.currentx = event.xdata
-        self.currenty = event.ydata
-
-        designermenu = QMenu(aw)  # if we bind this to self, we inherit the background-color: transparent from self.fig
-
-        designermenu.addSeparator()
-
-        addpointAction = QAction(QApplication.translate("Contextual Menu", "Add point"),self)
-        addpointAction.triggered.connect(self.addpoint_action)
-        designermenu.addAction(addpointAction)
-
-        removepointAction = QAction(QApplication.translate("Contextual Menu", "Remove point"),self)
-        removepointAction.triggered.connect(self.removepoint)
-        designermenu.addAction(removepointAction)
-
-        designermenu.addSeparator()
-
-        loadpointsAction = QAction(QApplication.translate("Contextual Menu", "Load points"),self)
-        loadpointsAction.triggered.connect(self.loadpoints)
-        designermenu.addAction(loadpointsAction)
-
-        savepointsAction = QAction(QApplication.translate("Contextual Menu", "Save points"),self)
-        savepointsAction.triggered.connect(self.savepoints)
-        designermenu.addAction(savepointsAction)
-
-        designermenu.addSeparator()
-
-        resetAction = QAction(QApplication.translate("Contextual Menu", "Reset Designer"),self)
-        resetAction.triggered.connect(self.reset_designer)
-        designermenu.addAction(resetAction)
-
-        configAction = QAction(QApplication.translate("Contextual Menu", "Config..."),self)
-        configAction.triggered.connect(self.desconfig)
-        designermenu.addAction(configAction)
-
-        designermenu.exec_(QCursor.pos())
+        try:
+            if event.inaxes != self.ax: return
+            if event.button != 3: return   #select right click only
+    
+    
+            self.releaseMouse()
+            self.mousepress = False
+            self.setCursor(Qt.CursorShape.OpenHandCursor)
+    
+            self.currentx = event.xdata
+            self.currenty = event.ydata
+    
+            designermenu = QMenu(aw)  # if we bind this to self, we inherit the background-color: transparent from self.fig
+    
+            designermenu.addSeparator()
+    
+            addpointAction = QAction(QApplication.translate("Contextual Menu", "Add point"),self)
+            addpointAction.triggered.connect(self.addpoint_action)
+            designermenu.addAction(addpointAction)
+    
+            removepointAction = QAction(QApplication.translate("Contextual Menu", "Remove point"),self)
+            removepointAction.triggered.connect(self.removepoint)
+            designermenu.addAction(removepointAction)
+    
+            designermenu.addSeparator()
+    
+            loadpointsAction = QAction(QApplication.translate("Contextual Menu", "Load points"),self)
+            loadpointsAction.triggered.connect(self.loadpoints)
+            designermenu.addAction(loadpointsAction)
+    
+            savepointsAction = QAction(QApplication.translate("Contextual Menu", "Save points"),self)
+            savepointsAction.triggered.connect(self.savepoints)
+            designermenu.addAction(savepointsAction)
+    
+            designermenu.addSeparator()
+    
+            resetAction = QAction(QApplication.translate("Contextual Menu", "Reset Designer"),self)
+            resetAction.triggered.connect(self.reset_designer)
+            designermenu.addAction(resetAction)
+    
+            configAction = QAction(QApplication.translate("Contextual Menu", "Config..."),self)
+            configAction.triggered.connect(self.desconfig)
+            designermenu.addAction(configAction)
+    
+            designermenu.exec(QCursor.pos())
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 
     def on_pick(self,event):
         if self.currentx or self.currenty:
@@ -16697,7 +16699,7 @@ class ApplicationWindow(QMainWindow):
         self.analyzeMenu.addSeparator()
         self.clearresultsAction = QAction(QApplication.translate("Menu","Clear results"),self)
         self.clearresultsAction.triggered.connect(self.clearResults)
-        self.clearresultsAction.setShortcut("Ctrl+Alt+K")
+        self.clearresultsAction.setShortcut("Ctrl+Alt+K") # COMMAND+OPTION on macOS
         self.analyzeMenu.addAction(self.clearresultsAction)
 
         self.roastCompareAction = QAction(QApplication.translate("Menu", "Comparator"), self)
@@ -16815,7 +16817,7 @@ class ApplicationWindow(QMainWindow):
 
         self.viewMenu.addSeparator()
 
-        if platf != 'Darwin': # MacOS X automatically adds the fullscreen action
+        if not (platf == 'Darwin' and self.qmc.locale_str == "en"): # macOS automatically adds the fullscreen action to View menu
             self.fullscreenAction = QAction(QApplication.translate("Menu", "Full Screen"), self)
             self.fullscreenAction.triggered.connect(self.toggleFullscreen)
             self.fullscreenAction.setCheckable(True)
@@ -23428,7 +23430,7 @@ class ApplicationWindow(QMainWindow):
         try:
             #### lock shared resources #####
             aw.qmc.messagesemaphore.acquire(1)
-            if message:
+            if message and not self.qmc.designerflag:
                 _log.debug("message: %s", message)
             if style is not None and style != "":
                 aw.messagelabel.setStyleSheet(style)
@@ -23926,11 +23928,13 @@ class ApplicationWindow(QMainWindow):
                 #    reason only CTRL and CTRL+SHIFT modifier should be used with shortcut keys f,e,r,c,t,v, and h.
                 control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple k on macOS, CONTROL on Windows
                 alt_modifier = modifiers == Qt.KeyboardModifier.AltModifier # OPTION on macOS, ALT on Windows
+                shift_modifier = modifiers == Qt.KeyboardModifier.ShiftModifier # SHIFT
                 control_alt_modifier = modifiers == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier)
                 control_shift_modifier = modifiers == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier)
                 #meta_modifier = modifiers == Qt.KeyboardModifier.MetaModifier # Control on macOS, Meta on Windows
                 #uncomment next line to find the integer value of a k
                 #print(k)
+                
 
                 numberkeys = [48,49,50,51,52,53,54,55,56,57] # keycodes for number keys 0,1,...,9
 
@@ -23943,9 +23947,10 @@ class ApplicationWindow(QMainWindow):
                     self.toggleForegroundShowfullFlag()
                 elif k == 79:                       #O (toggle background showfull flag)
                     self.toggleBackroundShowfullFlag()
-                elif k == 72:           #H
+                elif k in [72, 170]:           #H  (the 170 corresponds to the ALT-H Qt.Key_ordfeminine result returned by Qt6 on macOS)
                     if not self.qmc.designerflag and not bool(aw.comparator):
-                        if alt_modifier and platf != 'Windows' or ((control_shift_modifier or control_alt_modifier) and platf == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
+                        # allow SHIFT-H for all platforms (ALT-H additionally for non-Windows platforms)
+                        if ((alt_modifier or shift_modifier) and platf != 'Windows') or (control_shift_modifier or control_alt_modifier and platf == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
                             self.deleteBackground()
                             if not self.qmc.flagon:
                                 self.autoAdjustAxis()
@@ -23962,12 +23967,6 @@ class ApplicationWindow(QMainWindow):
                                 self.autoAdjustAxis()
                                 self.qmc.timealign(redraw=False)
                                 self.qmc.redraw()
-                elif k == 75:                       #K
-                    if not aw.qmc.flagon and not self.qmc.designerflag and not bool(aw.comparator):
-                        if control_alt_modifier:
-                            aw.clearResults()
-                        elif control_modifier:
-                            aw.analysisfitCurvesALL()
                 elif k == 76:                       #L
                     if not self.qmc.designerflag and not bool(aw.comparator):
                         filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Alarms"),ext="*.alrm")
@@ -33505,9 +33504,8 @@ class ApplicationWindow(QMainWindow):
                     from PyQt5.QtGui import QPageLayout, QPageSize, QPagedPaintDevice # @Reimport @UnusedImport
                 else:
                     from PyQt6.QtCore import QMarginsF  # @Reimport @UnresolvedImport
-                    from PyQt6.QtGui import QPageLayout, QPageSize, QPagedPaintDevice  # @Reimport @UnresolvedImport
-                        
-                if QPrinter().paperSize() == QPagedPaintDevice.PageSize.Letter:
+                    from PyQt6.QtGui import QPageLayout, QPageSize  # @Reimport @UnresolvedImport                
+                if QPrinter().pageLayout().pageSize().id() == QPageSize.PageSizeId.Letter:
                     # Letter
                     ps = QPageSize(QPageSize.PageSizeId.Letter)
                     pu = QPageLayout.Unit.Inch

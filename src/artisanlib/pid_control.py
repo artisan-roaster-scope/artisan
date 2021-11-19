@@ -1229,8 +1229,8 @@ class PIDcontrol():
             self.svSliderMin = fromCtoF(self.svSliderMin)
             self.svSliderMax = fromCtoF(self.svSliderMax)
             # establish ne limits on sliders
-            self.aw.sliderSV.setMinimum(self.svSliderMin)
-            self.aw.sliderSV.setMaximum(self.svSliderMax)
+            self.aw.sliderSV.setMinimum(int(round(self.svSliderMin)))
+            self.aw.sliderSV.setMaximum(int(round(self.svSliderMax)))
             self.pidKp = self.pidKp / (9/5.)
             self.pidKi = self.pidKi / (9/5.)
             self.pidKd = self.pidKd / (9/5.)
