@@ -160,8 +160,6 @@ __Brett Pound__ –– support
 
 __Frans Goddijn__ –– support
 
-__Dario Ernst__ –– [mailing list](https://lists.einfachkaffee.de/postorius/lists/artisan-user.lists.einfachkaffee.de/){:target="_blank"} hosting
-
 We are always looking for people that support us here and there. Especially, people that help us to localize the UI of Artisan to more languages and to complete the existing translations are very welcome!
 
 Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"} on the [Artisan blog](https://artisan-roasterscope.blogspot.com){:target="_blank"}.

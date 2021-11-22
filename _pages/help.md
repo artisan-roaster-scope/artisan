@@ -30,7 +30,6 @@ If you need support please check the [documentation](#documentation) or ask the 
 ## Community
 
 - [Artisan Discussion Forum](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} (technical discussions and support; [GitHub registration](https://github.com/join){:target="_blank"} required to post; [Learn how to Subscribe to Discussions](/discussions))
-- [Artisan Mailing List](https://lists.einfachkaffee.de/postorius/lists/artisan-user.lists.einfachkaffee.de/){:target="_blank"} (announcements (new versions, documents, seminars,...); subscription required)
 - Public Forums or Facebook Groups (not monitored by the team)
    - [Home-Barista.com](https://www.home-barista.com/roasting/){:target="_blank"}
    - [Homeroasters.org](https://homeroasters.org/){:target="_blank"}
