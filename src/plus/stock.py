@@ -101,6 +101,7 @@ def fetch() -> bool:
         d = connection.getData(config.stock_url)
         _log.debug("-> %s", d.status_code)
         j = d.json()
+        connection.updateLimits(j) # update account limits
         if "success" in j and j["success"] and "result" in j and j["result"]:
             try:
                 stock_semaphore.acquire(1)
@@ -284,7 +285,7 @@ def renderAmount(amount, default_unit=None, target_unit_idx=0):
             w = config.app_window.float2float(
                 w, 1
             )  # @UndefinedVariable # we keep one decimal
-        res = "{0:g}{1}".format(w, target_unit)
+        res = "{0:g}{1}".format(w, target_unit).lower()
     return res
 
 

@@ -15496,19 +15496,36 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         else:
             days = QApplication.translate("Plus","{} days left").format(remaining_days)
         pu = aw.plus_paidUntil.date()
-        message = QApplication.translate("Plus","Paid until") + ' ' + QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))
-        if remaining_days <31:
-            if remaining_days <=3:
+        message = f'{QApplication.translate("Plus","Paid until")} {QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))}'
+        reminder_message = ''
+        if aw.plus_rlimit > 0:
+            percent_used = aw.plus_used/(aw.plus_rlimit/100)
+            unit = 1 # 1: kg, 2: lb
+            if aw.qmc.weight[2] in ["lb", "oz"]:
+                unit = 2
+            rlimit = plus.stock.renderAmount(aw.plus_rlimit, target_unit_idx=unit)
+            used = plus.stock.renderAmount(aw.plus_used, target_unit_idx=unit)
+            percent_used_formatted = f'{percent_used:.0f}% {QApplication.translate("Label","roasted")} ({used} / {rlimit})'
+            # if 90% of quota is used, render usage in red
+            if percent_used >= 90:
                 style = "background-color:#cc0f50;color:white;"
             else:
                 style = ""
-            message += '<blockquote><b><span style="' + style + '">&nbsp; ' + days + ' &nbsp;</span></b></blockquote>'
-        else:
+            reminder_message += f'<blockquote><b><span style="{style}">{percent_used_formatted}</span></b></blockquote>'
+        if remaining_days <31:
+            if remaining_days <= 3:
+                style = "background-color:#cc0f50;color:white;"
+            else:
+                style = ""
+            reminder_message += f'<blockquote><b><span style="{style}">{days}</span></b></blockquote>'
+        if reminder_message == '':
             message += '<br><br>'
+        else:
+            message += reminder_message
         message += QApplication.translate("Plus","Please visit our {0}shop{1} to extend your subscription").format('<a href="' + plus.config.shop_base_url + '">','</a>')
         #
         # if less then 31 days:
-        # n days left <= rot if <=3
+        # n days left <= red if <=3
         #  3 days, 2 days, 1 day, 0 days left
         #
         subscription_message_box = ArtisanMessageBox(aw,QApplication.translate("Message", "Subscription"),message)
@@ -15795,9 +15812,10 @@ class ApplicationWindow(QMainWindow):
     fireslideractionSignal = pyqtSignal(int)
     moveButtonSignal = pyqtSignal(str)
     sendnotificationMessageSignal = pyqtSignal(str,str,NotificationType)
+    updatePlusLimitsSignal = pyqtSignal(float, float)
     
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
-        'plus_paidUntil', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
+        'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
         'eventaction_running_threads', 'qtbase_additional_locales', 'qtbase_locales', 'curFile', 'MaxRecentFiles', 'recentFileActs', 'recentSettingActs',
         'recentThemeActs', 'applicationDirectory', 'helpdialog', 'redrawTimer', 'lastLoadedProfile', 'lastLoadedBackground',
         'analysisresultsanno', 'segmentresultsanno', 'largeLCDs_dialog', 'LargeLCDsFlag', 'largeDeltaLCDs_dialog', 'LargeDeltaLCDsFlag', 'largePIDLCDs_dialog',
@@ -15862,6 +15880,8 @@ class ApplicationWindow(QMainWindow):
                 # used in links back to objects on the platform (see plus/util.py#storeLink() and similars)
         self.plus_subscription = None # one of [None, "HOME", "PRO"]
         self.plus_paidUntil = None # either None if unknown or otherwise a Date object with indicating the expiration date of the account
+        self.plus_rlimit = 0 # account amount limit (kg); if 0 then considered as not valid
+        self.plus_used = 0   # account amount greens roasted within rlimit (kg); if 0 then considered as not valid
         self.plus_readonly = False # True if the plus user has only read rights to the plus account
 
         self.appearance = ""
@@ -18188,6 +18208,7 @@ class ApplicationWindow(QMainWindow):
         self.fireslideractionSignal.connect(self.fireslideraction)
         self.moveButtonSignal.connect(self.moveKbutton)
         self.sendnotificationMessageSignal.connect(self.sendNotificationMessage)
+        self.updatePlusLimitsSignal.connect(self.updatePlusLimits)
         
         self.notificationManager = None
         if not app.artisanviewerMode:
@@ -18204,6 +18225,12 @@ class ApplicationWindow(QMainWindow):
 
         QTimer.singleShot(0,lambda : _log.info("startup time: %.2f", libtime.process_time() - startup_time))
 
+
+    @pyqtSlot(float, float)
+    def updatePlusLimits(self, rlimit: float, used: float):
+        _log.debug("updatePlusLimits -> %s, %s", rlimit, used)
+        self.plus_rlimit = rlimit
+        self.plus_used = used
 
     @pyqtSlot(str,str,NotificationType)
     def sendNotificationMessage(self, title, message, notification_type):
@@ -18685,16 +18712,28 @@ class ApplicationWindow(QMainWindow):
                                 remaining_days = (aw.plus_paidUntil.date() - datetime.datetime.now().date()).days
                                 if remaining_days <= 0:
                                     subscription_icon = "plus-home-off"
-                                elif  remaining_days < 31:
+                                elif remaining_days < 31:
                                     subscription_icon = "plus-home-low"
+                                if aw.plus_rlimit > 0:
+                                    percent_used = aw.plus_used/(aw.plus_rlimit/100)
+                                    if percent_used >= 100:
+                                        subscription_icon = "plus-home-off"
+                                    elif percent_used >= 90:
+                                        subscription_icon = "plus-home-low"
                         elif aw.plus_subscription == "PRO":
                             subscription_icon = "plus-pro"
                             if aw.plus_paidUntil is not None:
                                 remaining_days = (aw.plus_paidUntil.date() - datetime.datetime.now().date()).days
                                 if remaining_days <= 0:
                                     subscription_icon = "plus-pro-off"
-                                elif  remaining_days < 31:
+                                elif remaining_days < 31:
                                     subscription_icon = "plus-pro-low"
+                                if aw.plus_rlimit > 0:
+                                    percent_used = aw.plus_used/(aw.plus_rlimit/100)
+                                    if percent_used >= 100:
+                                        subscription_icon = "plus-pro-off"
+                                    elif percent_used >= 90:
+                                        subscription_icon = "plus-pro-low"
                 else:
                     plus_icon = "plus-on"
                     tooltip = QApplication.translate("Tooltip", 'Disconnect artisan.plus')

@@ -162,6 +162,17 @@ def extractUserInfo(res, attr: str, default):
         return res[attr]
     return default
 
+# takes a JSON result and updates the account limits
+def updateLimits(res):
+    try:
+        if res and config.app_window and "ol" in res:
+            ol = res["ol"]
+            if "rlimit" in ol and "rused" in ol:
+                rlimit = ol["rlimit"]
+                used = ol["rused"]
+                config.app_window.updatePlusLimitsSignal.emit(rlimit, used)
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
 
 # returns True on successful authentification
 def authentify() -> bool:
@@ -227,7 +238,6 @@ def authentify() -> bool:
                 )
                 config.app_window.plus_paidUntil = None
                 config.app_window.plus_subscription = None
-                config.app_window.plus_paidUntil = None
                 if "account" in res["result"]["user"]:
                     config.app_window.plus_subscription = extractUserInfo(
                         res["result"]["user"]["account"],
@@ -244,6 +254,14 @@ def authentify() -> bool:
                             )
                     except Exception as e:  # pylint: disable=broad-except
                         _log.exception(e)
+                    
+                    if "limit" in res["result"]["user"]["account"]:
+                        ol = res["result"]["user"]["account"]["limit"]
+                        if "rlimit" in ol and "rused" in ol:
+                            rlimit = ol["rlimit"]
+                            used = ol["rused"]
+                            config.app_window.updatePlusLimitsSignal.emit(rlimit, used)
+                        
                 if config.app_window.plus_paidUntil is not None and (
                     config.app_window.plus_paidUntil.date()
                     - datetime.datetime.now().date()
