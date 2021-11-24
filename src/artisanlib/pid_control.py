@@ -644,7 +644,7 @@ class FujiPID():
         if self.aw.ser.useModbusPort:
             reg = self.aw.modbus.address2register(register,3)
             self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,mode)
-            r == ""
+            r = ""
         else:                
             command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,register,mode)
             r = self.aw.ser.sendFUJIcommand(command,8)
