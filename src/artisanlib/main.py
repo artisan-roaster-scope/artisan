@@ -60,6 +60,7 @@ import multiprocessing
 import re
 import gc
 import io
+import functools
 
 # links CTR-C signals to the system default (ignore)
 import signal
@@ -23158,6 +23159,7 @@ class ApplicationWindow(QMainWindow):
                 _log.exception(e)
 
     @staticmethod
+    @functools.lru_cache(maxsize=None) # we cache the result to avoid re-compuation
     def calc_env():
         # we try to set the users standard environment, replacing the one pointing to the restrictive python build in Artisan
         my_env = os.environ.copy()
@@ -23174,6 +23176,8 @@ class ApplicationWindow(QMainWindow):
                         for line in proc.stdout:
                             if isinstance(line, bytes):
                                 (k, _, value) = line.partition(b"=")
+                                k = k.decode('UTF-8')
+                                value = value.decode('UTF-8')
                             else:
                                 (k, _, value) = line.partition("=")
                             # don't copy PYTHONHOME nor PYTHONPATH if it points to the Artisan.app
@@ -23184,6 +23188,7 @@ class ApplicationWindow(QMainWindow):
                     _log.exception(e)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
+        _log.debug("my_env: %s", my_env)
         return my_env
 
     @staticmethod

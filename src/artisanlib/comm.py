@@ -695,6 +695,7 @@ class serialport():
     def callprogram(self):
         import subprocess
         try:
+            output = None
 #            output = os.popen(self.aw.ser.externalprogram,"r").readline()
             # we try to set the users standard environment, replacing the one pointing to the restrictive python build in Artisan
             my_env = self.aw.calc_env()
@@ -738,7 +739,8 @@ class serialport():
             tx = self.aw.qmc.timeclock.elapsedMilli()
             _, _, exc_tb = sys.exc_info() 
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " callprogram(): {0} ").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "callprogram() received:") + " {0} ").format(str(output)),getattr(exc_tb, 'tb_lineno', '?'))
+            if output is not None:
+                self.aw.qmc.adderror((QApplication.translate("Error Message", "callprogram() received:") + " {0} ").format(str(output)),getattr(exc_tb, 'tb_lineno', '?'))
             return tx,0.,0.
             
     def callprogram_34(self):
