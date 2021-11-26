@@ -1961,7 +1961,7 @@ class PXRpidDlgControl(PXpidDlgControl):
 
 
 ############################################################################
-######################## FUJI PXG4 PID CONTROL DIALOG ######################
+######################## FUJI PXG4/PXF PID CONTROL DIALOG ##################
 ############################################################################
 
 class PXG4pidDlgControl(PXpidDlgControl):
@@ -2419,7 +2419,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         # LAYOUTS
         tab1Layout = QGridLayout() #TAB1
         tab1Layout.setSpacing(10)
-        tab1Layout.setSizeConstraint(2)
+        tab1Layout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize) # 2
         tab1Layout.addLayout(buttonRampSoakLayout1,0,0)
         tab1Layout.addLayout(buttonRampSoakLayout2,0,1)
         tab1Layout.addWidget(button_rson,1,0)
@@ -2432,7 +2432,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         tab1Layout.addWidget(button_writeallrs,4,1)
         tab2Layout = QGridLayout() #TAB2 
         tab2Layout.setSpacing(10)
-        tab2Layout.setSizeConstraint(2)
+        tab2Layout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize) # 2
         tab2Layout.addWidget(labelsv,0,0)
         tab2Layout.addWidget(labelsvedit,0,1)
         tab2Layout.addWidget(self.sv7edit,1,0)

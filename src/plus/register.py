@@ -96,7 +96,6 @@ def addPath(uuid: str, path: str) -> None:
     import portalocker
     try:
         register_semaphore.acquire(1)
-        _log.debug("addPath(%s,%s)", str(uuid), str(path))
         with portalocker.Lock(uuid_cache_path_lock, timeout=0.5) as fh:
             addPathShelve(uuid, path, fh)
     except portalocker.exceptions.LockException as e:
@@ -128,7 +127,6 @@ def getPath(uuid: str) -> Optional[str]:
     import shelve
     try:
         register_semaphore.acquire(1)
-        _log.debug("getPath(%s)", str(uuid))
         with portalocker.Lock(uuid_cache_path_lock, timeout=0.5) as fh:
             try:
                 with shelve.open(uuid_cache_path) as db:
@@ -189,7 +187,6 @@ def getPath(uuid: str) -> Optional[str]:
 def scanDir(path: Optional[str] = None):
     _log.debug("scanDir(%s)", path)
     try:
-        _log.debug("scanDir(%s)", path)
         if path is None:
             # search the last used path
             currentDictory = Path(

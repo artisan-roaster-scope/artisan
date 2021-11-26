@@ -22539,25 +22539,61 @@ class ApplicationWindow(QMainWindow):
                                         self.sendmessage("Artisan Command: {}".format(cs))
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
-                            elif cs == "PIDon":
-                                aw.pidcontrol.pidOn()
                             elif cs == "PIDoff":
-                                aw.pidcontrol.pidOff()
+                                if aw.qmc.device == 0: # Fuji
+                                    standby = aw.fujipid.getONOFFstandby()
+                                    if standby == 0: # standby is off (=0), turn it on (=1)
+                                        aw.fujipid.setONOFFstandby(1)
+                                        aw.sendmessage(QApplication.translate("Message","PID set to OFF"))
+                                else:
+                                    aw.pidcontrol.pidOn()
+                            elif cs == "PIDon":
+                                if aw.qmc.device == 0: # Fuji
+                                    standby = aw.fujipid.getONOFFstandby()
+                                    if standby == 1: # standby is on (=1), turn it off (=0)
+                                        aw.fujipid.setONOFFstandby(0)
+                                        aw.sendmessage(QApplication.translate("Message","PID set to ON"))                                                       
+                                else:
+                                    aw.pidcontrol.pidOff()
                             elif cs == "PIDtoggle":
-                                aw.pidcontrol.togglePID()
+                                if aw.qmc.device == 0: # Fuji
+                                    standby = aw.fujipid.getONOFFstandby()
+                                    if standby == 1: # standby is on (=1), turn it off (=0)
+                                        aw.fujipid.setONOFFstandby(0)
+                                        aw.sendmessage(QApplication.translate("Message","PID set to ON")) 
+                                    elif standby == 0: # standby is off (=0), turn it on (=1)
+                                        aw.fujipid.setONOFFstandby(1)
+                                        aw.sendmessage(QApplication.translate("Message","PID set to OFF"))
+                                else:
+                                    aw.pidcontrol.togglePID()
                             # pidmode(<n>) : 0: manual, 1: RS, 2: background follow
                             elif cs.startswith("pidmode(") and cs.endswith(")"):
                                 try:
                                     value = int(cs[len("pidmode("):-1])
-                                    if value == 0:
-                                        aw.pidcontrol.svMode = 0
-                                        aw.sendmessage(QApplication.translate("Message","PID mode manual"))
-                                    elif value == 1:
-                                        aw.pidcontrol.svMode = 1
-                                        aw.sendmessage(QApplication.translate("Message","PID mode Ramp/Soak"))
-                                    elif value == 2:
-                                        aw.pidcontrol.svMode = 2
-                                        aw.sendmessage(QApplication.translate("Message","PID mode background"))
+                                    if aw.qmc.device == 0: # Fuji PID
+                                        #rs state =0 OFF, = 1 ON, = 2 hold
+                                        if value == 0:
+                                            aw.fujipid.setrampsoak(0)
+                                            aw.fujipid.followBackground = False
+                                            aw.sendmessage(QApplication.translate("Message","PID mode manual"))
+                                        elif value == 1:
+                                            aw.fujipid.setrampsoak(1)
+                                            aw.fujipid.followBackground = False
+                                            aw.sendmessage(QApplication.translate("Message","PID mode Ramp/Soak"))
+                                        elif value == 2:
+                                            aw.fujipid.setrampsoak(0)
+                                            aw.fujipid.followBackground = True
+                                            aw.sendmessage(QApplication.translate("Message","PID mode background"))
+                                    else: # software PID
+                                        if value == 0:
+                                            aw.pidcontrol.svMode = 0
+                                            aw.sendmessage(QApplication.translate("Message","PID mode manual"))
+                                        elif value == 1:
+                                            aw.pidcontrol.svMode = 1
+                                            aw.sendmessage(QApplication.translate("Message","PID mode Ramp/Soak"))
+                                        elif value == 2:
+                                            aw.pidcontrol.svMode = 2
+                                            aw.sendmessage(QApplication.translate("Message","PID mode background"))
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # playbackmode(<n>) with 0: off, 1: time, 2: BT, 3: ET
@@ -34797,16 +34833,15 @@ class ApplicationWindow(QMainWindow):
             modifiers = QApplication.keyboardModifiers()
             if modifiers == Qt.KeyboardModifier.ControlModifier and self.qmc.device == 0:
                 # a right-click on the Control button will toggle PID Standby on and off
-                if (aw.ser.controlETpid[0] == 0 and aw.fujipid.PXR["runstandby"][0] == 0) or \
-                    (aw.ser.controlETpid[0] == 1 and aw.ser.controlETpid[0] == 0):
+                standby = aw.fujipid.getONOFFstandby()
+                if standby == 0:
                     # standby is off (=0), turn it on (=1)
                     aw.fujipid.setONOFFstandby(1)
-                    aw.sendmessage(QApplication.translate("Message","PID Standby ON"))
-                elif (aw.ser.controlETpid[0] == 0 and aw.fujipid.PXR["runstandby"][0] == 1) or \
-                    (aw.ser.controlETpid[0] == 1 and aw.ser.controlETpid[0] == 1):
+                    aw.sendmessage(QApplication.translate("Message","PID set to OFF"))
+                elif standby == 1:
                     # standby is on (=1), turn it off (=0)
                     aw.fujipid.setONOFFstandby(0)
-                    aw.sendmessage(QApplication.translate("Message","PID Standby OFF"))
+                    aw.sendmessage(QApplication.translate("Message","PID set to ON"))
             else:
                 if self.ser.controlETpid[0] == 0:
                     dialog = PXG4pidDlgControl(self,self)

@@ -569,49 +569,6 @@ class FujiPID():
         #val range -3 to 103%. Check for possible decimal digit user settings
         return val
 
-    #turns ON turns OFF current ramp soak mode
-    #flag =0 OFF, flag = 1 ON, flag = 2 hold
-    #A ramp soak pattern defines a whole profile. They have a minimum of 4 segments.
-    # returns True on success, False otherwise
-    def setrampsoak(self,flag):
-        register = None
-        if self.aw.ser.controlETpid[0] == 0: #Fuji PXG
-            register = self.PXG4["rampsoak"][1]        
-        elif self.aw.ser.controlETpid[0] == 1: #Fuji PXR
-            register = self.PXR["rampsoak"][1]
-        elif self.aw.ser.controlETpid[0] == 4:
-            register = self.PXF["rampsoak"][1]
-        if self.aw.ser.useModbusPort:
-            if register is not None:
-                reg = self.aw.modbus.address2register(register,6)
-                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,flag)
-                if flag == 1:
-                    self.aw.fujipid.rampsoak = True
-                    self.aw.sendmessage(QApplication.translate("Message","RS ON"))
-                elif flag == 0:
-                    self.aw.fujipid.rampsoak = False
-                    self.aw.sendmessage(QApplication.translate("Message","RS OFF"))
-                else:
-                    self.aw.sendmessage(QApplication.translate("Message","RS on HOLD"))
-                return True         
-        elif register is not None:
-            command = self.message2send(self.aw.ser.controlETpid[1],6,register,flag)
-            r = self.aw.ser.sendFUJIcommand(command,8)
-            #if OK
-            if r == command:
-                if flag == 1:
-                    self.aw.fujipid.rampsoak = True
-                    self.aw.sendmessage(QApplication.translate("Message","RS ON"))
-                elif flag == 0:
-                    self.aw.fujipid.rampsoak = False
-                    self.aw.sendmessage(QApplication.translate("Message","RS OFF"))
-                else:
-                    self.aw.sendmessage(QApplication.translate("Message","RS on HOLD"))
-                return True
-            self.aw.qmc.adderror(QApplication.translate("Error Message","RampSoak could not be changed"))
-            return False
-        return False
-        
     def getrampsoakmode(self):
         if self.aw.ser.controlETpid[0] == 0: #Fuji PXG
             register = self.PXG4["rampsoakpattern"][1]
@@ -657,9 +614,53 @@ class FujiPID():
                 self.PXF["rampsoakpattern"][0] = mode
             return True
         return False
+            
+    #turns ON turns OFF current ramp soak mode
+    #flag =0 OFF, flag = 1 ON, flag = 2 hold
+    #A ramp soak pattern defines a whole profile. They have a minimum of 4 segments.
+    # returns True on success, False otherwise
+    def setrampsoak(self,flag):
+        register = None
+        if self.aw.ser.controlETpid[0] == 0: #Fuji PXG
+            register = self.PXG4["rampsoak"][1]        
+        elif self.aw.ser.controlETpid[0] == 1: #Fuji PXR
+            register = self.PXR["rampsoak"][1]
+        elif self.aw.ser.controlETpid[0] == 4: #Fuji PXF
+            register = self.PXF["rampsoak"][1]
+        if self.aw.ser.useModbusPort:
+            if register is not None:
+                reg = self.aw.modbus.address2register(register,6)
+                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,flag)
+                if flag == 1:
+                    self.aw.fujipid.rampsoak = True
+                    self.aw.sendmessage(QApplication.translate("Message","RS ON"))
+                elif flag == 0:
+                    self.aw.fujipid.rampsoak = False
+                    self.aw.sendmessage(QApplication.translate("Message","RS OFF"))
+                else:
+                    self.aw.sendmessage(QApplication.translate("Message","RS on HOLD"))
+                return True         
+        elif register is not None:
+            command = self.message2send(self.aw.ser.controlETpid[1],6,register,flag)
+            r = self.aw.ser.sendFUJIcommand(command,8)
+            #if OK
+            if r == command:
+                if flag == 1:
+                    self.aw.fujipid.rampsoak = True
+                    self.aw.sendmessage(QApplication.translate("Message","RS ON"))
+                elif flag == 0:
+                    self.aw.fujipid.rampsoak = False
+                    self.aw.sendmessage(QApplication.translate("Message","RS OFF"))
+                else:
+                    self.aw.sendmessage(QApplication.translate("Message","RS on HOLD"))
+                return True
+            self.aw.qmc.adderror(QApplication.translate("Error Message","RampSoak could not be changed"))
+            return False
+        return False
 
     # returns True on success, False otherwise
     def setONOFFstandby(self,flag):
+        _log.debug("setONOFFstandby(%s)",flag)
         #flag = 0 standby OFF, flag = 1 standby ON (pid off)
         #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
         #Fuji PXG
@@ -672,12 +673,11 @@ class FujiPID():
         if self.aw.ser.useModbusPort:
             reg = self.aw.modbus.address2register(register,6)
             self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,flag)
-            r = None
         else:
             command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,register,flag)
             #TX and RX
             r = self.aw.ser.sendFUJIcommand(command,8)
-        if r == command or self.aw.ser.useModbusPort:
+        if self.aw.ser.useModbusPort or r == command:
             if self.aw.ser.controlETpid[0] == 0:
                 self.aw.fujipid.PXG4["runstandby"][0] = flag
             elif self.aw.ser.controlETpid[0] == 1:
@@ -688,6 +688,15 @@ class FujiPID():
         mssg = QApplication.translate("Error Message","Exception:") + " setONOFFstandby()"
         self.aw.qmc.adderror(mssg)
         return False
+    
+    def getONOFFstandby(self):
+        if self.aw.ser.controlETpid[0] == 0:
+            return self.aw.fujipid.PXG4["runstandby"][0]
+        elif self.aw.ser.controlETpid[0] == 1:
+            return self.aw.fujipid.PXR["runstandby"][0]
+        elif self.aw.ser.controlETpid[0] == 4:
+            return self.aw.fujipid.PXF["runstandby"][0]
+        return None
                 
     #sets a new sv value (if slient=False, no output nor event recording is done, if move is True the SV slider is moved)
     def setsv(self,value,silent=False,move=True):
