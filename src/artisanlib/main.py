@@ -15990,8 +15990,7 @@ class ApplicationWindow(QMainWindow):
         #defaults the users profile path to the standard profilepath (incl. month/year subdirectories)
         self.userprofilepath = self.profilepath
 
-        self.printer = QPrinter(QPrinter.PrinterMode.HighResolution)            
-        self.printer.setCreator(application_name)
+        self.printer = None
 
         self.main_widget = QWidget(self)
         #set a minimum size (main window can be bigger but never smaller)
@@ -31612,8 +31611,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def filePrint(self,_=False):
-        image = aw.qmc.grab().toImage()
-
+        image = aw.qmc.grab().toImage() # a QImage on macOS
         if image.isNull():
             return
         if self.printer is None:
@@ -31621,14 +31619,19 @@ class ApplicationWindow(QMainWindow):
             self.printer.setCreator(application_name)
         form = QPrintDialog(self.printer, self)
         if form.exec():
+            # painter coordinates
             painter = QPainter(self.printer)
             rect = painter.viewport()
+            # image coordinates
             size = image.size()
             size.scale(rect.size(), Qt.AspectRatioMode.KeepAspectRatio)
-            painter.setViewport(rect.x(), rect.y(), size.width(),size.height())
-            painter.setWindow(image.rect()) #scale to fit page
+            painter.setViewport(rect.x(), rect.y(), size.width(), size.height()) # sets device coordinate system
+            image_rect = image.rect()
+            image_rect.setHeight(int(round(image_rect.height()/aw.devicePixelRatio())))
+            image_rect.setWidth(int(round(image_rect.width()/aw.devicePixelRatio())))
+            painter.setWindow(image_rect) #scale to fit page # sets logical coordinate system
             if isinstance(image, QPixmap):
-                painter.drawPixmap(0,0,image)
+                painter.drawPixmap(0, 0, image)
             else:
                 painter.drawImage(0, 0, image)
             painter.end()

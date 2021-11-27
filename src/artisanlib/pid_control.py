@@ -692,9 +692,9 @@ class FujiPID():
     def getONOFFstandby(self):
         if self.aw.ser.controlETpid[0] == 0:
             return self.aw.fujipid.PXG4["runstandby"][0]
-        elif self.aw.ser.controlETpid[0] == 1:
+        if self.aw.ser.controlETpid[0] == 1:
             return self.aw.fujipid.PXR["runstandby"][0]
-        elif self.aw.ser.controlETpid[0] == 4:
+        if self.aw.ser.controlETpid[0] == 4:
             return self.aw.fujipid.PXF["runstandby"][0]
         return None
                 
