@@ -13604,7 +13604,12 @@ class tgraphcanvas(FigureCanvas):
                     func = lambda x,a,b,c: a * numpy.log(b*x+c)
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    popt,_ = curve_fit(func, xa, yn) # pylint: disable=unbalanced-tuple-unpacking
+                    hint = [0.01,0.01,1]
+                    if power == 2:
+                        hint = [-0.001, 0.5, 10]
+                    elif power == 3:
+                        hint =     [-0.00001, -0.0001, 0.5, 10]
+                    popt,_ = curve_fit(func, xa, yn, p0=hint, maxfev=3000) # pylint: disable=unbalanced-tuple-unpacking
                 #perr = numpy.sqrt(numpy.diag(pcov))
                 if plot:
                     xb = numpy.array(self.timex)
@@ -18474,11 +18479,11 @@ class ApplicationWindow(QMainWindow):
 
     # takes an "Arduino" float time in seconds and returns the corresponding QTime() object
     @staticmethod
-    def time2QTime(t):
+    def time2QTime(t: float):
         return QTime(0,t//60,t%60)
     
     @staticmethod
-    def QTime2time(t):
+    def QTime2time(t: QTime):
         return t.minute() * 60 + t.second()
 
     def dragEnterEvent(self, event): # pylint: disable=no-self-use
