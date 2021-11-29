@@ -18475,7 +18475,7 @@ class ApplicationWindow(QMainWindow):
     # takes an "Arduino" float time in seconds and returns the corresponding QTime() object
     @staticmethod
     def time2QTime(t):
-        return QTime(0,t/60,t%60)
+        return QTime(0,t//60,t%60)
     
     @staticmethod
     def QTime2time(t):
