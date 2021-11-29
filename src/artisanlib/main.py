@@ -4062,7 +4062,7 @@ class tgraphcanvas(FigureCanvas):
                     #update SV on Arduino/TC4, Hottop, or MODBUS if in Ramp/Soak or Background Follow mode and PID is active
                     if aw.qmc.flagon: # only during sampling
                         #update SV on FujiPIDs
-                        if aw.qmc.device == 0 and aw.fujipid.followBackground:
+                        if aw.qmc.device == 0 and aw.fujipid.followBackground and aw.qmc.flagstart: # no SV updates while not yet recording for Fuji PIDs
                             # calculate actual SV
                             sv = aw.fujipid.calcSV(tx)
                             # update SV (if needed)
@@ -31624,11 +31624,14 @@ class ApplicationWindow(QMainWindow):
             rect = painter.viewport()
             # image coordinates
             size = image.size()
-            size.scale(rect.size(), Qt.AspectRatioMode.KeepAspectRatio)
+            rect_size = rect.size()
+            rect_size.setHeight(int(round(rect_size.height()*aw.devicePixelRatio())))
+            rect_size.setWidth(int(round(rect_size.width()*aw.devicePixelRatio())))
+            size.scale(rect_size, Qt.AspectRatioMode.KeepAspectRatio)
             painter.setViewport(rect.x(), rect.y(), size.width(), size.height()) # sets device coordinate system
             image_rect = image.rect()
-            image_rect.setHeight(int(round(image_rect.height()/aw.devicePixelRatio())))
-            image_rect.setWidth(int(round(image_rect.width()/aw.devicePixelRatio())))
+#            image_rect.setHeight(int(round(image_rect.height()/aw.devicePixelRatio())))
+#            image_rect.setWidth(int(round(image_rect.width()/aw.devicePixelRatio())))
             painter.setWindow(image_rect) #scale to fit page # sets logical coordinate system
             if isinstance(image, QPixmap):
                 painter.drawPixmap(0, 0, image)

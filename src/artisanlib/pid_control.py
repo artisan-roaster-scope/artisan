@@ -710,17 +710,17 @@ class FujiPID():
             
             #send command to the current sv (1-7)
             
-            #-- experimental begin
-            # read the current svN (1-7) being used
-            if self.aw.ser.useModbusPort:
-                reg = self.aw.modbus.address2register(reg_dict["selectsv"][1],3)
-                N = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
-            else:
-                command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict["selectsv"][1],1)
-                N = self.aw.fujipid.readoneword(command)
-            if N > 0:
-                reg_dict["selectsv"][0] = N
-            #-- experimental end
+#            #-- experimental begin
+#            # read the current svN (1-7) being used
+#            if self.aw.ser.useModbusPort:
+#                reg = self.aw.modbus.address2register(reg_dict["selectsv"][1],3)
+#                N = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+#            else:
+#                command = self.message2send(self.aw.ser.controlETpid[1],3,reg_dict["selectsv"][1],1)
+#                N = self.readoneword(command)
+#            if N > 0:
+#                reg_dict["selectsv"][0] = N
+#            #-- experimental end
             
             svkey = "sv"+ str(reg_dict["selectsv"][0]) #current sv
             if self.aw.ser.useModbusPort:
@@ -1477,7 +1477,7 @@ class PIDcontrol():
 #                # before and after DROP the SV configured in the dialog is returned (min/maxed)
 #                return max(self.aw.pidcontrol.svSliderMin,(min(self.aw.pidcontrol.svSliderMax,self.aw.pidcontrol.svValue)))
             if self.aw.qmc.timeindex[6] > 0: # after DROP, the SV configured in the dialog is returned (min/maxed)
-                return max(self.aw.pidcontrol.svSliderMin,(min(self.aw.pidcontrol.svSliderMax,self.aw.pidcontrol.svValue)))
+                return max(self.aw.pidcontrol.svSliderMin, min(self.aw.pidcontrol.svSliderMax, self.aw.pidcontrol.svValue))
             if self.aw.qmc.timeindex[0] < 0: # before CHARGE, the CHARGE temp of the background profile is returned
                 if self.aw.qmc.timeindexB[0] < 0:
                     # no CHARGE in background, return manual SV
