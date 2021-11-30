@@ -5697,7 +5697,7 @@ class tgraphcanvas(FigureCanvas):
                                 seconddigit = int(mathexpression[i+4])
                                 seconddigitstr = mathexpression[i+4]
                                 mathexpression = f"{mathexpression[:i+4]}{mathexpression[i+5:]}"
-                                Yshiftval = f"{10*Yshiftval}{seconddigit}"
+                                Yshiftval = 10*Yshiftval + seconddigit
 
                             val, evalsign = self.shiftValueEvalsign(timex,index,sign,Yshiftval)
 
@@ -5769,7 +5769,7 @@ class tgraphcanvas(FigureCanvas):
                                         seconddigit = int(mathexpression[i+5])
                                         seconddigitstr = mathexpression[i+5]
                                         mathexpression = f"{mathexpression[:i+5]}{mathexpression[i+6:]}"
-                                        Yshiftval = f"{10*Yshiftval}{seconddigit}"
+                                        Yshiftval = 10*Yshiftval + seconddigit
 
                                     if not len(self.timeB):
                                         # no background, set to 0
@@ -5949,7 +5949,6 @@ class tgraphcanvas(FigureCanvas):
 
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
-
                 #if plotter
                 if equeditnumber:
                     self.plottermessage = f"P{equeditnumber}: {e}"
@@ -5957,7 +5956,6 @@ class tgraphcanvas(FigureCanvas):
                 #if sample()
                 #virtual devices with symbolic may need 2 samples min.
                 if len(sample_timex) > 2:
-                    _log.exception(e)
                     e = str(e)
                     _, _, exc_tb = sys.exc_info()
                     mathexpression = mathexpression.replace("{","(").replace("}",")") # avoid {x} leading to key arrows
