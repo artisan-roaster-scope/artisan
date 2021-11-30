@@ -235,7 +235,7 @@ class NotificationManager(QObject):
     # actually presents the given notification to the user
     def showNotification(self, notification: Notification):
         try:
-            icon = QSystemTrayIcon.Information # NoIcon, Information, Warning, Critical
+            icon = QSystemTrayIcon.MessageIcon.Information # NoIcon, Information, Warning, Critical
             if notification.type in [NotificationType.ARTISAN_SYSTEM, NotificationType.ARTISAN_USER]:
                 icon = self.notificationArtisanIcon()
             elif notification.type in [NotificationType.PLUS_SYSTEM, NotificationType.PLUS_REMINDER]:

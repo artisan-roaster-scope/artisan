@@ -124,8 +124,9 @@ class PhidgetManager():
                                 khubport = k.getHubPort()
                                 if khub == hub and khubport == hubport:                                    
                                     self.attachedPhidgetChannels[k] = True
-                            except Exception as e: # pylint: disable=broad-except
-                                _log.exception(e)
+                            except Exception: # pylint: disable=broad-except
+                                #_log.exception(e)
+                                pass
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             self.attachedPhidgetChannels.pop(channel, None)
