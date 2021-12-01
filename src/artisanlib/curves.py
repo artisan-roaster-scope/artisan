@@ -1434,7 +1434,7 @@ class CurvesDlg(ArtisanDialog):
     @pyqtSlot(bool)
     def expradiobuttonClicked(self,_=False):
         expradioButton = self.sender()
-        if self.expradioButton.isChecked():
+        if expradioButton.isChecked():
             self.exppower = expradioButton.power
             self.expvarCheck.setChecked(False)
             self.expvar(0)
