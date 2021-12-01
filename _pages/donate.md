@@ -18,3 +18,9 @@ If you think Artisan is useful to you and your business, contribute financially 
 **Watch out!** 
 Home roasting enthusiasts often donate 10-100.- (in $ or EUR), while small roasting businesses and consultant that use Artisan in their daily work tend to donate 100-300.- (in $ or EUR) per year. For extra tech support, [please inquire](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"}.
 {: .notice--primary}
+
+<a href="https://artisan.plus/" target="_blank">
+![image](/assets/images/artisan-plus-logo.svg)
+</a>
+
+Another way to support the Artisan project is to subscribe to the [inventory management system artisan.plus](https://artisan.plus){:target="_blank"}. A yearly subscription for HOME roasters is only 49.- EUR with the additional benefit of access to coupons by [green bean supplier partners](https://doc.artisan.plus/partners/){:target="_blank"}.
