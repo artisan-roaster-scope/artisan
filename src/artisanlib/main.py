@@ -24015,7 +24015,7 @@ class ApplicationWindow(QMainWindow):
                     self.toggleForegroundShowfullFlag()
                 elif k == 79:                       #O (toggle background showfull flag)
                     self.toggleBackroundShowfullFlag()
-                elif k in [72, 170]:           #H  (the 170 corresponds to the ALT-H Qt.Key_ordfeminine result returned by Qt6 on macOS)
+                elif k == 72:           #H  (load / delete background profile
                     if not self.qmc.designerflag and not bool(aw.comparator):
                         # allow SHIFT-H for all platforms (ALT-H additionally for non-Windows platforms)
                         if ((alt_modifier or shift_modifier) and platf != 'Windows') or (control_shift_modifier or control_alt_modifier and platf == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
