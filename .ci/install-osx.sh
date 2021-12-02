@@ -43,9 +43,13 @@ python3 -m pip install --upgrade pip
 # thus we force the compilation from source
 sudo -H python3 -m pip install --no-binary lxml lxml==4.6.4 # 4.6.3, 4.6.2
 sudo -H python3 -m pip install -r src/requirements.txt
+
 # use a custom py2app v0.23 with apptemplate main-x86_64 build for 
 # target 10.13 using MacOSX10.15.sdk build on macOS 10.15 to add dark-mode support to builds
-sudo -H python3 -m pip install .ci/py2app-0.23-py2.py3-none-any.whl
+#sudo -H python3 -m pip install .ci/py2app-0.23-py2.py3-none-any.whl
+# with PyQt6 we need to use 0.26.1 which duplicates the Qt installation hopefully resolved in the next version
+sudo -H python3 -m pip install .ci/py2app-0.27-py2.py3-none-any.whl
+
 # replaced sudo -H python3 -m pip install -r src/requirements-${TRAVIS_OS_NAME}.txt
 sudo -H python3 -m pip install -r src/requirements-${ARTISAN_OS}.txt
 sudo rm -rf /usr/local/opt/python@3.9/lib/python3.9/site-packages/matplotlib/mpl-data/sample_data

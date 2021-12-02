@@ -259,7 +259,8 @@ Qt_modules = [
     'QtQml',
     'QtQmlModels',
     'QtWebChannel',
-    'QtPositioning'
+    'QtPositioning',
+    'QtOpenGL'
 ]
 Qt_frameworks = [module + ".framework" for module in Qt_modules]
 

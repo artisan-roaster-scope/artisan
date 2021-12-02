@@ -23,7 +23,7 @@ wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus needs to be put after
 openpyxl==3.0.9 # 3.0.7
 #PyQt 5.11.3 is preinstalled
-pyinstaller==4.4 #4.2
+pyinstaller==4.7 #4.4
 cffi==1.14.4
 cryptography==3.4.7 #3.3.2
 keyring==23.2.1 # 23.1.0 #22.3.0 # versions beyond 23.0.1 require importlib_metadata >=v3.6 (RPi buster comes with v2.0)

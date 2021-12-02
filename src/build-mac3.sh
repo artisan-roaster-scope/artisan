@@ -27,17 +27,19 @@ else
     export PYTHONBIN=$PYTHON/bin
     export PYTHONPATH=$PYTHON/lib/python${PYTHON_V}
 
-    export PYLUPDATE=$PYTHONBIN/pylupdate5
-    export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt5 # from PyQt v5.15.4 this dir changed form PyQt5/Qt to PyQt5/Qt5
-    export QT_SRC_PATH=~/Qt5.15.2/5.15.2/clang_64
-    export PYUIC=pyuic5
-    export PYRCC=pyrcc5
+# for PyQt5:
+#    export PYLUPDATE=$PYTHONBIN/pylupdate5
+#    export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt5 # from PyQt v5.15.4 this dir changed form PyQt5/Qt to PyQt5/Qt5
+#    export QT_SRC_PATH=~/Qt5.15.2/5.15.2/clang_64
+#    export PYUIC=pyuic5
+#    export PYRCC=pyrcc5
 
-#    export QT_PATH=${PYTHONPATH}/site-packages/PyQt6/Qt6
-#    export QT_SRC_PATH=~/Qt6/6.2.0/macos
-#    export PYUIC=pyuic6
-#    export PYRCC=pyrcc6
-#    export PYLUPDATE=./pylupdate6pro
+# for PyQt6:
+    export QT_PATH=${PYTHONPATH}/site-packages/PyQt6/Qt6
+    export QT_SRC_PATH=~/Qt6/6.2.0/macos
+    export PYUIC=pyuic6
+    export PYRCC=pyrcc6
+    export PYLUPDATE=./pylupdate6pro
 
     export MACOSX_DEPLOYMENT_TARGET=10.15
     export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
