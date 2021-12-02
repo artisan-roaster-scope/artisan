@@ -319,9 +319,9 @@ def authentify() -> bool:
 
 def getHeaders(
     authorized: bool = True, decompress: bool = True) -> Dict[str, str]:
-    os, os_version = config.app_window.get_os()  # @UndefinedVariable
+    os, os_version, os_arch = config.app_window.get_os()  # @UndefinedVariable
     headers = {
-        "user-agent": f"Artisan/{__version__} ({os}; {os_version})"
+        "user-agent": f"Artisan/{__version__} ({os}; {os_version}; {os_arch})"
     }
     try:
         locale = config.app_window.locale_str

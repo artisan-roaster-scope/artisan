@@ -28019,9 +28019,10 @@ class ApplicationWindow(QMainWindow):
             profile["version"] = str(__version__)
             profile["revision"] = str(__revision__)
             profile["build"] = str(__build__)
-            os_name,os_version = self.get_os()
+            os_name,os_version,os_arch = self.get_os()
             profile["artisan_os"] = os_name
             profile["artisan_os_version"] = os_version
+            profile["artisan_os_arch"] = os_arch
             profile["mode"] = self.qmc.mode
             profile["viewerMode"] = self.app.artisanviewerMode
             profile["timeindex"] = self.qmc.timeindex
@@ -30574,25 +30575,53 @@ class ApplicationWindow(QMainWindow):
         else:
             event.ignore()
 
-    # returns OS name and version strings
+    # returns OS name, version and architecture as strings
+    # ex: "macOS", "11.6",
     @staticmethod
+    @functools.lru_cache(maxsize=None) # we cache the result to avoid re-compuation
     def get_os():
+        def get_macOS_version():
+            # platform.mac_ver() returns 10.16-style version info on Big Sur
+            # and is likely to do so until Python is compiled with the macOS 11 SDK
+            # which may not happen for a while. And Apple's odd tricks mean that even
+            # reading /System/Library/CoreServices/SystemVersion.plist is unreliable.
+            try:
+                import subprocess
+                os_version_tuple = subprocess.check_output(
+                    ('/usr/bin/sw_vers', '-productVersion'),
+                    env={'SYSTEM_VERSION_COMPAT': '0'}
+                ).decode('UTF-8').rstrip().split('.')
+            except subprocess.CalledProcessError:
+                os_version_tuple = platform.mac_ver()[0].split(".")
+            os_version_tuple = os_version_tuple[0:2]
+            return '.'.join(os_version_tuple)
+        def get_macOS_arch():
+            # platform.machine() returns x86_64 on M1 macs running Artisan under Rossetta2
+            try:
+                import cpuinfo
+                manufacturer = cpuinfo.get_cpu_info().get('brand_raw')
+                return 'm1' if 'm1' in manufacturer.lower() else 'x86_64'
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+                return platform.machine()
         try:
             if platform.system().startswith('Darwin'):
-                return "Mac OS X", platform.mac_ver()[0]
+#                return "macOS", platform.mac_ver()[0], platform.machine() # reports wrong version on macOS 12 on older Python versions
+                return "macOS", get_macOS_version(), get_macOS_arch()
             if platform.system().startswith("Windows"):
-                return "Windows", platform.release()
+                return "Windows", platform.release(), platform.machine()
             # we assume Linux
             if os.uname()[4][:3] == 'arm':
-                return "RPi",platform.release()
+                return "RPi",platform.release(),os.uname()[4]
             try:
                 lib,version = platform.libc_ver()
-                return "Linux","{} {}".format(lib,version)
+                return "Linux","{} {}".format(lib,version), platform.machine()
             except Exception: # pylint: disable=broad-except
                 return "",""
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             return "",""
+
 
     def closeEventSettings(self, filename=None):
         #save window geometry and position. See QSettings documentation.
@@ -30633,9 +30662,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("artisan_version",__version__)
             settings.setValue("artisan_revision",__revision__)
             settings.setValue("artisan_build",__build__)
-            os_name,os_version = self.get_os()
+            os_name,os_version,os_arch = self.get_os()
             settings.setValue("artisan_os",os_name)
             settings.setValue("artisan_os_version",os_version)
+            settings.setValue("artisan_os_arch",os_arch)
             settings.endGroup()
             #save device
             settings.beginGroup("Device")
