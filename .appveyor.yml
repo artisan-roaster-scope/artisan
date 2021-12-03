@@ -122,7 +122,7 @@ for:
     - python -V
     - "%PYTHON%\\python.exe -m pip install --upgrade pip"
     - "%PYTHON%\\python.exe -m pip install wheel"
-    - "%PYTHON%\\python.exe -m pip install .ci\\pyinstaller-4.3-py3-none-any.whl"
+    - "%PYTHON%\\python.exe -m pip install .ci\\pyinstaller-4.7-py3-none-any.whl"
   ## start: build the pyinstaller bootloader and install (using the default VS 2015)
   #  - curl -L -O https://github.com/pyinstaller/pyinstaller/releases/download/v%PYINSTALLER_VER%/PyInstaller-%PYINSTALLER_VER%.tar.gz
   #  - tar xzf PyInstaller-%PYINSTALLER_VER%.tar.gz
