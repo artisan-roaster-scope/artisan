@@ -85,17 +85,6 @@ except Exception: # pylint: disable=broad-except
     pass
 ## MONKEY PATCH END:
 
-
-try:
-    #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import QLibraryInfo  # @UnusedImport @UnresolvedImport
-    pyqtversion = 6
-    os.environ["QT_API"] = "PyQt6"
-except Exception: # pylint: disable=broad-except
-    pyqtversion = 5
-    os.environ["QT_API"] = "PyQt5"
-#pyqtversion = 5 # until MPL and all build tools fully support PyQt6 we run on PyQt5
-
 try: # activate support for hiDPI screens on Windows
     if str(platform.system()).startswith("Windows"):
         os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
@@ -113,48 +102,49 @@ except Exception: # pylint: disable=broad-except
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
 
-#pylint: disable-next = E, W, R, C
-if pyqtversion < 6:
+try:
+    #pylint: disable-next = E, W, R, C
+    from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect, # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error
+                             QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnresolvedImport @UnusedImport
+                             QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport @UnusedImport
+                             QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport @UnusedImport
+                             QSlider, # @Reimport @UnresolvedImport @UnusedImport
+                             QColorDialog, QFrame, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
+                             QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt6.QtGui import (QAction, QImage, QImageReader, QWindow, # @Reimport @UnresolvedImport @UnusedImport
+                                QKeySequence, # @Reimport @UnresolvedImport @UnusedImport
+                                QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
+                                QRegularExpressionValidator,QDoubleValidator, QPainter ,QCursor) # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog) # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, # @Reimport @UnresolvedImport @UnusedImport
+                              qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @Reimport @UnresolvedImport @UnusedImport
+                              QRegularExpression, QDate, QUrl, QDir, Qt, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler) # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @Reimport @UnresolvedImport @UnusedImport
+    #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
+    from PyQt6.QtWebEngineWidgets import QWebEngineView # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt6 import sip # @Reimport @UnresolvedImport @UnusedImport
+except Exception:
     #pylint: disable = E, W, R, C
-    from PyQt5.QtWidgets import (QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport @UnusedImport
-                             QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnusedImport
-                             QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnusedImport
-                             QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnusedImport
-                             QSlider, QStackedWidget, # @Reimport @UnusedImport
-                             QColorDialog, QFrame, QProgressDialog, # @Reimport @UnusedImport
-                             QStyleFactory, QMenu, QLayout) # @Reimport @UnusedImport
-    from PyQt5.QtGui import (QImage, QImageReader, QWindow,  # @Reimport @UnusedImport
-                                QKeySequence, # @UnusedImport
-                                QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport @UnusedImport
-                                QRegularExpressionValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport @UnusedImport
-    from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport @UnusedImport
-    from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport @UnusedImport
-                              qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport @UnusedImport
-                              QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnusedImport
-    from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @UnusedImport # pylint: disable=unused-import
+    from PyQt5.QtWidgets import (QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport @UnresolvedImport @UnusedImport
+                             QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnresolvedImport @UnusedImport
+                             QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport @UnusedImport
+                             QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport @UnusedImport
+                             QSlider, QStackedWidget, # @Reimport @UnresolvedImport @UnusedImport
+                             QColorDialog, QFrame, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
+                             QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt5.QtGui import (QImage, QImageReader, QWindow,  # @Reimport @UnresolvedImport @UnusedImport
+                                QKeySequence, # @Reimport @UnresolvedImport @UnusedImport
+                                QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
+                                QRegularExpressionValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor) # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog) # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, # @Reimport @UnresolvedImport @UnusedImport
+                              qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,  # @Reimport @UnresolvedImport @UnusedImport
+                              QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler) # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @Reimport @UnresolvedImport @UnusedImport
     #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
-    from PyQt5.QtWebEngineWidgets import QWebEngineView # @UnusedImport @UnusedImport # pylint: disable=unused-import
-    from PyQt5 import sip # @UnusedImport
-else:
-    from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport @UnresolvedImport # pylint: disable=import-error
-                             QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnresolvedImport
-                             QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport
-                             QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport
-                             QSlider,  # @Reimport @UnresolvedImport
-                             QColorDialog, QFrame, QProgressDialog, # @Reimport @UnresolvedImport
-                             QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport
-    from PyQt6.QtGui import (QAction, QImage, QImageReader, QWindow,  # @Reimport @UnresolvedImport # pylint: disable=import-error
-                                QKeySequence, # @Reimport s@UnresolvedImport
-                                QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport @UnresolvedImport
-                                QRegularExpressionValidator,QDoubleValidator, QPainter ,QCursor)  # @Reimport @UnresolvedImport
-    from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport @UnresolvedImport # pylint: disable=import-error
-    from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport @UnresolvedImport # pylint: disable=import-error
-                              qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @Reimport @UnresolvedImport
-                              QRegularExpression, QDate, QUrl, QDir, Qt, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport @UnresolvedImport
-    from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @Reimport @UnusedImport @UnresolvedImport # pylint: disable=import-error
-    #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
-    from PyQt6.QtWebEngineWidgets import QWebEngineView # @Reimport  @UnusedImport @UnresolvedImport # pylint: disable=import-error
-    from PyQt6 import sip # @Reimport @UnusedImport @UnresolvedImport # pylint: disable=import-error
+    from PyQt5.QtWebEngineWidgets import QWebEngineView # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
+
 
 from artisanlib.suppress_errors import suppress_stdout_stderr
 
@@ -615,7 +605,7 @@ import plus.register
 #################### Ambient Data Collection  #########################################
 #######################################################################################
 
-class AmbientWorker(QObject):
+class AmbientWorker(QObject): # pylint: disable=too-few-public-methods 
     finished = pyqtSignal()
     
     def run(self):
@@ -15747,7 +15737,7 @@ class SampleThread(QThread):
 ###     Artisan thread Server
 #########################################################################################################
 
-class Athreadserver(QWidget):
+class Athreadserver(QWidget): # pylint: disable=too-few-public-methods 
 
     def createSampleThread(self):
         if not aw.qmc.flagsamplingthreadrunning: # we only start a new sampling thread if none is running yet
@@ -15763,7 +15753,7 @@ class Athreadserver(QWidget):
 ###     Event Action Thread
 #########################################################################################################
 
-class EventActionThread(QThread):
+class EventActionThread(QThread): # pylint: disable=too-few-public-methods 
 
     def __init__(self, action, command):
         QThread.__init__(self)
@@ -15779,7 +15769,7 @@ class EventActionThread(QThread):
 #########################################################################################################
 
 # applies comma2dot as fixup to automatically turn numbers like "1,2" into valid numbers like "1.0" and the empty entry into "0.0"
-class MyQDoubleValidator(QDoubleValidator):
+class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-methods 
     
     def fixup(self, input_value): # pylint: disable=no-self-use
         if input_value is None or input_value == "":
@@ -33606,12 +33596,14 @@ class ApplicationWindow(QMainWindow):
                 self.html_loader.setZoomFactor(1)
             if self.pdf_page_layout is None:
                 # lazy imports
-                if pyqtversion < 6:
-                    from PyQt5.QtCore import QMarginsF   # @Reimport @UnusedImport
-                    from PyQt5.QtGui import QPageLayout, QPageSize, QPagedPaintDevice # @Reimport @UnusedImport
-                else:
-                    from PyQt6.QtCore import QMarginsF  # @Reimport @UnresolvedImport
-                    from PyQt6.QtGui import QPageLayout, QPageSize  # @Reimport @UnresolvedImport                
+                try:
+                    #pylint: disable = E, W, R, C
+                    from PyQt6.QtCore import QMarginsF  # @UnusedImport @Reimport  @UnresolvedImport
+                    from PyQt6.QtGui import QPageLayout, QPageSize  # @UnusedImport @Reimport  @UnresolvedImport            
+                except:
+                    #pylint: disable = E, W, R, C
+                    from PyQt5.QtCore import QMarginsF  # @UnusedImport @Reimport  @UnresolvedImport
+                    from PyQt5.QtGui import QPageLayout, QPageSize  # @UnusedImport @Reimport  @UnresolvedImport
                 if QPrinter().pageLayout().pageSize().id() == QPageSize.PageSizeId.Letter:
                     # Letter
                     ps = QPageSize(QPageSize.PageSizeId.Letter)
@@ -37550,10 +37542,10 @@ def initialize_locale(my_app) -> str:
 
     #load Qt default translations from QLibrary
     qtTranslator = QTranslator(my_app)
-    if pyqtversion == 5:
-        qt_trans_path = QLibraryInfo.location(QLibraryInfo.TranslationsPath)
-    else:
+    try:
         qt_trans_path = QLibraryInfo.path(QLibraryInfo.LibraryPath.TranslationsPath)
+    except Exception: # pylint: disable=broad-except
+        qt_trans_path = QLibraryInfo.location(QLibraryInfo.TranslationsPath)
     if qtTranslator.load("qtbase_" + locale, qt_trans_path):
         my_app.installTranslator(qtTranslator)
     #find Qt default translations in Unix binaries
