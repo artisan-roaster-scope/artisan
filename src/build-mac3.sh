@@ -8,8 +8,9 @@ set -e  # reduced logging
 if [ ! -z $APPVEYOR ]; then
     # Appveyor CI builds
     echo "NOTICE: Appveyor build"
+    export LC_CTYPE="en_US.UTF-8"
     export PYTHON_V=3.9
-    export PYTHON=/Users/appveyor/venv3.9.6
+    export PYTHON=/Users/appveyor/venv3.9 # venv3.9.8
     export PYTHONBIN=$PYTHON/bin
     export PYTHONPATH=$PYTHON/lib/python3.9
 
@@ -22,13 +23,13 @@ if [ ! -z $APPVEYOR ]; then
     
 # for PyQt6
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt6/Qt6
-    export QT_SRC_PATH=~/Qt6/6.2.0/macos
+    export QT_SRC_PATH==${QT_PATH}
     export PYUIC=pyuic6
     export PYRCC=pyrcc6
     export PYLUPDATE=./pylupdate6pro
     
     export MACOSX_DEPLOYMENT_TARGET=10.15
-    export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
+#    export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
 else
     # standard local builds
     echo "NOTICE: Standard build"

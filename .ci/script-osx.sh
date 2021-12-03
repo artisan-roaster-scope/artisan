@@ -1,7 +1,7 @@
 #!/bin/sh
 
-#set -ex
-set -e # reduced logging
+set -ex
+#set -e # reduced logging
 
 cd src
 ./build-mac3.sh
