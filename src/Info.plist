@@ -146,6 +146,8 @@
 	<string>10.15</string>
 	<key>LSMultipleInstancesProhibited</key>
 	<string>false</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Artisan would like to use bluetooth to communication with your Acaia scale</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
