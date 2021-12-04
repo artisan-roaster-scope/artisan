@@ -9,7 +9,7 @@ roastertype_setup=Phidget 2xRTD
 
 [Device]
 id=68
-phidget1200_async=false
+phidget1200_async=true
 phidget1200_changeTrigger=0
 phidget1200_dataRate=250
 phidget1200_formula=2

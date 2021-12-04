@@ -771,7 +771,7 @@ class tgraphcanvas(FigureCanvas):
         'eventmessagetimer', 'resizeredrawing', 'logoimg', 'analysisresultsloc_default', 'analysisresultsloc', 'analysispickflag', 'analysisresultsstr',
         'analysisstartchoice', 'analysisoffset', 'curvefitstartchoice', 'curvefitoffset', 'segmentresultsloc_default', 'segmentresultsloc',
         'segmentpickflag', 'segmentdeltathreshold', 'segmentsamplesthreshold', 'stats_summary_rect', 'title_text', 'title_artist', 'title_width',
-        'background_title_width', 'xlabel_text', 'xlabel_artist', 'xlabel_width', 'lazyredraw_on_resize_timer' ]
+        'background_title_width', 'xlabel_text', 'xlabel_artist', 'xlabel_width', 'lazyredraw_on_resize_timer', 'mathdictionary_base' ]
         
         
         
@@ -794,6 +794,15 @@ class tgraphcanvas(FigureCanvas):
         self.palette1 = self.palette.copy()
         self.EvalueColor_default = ['#43A7CF','#49B160','#800080','#AD0427']
         self.EvalueTextColor_default = ['white','#FFFFFF','white','#FFFFFF']
+        
+        # standard math functions allowed in symbolic formulas
+        self.mathdictionary_base = {
+            "min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,
+            "pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
+            "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,
+            "log":math.log,"radians":math.radians,
+            "sqrt":math.sqrt,"degrees":math.degrees}
+        
 
         self.artisanflavordefaultlabels: Final = [QApplication.translate("Textbox", "Acidity"),
                                             QApplication.translate("Textbox", "Aftertaste"),
@@ -5309,9 +5318,8 @@ class tgraphcanvas(FigureCanvas):
     # The given mathexpression has to be a non-empty string!
     def eval_math_expression(self,mathexpression,t,equeditnumber=None, RTsname=None,RTsval=None,t_offset=0):
         if len(mathexpression):
-            mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
-                              "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
-                              "sqrt":math.sqrt,"degrees":math.degrees}
+            mathdictionary = {}
+            mathdictionary.update(self.mathdictionary_base) # extend by the standard math symbolic formulas
 
             if aw.qmc.flagstart or not aw.qmc.flagon:
                 sample_timex = self.timex
@@ -9485,7 +9493,10 @@ class tgraphcanvas(FigureCanvas):
         width = img.width()
         height = img.height()
         imgsize = img.bits()
-        imgsize.setsize(img.byteCount())
+        try:
+            imgsize.setsize(img.sizeInBytes())
+        except Exception: # pylint: disable=broad-except
+            imgsize.setsize(img.byteCount()) byteCount() is depricated, but kept here for compatibility with older Qt versions
         arr = numpy.array(imgsize).reshape((height, width, int(32/8)))
         return arr
 
@@ -22818,7 +22829,10 @@ class ApplicationWindow(QMainWindow):
                             # loadBackground(<filepath>)
                             elif cs.startswith("loadBackground(") and cs.endswith(")"):
                                 try:
-                                    fp = str(eval(cs[len("loadBackground("):-1])) # pylint: disable=eval-used
+                                    try:
+                                        fp = str(eval(cs[len("loadBackground("):-1])) # pylint: disable=eval-used
+                                    except Exception: # pylint: disable=broad-except
+                                        fp = str(cs[len("loadBackground("):-1])
                                     self.loadBackgroundSignal.emit(fp)
                                     self.sendmessage("Artisan Command: {}".format(cs))
                                 except Exception as e: # pylint: disable=broad-except
