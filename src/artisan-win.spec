@@ -7,14 +7,14 @@ if os.environ.get('APPVEYOR'):
   ARTISAN_SRC = r'C:\projects\artisan\src'
   PYTHON = r'c:\python39-x64'
 else:
-  ARTISAN_SRC = r'C:\Users\luther\Desktop\src'
-  PYTHON = r'C:\Program Files\Python37'
+  ARTISAN_SRC = r'C:\Users\roast\Documents\artisan-roaster-scope\src'
+  PYTHON = r'C:\Program Files\Python39-x64'
 NAME = 'artisan'
 
 ##
 TARGET = 'dist\\' + NAME + '\\'
 PYTHON_PACKAGES = PYTHON + r'\Lib\site-packages'
-PYQT_QT = PYTHON_PACKAGES + r'\PyQt5\Qt'
+PYQT_QT = PYTHON_PACKAGES + r'\PyQt6\Qt'
 PYQT_QT_BIN = PYQT_QT + r'\bin'
 PYQT_QT_TRANSLATIONS = PYQT_QT + r'\translations'
 YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
@@ -36,7 +36,7 @@ a = Analysis(['artisan.py'],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],
-             hiddenimports=['scipy.spatial.transform._rotation_groups', 'scipy._lib.messagestream','pywintypes','win32cred','win32timezone', 'pkg_resources.py2_warn','scipy.special.cython_special'],
+             hiddenimports=['PyQt6.QtWebChannel','PyQt6.QtWebEngineCore','scipy.spatial.transform._rotation_groups', 'scipy._lib.messagestream','pywintypes','win32cred','win32timezone', 'pkg_resources.py2_warn','scipy.special.cython_special'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher)
