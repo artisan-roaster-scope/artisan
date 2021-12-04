@@ -9496,7 +9496,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             imgsize.setsize(img.sizeInBytes())
         except Exception: # pylint: disable=broad-except
-            imgsize.setsize(img.byteCount()) byteCount() is depricated, but kept here for compatibility with older Qt versions
+            imgsize.setsize(img.byteCount()) # byteCount() is depricated, but kept here for compatibility with older Qt versions
         arr = numpy.array(imgsize).reshape((height, width, int(32/8)))
         return arr
 
