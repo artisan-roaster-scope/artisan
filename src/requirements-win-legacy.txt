@@ -19,10 +19,10 @@ scipy==1.7.2 # 1.7.1 # depends on numpy thus we have to put it after numpy
 matplotlib==3.5.0 # 3.4.3 # 3.4.1 requires pyinstaller > 4.2 # currently pyinstaller up to 4.0 is not compatible with MPL 3.3.x
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
-#PyQt5==5.15.5 #5.14.2
-#PyQtWebEngine==5.15.4
-PyQt6==6.2.2
-PyQt6-WebEngine==6.2.1
+PyQt5==5.15.5 #5.14.2
+PyQtWebEngine==5.15.4
+#PyQt6==6.2.2
+#PyQt6-WebEngine==6.2.1
 openpyxl==3.0.9 # 3.0.6
 keyring==23.2.1 #21.8.0 # 21.5.0 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
 lxml==4.6.4 #4.6.3
