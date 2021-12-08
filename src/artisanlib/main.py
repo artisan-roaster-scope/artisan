@@ -7347,6 +7347,79 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.profileDataSemaphore.available() < 1:
                     aw.qmc.profileDataSemaphore.release(1)
 
+    def smoothETBT(self,smooth,recomputeAllDeltas,sampling,decay_smoothing_p):
+        try:
+            # we resample the temperatures to regular interval timestamps
+            if self.timex is not None and self.timex and len(self.timex)>1:
+                timex_lin = numpy.linspace(self.timex[0],self.timex[-1],len(self.timex))
+            else:
+                timex_lin = None
+            temp1_nogaps = fill_gaps(self.resizeList(self.temp1,len(self.timex)))
+            temp2_nogaps = fill_gaps(self.resizeList(self.temp2,len(self.timex)))
+
+            if smooth or len(self.stemp1) != len(self.timex):
+                if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon: # we don't smooth, but remove the dropouts
+                    self.stemp1 = temp1_nogaps
+                else:
+                    self.stemp1 = self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+            if smooth or len(self.stemp2) != len(self.timex):
+                if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon:  # we don't smooth, but remove the dropouts
+                    self.stemp2 = fill_gaps(self.temp2)
+                else:
+                    self.stemp2 = self.smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+
+            #populate delta ET (self.delta1) and delta BT (self.delta2)
+            # calculated here to be available for parsepecialeventannotations(). the curve are plotted later.
+            if self.DeltaETflag or self.DeltaBTflag:
+                if (recomputeAllDeltas or (self.DeltaETflag and self.delta1 == []) or (self.DeltaBTflag and self.delta2 == [])) and not self.flagstart: # during recording we don't recompute the deltas
+                    cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                    decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
+                    t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+                    t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+                    # we start RoR computation 10 readings after CHARGE to avoid this initial peak
+                    if aw.qmc.timeindex[0]>-1:
+                        RoR_start = min(aw.qmc.timeindex[0]+10, len(self.timex)-1)
+                    else:
+                        RoR_start = -1
+                    self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
+        except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " smoothETBT() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+
+    def smoothETBTBkgnd(self,recomputeAllDeltas,decay_smoothing_p):
+        try:
+            if recomputeAllDeltas or (self.DeltaETBflag and self.delta1B == []) or (self.DeltaBTBflag and self.delta2B == []):
+                
+                # we resample the temperatures to regular interval timestamps
+                if self.timeB is not None and self.timeB:
+                    timeB_lin = numpy.linspace(self.timeB[0],self.timeB[-1],len(self.timeB))
+                else:
+                    timeB_lin = None
+
+                # we populate temporary smoothed ET/BT data arrays
+                cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                st1 = self.smooth_list(self.timeB,fill_gaps(self.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
+                st2 = self.smooth_list(self.timeB,fill_gaps(self.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
+                # we start RoR computation 10 readings after CHARGE to avoid this initial peak
+                if aw.qmc.timeindexB[0]>-1:
+                    RoRstart = min(aw.qmc.timeindexB[0]+10, len(self.timeB)-1)
+                else:
+                    RoRstart = -1
+                if aw.qmc.background_profile_sampling_interval is None:
+                    dsET = None
+                else:
+                    dsET = max(1,int(aw.qmc.deltaETspan / aw.qmc.background_profile_sampling_interval))
+                if aw.qmc.background_profile_sampling_interval is None:
+                    dsBT = None
+                else:
+                    dsBT = max(1,int(aw.qmc.deltaBTspan / aw.qmc.background_profile_sampling_interval))
+                self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin,deltaETsamples=dsET,deltaBTsamples=dsBT)
+        except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " smmothETBTBkgnd() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
     def redraw(self, recomputeAllDeltas=True, smooth=True,sampling=False, takelock=True, forceRenewAxis=False):
@@ -7820,33 +7893,8 @@ class tgraphcanvas(FigureCanvas):
                                                 sketch_params=None,path_effects=[],
                                                 alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundBT")))
 
-                    # we resample the temperatures to regular interval timestamps
-                    if self.timeB is not None and self.timeB:
-                        timeB_lin = numpy.linspace(self.timeB[0],self.timeB[-1],len(self.timeB))
-                    else:
-                        timeB_lin = None
-
                     #populate background delta ET (self.delta1B) and delta BT (self.delta2B)
                     if self.DeltaETBflag or self.DeltaBTBflag:
-                        if recomputeAllDeltas or (self.DeltaETBflag and self.delta1B == []) or (self.DeltaBTBflag and self.delta2B == []):
-                            # we populate temporary smoothed ET/BT data arrays
-                            cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-                            st1 = self.smooth_list(self.timeB,fill_gaps(self.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
-                            st2 = self.smooth_list(self.timeB,fill_gaps(self.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
-                            # we start RoR computation 10 readings after CHARGE to avoid this initial peak
-                            if aw.qmc.timeindexB[0]>-1:
-                                RoRstart = min(aw.qmc.timeindexB[0]+10, len(self.timeB)-1)
-                            else:
-                                RoRstart = -1
-                            if aw.qmc.background_profile_sampling_interval is None:
-                                dsET = None
-                            else:
-                                dsET = max(1,int(aw.qmc.deltaETspan / aw.qmc.background_profile_sampling_interval))
-                            if aw.qmc.background_profile_sampling_interval is None:
-                                dsBT = None
-                            else:
-                                dsBT = max(1,int(aw.qmc.deltaBTspan / aw.qmc.background_profile_sampling_interval))
-                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin,deltaETsamples=dsET,deltaBTsamples=dsBT)
                         ##### DeltaETB,DeltaBTB curves
                         if self.delta_ax:
                             trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
@@ -8273,39 +8321,7 @@ class tgraphcanvas(FigureCanvas):
                 self.labels = []
                 self.legend_lines = []
 
-                # we resample the temperatures to regular interval timestamps
-                if self.timex is not None and self.timex and len(self.timex)>1:
-                    timex_lin = numpy.linspace(self.timex[0],self.timex[-1],len(self.timex))
-                else:
-                    timex_lin = None
-                temp1_nogaps = fill_gaps(self.resizeList(self.temp1,len(self.timex)))
-                temp2_nogaps = fill_gaps(self.resizeList(self.temp2,len(self.timex)))
-
-                if smooth or len(self.stemp1) != len(self.timex):
-                    if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon: # we don't smooth, but remove the dropouts
-                        self.stemp1 = temp1_nogaps
-                    else:
-                        self.stemp1 = self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-                if smooth or len(self.stemp2) != len(self.timex):
-                    if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon:  # we don't smooth, but remove the dropouts
-                        self.stemp2 = fill_gaps(self.temp2)
-                    else:
-                        self.stemp2 = self.smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-
-                #populate delta ET (self.delta1) and delta BT (self.delta2)
-                # calculated here to be available for parsepecialeventannotations(). the curve are plotted later.
-                if self.DeltaETflag or self.DeltaBTflag:
-                    if (recomputeAllDeltas or (self.DeltaETflag and self.delta1 == []) or (self.DeltaBTflag and self.delta2 == [])) and not self.flagstart: # during recording we don't recompute the deltas
-                        cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-                        decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
-                        t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-                        t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-                        # we start RoR computation 10 readings after CHARGE to avoid this initial peak
-                        if aw.qmc.timeindex[0]>-1:
-                            RoR_start = min(aw.qmc.timeindex[0]+10, len(self.timex)-1)
-                        else:
-                            RoR_start = -1
-                        self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
+                self.smoothETBT(smooth,recomputeAllDeltas,sampling,decay_smoothing_p)
 
 ## Output Idle Noise StdDev of BT RoR
 #                        try:
@@ -13631,13 +13647,16 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Error in lnRegression:") + " lnRegression() " + str(e),getattr(exc_tb, 'tb_lineno', '?'))
             if power == 2:
-                fit = QApplication.translate("Label","x") +"\u00b2"
+                fit = "x\u00b2"
             elif power == 3:
-                fit = QApplication.translate("Label","x") +"\u00b3"
+                fit = "x\u00b3"
             else:
                 fit = QApplication.translate("Label","ln()")
-            QMessageBox.warning(aw,QApplication.translate("Message","Curve fit problem"),
-                    QApplication.translate("Message","Cannot fit this curve to " + fit))
+            msg = (QApplication.translate("Message","Cannot fit this curve to " + fit))
+            QApplication.processEvents() #this is here to be sure the adderror gets wrtten to the log before the sendmessage
+            aw.sendmessage(msg)
+            #QMessageBox.warning(aw,QApplication.translate("Message","Curve fit problem"), msg)
+
         return res
 
     #interpolation type
@@ -20275,7 +20294,7 @@ class ApplicationWindow(QMainWindow):
                             temp = aw.qmc.extratemp2[x // 2]
                         else:
                             temp = aw.qmc.on_extratemp2[x // 2]
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 # timex might not have an index x // 2
                 pass
         return temp,timex
@@ -20293,65 +20312,93 @@ class ApplicationWindow(QMainWindow):
 
     def curveSimilarity2(self,exp=-1,analysis_starttime=0,analysis_endtime=0): # pylint: disable=no-self-use
         result = {}
+        result['mse_BT'] = float('nan')
+        result['mse_deltaBT'] = float('nan')
+        result['rmse_BT'] = float('nan')
+        result['rmse_deltaBT'] = float('nan')
+        result['r2_BT'] = float('nan')
+        result['r2_deltaBT'] = float('nan')
+        result['ror_fcs_act'] = '--'  #not a type issue, prettytable accepts text or number
+        result['ror_fcs_delta'] = '--'  #not a type issue, prettytable accepts text or number
+        result['ror_max_delta'] = float('nan')
+        result['ror_min_delta'] = float('nan')
+        result['segmentresultstr'] = ''
+        mask = numpy.empty(0)
+        fitRoR = "--"  #not a type issue, prettytable accepts text or number
+        RoR_FCs_act = "--"  #not a type issue, prettytable accepts text or number
+        mse_BT = float('nan')
+        mse_deltaBT = float('nan')
+        rmse_BT = float('nan')
+        rmse_deltaBT = float('nan')
+        r2_BT = float('nan')
+        r2_deltaBT = float('nan')
+        RoR_FCs_delta = '--'  #not a type issue, prettytable accepts text or number
+        maxdelta = float('nan')
+        mindelta = float('nan')
         try:
-            analysis_start = aw.qmc.time2index(analysis_starttime)
-            analysis_end = aw.qmc.time2index(analysis_endtime) +1 # +1 was added 9/25
-            np_bt = numpy.array(aw.qmc.stemp2[analysis_start:analysis_end])
-            np_dbt = numpy.array(aw.qmc.delta2[analysis_start:analysis_end])
-            #compare to background curve?
-            if exp == 4:  
-                # create background BT and background delta BT arrays over the interval of interest
-                xarray = numpy.array(aw.qmc.timex[analysis_start:analysis_end])
-                # replace None entries with 0 in the background delta list
-                _delta2B = [0 if x is None else x for x in aw.qmc.delta2B]
-                np_dbtb = numpy.array([self.qmc.timetemparray2temp(aw.qmc.timeB,_delta2B,x) for x in xarray])
-                np_btb = numpy.array([self.qmc.timetemparray2temp(aw.qmc.timeB,aw.qmc.temp2B,x) for x in xarray])
-            else:
-                np_btb = numpy.array(aw.qmc.stemp2B[analysis_start:analysis_end])
-                np_dbtb = numpy.array(aw.qmc.delta2B[analysis_start:analysis_end])
+            if self.qmc.background:
+                analysis_start = aw.qmc.time2index(analysis_starttime)
+                analysis_end = aw.qmc.time2index(analysis_endtime) +1 # +1 was added 9/25
+                np_bt = numpy.array(aw.qmc.stemp2[analysis_start:analysis_end])
+                np_dbt = numpy.array(aw.qmc.delta2[analysis_start:analysis_end])
+                #compare to background curve?
+                if exp == 4:  
+                    # create background BT and background delta BT arrays over the interval of interest
+                    xarray = numpy.array(aw.qmc.timex[analysis_start:analysis_end])
+                    # replace None entries with 0 in the background delta list
+                    _delta2B = [0 if x is None else x for x in aw.qmc.delta2B]
+                    np_dbtb = numpy.array([self.qmc.timetemparray2temp(aw.qmc.timeB,_delta2B,x) for x in xarray])
+                    np_btb = numpy.array([self.qmc.timetemparray2temp(aw.qmc.timeB,aw.qmc.temp2B,x) for x in xarray])
+                else:
+                    np_btb = numpy.array(aw.qmc.stemp2B[analysis_start:analysis_end])
+                    np_dbtb = numpy.array(aw.qmc.delta2B[analysis_start:analysis_end])
 
-            # Replace None values in the Delta curves with the closest numeric value on the right
-            for i in range(len(np_dbt) - 1, -1, -1):
-                if np_dbt[i] is None:
+                # Replace None values in the Delta curves with the closest numeric value on the right
+                def replNone(a,nv):
+                    for i in range(len(nv)):
+                        if i == len(nv) -1:
+                            a[nv[i]] = 0
+                        elif a[nv[i]+1] == None:
+                            a[nv[i]] = 0
+                        else:
+                            a[nv[i]] = a[nv[i] +1]
+                    return a
+                nv = numpy.where(np_dbt is None)[0]
+                nvb = numpy.where(np_dbtb is None)[0]
+                np_dbt = replNone(np_dbt,nv)
+                np_dbtb = replNone(np_dbtb,nvb)
+                
+                if len(np_dbtb) == 0:
+                    raise ValueError('Length of np_dbtb is zero')
+
+                #MSE
+                mse_BT = numpy.mean(numpy.square(np_bt - np_btb))
+                mse_deltaBT = numpy.mean(numpy.square(np_dbt - np_dbtb))
+
+                # RMSE
+                rmse_BT = numpy.sqrt(mse_BT)
+                rmse_deltaBT = numpy.sqrt(mse_deltaBT)
+
+                # R squared - Coefficient of determination from 0 to 1 (1 is a good result, 0 is not good)
+                # residual sum of squares
+                ss_res_bt = numpy.sum((np_bt - np_btb) ** 2)
+                ss_res_dbt = numpy.sum((np_dbt - np_dbtb) ** 2)
+                # total sum of squares
+                ss_tot_bt = numpy.sum((np_bt - numpy.mean(np_bt)) ** 2)
+                ss_tot_dbt = numpy.sum((np_dbt - numpy.mean(np_dbt)) ** 2)
+                # r-squared
+                r2_BT = 1 - (ss_res_bt / ss_tot_bt)
+                r2_deltaBT = 1 - (ss_res_dbt / ss_tot_dbt)
+
+                # Tests that require FCs is marked
+                if aw.qmc.timeindex[2]:
+                    # RoR at time of FCs, and Actual RoR versus Template RoR at FCs
+                    RoR_FCs_act = aw.qmc.delta2[aw.qmc.timeindex[2]]
                     try:
-                        np_dbt[i] = np_dbt[i+1]
+                        fcs_idx = aw.qmc.timeindex[2]-analysis_start
+                        RoR_FCs_delta = RoR_FCs_act - np_dbtb[fcs_idx]
                     except Exception: # pylint: disable=broad-except
-                        np_dbt[i] = 0
-            for i in range(len(np_dbtb) - 1, -1, -1):
-                if np_dbtb[i] is None:
-                    try:
-                        np_dbtb[i] = np_dbtb[i+1]
-                    except Exception: # pylint: disable=broad-except
-                        np_dbtb[i] = 0
-
-            #MSE
-            mse_BT = numpy.mean(numpy.square(np_bt - np_btb))
-            mse_deltaBT = numpy.mean(numpy.square(np_dbt - np_dbtb))
-
-            # RMSE
-            rmse_BT = numpy.sqrt(mse_BT)
-            rmse_deltaBT = numpy.sqrt(mse_deltaBT)
-
-            # R squared - Coefficient of determination from 0 to 1 (1 is a good result, 0 is not good)
-            # residual sum of squares
-            ss_res_bt = numpy.sum((np_bt - np_btb) ** 2)
-            ss_res_dbt = numpy.sum((np_dbt - np_dbtb) ** 2)
-            # total sum of squares
-            ss_tot_bt = numpy.sum((np_bt - numpy.mean(np_bt)) ** 2)
-            ss_tot_dbt = numpy.sum((np_dbt - numpy.mean(np_dbt)) ** 2)
-            # r-squared
-            r2_BT = 1 - (ss_res_bt / ss_tot_bt)
-            r2_deltaBT = 1 - (ss_res_dbt / ss_tot_dbt)
-
-            # Tests that require FCs is marked
-            if aw.qmc.timeindex[2]:
-                # RoR at time of FCs, and Actual RoR versus Template RoR at FCs
-                RoR_FCs_act = aw.qmc.delta2[aw.qmc.timeindex[2]]
-                try:
-                    fcs_idx = aw.qmc.timeindex[2]-analysis_start
-                    RoR_FCs_delta = RoR_FCs_act - np_dbtb[fcs_idx]
-                except Exception: # pylint: disable=broad-except
-                    RoR_FCs_delta = float('nan')
+                        RoR_FCs_delta = float('nan')
 
                 #max and min difference between actual RoR and template RoR
                 maxdelta = numpy.max(np_dbt - np_dbtb)
@@ -20461,97 +20508,179 @@ class ApplicationWindow(QMainWindow):
                 ioi_abc_deltas = numpy.sum(numpy.trapz(ioi_abs_deltas, x=times_all))
                 ioi_abcprime = ioi_abc_deltas / ioi_seconds
 
-                # general information
-                fitRoR = 60*(np_dbtb[-1] - np_dbtb[0]) / (aw.qmc.timex[timeindexs_all[-1]] - aw.qmc.timex[timeindexs_all[0]])
-                fitTypes = [QApplication.translate("Label","ln()"),
-                            "",
-                            QApplication.translate("Label","x") + "\u00b2",
-                            QApplication.translate("Label","x") + "\u00b3",
-                            QApplication.translate("Label","Bkgnd"), ""]
-                fitType = fitTypes[exp]
-                if aw.qmc.filterDropOuts:
-                    smoothspikes = QApplication.translate("Label","On")
-                else:
-                    smoothspikes = QApplication.translate("Label","Off")
-                if aw.qmc.optimalSmoothing:
-                    optimal= QApplication.translate("Label","On")
-                else:
-                    optimal = QApplication.translate("Label","Off")
-                if aw.qmc.polyfitRoRcalc:
-                    polyfit = QApplication.translate("Label","On")
-                else:
-                    polyfit = QApplication.translate("Label","Off")
-
-                # build a table of results
-                import prettytable  # @UnresolvedImport
-                tbl = prettytable.PrettyTable()
-                tbl.field_names = [QApplication.translate("Label","Start"),
-                                   QApplication.translate("Label","Duration"),
-                                   QApplication.translate("Label","Max Delta"),
-                                   QApplication.translate("Label","Swing"),
-                                   QApplication.translate("Label","ABC/secs")  ]
-                tbl.float_format = "5.2"
-                for i in range(len(mask)):
-                    thistime = self.eventtime2string(aw.qmc.timex[timeindexs_seg[i]] - aw.qmc.timex[aw.qmc.timeindex[0]])
-                    duration = self.eventtime2string(deltatimes_seg[i])
-                    if i > 0:
-                        swing = maxdeltas_seg[i] - maxdeltas_seg[i-1]
-                    else:
-                        swing = ""
-                    abcprime = segment_abc_deltas[i] / deltatimes_seg[i]
-                    tbl.add_row([thistime, duration, maxdeltas_seg[i], swing, abcprime ])
-                if len(mask) > 1:
-                    tbl.add_row(['~~~~~','~~~~~','~~~~~','~~~~~','~~~~~'])
-                    tbl.add_row([ioi_start, ioi_duration, ioi_maxdelta, '-', ioi_abcprime ])
-                segmentresultstr = QApplication.translate("Label","Segment Analysis (rise, crash and flick)") + "\n"
-                segmentresultstr += tbl.get_string(border=True)
-
-                # build table of general information
-                tbl2 = prettytable.PrettyTable()
-                tbl2.field_names = ["A","A1", "B", "B1"  ]
-                tbl2.align = 'l'
-                tbl2.align["A1"] = "r"
-                tbl2.align["B1"] = "r"
-                tbl2.float_format = "5.2"
-                tbl2.add_row([QApplication.translate("Label","Curve Fit"), fitType, '', ''])
-                tbl2.add_row([QApplication.translate("Label","Samples Threshold"), aw.qmc.segmentsamplesthreshold, QApplication.translate("Label","Delta Threshold"), aw.qmc.segmentdeltathreshold])
-                tbl2.add_row([QApplication.translate("Label","Sample rate (secs)"), self.qmc.profile_sampling_interval, QApplication.translate("Label","Smooth Curves/Spikes"), f'{str(int((aw.qmc.curvefilter-1)/2))}/{str(smoothspikes)}' ])
-                tbl2.add_row([QApplication.translate("Label","Delta Span/Smoothing"), f'{str(aw.qmc.deltaBTspan)}/{str(int((aw.qmc.deltaBTfilter-1)/2))}', QApplication.translate("Label","Polyfit/Optimal Smoothing"), f'{str(polyfit)}/{str(optimal)}'  ])
-                tbl2.add_row([QApplication.translate("Label","Fit RoRoR (C/min/min)"), fitRoR, QApplication.translate("Label","Actual RoR at FCs"), RoR_FCs_act])
-                segmentresultstr += "{}{}".format("\n", tbl2.get_string(border=False,header=False))
-
-                result['segmentresultstr'] = segmentresultstr
-
+                # fit RoR in C/min/min
+                if exp == 2:
+                    fitRoR = 60*(np_dbtb[-1] - np_dbtb[0]) / (aw.qmc.timex[timeindexs_all[-1]] - aw.qmc.timex[timeindexs_all[0]])
+                    fitRoR = f'{fitRoR:.2f}'
             else:
-                RoR_FCs_act = 0
-                RoR_FCs_delta = 0
-                maxdelta = 0
-                mindelta = 0
-                result['segmentresultstr'] = ""
+                # there is no background
+                pass
 
-            # build the dict to return
-            result['mse_BT'] = mse_BT
-            result['mse_deltaBT'] = mse_deltaBT
-            result['rmse_BT'] = rmse_BT
-            result['rmse_deltaBT'] = rmse_deltaBT
-            result['r2_BT'] = r2_BT
-            result['r2_deltaBT'] = r2_deltaBT
-            result['ror_fcs_act'] = RoR_FCs_act
-            result['ror_fcs_delta'] = RoR_FCs_delta
-            result['ror_max_delta'] = maxdelta
-            result['ror_min_delta'] = mindelta
+            # general information
+            fitTypes = [QApplication.translate("Label","ln()"),
+                        "",
+                        QApplication.translate("Label","x") + "\u00b2",
+                        QApplication.translate("Label","x") + "\u00b3",
+                        QApplication.translate("Label","Bkgnd"), ""]
+            fitType = fitTypes[exp]
+            if aw.qmc.filterDropOuts:
+                smoothspikes = QApplication.translate("Label","On")
+            else:
+                smoothspikes = QApplication.translate("Label","Off")
+            if aw.qmc.optimalSmoothing:
+                optimal= QApplication.translate("Label","On")
+            else:
+                optimal = QApplication.translate("Label","Off")
+            if aw.qmc.polyfitRoRcalc:
+                polyfit = QApplication.translate("Label","On")
+            else:
+                polyfit = QApplication.translate("Label","Off")
+
+            # build a table of results
+            import prettytable  # @UnresolvedImport
+            tbl = prettytable.PrettyTable()
+            tbl.field_names = [QApplication.translate("Label","Start"),
+                               QApplication.translate("Label","Duration"),
+                               QApplication.translate("Label","Max Delta"),
+                               QApplication.translate("Label","Swing"),
+                               QApplication.translate("Label","ABC/secs")  ]
+            tbl.float_format = "5.2"
+            for i in range(len(mask)):
+                thistime = self.eventtime2string(aw.qmc.timex[timeindexs_seg[i]] - aw.qmc.timex[aw.qmc.timeindex[0]])
+                duration = self.eventtime2string(deltatimes_seg[i])
+                if i > 0:
+                    swing = maxdeltas_seg[i] - maxdeltas_seg[i-1]
+                else:
+                    swing = ""
+                abcprime = segment_abc_deltas[i] / deltatimes_seg[i]
+                tbl.add_row([thistime, duration, maxdeltas_seg[i], swing, abcprime ])
+            if len(mask) > 1:
+                tbl.add_row(['~~~~~','~~~~~','~~~~~','~~~~~','~~~~~'])
+                tbl.add_row([ioi_start, ioi_duration, ioi_maxdelta, '-', ioi_abcprime ])
+            segmentresultstr = QApplication.translate("Label","Segment Analysis (rise, crash and flick)") + "\n"
+            segmentresultstr += tbl.get_string(border=True)
+
+            # build table of general information
+            tbl2 = prettytable.PrettyTable()
+            tbl2.field_names = ["A","A1", "B", "B1"  ]
+            tbl2.align = 'l'
+            tbl2.align["A1"] = "r"
+            tbl2.align["B1"] = "r"
+            tbl2.float_format = "5.2"
+            tbl2.add_row([QApplication.translate("Label","Curve Fit"), fitType, '', ''])
+            tbl2.add_row([QApplication.translate("Label","Samples Threshold"), aw.qmc.segmentsamplesthreshold, QApplication.translate("Label","Delta Threshold"), aw.qmc.segmentdeltathreshold])
+            tbl2.add_row([QApplication.translate("Label","Sample rate (secs)"), self.qmc.profile_sampling_interval, QApplication.translate("Label","Smooth Curves/Spikes"), f'{str(int((aw.qmc.curvefilter-1)/2))}/{str(smoothspikes)}' ])
+            tbl2.add_row([QApplication.translate("Label","Delta Span/Smoothing"), f'{str(aw.qmc.deltaBTspan)}/{str(int((aw.qmc.deltaBTfilter-1)/2))}', QApplication.translate("Label","Polyfit/Optimal Smoothing"), f'{str(polyfit)}/{str(optimal)}'  ])
+            tbl2.add_row([QApplication.translate("Label","Fit RoRoR (C/min/min)"), fitRoR, QApplication.translate("Label","Actual RoR at FCs"), RoR_FCs_act])
+            segmentresultstr += "{}{}".format("\n", tbl2.get_string(border=False,header=False))
+
+            result['segmentresultstr'] = segmentresultstr
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " curveSimilatrity2(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
+        # build the dict to return
+        result['mse_BT'] = mse_BT
+        result['mse_deltaBT'] = mse_deltaBT
+        result['rmse_BT'] = rmse_BT
+        result['rmse_deltaBT'] = rmse_deltaBT
+        result['r2_BT'] = r2_BT
+        result['r2_deltaBT'] = r2_deltaBT
+        result['ror_fcs_act'] = RoR_FCs_act
+        result['ror_fcs_delta'] = RoR_FCs_delta
+        result['ror_max_delta'] = maxdelta
+        result['ror_min_delta'] = mindelta
+
         return result
+
+
+########################
+#    # computes the similarity between BT and backgroundBT as well as ET and backgroundET
+#    # iterates over all BT/ET values backward from DROP to the specified BT temperature
+#    # returns None in case no similarity can be computed
+#    def NEWcurveSimilarity(self,BTlimit=None): # pylint: disable=no-self-use
+#        _log.debug("***** In curveSimilarity(%s)", BTlimit,)  #dave
+#        try:
+#            # if background profile is loaded and both profiles have a DROP even set
+#            if aw.qmc.backgroundprofile is not None and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
+#                # calculate time delta between background and foreground DROP event
+#                dropTimeDelta = aw.qmc.timex[aw.qmc.timeindex[6]] - aw.qmc.timeB[aw.qmc.timeindexB[6]]
+#                totalQuadraticDeltaET = 0
+#                totalQuadraticDeltaBT = 0
+#                count = 0
+#                _log.debug("First (DROP?) i=%s, timex[i]=%s, temp2=%s", aw.qmc.timeindex[6], aw.qmc.timex[aw.qmc.timeindex[6]], aw.qmc.temp2[aw.qmc.timeindex[6]])  #dave
+#
+#
+#                # CM is based on the Phases Dry not marked Dry
+#                i = self.findDryEnd(phasesindex=1)
+#                drytime = self.qmc.timex[i -1]  #one sample before DE
+#                _log.debug("CM DE from phases, timeindex=%s, timex=%s, temp2=%s",i -1, self.qmc.timex[i -1], aw.qmc.temp2[i-1]) #dave
+#                analysis_start = i
+#                analysis_end = aw.qmc.timeindex[6]
+#                
+#                _log.debug("CM analysis_start= %s, analysis_end= %s",analysis_start, analysis_end)  #dave
+#                np_bt = numpy.array(aw.qmc.stemp2[analysis_start:analysis_end])
+#                np_dbt = numpy.array(aw.qmc.delta2[analysis_start:analysis_end])
+#                exp = 4  #dave
+#
+#                #compare to background curve?
+#                if exp == 4:  
+#                    _log.debug("CM verified exp == 4") #dave
+#                    # create background BT and background delta BT arrays over the interval of interest
+#                    xarray = numpy.array(aw.qmc.timex[analysis_start:analysis_end])
+##                    # replace None entries with 0 in the background delta list
+##                    _delta2B = [0 if x is None else x for x in aw.qmc.delta2B]
+#                    np_dbtb = numpy.array([self.qmc.timetemparray2temp(aw.qmc.timeB,_delta2B,x) for x in xarray])
+#                    np_btb = numpy.array([self.qmc.timetemparray2temp(aw.qmc.timeB,aw.qmc.temp2B,x) for x in xarray])
+#                else:
+#                    _log.debug("CM Bad boo, we should not be here")  #dave
+#                    _log.debug("stemp2B=%s, delta2B=%s",len(aw.qmc.stemp2B),len(aw.qmc.delta2B))
+#                    np_btb = numpy.array(aw.qmc.stemp2B[analysis_start:analysis_end])
+#                    np_dbtb = numpy.array(aw.qmc.delta2B[analysis_start:analysis_end])
+#
+#                # Replace None values in the Delta curves with the closest numeric value on the right
+#                def replNone(a,nv):
+#                    for i in range(len(nv)):
+#                        print(f"We got in here!")  #dave
+#                        if i == len(nv) -1:
+#                            a[nv[i]] = 0
+#                        elif a[nv[i]+1] == None:
+#                            a[nv[i]] = 0
+#                        else:
+#                            a[nv[i]] = a[nv[i] +1]
+#                    return a
+#                nv = numpy.where(np_dbt is None)[0]
+#                nvb = numpy.where(np_dbtb is None)[0]
+#                np_dbt = replNone(np_dbt,nv)
+#                np_dbtb = replNone(np_dbtb,nvb)
+#                
+#                _log.debug("np_bt=%s, np_btb=%s, np_dbt=%s, np_dbtb=%s", len(np_bt), len(np_btb), len(np_dbt), len(np_dbtb))
+#
+#                #MSE
+#                mse_BT = numpy.mean(numpy.square(np_bt - np_btb))
+#                mse_deltaBT = numpy.mean(numpy.square(np_dbt - np_dbtb))
+#
+#                # RMSE
+#                rmse_BT = numpy.sqrt(mse_BT)
+#                rmse_deltaBT = numpy.sqrt(mse_deltaBT)
+#
+#                return rmse_BT, rmse_deltaBT
+#
+#            # no DROP event registered
+#            return None, None
+#        except Exception as e: # pylint: disable=broad-except
+#            _log.exception(e)
+#            _, _, exc_tb = sys.exc_info()
+#            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " curveSimilatrity(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+#            return None, None
 
     # computes the similarity between BT and backgroundBT as well as ET and backgroundET
     # iterates over all BT/ET values backward from DROP to the specified BT temperature
     # returns None in case no similarity can be computed
     def curveSimilarity(self,BTlimit=None): # pylint: disable=no-self-use
+        _log.debug("***** In curveSimilarity(%s)", BTlimit,)  #dave
         try:
             # if background profile is loaded and both profiles have a DROP even set
             if aw.qmc.backgroundprofile is not None and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
@@ -36875,7 +37004,12 @@ class ApplicationWindow(QMainWindow):
             if aw.qmc.mode == "F":
                 restoreF = True
                 self.qmc.convertTemperature("C", silent=True, setdefaultaxes=False)
-                self.analysisRecomputeDeltas()
+                smooth=True
+                sampling=False
+                decay_smoothing_p = not aw.qmc.optimalSmoothing
+                recomputeAllDeltas = True
+                self.qmc.smoothETBT(smooth,recomputeAllDeltas,sampling,decay_smoothing_p)
+                self.qmc.smoothETBTBkgnd(recomputeAllDeltas,decay_smoothing_p)
             else:
                 restoreF = False
 
@@ -36948,71 +37082,70 @@ class ApplicationWindow(QMainWindow):
             # curve fit results
             cfr = {} #use dict to allow more flexible expansion
 
+            # replace a nan value with '--'. returns a string
+            def replNan(x):
+                if type(x) in [type(str())]:
+                    return x
+                return '--' if numpy.isnan(x) else f"{x:.2f}"
+
             # background
             if exp == 4:
-                res = self.analysisGetResults(exp=4, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 cfr["equ_background"] = QApplication.translate("Label","Bkgnd")
-                cfr["dbt_background"] = res["mse_BT"]
-                cfr["dbdbt_background"] = res["mse_deltaBT"]
-                cfr["r2_deltabt_background"] = res["r2_deltaBT"]
-                cfr['ror_fcs_delta_background'] = res['ror_fcs_delta']
-                cfr['ror_max_delta_background'] = res['ror_max_delta']
-                cfr['ror_min_delta_background'] = res['ror_min_delta']
-                cfr['ror_maxmin_delta_background'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
+                res = self.analysisGetResults(exp=4, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+                cfr["dbt_background"] = replNan(res["mse_BT"])
+                cfr["dbt_background_r"] = replNan(res["rmse_BT"])
+                cfr['ror_fcs_delta_background'] = replNan(res['ror_fcs_delta'])
+                cfr['ror_min_delta_background'] = replNan(res['ror_min_delta'])
+                cfr['ror_maxmin_delta_background'] = f"{replNan(res['ror_max_delta'])}/{replNan(res['ror_min_delta'])}"
                 progress.setValue(3)
             # ln() or all
             if exp in [0,-1]:
                 res = self.analysisGetResults(exp=0, curvefit_starttime=curvefit_starttime_ln, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 cfr["equ_naturallog"] = res["equ"]
-                cfr["dbt_naturallog"] = res["mse_BT"]
-                cfr["dbdbt_naturallog"] = res["mse_deltaBT"]
-                cfr["r2_deltabt_naturallog"] = res["r2_deltaBT"]
-                cfr['ror_fcs_delta_naturallog'] = res['ror_fcs_delta']
-                cfr['ror_max_delta_naturallog'] = res['ror_max_delta']
-                cfr['ror_min_delta_naturallog'] = res['ror_min_delta']
-                cfr['ror_maxmin_delta_naturallog'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
+                cfr["dbt_naturallog"] = replNan(res["mse_BT"])
+                cfr["dbt_naturallog_r"] = replNan(res["rmse_BT"])
+                cfr['ror_fcs_delta_naturallog'] = replNan(res['ror_fcs_delta'])
+                cfr['ror_min_delta_naturallog'] = replNan(res['ror_min_delta'])
+                cfr['ror_maxmin_delta_naturallog'] = f"{replNan(res['ror_max_delta'])}/{replNan(res['ror_min_delta'])}"
                 progress.setValue(1 if exp == -1 else 3)
             # cubic or all
             if exp in [3,-1]:
                 res = self.analysisGetResults(exp=3, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 cfr["equ_cubic"] = res["equ"]
-                cfr["dbt_cubic"] = res["mse_BT"]
-                cfr["dbdbt_cubic"] = res["mse_deltaBT"]
-                cfr["r2_deltabt_cubic"] = res["r2_deltaBT"]
-                cfr['ror_fcs_delta_cubic'] = res['ror_fcs_delta']
-                cfr['ror_max_delta_cubic'] = res['ror_max_delta']
-                cfr['ror_min_delta_cubic'] = res['ror_min_delta']
-                cfr['ror_maxmin_delta_cubic'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
+                cfr["dbt_cubic"] = replNan(res["mse_BT"])
+                cfr["dbt_cubic_r"] = replNan(res["rmse_BT"])
+                cfr['ror_fcs_delta_cubic'] = replNan(res['ror_fcs_delta'])
+                cfr['ror_min_delta_cubic'] = replNan(res['ror_min_delta'])
+                cfr['ror_maxmin_delta_cubic'] = f"{replNan(res['ror_max_delta'])}/{replNan(res['ror_min_delta'])}"
                 progress.setValue(2 if exp == -1 else 3)
             # quadratic or all
             if exp in [2,-1]:
                 res = self.analysisGetResults(exp=2, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 cfr["equ_quadratic"] = res["equ"]
-                cfr["dbt_quadratic"] = res["mse_BT"]
-                cfr["dbdbt_quadratic"] = res["mse_deltaBT"]
-                cfr["r2_deltabt_quadratic"] = res["r2_deltaBT"]
-                cfr['ror_fcs_delta_quadratic'] = res['ror_fcs_delta']
-                cfr['ror_max_delta_quadratic'] = res['ror_max_delta']
-                cfr['ror_min_delta_quadratic'] = res['ror_min_delta']
-                cfr['ror_maxmin_delta_quadratic'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
+                cfr["dbt_quadratic"] = replNan(res["mse_BT"])
+                cfr["dbt_quadratic_r"] = replNan(res["rmse_BT"])
+                cfr['ror_fcs_delta_quadratic'] = replNan(res['ror_fcs_delta'])
+                cfr['ror_min_delta_quadratic'] = replNan(res['ror_min_delta'])
+                cfr['ror_maxmin_delta_quadratic'] = f"{replNan(res['ror_max_delta'])}/{replNan(res['ror_min_delta'])}"
                 progress.setValue(3)
 
             # build the results table
             import prettytable  # @UnresolvedImport
             tbl = prettytable.PrettyTable()
             tbl.field_names = [" ",
+                               QApplication.translate("Label","RMSE BT"),
                                QApplication.translate("Label","MSE BT"),
                                QApplication.translate("Label","RoR") +  " \u0394 " + QApplication.translate("Label","@FCs"),
                                QApplication.translate("Label","Max+/Max- RoR") + " \u0394"]
             tbl.float_format = "5.2"
             if "equ_background" in cfr and "dbt_background" in cfr and 'ror_fcs_delta_background' in cfr and 'ror_maxmin_delta_background' in cfr:
-                tbl.add_row([QApplication.translate("Label","Bkgnd"), cfr["dbt_background"], cfr['ror_fcs_delta_background'], cfr['ror_maxmin_delta_background']])
+                tbl.add_row([QApplication.translate("Label","Bkgnd"), cfr["dbt_background_r"], cfr["dbt_background"], cfr['ror_fcs_delta_background'], cfr['ror_maxmin_delta_background']])
             if "equ_quadratic" in cfr and "dbt_quadratic" in cfr and 'ror_fcs_delta_quadratic' in cfr and 'ror_maxmin_delta_quadratic' in cfr:
-                tbl.add_row([QApplication.translate("Label","x") +"\u00b2", cfr["dbt_quadratic"], cfr['ror_fcs_delta_quadratic'], cfr['ror_maxmin_delta_quadratic']])
+                tbl.add_row([QApplication.translate("Label","x") +"\u00b2", cfr["dbt_quadratic_r"], cfr["dbt_quadratic"], cfr['ror_fcs_delta_quadratic'], cfr['ror_maxmin_delta_quadratic']])
             if "equ_cubic" in cfr and "dbt_cubic" in cfr and 'ror_fcs_delta_cubic' in cfr and 'ror_maxmin_delta_cubic' in cfr:
-                tbl.add_row([QApplication.translate("Label","x") + "\u00b3", cfr["dbt_cubic"], cfr['ror_fcs_delta_cubic'], cfr['ror_maxmin_delta_cubic']])
+                tbl.add_row([QApplication.translate("Label","x") + "\u00b3", cfr["dbt_cubic_r"], cfr["dbt_cubic"], cfr['ror_fcs_delta_cubic'], cfr['ror_maxmin_delta_cubic']])
             if "equ_naturallog" in cfr and "dbt_naturallog" in cfr and 'ror_fcs_delta_naturallog' in cfr and 'ror_maxmin_delta_naturallog' in cfr:
-                tbl.add_row([QApplication.translate("Label","ln()"), cfr["dbt_naturallog"], cfr['ror_fcs_delta_naturallog'], cfr['ror_maxmin_delta_naturallog']])
+                tbl.add_row([QApplication.translate("Label","ln()"), cfr["dbt_naturallog_r"], cfr["dbt_naturallog"], cfr['ror_fcs_delta_naturallog'], cfr['ror_maxmin_delta_naturallog']])
             resultstr = "Curve Fit Analysis\n"
             resultstr += tbl.get_string(sortby=None)
 
@@ -37027,7 +37160,6 @@ class ApplicationWindow(QMainWindow):
             # convert back to Fahrenheit if the profile was converted to Celsius
             if restoreF:
                 self.qmc.convertTemperature("F", silent=True, setdefaultaxes=False)
-                self.analysisRecomputeDeltas()
 
             # create the results annotation and update the graph
             if len(resultstr) > 0:
@@ -37081,6 +37213,13 @@ class ApplicationWindow(QMainWindow):
 
     def analysisShowResults(self,cfr,resultstr,curvefit_starttime=0, curvefit_endtime=0, analysis_starttime=0, analysis_endtime=0):
         self.qmc.redraw(recomputeAllDeltas=True)
+        smooth=True
+        sampling=False
+        decay_smoothing_p = not aw.qmc.optimalSmoothing
+        recomputeAllDeltas = True
+        self.qmc.smoothETBT(smooth,recomputeAllDeltas,sampling,decay_smoothing_p)
+        self.qmc.smoothETBTBkgnd(recomputeAllDeltas,decay_smoothing_p)
+
         if len(resultstr) == 0:
             resultstr = self.qmc.analysisresultsstr
         else:
@@ -37169,81 +37308,14 @@ class ApplicationWindow(QMainWindow):
         if exp != 4:  #not using existing background so perform a curve fit that sets the background
             res['equ'] = self.qmc.lnRegression(power=exp, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, plot=False)
             self.deleteBackground()
-            self.setbackgroundequ(EQU=["",res['equ']],recomputeAllDeltas=True)  #redraw() called from setbackgroundequ()
+            self.setbackgroundequ(EQU=["",res['equ']],recomputeAllDeltas=True,doDraw=False)  #redraw() called from setbackgroundequ()
 
         result = self.curveSimilarity2(exp=exp, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
 
         retval = {**result, **res}
         return retval
 
-    @staticmethod
-    def analysisRecomputeDeltas():
-        try:
-            smooth=True
-            sampling=False
-            decay_smoothing_p = not aw.qmc.optimalSmoothing
-
-            # we resample the temperatures to regular interval timestamps
-            if aw.qmc.timeB is not None and aw.qmc.timeB:
-                timeB_lin = numpy.linspace(aw.qmc.timeB[0],aw.qmc.timeB[-1],len(aw.qmc.timeB))
-            else:
-                timeB_lin = None
-            # we resample the temperatures to regular interval timestamps
-            if aw.qmc.timex is not None and aw.qmc.timex and len(aw.qmc.timex)>1:
-                timex_lin = numpy.linspace(aw.qmc.timex[0],aw.qmc.timex[-1],len(aw.qmc.timex))
-            else:
-                timex_lin = None
-            temp1_nogaps = fill_gaps(aw.qmc.resizeList(aw.qmc.temp1,len(aw.qmc.timex)))
-            temp2_nogaps = fill_gaps(aw.qmc.resizeList(aw.qmc.temp2,len(aw.qmc.timex)))
-
-            if smooth or len(aw.qmc.stemp1) != len(aw.qmc.timex):
-                if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon: # we don't smooth, but remove the dropouts
-                    aw.qmc.stemp1 = temp1_nogaps
-                else:
-                    aw.qmc.stemp1 = aw.qmc.smooth_list(aw.qmc.timex,temp1_nogaps,window_len=aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-            if smooth or len(aw.qmc.stemp2) != len(aw.qmc.timex):
-                if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon:  # we don't smooth, but remove the dropouts
-                    aw.qmc.stemp2 = fill_gaps(aw.qmc.temp2)
-                else:
-                    aw.qmc.stemp2 = aw.qmc.smooth_list(aw.qmc.timex,temp2_nogaps,window_len=aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-
-            #populate background delta ET (aw.qmc.delta1B) and delta BT (aw.qmc.delta2B)
-            # we populate temporary smoothed ET/BT data arrays
-            cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-            st1 = aw.qmc.smooth_list(aw.qmc.timeB,fill_gaps(aw.qmc.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
-            st2 = aw.qmc.smooth_list(aw.qmc.timeB,fill_gaps(aw.qmc.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
-            # we start RoR computation 10 readings after CHARGE to avoid this initial peak
-            if aw.qmc.timeindexB[0]>-1:
-                RoRstart = min(aw.qmc.timeindexB[0]+10, len(aw.qmc.timeB)-1)
-            else:
-                RoRstart = -1
-            if aw.qmc.background_profile_sampling_interval is None:
-                dsET = None
-            else:
-                dsET = max(1,int(aw.qmc.deltaETspan / aw.qmc.background_profile_sampling_interval))
-            if aw.qmc.background_profile_sampling_interval is None:
-                dsBT = None
-            else:
-                dsBT = max(1,int(aw.qmc.deltaBTspan / aw.qmc.background_profile_sampling_interval))
-            aw.qmc.delta1B, aw.qmc.delta2B = aw.qmc.recomputeDeltas(aw.qmc.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin,deltaETsamples=dsET,deltaBTsamples=dsBT)
-
-            #populate delta ET (aw.qmc.delta1) and delta BT (aw.qmc.delta2)
-            cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-            decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
-            t1 = aw.qmc.smooth_list(aw.qmc.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-            t2 = aw.qmc.smooth_list(aw.qmc.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-            # we start RoR computation 10 readings after CHARGE to avoid this initial peak
-            if aw.qmc.timeindex[0]>-1:
-                RoR_start = min(aw.qmc.timeindex[0]+10, len(aw.qmc.timex)-1)
-            else:
-                RoR_start = -1
-            aw.qmc.delta1, aw.qmc.delta2 = aw.qmc.recomputeDeltas(aw.qmc.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " analysisRecomputeDeltas(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-
-    def setbackgroundequ(self,foreground=False, EQU=None,recomputeAllDeltas=False):
+    def setbackgroundequ(self,foreground=False,EQU=None,recomputeAllDeltas=False,doDraw=True):
         if EQU is None:
             EQU = ['','']
         # Check for incompatible vars from in the equations
@@ -37259,7 +37331,6 @@ class ApplicationWindow(QMainWindow):
             string = QApplication.translate("Message","Incompatible variables found in %s"%error)
             QMessageBox.warning(self,QApplication.translate("Message","Assignment problem"),string,
                                 QMessageBox.StandardButton.Discard)
-
         else:
             try:
                 equ = EQU[0]
@@ -37319,8 +37390,12 @@ class ApplicationWindow(QMainWindow):
                             aw.qmc.timeindexB[6] = max(0,aw.qmc.backgroundtime2index(t2))
                         aw.qmc.background = True
                         aw.qmc.backgroundprofile = True
-                        aw.qmc.redraw(recomputeAllDeltas=recomputeAllDeltas)
-                        aw.sendmessage(QApplication.translate("Message","B1 = [%s] ; B2 = [%s]"%(EQU[0],EQU[1])))
+                        if doDraw:
+                            aw.qmc.redraw(recomputeAllDeltas=recomputeAllDeltas)
+                            aw.sendmessage(QApplication.translate("Message","B1 = [%s] ; B2 = [%s]"%(EQU[0],EQU[1])))
+                        else:
+                            decay_smoothing_p = not aw.qmc.optimalSmoothing
+                            aw.qmc.smoothETBTBkgnd(recomputeAllDeltas,decay_smoothing_p)
 
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
