@@ -20363,8 +20363,8 @@ class ApplicationWindow(QMainWindow):
                         else:
                             a[nv[i]] = a[nv[i] +1]
                     return a
-                nv = numpy.where(np_dbt is None)[0]
-                nvb = numpy.where(np_dbtb is None)[0]
+                nv = numpy.where(np_dbt == None)[0]
+                nvb = numpy.where(np_dbtb == None)[0]
                 np_dbt = replNone(np_dbt,nv)
                 np_dbtb = replNone(np_dbtb,nvb)
                 
