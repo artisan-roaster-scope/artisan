@@ -7893,6 +7893,8 @@ class tgraphcanvas(FigureCanvas):
                                                 sketch_params=None,path_effects=[],
                                                 alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundBT")))
 
+                    self.smoothETBTBkgnd(recomputeAllDeltas,decay_smoothing_p)
+                    
                     #populate background delta ET (self.delta1B) and delta BT (self.delta2B)
                     if self.DeltaETBflag or self.DeltaBTBflag:
                         ##### DeltaETB,DeltaBTB curves
@@ -20680,7 +20682,6 @@ class ApplicationWindow(QMainWindow):
     # iterates over all BT/ET values backward from DROP to the specified BT temperature
     # returns None in case no similarity can be computed
     def curveSimilarity(self,BTlimit=None): # pylint: disable=no-self-use
-        _log.debug("***** In curveSimilarity(%s)", BTlimit,)  #dave
         try:
             # if background profile is loaded and both profiles have a DROP even set
             if aw.qmc.backgroundprofile is not None and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
@@ -37212,13 +37213,7 @@ class ApplicationWindow(QMainWindow):
         return artist.contains(evt)
 
     def analysisShowResults(self,cfr,resultstr,curvefit_starttime=0, curvefit_endtime=0, analysis_starttime=0, analysis_endtime=0):
-        self.qmc.redraw(recomputeAllDeltas=True)
-        smooth=True
-        sampling=False
-        decay_smoothing_p = not aw.qmc.optimalSmoothing
-        recomputeAllDeltas = True
-        self.qmc.smoothETBT(smooth,recomputeAllDeltas,sampling,decay_smoothing_p)
-        self.qmc.smoothETBTBkgnd(recomputeAllDeltas,decay_smoothing_p)
+        self.qmc.redraw(recomputeAllDeltas = True)
 
         if len(resultstr) == 0:
             resultstr = self.qmc.analysisresultsstr
