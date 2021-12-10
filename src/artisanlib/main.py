@@ -7591,7 +7591,7 @@ class tgraphcanvas(FigureCanvas):
                         y_label = self.delta_ax.set_ylabel(f'{aw.qmc.mode}{aw.arabicReshape(QApplication.translate("Label", "/min"))}',
                             color = self.palette["ylabel"],
                             fontsize="large",
-                            fontfamily=prop.get_family()                            
+                            fontfamily=prop.get_family()
                             )
                     try:
                         y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
@@ -28822,7 +28822,7 @@ class ApplicationWindow(QMainWindow):
         self.fileImport(QApplication.translate("Message", "Import RoastLogger"),self.importRoastLogger,True)
 
     #loads the settings at the start of application. See the oppposite closeEventSettings()
-    def settingsLoad(self, filename=None, theme=False, machine=False):
+    def settingsLoad(self, filename=None, theme=False, machine=False, redraw=True):
         res = False
         try:
             updateBatchCounter = True
@@ -30367,8 +30367,7 @@ class ApplicationWindow(QMainWindow):
 
 #--------------------------------
         try:
-
-            aw.setFonts() # this one triggers a redraw by default to establish the correct fonts
+            aw.setFonts(redraw=redraw) # this one triggers a redraw by default to establish the correct fonts
             # only after this the correct aspect ratio of the qmc canvas is set
 
             if len(self.logofilename) > 0:
@@ -30393,7 +30392,6 @@ class ApplicationWindow(QMainWindow):
                         aw.setdpi(toInt(settings.value("dpi",aw.dpi)),moveWindow=True)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-
             #restore geometry
             if settings.contains("Geometry"):
                 self.restoreGeometry(settings.value("Geometry"))
@@ -37678,7 +37676,7 @@ def main():
     aw = None # this is to ensure that the variable aw is already defined during application initialization
 
     aw = ApplicationWindow(locale=locale_str)
-
+    
     app.setActivationWindow(aw,activateOnMessage=False) # set the activation window for the QtSingleApplication
 
 
@@ -37690,12 +37688,12 @@ def main():
         QApplication.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
     else:
         QApplication.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-    aw.settingsLoad()
+    aw.settingsLoad(redraw=False) # redraw is triggered later in the startup process again
     
     # inform the user the debug logging is on
     if debugLogLevelActive():
         aw.sendmessage(QApplication.translate("Message", "debug logging ON"))
-
+    
     # swap BT/ET lcds on startup
     if aw.qmc.swaplcds:
         tmp = QWidget()
@@ -37708,6 +37706,7 @@ def main():
         tmp.setLayout(aw.LCD4frame.layout())
         aw.LCD4frame.setLayout(aw.LCD5frame.layout())
         aw.LCD5frame.setLayout(tmp.layout())
+        
     aw.show()
 
     try:

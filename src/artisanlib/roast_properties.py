@@ -1939,9 +1939,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.plus_stores_combo.blockSignals(True)       
                 self.plus_stores_combo.clear()
                 store_items = plus.stock.getStoreLabels(self.plus_stores)
-                # HACK to prevent those cutted menu items on macOS and Qt 5.15.1:
-                if sys.platform.startswith("darwin"):
-                    store_items = [l + "  " for l in store_items]
+#                # HACK to prevent those cutted menu items on macOS and Qt 5.15.1:
+#                if sys.platform.startswith("darwin"):
+#                    store_items = [l + "  " for l in store_items]
                 self.plus_stores_combo.addItems([""] + store_items)
                 p = plus.stock.getStorePosition(self.plus_default_store,self.plus_stores)
                 if p is None:
@@ -1980,9 +1980,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_coffees_combo.blockSignals(True)  
             self.plus_coffees_combo.clear()
             coffee_items = plus.stock.getCoffeesLabels(self.plus_coffees)
-            # HACK to prevent those cutted menu items on macOS and Qt 5.15.1:
-            if sys.platform.startswith("darwin"):
-                coffee_items = [l + "  " for l in coffee_items]
+#            # HACK to prevent those cutted menu items on macOS and Qt 5.15.1:
+#            if sys.platform.startswith("darwin"):
+#                coffee_items = [l + "  " for l in coffee_items]
             self.plus_coffees_combo.addItems([""] + coffee_items)
             
             p = None
@@ -2013,9 +2013,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_blends_combo.clear()
             blend_items = plus.stock.getBlendLabels(self.plus_blends)
             
-            # HACK to prevent those cutted menu items on macOS and Qt 5.15.1:
-            if sys.platform.startswith("darwin"):
-                blend_items = [l + "  " for l in blend_items]
+#            # HACK to prevent those cutted menu items on macOS and Qt 5.15.1:
+#            if sys.platform.startswith("darwin"):
+#                blend_items = [l + "  " for l in blend_items]
             self.plus_blends_combo.addItems([""] + blend_items) 
             
             if len(self.plus_blends) == 0:
