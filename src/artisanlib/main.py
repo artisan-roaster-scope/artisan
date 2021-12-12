@@ -20607,8 +20607,8 @@ class ApplicationWindow(QMainWindow):
             # if background profile is loaded and both profiles have a DROP event set
             if aw.qmc.backgroundprofile is not None and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
 
-                _log.debug(f"{self.qmc.profile_sampling_interval=}")  #pylint: disable=logging-fstring-interpolation
-                _log.debug(f"{self.qmc.background_profile_sampling_interval=}")  #pylint: disable=logging-fstring-interpolation
+                _log.debug(f"curveSimilarity: {self.qmc.profile_sampling_interval=}")  #pylint: disable=logging-fstring-interpolation
+                _log.debug(f"curveSimilarity: {self.qmc.background_profile_sampling_interval=}")  #pylint: disable=logging-fstring-interpolation
 
                 # create arrays using smoothed data if available
                 if aw.qmc.stemp1 and len(aw.qmc.stemp1) == len(aw.qmc.temp1):
@@ -20616,13 +20616,13 @@ class ApplicationWindow(QMainWindow):
                     np_et = numpy.array(aw.qmc.stemp1)
                 else:
                     np_et = numpy.array(aw.qmc.temp1)
-                    _log.debug("curveSimilarity using non-smoothed ET")
+                    _log.debug("curveSimilarity: using non-smoothed ET")
                 if aw.qmc.stemp2 and len(aw.qmc.stemp2) == len(aw.qmc.temp2):
                     # take smoothed data if available
                     np_bt = numpy.array(aw.qmc.stemp2)
                 else:
                     np_bt = numpy.array(aw.qmc.temp2)
-                    _log.debug("curveSimilarity using non-smoothed BT")
+                    _log.debug("curveSimilarity: using non-smoothed BT")
 
                 # CM is based on the Phases Dry not marked Dry
                 # Find the DRY point
@@ -20673,11 +20673,11 @@ class ApplicationWindow(QMainWindow):
                 if debugLogLevelActive():
                     old_det,old_dbt = aw.OLDcurveSimilarity(aw.qmc.phases[1])
                     if abs(old_det - det) > .1 or abs(old_dbt - dbt) > .1:
-                        aw.sendmessage("**** det, dbt results DO NOT MATCH with old method!!")
-                        _log.debug("OLDcurvesimilarity results %.2f/%.2f %s", old_det,old_dbt,aw.qmc.mode)
-                        _log.debug("curvesimilarity results %.2f/%.2f %s", det,dbt,aw.qmc.mode)
+                        aw.sendmessage("curveSimilarity: det, dbt results DO NOT MATCH with old method!!")
+                        _log.debug("curveSimilarity: OLDcurvesimilarity results %.2f/%.2f %s", old_det,old_dbt,aw.qmc.mode)
+                        _log.debug("curveSimilarity: curvesimilarity results    %.2f/%.2f %s", det,dbt,aw.qmc.mode)
                     else:
-                        _log.debug("det, dbt results MATCH with old method!!")
+                        _log.debug("curveSimilarity: det, dbt results MATCH with old method!!")
 
                 return det,dbt
 
