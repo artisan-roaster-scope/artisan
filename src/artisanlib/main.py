@@ -20597,91 +20597,103 @@ class ApplicationWindow(QMainWindow):
 
         return result
 
+    # computes the similarity between BT and backgroundBT as well as ET and backgroundET
+    # known as CM
+    # computes from profile DRY END as set in Phases dialog through DROP 
+    # returns None in case no similarity can be computed
+    # refactored to use numpy arrays.  BTlimit is now unused.  
+    def curveSimilarity(self,BTlimit=None): # pylint: disable=no-self-use  # pylint: disable=unused-argument
+        try:
+            # if background profile is loaded and both profiles have a DROP event set
+            if aw.qmc.backgroundprofile is not None and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
 
-########################
-#    # computes the similarity between BT and backgroundBT as well as ET and backgroundET
-#    # iterates over all BT/ET values backward from DROP to the specified BT temperature
-#    # returns None in case no similarity can be computed
-#    def NEWcurveSimilarity(self,BTlimit=None): # pylint: disable=no-self-use
-#        _log.debug("***** In curveSimilarity(%s)", BTlimit,)  #dave
-#        try:
-#            # if background profile is loaded and both profiles have a DROP even set
-#            if aw.qmc.backgroundprofile is not None and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
-#                # calculate time delta between background and foreground DROP event
-#                dropTimeDelta = aw.qmc.timex[aw.qmc.timeindex[6]] - aw.qmc.timeB[aw.qmc.timeindexB[6]]
-#                totalQuadraticDeltaET = 0
-#                totalQuadraticDeltaBT = 0
-#                count = 0
-#                _log.debug("First (DROP?) i=%s, timex[i]=%s, temp2=%s", aw.qmc.timeindex[6], aw.qmc.timex[aw.qmc.timeindex[6]], aw.qmc.temp2[aw.qmc.timeindex[6]])  #dave
-#
-#
-#                # CM is based on the Phases Dry not marked Dry
-#                i = self.findDryEnd(phasesindex=1)
-#                drytime = self.qmc.timex[i -1]  #one sample before DE
-#                _log.debug("CM DE from phases, timeindex=%s, timex=%s, temp2=%s",i -1, self.qmc.timex[i -1], aw.qmc.temp2[i-1]) #dave
-#                analysis_start = i
-#                analysis_end = aw.qmc.timeindex[6]
-#                
-#                _log.debug("CM analysis_start= %s, analysis_end= %s",analysis_start, analysis_end)  #dave
-#                np_bt = numpy.array(aw.qmc.stemp2[analysis_start:analysis_end])
-#                np_dbt = numpy.array(aw.qmc.delta2[analysis_start:analysis_end])
-#                exp = 4  #dave
-#
-#                #compare to background curve?
-#                if exp == 4:  
-#                    _log.debug("CM verified exp == 4") #dave
-#                    # create background BT and background delta BT arrays over the interval of interest
-#                    xarray = numpy.array(aw.qmc.timex[analysis_start:analysis_end])
-##                    # replace None entries with 0 in the background delta list
-##                    _delta2B = [0 if x is None else x for x in aw.qmc.delta2B]
-#                    np_dbtb = numpy.array([self.qmc.timetemparray2temp(aw.qmc.timeB,_delta2B,x) for x in xarray])
-#                    np_btb = numpy.array([self.qmc.timetemparray2temp(aw.qmc.timeB,aw.qmc.temp2B,x) for x in xarray])
-#                else:
-#                    _log.debug("CM Bad boo, we should not be here")  #dave
-#                    _log.debug("stemp2B=%s, delta2B=%s",len(aw.qmc.stemp2B),len(aw.qmc.delta2B))
-#                    np_btb = numpy.array(aw.qmc.stemp2B[analysis_start:analysis_end])
-#                    np_dbtb = numpy.array(aw.qmc.delta2B[analysis_start:analysis_end])
-#
-#                # Replace None values in the Delta curves with the closest numeric value on the right
-#                def replNone(a,nv):
-#                    for i in range(len(nv)):
-#                        print(f"We got in here!")  #dave
-#                        if i == len(nv) -1:
-#                            a[nv[i]] = 0
-#                        elif a[nv[i]+1] == None:
-#                            a[nv[i]] = 0
-#                        else:
-#                            a[nv[i]] = a[nv[i] +1]
-#                    return a
-#                nv = numpy.where(np_dbt is None)[0]
-#                nvb = numpy.where(np_dbtb is None)[0]
-#                np_dbt = replNone(np_dbt,nv)
-#                np_dbtb = replNone(np_dbtb,nvb)
-#                
-#                _log.debug("np_bt=%s, np_btb=%s, np_dbt=%s, np_dbtb=%s", len(np_bt), len(np_btb), len(np_dbt), len(np_dbtb))
-#
-#                #MSE
-#                mse_BT = numpy.mean(numpy.square(np_bt - np_btb))
-#                mse_deltaBT = numpy.mean(numpy.square(np_dbt - np_dbtb))
-#
-#                # RMSE
-#                rmse_BT = numpy.sqrt(mse_BT)
-#                rmse_deltaBT = numpy.sqrt(mse_deltaBT)
-#
-#                return rmse_BT, rmse_deltaBT
-#
-#            # no DROP event registered
-#            return None, None
-#        except Exception as e: # pylint: disable=broad-except
-#            _log.exception(e)
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " curveSimilatrity(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-#            return None, None
+                _log.debug(f"{self.qmc.profile_sampling_interval=}")  #pylint: disable=logging-fstring-interpolation
+                _log.debug(f"{self.qmc.background_profile_sampling_interval=}")  #pylint: disable=logging-fstring-interpolation
 
+                # create arrays using smoothed data if available
+                if aw.qmc.stemp1 and len(aw.qmc.stemp1) == len(aw.qmc.temp1):
+                    # take smoothed data if available
+                    np_et = numpy.array(aw.qmc.stemp1)
+                else:
+                    np_et = numpy.array(aw.qmc.temp1)
+                    _log.debug("curveSimilarity using non-smoothed ET")
+                if aw.qmc.stemp2 and len(aw.qmc.stemp2) == len(aw.qmc.temp2):
+                    # take smoothed data if available
+                    np_bt = numpy.array(aw.qmc.stemp2)
+                else:
+                    np_bt = numpy.array(aw.qmc.temp2)
+                    _log.debug("curveSimilarity using non-smoothed BT")
+
+                # CM is based on the Phases Dry not marked Dry
+                # Find the DRY point
+                # create a view of the original with a stride that accesses it in reverse order
+                rev_np_bt = np_bt[::-1]
+                # Find TP or if there is not one then find the minimum temp before DROP 
+                # Note - CHARGE is not considered
+                len_bt = len(aw.qmc.stemp2)
+                rev_drop_idx = len_bt - aw.qmc.timeindex[6]
+                BTlimit = aw.qmc.phases[1]
+                rev_min_idx = numpy.argmin(rev_np_bt[rev_drop_idx:]) + rev_drop_idx
+
+                # Find the first sample less than the phases DRY temp (going backwards from DROP)
+                rev_dry_idx = numpy.argmin(numpy.sign(rev_np_bt[rev_drop_idx:rev_min_idx] - BTlimit))
+
+                # Flip the index to forward looking
+                dry_idx = len_bt - (rev_drop_idx + rev_dry_idx) 
+
+                # set start and end indexes
+                start = dry_idx
+                end = aw.qmc.timeindex[6] +1  #the +1 adjusts for Python indexing
+                
+                # create arrays from Dry to DROP, 
+                np_et = np_et[start:end]
+                np_bt = np_bt[start:end]
+                np_timex = numpy.array(aw.qmc.timex[start:end])
+
+                # diference in time between DROPs in profile and background
+                dropTimeDelta = aw.qmc.timex[aw.qmc.timeindex[6]] - aw.qmc.timeB[aw.qmc.timeindexB[6]]
+
+                # these are not the smoothed background temps, which is how the old CM was done
+                np_etb = numpy.array(aw.qmc.temp1B)
+                np_btb = numpy.array(aw.qmc.temp2B)
+                np_timeB = numpy.array(aw.qmc.timeB) + dropTimeDelta
+
+                # hack to work like OLD method where any temp before timeB[0] is -1
+                np_etb = numpy.insert(np_etb,0,-1)
+                np_btb = numpy.insert(np_btb,0,-1)
+                np_timeB = numpy.insert(np_timeB,0,np_timeB[0]-0.1)
+                    
+                interp_np_etb = numpy.interp(np_timex,np_timeB,np_etb)
+                interp_np_btb = numpy.interp(np_timex,np_timeB,np_btb)
+
+                det = numpy.sqrt(numpy.mean(numpy.square(np_et - interp_np_etb)))
+                dbt = numpy.sqrt(numpy.mean(numpy.square(np_bt - interp_np_btb)))
+
+                #TODO remove this check  #pylint: disable=fixme
+                if debugLogLevelActive():
+                    old_det,old_dbt = aw.OLDcurveSimilarity(aw.qmc.phases[1])
+                    if abs(old_det - det) > .1 or abs(old_dbt - dbt) > .1:
+                        aw.sendmessage("**** det, dbt results DO NOT MATCH with old method!!")
+                        _log.debug("OLDcurvesimilarity results %.2f/%.2f %s", old_det,old_dbt,aw.qmc.mode)
+                        _log.debug("curvesimilarity results %.2f/%.2f %s", det,dbt,aw.qmc.mode)
+                    else:
+                        _log.debug("det, dbt results MATCH with old method!!")
+
+                return det,dbt
+
+            # no DROP event registered
+            return None, None
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " curveSimilatrity(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            return None, None
+
+    #TODO remove this function, left only for cross checking new funciton  #pylint: disable=fixme
     # computes the similarity between BT and backgroundBT as well as ET and backgroundET
     # iterates over all BT/ET values backward from DROP to the specified BT temperature
     # returns None in case no similarity can be computed
-    def curveSimilarity(self,BTlimit=None): # pylint: disable=no-self-use
+    def OLDcurveSimilarity(self,BTlimit=None): 
         try:
             # if background profile is loaded and both profiles have a DROP even set
             if aw.qmc.backgroundprofile is not None and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
