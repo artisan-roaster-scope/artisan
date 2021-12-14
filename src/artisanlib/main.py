@@ -61,6 +61,7 @@ import re
 import gc
 import io
 import functools
+from bisect import bisect_right
 
 # links CTR-C signals to the system default (ignore)
 import signal
@@ -135,7 +136,7 @@ except Exception:
     from PyQt5.QtGui import (QImage, QImageReader, QWindow,  # @Reimport @UnresolvedImport @UnusedImport
                                 QKeySequence, # @Reimport @UnresolvedImport @UnusedImport
                                 QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
-                                QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor) # @Reimport @UnresolvedImport @UnusedImport
+                                QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor, QFont) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, # @Reimport @UnresolvedImport @UnusedImport
                               qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,  # @Reimport @UnresolvedImport @UnusedImport
@@ -2339,7 +2340,7 @@ class tgraphcanvas(FigureCanvas):
         self.block_update = False
 
         # flag to toggle between Temp and RoR scale of xy-display; if None, the display is fully deactivated
-        self.fmt_data_RoR = None
+        self.fmt_data_RoR = False
         # toggle between using the 0: y-cursor pos, 1: BT@x, 2: ET@x, 3: BTB@x, 4: ETB@x (thus BT, ET or the corresponding background curve data at cursor position x)
         # to display the y of the cursor coordinates
         self.fmt_data_curve = 0
@@ -3331,7 +3332,7 @@ class tgraphcanvas(FigureCanvas):
 
     # note that partial values might be given here (time might update, but not the values)
     @pyqtSlot(str,str,str)
-    # pylint: disable=no-self-use
+    # pylint: disable=no-self-use # used as slot
     def updateLargeLCDs(self, bt, et, time):
         try:
             if aw.largeLCDs_dialog is not None:
@@ -3343,7 +3344,7 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(e)
 
     @pyqtSlot(str,str)
-    # pylint: disable=no-self-use
+    # pylint: disable=no-self-use # used as slot
     def setTimerLargeLCDcolor(self, fc, bc):
         try:
             if aw.largeLCDs_dialog is not None:
@@ -3352,7 +3353,7 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(e)
     
     @pyqtSlot(str,int)   
-    # pylint: disable=no-self-use
+    # pylint: disable=no-self-use # used as slot
     def showAlarmPopup(self, message, timeout):
         # alarm popup message with <aw.qmc.alarm_popup_timout>sec timeout
         amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice"),message,timeout=timeout,modal=False)
@@ -3362,7 +3363,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.updateWebLCDs(alertText=message,alertTimeout=timeout)
 
     @pyqtSlot(str,str)
-    # pylint: disable=no-self-use
+    # pylint: disable=no-self-use # used as slot
     def updateLargeLCDsReadings(self, bt, et):
         try:
             if aw.largeLCDs_dialog is not None:
@@ -3371,7 +3372,7 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(e)
 
     @pyqtSlot(str)
-    # pylint: disable=no-self-use
+    # pylint: disable=no-self-use # used as slot
     def updateLargeLCDsTime(self, time):
         try:
             if aw.largeLCDs_dialog is not None:
@@ -7513,6 +7514,8 @@ class tgraphcanvas(FigureCanvas):
 
                 rcParams['xtick.color'] = self.palette["xlabel"]
                 rcParams['ytick.color'] = self.palette["ylabel"]
+                
+                #rcParams['text.antialiased'] = True
 
                 if forceRenewAxis:
                     self.fig.clf()
@@ -12800,7 +12803,7 @@ class tgraphcanvas(FigureCanvas):
                     _,_,tsb,_ = aw.ts(tp=TP_index)
 
                     #curveSimilarity
-                    det,dbt = aw.curveSimilarity(aw.qmc.phases[1]) # we analyze from DRY-END as specified in the phases dialog to DROP
+                    det,dbt = aw.curveSimilarity() # we analyze from DRY-END as specified in the phases dialog to DROP
 
                     #end temperature
                     if self.locale_str == "ar":
@@ -13636,7 +13639,7 @@ class tgraphcanvas(FigureCanvas):
             if self.timeindex[0] > -1 and self.timeindex[6] > -1:  #CHARGE and DROP events exist
                 charge = self.timex[self.timeindex[0]]
                 if curvefit_starttime != None and curvefit_starttime > charge:
-                    begin = aw.time2index(curvefit_starttime)
+                    begin = self.time2index(curvefit_starttime)
                     time_l = []
                     temp_l = []
                 else:
@@ -13646,7 +13649,7 @@ class tgraphcanvas(FigureCanvas):
                         begin = self.timeindex[1]
                     else: # take DRY as specificed in phases
                         pi = aw.findDryEnd(phasesindex=1)
-                        begin = aw.time2index(self.timex[pi])
+                        begin = self.time2index(self.timex[pi])
                     # initial bean temp set to greens_temp or ambient or a fixed temp
                     if aw.qmc.greens_temp > 0:
                         time_l = [charge]
@@ -13662,7 +13665,7 @@ class tgraphcanvas(FigureCanvas):
                             roomTemp = 21.0
                         temp_l = [roomTemp]
                 if curvefit_endtime > 0:
-                    end = aw.time2index(curvefit_endtime)
+                    end = self.time2index(curvefit_endtime)
                 else:
                     end = self.timeindex[6]
                 time_l = time_l + self.timex[begin:end]
@@ -13858,31 +13861,27 @@ class tgraphcanvas(FigureCanvas):
             offset = 0
         return self.timetemparray2temp(self.timeB,self.delta1B,seconds + offset)
 
+    # fast variant based on binary search on lists using bisect (using numpy.searchsorted is slower)
+    # side-condition: values in self.qmc.timex in linear order
+    # time: time in seconds
+    # nearest: if nearest is True the closest index is returned (slower), otherwise the previous (faster)
+    # returns
+    #   -1 on empty timex
+    #    0 if time smaller than first entry of timex
+    #  len(timex)-1 if time larger than last entry of timex (last index)
     @staticmethod
-    def timearray2index(timearray, seconds):
-        #find where given seconds crosses timearray
-        if len(timearray):                           #check that timearray is not empty just in case
-            #if input seconds longer than available time return last index
-            if  seconds > timearray[-1]:
-                return len(timearray)-1
-            #if given input seconds smaller than first time return first index
-            if seconds < timearray[0]:
-                return 0
-            i = numpy.searchsorted(timearray,seconds,side='left')
-            if i < len(timearray) - 1:
-                #look around (check if the value of the next index is closer
-                choice1 = abs(timearray[i] - seconds)
-                choice2 = abs(timearray[i-1] - seconds)
-                #return closest (smallest) index
-                if choice2 < choice1:
-                    i = i - 1
-            return int(i)
+    def timearray2index(timearray, time, nearest:bool=True):
+        i = bisect_right(timearray, time)
+        if i:
+            if nearest and i>0 and (i == len(timearray) or abs(time - timearray[i]) > abs(time - timearray[i-1])):
+                return i-1
+            return i
         return -1
 
     #selects closest time INDEX in self.timex from a given input float seconds
-    def time2index(self,seconds):
+    def time2index(self,seconds, nearest:bool=True):
         #find where given seconds crosses self.timex
-        return self.timearray2index(self.timex,seconds)
+        return self.timearray2index(self.timex, seconds, nearest)
 
     #selects closest time INDEX in self.timeB from a given input float seconds
     def backgroundtime2index(self,seconds):
@@ -14698,7 +14697,7 @@ class tgraphcanvas(FigureCanvas):
     #launches designer config Window
     @pyqtSlot()
     @pyqtSlot(bool)
-    def desconfig(self, _=False): # pylint: disable=no-self-use
+    def desconfig(self, _=False): # pylint: disable=no-self-use # used as slot
         from artisanlib.designer import designerconfigDlg
         dialog = designerconfigDlg(aw,aw)
         dialog.show()
@@ -15536,15 +15535,15 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                     try:
                         if aw.qmc.fmt_data_curve == 1: # BT
                             if aw.qmc.fmt_data_RoR:
-                                ys = aw.qmc.delta2[aw.time2index(self._last_event.xdata)]
+                                ys = aw.qmc.delta2[aw.qmc.time2index(self._last_event.xdata, nearest=False)]
                             else:
-                                ys = aw.qmc.temp2[aw.time2index(self._last_event.xdata)]
+                                ys = aw.qmc.temp2[aw.qmc.time2index(self._last_event.xdata, nearest=False)]
                             channel = aw.BTname
                         elif aw.qmc.fmt_data_curve == 2: # ET
                             if aw.qmc.fmt_data_RoR:
-                                ys = aw.qmc.delta1[aw.time2index(self._last_event.xdata)]
+                                ys = aw.qmc.delta1[aw.qmc.time2index(self._last_event.xdata, nearest=False)]
                             else:
-                                ys = aw.qmc.temp1[aw.time2index(self._last_event.xdata)]
+                                ys = aw.qmc.temp1[aw.qmc.time2index(self._last_event.xdata, nearest=False)]
                             channel = aw.ETname
                         elif aw.qmc.fmt_data_curve == 3 and aw.qmc.backgroundprofile is not None: # BTB
                             if aw.qmc.fmt_data_RoR:
@@ -15574,6 +15573,8 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                     min_temp_digits = 5
                 else:
                     min_temp_digits = 3
+                if aw.qmc.fmt_data_RoR:
+                    min_temp_digits -= 1
                 if len(self.mode):
                     self.set_message(f"{self.mode}  {xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{aw.qmc.mode}{'/min' if aw.qmc.fmt_data_RoR else ''}")
                 else:
@@ -15901,7 +15902,7 @@ class EventActionThread(QThread): # pylint: disable=too-few-public-methods
 # applies comma2dot as fixup to automatically turn numbers like "1,2" into valid numbers like "1.0" and the empty entry into "0.0"
 class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-methods 
     
-    def fixup(self, input_value): # pylint: disable=no-self-use
+    def fixup(self, input_value): # pylint: disable=no-self-use # used by class
         if input_value is None or input_value == "":
             return "0"
         try:
@@ -18573,7 +18574,7 @@ class ApplicationWindow(QMainWindow):
             _log.exception(e)
 
     @pyqtSlot(str)
-    def setCanvasColor(self, c): # pylint: disable=no-self-use
+    def setCanvasColor(self, c): # pylint: disable=no-self-use # used as slot
         try:
             QColor(c) # test if color is valid
             aw.qmc.palette["canvas_alt"] = aw.qmc.palette["canvas"]
@@ -18584,7 +18585,7 @@ class ApplicationWindow(QMainWindow):
             _log.exception(e)
     
     @pyqtSlot()
-    def resetCanvasColor(self): # pylint: disable=no-self-use
+    def resetCanvasColor(self): # pylint: disable=no-self-use # used as slot
         try:
             if "canvas_alt" in aw.qmc.palette:
                 aw.qmc.palette["canvas"] = aw.qmc.palette["canvas_alt"]
@@ -18604,13 +18605,13 @@ class ApplicationWindow(QMainWindow):
     def QTime2time(t: QTime):
         return t.minute() * 60 + t.second()
 
-    def dragEnterEvent(self, event): # pylint: disable=no-self-use
+    def dragEnterEvent(self, event): # pylint: disable=no-self-use # class method
         if event.mimeData().hasUrls():
             event.accept()
         else:
             event.ignore()
 
-    def dropEvent(self, event): # pylint: disable=no-self-use
+    def dropEvent(self, event): # pylint: disable=no-self-use # class method
         urls = event.mimeData().urls()
         if urls and len(urls)>0:
             app.open_url(urls[0])
@@ -20273,7 +20274,7 @@ class ApplicationWindow(QMainWindow):
             aw.sendmessage(QApplication.translate("Message","super off"))
 
     @pyqtSlot("QPoint")
-    def PhaseslcdClicked(self,_): # pylint: disable=no-self-use
+    def PhaseslcdClicked(self,_): # pylint: disable=no-self-use # used as slot
         aw.qmc.phasesLCDmode = (aw.qmc.phasesLCDmode + 1)%3
         aw.updatePhasesLCDs()
 
@@ -20699,8 +20700,8 @@ class ApplicationWindow(QMainWindow):
     # known as CM
     # computes from profile DRY END as set in Phases dialog through DROP 
     # returns None in case no similarity can be computed
-    # refactored to use numpy arrays.  BTlimit is now unused.  
-    def curveSimilarity(self,BTlimit=None): # pylint: disable=no-self-use  # pylint: disable=unused-argument
+    # refactored to use numpy arrays.
+    def curveSimilarity(self):
         try:
             # if background profile is loaded and both profiles have a DROP event set
             if aw.qmc.backgroundprofile is not None and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
@@ -20769,7 +20770,7 @@ class ApplicationWindow(QMainWindow):
 
                 #TODO remove this check  #pylint: disable=fixme
                 if debugLogLevelActive():
-                    old_det,old_dbt = aw.OLDcurveSimilarity(aw.qmc.phases[1])
+                    old_det,old_dbt = aw.OLDcurveSimilarity()
                     if abs(old_det - det) > .1 or abs(old_dbt - dbt) > .1:
                         aw.sendmessage("curveSimilarity: det, dbt results DO NOT MATCH with old method!!")
                         _log.debug("curveSimilarity: OLDcurvesimilarity results %.2f/%.2f %s", old_det,old_dbt,aw.qmc.mode)
@@ -20791,7 +20792,9 @@ class ApplicationWindow(QMainWindow):
     # computes the similarity between BT and backgroundBT as well as ET and backgroundET
     # iterates over all BT/ET values backward from DROP to the specified BT temperature
     # returns None in case no similarity can be computed
-    def OLDcurveSimilarity(self,BTlimit=None): 
+    @staticmethod
+    def OLDcurveSimilarity(): 
+        BTlimit = aw.qmc.phases[1]
         try:
             # if background profile is loaded and both profiles have a DROP even set
             if aw.qmc.backgroundprofile is not None and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
@@ -20919,7 +20922,7 @@ class ApplicationWindow(QMainWindow):
             self.slider4.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.slider4.clearFocus()
 
-    def setFonts(self, redraw=True): # pylint: disable=no-self-use
+    def setFonts(self, redraw=True):
         # try to select the right font for matplotlib according to the given locale and plattform
         if self.qmc.graphfont == 0:
             try:
@@ -23700,7 +23703,7 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def on_actionCut_triggered(self,_=False): # pylint: disable=no-self-use
+    def on_actionCut_triggered(self,_=False): # pylint: disable=no-self-use # used as slot
         try:
             app.activeWindow().focusWidget().cut()
         except Exception as e: # pylint: disable=broad-except
@@ -23708,7 +23711,7 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def on_actionCopy_triggered(self,_=False): # pylint: disable=no-self-use
+    def on_actionCopy_triggered(self,_=False): # pylint: disable=no-self-use # used as slot
         try:
             app.activeWindow().focusWidget().copy()
         except Exception as e: # pylint: disable=broad-except
@@ -23716,7 +23719,7 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def on_actionPaste_triggered(self,_=False): # pylint: disable=no-self-use
+    def on_actionPaste_triggered(self,_=False): # pylint: disable=no-self-use # used as slot
         try:
             app.activeWindow().focusWidget().paste()
         except Exception as e: # pylint: disable=broad-except
@@ -25851,28 +25854,28 @@ class ApplicationWindow(QMainWindow):
             #set events
             CHARGE = stringtoseconds(header[2].split('CHARGE:')[1])
             if CHARGE > 0:
-                self.qmc.timeindex[0] = max(-1,self.time2index(CHARGE))
+                self.qmc.timeindex[0] = max(-1, self.qmc.time2index(CHARGE))
             DRYe = stringtoseconds(header[4].split('DRYe:')[1])
             if DRYe > 0:
-                self.qmc.timeindex[1] = max(0,self.time2index(DRYe))
+                self.qmc.timeindex[1] = max(0, self.qmc.time2index(DRYe))
             FCs = stringtoseconds(header[5].split('FCs:')[1])
             if FCs > 0:
-                self.qmc.timeindex[2] = max(0,self.time2index(FCs))
+                self.qmc.timeindex[2] = max(0, self.qmc.time2index(FCs))
             FCe = stringtoseconds(header[6].split('FCe:')[1])
             if FCe > 0:
-                self.qmc.timeindex[3] = max(0,self.time2index(FCe))
+                self.qmc.timeindex[3] = max(0, self.qmc.time2index(FCe))
             SCs = stringtoseconds(header[7].split('SCs:')[1])
             if SCs > 0:
-                self.qmc.timeindex[4] = max(0,self.time2index(SCs))
+                self.qmc.timeindex[4] = max(0, self.qmc.time2index(SCs))
             SCe = stringtoseconds(header[8].split('SCe:')[1])
             if SCe> 0:
-                self.qmc.timeindex[5] = max(0,self.time2index(SCe))
+                self.qmc.timeindex[5] = max(0, self.qmc.time2index(SCe))
             DROP = stringtoseconds(header[9].split('DROP:')[1])
             if DROP > 0:
-                self.qmc.timeindex[6] = max(0,self.time2index(DROP))
+                self.qmc.timeindex[6] = max(0, self.qmc.time2index(DROP))
             COOL = stringtoseconds(header[10].split('COOL:')[1])
             if COOL > 0:
-                self.qmc.timeindex[7] = max(0,self.time2index(COOL))
+                self.qmc.timeindex[7] = max(0, self.qmc.time2index(COOL))
             self.qmc.endofx = self.qmc.timex[-1]
             self.sendmessage(QApplication.translate("Message","Artisan CSV file loaded successfully"))
             self.qmc.fileDirtySignal.emit()
@@ -28208,7 +28211,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " computedProfileInformation() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         ######### Similarity #########
         try:
-            det,dbt = aw.curveSimilarity(aw.qmc.phases[1])
+            det,dbt = aw.curveSimilarity()
             if det is not None and not math.isnan(det):
                 computedProfile["det"] = det
             if dbt is not None and not math.isnan(dbt):
@@ -34342,35 +34345,6 @@ class ApplicationWindow(QMainWindow):
             notes_html = "<br>" + notes_html
         return notes_html
 
-    #finds closest Bean Temperature in aw.qmc.temp2 given an input time. timex and temp2 always have same dimension
-    def BTfromseconds(self,seconds):
-        if len(self.qmc.timex):
-            #find when input time crosses timex
-            for i in range(len(self.qmc.timex)):
-                if self.qmc.timex[i] > seconds:
-                    break
-            return float(self.qmc.temp2[i-1])           #return the BT temperature
-        return 0.0
-
-    #finds closest Environmental Temperature in aw.qmc.temp1 given an input time. timex and temp1 always have same dimension
-    def ETfromseconds(self,seconds):
-        if len(self.qmc.timex):
-            #find when input time crosses timex
-            for i in range(len(self.qmc.timex)):
-                if self.qmc.timex[i] > seconds:
-                    break
-            return float(self.qmc.temp1[i-1])           #return the ET temperature
-        return 0.0
-
-    # converts times (values of timex) to indices
-    def time2index(self,time):
-        for i in range(len(self.qmc.timex)):
-            if self.qmc.timex[i] >= time:
-                if i > 0 and abs(time - self.qmc.timex[i]) > abs(time - self.qmc.timex[i-1]):
-                    return i-1
-                return i
-        return -1
-
     #returns the index of the lowest point in BT; return -1 if no such value found
     def findTP(self):
         return self.findTPint(aw.qmc.timeindex, aw.qmc.timex, aw.qmc.temp2)
@@ -34845,12 +34819,12 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def showAboutQt(self, _=False): # pylint: disable=no-self-use
+    def showAboutQt(self, _=False): # pylint: disable=no-self-use # used as slot
         QApplication.instance().aboutQt()
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def helpHelp(self, _=False):  # pylint: disable=no-self-use
+    def helpHelp(self, _=False):  # pylint: disable=no-self-use # used as slot
         QDesktopServices.openUrl(QUrl("https://artisan-scope.org/docs/quick-start-guide/", QUrl.ParsingMode.TolerantMode))
 
     @pyqtSlot()
@@ -35607,7 +35581,7 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def switchETBT(self, _=False): # pylint: disable=no-self-use
+    def switchETBT(self, _=False): # pylint: disable=no-self-use # used as slot
         t2 = aw.qmc.temp2
         aw.qmc.temp2 = aw.qmc.temp1
         aw.qmc.temp1 = t2
@@ -36603,7 +36577,7 @@ class ApplicationWindow(QMainWindow):
                 widget.deleteLater()
 
     #orders extra event buttons based on max number of buttons
-    def realignbuttons(self): # pylint: disable=no-self-use
+    def realignbuttons(self):
         #clear buttons
         self.clearBoxLayout(self.e1buttonbarLayout)
         self.clearBoxLayout(self.e2buttonbarLayout)
