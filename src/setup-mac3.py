@@ -187,12 +187,12 @@ os.chdir('./dist')
 try:
     PYTHONPATH = os.environ["PYTHONPATH"] + r'/'
 except:
-    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/'
+    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/'
 
 try:
     PYTHON_V = os.environ["PYTHON_V"]
 except:
-    PYTHON_V = '3.9'
+    PYTHON_V = '3.10'
     
 # (independent) matplotlib (installed via pip) shared libs are not copied by py2app (both cp are needed!)
 # UPDATE 9/2020: pip install of MPL v3.3.x does not come with a .dylibs directory any longer
@@ -385,6 +385,10 @@ except:
     pass
 try:
     subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.9/matplotlib/mpl-data/sample_data",shell = True)
+except:
+    pass
+try:
+    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.10/matplotlib/mpl-data/sample_data",shell = True)
 except:
     pass
 
