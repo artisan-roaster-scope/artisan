@@ -4496,8 +4496,7 @@ class tgraphcanvas(FigureCanvas):
                                         # set new limits to center current temp on canvas
                                         self.ax.set_xlim(xlim_new)
                                         self.ax.set_ylim(ylim_new)
-                                        two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (self.background and (self.DeltaETBflag or self.DeltaBTBflag)))
-                                        if two_ax_mode and self.delta_ax:
+                                        if self.twoAxisMode() and self.delta_ax:
                                             # keep the RoR axis constant
                                             zlim = self.delta_ax.get_ylim()
                                             zlim_offset = (zlim[1] - zlim[0]) / 2.
@@ -6110,22 +6109,16 @@ class tgraphcanvas(FigureCanvas):
 
     def fmt_data(self,x):
         res = x
-        if self.fmt_data_ON and not aw.qmc.designerflag and not aw.qmc.wheelflag and self.delta_ax:
-            if self.fmt_data_RoR:
-                try:
-                    # depending on the z-order of ax vs delta_ax the one or the other one is correct
-                    #res = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,x))[1]))[1])
-                    res = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
-            else:
-                try:
-                    res = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
+        if self.fmt_data_ON and self.delta_ax and self.fmt_data_RoR and self.twoAxisMode():
+            try:
+                # depending on the z-order of ax vs delta_ax the one or the other one is correct
+                #res = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,x))[1]))[1])
+                res = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
+            except Exception:
+                pass
         if aw.qmc.LCDdecimalplaces:
             return aw.float2float(res)
-        return int(round(res))
+        return int(round(res)) 
 
     #used by xaxistosm(). Provides also negative time
     def formtime(self,x,_):
@@ -7479,6 +7472,10 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " smmothETBTBkgnd() anno {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
+    def twoAxisMode(self):
+        return (self.DeltaETflag or self.DeltaBTflag or
+                    (self.background and self.backgroundprofile and (self.DeltaETBflag or self.DeltaBTBflag)))
+    
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
     def redraw(self, recomputeAllDeltas=True, smooth=True,sampling=False, takelock=True, forceRenewAxis=False):
@@ -7591,8 +7588,7 @@ class tgraphcanvas(FigureCanvas):
                 except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                     pass
 
-                two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or
-                    (aw.qmc.background and aw.qmc.backgroundprofile and (self.DeltaETBflag or self.DeltaBTBflag))or
+                two_ax_mode = (self.twoAxisMode() or
                     any(aw.extraDelta1[:len(self.extratimex)]) or
                     any(aw.extraDelta2[:len(self.extratimex)]))
 
@@ -13886,9 +13882,9 @@ class tgraphcanvas(FigureCanvas):
         return self.timearray2index(self.timex, seconds, nearest)
 
     #selects closest time INDEX in self.timeB from a given input float seconds
-    def backgroundtime2index(self,seconds):
+    def backgroundtime2index(self,seconds, nearest:bool=True):
         #find where given seconds crosses self.timeB
-        return self.timearray2index(self.timeB,seconds)
+        return self.timearray2index(self.timeB, seconds, nearest)
 
     #updates list self.timeindex when found an _OLD_ profile without self.timeindex (new version)
     def timeindexupdate(self,times):
@@ -15525,13 +15521,15 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         return QPixmap.fromImage(tmp)
     
     def update_message(self):
+        if not aw.qmc.twoAxisMode():
+            aw.qmc.fmt_data_RoR = False
         if self._last_event is None or not aw.qmc.fmt_data_ON:
             self.set_message(self.mode)
         else:
             try:
                 channel = ""
                 xs = self._last_event.inaxes.format_xdata(self._last_event.xdata)
-                if aw.qmc.fmt_data_curve == 0:
+                if aw.qmc.fmt_data_curve == 0 or aw.qmc.designerflag:
                     ys = self._last_event.inaxes.format_ydata(self._last_event.ydata)
                 else:
                     try:
@@ -15549,15 +15547,15 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                             channel = aw.ETname
                         elif aw.qmc.fmt_data_curve == 3 and aw.qmc.backgroundprofile is not None: # BTB
                             if aw.qmc.fmt_data_RoR:
-                                ys = aw.qmc.delta2B[aw.qmc.backgroundtime2index(self._last_event.xdata)]
+                                ys = aw.qmc.delta2B[aw.qmc.backgroundtime2index(self._last_event.xdata, nearest=False)]
                             else:
-                                ys = aw.qmc.temp2B[aw.qmc.backgroundtime2index(self._last_event.xdata)]
+                                ys = aw.qmc.temp2B[aw.qmc.backgroundtime2index(self._last_event.xdata, nearest=False)]
                             channel = "BTB"
                         elif aw.qmc.fmt_data_curve == 4 and aw.qmc.backgroundprofile is not None: # ETB
                             if aw.qmc.fmt_data_RoR:
-                                ys = aw.qmc.delta1B[aw.qmc.backgroundtime2index(self._last_event.xdata)]
+                                ys = aw.qmc.delta1B[aw.qmc.backgroundtime2index(self._last_event.xdata, nearest=False)]
                             else:
-                                ys = aw.qmc.temp1B[aw.qmc.backgroundtime2index(self._last_event.xdata)]
+                                ys = aw.qmc.temp1B[aw.qmc.backgroundtime2index(self._last_event.xdata, nearest=False)]
                             channel = "ETB"
                         else:
                             ys = self._last_event.inaxes.format_ydata(self._last_event.ydata)
@@ -15675,7 +15673,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                             y_label.set_in_layout(False) # remove x-axis labels from tight_layout calculation
                         except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                             pass
-                        two_ax_mode = (aw.qmc.DeltaETflag or aw.qmc.DeltaBTflag or (aw.qmc.background and (aw.qmc.DeltaETBflag or aw.qmc.DeltaBTBflag))) and not aw.qmc.designerflag
+                        two_ax_mode = aw.qmc.twoAxisMode() and not aw.qmc.designerflag
                         if two_ax_mode and aw.qmc.delta_ax:
                             y_label = aw.qmc.delta_ax.set_ylabel(aw.qmc.mode + "/min")
                             try:
@@ -24407,10 +24405,10 @@ class ApplicationWindow(QMainWindow):
                     if not app.artisanviewerMode and self.qmc.flagon and not self.qmc.designerflag and not bool(aw.comparator):
                         self.automaticsave()
                 elif k == 68:                     #letter D (toggle xy coordinates between temp and RoR scale)
-                    if not self.qmc.designerflag and not self.qmc.wheelflag and not bool(aw.comparator):
+                    if not self.qmc.wheelflag:
                         if not self.qmc.fmt_data_ON:
                             self.qmc.fmt_data_ON = True
-                        elif self.qmc.fmt_data_RoR == False:
+                        elif self.qmc.fmt_data_RoR == False and self.qmc.twoAxisMode():
                             self.qmc.fmt_data_RoR = True
                         else:
                             self.qmc.fmt_data_RoR = False
@@ -24423,7 +24421,7 @@ class ApplicationWindow(QMainWindow):
                             except Exception as e: # pylint: disable=broad-except
                                 _log.exception(e)
                 elif k == 90:                     #letter Z (toggle xy coordinates between 0: cursor, 1: BT, 2: ET, 3: BTB, 4: ETB)
-                    if not self.qmc.designerflag and not self.qmc.wheelflag and not bool(aw.comparator):
+                    if not self.qmc.wheelflag and not bool(aw.comparator):
                         self.qmc.nextFmtDataCurve()
                 elif k == 67:                     #letter C (controls)
                     self.toggleControls()
