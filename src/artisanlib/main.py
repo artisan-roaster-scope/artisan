@@ -2339,8 +2339,9 @@ class tgraphcanvas(FigureCanvas):
         self.ax_background = None
         self.block_update = False
 
-        # flag to toggle between Temp and RoR scale of xy-display; if None, the display is fully deactivated
+        # flag to toggle between Temp and RoR scale of xy-display
         self.fmt_data_RoR = False
+        self.fmt_data_ON = True #; if False, the xy-display is deactivated
         # toggle between using the 0: y-cursor pos, 1: BT@x, 2: ET@x, 3: BTB@x, 4: ETB@x (thus BT, ET or the corresponding background curve data at cursor position x)
         # to display the y of the cursor coordinates
         self.fmt_data_curve = 0
@@ -6109,18 +6110,19 @@ class tgraphcanvas(FigureCanvas):
 
     def fmt_data(self,x):
         res = x
-        if self.fmt_data_RoR == True and not aw.qmc.designerflag and self.delta_ax:
-            try:
-                # depending on the z-order of ax vs delta_ax the one or the other one is correct
-                #res = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,x))[1]))[1])
-                res = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
-        elif self.fmt_data_RoR == False and aw.qmc.designerflag and self.delta_ax:
-            try:
-                res = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
+        if self.fmt_data_ON and not aw.qmc.designerflag and not aw.qmc.wheelflag and self.delta_ax:
+            if self.fmt_data_RoR:
+                try:
+                    # depending on the z-order of ax vs delta_ax the one or the other one is correct
+                    #res = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,x))[1]))[1])
+                    res = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+            else:
+                try:
+                    res = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
         if aw.qmc.LCDdecimalplaces:
             return aw.float2float(res)
         return int(round(res))
@@ -15523,7 +15525,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         return QPixmap.fromImage(tmp)
     
     def update_message(self):
-        if self._last_event is None or aw.qmc.fmt_data_RoR is None:
+        if self._last_event is None or not aw.qmc.fmt_data_ON:
             self.set_message(self.mode)
         else:
             try:
@@ -24406,12 +24408,13 @@ class ApplicationWindow(QMainWindow):
                         self.automaticsave()
                 elif k == 68:                     #letter D (toggle xy coordinates between temp and RoR scale)
                     if not self.qmc.designerflag and not self.qmc.wheelflag and not bool(aw.comparator):
-                        if self.qmc.fmt_data_RoR is None:
-                            self.qmc.fmt_data_RoR = False
+                        if not self.qmc.fmt_data_ON:
+                            self.qmc.fmt_data_ON = True
                         elif self.qmc.fmt_data_RoR == False:
                             self.qmc.fmt_data_RoR = True
                         else:
-                            self.qmc.fmt_data_RoR = None
+                            self.qmc.fmt_data_RoR = False
+                            self.qmc.fmt_data_ON = False
                         aw.ntb.update_message()
                         # force redraw crosslines if active
                         if aw.qmc.crossmarker:
@@ -29143,7 +29146,9 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #restore x,y formating mode
             if settings.contains("fmt_data_RoR"):
-                self.qmc.fmt_data_RoR = settings.value("fmt_data_RoR",self.qmc.fmt_data_RoR) # tri-state: None, False, True
+                self.qmc.fmt_data_RoR = bool(toBool(settings.value("fmt_data_RoR",self.qmc.fmt_data_RoR)))
+            if settings.contains("fmt_data_ON"):
+                self.qmc.fmt_data_ON = bool(toBool(settings.value("fmt_data_ON",self.qmc.fmt_data_ON)))
             if settings.contains("fmt_data_curve"):
                 self.qmc.fmt_data_curve = toInt(settings.value("fmt_data_curve",self.qmc.fmt_data_curve))
             #restore playback aid
@@ -30977,6 +30982,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("elevation",self.qmc.elevation)
             settings.endGroup()
             settings.setValue("fmt_data_RoR",self.qmc.fmt_data_RoR)
+            settings.setValue("fmt_data_ON",self.qmc.fmt_data_ON)
             settings.setValue("fmt_data_curve",self.qmc.fmt_data_curve)
             settings.setValue("detectBackgroundEventTime",self.qmc.detectBackgroundEventTime)
             settings.setValue("backgroundReproduce",self.qmc.backgroundReproduce)
