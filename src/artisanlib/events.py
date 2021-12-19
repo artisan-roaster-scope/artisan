@@ -357,28 +357,28 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E1thicknessSpinBox.setSingleStep(1)
         self.E1thicknessSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E1thicknessSpinBox.setRange(1,10)
-        self.E1thicknessSpinBox.setValue(self.aw.qmc.Evaluelinethickness[0])
+        self.E1thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[0])))
         self.E1thicknessSpinBox.valueChanged.connect(self.setElinethickness0)
         self.E2thicknessSpinBox = QSpinBox()
         self.E2thicknessSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E2thicknessSpinBox.setSingleStep(1)
         self.E2thicknessSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E2thicknessSpinBox.setRange(1,10)
-        self.E2thicknessSpinBox.setValue(self.aw.qmc.Evaluelinethickness[1])
+        self.E2thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[1])))
         self.E2thicknessSpinBox.valueChanged.connect(self.setElinethickness1)
         self.E3thicknessSpinBox = QSpinBox()
         self.E3thicknessSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E3thicknessSpinBox.setSingleStep(1)
         self.E3thicknessSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E3thicknessSpinBox.setRange(1,10)
-        self.E3thicknessSpinBox.setValue(self.aw.qmc.Evaluelinethickness[2])
+        self.E3thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[2])))
         self.E3thicknessSpinBox.valueChanged.connect(self.setElinethickness2)
         self.E4thicknessSpinBox = QSpinBox()
         self.E4thicknessSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E4thicknessSpinBox.setSingleStep(1)
         self.E4thicknessSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E4thicknessSpinBox.setRange(1,10)
-        self.E4thicknessSpinBox.setValue(self.aw.qmc.Evaluelinethickness[3])
+        self.E4thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[3])))
         self.E4thicknessSpinBox.valueChanged.connect(self.setElinethickness3)
         self.E1alphaSpinBox = QDoubleSpinBox()
         self.E1alphaSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -414,28 +414,28 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E1sizeSpinBox.setSingleStep(1)
         self.E1sizeSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E1sizeSpinBox.setRange(1,14)
-        self.E1sizeSpinBox.setValue(self.aw.qmc.EvalueMarkerSize[0])
+        self.E1sizeSpinBox.setValue(int(round(self.aw.qmc.EvalueMarkerSize[0])))
         self.E1sizeSpinBox.valueChanged.connect(self.setEmarkersize0)
         self.E2sizeSpinBox = QSpinBox()
         self.E2sizeSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E2sizeSpinBox.setSingleStep(1)
         self.E2sizeSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E2sizeSpinBox.setRange(1,14)
-        self.E2sizeSpinBox.setValue(self.aw.qmc.EvalueMarkerSize[1])
+        self.E2sizeSpinBox.setValue(int(round(self.aw.qmc.EvalueMarkerSize[1])))
         self.E2sizeSpinBox.valueChanged.connect(self.setEmarkersize1)
         self.E3sizeSpinBox = QSpinBox()
         self.E3sizeSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E3sizeSpinBox.setSingleStep(1)
         self.E3sizeSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E3sizeSpinBox.setRange(1,14)
-        self.E3sizeSpinBox.setValue(self.aw.qmc.EvalueMarkerSize[2])
+        self.E3sizeSpinBox.setValue(int(round(self.aw.qmc.EvalueMarkerSize[2])))
         self.E3sizeSpinBox.valueChanged.connect(self.setEmarkersize2)
         self.E4sizeSpinBox = QSpinBox()
         self.E4sizeSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E4sizeSpinBox.setSingleStep(1)
         self.E4sizeSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E4sizeSpinBox.setRange(1,14)
-        self.E4sizeSpinBox.setValue(self.aw.qmc.EvalueMarkerSize[3])
+        self.E4sizeSpinBox.setValue(int(round(self.aw.qmc.EvalueMarkerSize[3])))
         self.E4sizeSpinBox.valueChanged.connect(self.setEmarkersize3)
         self.autoCharge = QCheckBox(QApplication.translate("CheckBox","Auto CHARGE"))
         self.autoCharge.setChecked(self.aw.qmc.autoChargeFlag)
@@ -615,26 +615,27 @@ class EventsDlg(ArtisanResizeablDialog):
                        QApplication.translate("ComboBox", "Artisan Command"),
                        QApplication.translate("ComboBox", "RC Command"),
                        QApplication.translate("ComboBox", "WebSocket Command")]
+        self.sliderActionTypesSorted = sorted(self.sliderActionTypes)
         self.E1action = QComboBox()
         self.E1action.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.E1action.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.E1action.addItems(self.sliderActionTypes)
-        self.E1action.setCurrentIndex(self.aw.eventslideractions[0])
+        self.E1action.addItems(self.sliderActionTypesSorted)
+        self.E1action.setCurrentIndex(self.sliderActionTypesSorted.index(self.sliderActionTypes[self.aw.eventslideractions[0]]))
         self.E2action = QComboBox()
         self.E2action.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.E2action.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.E2action.addItems(self.sliderActionTypes)
-        self.E2action.setCurrentIndex(self.aw.eventslideractions[1])
+        self.E2action.addItems(self.sliderActionTypesSorted)
+        self.E2action.setCurrentIndex(self.sliderActionTypesSorted.index(self.sliderActionTypes[self.aw.eventslideractions[1]]))
         self.E3action = QComboBox()
         self.E3action.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.E3action.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.E3action.addItems(self.sliderActionTypes)
-        self.E3action.setCurrentIndex(self.aw.eventslideractions[2])
+        self.E3action.addItems(self.sliderActionTypesSorted)
+        self.E3action.setCurrentIndex(self.sliderActionTypesSorted.index(self.sliderActionTypes[self.aw.eventslideractions[2]]))
         self.E4action = QComboBox()
         self.E4action.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.E4action.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.E4action.addItems(self.sliderActionTypes)
-        self.E4action.setCurrentIndex(self.aw.eventslideractions[3])
+        self.E4action.addItems(self.sliderActionTypesSorted)
+        self.E4action.setCurrentIndex(self.sliderActionTypesSorted.index(self.sliderActionTypes[self.aw.eventslideractions[3]]))
         self.E1command = QLineEdit(self.aw.eventslidercommands[0])
         self.E2command = QLineEdit(self.aw.eventslidercommands[1])
         self.E3command = QLineEdit(self.aw.eventslidercommands[2])
@@ -993,13 +994,14 @@ class EventsDlg(ArtisanResizeablDialog):
                        QApplication.translate("ComboBox", "RC Command"),
                        QApplication.translate("ComboBox", "Multiple Event"),
                        QApplication.translate("ComboBox", "WebSocket Command")]
+        self.buttonActionTypesSorted = sorted(self.buttonActionTypes)
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE"))
         self.CHARGEbutton.setChecked(bool(self.aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
         self.CHARGEbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.CHARGEbuttonActionType.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.CHARGEbuttonActionType.addItems(self.buttonActionTypes)
-        self.CHARGEbuttonActionType.setCurrentIndex(self.aw.qmc.buttonactions[0])
+        self.CHARGEbuttonActionType.addItems(self.buttonActionTypesSorted)
+        self.CHARGEbuttonActionType.setCurrentIndex(self.buttonActionTypesSorted.index(self.buttonActionTypes[self.aw.qmc.buttonactions[0]]))
         self.CHARGEbuttonActionString = QLineEdit(self.aw.qmc.buttonactionstrings[0])
         self.CHARGEbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String"))
         self.DRYbutton = QCheckBox(QApplication.translate("CheckBox", "DRY END"))
@@ -1007,8 +1009,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.DRYbuttonActionType = QComboBox()
         self.DRYbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.DRYbuttonActionType.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.DRYbuttonActionType.addItems(self.buttonActionTypes)
-        self.DRYbuttonActionType.setCurrentIndex(self.aw.qmc.buttonactions[1])
+        self.DRYbuttonActionType.addItems(self.buttonActionTypesSorted)
+        self.DRYbuttonActionType.setCurrentIndex(self.buttonActionTypesSorted.index(self.buttonActionTypes[self.aw.qmc.buttonactions[1]]))
         self.DRYbuttonActionString = QLineEdit(self.aw.qmc.buttonactionstrings[1])
         self.DRYbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String"))
         self.FCSbutton = QCheckBox(QApplication.translate("CheckBox", "FC START"))
@@ -1016,8 +1018,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.FCSbuttonActionType = QComboBox()
         self.FCSbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.FCSbuttonActionType.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.FCSbuttonActionType.addItems(self.buttonActionTypes)
-        self.FCSbuttonActionType.setCurrentIndex(self.aw.qmc.buttonactions[2])
+        self.FCSbuttonActionType.addItems(self.buttonActionTypesSorted)
+        self.FCSbuttonActionType.setCurrentIndex(self.buttonActionTypesSorted.index(self.buttonActionTypes[self.aw.qmc.buttonactions[2]]))
         self.FCSbuttonActionString = QLineEdit(self.aw.qmc.buttonactionstrings[2])
         self.FCSbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String"))
         self.FCEbutton = QCheckBox(QApplication.translate("CheckBox", "FC END"))
@@ -1025,8 +1027,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.FCEbuttonActionType = QComboBox()
         self.FCEbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.FCEbuttonActionType.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.FCEbuttonActionType.addItems(self.buttonActionTypes)
-        self.FCEbuttonActionType.setCurrentIndex(self.aw.qmc.buttonactions[3])
+        self.FCEbuttonActionType.addItems(self.buttonActionTypesSorted)
+        self.FCEbuttonActionType.setCurrentIndex(self.buttonActionTypesSorted.index(self.buttonActionTypes[self.aw.qmc.buttonactions[3]]))
         self.FCEbuttonActionString = QLineEdit(self.aw.qmc.buttonactionstrings[3])
         self.FCEbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String"))
         self.SCSbutton = QCheckBox(QApplication.translate("CheckBox", "SC START"))
@@ -1034,8 +1036,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.SCSbuttonActionType = QComboBox()
         self.SCSbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.SCSbuttonActionType.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.SCSbuttonActionType.addItems(self.buttonActionTypes)
-        self.SCSbuttonActionType.setCurrentIndex(self.aw.qmc.buttonactions[4])
+        self.SCSbuttonActionType.addItems(self.buttonActionTypesSorted)
+        self.SCSbuttonActionType.setCurrentIndex(self.buttonActionTypesSorted.index(self.buttonActionTypes[self.aw.qmc.buttonactions[4]]))
         self.SCSbuttonActionString = QLineEdit(self.aw.qmc.buttonactionstrings[4])
         self.SCSbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String"))
         self.SCEbutton = QCheckBox(QApplication.translate("CheckBox", "SC END"))
@@ -1043,8 +1045,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.SCEbuttonActionType = QComboBox()
         self.SCEbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.SCEbuttonActionType.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.SCEbuttonActionType.addItems(self.buttonActionTypes)
-        self.SCEbuttonActionType.setCurrentIndex(self.aw.qmc.buttonactions[5])
+        self.SCEbuttonActionType.addItems(self.buttonActionTypesSorted)
+        self.SCEbuttonActionType.setCurrentIndex(self.buttonActionTypesSorted.index(self.buttonActionTypes[self.aw.qmc.buttonactions[5]]))
         self.SCEbuttonActionString = QLineEdit(self.aw.qmc.buttonactionstrings[5])
         self.SCEbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String"))
         self.DROPbutton = QCheckBox(QApplication.translate("CheckBox", "DROP"))
@@ -1052,8 +1054,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.DROPbuttonActionType = QComboBox()
         self.DROPbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.DROPbuttonActionType.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.DROPbuttonActionType.addItems(self.buttonActionTypes)
-        self.DROPbuttonActionType.setCurrentIndex(self.aw.qmc.buttonactions[6])
+        self.DROPbuttonActionType.addItems(self.buttonActionTypesSorted)
+        self.DROPbuttonActionType.setCurrentIndex(self.buttonActionTypesSorted.index(self.buttonActionTypes[self.aw.qmc.buttonactions[6]]))
         self.DROPbuttonActionString = QLineEdit(self.aw.qmc.buttonactionstrings[6])
         self.DROPbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String"))
         self.COOLbutton = QCheckBox(QApplication.translate("CheckBox", "COOL END"))
@@ -1061,31 +1063,31 @@ class EventsDlg(ArtisanResizeablDialog):
         self.COOLbuttonActionType = QComboBox()
         self.COOLbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.COOLbuttonActionType.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.COOLbuttonActionType.addItems(self.buttonActionTypes)
-        self.COOLbuttonActionType.setCurrentIndex(self.aw.qmc.buttonactions[7])
+        self.COOLbuttonActionType.addItems(self.buttonActionTypesSorted)
+        self.COOLbuttonActionType.setCurrentIndex(self.buttonActionTypesSorted.index(self.buttonActionTypes[self.aw.qmc.buttonactions[7]]))
         self.COOLbuttonActionString = QLineEdit(self.aw.qmc.buttonactionstrings[7])
         self.COOLbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String"))
         self.ONbuttonLabel = QLabel(QApplication.translate("Label", "ON"))
         self.ONbuttonActionType = QComboBox()
         self.ONbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.ONbuttonActionType.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.ONbuttonActionType.addItems(self.buttonActionTypes)
-        self.ONbuttonActionType.setCurrentIndex(self.aw.qmc.extrabuttonactions[0])
+        self.ONbuttonActionType.addItems(self.buttonActionTypesSorted)
+        self.ONbuttonActionType.setCurrentIndex(self.buttonActionTypesSorted.index(self.buttonActionTypes[self.aw.qmc.extrabuttonactions[0]]))
         self.ONbuttonActionString = QLineEdit(self.aw.qmc.extrabuttonactionstrings[0])
         self.ONbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String"))
         self.OFFbuttonActionType = QComboBox()
         self.OFFbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.OFFbuttonActionType.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.OFFbuttonActionType.addItems(self.buttonActionTypes)
-        self.OFFbuttonActionType.setCurrentIndex(self.aw.qmc.extrabuttonactions[1])
+        self.OFFbuttonActionType.addItems(self.buttonActionTypesSorted)
+        self.OFFbuttonActionType.setCurrentIndex(self.buttonActionTypesSorted.index(self.buttonActionTypes[self.aw.qmc.extrabuttonactions[1]]))
         self.OFFbuttonActionString = QLineEdit(self.aw.qmc.extrabuttonactionstrings[1])
         self.OFFbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String"))
         self.OFFbuttonLabel = QLabel(QApplication.translate("Label", "OFF"))
         self.SAMPLINGbuttonActionType = QComboBox()
         self.SAMPLINGbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.SAMPLINGbuttonActionType.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.SAMPLINGbuttonActionType.addItems(self.buttonActionTypes)
-        self.SAMPLINGbuttonActionType.setCurrentIndex(self.aw.qmc.extrabuttonactions[2])
+        self.SAMPLINGbuttonActionType.addItems(self.buttonActionTypesSorted)
+        self.SAMPLINGbuttonActionType.setCurrentIndex(self.buttonActionTypesSorted.index(self.buttonActionTypes[self.aw.qmc.extrabuttonactions[2]]))
         self.SAMPLINGbuttonActionType.setMinimumContentsLength(3)
         self.SAMPLINGbuttonActionType.setMinimumWidth(self.SAMPLINGbuttonActionType.minimumSizeHint().width())
         self.SAMPLINGbuttonActionString = QLineEdit(self.aw.qmc.extrabuttonactionstrings[2])
@@ -1105,16 +1107,16 @@ class EventsDlg(ArtisanResizeablDialog):
         self.RESETbuttonActionType = QComboBox()
         self.RESETbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.RESETbuttonActionType.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.RESETbuttonActionType.addItems(self.buttonActionTypes)
-        self.RESETbuttonActionType.setCurrentIndex(self.aw.qmc.xextrabuttonactions[0])
+        self.RESETbuttonActionType.addItems(self.buttonActionTypesSorted)
+        self.RESETbuttonActionType.setCurrentIndex(self.buttonActionTypesSorted.index(self.buttonActionTypes[self.aw.qmc.xextrabuttonactions[0]]))
         self.RESETbuttonActionString = QLineEdit(self.aw.qmc.xextrabuttonactionstrings[0])
         self.RESETbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String"))
         self.STARTbuttonLabel = QLabel(QApplication.translate("Label", "START"))
         self.STARTbuttonActionType = QComboBox()
         self.STARTbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type"))
         self.STARTbuttonActionType.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.STARTbuttonActionType.addItems(self.buttonActionTypes)
-        self.STARTbuttonActionType.setCurrentIndex(self.aw.qmc.xextrabuttonactions[1])
+        self.STARTbuttonActionType.addItems(self.buttonActionTypesSorted)
+        self.STARTbuttonActionType.setCurrentIndex(self.buttonActionTypesSorted.index(self.buttonActionTypes[self.aw.qmc.xextrabuttonactions[1]]))
         self.STARTbuttonActionString = QLineEdit(self.aw.qmc.xextrabuttonactionstrings[1])
         self.STARTbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String"))
         defaultButtonsLayout = QGridLayout()
@@ -1650,20 +1652,20 @@ class EventsDlg(ArtisanResizeablDialog):
         else:
             self.marker4typeComboBox.setCurrentIndex(0)
         # line thickness
-        self.E1thicknessSpinBox.setValue(self.aw.qmc.Evaluelinethickness[0])
-        self.E2thicknessSpinBox.setValue(self.aw.qmc.Evaluelinethickness[1])
-        self.E3thicknessSpinBox.setValue(self.aw.qmc.Evaluelinethickness[2])
-        self.E4thicknessSpinBox.setValue(self.aw.qmc.Evaluelinethickness[3])
+        self.E1thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[0])))
+        self.E2thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[1])))
+        self.E3thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[2])))
+        self.E4thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[3])))
         # opacity
         self.E1alphaSpinBox.setValue(self.aw.qmc.Evaluealpha[0])
         self.E2alphaSpinBox.setValue(self.aw.qmc.Evaluealpha[1])
         self.E3alphaSpinBox.setValue(self.aw.qmc.Evaluealpha[2])
         self.E4alphaSpinBox.setValue(self.aw.qmc.Evaluealpha[3])
         # marker sizes
-        self.E1sizeSpinBox.setValue(self.aw.qmc.EvalueMarkerSize[0])
-        self.E2sizeSpinBox.setValue(self.aw.qmc.EvalueMarkerSize[1])
-        self.E3sizeSpinBox.setValue(self.aw.qmc.EvalueMarkerSize[2])
-        self.E4sizeSpinBox.setValue(self.aw.qmc.EvalueMarkerSize[3])
+        self.E1sizeSpinBox.setValue(int(round(self.aw.qmc.EvalueMarkerSize[0])))
+        self.E2sizeSpinBox.setValue(int(round(self.aw.qmc.EvalueMarkerSize[1])))
+        self.E3sizeSpinBox.setValue(int(round(self.aw.qmc.EvalueMarkerSize[2])))
+        self.E4sizeSpinBox.setValue(int(round(self.aw.qmc.EvalueMarkerSize[3])))
 
     def updateSliderTab(self):
         # set event names
@@ -1677,10 +1679,10 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E3visibility.setChecked(bool(self.aw.eventslidervisibilities[2]))
         self.E4visibility.setChecked(bool(self.aw.eventslidervisibilities[3]))
         # set slider action
-        self.E1action.setCurrentIndex(self.aw.eventslideractions[0])
-        self.E2action.setCurrentIndex(self.aw.eventslideractions[1])
-        self.E3action.setCurrentIndex(self.aw.eventslideractions[2])
-        self.E4action.setCurrentIndex(self.aw.eventslideractions[3])
+        self.E1action.setCurrentIndex(self.sliderActionTypesSorted.index(self.sliderActionTypes[self.aw.eventslideractions[0]]))
+        self.E2action.setCurrentIndex(self.sliderActionTypesSorted.index(self.sliderActionTypes[self.aw.eventslideractions[1]]))
+        self.E3action.setCurrentIndex(self.sliderActionTypesSorted.index(self.sliderActionTypes[self.aw.eventslideractions[2]]))
+        self.E4action.setCurrentIndex(self.sliderActionTypesSorted.index(self.sliderActionTypes[self.aw.eventslideractions[3]]))
         # set slider command
         self.E1command.setText(self.aw.eventslidercommands[0])
         self.E2command.setText(self.aw.eventslidercommands[1])
@@ -2174,6 +2176,29 @@ class EventsDlg(ArtisanResizeablDialog):
         std_extra_events += [uchr(177) + e for e in std_extra_events[:-1]] # chr(241)
         std_extra_events.insert(0,QApplication.translate("Label", "")) # we prepend the empty item that does not create an event entry
 
+        self.custom_button_actions = ["",
+                                     QApplication.translate("ComboBox","Serial Command"),
+                                     QApplication.translate("ComboBox","Call Program"),
+                                     QApplication.translate("ComboBox","Multiple Event"),
+                                     QApplication.translate("ComboBox","Modbus Command"),
+                                     QApplication.translate("ComboBox","DTA Command"),
+                                     QApplication.translate("ComboBox","IO Command"),
+                                     QApplication.translate("ComboBox","Hottop Heater"),
+                                     QApplication.translate("ComboBox","Hottop Fan"),
+                                     QApplication.translate("ComboBox","Hottop Command"),
+                                     QApplication.translate("ComboBox","p-i-d"),
+                                     QApplication.translate("ComboBox","Fuji Command"),
+                                     QApplication.translate("ComboBox","PWM Command"),
+                                     QApplication.translate("ComboBox","VOUT Command"),
+                                     QApplication.translate("ComboBox","S7 Command"),
+                                     QApplication.translate("ComboBox","Aillio R1 Heater"),
+                                     QApplication.translate("ComboBox","Aillio R1 Fan"),
+                                     QApplication.translate("ComboBox","Aillio R1 Drum"),
+                                     QApplication.translate("ComboBox","Aillio R1 Command"),
+                                     QApplication.translate("ComboBox","Artisan Command"),
+                                     QApplication.translate("ComboBox","RC Command"),
+                                     QApplication.translate("ComboBox","WebSocket Command")]
+        self.custom_button_actions_sorted = sorted(self.custom_button_actions)
 
         for i in range(nbuttons):
             #label
@@ -2209,32 +2234,11 @@ class EventsDlg(ArtisanResizeablDialog):
             #Action
             actionComboBox = MyQComboBox()
             actionComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
-            actionComboBox.addItems(["",
-                                     QApplication.translate("ComboBox","Serial Command"),
-                                     QApplication.translate("ComboBox","Call Program"),
-                                     QApplication.translate("ComboBox","Multiple Event"),
-                                     QApplication.translate("ComboBox","Modbus Command"),
-                                     QApplication.translate("ComboBox","DTA Command"),
-                                     QApplication.translate("ComboBox","IO Command"),
-                                     QApplication.translate("ComboBox","Hottop Heater"),
-                                     QApplication.translate("ComboBox","Hottop Fan"),
-                                     QApplication.translate("ComboBox","Hottop Command"),
-                                     QApplication.translate("ComboBox","p-i-d"),
-                                     QApplication.translate("ComboBox","Fuji Command"),
-                                     QApplication.translate("ComboBox","PWM Command"),
-                                     QApplication.translate("ComboBox","VOUT Command"),
-                                     QApplication.translate("ComboBox","S7 Command"),
-                                     QApplication.translate("ComboBox","Aillio R1 Heater"),
-                                     QApplication.translate("ComboBox","Aillio R1 Fan"),
-                                     QApplication.translate("ComboBox","Aillio R1 Drum"),
-                                     QApplication.translate("ComboBox","Aillio R1 Command"),
-                                     QApplication.translate("ComboBox","Artisan Command"),
-                                     QApplication.translate("ComboBox","RC Command"),
-                                     QApplication.translate("ComboBox","WebSocket Command")])
+            actionComboBox.addItems(self.custom_button_actions_sorted)
             act = self.extraeventsactions[i]
             if act > 7:
                 act = act - 1
-            actionComboBox.setCurrentIndex(act)
+            actionComboBox.setCurrentIndex(self.custom_button_actions_sorted.index(self.custom_button_actions[act]))
             actionComboBox.currentIndexChanged.connect(self.setactioneventbutton)
 
             #Action Description
@@ -2473,7 +2477,7 @@ class EventsDlg(ArtisanResizeablDialog):
         if i is not None:
             actioncombobox = self.eventbuttontable.cellWidget(i,4)
             if i < len(self.extraeventsactions):
-                self.extraeventsactions[i] = actioncombobox.currentIndex()
+                self.extraeventsactions[i] = self.custom_button_actions.index(self.custom_button_actions_sorted[actioncombobox.currentIndex()])
                 if self.extraeventsactions[i] > 6: # increase action type as 7=CallProgramWithArg is not available for buttons
                     self.extraeventsactions[i] = self.extraeventsactions[i] + 1
 
@@ -2721,10 +2725,10 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.eventslidervisibilities[1] = int(self.E2visibility.isChecked())
         self.aw.eventslidervisibilities[2] = int(self.E3visibility.isChecked())
         self.aw.eventslidervisibilities[3] = int(self.E4visibility.isChecked())
-        self.aw.eventslideractions[0] = int(self.E1action.currentIndex())
-        self.aw.eventslideractions[1] = int(self.E2action.currentIndex())
-        self.aw.eventslideractions[2] = int(self.E3action.currentIndex())
-        self.aw.eventslideractions[3] = int(self.E4action.currentIndex())
+        self.aw.eventslideractions[0] = self.sliderActionTypes.index(self.sliderActionTypesSorted[self.E1action.currentIndex()])
+        self.aw.eventslideractions[1] = self.sliderActionTypes.index(self.sliderActionTypesSorted[self.E2action.currentIndex()])
+        self.aw.eventslideractions[2] = self.sliderActionTypes.index(self.sliderActionTypesSorted[self.E3action.currentIndex()])
+        self.aw.eventslideractions[3] = self.sliderActionTypes.index(self.sliderActionTypesSorted[self.E4action.currentIndex()])
         self.aw.eventslidercommands[0] = self.E1command.text()
         self.aw.eventslidercommands[1] = self.E2command.text()
         self.aw.eventslidercommands[2] = self.E3command.text()
@@ -2968,19 +2972,19 @@ class EventsDlg(ArtisanResizeablDialog):
             # save palette label
             self.aw.buttonpalette_label = self.transferpalettecurrentLabelEdit.text()
             #
-            self.aw.qmc.buttonactions[0] = self.CHARGEbuttonActionType.currentIndex()
-            self.aw.qmc.buttonactions[1] = self.DRYbuttonActionType.currentIndex()
-            self.aw.qmc.buttonactions[2] = self.FCSbuttonActionType.currentIndex()
-            self.aw.qmc.buttonactions[3] = self.FCEbuttonActionType.currentIndex()
-            self.aw.qmc.buttonactions[4] = self.SCSbuttonActionType.currentIndex()
-            self.aw.qmc.buttonactions[5] = self.SCEbuttonActionType.currentIndex()
-            self.aw.qmc.buttonactions[6] = self.DROPbuttonActionType.currentIndex()
-            self.aw.qmc.buttonactions[7] = self.COOLbuttonActionType.currentIndex()
-            self.aw.qmc.extrabuttonactions[0] = self.ONbuttonActionType.currentIndex()
-            self.aw.qmc.extrabuttonactions[1] = self.OFFbuttonActionType.currentIndex()
-            self.aw.qmc.extrabuttonactions[2] = self.SAMPLINGbuttonActionType.currentIndex()
-            self.aw.qmc.xextrabuttonactions[0] = self.RESETbuttonActionType.currentIndex()
-            self.aw.qmc.xextrabuttonactions[1] = self.STARTbuttonActionType.currentIndex()
+            self.aw.qmc.buttonactions[0] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.CHARGEbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactions[1] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.DRYbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactions[2] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.FCSbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactions[3] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.FCEbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactions[4] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.SCSbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactions[5] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.SCEbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactions[6] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.DROPbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactions[7] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.COOLbuttonActionType.currentIndex()])
+            self.aw.qmc.extrabuttonactions[0] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.ONbuttonActionType.currentIndex()])
+            self.aw.qmc.extrabuttonactions[1] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.OFFbuttonActionType.currentIndex()])
+            self.aw.qmc.extrabuttonactions[2] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.SAMPLINGbuttonActionType.currentIndex()])
+            self.aw.qmc.xextrabuttonactions[0] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.RESETbuttonActionType.currentIndex()])
+            self.aw.qmc.xextrabuttonactions[1] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.STARTbuttonActionType.currentIndex()])
             self.aw.qmc.buttonactionstrings[0] = self.CHARGEbuttonActionString.text()
             self.aw.qmc.buttonactionstrings[1] = self.DRYbuttonActionString.text()
             self.aw.qmc.buttonactionstrings[2] = self.FCSbuttonActionString.text()

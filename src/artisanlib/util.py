@@ -213,7 +213,7 @@ def removeAll(l,s):
 # fills in intermediate interpolated values replacing -1 values based on surrounding values
 # [1, 2, 3, -1, -1, -1, 10, 11] => [1, 2, 3, 4.75, 6.5, 8.25, 11]
 # [1,2,3,-1,-1,-1,-1] => [1,2,3,-1,-1,-1,-1] # no final value to interpolate too, so trailing -1 are kept!
-# [-1,-1,2] => [2, 2.0, 2] # a prefix of -1 will be replaced by the first value in l that is not -1
+# [-1,-1,2] => [2, 2, 2] # a prefix of -1 of max length 5 will be replaced by the first value in l that is not -1
 # INVARIANT: the resulting list has always the same lenght as l
 def fill_gaps(l):
     res = []
@@ -221,10 +221,10 @@ def fill_gaps(l):
     skip = -1
     for i,e in enumerate(l):
         if i >= skip:
-            if e == -1 and last_val == -1:
+            if i == 0 and e == -1 and last_val == -1: # only for the prefix
                 # a prefix of -1 will be replaced by the first value in l that is not -1
                 s = -1
-                for ee in l:
+                for ee in l[:5]:
                     if ee != -1:
                         s = ee
                         break

@@ -109,7 +109,7 @@ try:
                              QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnresolvedImport @UnusedImport
                              QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport @UnusedImport
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport @UnusedImport
-                             QSlider, # @Reimport @UnresolvedImport @UnusedImport
+                             QAbstractSlider, QSlider, # @Reimport @UnresolvedImport @UnusedImport
                              QColorDialog, QFrame, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
                              QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtGui import (QAction, QImage, QImageReader, QWindow, # @Reimport @UnresolvedImport @UnusedImport
@@ -130,7 +130,7 @@ except Exception:
                              QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnresolvedImport @UnusedImport
                              QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport @UnusedImport
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport @UnusedImport
-                             QSlider, QStackedWidget, # @Reimport @UnresolvedImport @UnusedImport
+                             QAbstractSlider, QSlider, QStackedWidget, # @Reimport @UnresolvedImport @UnusedImport
                              QColorDialog, QFrame, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
                              QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtGui import (QImage, QImageReader, QWindow,  # @Reimport @UnresolvedImport @UnusedImport
@@ -731,7 +731,7 @@ class tgraphcanvas(FigureCanvas):
         'ETBdeltamarkersize', 'alarmsetlabel', 'alarmflag', 'alarmguard', 'alarmnegguard', 'alarmtime', 'alarmoffset', 'alarmtime2menuidx', 'menuidx2alarmtime',
         'alarmcond', 'alarmstate', 'alarmsource', 'alarmtemperature', 'alarmaction', 'alarmbeep', 'alarmstrings', 'alarmtablecolumnwidths', 'silent_alarms',
         'alarmsets_count', 'alarmsets', 'loadalarmsfromprofile', 'loadalarmsfrombackground', 'alarmsfile', 'temporaryalarmflag', 'TPalarmtimeindex',
-        'rsfile', 'tempory_sample_trigger_redraw', 'temporarysetsv', 'temporary_error', 'temporarymovepositiveslider', 'temporarymovenegativeslider',
+        'rsfile', 'tempory_sample_trigger_redraw', 'temporary_error', 'temporarymovepositiveslider', 'temporarymovenegativeslider',
         'temporayslider_force_move', 'quantifiedEvent', 'loadaxisfromprofile', 'startofx_default', 'endofx_default', 'xgrid_default', 'ylimit_F_default',
         'ylimit_min_F_default', 'ygrid_F_default', 'zlimit_F_default', 'zlimit_min_F_default', 'zgrid_F_default', 'ylimit_C_default', 'ylimit_min_C_default',
         'ygrid_C_default', 'zlimit_C_default', 'zlimit_min_C_default', 'zgrid_C_default', 'temp_grid', 'time_grid', 'zlimit_max', 'zlimit_min_max',
@@ -1436,7 +1436,7 @@ class tgraphcanvas(FigureCanvas):
         #log flag that tells to log ET when using device 18 (manual mode)
         self.manuallogETflag = 0
 
-        self.zoom_follow = False # if True, Artisan "follows" BT in the center by panning during recording. Activated via a click on the ZOOM icon while ZOOM is active
+        self.zoom_follow = False # if True, Artisan "follows" BT in the center by panning during recording. Activated via a click on the HOME icon
 
         #self.flagalignFCs = False
         self.alignEvent = 0 # 0:CHARGE, 1:DRY, 2:FCs, 3:FCe, 4:SCs, 5:SCe, 6:DROP, 7:ALL
@@ -1988,7 +1988,6 @@ class tgraphcanvas(FigureCanvas):
 
         self.tempory_sample_trigger_redraw = False
 
-        self.temporarysetsv = None #set by sample() to a new SV to be send to the PID by updategraphics() within the GUI thread as this moves the SV slider
         self.temporary_error = None # set by adderror() to a new error message, send to the message line by updategraphics()
         self.temporarymovepositiveslider = None # set by pidcontrol.setEnergy (indirectly called from sample())
                 # holds tuple (slidernr,value) and is executued and reset by updategraphics
@@ -3585,6 +3584,7 @@ class tgraphcanvas(FigureCanvas):
     
     # sample devices at interval self.delay miliseconds.
     # we can assume within the processing of sample_processing() that flagon=True
+    # NOTE: sample_processing is processed in the GUI thread NOT the sample thread!
     def sample_processing(self, local_flagstart, temp1_readings, temp2_readings, timex_readings):
         ##### (try to) lock resources  #########
         gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,200) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
@@ -3651,8 +3651,6 @@ class tgraphcanvas(FigureCanvas):
                     sample_extractemp1 = aw.qmc.on_extractemp1
                     sample_extractimex2 = aw.qmc.on_extractimex2
                     sample_extractemp2 = aw.qmc.on_extractemp2
-
-
 
                 #if using a meter (thermocouple device)
                 if aw.qmc.device != 18 or aw.simulator is not None: # not NONE device
@@ -3796,6 +3794,9 @@ class tgraphcanvas(FigureCanvas):
                     t1 = self.inputFilter(sample_timex,sample_temp1,tx,t1)
                     t2 = self.inputFilter(sample_timex,sample_temp2,tx,t2,True)
                     
+                    
+                    length_of_qmc_timex = len(sample_timex)
+                    
                     # now copy the destructively modified values from temp1/2 to ctemp1/2 if any (to ensure to pick the right elements we compare the timestamps at those indicees)                    
                     if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
                         if len(sample_ctimex1)>0:
@@ -3808,12 +3809,10 @@ class tgraphcanvas(FigureCanvas):
                                 sample_ctemp2[-1] = sample_temp2[-1]
                             if len(sample_ctimex2)>1 and t2_prevprev is not None and sample_ctimex2[-2] == sample_timex[-2] and t2_prevprev != sample_temp2[-2]:
                                 sample_ctemp2[-2] = sample_temp2[-2]
-
-                    length_of_qmc_timex = len(sample_timex)
                     t1_final = t1
                     t2_final = t2
-                    sample_temp2.append(t2_final)
                     sample_temp1.append(t1_final)
+                    sample_temp2.append(t2_final)
                     sample_timex.append(tx)
                     length_of_qmc_timex += 1
                     if t1_final != -1:
@@ -3822,6 +3821,7 @@ class tgraphcanvas(FigureCanvas):
                     if t2_final != -1:
                         sample_ctimex2.append(tx)
                         sample_ctemp2.append(t2_final)
+                    
 
                     #we populate the temporary smoothed ET/BT data arrays (with readings cleansed from -1 dropouts)
                     cf = aw.qmc.curvefilter*2 - 1 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
@@ -3874,7 +3874,7 @@ class tgraphcanvas(FigureCanvas):
                         # register smoothed values
                         sample_stemp1.append(sst1)
                         sample_stemp2.append(sst2)
-
+                    
                     if local_flagstart:
                         if aw.qmc.ETcurve:
                             if aw.qmc.smooth_curves_on_recording:
@@ -3886,13 +3886,6 @@ class tgraphcanvas(FigureCanvas):
                                 aw.qmc.l_temp2.set_data(sample_ctimex2, sample_stemp2)
                             else:
                                 aw.qmc.l_temp2.set_data(sample_ctimex2, sample_ctemp2)
-
-                    if (aw.qmc.Controlbuttonflag and aw.pidcontrol.pidActive and \
-                            not aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
-                        if aw.pidcontrol.pidSource == 1:
-                            aw.qmc.pid.update(st2) # smoothed BT
-                        else:
-                            aw.qmc.pid.update(st1) # smoothed ET
 
                     #we need a minimum of two readings to calculate rate of change
 #                    if local_flagstart and length_of_qmc_timex > 1:
@@ -4095,16 +4088,15 @@ class tgraphcanvas(FigureCanvas):
                             # update SV (if needed)
                             if sv is not None and sv != aw.fujipid.sv:
                                 sv = max(0,sv) # we don't send SV < 0
-                                aw.qmc.temporarysetsv = sv
-                                # aw.fujipid.setsv(sv,silent=True) # this is called in updategraphics() within the GUI thread to move the sliders
-                        elif aw.pidcontrol.pidActive and aw.pidcontrol.svMode in [1,2]:
+                                aw.fujipid.setsv(sv,silent=True) # this is called in updategraphics() within the GUI thread to move the sliders
+                        elif (aw.pidcontrol.pidActive and aw.pidcontrol.svMode == 1) or aw.pidcontrol.svMode == 2:
+                            # in BackgroundFollow mode we update the SV even if not active, just we do not move the SV slider
                             # calculate actual SV
                             sv = aw.pidcontrol.calcSV(tx)
                             # update SV (if needed)
                             if sv is not None and sv != aw.pidcontrol.sv:
                                 sv = max(0,sv) # we don't send SV < 0
-                                aw.qmc.temporarysetsv = sv
-                                # aw.pidcontrol.setSV(sv,init=False) # this is called in updategraphics() within the GUI thread to move the sliders
+                                aw.pidcontrol.setSV(sv,init=False) # this is called in updategraphics() within the GUI thread to move the sliders
 
                     # update AUC running value
                     if local_flagstart: # only during recording
@@ -4414,14 +4406,6 @@ class tgraphcanvas(FigureCanvas):
                 finally:
                     if self.profileDataSemaphore.available() < 1:
                         self.profileDataSemaphore.release(1)
-
-                #check setSV
-                if self.temporarysetsv is not None:
-                    if self.device == 0 and aw.fujipid.followBackground:
-                        aw.fujipid.setsv(self.temporarysetsv,silent=True)
-                    else:
-                        aw.pidcontrol.setSV(self.temporarysetsv,init=False)
-                self.temporarysetsv = None
 
                 #check move slider pending actions
                 if self.temporarymovepositiveslider is not None:
@@ -5102,13 +5086,11 @@ class tgraphcanvas(FigureCanvas):
                         if aw.qmc.device == 0:
                             if sv is not None and sv != aw.fujipid.sv:
                                 sv = max(0,sv) # we don't send SV < 0
-                                #aw.qmc.temporarysetsv = sv
                                 aw.fujipid.setsv(sv,silent=True)
                         #elif aw.pidcontrol.pidActive:
                         else:
                             if sv is not None and sv != aw.pidcontrol.sv:
                                 sv = max(0,sv) # we don't send SV < 0
-                                #aw.qmc.temporarysetsv = sv
                                 aw.pidcontrol.setSV(sv,init=False)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
@@ -10644,6 +10626,9 @@ class tgraphcanvas(FigureCanvas):
                     self.ambiWorker.finished.connect(self.ambiWorker.deleteLater)
                     self.ambiThread.finished.connect(self.ambiThread.deleteLater)
                     self.ambiThread.start()
+            
+            # warm up software PID (write current p-i-d settings,..)
+            aw.pidcontrol.confSoftwarePID()
 
             self.generateNoneTempHints()
             self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
@@ -10689,7 +10674,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.buttonONOFF.setStyleSheet(aw.pushbuttonstyles_simulator["ON"])
             else:
                 aw.buttonONOFF.setStyleSheet(aw.pushbuttonstyles["ON"])
-            QApplication.processEvents()
+#            QApplication.processEvents()
             
             aw.buttonONOFF.setText(QApplication.translate("Button", "OFF")) # text means click to turn OFF (it is ON)
             aw.buttonONOFF.setToolTip(QApplication.translate("Tooltip", "Stop monitoring"))
@@ -11114,8 +11099,11 @@ class tgraphcanvas(FigureCanvas):
                     pass
 
             self.resetTimer() #reset time, otherwise the recorded timestamps append to the time on START after ON!
+            
             self.flagstart = True
+            
             self.timealign(redraw=True)
+            
             # start Monitor if not yet running
             if not self.flagon:
                 self.OnMonitor()
@@ -12598,7 +12586,8 @@ class tgraphcanvas(FigureCanvas):
                                 aw.eNumberSpinBox.setValue(Nevents+1)
                             except Exception: # pylint: disable=broad-except
                                 pass
-                            aw.eNumberSpinBox.blockSignals(False)
+                            finally:
+                                aw.eNumberSpinBox.blockSignals(False)
                             if aw.qmc.timeindex[0] > -1:
                                 timez = stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Nevents]]-aw.qmc.timex[aw.qmc.timeindex[0]])
                             else:
@@ -15780,6 +15769,16 @@ class SampleThread(QThread):
                     temp2_readings.append(t2)
                     timex_readings.append(tx)
                     
+                    # the software PID needs to be updated here in sampling thread to ensure constant timing for the deriv computation
+                    if (aw.qmc.Controlbuttonflag and
+                        not aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
+                        # and aw.pidcontrol.pidActive # we feed the PID algorithm also while it is not actively controlling
+                        if aw.pidcontrol.pidSource == 1:
+                            aw.qmc.pid.update(t2)
+                        else:
+                            aw.qmc.pid.update(t1)
+                    
+                    
                     ##############  if using Extra devices
                     for i in range(len(aw.qmc.extradevices)):
                         extratx, extrat2, extrat1 = self.sample_extra_device(i)
@@ -15876,7 +15875,7 @@ class Athreadserver(QWidget): # pylint: disable=too-few-public-methods
 
             #connect graphics to GUI thread
             sthread.sample_processingSignal.connect(aw.qmc.sample_processing)
-            sthread.start(QThread.Priority.TimeCriticalPriority) # TimeCriticalPriority > QThread.Priority.HighestPriority > QThread.Priority.HighPriority
+            sthread.start(QThread.Priority.TimeCriticalPriority) # TimeCriticalPriority > HighestPriority > HighPriority > NormalPriority > LowPriority
             sthread.wait(300)    #needed in some Win OS
 
 
@@ -18131,9 +18130,15 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox1.setFlat(True)
         self.sliderGrpBox1x = QVBoxLayout() # we had to add this extra layer of QVBoxLayout for alignment issues
         self.sliderGrpBox1x.addWidget(self.sliderGrpBox1)
-        self.slider1.setTracking(False)
-        self.slider1.sliderMoved.connect(self.slider1Moved)
-        self.slider1.valueChanged.connect(self.slider1valueChanged)
+# simulate tracking via sliderMoved events to work around an issue of certain PyQt5 variants on macOS; this breaks on PyQt6.2.2 on macOS
+#        self.slider1.setTracking(False)
+#        self.slider1.sliderMoved.connect(self.slider1Moved)
+#        self.slider1.valueChanged.connect(self.slider1valueChanged)
+# tracking on version that works on PyQt6.2.2 on macOS and on PyQt 5.15.6
+        # tracking by default on (drives the LCD)
+        self.slider1.valueChanged.connect(self.updateSlider1LCD)
+        self.slider1.sliderReleased.connect(self.slider1released)
+        # needed for both tracking variants:
         self.slider1.actionTriggered.connect(self.slider1actionTriggered)
         self.slider1.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus
         
@@ -18156,9 +18161,15 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox2.setFlat(True)
         self.sliderGrpBox2x = QVBoxLayout() # we had to add this extra layer of QVBoxLayout for alignment issues
         self.sliderGrpBox2x.addWidget(self.sliderGrpBox2)
-        self.slider2.setTracking(False)
-        self.slider2.sliderMoved.connect(self.slider2Moved)
-        self.slider2.valueChanged.connect(self.slider2valueChanged)
+# simulate tracking via sliderMoved events to work around an issue of certain PyQt5 variants on macOS; this breaks on PyQt6.2.2 on macOS
+#        self.slider2.setTracking(False)
+#        self.slider2.sliderMoved.connect(self.slider2Moved)
+#        self.slider2.valueChanged.connect(self.slider2valueChanged)
+# tracking on version that works on PyQt6.2.2 on macOS and on PyQt 5.15.6
+        # tracking by default on (drives the LCD)
+        self.slider2.valueChanged.connect(self.updateSlider2LCD)
+        self.slider2.sliderReleased.connect(self.slider2released)
+        # needed for both tracking variants:
         self.slider2.actionTriggered.connect(self.slider2actionTriggered)
         self.slider2.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus
 
@@ -18181,9 +18192,15 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox3.setFlat(True)
         self.sliderGrpBox3x = QVBoxLayout() # we had to add this extra layer of QVBoxLayout for alignment issues
         self.sliderGrpBox3x.addWidget(self.sliderGrpBox3)
-        self.slider3.setTracking(False)
-        self.slider3.sliderMoved.connect(self.slider3Moved)
-        self.slider3.valueChanged.connect(self.slider3valueChanged)
+# simulate tracking via sliderMoved events to work around an issue of certain PyQt5 variants on macOS; this breaks on PyQt6.2.2 on macOS
+#        self.slider3.setTracking(False)
+#        self.slider3.sliderMoved.connect(self.slider3Moved)
+#        self.slider3.valueChanged.connect(self.slider3valueChanged)
+# tracking on version that works on PyQt6.2.2 on macOS and on PyQt 5.15.6
+        # tracking by default on (drives the LCD)
+        self.slider3.valueChanged.connect(self.updateSlider3LCD)
+        self.slider3.sliderReleased.connect(self.slider3released)
+        # needed for both tracking variants:
         self.slider3.actionTriggered.connect(self.slider3actionTriggered)
         self.slider3.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus
 
@@ -18206,9 +18223,15 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox4.setFlat(True)
         self.sliderGrpBox4x = QVBoxLayout() # we had to add this extra layer of QVBoxLayout for alignment issues
         self.sliderGrpBox4x.addWidget(self.sliderGrpBox4)
-        self.slider4.setTracking(False)
-        self.slider4.sliderMoved.connect(self.slider4Moved)
-        self.slider4.valueChanged.connect(self.slider4valueChanged)
+# simulate tracking via sliderMoved events to work around an issue of certain PyQt5 variants on macOS; this breaks on PyQt6.2.2 on macOS
+#        self.slider4.setTracking(False)
+#        self.slider4.sliderMoved.connect(self.slider4Moved)
+#        self.slider4.valueChanged.connect(self.slider4valueChanged)
+# tracking on version that works on PyQt6.2.2 on macOS and on PyQt 5.15.6
+        # tracking by default on (drives the LCD)
+        self.slider4.valueChanged.connect(self.updateSlider4LCD)
+        self.slider4.sliderReleased.connect(self.slider4released)
+        # needed for both tracking variants:
         self.slider4.actionTriggered.connect(self.slider4actionTriggered)
         self.slider4.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus
 
@@ -18232,7 +18255,6 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBoxSV.setVisible(False)
         self.sliderGrpBoxSV.setTitle("SV")
         self.sliderGrpBoxSV.setFlat(True)
-        #self.sliderSV.setTracking(False)
         self.sliderSV.valueChanged.connect(self.updateSVSliderLCD)
         self.sliderSV.sliderReleased.connect(self.sliderSVreleased)
         self.sliderSV.actionTriggered.connect(self.sliderSVactionTriggered)
@@ -21513,15 +21535,23 @@ class ApplicationWindow(QMainWindow):
         if v < aw.pidcontrol.svSliderMin:
             v = aw.pidcontrol.svSliderMin
         self.sliderLCDSV.display(v)
-        if self.SVslidermoved and self.sliderLCDSV.intValue() != self.sliderSV.value():
+        if self.SVslidermoved: 
+            if self.sliderLCDSV.intValue() != self.sliderSV.value():
             # if slider was moved by a keyboard action, we have to explicitly update the value and send the signals
-            self.sliderSV.setValue(self.sliderLCDSV.intValue())
+                self.sliderSV.setValue(self.sliderLCDSV.intValue())
             self.sliderSVreleased()
             self.SVslidermoved = 0
 
     @pyqtSlot(int)
     def sliderSVactionTriggered(self,n):
-        if n in [1,2,3,4]: # keyboard moves enable the slider value change
+        if n in [
+                    1, 2, 3, 4,
+#                    QAbstractSlider.SliderAction.SliderSingleStepAdd,
+#                    QAbstractSlider.SliderAction.SliderSingleStepSub,
+#                    QAbstractSlider.SliderAction.SliderPageStepAdd,
+#                    QAbstractSlider.SliderAction.SliderPageStepSub
+                ]: # keyboard moves enable the slider value change
+            # we set a fake-release-event for keyboard triggered slider moves
             self.SVslidermoved = 1
 
     @pyqtSlot()
@@ -21535,7 +21565,8 @@ class ApplicationWindow(QMainWindow):
             _log.exception(e)
 
     # if setValue=False, the slider is only moved without a change signal being issued
-    def moveSVslider(self,v,setValue=True):
+    def moveSVslider(self, v:float, setValue:bool=True):
+        v = int(round(v))
         if aw.pidcontrol.svSlider:
             if setValue:
                 self.sliderSV.setValue(v)
@@ -21548,55 +21579,140 @@ class ApplicationWindow(QMainWindow):
     # - by drag and release the slider handle
     # - by using the up/down cursor keys or page up/down keys
     # - using the Artisan slider shortcuts via keys Q, W, E, R
-    # - programatically
-    # The drag-and-release action (at least on Mac OS X) in some cases triggers a valueChanged signal short after fetching the handle and before moving it.
+    # - using an Artisan Command (eg. via an alarm)
+    # - programatically (PID)
+    # The drag-and-release action (at least on Mac OS X) in some cases triggers 
+    # a valueChanged signal short after fetching the handle and before moving it.
     # To avoid the generation of an additional event with an event value close to the last one, the eventslidermoved variable has been added.
     # It is set after a slider move. If it is not set, only value changes above a certain limit (here 3) are accepted.
-    @pyqtSlot(int)
-    def slider1Moved(self,v):
-        self.eventslidermoved[0]=1
-        self.updateSliderLCD(0,v)
-    @pyqtSlot(int)
-    def slider2Moved(self,v):
-        self.eventslidermoved[1]=1
-        self.updateSliderLCD(1,v)
-    @pyqtSlot(int)
-    def slider3Moved(self,v):
-        self.eventslidermoved[2]=1
-        self.updateSliderLCD(2,v)
-    @pyqtSlot(int)
-    def slider4Moved(self,v):
-        self.eventslidermoved[3]=1
-        self.updateSliderLCD(3,v)
+    
+    # the following are only needed with the slider tracking off work around:
+#    @pyqtSlot(int)
+#    def slider1Moved(self,v):
+#        self.eventslidermoved[0]=1
+#        self.updateSliderLCD(0,v)
+#    @pyqtSlot(int)
+#    def slider2Moved(self,v):
+#        self.eventslidermoved[1]=1
+#        self.updateSliderLCD(1,v)
+#    @pyqtSlot(int)
+#    def slider3Moved(self,v):
+#        self.eventslidermoved[2]=1
+#        self.updateSliderLCD(2,v)
+#    @pyqtSlot(int)
+#    def slider4Moved(self,v):
+#        self.eventslidermoved[3]=1
+#        self.updateSliderLCD(3,v)
 
+# required for the default tracking sliders
+    @pyqtSlot()
+    def slider1released(self):
+        self.sliderReleased(0,updateLCD=False)
+    @pyqtSlot()
+    def slider2released(self):
+        self.sliderReleased(1,updateLCD=False)
+    @pyqtSlot()
+    def slider3released(self):
+        self.sliderReleased(2,updateLCD=False)
+    @pyqtSlot()
+    def slider4released(self):
+        self.sliderReleased(3,updateLCD=False)
+
+# required for the default tracking sliders
     @pyqtSlot(int)
-    def slider1valueChanged(self,_):
-        self.sliderReleased(0,updateLCD=True)
+    def updateSlider1LCD(self,v):
+        self.updateSliderLCD(0,v)
+        if self.eventslidermoved[0]:
+            # if slider was moved by a keyboard action, we have to explicitly update the value and send the signals
+            if self.sliderLCD1.intValue() != self.slider1.value():
+                self.slider1.setValue(self.sliderLCD1.intValue())
+            self.slider1released()
+            self.eventslidermoved[0] = 0
     @pyqtSlot(int)
-    def slider2valueChanged(self,_):
-        self.sliderReleased(1,updateLCD=True)
+    def updateSlider2LCD(self,v):
+        self.updateSliderLCD(1,v)
+        if self.eventslidermoved[1]:
+            # if slider was moved by a keyboard action, we have to explicitly update the value and send the signals
+            if self.sliderLCD2.intValue() != self.slider2.value():
+                self.slider2.setValue(self.sliderLCD2.intValue())
+            self.slider2released()
+            self.eventslidermoved[1] = 0
     @pyqtSlot(int)
-    def slider3valueChanged(self,_):
-        self.sliderReleased(2,updateLCD=True)
+    def updateSlider3LCD(self,v):
+        self.updateSliderLCD(2,v)
+        if self.eventslidermoved[2]:
+            # if slider was moved by a keyboard action, we have to explicitly update the value and send the signals
+            if self.sliderLCD3.intValue() != self.slider3.value():
+                self.slider3.setValue(self.sliderLCD3.intValue())
+            self.slider3released()
+            self.eventslidermoved[2] = 0
     @pyqtSlot(int)
-    def slider4valueChanged(self,_):
-        self.sliderReleased(3,updateLCD=True)
+    def updateSlider4LCD(self,v):
+        self.updateSliderLCD(3,v)
+        if self.eventslidermoved[3]:
+            # if slider was moved by a keyboard action, we have to explicitly update the value and send the signals
+            if self.sliderLCD4.intValue() != self.slider4.value():
+                self.slider4.setValue(self.sliderLCD4.intValue())
+            self.slider4released()
+            self.eventslidermoved[3] = 0
+
+# required for simulating slider tracking via sliderMove events to work around an issue of certain PyQt5 variants
+#    @pyqtSlot(int)
+#    def slider1valueChanged(self,_):
+#        self.sliderReleased(0,updateLCD=True)
+#    @pyqtSlot(int)
+#    def slider2valueChanged(self,_):
+#        self.sliderReleased(1,updateLCD=True)
+#    @pyqtSlot(int)
+#    def slider3valueChanged(self,_):
+#        self.sliderReleased(2,updateLCD=True)
+#    @pyqtSlot(int)
+#    def slider4valueChanged(self,_):
+#        self.sliderReleased(3,updateLCD=True)
 
     @pyqtSlot(int)
     def slider1actionTriggered(self,n):
-        if n in [1,2,3,4]: # keyboard moves enable the slider value change
+        if n in [
+                    1, 2, 3, 4,
+#                    QAbstractSlider.SliderAction.SliderSingleStepAdd,
+#                    QAbstractSlider.SliderAction.SliderSingleStepSub,
+#                    QAbstractSlider.SliderAction.SliderPageStepAdd,
+#                    QAbstractSlider.SliderAction.SliderPageStepSub
+                ]: # keyboard moves enable the slider value change
+            # we set a fake-release-event for keyboard triggered slider moves
             self.eventslidermoved[0]=1
     @pyqtSlot(int)
     def slider2actionTriggered(self,n):
-        if n in [1,2,3,4]: # keyboard moves enable the slider value change
+        if n in [
+                    1, 2, 3, 4,
+#                    QAbstractSlider.SliderAction.SliderSingleStepAdd,
+#                    QAbstractSlider.SliderAction.SliderSingleStepSub,
+#                    QAbstractSlider.SliderAction.SliderPageStepAdd,
+#                    QAbstractSlider.SliderAction.SliderPageStepSub
+                ]: # keyboard moves enable the slider value change
+            # we set a fake-release-event for keyboard triggered slider moves
             self.eventslidermoved[1]=1
     @pyqtSlot(int)
     def slider3actionTriggered(self,n):
-        if n in [1,2,3,4]: # keyboard moves enable the slider value change
+        if n in [
+                    1, 2, 3, 4,
+#                    QAbstractSlider.SliderAction.SliderSingleStepAdd,
+#                    QAbstractSlider.SliderAction.SliderSingleStepSub,
+#                    QAbstractSlider.SliderAction.SliderPageStepAdd,
+#                    QAbstractSlider.SliderAction.SliderPageStepSub
+                ]: # keyboard moves enable the slider value change
+            # we set a fake-release-event for keyboard triggered slider moves
             self.eventslidermoved[2]=1
     @pyqtSlot(int)
     def slider4actionTriggered(self,n):
-        if n in [1,2,3,4]: # keyboard moves enable the slider value change
+        if n in [
+                    1, 2, 3, 4,
+#                    QAbstractSlider.SliderAction.SliderSingleStepAdd,
+#                    QAbstractSlider.SliderAction.SliderSingleStepSub,
+#                    QAbstractSlider.SliderAction.SliderPageStepAdd,
+#                    QAbstractSlider.SliderAction.SliderPageStepSub
+                ]: # keyboard moves enable the slider value change
+            # we set a fake-release-event for keyboard triggered slider moves
             self.eventslidermoved[3]=1
 
     # if updateLCD=True, call moveslider() which in turn updates the LCD
@@ -21735,25 +21851,27 @@ class ApplicationWindow(QMainWindow):
         self.slider2.blockSignals(True)
         self.slider3.blockSignals(True)
         self.slider4.blockSignals(True)
-        # reset limits
-        self.slider1.setMinimum(self.eventslidermin[0])
-        self.slider1.setMaximum(self.eventslidermax[0])
-        self.slider2.setMinimum(self.eventslidermin[1])
-        self.slider2.setMaximum(self.eventslidermax[1])
-        self.slider3.setMinimum(self.eventslidermin[2])
-        self.slider3.setMaximum(self.eventslidermax[2])
-        self.slider4.setMinimum(self.eventslidermin[3])
-        self.slider4.setMaximum(self.eventslidermax[3])
-        # update slider LCDs
-        self.updateSliderLCD(0,min(self.eventslidermax[0],max(self.eventslidermin[0],self.slider1.value())))
-        self.updateSliderLCD(1,min(self.eventslidermax[1],max(self.eventslidermin[1],self.slider2.value())))
-        self.updateSliderLCD(2,min(self.eventslidermax[2],max(self.eventslidermin[2],self.slider3.value())))
-        self.updateSliderLCD(3,min(self.eventslidermax[3],max(self.eventslidermin[3],self.slider4.value())))
-        # unblock sliders signaling
-        self.slider1.blockSignals(False)
-        self.slider2.blockSignals(False)
-        self.slider3.blockSignals(False)
-        self.slider4.blockSignals(False)
+        try:
+            # reset limits
+            self.slider1.setMinimum(self.eventslidermin[0])
+            self.slider1.setMaximum(self.eventslidermax[0])
+            self.slider2.setMinimum(self.eventslidermin[1])
+            self.slider2.setMaximum(self.eventslidermax[1])
+            self.slider3.setMinimum(self.eventslidermin[2])
+            self.slider3.setMaximum(self.eventslidermax[2])
+            self.slider4.setMinimum(self.eventslidermin[3])
+            self.slider4.setMaximum(self.eventslidermax[3])
+            # update slider LCDs
+            self.updateSliderLCD(0,min(self.eventslidermax[0],max(self.eventslidermin[0],self.slider1.value())))
+            self.updateSliderLCD(1,min(self.eventslidermax[1],max(self.eventslidermin[1],self.slider2.value())))
+            self.updateSliderLCD(2,min(self.eventslidermax[2],max(self.eventslidermin[2],self.slider3.value())))
+            self.updateSliderLCD(3,min(self.eventslidermax[3],max(self.eventslidermin[3],self.slider4.value())))
+        finally:
+            # unblock sliders signaling
+            self.slider1.blockSignals(False)
+            self.slider2.blockSignals(False)
+            self.slider3.blockSignals(False)
+            self.slider4.blockSignals(False)
 
     # creates a drop shadow effect
     def makeShadow(self,strong=False):
@@ -22259,10 +22377,7 @@ class ApplicationWindow(QMainWindow):
 
                             elif cs_a[0] == "slider" and cs_len == 3:
                                 v = toFloat(cs_a[2])
-                                if 0 < v <= 100:
-                                    aw.moveslider(toInt(cs_a[1]), v)
-                                else:
-                                    aw.sendmessage(QApplication.translate("Message", "Slider out of range (%f)" % (v)))
+                                aw.moveslider(toInt(cs_a[1]), v)
                             elif cs_a[0] == "button" and cs_len > 3:
                                 b = toInt(cs_a[1]) - 1 # gui button list is indexed from 1
                                 c = toInt(cs_a[2])
@@ -23532,8 +23647,8 @@ class ApplicationWindow(QMainWindow):
 
     # n=0 : slider1; n=1 : slider2; n=2 : slider3; n=3 : slider4
     # updates corresponding eventslidervalues
-    def moveslider(self,n,v,forceLCDupdate=False):
-        v = min(max(v,self.eventslidermin[n]),self.eventslidermax[n])
+    def moveslider(self, n:int, v:float, forceLCDupdate=False):
+        v = min(max(int(round(v)),self.eventslidermin[n]),self.eventslidermax[n])
         self.eventslidervalues[n] = v
         # first update slider LCDs if needed
         if n == 0 and (forceLCDupdate or self.slider1.value() != v):
@@ -24421,7 +24536,7 @@ class ApplicationWindow(QMainWindow):
                             except Exception as e: # pylint: disable=broad-except
                                 _log.exception(e)
                 elif k == 90:                     #letter Z (toggle xy coordinates between 0: cursor, 1: BT, 2: ET, 3: BTB, 4: ETB)
-                    if not self.qmc.wheelflag and not bool(aw.comparator):
+                    if not self.qmc.designerflag and not self.qmc.wheelflag and not bool(aw.comparator):
                         self.qmc.nextFmtDataCurve()
                 elif k == 67:                     #letter C (controls)
                     self.toggleControls()
@@ -29749,11 +29864,13 @@ class ApplicationWindow(QMainWindow):
                     aw.pidcontrol.svLabel = toString(settings.value("svLabel",aw.pidcontrol.svLabel))
 
                 aw.sliderSV.blockSignals(True)
-                if settings.contains("dutyMin"):
-                    aw.pidcontrol.dutyMin = toInt(settings.value("dutyMin",aw.pidcontrol.dutyMin))
-                if settings.contains("dutyMax"):
-                    aw.pidcontrol.dutyMax = toInt(settings.value("dutyMax",aw.pidcontrol.dutyMax))
-                aw.sliderSV.blockSignals(False)
+                try:
+                    if settings.contains("dutyMin"):
+                        aw.pidcontrol.dutyMin = toInt(settings.value("dutyMin",aw.pidcontrol.dutyMin))
+                    if settings.contains("dutyMax"):
+                        aw.pidcontrol.dutyMax = toInt(settings.value("dutyMax",aw.pidcontrol.dutyMax))
+                finally:
+                    aw.sliderSV.blockSignals(False)
 
                 aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider)
                 aw.pidcontrol.pidKp = toFloat(settings.value("pidKp",aw.pidcontrol.pidKp))
@@ -30800,18 +30917,18 @@ class ApplicationWindow(QMainWindow):
                 m = self.qmc.l_eventtype4dots.get_marker()
                 if not isinstance(m, (int)):
                     self.qmc.EvalueMarker[3] = m
-                self.qmc.EvalueMarkerSize[0] = self.qmc.l_eventtype1dots.get_markersize()
-                self.qmc.EvalueMarkerSize[1] = self.qmc.l_eventtype2dots.get_markersize()
-                self.qmc.EvalueMarkerSize[2] = self.qmc.l_eventtype3dots.get_markersize()
-                self.qmc.EvalueMarkerSize[3] = self.qmc.l_eventtype4dots.get_markersize()
+                self.qmc.EvalueMarkerSize[0] = int(round(self.qmc.l_eventtype1dots.get_markersize()))
+                self.qmc.EvalueMarkerSize[1] = int(round(self.qmc.l_eventtype2dots.get_markersize()))
+                self.qmc.EvalueMarkerSize[2] = int(round(self.qmc.l_eventtype3dots.get_markersize()))
+                self.qmc.EvalueMarkerSize[3] = int(round(self.qmc.l_eventtype4dots.get_markersize()))
                 self.qmc.EvalueColor[0] = self.getColor(self.qmc.l_eventtype1dots)
                 self.qmc.EvalueColor[1] = self.getColor(self.qmc.l_eventtype2dots)
                 self.qmc.EvalueColor[2] = self.getColor(self.qmc.l_eventtype3dots)
                 self.qmc.EvalueColor[3] = self.getColor(self.qmc.l_eventtype4dots)
-                self.qmc.Evaluelinethickness[0] = self.qmc.l_eventtype1dots.get_linewidth()
-                self.qmc.Evaluelinethickness[1] = self.qmc.l_eventtype2dots.get_linewidth()
-                self.qmc.Evaluelinethickness[2] = self.qmc.l_eventtype3dots.get_linewidth()
-                self.qmc.Evaluelinethickness[3] = self.qmc.l_eventtype4dots.get_linewidth()
+                self.qmc.Evaluelinethickness[0] = int(round(self.qmc.l_eventtype1dots.get_linewidth()))
+                self.qmc.Evaluelinethickness[1] = int(round(self.qmc.l_eventtype2dots.get_linewidth()))
+                self.qmc.Evaluelinethickness[2] = int(round(self.qmc.l_eventtype3dots.get_linewidth()))
+                self.qmc.Evaluelinethickness[3] = int(round(self.qmc.l_eventtype4dots.get_linewidth()))
                 self.qmc.etypes[0] = self.qmc.l_eventtype1dots.get_label()
                 self.qmc.etypes[1] = self.qmc.l_eventtype2dots.get_label()
                 self.qmc.etypes[2] = self.qmc.l_eventtype3dots.get_label()

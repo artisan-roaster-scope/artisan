@@ -1282,6 +1282,19 @@ class PIDcontrol():
                     self.aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["rstimer"],self.aw.lcdpaletteB["rstimer"]))
                     self.aw.qmc.setTimerLargeLCDcolorSignal.emit(self.aw.lcdpaletteF["rstimer"],self.aw.lcdpaletteB["rstimer"])
 
+    # the internal software PID should be configured on ON, but not be activated yet to warm it up
+    def confSoftwarePID(self):
+        if self.aw.pidcontrol.externalPIDControl() not in [1, 2] and not(self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag) and self.aw.qmc.Controlbuttonflag:
+            # software PID
+            self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd,self.pOnE)
+            self.aw.qmc.pid.setLimits((-100 if self.aw.pidcontrol.pidNegativeTarget else 0),(100 if self.aw.pidcontrol.pidPositiveTarget else 0))
+            self.aw.qmc.pid.setDutySteps(self.aw.pidcontrol.dutySteps)
+            self.aw.qmc.pid.setDutyMin(self.aw.pidcontrol.dutyMin)
+            self.aw.qmc.pid.setDutyMax(self.aw.pidcontrol.dutyMax)
+            self.aw.qmc.pid.setControl(self.aw.pidcontrol.setEnergy)
+            if self.aw.pidcontrol.svMode == 0:
+                self.aw.pidcontrol.setSV(self.aw.sliderSV.value())
+
     def pidOn(self):
         if self.aw.qmc.flagon:
             self.pidModeInit()
@@ -1598,6 +1611,7 @@ class PIDcontrol():
                 sv = self.aw.pidcontrol.sv
             else:
                 sv = min(self.svSliderMax, max(self.svSliderMin, self.aw.pidcontrol.svValue))
+            sv = int(round(sv))
             self.aw.updateSVSliderLCD(sv)
             self.aw.sliderSV.setValue(sv)
             self.aw.sliderSV.blockSignals(False)
