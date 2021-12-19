@@ -2344,6 +2344,7 @@ class tgraphcanvas(FigureCanvas):
         # toggle between using the 0: y-cursor pos, 1: BT@x, 2: ET@x, 3: BTB@x, 4: ETB@x (thus BT, ET or the corresponding background curve data at cursor position x)
         # to display the y of the cursor coordinates
         self.fmt_data_curve = 0
+        self.running_LCDs = False # if True and not sampling visible LCDs show the readings at the cursor position
 
         #holds last values calculated from plotter
         self.plotterstack = [0]*10
@@ -4260,6 +4261,154 @@ class tgraphcanvas(FigureCanvas):
                 #update screen in main GUI thread
                 self.updategraphicsSignal.emit()
 
+
+    # idx is the index to be displayed, by default -1 (the last item of each given array)
+    # all other parameters are expected to be lists of values, but for PID_SV and PID_DUTY
+    # if time is None, the timer LCD is not updated
+    # values of -1 are suppressed to their default "off" representation
+    # XTs1 and XTs2 are lists of lists of values for the corresponding extra LCDs
+    def updateLCDs(self, time, temp1, temp2, delta1, delta2, XTs1, XTs2, PID_SV=-1, PID_DUTY=-1, idx=-1):
+        try:
+            if self.LCDdecimalplaces:
+                lcdformat = "%.1f"
+                resLCD = "u.u"
+            else:
+                lcdformat = "%.0f"
+                resLCD = "uu"
+            timestr = None
+            ## TIMER LCDS:
+            if not self.flagstart:
+                timestr = "00:00"
+            if time is None:
+                pass
+            
+            ## ET LCD:
+            etstr = resLCD
+            try: # if temp1 is None, which should never be the case, this fails
+                if temp1 and temp1[idx] not in [None, -1]:
+                    if -100 < temp1[-1] < 1000:
+                        etstr = lcdformat%temp1[idx]
+                    elif self.LCDdecimalplaces and -10000 < temp1[idx] < 100000:
+                        etstr = "%.0f"%temp1[idx]
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+            aw.lcd2.display(etstr)
+            
+            ## BT LCD:
+            btstr = resLCD
+            try:
+                if temp2 and temp2[idx] not in [None, -1]:
+                    if -100 < temp2[-1] < 1000:
+                        btstr = lcdformat%temp2[idx]            # BT
+                    elif self.LCDdecimalplaces and -10000 < temp2[idx] < 100000:
+                        btstr = "%.0f"%float(temp2[idx])
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+            aw.lcd3.display(btstr)
+
+            ## Delta LCDs:
+            deltaetstr = resLCD
+            deltabtstr = resLCD
+            try:
+                if delta1 and delta1[idx] not in [None, -1]:
+                    if -100 < delta1[idx] < 1000:
+                        deltaetstr = lcdformat%delta1[idx]        # rate of change ET (degress per minute)
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+            try:
+                if delta2 and delta2[idx] not in [None, -1]:
+                    if -100 < delta2[idx] < 1000:
+                        deltabtstr = lcdformat%delta2[idx]        # rate of change BT (degrees per minute)
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+            aw.lcd4.display(deltaetstr)
+            aw.lcd5.display(deltabtstr)
+            try:
+                self.updateLargeDeltaLCDs(deltabt=deltabtstr,deltaet=deltaetstr)
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+            
+            # Fuji/Delta LCDs
+            try:
+                if aw.ser.showFujiLCDs and self.device in (0, 26):
+                    pidsvstr = resLCD
+                    piddutystr = resLCD
+                    if PID_SV not in [None, -1] and PID_DUTY not in [None, -1]:
+                        pidsvstr = lcdformat%PID_SV
+                        piddutystr = lcdformat%PID_DUTY
+                    aw.lcd6.display(pidsvstr)
+                    aw.lcd7.display(piddutystr)
+                    self.updateLargePIDLCDs(sv=pidsvstr,duty=piddutystr)
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)            
+
+            # LargeLCDs and WebLCDs
+            if aw.WebLCDs:
+                self.updateWebLCDs(bt=btstr,et=etstr,time=timestr)
+            try:
+                if timestr is None:
+                    self.updateLargeLCDsReadingsSignal.emit(btstr,etstr)
+                else:
+                    self.updateLargeLCDsSignal.emit(btstr,etstr,timestr)
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+
+            # Extra LCDs
+            ndev = min(len(XTs1),len(XTs2))
+            extra1_values = []
+            extra2_values = []
+            for i in range(ndev):
+                if i < aw.nLCDS:
+                    try:
+                        if XTs1[i]:
+                            fmt = lcdformat
+                            v = float(XTs1[i][idx])
+                            extra1_value = resLCD
+                            if v != -1:
+                                if self.intChannel(i,0):
+                                    fmt = "%.0f"
+                                if -100 < v < 1000:
+                                    extra1_value = fmt%v # everything fits
+                                elif self.LCDdecimalplaces and -10000 < v < 100000:
+                                    fmt = "%.0f"
+                                    extra1_value = fmt%v
+                            elif self.intChannel(i,0):
+                                extra1_value = "uu"
+                            aw.extraLCD1[i].display(extra1_value)
+                            extra1_values.append(extra1_value)
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+                        extra1_value = "--"
+                        extra1_values.append(extra1_value)
+                        aw.extraLCD1[i].display(extra1_value)
+                    try:
+                        if XTs2[i]:
+                            fmt = lcdformat
+                            v = float(XTs2[i][-1])
+                            extra2_value = resLCD
+                            if v != -1:
+                                if self.intChannel(i,1):
+                                    fmt = "%.0f"
+                                if -100 < v < 1000:
+                                    extra2_value = fmt%v # everything fits
+                                elif self.LCDdecimalplaces and -10000 < v < 100000:
+                                    fmt = "%.0f"
+                                    extra2_value = fmt%v
+                            elif self.intChannel(i,1):
+                                extra2_value = "uu"
+                            aw.extraLCD2[i].display(extra2_value)
+                            extra2_values.append(extra2_value)
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+                        extra2_value = "--"
+                        extra2_values.append(extra2_value)
+                        aw.extraLCD2[i].display(extra2_value)            
+            
+            self.updateLargeExtraLCDs(extra1=extra1_values,extra2=extra2_values)
+
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+
     # runs from GUI thread.
     # this function is called by a signal at the end of the thread sample()
     # during sample, updates to GUI widgets or anything GUI must be done here (never from thread)
@@ -4279,6 +4428,10 @@ class tgraphcanvas(FigureCanvas):
                         sample_extratimex = self.extratimex
                         sample_extratemp1 = self.extratemp1
                         sample_extratemp2 = self.extratemp2
+                        
+                        sample_delta1 = self.delta1
+                        sample_delta2 = self.delta2
+                        
                     else: # only on ON we use the temporary sampling datastructures
                         sample_timex = self.on_timex
                         sample_temp1 = self.on_temp1
@@ -4286,123 +4439,23 @@ class tgraphcanvas(FigureCanvas):
                         sample_extratimex = self.extratimex
                         sample_extratemp1 = self.on_extratemp1
                         sample_extratemp2 = self.on_extratemp2
+                        
+                        sample_delta1 = self.on_delta1
+                        sample_delta2 = self.on_delta2
 
                     if len(sample_timex):
-                        if self.LCDdecimalplaces:
-                            lcdformat = "%.1f"
-                            resLCD = "u.u"
-                        else:
-                            lcdformat = "%.0f"
-                            resLCD = "uu"
-                        etstr = resLCD
-                        try: # if sample_temp1 is None, which should never be the case, this fails
-                            if sample_temp1[-1] != -1:
-                                if len(sample_temp1) and -100 < sample_temp1[-1] < 1000:
-                                    etstr = lcdformat%float(sample_temp1[-1])            # ET
-                                elif self.LCDdecimalplaces and len(sample_temp1) and -10000 < sample_temp1[-1] < 100000:
-                                    etstr = "%.0f"%float(sample_temp1[-1])
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
-                        aw.lcd2.display(etstr)
-                        btstr = resLCD
-                        try:
-                            if sample_temp2[-1] != -1:
-                                if len(sample_temp2) and -100 < sample_temp2[-1] < 1000:
-                                    btstr = lcdformat%float(sample_temp2[-1])            # BT
-                                elif self.LCDdecimalplaces and len(sample_temp2) and -10000 < sample_temp2[-1] < 100000:
-                                    btstr = "%.0f"%float(sample_temp2[-1])
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
-                        aw.lcd3.display(btstr)
-                        deltaetstr = resLCD
-                        deltabtstr = resLCD
-                        try:
-                            if -100 < self.rateofchange1 < 1000:
-                                deltaetstr = lcdformat%float(self.rateofchange1)        # rate of change ET (degress per minute)
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
-                        try:
-                            if -100 < self.rateofchange2 < 1000:
-                                deltabtstr = lcdformat%float(self.rateofchange2)        # rate of change BT (degrees per minute)
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
-                        aw.lcd4.display(deltaetstr)
-                        aw.lcd5.display(deltabtstr)
-                        try:
-                            self.updateLargeDeltaLCDs(deltabt=deltabtstr,deltaet=deltaetstr)
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
-                        try:
-                            if aw.ser.showFujiLCDs and self.device in (0, 26):         #extra LCDs for Fuji or DTA pid
-                                pidsv = lcdformat%self.currentpidsv
-                                aw.lcd6.display(pidsv)
-                                pidduty = lcdformat%self.dutycycle
-                                aw.lcd7.display(pidduty)
-                                self.updateLargePIDLCDs(sv=pidsv,duty=pidduty)
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
+                        # update all LCDs (small, large, Web,..)
+                        self.updateLCDs(
+                            None,
+                            sample_temp1,
+                            sample_temp2,
+                            sample_delta1,
+                            sample_delta2,
+                            sample_extratemp1,
+                            sample_extratemp2,
+                            self.currentpidsv,
+                            self.dutycycle)
 
-                        ndev = len(self.extradevices)
-                        extra1_values = []
-                        extra2_values = []
-                        for i in range(ndev):
-                            if i < aw.nLCDS:
-                                try:
-                                    if sample_extratemp1[i]:
-                                        fmt = lcdformat
-                                        v = float(sample_extratemp1[i][-1])
-                                        extra1_value = resLCD
-                                        if v != -1:
-                                            if self.intChannel(i,0):
-                                                fmt = "%.0f"
-                                            if -100 < v < 1000:
-                                                extra1_value = fmt%v # everything fits
-                                            elif self.LCDdecimalplaces and -10000 < v < 100000:
-                                                fmt = "%.0f"
-                                                extra1_value = fmt%v
-                                        elif self.intChannel(i,0):
-                                            extra1_value = "uu"
-                                        aw.extraLCD1[i].display(extra1_value)
-                                        extra1_values.append(extra1_value)
-                                except Exception as e: # pylint: disable=broad-except
-                                    _log.exception(e)
-                                    extra1_value = "--"
-                                    extra1_values.append(extra1_value)
-                                    aw.extraLCD1[i].display(extra1_value)
-                                try:
-                                    if sample_extratemp2[i]:
-                                        fmt = lcdformat
-                                        v = float(sample_extratemp2[i][-1])
-                                        extra2_value = resLCD
-                                        if v != -1:
-                                            if self.intChannel(i,1):
-                                                fmt = "%.0f"
-                                            if -100 < v < 1000:
-                                                extra2_value = fmt%v # everything fits
-                                            elif self.LCDdecimalplaces and -10000 < v < 100000:
-                                                fmt = "%.0f"
-                                                extra2_value = fmt%v
-                                        elif self.intChannel(i,1):
-                                            extra2_value = "uu"
-                                        aw.extraLCD2[i].display(extra2_value)
-                                        extra2_values.append(extra2_value)
-                                except Exception as e: # pylint: disable=broad-except
-                                    _log.exception(e)
-                                    extra2_value = "--"
-                                    extra2_values.append(extra2_value)
-                                    aw.extraLCD2[i].display(extra2_value)
-
-                        # update large LCDs (incl. Web LCDs)
-                        timestr = None
-                        if not self.flagstart:
-                            timestr = "00:00"
-                        if aw.WebLCDs:
-                            self.updateWebLCDs(bt=btstr,et=etstr,time=timestr)
-                        if timestr is None:
-                            self.updateLargeLCDsReadingsSignal.emit(btstr,etstr)
-                        else:
-                            self.updateLargeLCDsSignal.emit(btstr,etstr,timestr)
-                        self.updateLargeExtraLCDs(extra1=extra1_values,extra2=extra2_values)
                 finally:
                     if self.profileDataSemaphore.available() < 1:
                         self.profileDataSemaphore.release(1)
@@ -15512,6 +15565,9 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
     def update_message(self):
         if not aw.qmc.twoAxisMode():
             aw.qmc.fmt_data_RoR = False
+        xs = None
+        time2index = None # caches the timex index computed at x cursor position
+        # update xy cursor position widget
         if self._last_event is None or not aw.qmc.fmt_data_ON:
             self.set_message(self.mode)
         else:
@@ -15523,16 +15579,18 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 else:
                     try:
                         if aw.qmc.fmt_data_curve == 1: # BT
+                            time2index = aw.qmc.time2index(self._last_event.xdata, nearest=False)
                             if aw.qmc.fmt_data_RoR:
-                                ys = aw.qmc.delta2[aw.qmc.time2index(self._last_event.xdata, nearest=False)]
+                                ys = aw.qmc.delta2[time2index]
                             else:
-                                ys = aw.qmc.temp2[aw.qmc.time2index(self._last_event.xdata, nearest=False)]
+                                ys = aw.qmc.temp2[time2index]
                             channel = aw.BTname
                         elif aw.qmc.fmt_data_curve == 2: # ET
+                            time2index = aw.qmc.time2index(self._last_event.xdata, nearest=False)
                             if aw.qmc.fmt_data_RoR:
-                                ys = aw.qmc.delta1[aw.qmc.time2index(self._last_event.xdata, nearest=False)]
+                                ys = aw.qmc.delta1[time2index]
                             else:
-                                ys = aw.qmc.temp1[aw.qmc.time2index(self._last_event.xdata, nearest=False)]
+                                ys = aw.qmc.temp1[time2index]
                             channel = aw.ETname
                         elif aw.qmc.fmt_data_curve == 3 and aw.qmc.backgroundprofile is not None: # BTB
                             if aw.qmc.fmt_data_RoR:
@@ -15568,6 +15626,16 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                     self.set_message(f"{self.mode}  {xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{aw.qmc.mode}{'/min' if aw.qmc.fmt_data_RoR else ''}")
                 else:
                     self.set_message(f"{xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{aw.qmc.mode}{'/min' if aw.qmc.fmt_data_RoR else ''}")
+        # update running LCDs
+        
+        # timer
+        # BT/ET/deltaBT/deltaET
+        # Fuji LCDs
+        # Extra LCDs
+        # Web LCDs
+        # Large LCDs BT/ET
+        # Large LCDs Extra LCDs
+        
 
     # overwritten from MPL v3.2.2 to get rid of that extra data printed
     def mouse_move(self, event):
@@ -21607,16 +21675,16 @@ class ApplicationWindow(QMainWindow):
 # required for the default tracking sliders
     @pyqtSlot()
     def slider1released(self):
-        self.sliderReleased(0,updateLCD=False)
+        self.sliderReleased(0,force=True,updateLCD=False)
     @pyqtSlot()
     def slider2released(self):
-        self.sliderReleased(1,updateLCD=False)
+        self.sliderReleased(1,force=True,updateLCD=False)
     @pyqtSlot()
     def slider3released(self):
-        self.sliderReleased(2,updateLCD=False)
+        self.sliderReleased(2,force=True,updateLCD=False)
     @pyqtSlot()
     def slider4released(self):
-        self.sliderReleased(3,updateLCD=False)
+        self.sliderReleased(3,force=True,updateLCD=False)
 
 # required for the default tracking sliders
     @pyqtSlot(int)
@@ -22820,11 +22888,11 @@ class ApplicationWindow(QMainWindow):
                                     _log.exception(e)
                 elif action == 16: # Aillio Heater
                     self.ser.R1.set_heater(int(cmd)/10)
-                elif action == 17: # Aillio Fan
+                elif action == 17 and self.ser.R1 is not None: # Aillio Fan
                     self.ser.R1.set_fan(int(cmd)/10)
-                elif action == 18: # Aillio Drum
+                elif action == 18 and self.ser.R1 is not None: # Aillio Drum
                     self.ser.R1.set_drum(int(cmd)/10)
-                elif action == 19:
+                elif action == 19 and self.ser.R1 is not None:
                     if cmd_str == "PRS":
                         self.ser.R1.prs()
                 elif action == 20: # Artisan Command
@@ -24538,6 +24606,8 @@ class ApplicationWindow(QMainWindow):
                 elif k == 90:                     #letter Z (toggle xy coordinates between 0: cursor, 1: BT, 2: ET, 3: BTB, 4: ETB)
                     if not self.qmc.designerflag and not self.qmc.wheelflag and not bool(aw.comparator):
                         self.qmc.nextFmtDataCurve()
+                elif k == 85:                     #letter U (toggle running LCDs on/off)
+                    self.running_LCDs = not self.running_LCDs                        
                 elif k == 67:                     #letter C (controls)
                     self.toggleControls()
                 elif k == 88:                     #letter X (readings)

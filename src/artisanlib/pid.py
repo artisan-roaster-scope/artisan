@@ -110,6 +110,7 @@ class PID():
         try:
             self.pidSemaphore.acquire(1)
 #            self.init() # we keep the PID running always, even if inactive, and do not disturb it with an init on switching it active
+            self.lastOutput = None # this ensures that the next update sends a control output
             self.active = True
         finally:
             if self.pidSemaphore.available() < 1:
