@@ -29,7 +29,7 @@ def content():
     tbl_Alarms.add_row([QApplication.translate('HelpDlg','Condition'),QApplication.translate('HelpDlg','Alarm is triggered if source rises above or below the specified temperature.')])
     tbl_Alarms.add_row([QApplication.translate('HelpDlg','Temp'),QApplication.translate('HelpDlg','The specified temperature limit.')])
     tbl_Alarms.add_row([QApplication.translate('HelpDlg','Action'),QApplication.translate('HelpDlg','The action to be triggered if all conditions are fulfilled.')])
-    tbl_Alarms.add_row([QApplication.translate('HelpDlg','Description'),QApplication.translate('HelpDlg','Commands for alarms with an action go here.  Anything after a &#39;#&#39; character is considerd a comment and is ignored when processing the alarm.  ')])
+    tbl_Alarms.add_row([QApplication.translate('HelpDlg','Description'),QApplication.translate('HelpDlg','Commands for alarms with an action go here.  Anything after a &#39;#&#39; character is considered a comment and is ignored when processing the alarm.  ')])
     strlist.append(tbl_Alarms.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
     strlist.append("<br/><br/><b>")
     strlist.append(QApplication.translate('HelpDlg','ALARM CONFIGURATION OPTIONS'))

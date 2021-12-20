@@ -23,6 +23,7 @@ def content():
     tbl_KeyboardShortcuts.add_row(['t\u00A0\u00A0\u00A0[Windows: CTRL+SHIFT+t]',QApplication.translate('HelpDlg','Toggle mouse cross lines')])
     tbl_KeyboardShortcuts.add_row(['d',QApplication.translate('HelpDlg','Toggle xy cursor mode (off/temp/delta)')])
     tbl_KeyboardShortcuts.add_row(['z',QApplication.translate('HelpDlg','Toggle xy cursor clamp mode (off/BT/ET/BTB/ETB)')])
+    tbl_KeyboardShortcuts.add_row(['u',QApplication.translate('HelpDlg','Toggle LCD cursor (off/profile/template)')])
     tbl_KeyboardShortcuts.add_row(['c',QApplication.translate('HelpDlg','Shows/Hides Controls')])
     tbl_KeyboardShortcuts.add_row(['x',QApplication.translate('HelpDlg','Shows/Hides LCD Readings')])
     tbl_KeyboardShortcuts.add_row(['m',QApplication.translate('HelpDlg','Shows/Hides Event Buttons')])

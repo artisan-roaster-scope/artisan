@@ -759,7 +759,7 @@ class tgraphcanvas(FigureCanvas):
         'R1_DT', 'R1_BT', 'R1_BT_ROR', 'R1_EXIT_TEMP', 'R1_HEATER', 'R1_FAN', 'R1_DRUM', 'R1_VOLTAGE', 'R1_TX', 'R1_STATE', 'R1_FAN_RPM', 'R1_STATE_STR',
         'extraArduinoT1', 'extraArduinoT2', 'extraArduinoT3', 'extraArduinoT4', 'extraArduinoT5', 'extraArduinoT6', 'program_t3', 'program_t4', 'program_t5', 'program_t6', 
         'program_t7', 'program_t8', 'program_t9', 'program_t10', 'dutycycle', 'dutycycleTX', 'currentpidsv', 'linecount', 'deltalinecount',
-        'ax_background', 'block_update', 'fmt_data_RoR', 'fmt_data_curve', 'plotterstack', 'plotterequationresults', 'plottermessage', 'alarm_popup_timout',
+        'ax_background', 'block_update', 'fmt_data_RoR', 'fmt_data_curve', 'running_LCDs', 'plotterstack', 'plotterequationresults', 'plottermessage', 'alarm_popup_timout',
         'RTtemp1', 'RTtemp2', 'RTextratemp1', 'RTextratemp2', 'RTextratx', 'idx_met', 'showmet', 'met_annotate', 'met_timex_temp1_delta',
         'extendevents', 'statssummary', 'showtimeguide', 'statsmaxchrperline', 'energyunits', 'powerunits', 'sourcenames', 'loadlabels_setup',
         'loadratings_setup', 'ratingunits_setup', 'sourcetypes_setup', 'load_etypes_setup', 'presssure_percents_setup', 'loadevent_zeropcts_setup',
@@ -2344,7 +2344,7 @@ class tgraphcanvas(FigureCanvas):
         # toggle between using the 0: y-cursor pos, 1: BT@x, 2: ET@x, 3: BTB@x, 4: ETB@x (thus BT, ET or the corresponding background curve data at cursor position x)
         # to display the y of the cursor coordinates
         self.fmt_data_curve = 0
-        self.running_LCDs = False # if True and not sampling visible LCDs show the readings at the cursor position
+        self.running_LCDs = 0 # if not 0 and not sampling visible LCDs show the readings at the cursor position of 1: forground profile, 2: background profile
 
         #holds last values calculated from plotter
         self.plotterstack = [0]*10
@@ -4263,30 +4263,43 @@ class tgraphcanvas(FigureCanvas):
 
 
     # idx is the index to be displayed, by default -1 (the last item of each given array)
+    # if idx is None, the default error values are displayed
     # all other parameters are expected to be lists of values, but for PID_SV and PID_DUTY
+    # time is the time at in second to be displayed (might be negative, but negative times are rendered as 00:00)
     # if time is None, the timer LCD is not updated
+    # time is only updated if not sampling (aw.qmc.flagon=False)
     # values of -1 are suppressed to their default "off" representation
     # XTs1 and XTs2 are lists of lists of values for the corresponding extra LCDs
     def updateLCDs(self, time, temp1, temp2, delta1, delta2, XTs1, XTs2, PID_SV=-1, PID_DUTY=-1, idx=-1):
         try:
             if self.LCDdecimalplaces:
                 lcdformat = "%.1f"
-                resLCD = "u.u"
+                if idx is None:
+                    resLCD = "-.-"
+                else:
+                    resLCD = "u.u"
             else:
                 lcdformat = "%.0f"
-                resLCD = "uu"
+                if idx is None:
+                    resLCD = "--"
+                else:
+                    resLCD = "uu"
             timestr = None
             ## TIMER LCDS:
-            if not self.flagstart:
+            if not self.flagon and time is not None:
                 timestr = "00:00"
-            if time is None:
-                pass
+                if time > 0:
+                    try:
+                        timestr = stringfromseconds(time)
+                    except Exception: # pylint: disable=broad-except
+                        pass
+                self.setLCDtimestr(timestr)
             
             ## ET LCD:
             etstr = resLCD
             try: # if temp1 is None, which should never be the case, this fails
-                if temp1 and temp1[idx] not in [None, -1]:
-                    if -100 < temp1[-1] < 1000:
+                if temp1 and idx is not None and idx < len(temp1) and temp1[idx] not in [None, -1]:
+                    if -100 < temp1[idx] < 1000:
                         etstr = lcdformat%temp1[idx]
                     elif self.LCDdecimalplaces and -10000 < temp1[idx] < 100000:
                         etstr = "%.0f"%temp1[idx]
@@ -4297,8 +4310,8 @@ class tgraphcanvas(FigureCanvas):
             ## BT LCD:
             btstr = resLCD
             try:
-                if temp2 and temp2[idx] not in [None, -1]:
-                    if -100 < temp2[-1] < 1000:
+                if temp2 and idx is not None and idx < len(temp2) and temp2[idx] not in [None, -1]:
+                    if -100 < temp2[idx] < 1000:
                         btstr = lcdformat%temp2[idx]            # BT
                     elif self.LCDdecimalplaces and -10000 < temp2[idx] < 100000:
                         btstr = "%.0f"%float(temp2[idx])
@@ -4310,13 +4323,13 @@ class tgraphcanvas(FigureCanvas):
             deltaetstr = resLCD
             deltabtstr = resLCD
             try:
-                if delta1 and delta1[idx] not in [None, -1]:
+                if delta1 and idx is not None and idx < len(delta1) and delta1[idx] not in [None, -1]:
                     if -100 < delta1[idx] < 1000:
                         deltaetstr = lcdformat%delta1[idx]        # rate of change ET (degress per minute)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             try:
-                if delta2 and delta2[idx] not in [None, -1]:
+                if delta2 and idx is not None and idx < len(delta2) and delta2[idx] not in [None, -1]:
                     if -100 < delta2[idx] < 1000:
                         deltabtstr = lcdformat%delta2[idx]        # rate of change BT (degrees per minute)
             except Exception as e: # pylint: disable=broad-except
@@ -4360,11 +4373,11 @@ class tgraphcanvas(FigureCanvas):
             for i in range(ndev):
                 if i < aw.nLCDS:
                     try:
-                        if XTs1[i]:
+                        extra1_value = resLCD
+                        if idx is not None and XTs1[i] and idx < len(XTs1[i]):
                             fmt = lcdformat
                             v = float(XTs1[i][idx])
-                            extra1_value = resLCD
-                            if v != -1:
+                            if v is not None and v != -1:
                                 if self.intChannel(i,0):
                                     fmt = "%.0f"
                                 if -100 < v < 1000:
@@ -4374,19 +4387,19 @@ class tgraphcanvas(FigureCanvas):
                                     extra1_value = fmt%v
                             elif self.intChannel(i,0):
                                 extra1_value = "uu"
-                            aw.extraLCD1[i].display(extra1_value)
-                            extra1_values.append(extra1_value)
+                        aw.extraLCD1[i].display(extra1_value)
+                        extra1_values.append(extra1_value)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                         extra1_value = "--"
                         extra1_values.append(extra1_value)
                         aw.extraLCD1[i].display(extra1_value)
                     try:
-                        if XTs2[i]:
+                        extra2_value = resLCD
+                        if idx is not None and XTs2[i] and idx < len(XTs2[i]):
                             fmt = lcdformat
-                            v = float(XTs2[i][-1])
-                            extra2_value = resLCD
-                            if v != -1:
+                            v = float(XTs2[i][idx])
+                            if v is not None and v != -1:
                                 if self.intChannel(i,1):
                                     fmt = "%.0f"
                                 if -100 < v < 1000:
@@ -4396,8 +4409,8 @@ class tgraphcanvas(FigureCanvas):
                                     extra2_value = fmt%v
                             elif self.intChannel(i,1):
                                 extra2_value = "uu"
-                            aw.extraLCD2[i].display(extra2_value)
-                            extra2_values.append(extra2_value)
+                        aw.extraLCD2[i].display(extra2_value)
+                        extra2_values.append(extra2_value)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                         extra2_value = "--"
@@ -4745,15 +4758,17 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate("Error Message","Exception:") + " updategraphics() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def setLCDtime(self,ts):
-        timestr = stringfromseconds(ts)
+    def setLCDtimestr(self, timestr):
         aw.lcd1.display(timestr)
-
         # update connected WebLCDs
         if aw.WebLCDs:
             self.updateWebLCDs(time=timestr)
         if aw.largeLCDs_dialog:
             self.updateLargeLCDsTimeSignal.emit(timestr)
+    
+    def setLCDtime(self,ts):
+        timestr = stringfromseconds(ts)
+        self.setLCDtimestr(timestr)
     
     def updateLCDtime(self):
         if self.flagstart and self.flagon:
@@ -15566,76 +15581,107 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         if not aw.qmc.twoAxisMode():
             aw.qmc.fmt_data_RoR = False
         xs = None
-        time2index = None # caches the timex index computed at x cursor position
+        timeindex = None # caches the foreground timex index computed at x cursor position
+        backgroundtimeindex = None # caches the background timex index computed at x cursor position
         # update xy cursor position widget
-        if self._last_event is None or not aw.qmc.fmt_data_ON:
+        if self._last_event is None:
             self.set_message(self.mode)
         else:
-            try:
-                channel = ""
-                xs = self._last_event.inaxes.format_xdata(self._last_event.xdata)
-                if aw.qmc.fmt_data_curve == 0 or aw.qmc.designerflag:
-                    ys = self._last_event.inaxes.format_ydata(self._last_event.ydata)
-                else:
-                    try:
-                        if aw.qmc.fmt_data_curve == 1: # BT
-                            time2index = aw.qmc.time2index(self._last_event.xdata, nearest=False)
-                            if aw.qmc.fmt_data_RoR:
-                                ys = aw.qmc.delta2[time2index]
-                            else:
-                                ys = aw.qmc.temp2[time2index]
-                            channel = aw.BTname
-                        elif aw.qmc.fmt_data_curve == 2: # ET
-                            time2index = aw.qmc.time2index(self._last_event.xdata, nearest=False)
-                            if aw.qmc.fmt_data_RoR:
-                                ys = aw.qmc.delta1[time2index]
-                            else:
-                                ys = aw.qmc.temp1[time2index]
-                            channel = aw.ETname
-                        elif aw.qmc.fmt_data_curve == 3 and aw.qmc.backgroundprofile is not None: # BTB
-                            if aw.qmc.fmt_data_RoR:
-                                ys = aw.qmc.delta2B[aw.qmc.backgroundtime2index(self._last_event.xdata, nearest=False)]
-                            else:
-                                ys = aw.qmc.temp2B[aw.qmc.backgroundtime2index(self._last_event.xdata, nearest=False)]
-                            channel = "BTB"
-                        elif aw.qmc.fmt_data_curve == 4 and aw.qmc.backgroundprofile is not None: # ETB
-                            if aw.qmc.fmt_data_RoR:
-                                ys = aw.qmc.delta1B[aw.qmc.backgroundtime2index(self._last_event.xdata, nearest=False)]
-                            else:
-                                ys = aw.qmc.temp1B[aw.qmc.backgroundtime2index(self._last_event.xdata, nearest=False)]
-                            channel = "ETB"
-                        else:
-                            ys = self._last_event.inaxes.format_ydata(self._last_event.ydata)
-                        if ys is not None:
-                            if aw.qmc.LCDdecimalplaces:
-                                ys = aw.float2float(ys)
-                            else:
-                                ys = int(round(ys))
-                    except Exception: # pylint: disable=broad-except
-                        ys = self._last_event.inaxes.format_ydata(self._last_event.ydata)
-            except Exception: # pylint: disable=broad-except
+            if not aw.qmc.fmt_data_ON:
                 self.set_message(self.mode)
             else:
-                if aw.qmc.LCDdecimalplaces:
-                    min_temp_digits = 5
+                try:
+                    channel = ""
+                    xs = self._last_event.inaxes.format_xdata(self._last_event.xdata)
+                    if aw.qmc.fmt_data_curve == 0 or aw.qmc.designerflag:
+                        ys = self._last_event.inaxes.format_ydata(self._last_event.ydata)
+                    else:
+                        try:
+                            if aw.qmc.fmt_data_curve == 1: # BT
+                                timeindex = aw.qmc.time2index(self._last_event.xdata, nearest=False)
+                                if aw.qmc.fmt_data_RoR:
+                                    ys = aw.qmc.delta2[timeindex]
+                                else:
+                                    ys = aw.qmc.temp2[timeindex]
+                                channel = aw.BTname
+                            elif aw.qmc.fmt_data_curve == 2: # ET
+                                timeindex = aw.qmc.time2index(self._last_event.xdata, nearest=False)
+                                if aw.qmc.fmt_data_RoR:
+                                    ys = aw.qmc.delta1[timeindex]
+                                else:
+                                    ys = aw.qmc.temp1[timeindex]
+                                channel = aw.ETname
+                            elif aw.qmc.fmt_data_curve == 3 and aw.qmc.backgroundprofile is not None: # BTB
+                                backgroundtimeindex = aw.qmc.backgroundtime2index(self._last_event.xdata, nearest=False)
+                                if aw.qmc.fmt_data_RoR:
+                                    ys = aw.qmc.delta2B[backgroundtimeindex]
+                                else:
+                                    ys = aw.qmc.temp2B[backgroundtimeindex]
+                                channel = "BTB"
+                            elif aw.qmc.fmt_data_curve == 4 and aw.qmc.backgroundprofile is not None: # ETB
+                                backgroundtimeindex = aw.qmc.backgroundtime2index(self._last_event.xdata, nearest=False)
+                                if aw.qmc.fmt_data_RoR:
+                                    ys = aw.qmc.delta1B[backgroundtimeindex]
+                                else:
+                                    ys = aw.qmc.temp1B[backgroundtimeindex]
+                                channel = "ETB"
+                            else:
+                                ys = self._last_event.inaxes.format_ydata(self._last_event.ydata)
+                            if ys is not None:
+                                if aw.qmc.LCDdecimalplaces:
+                                    ys = aw.float2float(ys)
+                                else:
+                                    ys = int(round(ys))
+                        except Exception: # pylint: disable=broad-except
+                            ys = self._last_event.inaxes.format_ydata(self._last_event.ydata)
+                except Exception: # pylint: disable=broad-except
+                    self.set_message(self.mode)
                 else:
-                    min_temp_digits = 3
-                if aw.qmc.fmt_data_RoR:
-                    min_temp_digits -= 1
-                if len(self.mode):
-                    self.set_message(f"{self.mode}  {xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{aw.qmc.mode}{'/min' if aw.qmc.fmt_data_RoR else ''}")
-                else:
-                    self.set_message(f"{xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{aw.qmc.mode}{'/min' if aw.qmc.fmt_data_RoR else ''}")
-        # update running LCDs
-        
-        # timer
-        # BT/ET/deltaBT/deltaET
-        # Fuji LCDs
-        # Extra LCDs
-        # Web LCDs
-        # Large LCDs BT/ET
-        # Large LCDs Extra LCDs
-        
+                    if aw.qmc.LCDdecimalplaces:
+                        min_temp_digits = 5
+                    else:
+                        min_temp_digits = 3
+                    if aw.qmc.fmt_data_RoR:
+                        min_temp_digits -= 1
+                    if len(self.mode):
+                        self.set_message(f"{self.mode}  {xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{aw.qmc.mode}{'/min' if aw.qmc.fmt_data_RoR else ''}")
+                    else:
+                        self.set_message(f"{xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{aw.qmc.mode}{'/min' if aw.qmc.fmt_data_RoR else ''}")
+            # update running LCDs
+            if not aw.qmc.flagon:
+                if aw.qmc.running_LCDs == 1: # show foreground profile readings at cursor position in LCDs
+                    if timeindex is None:
+                        timeindex = aw.qmc.time2index(self._last_event.xdata, nearest=False)
+                    time = self._last_event.xdata
+                    if aw.qmc.timeindex[0] != -1 and aw.qmc.timeindex[0] < len(aw.qmc.timex):
+                        time -= aw.qmc.timex[aw.qmc.timeindex[0]]
+                    aw.qmc.updateLCDs(
+                        time,
+                        aw.qmc.temp1,
+                        aw.qmc.temp2,
+                        aw.qmc.delta1,
+                        aw.qmc.delta2,
+                        aw.qmc.extratemp1,
+                        aw.qmc.extratemp2,
+                        idx=(None if timeindex < 0 else timeindex))
+                elif aw.qmc.running_LCDs == 2:  # show background profile readings at cursor position in LCDs
+                    try:
+                        if backgroundtimeindex is None:
+                            backgroundtimeindex = aw.qmc.backgroundtime2index(self._last_event.xdata, nearest=False)
+                        time = self._last_event.xdata
+                        if aw.qmc.timeindexB[0] != -1 and aw.qmc.timeindexB[0] < len(aw.qmc.timeB):
+                            time -= aw.qmc.timeB[aw.qmc.timeindexB[0]]
+                        aw.qmc.updateLCDs(
+                            time,
+                            aw.qmc.temp1B,
+                            aw.qmc.temp2B,
+                            aw.qmc.delta1B,
+                            aw.qmc.delta2B,
+                            aw.qmc.temp1BX,
+                            aw.qmc.temp2BX,
+                            idx=(None if backgroundtimeindex < 0 else backgroundtimeindex))
+                    except Exception as e:
+                        _log.exception(e)
 
     # overwritten from MPL v3.2.2 to get rid of that extra data printed
     def mouse_move(self, event):
@@ -24607,7 +24653,28 @@ class ApplicationWindow(QMainWindow):
                     if not self.qmc.designerflag and not self.qmc.wheelflag and not bool(aw.comparator):
                         self.qmc.nextFmtDataCurve()
                 elif k == 85:                     #letter U (toggle running LCDs on/off)
-                    self.running_LCDs = not self.running_LCDs                        
+                    if not self.qmc.flagon:
+                        if self.qmc.running_LCDs == 0 and self.curFile:
+                            self.qmc.running_LCDs = 1
+                            aw.sendmessage(QApplication.translate("Message", "LCD cursor on profile data"))
+                        elif self.qmc.running_LCDs == 1 and self.qmc.backgroundprofile:
+                            self.qmc.running_LCDs = 2
+                            aw.sendmessage(QApplication.translate("Message", "LCD cursor on template data"))
+                        elif self.qmc.running_LCDs == 2:
+                            self.qmc.running_LCDs = 0
+                            aw.sendmessage(QApplication.translate("Message", "LCD cursor OFF"))
+                        if self.qmc.running_LCDs == 0:
+                            self.qmc.updateLCDs(
+                                -1,
+                                self.qmc.temp1,
+                                self.qmc.temp2,
+                                self.qmc.delta1,
+                                self.qmc.delta2,
+                                self.qmc.extratemp1,
+                                self.qmc.extratemp2,
+                                idx=None) # show default OFF placeholders in LCDs
+                        else:
+                            aw.ntb.update_message()
                 elif k == 67:                     #letter C (controls)
                     self.toggleControls()
                 elif k == 88:                     #letter X (readings)
