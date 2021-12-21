@@ -20842,8 +20842,8 @@ class ApplicationWindow(QMainWindow):
             # if background profile is loaded and both profiles have a DROP event set
             if aw.qmc.backgroundprofile is not None and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
 
-                _log.debug(f"curveSimilarity: {self.qmc.profile_sampling_interval=}")  #pylint: disable=logging-fstring-interpolation
-                _log.debug(f"curveSimilarity: {self.qmc.background_profile_sampling_interval=}")  #pylint: disable=logging-fstring-interpolation
+#                _log.debug(f"curveSimilarity: {self.qmc.profile_sampling_interval=}")  #pylint: disable=logging-fstring-interpolation
+#                _log.debug(f"curveSimilarity: {self.qmc.background_profile_sampling_interval=}")  #pylint: disable=logging-fstring-interpolation
 
                 # create arrays using smoothed data if available
                 if aw.qmc.stemp1 and len(aw.qmc.stemp1) == len(aw.qmc.temp1):
@@ -20904,15 +20904,15 @@ class ApplicationWindow(QMainWindow):
                 det = numpy.sqrt(numpy.mean(numpy.square(np_et - interp_np_etb)))
                 dbt = numpy.sqrt(numpy.mean(numpy.square(np_bt - interp_np_btb)))
 
-                #TODO remove this check  #pylint: disable=fixme
-                if debugLogLevelActive():
-                    old_det,old_dbt = aw.OLDcurveSimilarity()
-                    if abs(old_det - det) > .1 or abs(old_dbt - dbt) > .1:
-                        aw.sendmessage("curveSimilarity: det, dbt results DO NOT MATCH with old method!!")
-                        _log.debug("curveSimilarity: OLDcurvesimilarity results %.2f/%.2f %s", old_det,old_dbt,aw.qmc.mode)
-                        _log.debug("curveSimilarity: curvesimilarity results    %.2f/%.2f %s", det,dbt,aw.qmc.mode)
-                    else:
-                        _log.debug("curveSimilarity: det, dbt results MATCH with old method!!")
+#                #TODO remove this check  #pylint: disable=fixme
+#                if debugLogLevelActive():
+#                    old_det,old_dbt = aw.OLDcurveSimilarity()
+#                    if abs(old_det - det) > .1 or abs(old_dbt - dbt) > .1:
+#                        aw.sendmessage("curveSimilarity: det, dbt results DO NOT MATCH with old method!!")
+#                        _log.debug("curveSimilarity: OLDcurvesimilarity results %.2f/%.2f %s", old_det,old_dbt,aw.qmc.mode)
+#                        _log.debug("curveSimilarity: curvesimilarity results    %.2f/%.2f %s", det,dbt,aw.qmc.mode)
+#                    else:
+#                        _log.debug("curveSimilarity: det, dbt results MATCH with old method!!")
 
                 return det,dbt
 
