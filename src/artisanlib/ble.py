@@ -303,7 +303,7 @@ class BleInterface(QtCore.QObject):
 
     @QtCore.pyqtSlot("QBluetoothDeviceInfo")
     def addDevice(self, device):
-        _log.debug("addDevice()")
+#        _log.debug("addDevice()")
         # pylint: disable=maybe-no-member
         if self.m_device is None and device.coreConfigurations() & QtBluetooth.QBluetoothDeviceInfo.CoreConfiguration.LowEnergyCoreConfiguration:
             m_device = QtBluetooth.QBluetoothDeviceInfo(device)            
