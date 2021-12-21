@@ -147,7 +147,7 @@
 	<key>LSMultipleInstancesProhibited</key>
 	<string>false</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Artisan would like to use bluetooth to communication with your Acaia scale</string>
+	<string>Artisan wants to access your Bluetooth adapter</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
@@ -156,5 +156,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
 </dict>
 </plist>
