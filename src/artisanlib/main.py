@@ -61,6 +61,7 @@ import re
 import gc
 import io
 import functools
+import dateutil.parser
 from bisect import bisect_right
 
 # links CTR-C signals to the system default (ignore)
@@ -69,7 +70,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 import logging.config
 from yaml import safe_load as yaml_load
-from typing import Final
+from typing import Final, Optional
 
 from functools import reduce as freduce
 
@@ -11291,7 +11292,7 @@ class tgraphcanvas(FigureCanvas):
                 # we are already in monitoring mode, we just clear this first measurement and go
                 aw.qmc.clearMeasurements(andLCDs=False)
             elif self.timex != []: # there is a profile loaded, we have to reset
-                aw.qmc.reset(True,False)
+                aw.qmc.reset(True,False,keepProperties=True)
             try:
                 settings = QSettings()
                 starts = 0
@@ -16051,6 +16052,7 @@ class ApplicationWindow(QMainWindow):
     moveButtonSignal = pyqtSignal(str)
     sendnotificationMessageSignal = pyqtSignal(str,str,NotificationType)
     updatePlusLimitsSignal = pyqtSignal(float, float)
+    updatePlusPaidUntilSignal = pyqtSignal(str)
     
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
@@ -16117,10 +16119,10 @@ class ApplicationWindow(QMainWindow):
         self.plus_language = "en" # one of ["en", "de", "it", ..] indicates the language setting of the plus_account used on the artisan.plus platform,
                 # used in links back to objects on the platform (see plus/util.py#storeLink() and similars)
         self.plus_subscription = None # one of [None, "HOME", "PRO"]
-        self.plus_paidUntil = None # either None if unknown or otherwise a Date object with indicating the expiration date of the account
-        self.plus_rlimit = 0 # account amount limit (kg); if 0 then considered as not valid
-        self.plus_used = 0   # account amount greens roasted within rlimit (kg); if 0 then considered as not valid
-        self.plus_readonly = False # True if the plus user has only read rights to the plus account
+        self.plus_paidUntil : Optional[datetime.datetime] = None # either None if unknown or otherwise a datetime.datetime object with indicating the expiration date of the account
+        self.plus_rlimit : float = 0 # account amount limit (kg); if 0 then considered as not valid
+        self.plus_used : float = 0   # account amount greens roasted within rlimit (kg); if 0 then considered as not valid
+        self.plus_readonly : bool = False # True if the plus user has only read rights to the plus account (account might be deactivated, or user might be a read-only user)
 
         self.appearance = ""
 
@@ -18469,6 +18471,7 @@ class ApplicationWindow(QMainWindow):
         self.moveButtonSignal.connect(self.moveKbutton)
         self.sendnotificationMessageSignal.connect(self.sendNotificationMessage)
         self.updatePlusLimitsSignal.connect(self.updatePlusLimits)
+        self.updatePlusPaidUntilSignal.connect(self.updatePlusPaidUntil)
         
         self.notificationManager = None
         if not app.artisanviewerMode:
@@ -18486,11 +18489,25 @@ class ApplicationWindow(QMainWindow):
         QTimer.singleShot(0,lambda : _log.info("startup time: %.2f", libtime.process_time() - startup_time))
 
 
+    # if any of the parameters is <0 the corresponding variable is not updated
     @pyqtSlot(float, float)
     def updatePlusLimits(self, rlimit: float, used: float):
         _log.debug("updatePlusLimits -> %s, %s", rlimit, used)
-        self.plus_rlimit = rlimit
-        self.plus_used = used
+        if rlimit > -1:
+            self.plus_rlimit = rlimit
+        if used > -1:
+            self.plus_used = used
+    
+    @pyqtSlot(str)
+    def updatePlusPaidUntil(self, pu: str):
+        _log.debug("updatePlusPaidUntil -> %s", pu)
+        try:
+            if pu is not None:
+                self.plus_paidUntil = (
+                    dateutil.parser.parse(pu)
+                )
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
 
     @pyqtSlot(str,str,NotificationType)
     def sendNotificationMessage(self, title, message, notification_type):
@@ -18965,7 +18982,8 @@ class ApplicationWindow(QMainWindow):
                         else:
                             plus_icon = "plus-unsynced"
                             tooltip = QApplication.translate("Tooltip", 'Upload to artisan.plus')
-                    if not aw.plus_readonly:
+                    if True: # pylint: disable=using-constant-test 
+                        #not aw.plus_readonly: # we want to show the status also if read-only due to extension of the subscription limit
                         if aw.plus_subscription == "HOME":
                             subscription_icon = "plus-home"
                             if aw.plus_paidUntil is not None:
@@ -20837,7 +20855,7 @@ class ApplicationWindow(QMainWindow):
     # computes from profile DRY END as set in Phases dialog through DROP 
     # returns None in case no similarity can be computed
     # refactored to use numpy arrays.
-    def curveSimilarity(self):
+    def curveSimilarity(self): # pylint: disable=no-self-use
         try:
             # if background profile is loaded and both profiles have a DROP event set
             if aw.qmc.backgroundprofile is not None and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
@@ -23007,7 +23025,7 @@ class ApplicationWindow(QMainWindow):
                                         aw.fujipid.setONOFFstandby(1)
                                         aw.sendmessage(QApplication.translate("Message","PID set to OFF"))
                                 else:
-                                    aw.pidcontrol.pidOn()
+                                    aw.pidcontrol.pidOff()
                             elif cs == "PIDon":
                                 if aw.qmc.device == 0: # Fuji
                                     standby = aw.fujipid.getONOFFstandby()
@@ -23015,7 +23033,7 @@ class ApplicationWindow(QMainWindow):
                                         aw.fujipid.setONOFFstandby(0)
                                         aw.sendmessage(QApplication.translate("Message","PID set to ON"))                                                       
                                 else:
-                                    aw.pidcontrol.pidOff()
+                                    aw.pidcontrol.pidOn()
                             elif cs == "PIDtoggle":
                                 if aw.qmc.device == 0: # Fuji
                                     standby = aw.fujipid.getONOFFstandby()
@@ -24657,10 +24675,10 @@ class ApplicationWindow(QMainWindow):
                         if self.qmc.running_LCDs == 0 and self.curFile:
                             self.qmc.running_LCDs = 1
                             aw.sendmessage(QApplication.translate("Message", "LCD cursor on profile data"))
-                        elif self.qmc.running_LCDs == 1 and self.qmc.backgroundprofile:
+                        elif self.qmc.running_LCDs in [0, 1] and self.qmc.backgroundprofile:
                             self.qmc.running_LCDs = 2
                             aw.sendmessage(QApplication.translate("Message", "LCD cursor on template data"))
-                        elif self.qmc.running_LCDs == 2:
+                        elif self.qmc.running_LCDs in [1, 2]:
                             self.qmc.running_LCDs = 0
                             aw.sendmessage(QApplication.translate("Message", "LCD cursor OFF"))
                         if self.qmc.running_LCDs == 0:

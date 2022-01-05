@@ -44,7 +44,19 @@ class NotificationType(Enum):
     ARTISAN_USER = 2   # issues with notify() Artisan Command
     PLUS_SYSTEM = 3    # an artisan.plus system notification
     PLUS_REMINDER = 4  # an artisan.plus reminder notification
+    PLUS_ADMIN = 5     # an artisan.plus admin message
+    PLUS_ADVERT = 6    # an artisan.plus advertisement
 
+# maps an artisan.plus notification ntype type string to the corresponding Artisan NotificationType
+def ntype2NotificationType(ntype:str) -> NotificationType:
+    ntype = ntype.upper()
+    if ntype == "ADMIN":
+        return NotificationType.PLUS_ADMIN
+    if ntype == "ADVERT":
+        return NotificationType.PLUS_ADVERT
+    if ntype == "REMINDER":
+        return NotificationType.PLUS_REMINDER
+    return NotificationType.PLUS_SYSTEM
 
 class Notification():
     def __init__(self, title: str, message: str, notification_type: NotificationType, created: Optional[float] = None):
