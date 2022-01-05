@@ -808,7 +808,6 @@ class PID_DlgControl(ArtisanDialog):
         
     def exportrampsoaksJSON(self,filename):
         try:
-            self.aw.qmc.rampSoakSemaphore.acquire(1)
             self.saverampsoaks()
             rampsoaks = {}
             rampsoaks["svLabel"] = self.aw.pidcontrol.svLabel
@@ -830,9 +829,6 @@ class PID_DlgControl(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " exportrampsoaksJSON(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
-        finally:
-            if self.aw.qmc.rampSoakSemaphore.available() < 1:
-                self.aw.qmc.rampSoakSemaphore.release(1)
             
     def saverampsoaks(self):
         try:
