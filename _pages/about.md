@@ -47,14 +47,6 @@ gallery:
     image_path: /assets/images/hottop-logo.png
     alt: "Hottop"
     title: "Hottop"
-  - url: http://www.kaldi.co.kr
-    image_path: /assets/images/kaldi-logo.jpg
-    alt: "KALDI Coffee Roaster"
-    title: "KALDI Coffee Roaster"
-  - url: http://www.hasgaranti.com.tr
-    image_path: /assets/images/hasgaranti-logo.jpg
-    alt: "Has Garanti"
-    title: "Has Garanti"
   - url: https://www.bescaroasters.com/
     image_path: /assets/images/besca-logo.jpg
     alt: "Besca Roasters"

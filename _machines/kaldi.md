@@ -10,8 +10,7 @@ header:
 sidebar:
   nav: "machines"
 ---
-
-<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Producer:__ [KALDI Coffee Roaster](http://www.kaldi.co.kr){:target="_blank"}, Republic of Korea
 * __Machine:__ Kaldi Fortis (Tron setup in preparation)
