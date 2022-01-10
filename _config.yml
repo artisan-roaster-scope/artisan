@@ -144,7 +144,7 @@ footer:
       icon: "fab fa-fw fa-youtube"
       url: "https://www.youtube.com/channel/UCEp-DH_Y7sBR3-X3FWomgog"
     - label: "Linked.in"
-      icon: "fab fa-fw fa-linkedin-square"
+      icon: "fab fa-fw fa-linkedin"
       url: "https://www.linkedin.com/company/artisan-plus"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
