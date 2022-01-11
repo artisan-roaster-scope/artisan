@@ -872,7 +872,7 @@ class modbusport():
                         retry = retry - 1
                         #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
                     else:
-                        raise Exception("Exception response")
+                        raise Exception("readSingleRegister({},{},{},{},{}) failed".format(slave,register,code,force,signed))
                 else:
                     break
             if code in [1,2]:

@@ -147,17 +147,17 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         ###################################################
         # PID
         controllabel =QLabel(QApplication.translate("Label", "Control ET"))
+        # 0 = FujiPXG, 1 = FujiPXR3, 2 = DTA, 3 = not used, 4 = PXF
+        supported_ET_pids = [("Fuji PXF", 4), ("Fuji PXG", 0), ("Fuji PXR", 1), ("Delta DTA", 2)]
         self.controlpidtypeComboBox = QComboBox()
-        self.controlpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR","Delta DTA","Fuji PXF"])
+        self.controlpidtypeComboBox.addItems([item[0] for item in supported_ET_pids])
         cp = self.aw.ser.controlETpid[0]
-        if cp < 3:
-            self.controlpidtypeComboBox.setCurrentIndex(cp)  #pid type is index 0
-        else:
-            self.controlpidtypeComboBox.setCurrentIndex(cp-1)  #pid type is index 0 PXF has an index offset of 1 as index 3 is not used
+        self.controlpidtypeComboBox.setCurrentIndex([y[1] for y in supported_ET_pids].index(cp))
         btlabel =QLabel(QApplication.translate("Label", "Read BT"))
+        supported_BT_pids = [("", 2), ("Fuji PXF", 4), ("Fuji PXG", 0), ("Fuji PXR", 1), ("Delta DTA", 3)]
         self.btpidtypeComboBox = QComboBox()
-        self.btpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR","None","Delta DTA","Fuji PXF"])
-        self.btpidtypeComboBox.setCurrentIndex(self.aw.ser.readBTpid[0]) #pid type is index 0
+        self.btpidtypeComboBox.addItems([item[0] for item in supported_BT_pids])
+        self.btpidtypeComboBox.setCurrentIndex([y[1] for y in supported_BT_pids].index(self.aw.ser.readBTpid[0])) #pid type is index 0
         label1 = QLabel(QApplication.translate("Label", "Type"))
         label2 = QLabel(QApplication.translate("Label", "RS485 Unit ID"))
         #rs485 possible unit IDs (1-32); unit 0 is master (computer)
@@ -1999,7 +1999,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 elif str(self.btpidtypeComboBox.currentText()) == "Fuji PXR":
                     self.aw.ser.readBTpid[0] = 1
                     str2 = "Fuji PXR"
-                elif str(self.btpidtypeComboBox.currentText()) == "None":
+                elif str(self.btpidtypeComboBox.currentText()) == "":
                     self.aw.ser.readBTpid[0] = 2
                     str2 = "None"
                 elif str(self.btpidtypeComboBox.currentText()) == "Delta DTA":
