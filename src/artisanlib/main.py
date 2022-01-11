@@ -28173,6 +28173,7 @@ class ApplicationWindow(QMainWindow):
                 skipped = numpy.count_nonzero(tx_diff > skipped_sample_time)
                 bins = [0, 1*profile_sampling_interval, 1.5*profile_sampling_interval, 4*profile_sampling_interval, 9999]
                 hist = numpy.histogram(tx_diff,bins=bins)
+                std_sample = numpy.std(tx_diff)
 
                 # Aperiodic sample ratio
                 aperiodicRatio = avg_sample / profile_sampling_interval
@@ -28217,6 +28218,7 @@ class ApplicationWindow(QMainWindow):
                     f"\n  Shortest Sample Interval: {shortest_sample:.2f}"
                     f"\n  Longest Sample Interval: {longest_sample:.2f}"
                     f"\n  Average Sample Time: {avg_sample:.2f}"
+                    f"\n  Std Dev Sample Time: {std_sample:.2E}"
                     f"\n  Profile Sampling Interval: {profile_sampling_interval:.2f}"
                     f"\n  Aperiodic Samples Ratio: {aperiodicRatio:.2f}"
                     f"\n  {missingEvents}"
