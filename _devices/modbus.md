@@ -17,13 +17,24 @@ Artisan supports all variants of the MODBUS protocol.
 * MODBUS TCP
 * MODBUS UDP
 
-It can be configured to read registers via functions 1, 2, 3 and 4 for up to 6 data channels. See the posts [Modbus RTU](https://artisan-roasterscope.blogspot.it/2013/03/modbus-rtu.html) and [More Modbus](https://artisan-roasterscope.blogspot.it/2013/05/more-modbus.html) for configuration details.
+It can be configured to read registers via functions 1, 2, 3 and 4 for up to 8 data channels. See the posts [Modbus RTU](https://artisan-roasterscope.blogspot.it/2013/03/modbus-rtu.html) and [More Modbus](https://artisan-roasterscope.blogspot.it/2013/05/more-modbus.html) for configuration details.
 
-Integer divisions by 10 and 100 as well as the decode of float and BCD encodings are supported. Bytes and words are can be big or little endian ordered.
+Integer divisions by 10 and 100 are supported. Bytes and words are can be big or little endian ordered. Data can be interpreted as Temperature (C/F) or just numbers. Finally the following decoders are available to convert the received bytes into numbers.
+
+Decoder  | Bits | Registers | Description | Old name
+-------- | ---- | --------- | ----------- | -----------------------------
+uInt16   | 16   | 1 | unsigned Integer | Int
+uInt32   | 32   | 2 | unsigned Integer | Int32
+sInt16   | 16   | 1 | signed Integer   | --
+sInt32   | 32   | 2 | signed Integer   | --
+BCD16    | 16   | 1 | unsigned Integer, BCD decoded | BCD
+BCD32    | 32   | 2 | unsigned Integer, BCD decoded | BCD32
+Float32  | 32   | 2 | Float | Float
+
 
 PID mechanism of external devices can be connected via MODBUS to the Artisan PID controls (see the post on [PID support](https://artisan-roasterscope.blogspot.it/2016/11/pid-control.html) for details).
 
-Buttons and sliders can send out `MODBUS Command`s via functions 5, 6, 15, 16 and 22. The following commands in the action description are supported.
+Buttons and sliders can send out `MODBUS Command`s via MODBUS functions 5, 6, 15, 16 and 22. The following commands in the action description are supported.
 
 Note that MODBUS Command actions can be sequenced by separating them with semicolons like in `read(0,10); mwrite(0,20,255,0,_)`
 
