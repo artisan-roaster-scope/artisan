@@ -33,8 +33,8 @@ branches:
   only:
     - master
 
-stack:
-  python 3.9
+#stack:
+#  python 3.9
 
 for:
 -
@@ -44,46 +44,23 @@ for:
     fast_finish: false
 
   environment:
-    PYTHON: "C:\\Python38-x64"
-  #  PYINSTALLER_VER: "4.3"
-    UPLOADTOOL_BODY:
-      "WARNING: pre-release builds may not work. Use at your own risk."
+    PYTHON_PATH: "C:\\Python38-x64"
+    QT_PATH: "c:\\qt\\5.15\\msvc2019_64"
+    PYUIC: "pyuic5.exe"
+    PYINSTALLER_VER: "4.3"
+    ARTISAN_LEGACY: "True"
+    ARTISAN_SPEC: "win-legacy"
+    VC_REDIST: "https://aka.ms/vs/16/release/vc_redist.x64.exe"
+    UPLOADTOOL_BODY: "WARNING: pre-release builds may not work. Use at your own risk."
 
   install:
-    - echo "Windows Legacy Install"
-    - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-    - echo "Python Version"
-    - python -V
-    - "%PYTHON%\\python.exe -m pip install --upgrade pip"
-    - "%PYTHON%\\python.exe -m pip install wheel"
-    - "%PYTHON%\\python.exe -m pip install .ci\\pyinstaller-4.3-py3-none-any.whl"
-  #  # start: build the pyinstaller bootloader and install (using the default VS 2015)
-  #  - curl -L -O https://github.com/pyinstaller/pyinstaller/releases/download/v%PYINSTALLER_VER%/PyInstaller-%PYINSTALLER_VER%.tar.gz
-  #  - tar xzf PyInstaller-%PYINSTALLER_VER%.tar.gz
-  #  - del PyInstaller-%PYINSTALLER_VER%.tar.gz
-  #  - cd pyinstaller-%PYINSTALLER_VER%\bootloader
-  #  - "%PYTHON%\\python.exe ./waf all --target-arch=64bit"
-  #  - cd ..
-  #  - "%PYTHON%\\python.exe setup.py install"
-  #  - cd ..
-  #  # end: build the pyinstaller bootloader and install
-    - "%PYTHON%\\python.exe -m pip install -r src\\requirements.txt"
-    - "%PYTHON%\\python.exe -m pip install -r src\\requirements-win-legacy.txt"
-    - curl -L -O https://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x64.exe
-    - curl -k -L -O https://netcologne.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
-    - 7z x snap7-full-1.4.2.7z
-    - copy snap7-full-1.4.2\build\bin\win64\snap7.dll c:\windows
-    - curl -k -L -O https://netcologne.dl.sourceforge.net/project/libusb-win32/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip
-    - 7z x libusb-win32-bin-1.2.6.0.zip
-    - copy libusb-win32-bin-1.2.6.0\bin\amd64\libusb0.dll C:\Windows\SysWOW64
+    - cmd: echo Windows Legacy Install
+    - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
+    - cmd: .ci\install-win.bat LEGACY
 
   build_script:
-    - echo "Windows Legacy Build"
+    - cmd: echo Windows Legacy Build
     - cmd: cd src
-
-    # downgrade artisan-win.spec to use python 3.8
-    - ps: gc artisan-win.spec | %{ $_ -replace "PYTHON = r'c\:\\python39-x64'", "PYTHON = r'c:\python38-x64'" } | out-file newfile -encoding ascii
-    - ps: move -force newfile artisan-win.spec
 
     # update the __revision__ field with the left seven of the GIT commit hash
     - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
@@ -92,8 +69,9 @@ for:
 
     # run the install script
     - cmd: build-win3-pi.bat LEGACY
-    - cmd: copy ..\LICENSE LICENSE.txt
-    - cmd: 7z a artisan-win-legacy-%ARTISAN_VERSION%.zip Setup*.exe LICENSE.txt README.txt
+
+#  test_script:
+#    - cmd: python -m unittest discover
 
 #  artifacts:
 #    - path: 'src\artisan-*.zip'
@@ -110,54 +88,34 @@ for:
     fast_finish: false
 
   environment:
-    PYTHON: "C:\\Python39-x64"
-  #  PYINSTALLER_VER: "4.3"
-    UPLOADTOOL_BODY:
-      "WARNING: pre-release builds may not work. Use at your own risk."
+    PYTHON_PATH: "C:\\Python310-x64"
+    QT_PATH: "C:\\qt\\6.2\\msvc2019_64"
+    PYUIC: "pyuic6.exe"
+    PYINSTALLER_VER: "4.7"
+    ARTISAN_LEGACY: "False"
+    ARTISAN_SPEC: "win"
+    VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+    UPLOADTOOL_BODY: "WARNING: pre-release builds may not work. Use at your own risk."
 
   install:
-    - echo "Windows Install"
-    - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-    - echo "Python Version"
-    - python -V
-    - "%PYTHON%\\python.exe -m pip install --upgrade pip"
-    - "%PYTHON%\\python.exe -m pip install wheel"
-    - "%PYTHON%\\python.exe -m pip install .ci\\pyinstaller-4.7-py3-none-any.whl"
-  ## start: build the pyinstaller bootloader and install (using the default VS 2015)
-  #  - curl -L -O https://github.com/pyinstaller/pyinstaller/releases/download/v%PYINSTALLER_VER%/PyInstaller-%PYINSTALLER_VER%.tar.gz
-  #  - tar xzf PyInstaller-%PYINSTALLER_VER%.tar.gz
-  #  - del PyInstaller-%PYINSTALLER_VER%.tar.gz
-  #  - cd pyinstaller-%PYINSTALLER_VER%\bootloader
-  #  - "%PYTHON%\\python.exe ./waf all --target-arch=64bit"
-  #  - cd ..
-  #  - "%PYTHON%\\python.exe setup.py install"
-  #  - cd ..
-  ## end: build the pyinstaller bootloader and install
-    - "%PYTHON%\\python.exe -m pip install -r src\\requirements.txt"
-    - "%PYTHON%\\python.exe -m pip install -r src\\requirements-win.txt"
-    - curl -L -O https://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x64.exe
-  #  - curl -k -L -O https://kent.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
-    - curl -k -L -O https://netcologne.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
-    - 7z x snap7-full-1.4.2.7z
-    - copy snap7-full-1.4.2\build\bin\win64\snap7.dll c:\windows
-    - curl -k -L -O https://netcologne.dl.sourceforge.net/project/libusb-win32/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip
-    - 7z x libusb-win32-bin-1.2.6.0.zip
-    - copy libusb-win32-bin-1.2.6.0\bin\amd64\libusb0.dll C:\Windows\SysWOW64
+    - cmd: echo Windows Install
+    - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
+    - cmd: .ci\install-win.bat
 
   build_script:
-    - echo "Windows Build"
+    - cmd: echo Windows Build
     - cmd: cd src
+
     # update the __revision__ field with the left seven of the GIT commit hash
     - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
     - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '0'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
     - ps: move -force newfile artisanlib/__init__.py
+
     # run the install script
     - cmd: build-win3-pi.bat
-    - cmd: copy ..\LICENSE LICENSE.txt
-    - cmd: 7z a artisan-win-%ARTISAN_VERSION%.zip Setup*.exe LICENSE.txt README.txt
 
-  test_script:
-    - python -m unittest discover
+#  test_script:
+#    - cmd: python -m unittest discover
 
 #  artifacts:
 #    - path: 'src\artisan-*.zip'

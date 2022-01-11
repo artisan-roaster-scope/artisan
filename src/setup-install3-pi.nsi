@@ -222,7 +222,7 @@ Section "MainSection" SEC01
   CreateShortCut "$DESKTOP\Artisan.lnk" "$INSTDIR\artisan.exe"
 SectionEnd
 
-Section "Microsoft Visual C++ 2015 Redistributable Package (x64)" SEC02
+Section "Microsoft Visual C++ Redistributable Package (x64)" SEC02
   ExecWait '$INSTDIR\vc_redist.x64.exe /install /passive /norestart'
 SectionEnd
 

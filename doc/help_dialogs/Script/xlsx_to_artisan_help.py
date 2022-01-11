@@ -284,28 +284,27 @@ def writehtmlFile(fname_in, fname_out, fname_htm):
     outfile.close()
     
 if __name__ == "__main__":
-    
     if len(sys.argv) > 1:
+        currPath = (os.path.dirname(__file__)) + '/'
+        #print(f"{currPath=}")
         if sys.argv[1] == "all":
-            for filename in os.listdir('../input_files/'):
+            for filename in os.listdir(currPath + '../input_files/'):
                 if filename.endswith(".xlsx"): 
                     fn = filename.replace(".xlsx","")
-                    fname_in =  '../input_files/' + filename
-                    fname_out = '../../../src/help/' + fn + '_help.py'
-                    fname_htm = '../Output_html/' + fn + '_help.html'
-                    print()
-                    print(filename)
+                    fname_in =  currPath + '../input_files/' + filename
+                    fname_out = currPath + '../../../src/help/' + fn + '_help.py'
+                    fname_htm = currPath + '../Output_html/' + fn + '_help.html'
+                    print(f"\n{filename}")
                     writepyFile(fname_in,fname_out)
                     writehtmlFile(fname_in,fname_out,fname_htm)
                     continue
                 else:
                     continue
         else:   #only one file
-            fname_in =  '../input_files/' + sys.argv[1] + '.xlsx'
-            fname_out = '../../../src/help/' + sys.argv[1] + '_help.py'
-            fname_htm = '../Output_html/' + sys.argv[1] + '_help.html'
-            print()
-            print(sys.argv[1] + '.xlsx')
+            fname_in =  currPath + '../input_files/' + sys.argv[1] + '.xlsx'
+            fname_out = currPath + '../../../src/help/' + sys.argv[1] + '_help.py'
+            fname_htm = currPath + '../Output_html/' + sys.argv[1] + '_help.html'
+            print(f"\n{sys.argv[1]}.xslx")
             writepyFile(fname_in,fname_out)
             writehtmlFile(fname_in,fname_out,fname_htm)
     else:

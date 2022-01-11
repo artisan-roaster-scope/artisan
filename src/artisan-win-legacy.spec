@@ -5,10 +5,10 @@ block_cipher = None
 import os
 if os.environ.get('APPVEYOR'):
   ARTISAN_SRC = r'C:\projects\artisan\src'
-  PYTHON = r'c:\python39-x64'
+  PYTHON = r'c:\python38-x64'
 else:
-  ARTISAN_SRC = r'C:\Users\luther\Desktop\src'
-  PYTHON = r'C:\Program Files\Python37'
+  ARTISAN_SRC = r'C:\Users\roast\Documents\artisan-roaster-scope\src'
+  PYTHON = r'C:\Program Files\Python38'
 NAME = 'artisan'
 
 ##
@@ -36,7 +36,7 @@ a = Analysis(['artisan.py'],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],
-             hiddenimports=['scipy.spatial.transform._rotation_groups', 'scipy._lib.messagestream','pywintypes','win32cred','win32timezone', 'pkg_resources.py2_warn','scipy.special.cython_special'],
+             hiddenimports=['scipy.spatial.transform._rotation_groups', 'scipy._lib.messagestream','pywintypes','win32cred','win32timezone','pkg_resources.py2_warn','scipy.special.cython_special'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher)

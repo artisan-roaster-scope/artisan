@@ -5,10 +5,10 @@ block_cipher = None
 import os
 if os.environ.get('APPVEYOR'):
   ARTISAN_SRC = r'C:\projects\artisan\src'
-  PYTHON = r'c:\python39-x64'
+  PYTHON = r'c:\python310-x64'
 else:
   ARTISAN_SRC = r'C:\Users\roast\Documents\artisan-roaster-scope\src'
-  PYTHON = r'C:\Program Files\Python39-x64'
+  PYTHON = r'C:\Program Files\Python310-x64'
 NAME = 'artisan'
 
 ##
@@ -63,7 +63,7 @@ coll = COLLECT(exe,
                name=NAME)
 
 
-# assumes the Microsoft Visual C++ 2015 Redistributable Package (x64), vc_redist.x64.exe, is located above the source directory
+# assumes the Microsoft Visual C++ Redistributable Package (x64), vc_redist.x64.exe, is located above the source directory
 os.system(r'copy ..\vc_redist.x64.exe ' + TARGET)
 
 os.system('copy README.txt ' + TARGET)
