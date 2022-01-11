@@ -1,6 +1,8 @@
 [Device]
 id=29
 roastertype_setup=Has Garanti HGS
+dropDuplicates=true
+dropDuplicatesLimit=0.2
 
 [Modbus]
 PID_OFF_action=

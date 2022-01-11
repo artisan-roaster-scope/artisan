@@ -29888,6 +29888,15 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.inputBCDsAsInt[5] = bool(toBool(settings.value("input6BCDsAsInt",self.modbus.inputBCDsAsInt[5])))
                 self.modbus.inputBCDsAsInt[6] = bool(toBool(settings.value("input7BCDsAsInt",self.modbus.inputBCDsAsInt[6])))
                 self.modbus.inputBCDsAsInt[7] = bool(toBool(settings.value("input8BCDsAsInt",self.modbus.inputBCDsAsInt[7])))
+            if settings.contains("input1Signed"):
+                self.modbus.inputSigned[0] = bool(toBool(settings.value("input1Signed",self.modbus.inputSigned[0])))
+                self.modbus.inputSigned[1] = bool(toBool(settings.value("input2Signed",self.modbus.inputSigned[1])))
+                self.modbus.inputSigned[2] = bool(toBool(settings.value("input3Signed",self.modbus.inputSigned[2])))
+                self.modbus.inputSigned[3] = bool(toBool(settings.value("input4Signed",self.modbus.inputSigned[3])))
+                self.modbus.inputSigned[4] = bool(toBool(settings.value("input5Signed",self.modbus.inputSigned[4])))
+                self.modbus.inputSigned[5] = bool(toBool(settings.value("input6Signed",self.modbus.inputSigned[5])))
+                self.modbus.inputSigned[6] = bool(toBool(settings.value("input7Signed",self.modbus.inputSigned[6])))
+                self.modbus.inputSigned[7] = bool(toBool(settings.value("input8Signed",self.modbus.inputSigned[7])))
             if settings.contains("PIDmultiplier"):
                 self.modbus.PIDmultiplier = toInt(settings.value("PIDmultiplier",self.modbus.PIDmultiplier))
                 self.modbus.SVmultiplier = toInt(settings.value("SVmultiplier",self.modbus.SVmultiplier))
@@ -31452,6 +31461,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input1mode",self.modbus.inputModes[0])
             settings.setValue("input1FloatsAsInt",self.modbus.inputFloatsAsInt[0])
             settings.setValue("input1BCDsAsInt",self.modbus.inputBCDsAsInt[0])
+            settings.setValue("input1Signed",self.modbus.inputSigned[0])
             settings.setValue("input2slave",self.modbus.inputSlaves[1])
             settings.setValue("input2register",self.modbus.inputRegisters[1])
             settings.setValue("input2float",self.modbus.inputFloats[1])
@@ -31461,6 +31471,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input2mode",self.modbus.inputModes[1])
             settings.setValue("input2FloatsAsInt",self.modbus.inputFloatsAsInt[1])
             settings.setValue("input2BCDsAsInt",self.modbus.inputBCDsAsInt[1])
+            settings.setValue("input2Signed",self.modbus.inputSigned[1])
             settings.setValue("input3slave",self.modbus.inputSlaves[2])
             settings.setValue("input3register",self.modbus.inputRegisters[2])
             settings.setValue("input3float",self.modbus.inputFloats[2])
@@ -31470,6 +31481,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input3mode",self.modbus.inputModes[2])
             settings.setValue("input3FloatsAsInt",self.modbus.inputFloatsAsInt[2])
             settings.setValue("input3BCDsAsInt",self.modbus.inputBCDsAsInt[2])
+            settings.setValue("input3Signed",self.modbus.inputSigned[2])
             settings.setValue("input4slave",self.modbus.inputSlaves[3])
             settings.setValue("input4register",self.modbus.inputRegisters[3])
             settings.setValue("input4float",self.modbus.inputFloats[3])
@@ -31479,6 +31491,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input4mode",self.modbus.inputModes[3])
             settings.setValue("input4FloatsAsInt",self.modbus.inputFloatsAsInt[3])
             settings.setValue("input4BCDsAsInt",self.modbus.inputBCDsAsInt[3])
+            settings.setValue("input4Signed",self.modbus.inputSigned[3])
             settings.setValue("input5slave",self.modbus.inputSlaves[4])
             settings.setValue("input5register",self.modbus.inputRegisters[4])
             settings.setValue("input5float",self.modbus.inputFloats[4])
@@ -31488,6 +31501,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input5mode",self.modbus.inputModes[4])
             settings.setValue("input5FloatsAsInt",self.modbus.inputFloatsAsInt[4])
             settings.setValue("input5BCDsAsInt",self.modbus.inputBCDsAsInt[4])
+            settings.setValue("input5Signed",self.modbus.inputSigned[4])
             settings.setValue("input6slave",self.modbus.inputSlaves[5])
             settings.setValue("input6register",self.modbus.inputRegisters[5])
             settings.setValue("input6float",self.modbus.inputFloats[5])
@@ -31497,6 +31511,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input6mode",self.modbus.inputModes[5])
             settings.setValue("input6FloatsAsInt",self.modbus.inputFloatsAsInt[5])
             settings.setValue("input6BCDsAsInt",self.modbus.inputBCDsAsInt[5])
+            settings.setValue("input6Signed",self.modbus.inputSigned[5])
             settings.setValue("input7slave",self.modbus.inputSlaves[6])
             settings.setValue("input7register",self.modbus.inputRegisters[6])
             settings.setValue("input7float",self.modbus.inputFloats[6])
@@ -31506,6 +31521,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input7mode",self.modbus.inputModes[6])
             settings.setValue("input7FloatsAsInt",self.modbus.inputFloatsAsInt[6])
             settings.setValue("input7BCDsAsInt",self.modbus.inputBCDsAsInt[6])
+            settings.setValue("input7Signed",self.modbus.inputSigned[6])
             settings.setValue("input8slave",self.modbus.inputSlaves[7])
             settings.setValue("input8register",self.modbus.inputRegisters[7])
             settings.setValue("input8float",self.modbus.inputFloats[7])
@@ -31515,6 +31531,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input8mode",self.modbus.inputModes[7])
             settings.setValue("input8FloatsAsInt",self.modbus.inputFloatsAsInt[7])
             settings.setValue("input8BCDsAsInt",self.modbus.inputBCDsAsInt[7])
+            settings.setValue("input8Signed",self.modbus.inputSigned[7])
 
             settings.setValue("PIDmultiplier",self.modbus.PIDmultiplier)
             settings.setValue("SVmultiplier",self.modbus.SVmultiplier)
@@ -35201,26 +35218,43 @@ class ApplicationWindow(QMainWindow):
                     self.modbus.inputFloatsAsInt[i] = False
                     self.modbus.inputFloats[i] = False
                     self.modbus.inputBCDs[i] = False
+                    self.modbus.inputSigned[i] = False
+                elif dialog.modbus_inputDecodes[i].currentIndex() == 1:
+                    self.modbus.inputBCDsAsInt[i] = False
+                    self.modbus.inputFloatsAsInt[i] = True
+                    self.modbus.inputFloats[i] = False
+                    self.modbus.inputBCDs[i] = False
+                    self.modbus.inputSigned[i] = False
+                elif dialog.modbus_inputDecodes[i].currentIndex() == 6:
+                    self.modbus.inputBCDsAsInt[i] = False
+                    self.modbus.inputFloatsAsInt[i] = False
+                    self.modbus.inputFloats[i] = True
+                    self.modbus.inputBCDs[i] = False
+                    self.modbus.inputSigned[i] = False
+                elif dialog.modbus_inputDecodes[i].currentIndex() == 5:
+                    self.modbus.inputBCDsAsInt[i] = False
+                    self.modbus.inputFloatsAsInt[i] = False
+                    self.modbus.inputFloats[i] = False
+                    self.modbus.inputBCDs[i] = True
+                    self.modbus.inputSigned[i] = False
+                elif dialog.modbus_inputDecodes[i].currentIndex() == 2:
+                    self.modbus.inputBCDsAsInt[i] = False
+                    self.modbus.inputFloatsAsInt[i] = False
+                    self.modbus.inputFloats[i] = False
+                    self.modbus.inputBCDs[i] = False
+                    self.modbus.inputSigned[i] = True
                 elif dialog.modbus_inputDecodes[i].currentIndex() == 3:
                     self.modbus.inputBCDsAsInt[i] = False
                     self.modbus.inputFloatsAsInt[i] = True
                     self.modbus.inputFloats[i] = False
                     self.modbus.inputBCDs[i] = False
-                elif dialog.modbus_inputDecodes[i].currentIndex() == 1:
-                    self.modbus.inputBCDsAsInt[i] = False
-                    self.modbus.inputFloatsAsInt[i] = False
-                    self.modbus.inputFloats[i] = True
-                    self.modbus.inputBCDs[i] = False
-                elif dialog.modbus_inputDecodes[i].currentIndex() == 2:
-                    self.modbus.inputBCDsAsInt[i] = False
-                    self.modbus.inputFloatsAsInt[i] = False
-                    self.modbus.inputFloats[i] = False
-                    self.modbus.inputBCDs[i] = True
-                else:
+                    self.modbus.inputSigned[i] = True
+                else: # index 0
                     self.modbus.inputBCDsAsInt[i] = False
                     self.modbus.inputFloatsAsInt[i] = False
                     self.modbus.inputFloats[i] = False
                     self.modbus.inputBCDs[i] = False
+                    self.modbus.inputSigned[i] = False
 
             self.modbus.SVmultiplier = dialog.modbus_SVmultiplier.currentIndex()
             self.modbus.PIDmultiplier = dialog.modbus_PIDmultiplier.currentIndex()

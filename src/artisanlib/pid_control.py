@@ -1188,7 +1188,7 @@ class PIDcontrol():
                         vp = abs(100 - v)
                     else:
                         vp = v
-                    vp = min(100,max(0,int(vp)))
+                    vp = min(100,max(0,int(round(vp))))
                     # we need to map the duty [0%,100%] to the [slidermin,slidermax] range
                     heat = int(round(numpy.interp(vp,[0,100],[self.aw.eventslidermin[slidernr],self.aw.eventslidermax[slidernr]])))
                     self.aw.block_quantification_sampling_ticks[slidernr] = self.aw.sampling_ticks_to_block_quantifiction

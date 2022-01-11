@@ -5,6 +5,8 @@ Delay=3000
 ETcurve=false
 ETlcd=false
 roastertype_setup=Rolltech EL
+dropDuplicates=true
+dropDuplicatesLimit=0.2
 
 [Device]
 id=29

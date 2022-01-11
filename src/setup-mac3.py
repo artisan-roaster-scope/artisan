@@ -249,18 +249,18 @@ Qt_modules = [
     'QtNetwork',
     'QtDBus',
     'QtBluetooth',
-    'QtConcurrent',
+    'QtConcurrent', # not on PyQt6
 # needed for QtWebEngine HTML2PDF export:
     'QtWebEngineWidgets',
     'QtWebEngineCore',
-    'QtWebEngine',
+    'QtWebEngine', # not on PyQt6
     'QtQuick',
     'QtQuickWidgets',
     'QtQml',
     'QtQmlModels',
     'QtWebChannel',
     'QtPositioning',
-    'QtOpenGL'
+    'QtOpenGL' # required by QtWebEngineCore
 ]
 Qt_frameworks = [module + ".framework" for module in Qt_modules]
 

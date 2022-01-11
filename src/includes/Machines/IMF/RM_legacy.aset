@@ -2,6 +2,8 @@
 Delay=1000
 Oversampling=true
 roastertype_setup=IMF RM legacy
+dropDuplicates=true
+dropDuplicatesLimit=0.2
 
 [CurveStyles]
 extradrawstyles1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0\x64\0\x65\0\x66\0\x61\0u\0l\0t)

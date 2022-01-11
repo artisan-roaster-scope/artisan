@@ -1,6 +1,8 @@
 [General]
 Delay=2000
 roastertype_setup=GR 2xEMKO
+dropDuplicates=true
+dropDuplicatesLimit=0.2
 
 [Device]
 id=29

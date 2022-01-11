@@ -494,7 +494,10 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_baudratelabel.setBuddy(self.modbus_baudrateComboBox)
         self.modbus_bauds = ["1200","2400","4800","9600","19200","38400","57600","115200"]
         self.modbus_baudrateComboBox.addItems(self.modbus_bauds)
-        self.modbus_baudrateComboBox.setCurrentIndex(self.modbus_bauds.index(str(self.aw.modbus.baudrate)))
+        try:
+            self.modbus_baudrateComboBox.setCurrentIndex(self.modbus_bauds.index(str(self.aw.modbus.baudrate)))
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
         modbus_bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size"))
         self.modbus_bytesizeComboBox = QComboBox()
         modbus_bytesizelabel.setBuddy(self.modbus_bytesizeComboBox)
@@ -521,7 +524,7 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_function_codes = ["1","2","3","4"]
         modbus_modes = ["", "C","F"]
         modbus_divs = ["", "1/10","1/100"]
-        modbus_decode = ["Int", "Float","BCD32", "Int32", "BCD"]
+        modbus_decode = ["uInt16", "uInt32", "sInt16", "sInt32", "BCD16", "BCD32", "Float32"]
         
         modbus_input1slavelabel = QLabel(QApplication.translate("Label", "Slave"))
         modbus_input1registerlabel = QLabel(QApplication.translate("Label", "Register"))
@@ -540,31 +543,31 @@ class comportDlg(ArtisanResizeablDialog):
         for i in range(self.aw.modbus.channels):
             self.modbus_inputSlaveEdits[i] = QLineEdit(str(self.aw.modbus.inputSlaves[i]))
             self.modbus_inputSlaveEdits[i].setValidator(QIntValidator(0,247,self.modbus_inputSlaveEdits[i]))
-            self.modbus_inputSlaveEdits[i].setFixedWidth(65)
+            self.modbus_inputSlaveEdits[i].setFixedWidth(75)
             self.modbus_inputSlaveEdits[i].setAlignment(Qt.AlignmentFlag.AlignRight)
             #
             self.modbus_inputRegisterEdits[i] = QLineEdit(str(self.aw.modbus.inputRegisters[i]))
             self.modbus_inputRegisterEdits[i].setValidator(QIntValidator(0,65536,self.modbus_inputRegisterEdits[i]))
-            self.modbus_inputRegisterEdits[i].setFixedWidth(65)
+            self.modbus_inputRegisterEdits[i].setFixedWidth(75)
             self.modbus_inputRegisterEdits[i].setAlignment(Qt.AlignmentFlag.AlignRight)
             #
             self.modbus_inputCodes[i] = QComboBox()
             self.modbus_inputCodes[i].setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.modbus_inputCodes[i].addItems(modbus_function_codes)
             self.modbus_inputCodes[i].setCurrentIndex(modbus_function_codes.index(str(self.aw.modbus.inputCodes[i])))
-            self.modbus_inputCodes[i].setFixedWidth(70)
+            self.modbus_inputCodes[i].setFixedWidth(85)
             #
             self.modbus_inputDivs[i] = QComboBox()
             self.modbus_inputDivs[i].setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.modbus_inputDivs[i].addItems(modbus_divs)
             self.modbus_inputDivs[i].setCurrentIndex(self.aw.modbus.inputDivs[i])
-            self.modbus_inputDivs[i].setFixedWidth(70)
+            self.modbus_inputDivs[i].setFixedWidth(85)
             #
             self.modbus_inputModes[i] = QComboBox()
             self.modbus_inputModes[i].setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.modbus_inputModes[i].addItems(modbus_modes)
             self.modbus_inputModes[i].setCurrentIndex(modbus_modes.index(str(self.aw.modbus.inputModes[i])))
-            self.modbus_inputModes[i].setFixedWidth(70)
+            self.modbus_inputModes[i].setFixedWidth(85)
             #
             self.modbus_inputDecodes[i] = QComboBox()
             self.modbus_inputDecodes[i].setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -572,12 +575,20 @@ class comportDlg(ArtisanResizeablDialog):
             if self.aw.modbus.inputBCDsAsInt[i]:
                 self.modbus_inputDecodes[i].setCurrentIndex(4)
             elif self.aw.modbus.inputFloatsAsInt[i]:
-                self.modbus_inputDecodes[i].setCurrentIndex(3)
+                if self.aw.modbus.inputSigned[i]:
+                    self.modbus_inputDecodes[i].setCurrentIndex(3)
+                else:
+                    self.modbus_inputDecodes[i].setCurrentIndex(1)
             elif self.aw.modbus.inputFloats[i]:
-                self.modbus_inputDecodes[i].setCurrentIndex(1)
+                self.modbus_inputDecodes[i].setCurrentIndex(6)
             elif self.aw.modbus.inputBCDs[i]:
-                self.modbus_inputDecodes[i].setCurrentIndex(2)
-            self.modbus_inputDecodes[i].setFixedWidth(70)
+                self.modbus_inputDecodes[i].setCurrentIndex(5)
+            else:
+                if self.aw.modbus.inputSigned[i]:
+                    self.modbus_inputDecodes[i].setCurrentIndex(2)
+                else:
+                    self.modbus_inputDecodes[i].setCurrentIndex(0)
+            self.modbus_inputDecodes[i].setFixedWidth(85)
 
         modbus_endianlabel = QLabel(QApplication.translate("Label", "little-endian"))
         
@@ -756,7 +767,10 @@ class comportDlg(ArtisanResizeablDialog):
         scale_baudratelabel.setBuddy(self.scale_baudrateComboBox)
         self.scale_bauds = ["1200","2400","4800","9600","19200","38400","57600","115200"]
         self.scale_baudrateComboBox.addItems(self.scale_bauds)
-        self.scale_baudrateComboBox.setCurrentIndex(self.scale_bauds.index(str(self.aw.scale.baudrate)))
+        try:
+            self.scale_baudrateComboBox.setCurrentIndex(self.scale_bauds.index(str(self.aw.scale.baudrate)))
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
         scale_bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size"))
         self.scale_bytesizeComboBox = QComboBox()
         scale_bytesizelabel.setBuddy(self.scale_bytesizeComboBox)

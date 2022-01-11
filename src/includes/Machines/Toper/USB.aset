@@ -1,6 +1,8 @@
 [General]
 Delay=3000
 roastertype_setup=Toper USB
+dropDuplicates=true
+dropDuplicatesLimit=0.2
 
 [Device]
 id=29
