@@ -323,10 +323,12 @@ Section Uninstall
   RMDir /r "$INSTDIR\Themes"
   RMDir /r "$INSTDIR\Themes"
   RMDir /r "$INSTDIR\tk"
+  RMDir /r "$INSTDIR\tornado"
   RMDir /r "$INSTDIR\translations"
   RMDir /r "$INSTDIR\wcwidth"
   RMDir /r "$INSTDIR\Wheels"
   RMDir /r "$INSTDIR\win32com"
+  RMDir /r "$INSTDIR\wx"
   RMDir /r "$INSTDIR\yaml"
   RMDir /r "$INSTDIR\zope"
 
@@ -335,10 +337,14 @@ Section Uninstall
   !insertmacro Rmdir_Wildcard "$INSTDIR\altgraph*.dist-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\cffi*.dist-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\gevent*.dist-info" ${__LINE__}
+  !insertmacro Rmdir_Wildcard "$INSTDIR\gevent*.egg-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\greenlet*.dist-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\importlib_metadata*.dist-info" ${__LINE__}
+  !insertmacro Rmdir_Wildcard "$INSTDIR\importlib_metadata*.egg-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\keyring*.dist-info" ${__LINE__}
+  !insertmacro Rmdir_Wildcard "$INSTDIR\keyring*.egg-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\prettytable*.dist-info" ${__LINE__}
+  !insertmacro Rmdir_Wildcard "$INSTDIR\prettytable*.egg-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\pycparser*.dist-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\pyinstaller*.dist-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\setuptools*.dist-info" ${__LINE__}
