@@ -545,7 +545,11 @@ class serialport():
         t1 = self.aw.fujipid.gettemperature(self.controlETpid[0],self.controlETpid[1])/10.  #Need to divide by 10 because using 1 decimal point in Fuji (ie. received 843 = 84.3)
         #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None 3 = DTA)
         if self.readBTpid[0] < 2 or self.readBTpid[0] == 4:                    
-            t2 = self.aw.fujipid.gettemperature(self.readBTpid[0],self.readBTpid[1])/10.
+            t2 = self.aw.fujipid.gettemperature(self.readBTpid[0],self.readBTpid[1])
+            if t2 is None:
+                t2 = -1
+            else:
+                t2 = t2/10.
         elif self.readBTpid[0] == 3:
             ### arguments to create command to READ TEMPERATURE
             unitID = self.readBTpid[1]
@@ -2148,15 +2152,37 @@ class serialport():
                 if not self.aw.modbus.optimizer or force:
                     self.aw.modbus.sleepBetween() # we start with a sleep, as it could be that just a send command happend before the semaphore was catched
                 if self.aw.modbus.inputFloats[i]:
-                    res[i] = self.aw.modbus.readFloat(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i],force)
+                    res[i] = self.aw.modbus.readFloat(
+                                self.aw.modbus.inputSlaves[i],
+                                self.aw.modbus.inputRegisters[i],
+                                self.aw.modbus.inputCodes[i],
+                                force)
                 elif self.aw.modbus.inputFloatsAsInt[i]:
-                    res[i] = self.aw.modbus.readInt32(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i],force)
+                    res[i] = self.aw.modbus.readInt32(
+                                self.aw.modbus.inputSlaves[i],
+                                self.aw.modbus.inputRegisters[i],
+                                self.aw.modbus.inputCodes[i],
+                                force,
+                                signed=self.aw.modbus.inputSigned[i])
                 elif self.aw.modbus.inputBCDs[i]:
-                    res[i] = self.aw.modbus.readBCD(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i],force)
+                    res[i] = self.aw.modbus.readBCD(
+                                self.aw.modbus.inputSlaves[i],
+                                self.aw.modbus.inputRegisters[i],
+                                self.aw.modbus.inputCodes[i],
+                                force)
                 elif self.aw.modbus.inputBCDsAsInt[i]:
-                    res[i] = self.aw.modbus.readBCDint(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i],force)
+                    res[i] = self.aw.modbus.readBCDint(
+                                self.aw.modbus.inputSlaves[i],
+                                self.aw.modbus.inputRegisters[i],
+                                self.aw.modbus.inputCodes[i],
+                                force)
                 else:
-                    res[i] = self.aw.modbus.readSingleRegister(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i],force)
+                    res[i] = self.aw.modbus.readSingleRegister(
+                                self.aw.modbus.inputSlaves[i],
+                                self.aw.modbus.inputRegisters[i],
+                                self.aw.modbus.inputCodes[i],
+                                force,
+                                signed=self.aw.modbus.inputSigned[i])
                 res[i] = self.processChannelData(res[i],self.aw.modbus.inputDivs[i],self.aw.modbus.inputModes[i])
         
         self.aw.qmc.extraMODBUStemps = res[:]

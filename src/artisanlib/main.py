@@ -732,7 +732,7 @@ class tgraphcanvas(FigureCanvas):
         'ETBdeltamarkersize', 'alarmsetlabel', 'alarmflag', 'alarmguard', 'alarmnegguard', 'alarmtime', 'alarmoffset', 'alarmtime2menuidx', 'menuidx2alarmtime',
         'alarmcond', 'alarmstate', 'alarmsource', 'alarmtemperature', 'alarmaction', 'alarmbeep', 'alarmstrings', 'alarmtablecolumnwidths', 'silent_alarms',
         'alarmsets_count', 'alarmsets', 'loadalarmsfromprofile', 'loadalarmsfrombackground', 'alarmsfile', 'temporaryalarmflag', 'TPalarmtimeindex',
-        'rsfile', 'tempory_sample_trigger_redraw', 'temporary_error', 'temporarymovepositiveslider', 'temporarymovenegativeslider',
+        'rsfile', 'temporary_error', 'temporarymovepositiveslider', 'temporarymovenegativeslider',
         'temporayslider_force_move', 'quantifiedEvent', 'loadaxisfromprofile', 'startofx_default', 'endofx_default', 'xgrid_default', 'ylimit_F_default',
         'ylimit_min_F_default', 'ygrid_F_default', 'zlimit_F_default', 'zlimit_min_F_default', 'zgrid_F_default', 'ylimit_C_default', 'ylimit_min_C_default',
         'ygrid_C_default', 'zlimit_C_default', 'zlimit_min_C_default', 'zgrid_C_default', 'temp_grid', 'time_grid', 'zlimit_max', 'zlimit_min_max',
@@ -965,7 +965,7 @@ class tgraphcanvas(FigureCanvas):
         self.phasesLCDflag = True
         self.phasesLCDmode = 1 # one of 0: time, 1: percentage, 2: temp mode
         self.phasesLCDmode_l = [1,1,1]
-        self.phasesLCDmode_all = [False,False,False]
+        self.phasesLCDmode_all = [False,False,True]
 
 
         #statistics flags selects to display: stat. time, stat. bar, (stat. flavors), stat. area, stat. deg/min, stat. ETBTarea
@@ -1428,8 +1428,8 @@ class tgraphcanvas(FigureCanvas):
         self.rateofchange2 = 0.0
 
         #read and plot on/off flag
-        self.flagon = False  # Artisan turned on
-        self.flagstart = False # Artisan logging
+        self.flagon = False  # Artisan turned on (sampling)
+        self.flagstart = False # Artisan logging/recording
         self.flagKeepON = False # turn Artisan ON again after pressing OFF during recording
         self.flagOpenCompleted = False # after completing a recording with OFF, send the saved profile to be opened in the ArtisanViewer
         self.flagsampling = False # if True, Artisan is still in the sampling phase and one has to wait for its end to turn OFF
@@ -1986,8 +1986,6 @@ class tgraphcanvas(FigureCanvas):
         self.TPalarmtimeindex = None # is set to the current  aw.qmc.timeindex by sample(), if alarms are defined and once the TP is detected
 
         self.rsfile = "" # filename Ramp/Soak patterns were loaded from
-
-        self.tempory_sample_trigger_redraw = False
 
         self.temporary_error = None # set by adderror() to a new error message, send to the message line by updategraphics()
         self.temporarymovepositiveslider = None # set by pidcontrol.setEnergy (indirectly called from sample())
@@ -4017,8 +4015,7 @@ class tgraphcanvas(FigureCanvas):
                         #readjust xlimit of plot if needed
                         if  not aw.qmc.fixmaxtime and not aw.qmc.locktimex and sample_timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
                             aw.qmc.endofx = int(sample_timex[-1] + 180.)         # increase x limit by 3 minutes
-                            aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
-                            aw.qmc.tempory_sample_trigger_redraw = True # we enfore a full redraw within updategraphics
+                            aw.qmc.xaxistosm()
                         if aw.qmc.projectFlag:
                             aw.qmc.updateProjection()
 
@@ -4610,117 +4607,113 @@ class tgraphcanvas(FigureCanvas):
                     ##### updated canvas
                     try:
                         if not self.block_update:
-                            if self.tempory_sample_trigger_redraw:
-                                self.tempory_sample_trigger_redraw = False
-                                self.redraw()
-                            else:
-                            #-- start update display
-                                #### lock shared resources to ensure that no other redraw is interfering with this one here #####
-                                self.profileDataSemaphore.acquire(1)
-                                try:
-                                    if self.ax_background is not None:
-                                        self.fig.canvas.restore_region(self.ax_background)
-                                        # draw eventtypes
-    # this seems not to be needed and hides partially event by value "Combo-type" annotations
-    #                                    if self.eventsshowflag and self.eventsGraphflag in [2,3,4]:
-    #                                        self.ax.draw_artist(self.l_eventtype1dots)
-    #                                        self.ax.draw_artist(self.l_eventtype2dots)
-    #                                        self.ax.draw_artist(self.l_eventtype3dots)
-    #                                        self.ax.draw_artist(self.l_eventtype4dots)
-                                        # draw delta lines
+                        #-- start update display
+                            #### lock shared resources to ensure that no other redraw is interfering with this one here #####
+                            self.profileDataSemaphore.acquire(1)
+                            try:
+                                if self.ax_background is not None:
+                                    self.fig.canvas.restore_region(self.ax_background)
+                                    # draw eventtypes
+# this seems not to be needed and hides partially event by value "Combo-type" annotations
+#                                    if self.eventsshowflag and self.eventsGraphflag in [2,3,4]:
+#                                        self.ax.draw_artist(self.l_eventtype1dots)
+#                                        self.ax.draw_artist(self.l_eventtype2dots)
+#                                        self.ax.draw_artist(self.l_eventtype3dots)
+#                                        self.ax.draw_artist(self.l_eventtype4dots)
+                                    # draw delta lines
 
-                                        if self.swapdeltalcds:
-                                            if self.DeltaETflag and self.l_delta1 is not None:
-                                                try:
-                                                    self.ax.draw_artist(self.l_delta1)
-                                                except Exception as e: # pylint: disable=broad-except
-                                                    _log.exception(e)
-                                            if self.DeltaBTflag and self.l_delta2 is not None:
-                                                try:
-                                                    self.ax.draw_artist(self.l_delta2)
-                                                except Exception as e: # pylint: disable=broad-except
-                                                    _log.exception(e)
-                                        else:
-                                            if self.DeltaBTflag and self.l_delta2 is not None:
-                                                try:
-                                                    self.ax.draw_artist(self.l_delta2)
-                                                except Exception as e: # pylint: disable=broad-except
-                                                    _log.exception(e)
-                                            if self.DeltaETflag and self.l_delta1 is not None:
-                                                try:
-                                                    self.ax.draw_artist(self.l_delta1)
-                                                except Exception as e: # pylint: disable=broad-except
-                                                    _log.exception(e)
-
-                                        # draw extra curves
-                                        xtra_dev_lines1 = 0
-                                        xtra_dev_lines2 = 0
-
-                                        try:
-                                            for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(sample_extratimex),len(sample_extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(sample_extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                                                if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
-                                                    try:
-                                                        self.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
-                                                    except Exception as e: # pylint: disable=broad-except
-                                                        _log.exception(e)
-                                                    xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                                if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
-                                                    try:
-                                                        self.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
-                                                    except Exception as e: # pylint: disable=broad-except
-                                                        _log.exception(e)
-                                                    xtra_dev_lines2 = xtra_dev_lines2 + 1
-                                        except Exception: # pylint: disable=broad-except
-                                            pass
-                                        if self.swaplcds:
-                                            # draw ET
-                                            if self.ETcurve:
-                                                try:
-                                                    self.ax.draw_artist(self.l_temp1)
-                                                except Exception as e: # pylint: disable=broad-except
-                                                    _log.exception(e)
-                                            # draw BT
-                                            if self.BTcurve:
-                                                try:
-                                                    self.ax.draw_artist(self.l_temp2)
-                                                except Exception as e: # pylint: disable=broad-except
-                                                    _log.exception(e)
-                                        else:
-                                            # draw BT
-                                            if self.BTcurve:
-                                                try:
-                                                    self.ax.draw_artist(self.l_temp2)
-                                                except Exception as e: # pylint: disable=broad-except
-                                                    _log.exception(e)
-                                            # draw ET
-                                            if self.ETcurve:
-                                                try:
-                                                    self.ax.draw_artist(self.l_temp1)
-                                                except Exception as e: # pylint: disable=broad-except
-                                                    _log.exception(e)
-
-                                        try:
-                                            if self.BTcurve:
-                                                for a in self.l_annotations:
-                                                    self.ax.draw_artist(a)
-                                        except Exception as e : # pylint: disable=broad-except
-                                            _log.exception(e)
-
-                                        try:
-                                            self.update_additional_artists()
-                                        except Exception as e: # pylint: disable=broad-except
-                                            _log.exception(e)
-
-                                        self.fig.canvas.blit(self.ax.get_figure().bbox)
-
+                                    if self.swapdeltalcds:
+                                        if self.DeltaETflag and self.l_delta1 is not None:
+                                            try:
+                                                self.ax.draw_artist(self.l_delta1)
+                                            except Exception as e: # pylint: disable=broad-except
+                                                _log.exception(e)
+                                        if self.DeltaBTflag and self.l_delta2 is not None:
+                                            try:
+                                                self.ax.draw_artist(self.l_delta2)
+                                            except Exception as e: # pylint: disable=broad-except
+                                                _log.exception(e)
                                     else:
-                                        # we do not have a background to bitblit, so do a full redraw
-                                        self.updateBackground() # does the canvas draw, but also fills the ax_background cache
+                                        if self.DeltaBTflag and self.l_delta2 is not None:
+                                            try:
+                                                self.ax.draw_artist(self.l_delta2)
+                                            except Exception as e: # pylint: disable=broad-except
+                                                _log.exception(e)
+                                        if self.DeltaETflag and self.l_delta1 is not None:
+                                            try:
+                                                self.ax.draw_artist(self.l_delta1)
+                                            except Exception as e: # pylint: disable=broad-except
+                                                _log.exception(e)
+
+                                    # draw extra curves
+                                    xtra_dev_lines1 = 0
+                                    xtra_dev_lines2 = 0
+
+                                    try:
+                                        for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(sample_extratimex),len(sample_extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(sample_extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                                            if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
+                                                try:
+                                                    self.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
+                                                xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                            if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
+                                                try:
+                                                    self.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
+                                                xtra_dev_lines2 = xtra_dev_lines2 + 1
+                                    except Exception: # pylint: disable=broad-except
+                                        pass
+                                    if self.swaplcds:
+                                        # draw ET
+                                        if self.ETcurve:
+                                            try:
+                                                self.ax.draw_artist(self.l_temp1)
+                                            except Exception as e: # pylint: disable=broad-except
+                                                _log.exception(e)
+                                        # draw BT
+                                        if self.BTcurve:
+                                            try:
+                                                self.ax.draw_artist(self.l_temp2)
+                                            except Exception as e: # pylint: disable=broad-except
+                                                _log.exception(e)
+                                    else:
+                                        # draw BT
+                                        if self.BTcurve:
+                                            try:
+                                                self.ax.draw_artist(self.l_temp2)
+                                            except Exception as e: # pylint: disable=broad-except
+                                                _log.exception(e)
+                                        # draw ET
+                                        if self.ETcurve:
+                                            try:
+                                                self.ax.draw_artist(self.l_temp1)
+                                            except Exception as e: # pylint: disable=broad-except
+                                                _log.exception(e)
+
+                                    try:
+                                        if self.BTcurve:
+                                            for a in self.l_annotations:
+                                                self.ax.draw_artist(a)
+                                    except Exception as e : # pylint: disable=broad-except
+                                        _log.exception(e)
+
+                                    try:
                                         self.update_additional_artists()
-                                finally:
-                                    if self.profileDataSemaphore.available() < 1:
-                                        self.profileDataSemaphore.release(1)
-                            #-- end update display
+                                    except Exception as e: # pylint: disable=broad-except
+                                        _log.exception(e)
+
+                                    self.fig.canvas.blit(self.ax.get_figure().bbox)
+
+                                else:
+                                    # we do not have a background to bitblit, so do a full redraw
+                                    self.updateBackground() # does the canvas draw, but also fills the ax_background cache
+                                    self.update_additional_artists()
+                            finally:
+                                if self.profileDataSemaphore.available() < 1:
+                                    self.profileDataSemaphore.release(1)
+                        #-- end update display
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                         _, _, exc_tb = sys.exc_info()
@@ -18490,6 +18483,11 @@ class ApplicationWindow(QMainWindow):
 
         QTimer.singleShot(0,lambda : _log.info("startup time: %.2f", libtime.process_time() - startup_time))
 
+    def mousePressEvent(self, event):
+        super().mousePressEvent(event)
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.releaseminieditor()
+            self.releaseSliderFocus()
 
     # if any of the parameters is <0 the corresponding variable is not updated
     @pyqtSlot(float, float)
@@ -21053,6 +21051,11 @@ class ApplicationWindow(QMainWindow):
             lcd.setMinimumWidth(3*x)
             lcd.setMaximumWidth(3*x)
         return lcd
+    
+    def releaseSliderFocus(self):
+        for s in [self.slider1,self.slider2,self.slider3,self.slider4]:
+            s.releaseKeyboard()
+            s.clearFocus()
 
     # set slider focus to Qt.FocusPolicy.StrongFocus to allow keyboard control and
     # Qt.FocusPolicy.NoFocus to deactivate it
@@ -24498,7 +24501,6 @@ class ApplicationWindow(QMainWindow):
                 #meta_modifier = modifiers == Qt.KeyboardModifier.MetaModifier # Control on macOS, Meta on Windows
                 #uncomment next line to find the integer value of a k
                 #print(k)
-                
 
                 numberkeys = [48,49,50,51,52,53,54,55,56,57] # keycodes for number keys 0,1,...,9
 
@@ -24791,24 +24793,24 @@ class ApplicationWindow(QMainWindow):
             self.etimeline.clearFocus()
             self.etypeComboBox.clearFocus()
             self.eNumberSpinBox.clearFocus()
+            self.buttonminiEvent.clearFocus()
 
     # this function respects the button visibility via aw.qmc.buttonvisibility and if button.isDisabled()
-    # ON/OFF (1,self.buttonONOFF) -> CHARGE (2,self.buttonCHARGE) -> DRYEND (3,self.buttonDRY) -> FCs (4,self.buttonFCs)
-    # -> FCe (5,self.buttonFCe) -> SCs (6,self.buttonSCs) -> SCe (7,self.buttonSCe) -> DROP (8,self.buttonDROP)
-    # -> COOLend (9,self.buttonCOOL) -> EVENT (10,self.buttonEVENT)-> ON/OFF
-    # currentButtonIndex is from [1-10]
+    # button = 0:CHARGE, 1:DRY_END, 2:FC_START, 3:FC_END, 4:SC_START, 5:SC_END, 6:DROP, 7:COOL_END; 8:EVENT (EVENT is always enabled!)
     # buttons that trigger events and can be triggered only once
     def nextActiveButton(self,currentButtonIndex):
         if currentButtonIndex == 8: # current: EVENT
-            return 0 # next: CHARGE
+            currentButtonIndex = -1 # next: CHARGE
         if currentButtonIndex == 7: # current: COOL (last before EVENT)
             # check if the EVENT button is active, else move to the ON/OFF
             if aw.eventsbuttonflag:
-                return 8 # next: EVENT
-            return 0 # next: CHARGE
+                return 8 # next: EVENT (always enabled)
+            currentButtonIndex = -1 # next: CHARGE
         # we check if the next button is visible, else we recurse (the index of buttonvisibility starts from 0:CHARGE and leads to 7:COOL)
         if aw.qmc.buttonvisibility[currentButtonIndex + 1] and self.keyboardButtonList[currentButtonIndex + 1].isEnabled():
             return currentButtonIndex + 1
+        if not any(aw.qmc.buttonvisibility) and not aw.eventsbuttonflag: # prevent infinit loop if all buttons are hidden
+            return 8 # EVENT
         return self.nextActiveButton(currentButtonIndex + 1)
 
     def previousActiveButton(self,currentButtonIndex):
@@ -24820,6 +24822,8 @@ class ApplicationWindow(QMainWindow):
         # we check if the previous button is visible, else we recurse (the index of buttonvisibility starts from 0:CHARGE and leads to 7:COOL)
         if aw.qmc.buttonvisibility[currentButtonIndex - 1] and self.keyboardButtonList[currentButtonIndex - 1].isEnabled():
             return currentButtonIndex - 1
+        if not any(aw.qmc.buttonvisibility) and not aw.eventsbuttonflag: # prevent infinit loop if all buttons are hidden
+            return 8 # EVENT
         return self.previousActiveButton(currentButtonIndex - 1)
 
     def resetKeyboardButtonMarks(self):
@@ -24869,7 +24873,7 @@ class ApplicationWindow(QMainWindow):
                         aw.moveKbutton("right")
                         if aw.keyboardmoveindex == this_index:
                             break
-                    aw.moveKbutton("right") # now to the next
+                aw.moveKbutton("right") # now to the next
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 

@@ -27,6 +27,7 @@ import plus.config  # @UnusedImport
 import plus.util
 import plus.stock
 import plus.controller
+import plus.queue
 
 #from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import deltaLabelUTF8, appFrozen, stringfromseconds,stringtoseconds, toInt, toFloat, abbrevString
@@ -4862,6 +4863,12 @@ class editGraphDlg(ArtisanResizeablDialog):
         
         if not self.aw.qmc.flagon:
             self.aw.sendmessage(QApplication.translate("Message","Roast properties updated but profile not saved to disk"))
+        # if recording, dirty and CHARGE and DROP set we send changes to artisan.plus
+        if self.aw.qmc.flagstart and self.aw.qmc.safesaveflag and self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6] > 0:
+            try:
+                plus.queue.addRoast()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
         self.close()
     
     def getMeasuredvalues(self,title,func_updatefields,fields,loadEnergy,func_updateduration, durationfield, duration):
