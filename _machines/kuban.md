@@ -11,14 +11,14 @@ sidebar:
   nav: "machines"
 ---
 * __Producer:__ [Kuban](https://kubancoffeeroasters.com/){:target="_blank"}, Turkey
-* __Machines:__ Kuban Supreme
-* __Connection:__ Siemens S7 via the network
+* __Machines:__ Kuban Supreme (Automatic and Manual)
+* __Connection:__ Siemens S7 via the network or MODBUS RTU via USB
 * __Features:__
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
-  - logging and control of drum speed, fan speed, burner power and mixer speed
+  - additional the Supreme Automatic allows logging and control of drum speed, fan speed, burner power and mixer speed
  
  
-### Setup
+### Setup Supreme Automatic
 
 The computer running Artisan must be on the same IP network as the roaster. The default IP address of the roaster is 192.168.0.5. Configure your computer to use a static IP address in the range of the roaster (192.168.0.x) but with x different from that of the roaster (eg. 192.168.0.42). Choose 255.255.255.0 as subnet mask. 
  
