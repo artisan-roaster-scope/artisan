@@ -15912,6 +15912,8 @@ class SampleThread(QThread):
                 if aw.qmc.samplingSemaphore.available() < 1:
                     aw.qmc.samplingSemaphore.release(1)
                 self.sample_processingSignal.emit(local_flagstart, temp1_readings, temp2_readings, timex_readings)
+        else:
+            _log.debug("sample() timeout")
 
     # libtime.sleep is accurate only up to 0-5ms
     # using a hyprid approach using sleep() and busy-wait based on the time.perf_counter()
@@ -29286,7 +29288,7 @@ class ApplicationWindow(QMainWindow):
                 # the neverUpdateBatchCounter flag is never changed on loading a settings file!
                 settings.beginGroup("Batch")
                 if settings.contains("neverUpdateBatchCounter"):
-                    aw.qmc.neverUpdateBatchCounter = toInt(settings.value("neverUpdateBatchCounter",aw.qmc.neverUpdateBatchCounter))
+                    aw.qmc.neverUpdateBatchCounter = toBool(settings.value("neverUpdateBatchCounter",aw.qmc.neverUpdateBatchCounter))
                 settings.endGroup()
 
             if filename is None and settings.contains("fullscreen"):

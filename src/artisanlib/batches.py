@@ -126,7 +126,7 @@ class batchDlg(ArtisanDialog):
         else:
             self.aw.qmc.batchcounter = -1
             self.aw.qmc.batchsequence = 1
-        self.aw.qmc.neverUpdateBatchCounter = self.neverOverwriteCheckbox.isChecked()
+        self.aw.qmc.neverUpdateBatchCounter = bool(self.neverOverwriteCheckbox.isChecked())
         self.aw.closeEventSettings()
         self.close()
     

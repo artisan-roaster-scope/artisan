@@ -2,7 +2,7 @@
 Delay=1000
 Oversampling=false
 BackgroundAlpha=0.1
-roastertype_setup=Kuban Supreme
+roastertype_setup=Kuban Supreme Automatic
 
 [ArduinoPID]
 dutyMax=100
