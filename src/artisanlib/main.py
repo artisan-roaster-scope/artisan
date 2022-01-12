@@ -24904,9 +24904,6 @@ class ApplicationWindow(QMainWindow):
                     button_is_flat = self.keyboardButtonList[self.keyboardmoveindex].isFlat()
                     self.keyboardmove[self.keyboardmoveindex]()   #apply button command
                     #behaviour rules after pressing a button
-                    #if less than EVENT jump forward to the right one automatically
-                    if not button_is_flat and self.keyboardmoveindex < 8:
-                        self.moveKbutton("right")
                     self.lastkeyboardcmd = now
                     self.releaseminieditor()
                 else: # we ignore this event
