@@ -9687,6 +9687,7 @@ class tgraphcanvas(FigureCanvas):
                             roastoftheday_segments.append('nd')
                         elif aw.qmc.roastbatchpos == 1:
                             roastoftheday_segments.append('st')
+                        statstr_segments.append(f"{roastoftheday_segments[0]}{roastoftheday_segments[1]}")
                     else:
                         statstr_segments.append(f"\n#{aw.qmc.roastbatchpos}")
                     statstr_segments += [" ", QApplication.translate("AddlInfo", "Roast of the Day")]
