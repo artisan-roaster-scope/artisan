@@ -3026,9 +3026,6 @@ class EventsDlg(ArtisanResizeablDialog):
                 # update minieditor event type ComboBox
                 self.aw.etypeComboBox.clear()
                 self.aw.etypeComboBox.addItems(self.aw.qmc.etypes)
-                #update mini editor
-                self.aw.etypeComboBox.clear()
-                self.aw.etypeComboBox.addItems(self.aw.qmc.etypes)
                 #update autoCharge/Drop flag
                 self.aw.qmc.autoChargeFlag = self.autoCharge.isChecked()
                 self.aw.qmc.autoDropFlag = self.autoDrop.isChecked()

@@ -24702,6 +24702,13 @@ class ApplicationWindow(QMainWindow):
                 elif k == 88:                     #letter X (readings)
                     if not app.artisanviewerMode:
                         self.toggleReadings()
+                elif k == 89:                     #letter Y (minieditor)
+                    if self.qmc.flagstart:
+                        if self.minieventsflag:
+                            self.minieventsflag = 0
+                        else: 
+                            self.minieventsflag = 1
+                        self.update_minieventline_visibility()
                 elif k == 83:                     #letter S (sliders)
                     if not app.artisanviewerMode:
                         self.toggleSliders()
@@ -24901,7 +24908,7 @@ class ApplicationWindow(QMainWindow):
             if kcommand == "space":
                 now = libtime.perf_counter()
                 if self.lastkeyboardcmd == 0 or (now > self.lastkeyboardcmd + 1): # accept SPACE keyboard cmds only every 1sec.
-                    button_is_flat = self.keyboardButtonList[self.keyboardmoveindex].isFlat()
+#                    button_is_flat = self.keyboardButtonList[self.keyboardmoveindex].isFlat()
                     self.keyboardmove[self.keyboardmoveindex]()   #apply button command
                     #behaviour rules after pressing a button
                     self.lastkeyboardcmd = now
