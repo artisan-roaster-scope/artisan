@@ -26,6 +26,7 @@ def content():
     tbl_KeyboardShortcuts.add_row(['u',QApplication.translate('HelpDlg','Toggle LCD cursor (off/profile/template)')])
     tbl_KeyboardShortcuts.add_row(['c',QApplication.translate('HelpDlg','Shows/Hides Controls')])
     tbl_KeyboardShortcuts.add_row(['x',QApplication.translate('HelpDlg','Shows/Hides LCD Readings')])
+    tbl_KeyboardShortcuts.add_row(['y',QApplication.translate('HelpDlg','Shows/Hides Mini Event editor (on recording)')])
     tbl_KeyboardShortcuts.add_row(['m',QApplication.translate('HelpDlg','Shows/Hides Event Buttons')])
     tbl_KeyboardShortcuts.add_row(['b',QApplication.translate('HelpDlg','Shows/Hides Extra Event Buttons')])
     tbl_KeyboardShortcuts.add_row(['s',QApplication.translate('HelpDlg','Shows/Hides Event Sliders')])
