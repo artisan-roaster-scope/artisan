@@ -16,7 +16,7 @@ distro==1.5.0
 #
 gevent==1.5.0
 gevent-websocket==0.10.1
-numpy==1.18.4
+numpy==1.21.5 #1.18.4 conatians buffer overflow vulnerability
 scipy==1.3.3 # depends on numpy thus needs to be put after
 matplotlib==3.0.3 # 3.1.x requires Python 3.7, stretch comes with Python 3.5.3 only
 wquantiles==0.5 # depends on numpy thus we have to put it after numpy

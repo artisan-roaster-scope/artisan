@@ -11,7 +11,7 @@ py-cpuinfo==8.0.0 # used for proper CPU arch detection running under Rosetta2
 ######
 # packages that differ per platform:
 #
-gevent==2.12.0 #21.8.0 # 1.5.0 is not compatible with Python 3.8
+gevent==21.12.0 #21.8.0 # 1.5.0 is not compatible with Python 3.8
 gevent-websocket==0.10.1
 numpy==1.22.0 #1.21.4 # 1.16.2 fails on TravisCI; py2app fails with 1.16.5, 1.17.0-2
 scipy==1.7.3 #1.7.2  # depends on numpy thus we have to put it after numpy	
