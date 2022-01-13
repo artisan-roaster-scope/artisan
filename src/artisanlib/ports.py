@@ -486,7 +486,7 @@ class comportDlg(ArtisanResizeablDialog):
         ##########################    TAB 3 WIDGETS   MODBUS
         modbus_comportlabel = QLabel(QApplication.translate("Label", "Comm Port"))
         self.modbus_comportEdit = PortComboBox(selection = self.aw.modbus.comport)
-        self.modbus_comportEdit.setFixedWidth(150)
+#        self.modbus_comportEdit.setFixedWidth(120)
         self.modbus_comportEdit.activated.connect(self.portComboBoxIndexChanged)
         modbus_comportlabel.setBuddy(self.modbus_comportEdit)
         modbus_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate"))
@@ -611,13 +611,13 @@ class comportDlg(ArtisanResizeablDialog):
         # host (IP or hostname)
         modbus_hostlabel = QLabel(QApplication.translate("Label", "Host"))
         self.modbus_hostEdit = QLineEdit(str(self.aw.modbus.host))
-        self.modbus_hostEdit.setFixedWidth(120)
+        self.modbus_hostEdit.setFixedWidth(100)
         self.modbus_hostEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         # port (default 502)
         modbus_portlabel = QLabel(QApplication.translate("Label", "Port"))
         self.modbus_portEdit = QLineEdit(str(self.aw.modbus.port))
         self.modbus_portEdit.setValidator(QIntValidator(1,65535,self.modbus_portEdit))
-        self.modbus_portEdit.setFixedWidth(60)
+        self.modbus_portEdit.setFixedWidth(50)
         self.modbus_portEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         
         # modbus external PID conf
@@ -891,8 +891,8 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_grid.addWidget(self.modbus_stopbitsComboBox,4,1)
         modbus_grid.addWidget(modbus_timeoutlabel,5,0,Qt.AlignmentFlag.AlignRight)
         modbus_grid.addWidget(self.modbus_timeoutEdit,5,1)
-        modbus_grid.setContentsMargins(5,5,5,5)
-        modbus_grid.setSpacing(7)
+        modbus_grid.setContentsMargins(3,3,3,3)
+        modbus_grid.setSpacing(5)
         modbus_gridV = QVBoxLayout()
         modbus_gridV.addStretch()
         modbus_gridV.addLayout(modbus_grid)
@@ -915,6 +915,9 @@ class comportDlg(ArtisanResizeablDialog):
             modbus_input_grid.addWidget(self.modbus_inputDivs[i],4,i+1)
             modbus_input_grid.addWidget(self.modbus_inputModes[i],5,i+1)
             modbus_input_grid.addWidget(self.modbus_inputDecodes[i],6,i+1,Qt.AlignmentFlag.AlignCenter)
+            
+        modbus_input_grid.setContentsMargins(0,0,0,0)
+        modbus_input_grid.setSpacing(2)
         
         modbus_gridVLayout = QHBoxLayout()
         modbus_gridVLayout.addLayout(modbus_gridV)
@@ -950,6 +953,7 @@ class comportDlg(ArtisanResizeablDialog):
         tab3Layout = QVBoxLayout()
         tab3Layout.addLayout(modbus_gridVLayout)
         tab3Layout.addWidget(modbus_pidgroup)
+        tab3Layout.addStretch()
         tab3Layout.addLayout(modbus_setup)
         tab3Layout.addStretch()
         tab3Layout.setContentsMargins(0,0,0,0)

@@ -1460,12 +1460,15 @@ class tgraphcanvas(FigureCanvas):
         self.title = QApplication.translate("Scope Title", "Roaster Scope")
         self.title_show_always = False
         self.ambientTemp = 0.
+        self.ambientTemp_sampled = 0. # keeps the measured ambientTemp over a restart
         self.ambientTempSource = 0 # indicates the temperature curve that is used to automatically fill the ambient temperature on DROP
 #                                  # 0 : None; 1 : ET, 2 : BT, 3 : 0xT1, 4 : 0xT2,
         self.ambient_temperature_device = 0
         self.ambient_pressure = 0.
+        self.ambient_pressure_sampled = 0. # keeps the measured ambientTemp over a restart
         self.ambient_pressure_device = 0
         self.ambient_humidity = 0.
+        self.ambient_humidity_sampled = 0. # keeps the measured ambientTemp over a restart
         self.ambient_humidity_device = 0
         self.elevation = 0
 
@@ -5502,7 +5505,14 @@ class tgraphcanvas(FigureCanvas):
                         mathdictionary[v] = 0
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
-
+            
+            try:
+                mathdictionary["aTMP"] = self.ambientTemp
+                mathdictionary["aHUM"] = self.ambient_humidity
+                mathdictionary["aPRE"] = self.ambient_pressure
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+            
             # prediction of the time to DRY and FCs before the event
             # this evaluates to None before TP and 0 after the event
             try:
@@ -6415,9 +6425,10 @@ class tgraphcanvas(FigureCanvas):
                 self.volume = [0,0,self.volume[2]]
                 self.density = [0,self.density[1],1,self.density[3]]
                 self.density_roasted = [0,self.density_roasted[1],1,self.density_roasted[3]]
-                self.ambientTemp = 0.
-                self.ambient_humidity = 0.
-                self.ambient_pressure = 0.
+                # we reset ambient values to the last sampled readings in this session
+                self.ambientTemp = self.ambientTemp_sampled
+                self.ambient_humidity = self.ambient_humidity_sampled
+                self.ambient_pressure = self.ambient_pressure_sampled
                 self.beansize = 0.
                 self.beansize_min = 0
                 self.beansize_max = 0
@@ -10901,6 +10912,7 @@ class tgraphcanvas(FigureCanvas):
             # set and report
             if humidity is not None:
                 self.ambient_humidity = aw.float2float(humidity,1)
+                self.ambient_humidity_sampled = self.ambient_humidity
                 aw.sendmessage(QApplication.translate("Message","Humidity: {}%").format(self.ambient_humidity))
                 libtime.sleep(1)
 
@@ -10908,11 +10920,13 @@ class tgraphcanvas(FigureCanvas):
                 if self.mode == "F":
                     temp = fromCtoF(temp)
                 self.ambientTemp = aw.float2float(temp,1)
+                self.ambientTemp_sampled = self.ambientTemp
                 aw.sendmessage(QApplication.translate("Message","Temperature: {}{}").format(self.ambientTemp,self.mode))
                 libtime.sleep(1)
 
             if pressure is not None:
                 self.ambient_pressure = aw.float2float(pressure,1)
+                self.ambient_pressure_sampled = self.ambient_pressure
                 aw.sendmessage(QApplication.translate("Message","Pressure: {}hPa").format(self.ambient_pressure))
         except Exception as e:
             _log.exception(e)
