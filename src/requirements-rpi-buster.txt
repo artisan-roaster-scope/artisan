@@ -14,9 +14,9 @@ distro==1.6.0 #1.5.0
 ######
 # packages that differ per platform:
 #
-gevent==21.8.0 #21.1.2
+gevent==21.12.0 #21.8.0
 gevent-websocket==0.10.1
-numpy==1.21.4 # 1.21.3
+numpy==1.22.0 #1.21.4
 scipy==1.7.3 # 1.7.2 # depends on numpy thus needs to be put after
 matplotlib==3.5.1 # 3.5.0 # 3.4.1 requires pyinstaller > 4.2 # 3.1.x requires Python 3.7, stretch comes with Python 3.5.3 only
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
@@ -24,10 +24,10 @@ colorspacious==1.1.2 # depends on numpy thus needs to be put after
 openpyxl==3.0.9 # 3.0.7
 #PyQt 5.11.3 is preinstalled
 # what about 
-pyinstaller==4.7 #4.4
+pyinstaller==4.8 #4.4
 cffi==1.14.4
-cryptography==3.4.7 #3.3.2
-keyring==23.4.0 # 23.2.1 # versions beyond 23.0.1 require importlib_metadata >=v3.6 (RPi buster comes with v2.0)
+cryptography==3.4.8 #3.4.7 #3.3.2
+keyring==23.5.0 #23.4.0 # versions beyond 23.0.1 require importlib_metadata >=v3.6 (RPi buster comes with v2.0)
 SecretStorage==3.3.1 # 3.3.0
 lxml==4.7.1 #4.6.5 #4.6.4
 prettytable==0.7.2 # >1.0.0 fail to be packed and the monkey patch in main.py does not help here due the old python version

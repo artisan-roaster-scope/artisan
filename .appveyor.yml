@@ -91,7 +91,7 @@ for:
     PYTHON_PATH: "C:\\Python310-x64"
     QT_PATH: "C:\\qt\\6.2\\msvc2019_64"
     PYUIC: "pyuic6.exe"
-    PYINSTALLER_VER: "4.7"
+    PYINSTALLER_VER: "4.8"
     ARTISAN_LEGACY: "False"
     ARTISAN_SPEC: "win"
     VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"
@@ -133,7 +133,7 @@ for:
 
   environment:
     ARTISAN_OS: osx
-    PYTHON: ~/venv3.9
+    PYTHON: ~/venv3.10
     language: generic
     HOMEBREW_NO_INSTALL_CLEANUP: 1
     HOMEBREW_NO_ANALYTICS: 1

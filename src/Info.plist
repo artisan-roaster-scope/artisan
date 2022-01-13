@@ -146,30 +146,30 @@
 	<string>10.15</string>
 	<key>LSMultipleInstancesProhibited</key>
 	<string>false</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Artisan wants to access bluetooth</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Artisan wants to access bluetooth</string>
 	<key>NSDesktopFolderUsageDescription</key>
 	<string>Artisan wants to access the Desktop folder</string>
 	<key>NSDocumentsFolderUsageDescription</key>
 	<string>Artisan wants to access the Documents folder</string>
 	<key>NSDownloadsFolderUsageDescription</key>
 	<string>Artisan wants to access the Downloads folder</string>
-	<key>NSNetworkVolumesUsageDescription</key>
-	<string>Artisan wants to access network volumes</string>
-	<key>NSRemovableVolumesUsageDescription</key>
-	<string>Artisan wants to access removable volumes</string>
 	<key>NSFileProviderDomainUsageDescription</key>
 	<string>Artisan wants to access files from a provider</string>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Artisan wants to access bluetooth</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Artisan wants to access bluetooth</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>GNU General Public License (GPL)</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
+	<key>NSNetworkVolumesUsageDescription</key>
+	<string>Artisan wants to access network volumes</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSRemovableVolumesUsageDescription</key>
+	<string>Artisan wants to access removable volumes</string>
 	<key>NSSupportsAutomaticGraphicsSwitching</key>
 	<true/>
 </dict>
