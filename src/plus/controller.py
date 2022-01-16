@@ -46,14 +46,8 @@ _log: Final = logging.getLogger(__name__)
 
 connect_semaphore = QSemaphore(1)
 
-
 def is_connected() -> bool:
-    try:
-        connect_semaphore.acquire(1)
-        return config.connected
-    finally:
-        if connect_semaphore.available() < 1:
-            connect_semaphore.release(1)
+    return config.connected
 
 
 # artisan.plus is on as soon as an account id has been established
@@ -119,6 +113,7 @@ def toggle(app_window):
 
 
 # if clear_on_failure is set, credentials are removed if connect fails
+# NOTE: authentify might be called from outside the GUI thread (interactive must be False in this case!)
 def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
     if not is_connected():
         _log.info(
@@ -134,7 +129,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                     import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
                 else:
                     import keyring.backends.SecretService  # @UnusedImport
-                import keyring  # @Reimport # imported last to make py2app work            
+                import keyring  # @Reimport # imported last to make py2app work
             
                 connection.setKeyring()
                 account = config.app_window.plus_account
@@ -300,7 +295,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                 connect_semaphore.release(1)
         config.app_window.updatePlusStatusSignal.emit()  # @UndefinedVariable
         if interactive and is_connected():
-            stock.update()
+            QTimer.singleShot(2500, stock.update)
 
 
 # show a dialog to have the user confirm the disconnect action

@@ -694,7 +694,7 @@ def fetchServerUpdate(uuid: str, file=None):
         elif status == 404:
             try:
                 data = res.json()
-                connection.updateLimits(data) # update account limits
+                util.updateLimitsFromResponse(data) # update account limits
                 if "success" in data and not data["success"]:
                     _log.debug(
                         ("fetchServerUpdate() ->"
@@ -716,7 +716,7 @@ def fetchServerUpdate(uuid: str, file=None):
                 "fetchServerUpdate() -> 200 data on server is newer"
             )
             data = res.json()
-            connection.updateLimits(data) # update account limits
+            util.updateLimitsFromResponse(data) # update account limits
             if "result" in data:
                 r = data["result"]
                 _log.debug("-> fetch: %s", r)

@@ -425,15 +425,8 @@ class modbusport():
                                     register,
                                     code,
                                     len(res.registers))
+                            _log.debug(ser_str)
                             self.aw.addserial(ser_str)
-                        _log.debug("readActiveRegisters : %s ms => %s:%s || Slave = %s || Register = %s || Code == %s || Rx# == %s",
-                            self.formatMS(tx,time.time()),
-                            self.host,
-                            self.port,
-                            slave,
-                            register,
-                            code,
-                            len(res.registers))
                         
                         if res is not None:
                             if self.commError: # we clear the previous error and send a message

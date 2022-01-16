@@ -70,7 +70,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 import logging.config
 from yaml import safe_load as yaml_load
-from typing import Final, Optional
+from typing import Final, Optional, List
 
 from functools import reduce as freduce
 
@@ -602,6 +602,7 @@ import plus.sync
 import plus.queue
 import plus.controller
 import plus.register
+import plus.notifications
 
 #######################################################################################
 #################### Ambient Data Collection  #########################################
@@ -2416,21 +2417,21 @@ class tgraphcanvas(FigureCanvas):
 
         ## working variables (stored in .alog profiles):
         # Burners
-        self.loadlabels = self.loadlabels_setup                  # burner labels
-        self.loadratings = self.loadratings_setup                # in ratingunits
-        self.ratingunits = self.ratingunits_setup                # index in list self.heatunits 
-        self.sourcetypes = self.sourcetypes_setup                # index in list self.sourcetypes
-        self.load_etypes = self.load_etypes_setup                # index of the etype that is the gas/burner setting
-        self.presssure_percents = self.presssure_percents_setup  # event value in pressure percent
-        self.loadevent_zeropcts = self.loadevent_zeropcts_setup  # event value corresponding to 0 percent
-        self.loadevent_hundpcts = self.loadevent_hundpcts_setup  # event value corresponding to 100 percent
+        self.loadlabels = self.loadlabels_setup[:]               # burner labels
+        self.loadratings = self.loadratings_setup[:]             # in ratingunits
+        self.ratingunits = self.ratingunits_setup[:]             # index in list self.heatunits 
+        self.sourcetypes = self.sourcetypes_setup[:]             # index in list self.sourcetypes
+        self.load_etypes = self.load_etypes_setup[:]             # index of the etype that is the gas/burner setting
+        self.presssure_percents = self.presssure_percents_setup[:]  # event value in pressure percent
+        self.loadevent_zeropcts = self.loadevent_zeropcts_setup[:]  # event value corresponding to 0 percent
+        self.loadevent_hundpcts = self.loadevent_hundpcts_setup[:]  # event value corresponding to 100 percent
         # Protocol
-        self.preheatDuration = self.preheatDuration_setup            # length of preheat in seconds
-        self.preheatenergies = self.preheatenergies_setup            # rating of the preheat burner
-        self.betweenbatchDuration = self.betweenbatchDuration_setup  # length of bbp in seconds
-        self.betweenbatchenergies = self.betweenbatchenergies_setup  # rating of the between batch burner
-        self.coolingDuration = self.coolingDuration_setup            # length of cooling in seconds
-        self.coolingenergies = self.coolingenergies_setup            # rating of the cooling burner
+        self.preheatDuration = self.preheatDuration_setup               # length of preheat in seconds
+        self.preheatenergies = self.preheatenergies_setup[:]            # rating of the preheat burner
+        self.betweenbatchDuration = self.betweenbatchDuration_setup     # length of bbp in seconds
+        self.betweenbatchenergies = self.betweenbatchenergies_setup[:]  # rating of the between batch burner
+        self.coolingDuration = self.coolingDuration_setup               # length of cooling in seconds
+        self.coolingenergies = self.coolingenergies_setup[:]            # rating of the cooling burner
         self.betweenbatch_after_preheat = self.betweenbatch_after_preheat_setup # True if after preheat a BBP is done
         self.electricEnergyMix = self.electricEnergyMix_setup        # the amount of renewable electric energy in the energy mix in %
 
@@ -16061,8 +16062,8 @@ class ApplicationWindow(QMainWindow):
     fireslideractionSignal = pyqtSignal(int)
     moveButtonSignal = pyqtSignal(str)
     sendnotificationMessageSignal = pyqtSignal(str,str,NotificationType)
-    updatePlusLimitsSignal = pyqtSignal(float, float)
-    updatePlusPaidUntilSignal = pyqtSignal(str)
+    updateSubscriptionSignal = pyqtSignal(str)
+    updateLimitsSignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int
     
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
@@ -18480,8 +18481,8 @@ class ApplicationWindow(QMainWindow):
         self.fireslideractionSignal.connect(self.fireslideraction)
         self.moveButtonSignal.connect(self.moveKbutton)
         self.sendnotificationMessageSignal.connect(self.sendNotificationMessage)
-        self.updatePlusLimitsSignal.connect(self.updatePlusLimits)
-        self.updatePlusPaidUntilSignal.connect(self.updatePlusPaidUntil)
+        self.updateSubscriptionSignal.connect(self.updateSubscription)
+        self.updateLimitsSignal.connect(self.updateLimits)
         
         self.notificationManager = None
         if not app.artisanviewerMode:
@@ -18504,25 +18505,39 @@ class ApplicationWindow(QMainWindow):
             self.releaseminieditor()
             self.releaseSliderFocus()
 
+    def updateSubscription(self, subscription: str):
+        _log.debug("updateSubscription(%s)", subscription)
+        if subscription:
+            self.plus_subscription = subscription
+        else:
+            self.plus_subscription = None
+
     # if any of the parameters is <0 the corresponding variable is not updated
-    @pyqtSlot(float, float)
     def updatePlusLimits(self, rlimit: float, used: float):
-        _log.debug("updatePlusLimits -> %s, %s", rlimit, used)
+        _log.debug("updatePlusLimits(%s, %s)", rlimit, used)
         if rlimit > -1:
             self.plus_rlimit = rlimit
         if used > -1:
             self.plus_used = used
     
-    @pyqtSlot(str)
+    # if pu is "" the corresponding variable is not updated
     def updatePlusPaidUntil(self, pu: str):
-        _log.debug("updatePlusPaidUntil -> %s", pu)
+        _log.debug("updatePlusPaidUntil(%s)", pu)
         try:
-            if pu is not None:
+            if pu != "":
                 self.plus_paidUntil = (
                     dateutil.parser.parse(pu)
                 )
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
+
+    # if rlimit = -1 or rused = -1 or pu = "", no update information is available and the state is not updated
+    @pyqtSlot(float,float,str,int,list)
+    def updateLimits(self, rlimit:float, rused:float, pu:str, notifications:int, machines: List[str]):
+        _log.debug("updateLimits(%s,%s,%s,%s,%s)", rlimit, rused, pu, notifications, machines)
+        self.updatePlusLimits(rlimit, rused)
+        self.updatePlusPaidUntil(pu)
+        plus.notifications.updateNotifications(notifications, machines)
 
     @pyqtSlot(str,str,NotificationType)
     def sendNotificationMessage(self, title, message, notification_type):
@@ -18717,8 +18732,8 @@ class ApplicationWindow(QMainWindow):
         
     def donate(self):
         try:
-            everytime = 6*30*24*60*60 # 6 month in seconds
-            everystarts = 50
+            everytime = 4*30*24*60*60 # 3 month in seconds
+            everystarts = 25
             starts = None
             lastdonationpopup = None
             settings = QSettings()
@@ -18728,8 +18743,10 @@ class ApplicationWindow(QMainWindow):
                 lastdonationpopup = settings.value("lastdonationpopup")
             now = int(libtime.time())
             if not(settings.status() == QSettings.Status.NoError and lastdonationpopup is not None and starts is not None and (now >= lastdonationpopup > now-everytime) and 0 <= starts < everystarts): 
-                message = QApplication.translate("Message","Please support Artisan with your donation!")
+                message = QApplication.translate("Message","Please support Artisan with your donation")
                 message += '<br><br><a href="{0}">{0}</a>'.format("https://artisan-scope.org/donate/")
+                message += '<br><br>or by subscribing to'
+                message += '<br><br><a href="{0}">{0}</a>'.format("https://artisan.plus")
                 donate_message_box = QMessageBox(self)
                 donate_message_box.setText(message)    
                 donate_message_box.setIcon(QMessageBox.Icon.Information)
@@ -30296,6 +30313,19 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("time_grid"):
                 self.qmc.time_grid = bool(toBool(settings.value("time_grid",self.qmc.time_grid)))
             settings.endGroup()
+
+            # only set in (some) predefined machine setups:
+            if filename and machine:
+                settings.beginGroup("MachineSetup")
+                if settings.contains("capacity"):
+                    self.qmc.roastersize_setup = toFloat(settings.value("capacity",self.qmc.roastersize_setup))
+                else:
+                    self.qmc.roastersize_setup = 0
+                if settings.contains("heating_type"):
+                    self.qmc.roasterheating_setup = toInt(settings.value("heating_type",self.qmc.roasterheating_setup))
+                else:
+                    self.qmc.roasterheating_setup = 0
+                settings.endGroup()
             
             if settings.contains("organization_setup"):
                 self.qmc.organization_setup = toString(settings.value("organization_setup",self.qmc.organization_setup))
@@ -30350,17 +30380,6 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             self.qmc.restoreEnergyLoadDefaults()
             self.qmc.restoreEnergyProtocolDefaults()
-            
-            settings.beginGroup("MachineSetup")
-            if settings.contains("capacity"):
-                self.qmc.roastersize_setup = toFloat(settings.value("capacity",self.qmc.roastersize_setup))
-            else:
-                self.qmc.roastersize_setup = 0
-            if settings.contains("heating_type"):
-                self.qmc.roasterheating_setup = toInt(settings.value("heating_type",self.qmc.roasterheating_setup))
-            else:
-                self.qmc.roasterheating_setup = 0
-            settings.endGroup()
             
             settings.beginGroup("EnergyDefaults")
             if settings.contains("ratings"):
@@ -32019,6 +32038,9 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue("lastLoadedBackground",aw.qmc.backgroundpath)
             else:
                 settings.setValue("lastLoadedBackground","")
+            # on exported settings we add the current timestamp
+            if filename:
+                settings.setValue("timestamp", QDateTime.currentDateTime().toString("yyyy-MM-ddThh:mm:ss"))
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)

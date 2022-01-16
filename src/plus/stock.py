@@ -24,19 +24,18 @@
 
 try:
     #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import QSemaphore, QObject, QThread, pyqtSlot, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:
     #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QSemaphore, QObject, QThread, pyqtSlot, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import decodeLocal, encodeLocal, getDirectory
-from plus import config, connection, controller
+from plus import config, connection, controller, util
 from typing import Final
 import copy
 import json
-import threading
 import time
 import logging
 
@@ -62,63 +61,87 @@ stock_epsilon = 0.01
 # updates the stock cache
 
 
-def update() -> None:
-    update_thread = threading.Thread(target=update_blocking)
-    update_thread.start()
+####### Stock Update Thread
 
+worker = None
+worker_thread = None
 
-def update_blocking() -> None:
-    _log.debug("update_blocking()")
-    if stock is None:
-        load()
-    try:
-        stock_semaphore.acquire(1)
-        fetch_enabled = config.connected and (
-            stock is None
-            or (
-                "retrieved" in stock
-                and (time.time() - stock["retrieved"])
-                > config.stock_cache_expiration
+class Worker(QObject):
+    startSignal = pyqtSignal()
+    replySignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int, machines:List[str]
+
+    @pyqtSlot()
+    def update_blocking(self) -> None:
+        _log.debug("update_blocking()")
+        if stock is None:
+            load()
+        fetch_enabled = False
+        try:
+            stock_semaphore.acquire(1)
+            fetch_enabled = config.connected and (
+                stock is None
+                or (
+                    "retrieved" in stock
+                    and (time.time() - stock["retrieved"])
+                    > config.stock_cache_expiration
+                )
             )
-        )
-    finally:
-        if stock_semaphore.available() < 1:
-            stock_semaphore.release(1)
-    if fetch_enabled:
-        res = fetch()
-        if res:
-            save()
-    else:
-        _log.debug("-> stock valid")
+        finally:
+            if stock_semaphore.available() < 1:
+                stock_semaphore.release(1)
+        if fetch_enabled:
+            res = self.fetch()
+            if res:
+                save()
+        else:
+            _log.debug("-> stock valid")
+
+    # requests stock data from server and fills the stock cache
+    def fetch(self) -> bool:
+        global stock  # pylint: disable=global-statement
+        _log.info("fetch()")
+        try:
+            # fetch from server
+            d = connection.getData(config.stock_url)
+            _log.debug("-> %s", d.status_code)
+            j = d.json()
+            if j:
+                rlimit,rused,pu,notifications,machines = util.extractAccountState(j)
+                self.replySignal.emit(rlimit,rused,pu,notifications,machines)
+            if "success" in j and j["success"] and "result" in j and j["result"]:
+                try:
+                    stock_semaphore.acquire(1)
+                    stock = j["result"]
+                    stock["retrieved"] = time.time()
+                    _log.debug("-> retrieved")
+    #                _log.debug("stock = %s", stock)
+                finally:
+                    if stock_semaphore.available() < 1:
+                        stock_semaphore.release(1)
+                controller.reconnected()
+                return True
+            return False
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+            controller.disconnect(remove_credentials=False, stop_queue=False)
+            return False
 
 
-# requests stock data from server and fills the stock cache
-def fetch() -> bool:
-    global stock  # pylint: disable=global-statement
-    _log.info("fetch()")
+def update() -> None:
+    _log.debug("update()")
+    global worker, worker_thread  # pylint: disable=global-statement
+
     try:
-        # fetch from server
-        d = connection.getData(config.stock_url)
-        _log.debug("-> %s", d.status_code)
-        j = d.json()
-        connection.updateLimits(j) # update account limits
-        if "success" in j and j["success"] and "result" in j and j["result"]:
-            try:
-                stock_semaphore.acquire(1)
-                stock = j["result"]
-                stock["retrieved"] = time.time()
-                _log.debug("-> retrieved")
-                _log.debug("stock = %s", stock)
-            finally:
-                if stock_semaphore.available() < 1:
-                    stock_semaphore.release(1)
-            controller.reconnected()
-            return True
-        return False
+        if worker_thread is None:
+            worker_thread = QThread()
+            worker_thread.start()
+            worker = Worker()
+            worker.moveToThread(worker_thread)
+            worker.startSignal.connect(worker.update_blocking)
+            worker.replySignal.connect(util.updateLimits)
+        worker.startSignal.emit()
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
-        controller.disconnect(remove_credentials=False, stop_queue=False)
-        return False
 
 
 ###################

@@ -24,19 +24,19 @@
 
 try:
     #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import QStandardPaths, QCoreApplication, QDir, QUrl # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import QStandardPaths, QCoreApplication, QDir, QUrl, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QDesktopServices # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:
     #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import QStandardPaths, QCoreApplication, QDir, QUrl # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QStandardPaths, QCoreApplication, QDir, QUrl, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QDesktopServices # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import decodeLocal
 from pathlib import Path
 from plus import config
-from typing import Optional, Final
+from typing import Optional, Final, List
 import datetime
 import dateutil.parser
 import logging
@@ -310,6 +310,50 @@ def getLanguage() -> str:
         # config.app_window might be still unbound
         pass
     return "en"
+
+
+# processing responses
+
+# if rlimit = -1 or rused = -1 or pu = "", no update information is available and the state is not updated
+@pyqtSlot(float,float,str,int,list)
+def updateLimits(rlimit:float, rused:float, pu:str, notifications:int, machines: List[str]):
+    _log.debug("util:updateLimits(%s,%s,%s,%s,%s)",rlimit,rused,pu,notifications, machines)
+    if config.app_window:
+        config.app_window.updateLimits(rlimit, rused, pu, notifications, machines)
+
+# takes the JSON response dict and returns the accont state as tuple
+# rlimit:float, rused:float, pu:str, notifications:int
+def extractAccountState(response: dict):
+    rlimit = -1
+    rused = -1
+    pu = ""
+    notifications = 0 # unqualified notifications
+    machines = [] # list of machine names with matching notifications
+    try:
+        if response:
+            if "ol" in response:
+                ol = response["ol"]
+                if "rlimit" in ol:
+                    rlimit = ol["rlimit"]
+                if "rused" in ol:
+                    rused = ol["rused"]
+            if "pu" in response:
+                pu = response["pu"]
+            if "notifications" in response:
+                notificationDict = response["notifications"]
+                if "unqualified" in notificationDict:
+                    notifications = notificationDict["unqualified"]
+                if "machines" in notificationDict:
+                    machines = notificationDict["machines"]
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
+    return rlimit, rused, pu, notifications, machines
+        
+@pyqtSlot(dict)
+def updateLimitsFromResponse(response: dict):
+    _log.debug("updateLimitsFromResponse")
+    rlimit,rused,pu,notifications,machines = extractAccountState(response)
+    updateLimits(rlimit,rused,pu,notifications,machines)
 
 
 # Open Web Links

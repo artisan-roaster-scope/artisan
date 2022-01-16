@@ -25,16 +25,16 @@
 
 try:
     #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import QCoreApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import QCoreApplication, QObject, QThread, pyqtSlot, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:
     #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import QCoreApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QCoreApplication, QObject, QThread, pyqtSlot, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import getDirectory
 from plus import config, util, roast, connection, sync, controller
-from typing import Any, Dict, Final
+from typing import Any, Dict, Final, List
 import threading
 import time
 import logging
@@ -52,20 +52,20 @@ queue = None # holdes the persistqueue.SQLiteQueue, initialized by start()
 #   data  : the data dictionary that will be send in the body as JSON
 #   verb  : the HTTP verb to be used (POST or PUT)
 
+worker = None
 worker_thread = None
 
 
-class Concur(threading.Thread):
+class Worker(QObject):
+    startSignal = pyqtSignal()
+    replySignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int, machines:List[str]
 
-    __slots__ = [ 'daemon', 'paused', 'state' ]
+    __slots__ = [ '_paused', '_state' ]
     
     def __init__(self):
-        threading.Thread.__init__(self)
-        self.daemon = (
-            True  # OK for main to exit even if instance is still running
-        )
-        self.paused = False  # start out non-paused
-        self.state = threading.Condition()
+        super().__init__()
+        self._paused = False  # start out non-paused
+        self._state = threading.Condition()
 
     @staticmethod
     def addSyncItem(item):
@@ -78,17 +78,17 @@ class Concur(threading.Thread):
             )
             config.app_window.updatePlusStatusSignal.emit()  # @UndefinedVariable
 
-    def run(self):
-        _log.debug("run()")
+    @pyqtSlot()
+    def task(self):
         from requests.exceptions import ConnectionError as RequestsConnectionError
         time.sleep(config.queue_start_delay)
         self.resume()  # unpause self
         item = None
         while True:
             time.sleep(config.queue_task_delay)
-            with self.state:
-                if self.paused:
-                    self.state.wait()  # block until notified
+            with self._state:
+                if self._paused:
+                    self._state.wait()  # block until notified
             _log.debug("-> qsize: %s", queue.qsize())
             _log.debug("looking for next item to be fetched")
             try:
@@ -131,6 +131,14 @@ class Concur(threading.Thread):
                             sr, h = roast.getSyncRecord()
                             if item["data"]["roast_id"] == sr["roast_id"]:
                                 sync.setSyncRecordHash(sync_record=sr, h=h)
+                            try:
+                                response = r.json()
+                                _log.debug("response: %s",response)
+                                if response:
+                                    rlimit,rused,pu,notifications, machines = util.extractAccountState(response)
+                                    self.replySignal.emit(rlimit,rused,pu,notifications,machines)
+                            except Exception as e:  # pylint: disable=broad-except
+                                _log.exception(e)
                         else:
                             # partial sync updates for roasts not registered
                             # for syncing are ignored
@@ -201,22 +209,29 @@ class Concur(threading.Thread):
                 item = None
                 _log.debug("-> task done")
                 _log.debug(
-                    "end of run:while paused=%s", self.paused
+                    "end of run:while paused=%s", self._paused
                 )
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
 
     def resume(self):
-        _log.info("resume()")
-        with self.state:
-            self.paused = False
-            self.state.notify()  # unblock self if waiting
+        _log.debug("resume()")
+        with self._state:
+            self._paused = False
+            self._state.notify()  # unblock self if waiting
 
     def pause(self):
-        _log.info("pause()")
-        with self.state:
-            self.paused = True  # make self block and wait
+        _log.debug("pause()")
+        with self._state:
+            self._paused = True  # make self block and wait
 
+# will be evaluated in GUI thread
+def processReply(rlimit:float, rused:float, pu:str, notifications:int, machines:List[str]):
+    try:
+#        _log.debug('thread id', threading.get_ident())
+        _log.debug("processReply(%s,%s,%s,%s,%s", rlimit, rused, pu, notifications, machines)
+    except Exception:  # pylint: disable=broad-except
+        pass
 
 def start():
     if app.artisanviewerMode:
@@ -225,7 +240,7 @@ def start():
         )
     else:
         global queue  # pylint: disable=global-statement
-        global worker_thread  # pylint: disable=global-statement
+        global worker, worker_thread  # pylint: disable=global-statement
         
         if queue is None:
             # we initialize the queue
@@ -240,21 +255,23 @@ def start():
         _log.info("start()")
         _log.debug("-> qsize: %s", queue.qsize())
         if worker_thread is None:
-            worker_thread = Concur()
-            worker_thread.setDaemon(
-                True
-            )  # a daemon thread is automatically killed on program exit
+            worker = Worker()
+            worker_thread = QThread()
             worker_thread.start()
+            worker.moveToThread(worker_thread)
+            worker.startSignal.connect(worker.task)
+            worker.replySignal.connect(util.updateLimits)
+#            app.aboutToQuit.connect(end)
+            worker.startSignal.emit()
         else:
-            worker_thread.resume()
+            worker.resume()
 
 
 # the queue worker thread cannot really be stopped, but we can pause it
 def stop():
     if not app.artisanviewerMode:
-        _log.info("stop()")
-        if worker_thread is not None:
-            worker_thread.pause()
+        if worker is not None:
+            worker.pause()
 
 
 # check if a full roast record (one with date) with roast_id is in the queue
