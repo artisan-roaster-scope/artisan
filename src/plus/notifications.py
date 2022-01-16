@@ -56,7 +56,7 @@ def updateNotifications(notifications: int, machines: List[str]):
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
 
-# fetches new notifications and returns them as list
+# fetches new notifications and forward them to the Artisan notification system
 # sidecondition: at this point all pending notifications are delivered and the "notification" count on the server can be assumed to be 0
 def retrieveNotifications():
     _log.debug("retrieveNotifications() before lock")
@@ -71,7 +71,7 @@ def retrieveNotifications():
                 else:
                     params = None
                 # fetch from server
-                d = connection.getData(config.notifications_url) #, params=params)
+                d = connection.getData(config.notifications_url, params=params)
                 _log.debug("-> %s", d.status_code)
                 res = d.json()
                 _log.debug("-> retrieved")
@@ -80,7 +80,7 @@ def retrieveNotifications():
                 
                 # TO BE DONE: process result in order (order by what?)                
                 # process new account state:
-                # TODO here we need to hand over the new notifications to the Artisan notification system
+                # here we need to hand over the new notifications to the Artisan notification system
                 
                 # NOTE: we do not updateLimitsFromResponse(res) here to avoid an infinit loop if the server does not reset the notifications counter. Further notifications will be retrieved on next request
         except Exception as e:  # pylint: disable=broad-except
