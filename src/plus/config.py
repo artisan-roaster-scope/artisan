@@ -43,8 +43,8 @@ uuid_tag: Final = "roastUUID"
 # Serivce URLs
 
 # # LOCAL SETUP
-# api_base_url         = "https://localhost:62602/api/v1"
-# web_base_url         = "https://localhost:8088"
+#api_base_url         = "https://localhost:62602/api/v1"
+#web_base_url         = "https://localhost:8088"
 
 # # CLOUD SETUP
 api_base_url: Final = "https://artisan.plus/api/v1"
@@ -57,10 +57,11 @@ reset_passwd_url: Final = web_base_url + "/resetPassword"
 auth_url: Final = api_base_url + "/accounts/users/authenticate"
 stock_url: Final = api_base_url + "/acoffees"
 roast_url: Final = api_base_url + "/aroast"
+notifications_url: Final = api_base_url + "/notifications"
 
 # Connection configurations
 
-# verify_ssl       = False
+#verify_ssl       = False
 verify_ssl: Final = True
 connect_timeout: Final = 2  # in seconds
 read_timeout: Final = 4  # in seconds

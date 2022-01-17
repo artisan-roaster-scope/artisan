@@ -39,7 +39,7 @@ import platform
 import logging
 import dateutil.parser
 
-from plus import config, account
+from plus import config, account, util
 
 _log: Final = logging.getLogger(__name__)
 
@@ -155,13 +155,6 @@ def setKeyring() -> None:
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
 
-
-# res is assumed to be a dict and the projection result to be a non-empty string or a number
-def extractUserInfo(res, attr: str, default):
-    if attr in res and ((isinstance(res[attr], str) and res[attr] != "") or (isinstance(res[attr],(int, float)))):
-        return res[attr]
-    return default
-
 # returns True on successful authentification
 # NOTE: authentify might be called from outside the GUI thread
 def authentify() -> bool:
@@ -201,7 +194,7 @@ def authentify() -> bool:
                 "email": config.app_window.plus_account,
                 "password": config.passwd,
             }  # @UndefinedVariable
-            r = postData(config.auth_url, data, False)
+            r = sendData(config.auth_url, data, "POST", False)
             _log.debug(
                 "-> authentifying reply status code: %s",
                 r.status_code,
@@ -219,10 +212,10 @@ def authentify() -> bool:
                     "-> authentified, token received"
                 )
                 # extract in user/account data
-                nickname = extractUserInfo(
+                nickname = util.extractInfo(
                     res["result"]["user"], "nickname", None
                 )
-                config.app_window.plus_language = extractUserInfo(
+                config.app_window.plus_language = util.extractInfo(
                     res["result"]["user"], "language", "en"
                 )
                 
@@ -232,11 +225,11 @@ def authentify() -> bool:
                 config.app_window.plus_used = 0
                 if "account" in res["result"]["user"]:
                     res_account = res["result"]["user"]["account"]
-                    subscription = extractUserInfo(
+                    subscription = util.extractInfo(
                         res_account, "subscription", ""
                     )
                     config.app_window.updateSubscriptionSignal.emit(subscription)
-                    paidUntil = extractUserInfo(
+                    paidUntil = util.extractInfo(
                         res_account, "paidUntil", ""
                     )
                     rlimit = -1
@@ -256,8 +249,8 @@ def authentify() -> bool:
                     if "notifications" in res:
                         notificationDict = res["notifications"]
                         if notificationDict:
-                            notifications = extractUserInfo(notificationDict, "unqualified", 0)
-                            machines = extractUserInfo(notificationDict, "machines", [])
+                            notifications = util.extractInfo(notificationDict, "unqualified", 0)
+                            machines = util.extractInfo(notificationDict, "machines", [])
                         try:
                             config.app_window.updateLimitsSignal.emit(rlimit,rused,paidUntil,notifications,machines)
                         except Exception as e:  # pylint: disable=broad-except
@@ -349,17 +342,6 @@ def getHeaders(
     return headers
 
 
-def sendData(url: str, data: Dict[Any, Any], verb: str) -> Any:
-    if verb == "POST":
-        return postData(url, data)
-    return putData(url, data)
-
-
-# TODO: implement! # pylint: disable=fixme
-def putData(url: str, data: Dict[Any, Any]) -> Any:
-    del url, data
-
-
 def getHeadersAndData(authorized: bool, compress: bool, jsondata: JSON):
     headers = getHeaders(authorized, decompress=compress)
     headers["Content-Type"] = "application/json"
@@ -372,25 +354,35 @@ def getHeadersAndData(authorized: bool, compress: bool, jsondata: JSON):
     return headers, postdata
 
 
-def postData(
+def sendData(
     url: str,
-    data,
+    data: Dict[Any, Any],
+    verb: str, # POST or PUT
     authorized: bool = True,
     compress: bool = config.compress_posts,
 ) -> Any:
     # don't log POST data as it might contain credentials!
-    _log.info("postData(%s,_data_,%s)", url, authorized)
+    _log.info("sendData(%s,_data_,%s,%s)", url, verb, authorized)
     jsondata = json.dumps(data).encode("utf8")
     _log.debug("-> size %s", len(jsondata))
     headers, postdata = getHeadersAndData(authorized, compress, jsondata)
     import requests  # @Reimport
-    r = requests.post(
-        url,
-        headers=headers,
-        data=postdata,
-        verify=config.verify_ssl,
-        timeout=(config.connect_timeout, config.read_timeout),
-    )
+    if verb == "POST":
+        r = requests.post(
+            url,
+            headers=headers,
+            data=postdata,
+            verify=config.verify_ssl,
+            timeout=(config.connect_timeout, config.read_timeout),
+        )
+    else:
+        r = requests.put(
+            url,
+            headers=headers,
+            data=postdata,
+            verify=config.verify_ssl,
+            timeout=(config.connect_timeout, config.read_timeout),
+        )
     _log.debug("-> status %s, time %s", r.status_code, r.elapsed.total_seconds())
     if authorized and r.status_code == 401:  # authorisation failed
         _log.debug("-> session token outdated (401)")
@@ -399,13 +391,22 @@ def postData(
             headers, postdata = getHeadersAndData(
                 authorized, compress, jsondata
             )  # recreate header with new token
-            r = requests.post(
-                url,
-                headers=headers,
-                data=postdata,
-                verify=config.verify_ssl,
-                timeout=(config.connect_timeout, config.read_timeout),
-            )
+            if verb == "POST":
+                r = requests.post(
+                    url,
+                    headers=headers,
+                    data=postdata,
+                    verify=config.verify_ssl,
+                    timeout=(config.connect_timeout, config.read_timeout),
+                )
+            else:
+                r = requests.put(
+                    url,
+                    headers=headers,
+                    data=postdata,
+                    verify=config.verify_ssl,
+                    timeout=(config.connect_timeout, config.read_timeout),
+                )
             _log.debug("-> status %s, time %s", r.status_code, r.elapsed.total_seconds())
     return r
 

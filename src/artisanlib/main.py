@@ -23990,24 +23990,24 @@ class ApplicationWindow(QMainWindow):
     def on_actionCut_triggered(self,_=False): # pylint: disable=no-self-use # used as slot
         try:
             app.activeWindow().focusWidget().cut()
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception: # pylint: disable=broad-except
+            pass # not every QWidget has a cut method
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def on_actionCopy_triggered(self,_=False): # pylint: disable=no-self-use # used as slot
         try:
             app.activeWindow().focusWidget().copy()
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception: # pylint: disable=broad-except
+            pass # not every QWidget has a copy method
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def on_actionPaste_triggered(self,_=False): # pylint: disable=no-self-use # used as slot
         try:
             app.activeWindow().focusWidget().paste()
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception: # pylint: disable=broad-except
+            pass # not every QWidget has a paste method
 
     # clears the message line without appending to the message log
     def clearMessageLine(self,style=None):

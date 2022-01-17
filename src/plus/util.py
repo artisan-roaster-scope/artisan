@@ -96,6 +96,13 @@ def getGMToffset():
     ).astimezone().utcoffset() // datetime.timedelta(seconds=1)
 
 
+# extra simple information from a dict
+# res is assumed to be a dict and the projection result to be a non-empty string or a number
+def extractInfo(res, attr: str, default):
+    if attr in res and ((isinstance(res[attr], str) and res[attr] != "") or (isinstance(res[attr],(int, float)))):
+        return res[attr]
+    return default
+
 # Prepare Temperatures for sending
 
 
