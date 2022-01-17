@@ -107,7 +107,7 @@ def processNotification(plus_notification):
             if aw.notificationManager:
                 created = None
                 try:
-                    created = util.ISO86012epoch(plus_notification["added_on"]) - 8*24*60*60
+                    created = util.ISO86012epoch(plus_notification["added_on"])
                 except Exception:  # pylint: disable=broad-except
                     pass
                 aw.notificationManager.sendNotificationMessage(
