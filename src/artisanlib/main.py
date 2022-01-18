@@ -6477,9 +6477,7 @@ class tgraphcanvas(FigureCanvas):
             self.ystep_up = 0
 
             # reset keyboard mode
-            aw.keyboardmoveindex = 0 # points to the last activated button; we start with the CHARGE button (see keyboardButtonList)
-            aw.keyboardmoveflag = 0
-            aw.resetKeyboardButtonMarks()
+            aw.keyboardmoveindex = 0 # points to the last activated button in keyboardButtonList; we start with the CHARGE button            aw.resetKeyboardButtonMarks()
 
             if not (aw.qmc.autotimex and aw.qmc.background):
                 if self.locktimex:
@@ -10831,8 +10829,7 @@ class tgraphcanvas(FigureCanvas):
             #enable RESET button:
             aw.buttonRESET.setStyleSheet(aw.pushbuttonstyles["RESET"])
             aw.buttonRESET.setEnabled(True)
-            aw.buttonRESET.setVisible(True)
-            aw.keyboardmoveflag = 0  #disable keyboard navigation
+            aw.buttonRESET.setVisible(True)          
             
             # enable "green flag" menu:
             try:
@@ -11235,6 +11232,9 @@ class tgraphcanvas(FigureCanvas):
             self.updateLCDtime()
             aw.lowerbuttondialog.setVisible(True)
             aw.applyStandardButtonVisibility()
+            if aw.keyboardmoveflag:
+                aw.keyboardmoveflag = 0
+                aw.moveKbutton("enter", force=True)            
 
             aw.update_extraeventbuttons_visibility()
             aw.updateExtraButtonsVisibility()
@@ -11309,7 +11309,10 @@ class tgraphcanvas(FigureCanvas):
 
     @pyqtSlot()
     def toggleRecorderTigger(self):
-        self.ToggleRecorder()
+        if self.flagstart:
+            self.ToggleMonitor()
+        else:
+            self.ToggleRecorder()
 
     #Turns START/STOP flag self.flagon to read and plot. Called from push button_2.
     @pyqtSlot(bool)
@@ -12083,7 +12086,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         start = 0
                     # we check if this is the first DROP mark on this roast
-                    firstDROP = self.timeindex[6] == 0
+                    firstDROP = self.timeindex[6] == 0 # on UNDO DROP we do not send the record to plus
                     if aw.buttonDROP.isFlat() and self.timeindex[6] > 0:
                         # undo wrongly set FCs
                         # deactivate autoDROP
@@ -17984,7 +17987,7 @@ class ApplicationWindow(QMainWindow):
                              self.qmc.mark2Cstart,self.qmc.mark2Cend,self.qmc.markDrop,self.qmc.markCoolEnd,self.qmc.EventRecord]
         # list of buttons that can be controlled via the keyboard
         # RESET -> ON/OFF -> .. -> EVENT (RESET at index 0 is never used)
-        self.keyboardButtonList = [
+        self.keyboardButtonList = [ # this list corresponds to the self.qmc.buttonvisibility, but has additionally the entry for the EVENT button
             self.buttonCHARGE,  # 0 CHARGE
             self.buttonDRY, # 1 DRY END
             self.buttonFCs,  # 2 FC START
@@ -18763,8 +18766,9 @@ class ApplicationWindow(QMainWindow):
             if not(settings.status() == QSettings.Status.NoError and lastdonationpopup is not None and starts is not None and (now >= lastdonationpopup > now-everytime) and 0 <= starts < everystarts): 
                 message = QApplication.translate("Message","Please support Artisan with your donation")
                 message += '<br><br><a href="{0}">{0}</a>'.format("https://artisan-scope.org/donate/")
-                message += '<br><br>or by subscribing to'
+                message += '<br><br>and subscribe to'
                 message += '<br><br><a href="{0}">{0}</a>'.format("https://artisan.plus")
+                message += '<br><br>to supress this dialog'
                 donate_message_box = QMessageBox(self)
                 donate_message_box.setText(message)    
                 donate_message_box.setIcon(QMessageBox.Icon.Information)
@@ -24634,11 +24638,30 @@ class ApplicationWindow(QMainWindow):
                         aw.pidcontrol.svLookahead = aw.pidcontrol.svLookahead+1
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}").format(aw.pidcontrol.svLookahead))
                 elif k == 32:                       #SELECTS ACTIVE BUTTON
-                    if self.keyboardmoveflag:
-                        self.moveKbutton("space")
-                    else:
-                        self.qmc.EventRecord()
-                elif k == 16777220:                 #TURN ON/OFF KEYBOARD MOVES
+                    if self.qmc.flagstart:
+                        if self.keyboardmoveflag:
+                            # if recording and manual keyboard move mode is on and
+                            # EVENT button is not enabled and all visible buttons are disabled (flat)
+                            # and selected button is NOT DROP (to enable undo DROP)
+                            if (not self.eventsbuttonflag and 
+                                all(not self.qmc.buttonvisibility[i] or b.isFlat() for i,b in enumerate(self.keyboardButtonList[:-1])) and 
+                                self.keyboardmoveindex != 6):
+                                if self.qmc.buttonvisibility[6]:
+                                    # if DROP button is visible (but flat) we toggle the recorder OFF
+                                    self.qmc.toggleRecorderSignal.emit()
+                                else:
+                                    # DROP button hidden
+                                    if self.qmc.timeindex[6] == 0:
+                                        # we mark DROP if not yet marked
+                                        self.qmc.markDropSignal.emit()
+                                    self.qmc.toggleRecorderSignal.emit()
+                            else:
+                                self.moveKbutton("space")
+                        else:
+                            self.qmc.EventRecord()
+                    elif self.qmc.flagon:
+                        self.qmc.toggleRecorderSignal.emit()
+                elif k == 16777220:                 #ENTER: turns ON/OFF keyboard moves
                     self.releaseminieditor()
                     self.moveKbutton("enter")
                 elif k == 16777216:                 #ESCAPE
@@ -24935,10 +24958,10 @@ class ApplicationWindow(QMainWindow):
                 _log.exception(e)
 
     @pyqtSlot(str)
-    def moveKbutton(self, kcommand):
+    def moveKbutton(self, kcommand, force:bool = False):
         #"Enter" toggles ON/OFF keyboard
         if kcommand =="enter" and self.qmc.flagstart:
-            if self.keyboardmoveflag == 0:
+            if force or self.keyboardmoveflag == 0:
                 #turn on
                 self.keyboardmoveflag = 1
                 # deactivate slider keyboard control
@@ -24958,7 +24981,6 @@ class ApplicationWindow(QMainWindow):
             if kcommand == "space":
                 now = libtime.perf_counter()
                 if self.lastkeyboardcmd == 0 or (now > self.lastkeyboardcmd + 1): # accept SPACE keyboard cmds only every 1sec.
-#                    button_is_flat = self.keyboardButtonList[self.keyboardmoveindex].isFlat()
                     self.keyboardmove[self.keyboardmoveindex]()   #apply button command
                     #behaviour rules after pressing a button
                     self.lastkeyboardcmd = now
@@ -29604,31 +29626,33 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("SegmentResultsLoc"):
                 self.qmc.segmentresultsloc = [toFloat(x) for x in toList(settings.value("SegmentResultsLoc",self.qmc.segmentresultsloc))]
             if settings.contains("analysisstartchoice"):
-                self.qmc.analysisstartchoice = toInt(settings.value("analysisstartchoice",int()))
+                self.qmc.analysisstartchoice = toInt(settings.value("analysisstartchoice",int(self.qmc.analysisstartchoice)))
             if settings.contains("analysisoffset"):
-                self.qmc.analysisoffset = toInt(settings.value("analysisoffset",int()))
+                self.qmc.analysisoffset = toInt(settings.value("analysisoffset",int(self.qmc.analysisoffset)))
             if settings.contains("curvefitstartchoice"):
-                self.qmc.curvefitstartchoice = toInt(settings.value("curvefitstartchoice",int()))
+                self.qmc.curvefitstartchoice = toInt(settings.value("curvefitstartchoice",int(self.qmc.curvefitstartchoice)))
             if settings.contains("curvefitoffset"):
-                self.qmc.curvefitoffset = toInt(settings.value("curvefitoffset",int()))
+                self.qmc.curvefitoffset = toInt(settings.value("curvefitoffset",int(self.qmc.curvefitoffset)))
             if settings.contains("segmentsamplesthreshold"):
-                self.qmc.segmentsamplesthreshold = toInt(settings.value("segmentsamplesthreshold",int()))
+                self.qmc.segmentsamplesthreshold = toInt(settings.value("segmentsamplesthreshold",int(self.qmc.segmentsamplesthreshold)))
             if settings.contains("segmentdeltathreshold"):
                 self.qmc.segmentdeltathreshold = aw.float2float(toFloat(settings.value("segmentdeltathreshold",self.qmc.segmentdeltathreshold)),4)
             if settings.contains("AUCbegin"):
-                self.qmc.AUCbegin = toInt(settings.value("AUCbegin",int()))
-                self.qmc.AUCbase = toInt(settings.value("AUCbase",int()))
+                self.qmc.AUCbegin = toInt(settings.value("AUCbegin",int(self.qmc.AUCbegin)))
+                self.qmc.AUCbase = toInt(settings.value("AUCbase",int(self.qmc.AUCbase)))
                 self.qmc.AUCbaseFlag = bool(toBool(settings.value("AUCbaseFlag",self.qmc.AUCbaseFlag)))
-                self.qmc.AUCtarget = toInt(settings.value("AUCtarget",int()))
+                self.qmc.AUCtarget = toInt(settings.value("AUCtarget",int(self.qmc.AUCtarget)))
                 self.qmc.AUCtargetFlag = bool(toBool(settings.value("AUCtargetFlag",self.qmc.AUCtargetFlag)))
                 self.qmc.AUCguideFlag = bool(toBool(settings.value("AUCguideFlag",self.qmc.AUCguideFlag)))
                 self.qmc.AUClcdFlag = bool(toBool(settings.value("AUClcdFlag",self.qmc.AUClcdFlag)))
                 self.qmc.AUCLCDmode = toInt(settings.value("AUCLCDmode",self.qmc.AUCLCDmode))
             if settings.contains("AUCshowFlag"):
                 self.qmc.AUCshowFlag = bool(toBool(settings.value("AUCshowFlag",self.qmc.AUCshowFlag)))
+            if settings.contains("keyboardmoveflag"):
+                self.keyboardmoveflag = toInt(settings.value("keyboardmoveflag",int(self.keyboardmoveflag)))
             #restore ambient temperature source
             if settings.contains("AmbientTempSource"):
-                aw.qmc.ambientTempSource = toInt(settings.value("AmbientTempSource",int()))
+                aw.qmc.ambientTempSource = toInt(settings.value("AmbientTempSource",int(aw.qmc.ambientTempSource)))
             #restore delay
             if settings.contains("Delay"):
                 self.qmc.delay = max(self.qmc.min_delay,toInt(settings.value("Delay",int(self.qmc.delay))))
@@ -30956,14 +30980,9 @@ class ApplicationWindow(QMainWindow):
         else:
             self.buttonEVENT.setVisible(False)
         #set default button visibility
-        aw.buttonCHARGE.setVisible(bool(aw.qmc.buttonvisibility[0]))
-        aw.buttonDRY.setVisible(bool(aw.qmc.buttonvisibility[1]))
-        aw.buttonFCs.setVisible(bool(aw.qmc.buttonvisibility[2]))
-        aw.buttonFCe.setVisible(bool(aw.qmc.buttonvisibility[3]))
-        aw.buttonSCs.setVisible(bool(aw.qmc.buttonvisibility[4]))
-        aw.buttonSCe.setVisible(bool(aw.qmc.buttonvisibility[5]))
-        aw.buttonDROP.setVisible(bool(aw.qmc.buttonvisibility[6]))
-        aw.buttonCOOL.setVisible(bool(aw.qmc.buttonvisibility[7]))
+        for i in range(8):
+            self.keyboardButtonList[i].setVisible(bool(self.qmc.buttonvisibility[i]))
+            self.keyboardButtonList[i].setSelected(False)
 
     @staticmethod
     def getColor(line):
@@ -31374,6 +31393,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("AUClcdFlag",self.qmc.AUClcdFlag)
             settings.setValue("AUCLCDmode",self.qmc.AUCLCDmode)
             settings.setValue("AUCshowFlag",self.qmc.AUCshowFlag)
+            settings.setValue("keyboardmoveflag",self.keyboardmoveflag)
             #save Events settings
             settings.beginGroup("events")
             settings.setValue("eventsbuttonflag",self.eventsbuttonflag)
