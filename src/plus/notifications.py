@@ -62,7 +62,6 @@ def updateNotifications(notifications: int, machines: List[str]):
 # fetches new notifications and forward them to the Artisan notification system
 # sidecondition: at this point all pending notifications are delivered and the "notification" count on the server can be assumed to be 0
 def retrieveNotifications():
-    _log.debug("retrieveNotifications() before lock")
     gotlock = get_notifications_semaphore.tryAcquire(1,0) 
     # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
     if gotlock:
@@ -95,8 +94,6 @@ def retrieveNotifications():
         finally:
             if get_notifications_semaphore.available() < 1:
                 get_notifications_semaphore.release(1)
-    else:
-        _log.debug("TEST: retrieveNotification() lock was blocked")
 
 
 # process the received plus notifications and hand them over to the Artisan notification system

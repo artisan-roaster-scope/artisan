@@ -324,7 +324,6 @@ def getLanguage() -> str:
 # if rlimit = -1 or rused = -1 or pu = "", no update information is available and the state is not updated
 @pyqtSlot(float,float,str,int,list)
 def updateLimits(rlimit:float, rused:float, pu:str, notifications:int, machines: List[str]):
-    _log.debug("util:updateLimits(%s,%s,%s,%s,%s)",rlimit,rused,pu,notifications, machines)
     if config.app_window:
         config.app_window.updateLimits(rlimit, rused, pu, notifications, machines)
 
@@ -358,7 +357,6 @@ def extractAccountState(response: dict):
         
 @pyqtSlot(dict)
 def updateLimitsFromResponse(response: dict):
-    _log.debug("updateLimitsFromResponse")
     rlimit,rused,pu,notifications,machines = extractAccountState(response)
     updateLimits(rlimit,rused,pu,notifications,machines)
 

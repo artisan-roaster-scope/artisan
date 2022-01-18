@@ -133,7 +133,6 @@ class Worker(QObject):
                                 sync.setSyncRecordHash(sync_record=sr, h=h)
                             try:
                                 response = r.json()
-                                _log.debug("response: %s",response)
                                 if response:
                                     rlimit,rused,pu,notifications, machines = util.extractAccountState(response)
                                     self.replySignal.emit(rlimit,rused,pu,notifications,machines)
@@ -207,7 +206,6 @@ class Worker(QObject):
                 # we call task_done to remove the item from the queue
                 queue.task_done()
                 item = None
-                _log.debug("-> task done")
                 _log.debug(
                     "end of run:while paused=%s", self._paused
                 )

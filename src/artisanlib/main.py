@@ -700,7 +700,7 @@ class tgraphcanvas(FigureCanvas):
         'backgroundeventsflag', 'backgroundpath', 'backgroundUUID', 'backgroundUUID', 'backgroundShowFullflag', 'titleB', 'roastbatchnrB', 'roastbatchprefixB',
         'roastbatchposB', 'temp1B', 'temp2B', 'temp1BX', 'temp2BX', 'timeB', 'temp1Bdelta', 'temp2Bdelta',
         'stemp1B', 'stemp2B', 'stemp1BX', 'stemp2BX', 'extraname1B', 'extraname2B', 'extratimexB', 'xtcurveidx', 'ytcurveidx', 'delta1B', 'delta2B', 'timeindexB',
-        'TP_time_B', 'TP_time_B_loaded', 'backgroundEvents', 'backgroundEtypes', 'backgroundEvalues', 'backgroundEStrings', 'backgroundalpha', 'backgroundmetcolor',
+        'TP_time_B_loaded', 'backgroundEvents', 'backgroundEtypes', 'backgroundEvalues', 'backgroundEStrings', 'backgroundalpha', 'backgroundmetcolor',
         'backgroundbtcolor', 'backgroundxtcolor', 'backgroundytcolor', 'backgrounddeltaetcolor', 'backgrounddeltabtcolor', 'backmoveflag', 'detectBackgroundEventTime',
         'backgroundReproduce', 'backgroundReproduceBeep', 'backgroundPlaybackEvents', 'backgroundPlaybackDROP', 'Betypes', 'backgroundFlavors', 'flavorbackgroundflag', 
         'E1backgroundtimex', 'E2backgroundtimex', 'E3backgroundtimex', 'E4backgroundtimex', 'E1backgroundvalues', 'E2backgroundvalues', 'E3backgroundvalues', 
@@ -1593,8 +1593,7 @@ class tgraphcanvas(FigureCanvas):
         self.ytcurveidx = 0 # the selected second extra background courve to be displayed
         self.delta1B,self.delta2B = [],[]
         self.timeindexB = [-1,0,0,0,0,0,0,0]
-        self.TP_time_B = -1 # the time in seconds the backgrounds TP should be placed (originally retrieved from file, see TP_time_B_loaded)
-        self.TP_time_B_loaded = -1 # the time in seconds the background TP happend. While TP_time_B changes if background is moved, TP_time_b_loaded does not change and should be used for display
+        self.TP_time_B_loaded = None # the time in seconds the background TP happend. TP_time_B_loaded does not change and should be used for display
         self.backgroundEvents = [] #indexes of background events
         self.backgroundEtypes = []
         self.backgroundEvalues = []
@@ -6864,15 +6863,15 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.l_annotations_dict[draggable_anno_key] = [temp_anno, time_anno]
         return res
 
-    def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,timeindex2=None,TP_time=-1,TP_time_loaded=-1,draggable=True):
+    def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,timeindex2=None,TP_time_loaded=-1,draggable=True):
         ystep_down = ystep_up = 0
         anno_artists = []
         #Add markers for CHARGE
         try:
             if len(timex) > 0:
                 if timeindex[0] != -1 and len(timex) > timeindex[0]:
-                    t0idx = timeindex[0]
-                    t0 = timex[t0idx]
+                    t0idx = timeindex[0] # time idx at CHARGE
+                    t0 = timex[t0idx]    # time at CHARGE in sec.
                 else:
                     t0idx = 0
                     t0 = 0
@@ -6893,24 +6892,28 @@ class tgraphcanvas(FigureCanvas):
                     anno_artists += time_temp_annos
 
                 #Add TP marker
-                if self.markTPflag and TP_index and TP_index > 0:
-                    ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}"), stringfromseconds(timex[TP_index]-t0,False))
-                    a = 1.
-                    e = 0
-                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1)
-                elif TP_time > -1:
-                    ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
-                    if timeindex2:
-                        a = aw.qmc.backgroundalpha
-                    else:
+                if self.markTPflag:
+                    if TP_index and TP_index > 0:
+                        ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}"), stringfromseconds(timex[TP_index]-t0,False))
                         a = 1.
-                    e = 0
-                    TP_index = self.backgroundtime2index(TP_time) + timeindex[0]
-
-                    TP_time = TP_time - t0
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}"),stringfromseconds(TP_time_loaded,False))
-                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1)
+                        e = 0
+                        anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1)
+                    elif TP_time_loaded is not None:
+                        ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
+                        if timeindex2:
+                            a = aw.qmc.backgroundalpha
+                        else:
+                            a = 1.
+                        e = 0
+                        if timeindex[0]>0:
+                            # CHARGE set
+                            shift = timex[timeindex[0]]
+                        else:
+                            shift = 0
+                        TP_index = self.backgroundtime2index(TP_time_loaded + shift)
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}"),stringfromseconds(TP_time_loaded,False))
+                        anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1)
                 #Add Dry End markers
                 if timeindex[1]:
                     tidx = timeindex[1]
@@ -8419,7 +8422,17 @@ class tgraphcanvas(FigureCanvas):
                                 startB = 0
                         try:
                             # background annotations are not draggable
-                            aw.qmc.l_background_annotations.extend(self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timeindex,TP_time=self.TP_time_B,TP_time_loaded=self.TP_time_B_loaded, draggable=False))
+                            aw.qmc.l_background_annotations.extend(self.place_annotations(
+                                -1, # TP_index
+                                d,
+                                self.timeB,
+                                self.timeindexB,
+                                self.temp2B,
+                                self.stemp2B,
+                                startB,
+                                self.timeindex, # timeindex2
+                                TP_time_loaded=self.TP_time_B_loaded, 
+                                draggable=False))
                         except Exception: # pylint: disable=broad-except
                             pass
 
@@ -9177,11 +9190,20 @@ class tgraphcanvas(FigureCanvas):
                 if not self.designerflag:
                     if aw.qmc.BTcurve:
                         if self.flagstart: # no smoothed lines in this case, pass normal BT
-                            aw.qmc.l_annotations = self.place_annotations(aw.qmc.TPalarmtimeindex,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2)
+                            aw.qmc.l_annotations = self.place_annotations(
+                                aw.qmc.TPalarmtimeindex,
+                                aw.qmc.ylimit - aw.qmc.ylimit_min,
+                                self.timex,self.timeindex,
+                                self.temp2,self.temp2)
                         else:
                             TP_index = aw.findTP()
                             if aw.qmc.annotationsflag:
-                                aw.qmc.l_annotations = self.place_annotations(TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2)
+                                aw.qmc.l_annotations = self.place_annotations(
+                                    TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,
+                                    self.timex,
+                                    self.timeindex,
+                                    self.temp2,
+                                    self.stemp2)
                             if self.timeindex[6]:
                                 self.writestatistics(TP_index)
                         #add the time and temp annotations to the bt list
@@ -13542,8 +13564,6 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(len(self.extratimexB)):
                     for j in range(len(self.extratimexB[i])):
                         self.extratimexB[i][j] -= step
-                if self.TP_time_B > -1:
-                    self.TP_time_B -= step
 
             elif direction == "right":
                 for i in range(lt):
@@ -13551,8 +13571,6 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(len(self.extratimexB)):
                     for j in range(len(self.extratimexB[i])):
                         self.extratimexB[i][j] += step
-                if self.TP_time_B > -1:
-                    self.TP_time_B += step
 
             elif direction == "down":
                 for i in range(lt):
@@ -26050,14 +26068,20 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.background_profile_sampling_interval = profile["samplinginterval"]
                 try:
                     try:
-                        self.qmc.TP_time_B = profile["computed"]["TP_time"]
+                        self.qmc.TP_time_B_loaded = None
                         self.qmc.TP_time_B_loaded = profile["computed"]["TP_time"]
-                    except Exception: # pylint: disable=broad-except
-                        if (self.qmc.extratimexB) > 0:
-                            self.qmc.TP_time_B = 0
+                        if self.qmc.TP_time_B_loaded is not None:
+                            if self.qmc.timeindexB[0]>0:
+                                # CHARGE set
+                                shift = self.qmc.timeB[self.qmc.timeindexB[0]]
+                            else:
+                                shift = 0
+                            TP_index = self.qmc.backgroundtime2index(self.qmc.TP_time_B_loaded + shift)
                         else:
-                            self.qmc.TP_time_B = None
-                    _,_,auc,_ = aw.ts(tp=aw.qmc.backgroundtime2index(self.qmc.TP_time_B),background=True)
+                            TP_index = None
+                        _,_,auc,_ = aw.ts(tp=TP_index,background=True)
+                    except Exception: # pylint: disable=broad-except
+                        _,_,auc,_ = aw.ts(tp=None,background=True)
                     aw.qmc.AUCbackground = auc
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
@@ -35931,8 +35955,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.backgroundEvalues, self.qmc.backgroundEStrings,self.qmc.backgroundFlavors = [],[],[]
         self.qmc.timeindexB = [-1,0,0,0,0,0,0,0]
         self.qmc.backmoveflag = 1
-        self.qmc.TP_time_B = -1
-        self.qmc.TP_time_B_loaded = -1
+        self.qmc.TP_time_B_loaded = None
         self.qmc.AUCbackground = -1
         self.qmc.l_background_annotations = []
         self.qmc.analysisresultsstr = ""
