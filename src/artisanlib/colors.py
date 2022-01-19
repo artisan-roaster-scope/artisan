@@ -611,7 +611,7 @@ class graphColorDlg(ArtisanDialog):
             color = QColor(self.aw.lcdpaletteF["timer"])
             color.setHsv(hue,255,255,255)
             self.aw.lcdpaletteF["timer"] = str(color.name())
-            self.aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"]))
+            self.aw.setTimerColor("timer")
             if self.aw.largeLCDs_dialog:
                 self.aw.largeLCDs_dialog.updateStyles()
         elif lcd == 2:
@@ -666,7 +666,7 @@ class graphColorDlg(ArtisanDialog):
                 self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,"timer")
             else:
                 self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,"timer")
-            self.aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"]))
+            self.aw.setTimerColor("timer")
             if self.aw.largeLCDs_dialog:
                 self.aw.largeLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd2LEDButton,self.lcd2backButton]:

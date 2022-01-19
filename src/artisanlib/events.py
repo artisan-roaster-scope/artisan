@@ -442,6 +442,18 @@ class EventsDlg(ArtisanResizeablDialog):
         self.autoCharge.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         if self.app.artisanviewerMode:
             self.autoCharge.setEnabled(False)
+        self.chargeTimer = QCheckBox(QApplication.translate("CheckBox","CHARGE timer"))
+        self.chargeTimer.setChecked(self.aw.qmc.chargeTimerFlag)
+        self.chargeTimer.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        if self.app.artisanviewerMode:
+            self.chargeTimer.setEnabled(False)
+        self.chargeTimerSpinner = QSpinBox()
+        self.chargeTimerSpinner.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.chargeTimerSpinner.setSingleStep(1)
+        self.chargeTimerSpinner.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.chargeTimerSpinner.setRange(0,60)
+        self.chargeTimerSpinner.setSuffix("s")
+        self.chargeTimerSpinner.setValue(self.aw.qmc.chargeTimerPeriod)                        
         self.autoDrop = QCheckBox(QApplication.translate("CheckBox","Auto DROP"))
         self.autoDrop.setChecked(self.aw.qmc.autoDropFlag)
         self.autoDrop.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -932,11 +944,15 @@ class EventsDlg(ArtisanResizeablDialog):
         FlagsLayout.addWidget(self.eventsclampflag)
         FlagsLayout.addSpacing(5)
         FlagsLayout.addWidget(self.eventslabelsflag)
-        FlagsLayout.addSpacing(5)
+        FlagsLayout.addSpacing(3)
         FlagsLayout.addWidget(self.eventslabelscharsSpinner)
         FlagsLayout.addStretch()
         
         FlagsLayout2 = QHBoxLayout()
+        FlagsLayout2.addWidget(self.chargeTimer)
+        FlagsLayout2.addSpacing(3)
+        FlagsLayout2.addWidget(self.chargeTimerSpinner)
+        FlagsLayout2.addSpacing(15)
         FlagsLayout2.addWidget(self.autoCharge)
         FlagsLayout2.addSpacing(15)
         FlagsLayout2.addWidget(self.autoDrop)
@@ -2839,6 +2855,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.eventsGraphflagstored = self.aw.qmc.eventsGraphflag
         self.etypesstored = self.aw.qmc.etypes
         self.etypeComboBoxstored = self.aw.etypeComboBox
+        self.chargeTimerFlagstored = self.aw.qmc.chargeTimerFlag
+        self.chargeTimerPeriodstored = self.aw.qmc.chargeTimerPeriod
         self.autoChargeFlagstored = self.aw.qmc.autoChargeFlag
         self.autoDropFlagstored = self.aw.qmc.autoDropFlag
         self.markTPFlagstored = self.aw.qmc.markTPflag
@@ -2900,6 +2918,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.qmc.eventsGraphflag = self.eventsGraphflagstored
         self.aw.qmc.etypes = self.etypesstored
         self.aw.etypeComboBox = self.etypeComboBoxstored
+        self.aw.qmc.chargeTimerFlag = self.chargeTimerFlagstored
+        self.aw.qmc.chargeTimerPeriod = self.chargeTimerPeriodstored
         self.aw.qmc.autoChargeFlag = self.autoChargeFlagstored
         self.aw.qmc.autoDropFlag = self.autoDropFlagstored
         self.aw.qmc.markTPflag = self.markTPFlagstored
@@ -3026,6 +3046,9 @@ class EventsDlg(ArtisanResizeablDialog):
                 # update minieditor event type ComboBox
                 self.aw.etypeComboBox.clear()
                 self.aw.etypeComboBox.addItems(self.aw.qmc.etypes)
+                #update chargeTimer
+                self.aw.qmc.chargeTimerFlag = self.chargeTimer.isChecked()
+                self.aw.qmc.chargeTimerPeriod = self.chargeTimerSpinner.value()
                 #update autoCharge/Drop flag
                 self.aw.qmc.autoChargeFlag = self.autoCharge.isChecked()
                 self.aw.qmc.autoDropFlag = self.autoDrop.isChecked()

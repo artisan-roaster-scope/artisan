@@ -714,7 +714,7 @@ class tgraphcanvas(FigureCanvas):
         'swapdeltalcds', 'PIDbuttonflag', 'Controlbuttonflag', 'deltaETfilter', 'deltaBTfilter', 'curvefilter', 'deltaETspan', 'deltaBTspan',
         'deltaETsamples', 'deltaBTsamples', 'profile_sampling_interval', 'background_profile_sampling_interval', 'profile_meter', 'optimalSmoothing', 'polyfitRoRcalc',
         'patheffects', 'graphstyle', 'graphfont', 'buttonvisibility', 'buttonactions', 'buttonactionstrings', 'extrabuttonactions', 'extrabuttonactionstrings',
-        'xextrabuttonactions', 'xextrabuttonactionstrings', 'autoChargeFlag', 'autoDropFlag', 'autoChargeIdx', 'autoDropIdx', 'markTPflag', 'autoTPIdx',
+        'xextrabuttonactions', 'xextrabuttonactionstrings', 'chargeTimerFlag', 'autoChargeFlag', 'autoDropFlag', 'autoChargeIdx', 'autoDropIdx', 'markTPflag', 'autoTPIdx',
         'autoDRYflag', 'autoFCsFlag', 'autoCHARGEenabled', 'autoDRYenabled', 'autoFCsenabled', 'autoDROPenabled', 'autoDryIdx', 'autoFCsIdx', 'projectionconstant',
         'projectionmode', 'transMappingMode', 'weight', 'volume_units', 'volume', 'density', 'density_roasted', 'volumeCalcUnit', 'volumeCalcWeightInStr',
         'volumeCalcWeightOutStr', 'container_names', 'container_weights', 'container_idx', 'specialevents', 'etypes', 'etypesdefault', 'specialeventstype',
@@ -1744,8 +1744,10 @@ class tgraphcanvas(FigureCanvas):
         self.xextrabuttonactionstrings = [""]*2
 
         #flag to activate the automatic marking of the CHARGE and DROP events
-        self.autoChargeFlag = True
-        self.autoDropFlag = True
+        self.chargeTimerFlag: bool = False
+        self.chargeTimerPeriod: int = 0 # period until CHARGE since START if CHARGE timer is active
+        self.autoChargeFlag: bool = True
+        self.autoDropFlag: bool = True
         #autodetected CHARGE and DROP index
         self.autoChargeIdx = 0
         self.autoDropIdx = 0
@@ -4786,8 +4788,13 @@ class tgraphcanvas(FigureCanvas):
                             timer_color = "slowcoolingtimer"
                         else:
                             timer_color = "rstimer"
-                        aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF[timer_color],aw.lcdpaletteB[timer_color]))
-                        aw.qmc.setTimerLargeLCDcolorSignal.emit(aw.lcdpaletteF[timer_color],aw.lcdpaletteB[timer_color])
+                        aw.setTimerColor(timer_color)
+                    
+                    if self.chargeTimerFlag and self.timeindex[0] == -1 and self.chargeTimerPeriod!= 0:
+                        if self.chargeTimerPeriod > ts:
+                            ts = self.chargeTimerPeriod - ts
+                        else:
+                            ts = 0
 
                     self.setLCDtime(ts)
             except Exception as e:
@@ -6489,26 +6496,25 @@ class tgraphcanvas(FigureCanvas):
             if self.endofx < 1:
                 self.endofx = 60
 
-            aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
-            aw.qmc.setTimerLargeLCDcolorSignal.emit(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"])
+            aw.setTimerColor("timer")
 
             #roast flags
-            aw.qmc.heavyFC_flag = False
-            aw.qmc.lowFC_flag = False
-            aw.qmc.lightCut_flag = False
-            aw.qmc.darkCut_flag = False
-            aw.qmc.drops_flag = False
-            aw.qmc.oily_flag = False
-            aw.qmc.uneven_flag = False
-            aw.qmc.tipping_flag = False
-            aw.qmc.scorching_flag = False
-            aw.qmc.divots_flag = False
+            self.heavyFC_flag = False
+            self.lowFC_flag = False
+            self.lightCut_flag = False
+            self.darkCut_flag = False
+            self.drops_flag = False
+            self.oily_flag = False
+            self.uneven_flag = False
+            self.tipping_flag = False
+            self.scorching_flag = False
+            self.divots_flag = False
 
             # renable autoCHARGE/autoDRY/autoFCs/autoDROP; all of those get set to False on UNDO of the event for the current roast
-            aw.qmc.autoCHARGEenabled = True
-            aw.qmc.autoDRYenabled = True
-            aw.qmc.autoFCsenabled = True
-            aw.qmc.autoDROPenabled = True
+            self.autoCHARGEenabled = True
+            self.autoDRYenabled = True
+            self.autoFCsenabled = True
+            self.autoDROPenabled = True
 
             #Designer variables
             self.indexpoint = 0
@@ -7300,7 +7306,7 @@ class tgraphcanvas(FigureCanvas):
         if backgroundtitle != "":
             if aw.qmc.graphfont in [1,9]: # if selected font is Humor we translate the unicode title into pure ascii
                 backgroundtitle = self.__to_ascii(backgroundtitle)
-            backgroundtitle = f"\n{abbrevString(backgroundtitle,30)}"
+            backgroundtitle = f"\n{abbrevString(backgroundtitle, 32)}"
             
         st_artist = self.fig.suptitle(backgroundtitle,
                 horizontalalignment="right",verticalalignment="top",
@@ -11167,6 +11173,9 @@ class tgraphcanvas(FigureCanvas):
                 pass
             self.OffMonitor()
 
+    def fireChargeTimer(self):
+        self.autoChargeIdx = max(1,len(self.timex))
+        
     def OnRecorder(self):
         try:
             # if on turn mouse crosslines off
@@ -11186,10 +11195,9 @@ class tgraphcanvas(FigureCanvas):
                 _log.exception(e)
             
             # reset LCD timer color that might have been reset by the RS PID in monitoring mode:
-            aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
-            aw.qmc.setTimerLargeLCDcolorSignal.emit(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"])
-            if aw.qmc.delta_ax:
-                y_label = aw.qmc.delta_ax.set_ylabel("")
+            aw.setTimerColor("timer")
+            if self.delta_ax:
+                y_label = self.delta_ax.set_ylabel("")
                 try:
                     y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
                 except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
@@ -11205,7 +11213,7 @@ class tgraphcanvas(FigureCanvas):
             if not self.flagon:
                 self.OnMonitor()
             try:
-                aw.eventactionx(aw.qmc.xextrabuttonactions[1],aw.qmc.xextrabuttonactionstrings[1])
+                aw.eventactionx(self.xextrabuttonactions[1],self.xextrabuttonactionstrings[1])
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
@@ -11214,12 +11222,12 @@ class tgraphcanvas(FigureCanvas):
             self.roastepoch = self.roastdate.toSecsSinceEpoch()
             self.roasttzoffset = libtime.timezone
 
-            aw.qmc.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
-            aw.qmc.roastbatchpos = 1 # initialized to 1, set to increased batchsequence on DROP
-            if not aw.qmc.title_show_always:
-                aw.qmc.fig.suptitle("")
-            aw.qmc.profile_sampling_interval = self.delay / 1000.
-            aw.qmc.updateDeltaSamples()
+            self.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
+            self.roastbatchpos = 1 # initialized to 1, set to increased batchsequence on DROP
+            if not self.title_show_always:
+                self.fig.suptitle("")
+            self.profile_sampling_interval = self.delay / 1000.
+            self.updateDeltaSamples()
             aw.disableSaveActions()
             aw.sendmessage(QApplication.translate("Message","Scope recording..."))
             aw.buttonSTARTSTOP.setEnabled(False)
@@ -11254,6 +11262,14 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[0]
 
             aw.update_minieventline_visibility()
+            
+            # set CHARGEtimer
+            if self.chargeTimerFlag:
+                if self.chargeTimerPeriod > 0:
+                    aw.setTimerColor("slowcoolingtimer")
+                QTimer.singleShot(self.chargeTimerPeriod*1000, self.fireChargeTimer)
+                
+            
 
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -11262,6 +11278,9 @@ class tgraphcanvas(FigureCanvas):
 
     def OffRecorder(self, autosave=True):
         try:
+            # mark DROP if not yet set and DROP button is hidden
+            if self.timeindex[6] == 0 and not self.buttonvisibility[6]:
+                self.markDrop()
             aw.enableSaveActions()
             aw.resetCurveVisibilities()
             self.flagstart = False
@@ -11395,16 +11414,26 @@ class tgraphcanvas(FigureCanvas):
                                 return
                         else:
                             if self.autoChargeIdx:
-                                self.timeindex[0] = self.autoChargeIdx
+                                # prevent CHARGE outofindex:
+                                if len(self.timex) > self.autoChargeIdx:
+                                    self.timeindex[0] = self.autoChargeIdx
+                                elif len(self.timex) > self.autoChargeIdx - 1:
+                                    # not yet enough readings
+                                    self.timeindex[0] = self.autoChargeIdx - 1
+                                else:
+                                    return
                             else:
                                 if len(self.timex) > 0:
                                     self.timeindex[0] = len(self.timex)-1
                                 else:
+                                    self.autoChargeIdx = 1 # set CHARGE on next (first) reading
                                     message = QApplication.translate("Message","Not enough data collected yet. Try again in a few seconds")
                                     aw.sendmessage(message)
                                     return
                             if aw.pidcontrol.pidOnCHARGE and not aw.pidcontrol.pidActive: # Arduino/TC4, Hottop, MODBUS
                                 aw.pidcontrol.pidOn()
+                        if self.chargeTimerPeriod > 0:
+                            aw.setTimerColor("timer")
                         try:
                             if not aw.qmc.locktimex:
                                 aw.qmc.startofx = aw.qmc.chargemintime + self.timex[self.timeindex[0]] # we set the min x-axis limit to the CHARGE Min time
@@ -11477,9 +11506,9 @@ class tgraphcanvas(FigureCanvas):
                     _log.exception(e)
                 if aw.qmc.roastpropertiesAutoOpenFlag:
                     aw.openPropertiesSignal.emit()
-                aw.onMarkMoveToNext(aw.buttonCHARGE)
                 if not(self.autoChargeIdx and aw.qmc.timeindex[0] < 0):
                     self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+            aw.onMarkMoveToNext(aw.buttonCHARGE)
 
 
     # called from sample() and marks the autodetected TP visually on the graph
@@ -11617,10 +11646,10 @@ class tgraphcanvas(FigureCanvas):
                         aw.sendmessage(message)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-                    aw.onMarkMoveToNext(aw.buttonDRY)
                     if self.autoDryIdx == 0:
                         # only if markDryEnd() is not anyhow triggered within updategraphics()
                         self.updategraphicsSignal.emit()
+                aw.onMarkMoveToNext(aw.buttonDRY)
 
     # trigger to be called by the markFCsSignal
     @pyqtSlot()
@@ -11730,10 +11759,10 @@ class tgraphcanvas(FigureCanvas):
                     st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
                     message = QApplication.translate("Message","[FC START] recorded at {0} BT = {1}").format(st1,st2)
                     aw.sendmessage(message)
-                    aw.onMarkMoveToNext(aw.buttonFCs)
                     if self.autoFCsIdx == 0:
                         # only if mark1Cstart() is not triggered from within updategraphics() and the canvas is anyhow updated
                         self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                aw.onMarkMoveToNext(aw.buttonFCs)
 
     # trigger to be called by the markFCeSignal
     @pyqtSlot()
@@ -11836,8 +11865,8 @@ class tgraphcanvas(FigureCanvas):
                     st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
                     message = QApplication.translate("Message","[FC END] recorded at {0} BT = {1}").format(st1,st2)
                     aw.sendmessage(message)
-                    aw.onMarkMoveToNext(aw.buttonFCe)
                     self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                aw.onMarkMoveToNext(aw.buttonFCe)
 
 
     # trigger to be called by the markSCsSignal
@@ -11952,8 +11981,8 @@ class tgraphcanvas(FigureCanvas):
                         aw.sendmessage(message)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-                    aw.onMarkMoveToNext(aw.buttonSCs)
                     self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                aw.onMarkMoveToNext(aw.buttonSCs)
 
     # trigger to be called by the markSCeSignal
     @pyqtSlot()
@@ -12061,8 +12090,8 @@ class tgraphcanvas(FigureCanvas):
                     st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
                     message = QApplication.translate("Message","[SC END] recorded at {0} BT = {1}").format(st1,st2)
                     aw.sendmessage(message)
-                    aw.onMarkMoveToNext(aw.buttonSCe)
                     self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                aw.onMarkMoveToNext(aw.buttonSCe)
 
     # trigger to be called by the markDropSignal
     @pyqtSlot()
@@ -12229,10 +12258,10 @@ class tgraphcanvas(FigureCanvas):
                                     _log.exception(e)
                         if aw.qmc.roastpropertiesAutoOpenDropFlag:
                             aw.openPropertiesSignal.emit()
-                        aw.onMarkMoveToNext(aw.buttonDROP)
                         if not (self.autoDropIdx > 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]):
                             # only if not anyhow markDrop() is triggered from within updategraphic() which guarantees an immedate redraw
                             self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                    aw.onMarkMoveToNext(aw.buttonDROP)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
@@ -12350,6 +12379,7 @@ class tgraphcanvas(FigureCanvas):
                     #set message at bottom
                     aw.sendmessage(message)
                     self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                aw.onMarkMoveToNext(aw.buttonCOOL)
 
     @staticmethod
     def decBatchCounter():
@@ -16956,8 +16986,8 @@ class ApplicationWindow(QMainWindow):
                 ("pt_BR", "Portugu\u00EAs do Brasil"),
                 ("ru", "\u0420\u0443\u0441\u0441\u043a\u0438\u0439"),
                 ("sk", "Slov\u00e1k"),
-                ("fi", "Suomalainen"),
                 ("sv", "Svenska"),
+                ("fi", "Suomalainen"),
                 ("th", "Thai"),
                 ("tr", "T\xfcrk\u00e7e"),
                 ("vi", "Ti\u1EBFng Vi\u1EC7t"),
@@ -18520,6 +18550,11 @@ class ApplicationWindow(QMainWindow):
 
         QTimer.singleShot(0,lambda : _log.info("startup time: %.2f", libtime.process_time() - startup_time))
 
+    # timer_color one of "timer" (black), "slowcoolingtimer" (red), "rstimer" (blue)
+    def setTimerColor(self, timer_color:str):
+        self.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF[timer_color],self.lcdpaletteB[timer_color]))
+        self.qmc.setTimerLargeLCDcolorSignal.emit(self.lcdpaletteF[timer_color], self.lcdpaletteB[timer_color])
+        
     def mousePressEvent(self, event):
         super().mousePressEvent(event)
         if event.button() == Qt.MouseButton.LeftButton:
@@ -18753,8 +18788,8 @@ class ApplicationWindow(QMainWindow):
         
     def donate(self):
         try:
-            everytime = 4*30*24*60*60 # 3 month in seconds
-            everystarts = 25
+            everytime = 4*30*24*60*60 # 4 month in seconds
+            everystarts = 30 # number of recordings
             starts = None
             lastdonationpopup = None
             settings = QSettings()
@@ -18763,12 +18798,18 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("lastdonationpopup"):
                 lastdonationpopup = settings.value("lastdonationpopup")
             now = int(libtime.time())
-            if not(settings.status() == QSettings.Status.NoError and lastdonationpopup is not None and starts is not None and (now >= lastdonationpopup > now-everytime) and 0 <= starts < everystarts): 
-                message = QApplication.translate("Message","Please support Artisan with your donation")
+            if not(settings.status() == QSettings.Status.NoError and 
+                    lastdonationpopup is not None and 
+                    starts is not None and 
+                    (now >= lastdonationpopup > now-everytime) and 
+                    0 <= starts < everystarts): 
+                message = QApplication.translate("Message", "Artisan is free to use!")
+                message += "<br><br>To keep it free and current"
+                message += "<br>please support us"
                 message += '<br><br><a href="{0}">{0}</a>'.format("https://artisan-scope.org/donate/")
                 message += '<br><br>and subscribe to'
                 message += '<br><br><a href="{0}">{0}</a>'.format("https://artisan.plus")
-                message += '<br><br>to supress this dialog'
+                message += '<br><br>to suppress this dialog'
                 donate_message_box = QMessageBox(self)
                 donate_message_box.setText(message)    
                 donate_message_box.setIcon(QMessageBox.Icon.Information)
@@ -19976,7 +20017,7 @@ class ApplicationWindow(QMainWindow):
         aw.lcdpaletteF["rstimer"] = "black"
         aw.lcdpaletteB["slowcoolingtimer"] = "black"
         aw.lcdpaletteF["slowcoolingtimer"] = "white"
-        aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+        aw.setTimerColor("timer")
         aw.lcd2.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
         aw.lcd3.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
         aw.lcd4.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
@@ -24642,19 +24683,10 @@ class ApplicationWindow(QMainWindow):
                         if self.keyboardmoveflag:
                             # if recording and manual keyboard move mode is on and
                             # EVENT button is not enabled and all visible buttons are disabled (flat)
-                            # and selected button is NOT DROP (to enable undo DROP)
-                            if (not self.eventsbuttonflag and 
-                                all(not self.qmc.buttonvisibility[i] or b.isFlat() for i,b in enumerate(self.keyboardButtonList[:-1])) and 
-                                self.keyboardmoveindex != 6):
-                                if self.qmc.buttonvisibility[6]:
-                                    # if DROP button is visible (but flat) we toggle the recorder OFF
-                                    self.qmc.toggleRecorderSignal.emit()
-                                else:
-                                    # DROP button hidden
-                                    if self.qmc.timeindex[6] == 0:
-                                        # we mark DROP if not yet marked
-                                        self.qmc.markDropSignal.emit()
-                                    self.qmc.toggleRecorderSignal.emit()
+                            # and selected button is NOT DROP (to enable undo DROP) nor the EVENT button
+                            if (all(not self.qmc.buttonvisibility[i] or b.isFlat() for i,b in enumerate(self.keyboardButtonList[:-1])) and 
+                                self.keyboardmoveindex != 6) and (not self.eventsbuttonflag or self.keyboardmoveindex != 8):
+                                self.qmc.toggleRecorderSignal.emit()
                             else:
                                 self.moveKbutton("space")
                         else:
@@ -24887,10 +24919,10 @@ class ApplicationWindow(QMainWindow):
                 return 8 # next: EVENT (always enabled)
             currentButtonIndex = -1 # next: CHARGE
         # we check if the next button is visible, else we recurse (the index of buttonvisibility starts from 0:CHARGE and leads to 7:COOL)
-        if aw.qmc.buttonvisibility[currentButtonIndex + 1] and self.keyboardButtonList[currentButtonIndex + 1].isEnabled():
+        if self.qmc.buttonvisibility[currentButtonIndex + 1] and self.keyboardButtonList[currentButtonIndex + 1].isEnabled():
             return currentButtonIndex + 1
-        if not any(aw.qmc.buttonvisibility) and not aw.eventsbuttonflag: # prevent infinit loop if all buttons are hidden
-            return 8 # EVENT
+        if not any(self.qmc.buttonvisibility): # prevent infinit loop if all buttons are hidden
+            return 7 # CHARGE
         return self.nextActiveButton(currentButtonIndex + 1)
 
     def previousActiveButton(self,currentButtonIndex):
@@ -24900,10 +24932,10 @@ class ApplicationWindow(QMainWindow):
                 return 8 # next: EVENT
             currentButtonIndex = 8 # set to EVENT and move to previous non-flat button
         # we check if the previous button is visible, else we recurse (the index of buttonvisibility starts from 0:CHARGE and leads to 7:COOL)
-        if aw.qmc.buttonvisibility[currentButtonIndex - 1] and self.keyboardButtonList[currentButtonIndex - 1].isEnabled():
+        if self.qmc.buttonvisibility[currentButtonIndex - 1] and self.keyboardButtonList[currentButtonIndex - 1].isEnabled():
             return currentButtonIndex - 1
-        if not any(aw.qmc.buttonvisibility) and not aw.eventsbuttonflag: # prevent infinit loop if all buttons are hidden
-            return 8 # EVENT
+        if not any(self.qmc.buttonvisibility): # prevent infinit loop if all buttons are hidden
+            return 0 # CHARGE
         return self.previousActiveButton(currentButtonIndex - 1)
 
     def resetKeyboardButtonMarks(self):
@@ -24942,20 +24974,41 @@ class ApplicationWindow(QMainWindow):
                 return m
         return moveindex
 
-    # on manual
-    @staticmethod
-    def onMarkMoveToNext(button):
-        if aw.keyboardmoveflag: # keyboard navigation is active
-            try:
-                this_index = aw.keyboardButtonList.index(button)
-                if aw.keyboardmoveindex < this_index:
-                    for _ in range(this_index - aw.keyboardmoveindex):
-                        aw.moveKbutton("right")
-                        if aw.keyboardmoveindex == this_index:
+    # called after markCHARGE, markDROP,....
+    # moves keyboard navigation to next button
+    # and enables/disables buttons depending if undo is applicable
+    def onMarkMoveToNext(self, button):
+        try:
+            this_index = self.keyboardButtonList.index(button)
+            if self.qmc.buttonvisibility[this_index]:
+                if button.isFlat():
+                    if self.keyboardmoveflag:
+                        # keyboard navigation is active, button is flat (was just activated), and button is visible
+                        # move to the right up to the button index
+                        if self.keyboardmoveindex < this_index:
+                            for _ in range(this_index - self.keyboardmoveindex):
+                                self.moveKbutton("right")
+                                if self.keyboardmoveindex == this_index:
+                                    break
+                        # if we found our button, move one more to the right
+                        if this_index == self.keyboardmoveindex:
+                            self.moveKbutton("right") # now to the next
+                    # disable all buttons before this_index until the previous registered event
+                    for i in range(this_index-1,-1,-1):
+                        self.keyboardButtonList[i].setEnabled(False)
+                        if self.qmc.timeindex[i]>0:
+                            # stop if already marked
                             break
-                aw.moveKbutton("right") # now to the next
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
+                else:
+                    # an undo action
+                    # enable all buttons before this_index until the previous registered event
+                    for i in range(this_index-1,-1,-1):
+                        self.keyboardButtonList[i].setEnabled(True)
+                        if self.qmc.timeindex[i]>0:
+                            # stop if already marked
+                            break
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 
     @pyqtSlot(str)
     def moveKbutton(self, kcommand, force:bool = False):
@@ -29590,6 +29643,10 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("autoChargeDrop"):
                 self.qmc.autoChargeFlag = bool(toBool(settings.value("autoChargeDrop",False)))
                 self.qmc.autoDropFlag = self.qmc.autoChargeFlag
+            if settings.contains("chargeTimer"):
+                self.qmc.chargeTimerFlag = bool(toBool(settings.value("chargeTimer",self.qmc.chargeTimerFlag)))
+            if settings.contains("chargeTimerPeriod"):
+                self.qmc.chargeTimerPeriod = toInt(settings.value("chargeTimerPeriod",int(self.qmc.chargeTimerPeriod)))
             if settings.contains("autoCharge"):
                 self.qmc.autoChargeFlag = bool(toBool(settings.value("autoCharge",self.qmc.autoChargeFlag)))
             if settings.contains("autoDrop"):
@@ -31414,6 +31471,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("annotationsflag",self.qmc.annotationsflag)
             settings.setValue("showeventsonbt",self.qmc.showeventsonbt)
             settings.setValue("showEtypes",self.qmc.showEtypes)
+            settings.setValue("chargeTimer",self.qmc.chargeTimerFlag)
+            settings.setValue("chargeTimerPeriod",self.qmc.chargeTimerPeriod)
             settings.setValue("autoCharge",self.qmc.autoChargeFlag)
             settings.setValue("autoDrop",self.qmc.autoDropFlag)
             settings.setValue("markTP",self.qmc.markTPflag)

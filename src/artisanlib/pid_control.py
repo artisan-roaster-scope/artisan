@@ -1279,8 +1279,7 @@ class PIDcontrol():
                 self.time_pidON = self.aw.qmc.on_timex[-1]
                 if self.svMode == 1:
                     # turn the timer LCD color blue if in RS mode and not recording
-                    self.aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["rstimer"],self.aw.lcdpaletteB["rstimer"]))
-                    self.aw.qmc.setTimerLargeLCDcolorSignal.emit(self.aw.lcdpaletteF["rstimer"],self.aw.lcdpaletteB["rstimer"])
+                    self.aw.setTimerColor("rstimer")
 
     # the internal software PID should be configured on ON, but not be activated yet to warm it up
     def confSoftwarePID(self):
@@ -1347,8 +1346,7 @@ class PIDcontrol():
 
     def pidOff(self):
         self.aw.sendmessage(QApplication.translate("Message","PID OFF"))
-        self.aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"]))
-        self.aw.qmc.setTimerLargeLCDcolorSignal.emit(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"])
+        self.aw.setTimerColor("timer")
         if self.aw.qmc.flagon and not self.aw.qmc.flagstart:
             self.aw.qmc.setLCDtime(0)
         # MODBUS hardware PID
