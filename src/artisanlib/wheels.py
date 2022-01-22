@@ -106,10 +106,10 @@ class WheelDlg(ArtisanDialog):
         addButton = QPushButton(QApplication.translate("Button","Add"))
         addButton.setToolTip(QApplication.translate("Tooltip","Add new wheel"))
         addButton.clicked.connect(self.insertwheel)
-        rotateLeftButton = QPushButton(QApplication.translate("Button","<"))
+        rotateLeftButton = QPushButton("<")
         rotateLeftButton.setToolTip(QApplication.translate("Tooltip","Rotate graph 1 degree counter clockwise"))
         rotateLeftButton.clicked.connect(self.rotatewheels1)
-        rotateRightButton = QPushButton(QApplication.translate("Button",">"))
+        rotateRightButton = QPushButton(">")
         rotateRightButton.setToolTip(QApplication.translate("Tooltip","Rotate graph 1 degree clockwise"))
         rotateRightButton.clicked.connect(self.rotatewheels0)
         

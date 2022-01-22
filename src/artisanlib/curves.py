@@ -356,7 +356,7 @@ class CurvesDlg(ArtisanDialog):
         #Filter holds the number of pads in filter
         self.Filter = QSpinBox()
         self.Filter.setSingleStep(1)
-        self.Filter.setRange(0,40)
+        self.Filter.setRange(0,10)
         self.Filter.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Filter.setValue(int(round((self.aw.qmc.curvefilter - 1)/2)))
         self.Filter.editingFinished.connect(self.changeFilter)

@@ -5581,7 +5581,7 @@ class tgraphcanvas(FigureCanvas):
             try:
                 t = float(t)
                 #extract Ys
-                Yval = []                   #stores value number example Y9 = 9
+                Yval = []                   #stores value number example Y9 = 9 => Yval = ['9']
                 mlen = len(mathexpression)
                 for i in range(mlen):
                     #Start symbolic assignment
@@ -6013,7 +6013,9 @@ class tgraphcanvas(FigureCanvas):
                         for i in range(len(Yval)):
                             y_string = f"Y{Yval[i]}"
                             if y_string not in mathdictionary:
-                                mathdictionary[y_string] = Y[int(Yval[i])-1]
+                                idx = int(Yval[i])-1
+                                if len(Y) > idx > -1:
+                                    mathdictionary[y_string] = Y[idx]
 
                         #add other timeshifted expressions to the math dictionary: shifted t and P
                         for i in range(len(timeshiftexpressions)):
@@ -6328,7 +6330,7 @@ class tgraphcanvas(FigureCanvas):
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     # returns False if action was canceled, True otherwise
     # if keepProperties=True (a call from OnMonitor()), we keep all the pre-set roast properties
-    def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False,fireResetAction=True):
+    def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False,fireResetAction=True,forceRestoreSettings=False):
         try:
             focused_widget = QApplication.focusWidget()
             if focused_widget and focused_widget != aw.centralWidget():
@@ -6340,7 +6342,7 @@ class tgraphcanvas(FigureCanvas):
             return False
         
         # restore and clear extra device settings which might have been created on loading a profile with different extra devices settings configuration
-        aw.restoreExtraDeviceSettingsBackup()
+        aw.restoreExtraDeviceSettingsBackup(forceRestoreSettings)
         
         if sampling and self.flagOpenCompleted and aw.curFile is not None:
             # always if ON is pressed while a profile is loaded, the profile is send to the Viewer
@@ -6807,7 +6809,9 @@ class tgraphcanvas(FigureCanvas):
                 y = fp[2]
                 self.l_event_flags_pos_dict[i] = (x,y)
 
-    # e is the x-axis offset, yup/ydown are the y-axis offsets
+    # temp and time are the two annotation
+    # x,y is the position of the annotation line start
+    # e is the x-axis offset, yup/ydown are the y-axis offsets of the annotations line ends and the annotation text
     # a is the alpha value
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.,draggable=True,draggable_anno_key=None):
         fontprop_small = aw.mpl_fontproperties.copy()
@@ -6867,7 +6871,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.l_annotations_dict[draggable_anno_key] = [temp_anno, time_anno]
         return res
 
-    def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,timeindex2=None,TP_time_loaded=-1,draggable=True):
+    def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,timeindex2=None,TP_time_loaded=None,draggable=True):
         ystep_down = ystep_up = 0
         anno_artists = []
         #Add markers for CHARGE
@@ -6904,7 +6908,6 @@ class tgraphcanvas(FigureCanvas):
                         e = 0
                         anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1)
                     elif TP_time_loaded is not None:
-                        ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
                         if timeindex2:
                             a = aw.qmc.backgroundalpha
                         else:
@@ -6916,6 +6919,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             shift = 0
                         TP_index = self.backgroundtime2index(TP_time_loaded + shift)
+                        ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}"),stringfromseconds(TP_time_loaded,False))
                         anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1)
                 #Add Dry End markers
@@ -9253,8 +9257,10 @@ class tgraphcanvas(FigureCanvas):
                             loc = self.legendloc_pos # a user define legend position set by drag-and-drop
                     else:
                         loc = self.legend._loc # pylint: disable=protected-access
-                    leg = self.ax.legend(self.handles,self.labels,loc=loc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
-
+                    try:
+                        leg = self.ax.legend(self.handles,self.labels,loc=loc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
+                    except Exception:
+                        pass
                     try:
                         leg.set_in_layout(False) # remove legend from tight_layout calculation
                     except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
@@ -13715,6 +13721,27 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " univariateinfo() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
+    
+    def test(self):
+        p = 60 # period in seconds
+        k = int(round(p / self.delay * 1000)) # number of past readings to consider
+        if len(self.timex)>k:
+            try:
+                ET = numpy.array([numpy.nan if x == -1 else x for x in self.temp1[-k:]], dtype='float64')
+                BT = numpy.array([numpy.nan if x == -1 else x for x in self.temp2[-k:]], dtype='float64')
+                ET_BT = ET - BT
+                delta = numpy.array([numpy.nan if x == -1 else x for x in self.delta2[-k:]], dtype='float64')
+                idx = numpy.isfinite(ET_BT) & numpy.isfinite(delta)
+                z = numpy.polyfit(ET_BT[idx],delta[idx], 1)
+                print("z",z)
+                f = numpy.poly1d(z)
+                return f(ET_BT[-1]), f(0)
+            except Exception as e:
+                print(e)
+                _log.exception(e)
+                return -1, -1
+        else:
+            return -1, -1
 
     def polyfit(self,xarray,yarray,deg,startindex,endindex,_=False,onDeltaAxis=False):
         xa = xarray[startindex:endindex]
@@ -15932,14 +15959,14 @@ class SampleThread(QThread):
                         _log.exception(e)
                     
                     #### first retrieve readings from the main device
-                    timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
+#                    timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
 #                    #read time, ET (t1) and BT (t2) TEMPERATURE
 #                    tx_org,t1,t2 = self.sample_main_device()
 #                    etbt_time = libtime.perf_counter() - timeBeforeETBT
 #                    tx = tx_org + (etbt_time / 2.0) # we take the average between before and after
 # instead of estimating the real time of the sample, let the device implementation decide (mostly, the time the request was send should be accurate enough)
                     tx,t1,t2 = self.sample_main_device()
-                    etbt_time = libtime.perf_counter() - timeBeforeETBT
+                    #etbt_time = libtime.perf_counter() - timeBeforeETBT
                     temp1_readings.append(t1)
                     temp2_readings.append(t2)
                     timex_readings.append(tx)
@@ -15960,10 +15987,10 @@ class SampleThread(QThread):
                         temp1_readings.append(extrat1)
                         temp2_readings.append(extrat2)
                         timex_readings.append(extratx)
-                    total_time = libtime.perf_counter() - timeBeforeETBT
+#                    total_time = libtime.perf_counter() - timeBeforeETBT
                     
-                    _log.debug("sample(): ET/BT time => %.4f", etbt_time)
-                    _log.debug("sample(): total time => %.4f", total_time)
+#                    _log.debug("sample(): ET/BT time => %.4f", etbt_time)
+#                    _log.debug("sample(): total time => %.4f", total_time)
 
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
@@ -16209,7 +16236,7 @@ class ApplicationWindow(QMainWindow):
         # for other locales standard OK/Cancel buttons created in dialogs via QDialogButtonBoxes should be
         # renamed via setText to link them to artisan translations (which hopefully provides those translations)
 
-        self.qtbase_additional_locales = ["cs","da","el","fa","gd","lv","nl","pt_BR","pt","sk","sv","zh_CN"] # additionally added to /translations
+        self.qtbase_additional_locales = ["da","el","fa","gd","lv","nl","pt_BR","pt","sk","sv","zh_CN"] # additionally added to /translations
         self.qtbase_locales = ["ar","de","en","es","fi","fr","he","hu","it","ja","ko","pl","ru","tr","zh_TW"] # from Qt distribution
 
         #############################  Define variables that need to exist before calling settingsload()
@@ -18627,7 +18654,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.BTcurve = not self.qmc.BTcurve
         else:
             self.qmc.ETcurve = not self.qmc.ETcurve
-        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
+        self.qmc.redraw(recomputeAllDeltas=False)
     
     @pyqtSlot()
     def toggleBTCurve(self):
@@ -18635,7 +18662,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ETcurve = not self.qmc.ETcurve
         else:
             self.qmc.BTcurve = not self.qmc.BTcurve
-        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
+        self.qmc.redraw(recomputeAllDeltas=False)
     @pyqtSlot()
     
     def toggleDeltaETCurve(self):
@@ -18643,7 +18670,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.DeltaBTflag = not self.qmc.DeltaBTflag
         else:
             self.qmc.DeltaETflag = not self.qmc.DeltaETflag
-        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
+        self.qmc.redraw(recomputeAllDeltas=False)
     
     @pyqtSlot()
     def toggleDeltaBTCurve(self):
@@ -18651,7 +18678,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.DeltaETflag = not self.qmc.DeltaETflag
         else:
             self.qmc.DeltaBTflag = not self.qmc.DeltaBTflag
-        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
+        self.qmc.redraw(recomputeAllDeltas=False)
     
     @pyqtSlot()
     def toggleExtraCurve1(self):
@@ -18661,7 +18688,7 @@ class ApplicationWindow(QMainWindow):
             self.extraCurveVisibility1[i] = not self.extraCurveVisibility1[i]
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
+        self.qmc.redraw(recomputeAllDeltas=False)
     
     @pyqtSlot()
     def toggleExtraCurve2(self):
@@ -18671,7 +18698,7 @@ class ApplicationWindow(QMainWindow):
             self.extraCurveVisibility2[i] = not self.extraCurveVisibility2[i]
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-        self.qmc.redraw(recomputeAllDeltas=False,smooth=False)
+        self.qmc.redraw(recomputeAllDeltas=False)
 
     def addLanguage(self, locale, menu_entry):
         languageAction = QAction(menu_entry, self)
@@ -18803,13 +18830,8 @@ class ApplicationWindow(QMainWindow):
                     starts is not None and 
                     (now >= lastdonationpopup > now-everytime) and 
                     0 <= starts < everystarts): 
-                message = QApplication.translate("Message", "Artisan is free to use!")
-                message += "<br><br>To keep it free and current"
-                message += "<br>please support us"
-                message += '<br><br><a href="{0}">{0}</a>'.format("https://artisan-scope.org/donate/")
-                message += '<br><br>and subscribe to'
-                message += '<br><br><a href="{0}">{0}</a>'.format("https://artisan.plus")
-                message += '<br><br>to suppress this dialog'
+                message = QApplication.translate("Message", 'Artisan is free to use!<br><br>To keep it free and current please support us<br><br><a href="{0}">{0}</a><br><br>and book<br><br><a href="{1}">{1}</a><br><br>to suppress this dialog')
+                message = message.format("https://artisan-scope.org/donate/", "https://artisan.plus")
                 donate_message_box = QMessageBox(self)
                 donate_message_box.setText(message)    
                 donate_message_box.setIcon(QMessageBox.Icon.Information)
@@ -25678,7 +25700,8 @@ class ApplicationWindow(QMainWindow):
                 else:
                     org_obj_extra_devs = []
                 if res:
-                    res = self.setProfile(filename,obj,quiet=quiet)
+                    # we avoid the reset within setProfile as we just did a reset and do not want to confuse the ExtraDeviceSettingsBackup
+                    res = self.setProfile(filename,obj,quiet=quiet,reset=False) 
             else:
                 self.sendmessage(QApplication.translate("Message","Invalid artisan format"))
                 res = False
@@ -27554,13 +27577,13 @@ class ApplicationWindow(QMainWindow):
             self.extraser[i].timeout = self.extratimeout[i]
     
     # this should only be called from reset()
-    def restoreExtraDeviceSettingsBackup(self):
+    def restoreExtraDeviceSettingsBackup(self, force=False):
         try:
             filename = self.getExtraDeviceSettingsPath()
             if os.path.isfile(filename):
                 modifiers = QApplication.keyboardModifiers()
                 control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple key on macOS, Control key on Windows
-                if not control_modifier:
+                if force or not control_modifier:
                     settings = QSettings(filename, QSettings.Format.IniFormat)
                     settings.beginGroup("ExtraDev")
                     self.getExtraDeviceSettings(settings)
@@ -27587,11 +27610,11 @@ class ApplicationWindow(QMainWindow):
             _log.exception(e)
 
     #called by fileLoad()
-    def setProfile(self,filename,profile,quiet=False):
+    def setProfile(self,filename,profile,quiet=False,reset=True):
         try:
             updateRender = False
             #extra devices load and check
-            if "extratimex" in profile:
+            if profile and "extratimex" in profile:
                 if "extradevices" in profile:
                     updateRender = False
                     # check for difference in the Data values between the profile and current settings
@@ -27630,7 +27653,7 @@ class ApplicationWindow(QMainWindow):
 #                                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel, QMessageBox.StandardButton.No)
 
                         if reply == QMessageBox.StandardButton.Yes:
-                            if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
+                            if not reset or self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
                                 self.createExtraDeviceSettingsBackup() # we make a backup of the core extra device settings before loading the profile, to be restored on next RESET
                                 updateRender = True
                                 aw.qmc.resetlinecountcaches()
@@ -36094,7 +36117,7 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.fileDirtySignal.emit()
             else:
                 # reset
-                aw.qmc.reset(soundOn=False)
+                aw.qmc.reset(soundOn=False,forceRestoreSettings=True)
             if foreground_profile_path:
                 # load foreground into background
                 aw.loadbackground(foreground_profile_path)
@@ -36898,6 +36921,8 @@ class ApplicationWindow(QMainWindow):
 
         except IOError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:") + " resize() {0}").format(str(ex)))
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 
     def saveVectorGraph(self,extension="*.pdf",fname=""):
         try:
@@ -36926,6 +36951,8 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message","{0} saved").format(str(filename)))
         except IOError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:") + " saveVectorGraph() {0}").format(str(ex)))
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 
     #displays Dialog for the setting of the curves parameters (like RoR, Filters,..)
     @pyqtSlot()

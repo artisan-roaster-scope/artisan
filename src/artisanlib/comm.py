@@ -820,6 +820,8 @@ class serialport():
     def DUMMY(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
         return tx,0,0
+#        x,y = self.aw.qmc.test()
+#        return tx,x,y
         
     def PHIDGET1045(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
