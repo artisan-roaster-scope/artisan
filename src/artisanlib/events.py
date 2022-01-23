@@ -25,6 +25,8 @@ from artisanlib.util import uchr
 from artisanlib.dialogs import ArtisanResizeablDialog, ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 
+from uic import SliderCalculatorDialog
+
 
 try:
     #pylint: disable = E, W, R, C
@@ -32,14 +34,16 @@ try:
     from PyQt6.QtGui import (QColor, QFont, QIntValidator) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QDoubleSpinBox, QWidget, QTabWidget, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGridLayout, QGroupBox, QTableWidget, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGridLayout, QGroupBox, QTableWidget, QHeaderView, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:
     #pylint: disable = E, W, R, C
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QColor, QFont, QIntValidator) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QDoubleSpinBox, QWidget, QTabWidget, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGridLayout, QGroupBox, QTableWidget, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGridLayout, QGroupBox, QTableWidget, QHeaderView, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5 import sip  # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final = logging.getLogger(__name__)
@@ -728,6 +732,23 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E4_max.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E4_max.setRange(0,self.aw.eventsMaxValue)
         self.E4_max.setValue(self.aw.eventslidermax[3])
+        self.E1_calc = QToolButton()
+        self.E1_calc.setText("...")
+        self.E1_calc.setToolTip(QApplication.translate("Form Caption", "Slider Calculator"))
+        self.E1_calc.setAccessibleDescription("")
+        self.E1_calc.clicked.connect(self.slider1ToolButton_triggered)
+        self.E2_calc = QToolButton()
+        self.E2_calc.setText("...")
+        self.E2_calc.setToolTip(QApplication.translate("Form Caption", "Slider Calculator"))
+        self.E2_calc.clicked.connect(self.slider2ToolButton_triggered)
+        self.E3_calc = QToolButton()
+        self.E3_calc.setText("...")
+        self.E3_calc.setToolTip(QApplication.translate("Form Caption", "Slider Calculator"))
+        self.E3_calc.clicked.connect(self.slider3ToolButton_triggered)
+        self.E4_calc = QToolButton()
+        self.E4_calc.setText("...")
+        self.E4_calc.clicked.connect(self.slider4ToolButton_triggered)
+        self.E4_calc.setToolTip(QApplication.translate("Form Caption", "Slider Calculator"))
         
         # https://www.home-barista.com/home-roasting/coffee-roasting-best-practices-scott-rao-t65601-70.html#p724654
         bernoulli_tooltip_text = QApplication.translate("Tooltip", "Applies the Bernoulli's gas law to the values computed\nby applying the given factor and offset to the slider value\nassuming that the gas pressureand not the gas flow is controlled.\nTo reduce heat (or gas flow) by 50% the gas pressure\nhas to be reduced by 4 times.")
@@ -1297,10 +1318,10 @@ class EventsDlg(ArtisanResizeablDialog):
         tab5Layout.addWidget(eventtitlelabel,0,0)
         tab5Layout.addWidget(actiontitlelabel,0,1)
         tab5Layout.addWidget(commandtitlelabel,0,2)
-        tab5Layout.addWidget(offsettitlelabel,0,3)
-        tab5Layout.addWidget(factortitlelabel,0,4)
-        tab5Layout.addWidget(min_titlelabel,0,5)
-        tab5Layout.addWidget(max_titlelabel,0,6)
+        tab5Layout.addWidget(min_titlelabel,0,3)
+        tab5Layout.addWidget(max_titlelabel,0,4)
+        tab5Layout.addWidget(offsettitlelabel,0,5)
+        tab5Layout.addWidget(factortitlelabel,0,6)
         tab5Layout.addWidget(sliderBernoullititlelabel,0,7)
         tab5Layout.addWidget(slidercoarsetitlelabel,0,8)
         tab5Layout.addWidget(slidertemptitlelabel,0,9)
@@ -1317,22 +1338,22 @@ class EventsDlg(ArtisanResizeablDialog):
         tab5Layout.addWidget(self.E2command,2,2)
         tab5Layout.addWidget(self.E3command,3,2)
         tab5Layout.addWidget(self.E4command,4,2)
-        tab5Layout.addWidget(self.E1offset,1,3)
-        tab5Layout.addWidget(self.E2offset,2,3)
-        tab5Layout.addWidget(self.E3offset,3,3)
-        tab5Layout.addWidget(self.E4offset,4,3)
-        tab5Layout.addWidget(self.E1factor,1,4)
-        tab5Layout.addWidget(self.E2factor,2,4)
-        tab5Layout.addWidget(self.E3factor,3,4)
-        tab5Layout.addWidget(self.E4factor,4,4)
-        tab5Layout.addWidget(self.E1_min,1,5)
-        tab5Layout.addWidget(self.E2_min,2,5)
-        tab5Layout.addWidget(self.E3_min,3,5)
-        tab5Layout.addWidget(self.E4_min,4,5)
-        tab5Layout.addWidget(self.E1_max,1,6)
-        tab5Layout.addWidget(self.E2_max,2,6)
-        tab5Layout.addWidget(self.E3_max,3,6)
-        tab5Layout.addWidget(self.E4_max,4,6)
+        tab5Layout.addWidget(self.E1_min,1,3)
+        tab5Layout.addWidget(self.E2_min,2,3)
+        tab5Layout.addWidget(self.E3_min,3,3)
+        tab5Layout.addWidget(self.E4_min,4,3)
+        tab5Layout.addWidget(self.E1_max,1,4)
+        tab5Layout.addWidget(self.E2_max,2,4)
+        tab5Layout.addWidget(self.E3_max,3,4)
+        tab5Layout.addWidget(self.E4_max,4,4)
+        tab5Layout.addWidget(self.E1offset,1,5)
+        tab5Layout.addWidget(self.E2offset,2,5)
+        tab5Layout.addWidget(self.E3offset,3,5)
+        tab5Layout.addWidget(self.E4offset,4,5)
+        tab5Layout.addWidget(self.E1factor,1,6)
+        tab5Layout.addWidget(self.E2factor,2,6)
+        tab5Layout.addWidget(self.E3factor,3,6)
+        tab5Layout.addWidget(self.E4factor,4,6)
         tab5Layout.addWidget(self.E1slider_bernoulli,1,7,Qt.AlignmentFlag.AlignCenter)
         tab5Layout.addWidget(self.E2slider_bernoulli,2,7,Qt.AlignmentFlag.AlignCenter)
         tab5Layout.addWidget(self.E3slider_bernoulli,3,7,Qt.AlignmentFlag.AlignCenter)
@@ -1349,6 +1370,11 @@ class EventsDlg(ArtisanResizeablDialog):
         tab5Layout.addWidget(self.E2unit,2,10)
         tab5Layout.addWidget(self.E3unit,3,10)
         tab5Layout.addWidget(self.E4unit,4,10)
+        tab5Layout.addWidget(self.E1_calc,1,11)
+        tab5Layout.addWidget(self.E2_calc,2,11)
+        tab5Layout.addWidget(self.E3_calc,3,11)
+        tab5Layout.addWidget(self.E4_calc,4,11)
+        
         SliderHelpHBox = QHBoxLayout()
         SliderHelpHBox.addStretch()
         SliderHelpHBox.addWidget(helpsliderDialogButton)
@@ -3114,8 +3140,128 @@ class EventsDlg(ArtisanResizeablDialog):
                 QApplication.translate("Form Caption","Event Annotations Help"),
                 eventannotations_help.content())
 
+    @pyqtSlot(bool)
+    def slider1ToolButton_triggered(self,_):
+        self.openSliderCalculator(self.E1_min.value(), self.E1_max.value(), self.E1factor, self.E1offset)
+
+    @pyqtSlot(bool)
+    def slider2ToolButton_triggered(self,_):
+        self.openSliderCalculator(self.E2_min.value(), self.E2_max.value(), self.E2factor, self.E2offset)
+
+    @pyqtSlot(bool)
+    def slider3ToolButton_triggered(self,_):
+        self.openSliderCalculator(self.E3_min.value(), self.E3_max.value(), self.E3factor, self.E3offset)
+
+    @pyqtSlot(bool)
+    def slider4ToolButton_triggered(self,_):
+        self.openSliderCalculator(self.E4_min.value(), self.E4_max.value(), self.E4factor, self.E4offset)
+
     def closeHelp(self):
         self.aw.closeHelpDialog(self.helpdialog)
+    
+    @pyqtSlot()
+    def calcSliderFactorOffset(self):
+        dialog = self.sender().window()
+        dialog.ui.lineEdit_TargetValue_min.setText(self.aw.comma2dot(dialog.ui.lineEdit_TargetValue_min.text()))
+        dialog.ui.lineEdit_TargetValue_min.repaint()
+        dialog.ui.lineEdit_TargetValue_max.setText(self.aw.comma2dot(dialog.ui.lineEdit_TargetValue_max.text()))
+        dialog.ui.lineEdit_TargetValue_max.repaint()
+        
+        min_text = dialog.ui.lineEdit_TargetValue_min.text()
+        max_text = dialog.ui.lineEdit_TargetValue_max.text()
+        
+        offset = ""
+        factor = ""
+        if min_text != "" and max_text != "":
+            try:
+                min_slider = min(self.E1_min.value(), self.E1_max.value())
+                max_slider = max(self.E1_min.value(), self.E1_max.value())
+                tmin = float(min_text)
+                tmax = float(max_text)
+                min_target = min(tmin, tmax)
+                max_target = max(tmin, tmax)
+                if min_target != max_target and min_slider != max_slider:
+                    import numpy
+                    res = numpy.polyfit([min_slider, max_slider], [min_target, max_target], 1)
+                    if len(res) == 2:
+                        factor = f"{res[0]:.4f}"
+                        offset = f"{res[1]:.2f}"
+            except Exception: # pylint: disable=broad-except
+                pass
+        dialog.ui.lineEdit_Factor.setText(factor)
+        dialog.ui.lineEdit_Offset.setText(offset) 
+
+    def openSliderCalculator(self,sliderMin:int, sliderMax:int, factorWidget, offsetWidget):
+        dialog = SliderCalculator(self, factorWidget, offsetWidget)
+        layout  = dialog.layout()
+        # set data
+        dialog.ui.lineEdit_SliderValue_min.setText(str(sliderMin))
+        dialog.ui.lineEdit_SliderValue_max.setText(str(sliderMax))
+        # translations
+        dialog.ui.label_min.setText(QApplication.translate("Label","Min"))
+        dialog.ui.label_max.setText(QApplication.translate("Label","Max"))
+        dialog.ui.label_SliderValue.setText(QApplication.translate("Label","Slider Value"))
+        dialog.ui.label_TargetValue.setText(QApplication.translate("Label","Target Value"))
+        dialog.ui.label_Factor.setText(QApplication.translate("Label","Factor"))
+        dialog.ui.label_Offset.setText(QApplication.translate("Label","Offset"))
+        # set validators
+        dialog.ui.lineEdit_TargetValue_min.setValidator(self.aw.createCLocaleDoubleValidator(-99999., 99999., 2, dialog.ui.lineEdit_TargetValue_min))  # the max limit has to be high enough otherwise the connected signals are not send!
+        dialog.ui.lineEdit_TargetValue_max.setValidator(self.aw.createCLocaleDoubleValidator(-99999., 99999., 2, dialog.ui.lineEdit_TargetValue_max))  # the max limit has to be high enough otherwise the connected signals are not send!
+        # connect signals
+        dialog.ui.lineEdit_TargetValue_min.editingFinished.connect(self.calcSliderFactorOffset)
+        dialog.ui.lineEdit_TargetValue_max.editingFinished.connect(self.calcSliderFactorOffset)
+        
+#        dialog.ui.buttonbox.accepted.connect(dialog.)
+        
+        # fixed hight
+        layout.setSpacing(7)
+        dialog.setFixedHeight(dialog.sizeHint().height())
+        dialog.setFixedWidth(dialog.sizeHint().width())
+        res = dialog.exec()
+        #deleteLater() will not work here as the dialog is still bound via the parent
+        #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
+        # the following will immedately release the memory dispite this parent link
+        QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
+        try: # sip not supported on older PyQt versions (RPi!)
+            sip.delete(dialog)
+            #print(sip.isdeleted(dialog))
+        except Exception: # pylint: disable=broad-except
+            pass
+        return res
+        
+#########################################################################
+#############  SLIDER Calculator Dialog  ################################
+#########################################################################
+
+class SliderCalculator(ArtisanDialog):
+    def __init__(self, parent = None, factorWidget = None, offsetWidget = None):
+        super().__init__(parent)
+        self.parent = parent
+        self.factorWidget = factorWidget
+        self.offsetWidget = offsetWidget
+        self.ui = SliderCalculatorDialog.Ui_SliderCalculator()
+        self.ui.setupUi(self)
+        self.setWindowTitle(QApplication.translate("Form Caption","Slider Calculator"))
+        self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
+        # hack to assign the Apply button the AcceptRole without loosing default system translations
+        applyButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply)
+        self.ui.buttonBox.removeButton(applyButton)
+        self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
+    
+    @pyqtSlot()
+    def accept(self):
+        if self.factorWidget is not None and self.offsetWidget != None:
+            factor_text = self.ui.lineEdit_Factor.text()
+            offset_text = self.ui.lineEdit_Offset.text()
+            if factor_text != "" and offset_text != "":
+                try:
+                    self.factorWidget.setValue(float(factor_text))
+                    self.offsetWidget.setValue(float(offset_text))
+                except Exception: # pylint: disable=broad-except
+                    pass
+        self.close()
+        
+
 
 #########################################################################
 #############  CUSTOM EVENT DIALOG ######################################
