@@ -3779,11 +3779,11 @@ class serialport():
                     ser = self.serialPort2serialString(s,self.aw.ser.PhidgetDigitalOut[serial][channel].getHubPort())
                     try:
                         self.aw.ser.PhidgetDigitalOutLastToggle[ser][channel] = lastPWM # remember lastPWM to be able to switch on again
-                    except:
+                    except:  # pylint: disable=broad-except
                         pass
                     try:
                         self.aw.ser.PhidgetDigitalOutLastToggle[str(s)][channel] = lastPWM # remember lastPWM to be able to switch on again
-                    except:
+                    except:  # pylint: disable=broad-except
                         pass
     
     def phidgetOUTpulsePWM(self,channel,millis,serial=None):
@@ -3816,12 +3816,12 @@ class serialport():
                         try:
                             self.aw.ser.PhidgetDigitalOutLastPWM[sr][channel] = value
                             self.aw.ser.PhidgetDigitalOutLastToggle[sr][channel] = None # clears the lastToggle value
-                        except:
+                        except: # pylint: disable=broad-except
                             pass
                         try:
                             self.aw.ser.PhidgetDigitalOutLastPWM[str(s)][channel] = value
                             self.aw.ser.PhidgetDigitalOutLastToggle[str(s)][channel] = None # clears the lastToggle value
-                        except:
+                        except: # pylint: disable=broad-except
                             pass
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)

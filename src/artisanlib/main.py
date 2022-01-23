@@ -22862,7 +22862,7 @@ class ApplicationWindow(QMainWindow):
                                     if len(cs_split) == 2:
                                         aw.ser.phidgetOUTsetPWMfrequency(int(cs_split[0]),toFloat(eval(cs_split[1]))) # pylint: disable=eval-used
                                     elif len(cs_split) == 3:
-                                        aw.ser.phidgetOUTsetPWMfrequency(int(cs_split[0]),toFloat(eval(cs_split[1]),cs_split[2])) # pylint: disable=eval-used
+                                        aw.ser.phidgetOUTsetPWMfrequency(int(cs_split[0]),toFloat(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
                                 elif cs.startswith('toggle(') and len(cs)>8:
                                     cs_split = cs[7:-1].split(',')
                                     if len(cs_split) == 1:
@@ -22874,7 +22874,7 @@ class ApplicationWindow(QMainWindow):
                                     if len(cs_split) == 2:
                                         aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),toInt(eval(cs_split[1]))) # pylint: disable=eval-used
                                     elif len(cs_split) == 3:
-                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),toInt(eval(cs_split[1]),cs_split[2])) # pylint: disable=eval-used
+                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),toInt(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
                                 elif cs.startswith('togglehub(') and len(cs)>11:
                                     cs_split = cs[10:-1].split(',')
                                     if len(cs_split) == 1:
