@@ -147,7 +147,7 @@ with
 * `v` : voltage in V (float), eg. 5.5 for 5.5V
 * `s` : sleep time in seconds (float)
 *  `r` : voltage range with `r=5` to `[0-5V]` and `r=10` to `[-10,10V]`
-* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `out(0,5.5,560282)` or `out(0,5.5,560282:2)`. Using a command actions, like in `out(0,5.5)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
+* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `out(0,5.5,560282)` or `out(0,5.5,560282:2)`. Using a command actions, like in `out(0,5.5)`, without specifying a hub serial number, will attach to the first yet unattached module connected to the hub with the lowest serial number instead. If just a port number is given as in `out(0,5.5,:2)`, the yet unattached module connected to the given port (here 2) of the first hub with the lowest serial number is addressed.
 
 The default voltage range for the OUT1001 and OUT1002 is `[-10,10V]` (`r=10`). The following table summarizes the interplay of `r` and `v`.
 
@@ -185,7 +185,7 @@ with
 * `b` : bool with off (b=0) and on (b=1)
 * `t` : time in milliseconds (integer)
 * `s` : sleep time in seconds (float)
-* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `set(0,1,560282)` or `set(0,1,560282:2)`. Using a command actions, like in `set(0,1)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
+* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `set(0,1,560282)` or `set(0,1,560282:2)`. Using a command actions, like in `set(0,1)`, without specifying a hub serial number, will attach to the first yet unattached module connected to the hub with the lowest serial number instead. If just a port number is given as in `set(0,1,:2)`, the yet unattached module connected to the given port (here 2) of the first hub with the lowest serial number is addressed.
 
 
 ### 4.3 HUB PWM Output 
@@ -203,7 +203,7 @@ with
 * `p` : the HUB port to be addressed (integer)
 * `v` : value (integer)
 * `t` : time in milliseconds (integer)
-* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `outhub(0,8,560282)` or `outhub(0,8,560282:2)`. Using a command actions, like in `outhub(0,8)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
+* `sn` : optional hub serial number like in `outhub(0,8,560282)`. Using a command actions, like in `outhub(0,8)`, without specifying a hub serial number will attach to the first unattached hub with the lowest serial number instead.
 
 
 ### 4.4 PWM Output
@@ -224,7 +224,7 @@ with
 * `v` : value (integer)
 * `f` : frequency (real)
 * `t` : time in milliseconds (integer)
-* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `out(0,8,560282)` or `out(0,8,560282:2)`. Using a command actions, like in `out(0,8)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
+* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `out(0,8,560282)` or `out(0,8,560282:2)`. Using a command actions, like in `out(0,8)`, without specifying a hub serial number, will attach to the first yet unattached module connected to the hub with the lowest serial number instead. If just a port number is given as in `out(0,8,:2)`, the yet unattached module connected to the given port (here 2) of the first hub with the lowest serial number is addressed.
 
 
 ### 4.5 DC Motor Control
@@ -247,7 +247,7 @@ with
 * `a` : acceleration (float)
 * `v` : velocity (float)
 * `s` : sleep time in seconds (float)
-* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `accel(0,0.5,560282)` or `accel(0,0.5,560282:2)`. Using a command actions, like in `accel(0,0.5)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
+* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `accel(0,0.5,560282)` or `accel(0,0.5,560282:2)`. Using a command actions, like in `accel(0,0.5)`, without specifying a hub serial number, will attach to the first yet unattached module connected to the hub with the lowest serial number instead. If just a port number is given as in `accel(0,0.5,:2)`, the yet unattached module connected to the given port (here 2) of the first hub with the lowest serial number is addressed.
 
 
 ### 4.6 RC Servo Control
@@ -274,7 +274,7 @@ with
 * `ch` : the channel to be addressed (integer)
 * `min, max, l, pos` : values (integer)
 * `b` : bool value given as 0 (false) or 1 (true)
-* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `volt(0,6,560282)` or `volt(0,6,560282:2)`. Using a command actions, like in `volt(0,6)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
+* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `volt(0,6,560282)` or `volt(0,6,560282:2)`. Using a command actions, like in `volt(0,6)`, without specifying a hub serial number, will attach to the first yet unattached module connected to the hub with the lowest serial number instead. If just a port number is given as in `volt(0,6,:2)`, the yet unattached module connected to the given port (here 2) of the first hub with the lowest serial number is addressed.
 
 
 
