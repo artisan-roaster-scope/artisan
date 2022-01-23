@@ -22560,12 +22560,16 @@ class ApplicationWindow(QMainWindow):
                             cs_len = len(cs_a)
 
                             if cs_a[0] == "set":
+                                if cs_len>2:
+                                    channel=toInt(cs_a[1])
+                                    value=toBool(cs_a[2]) # pylint: disable=eval-used
                                 if cs_len == 3:
-                                    if not aw.ser.phidgetBinaryOUTset(toInt(cs_a[1]), bool(toInt(cs_a[2]))):
+                                    if not aw.ser.phidgetBinaryOUTset(channel, value):
                                         aw.sendmessage(QApplication.translate("Message", "Failed to set(%s, %s)" % (cs_a[1], cs_a[2])))
                                 elif cs_len == 4:
-                                    if not aw.ser.phidgetBinaryOUTset(toInt(cs_a[1]), bool(toInt(cs_a[2])), cs_a[3]):
-                                        aw.sendmessage(QApplication.translate("Message", "Failed to set(%s, %s, %s)" % (cs_a[1], cs_a[2], cs_a[3])))
+                                    serial = cs_a[3]
+                                    if not aw.ser.phidgetBinaryOUTset(channel, value, serial):
+                                        aw.sendmessage(QApplication.translate("Message", "Failed to set(%s, %s, %s)" % (cs_a[1], cs_a[2], serial)))
 
                             elif cs_a[0] == "toggle" and cs_len > 1:
                                 c = toInt(cs_a[1])
@@ -22845,16 +22849,20 @@ class ApplicationWindow(QMainWindow):
                             try:
                                 if cs.startswith('out(') and len(cs)>7:
                                     cs_split = cs[4:-1].split(',')
-                                    if len(cs_split) == 2:
-                                        aw.ser.phidgetOUTsetPWM(int(cs_split[0]),int(round(eval(cs_split[1])))) # pylint: disable=eval-used
-                                    elif len(cs_split) == 3:
-                                        aw.ser.phidgetOUTsetPWM(int(cs_split[0]),int(round(eval(cs_split[1])),cs_split[2])) # pylint: disable=eval-used
+                                    if len(cs_split)>1:
+                                        channel=toInt(cs_split[0])
+                                        value=toInt(eval(cs_split[1])) # pylint: disable=eval-used
+                                        if len(cs_split) == 2:
+                                            aw.ser.phidgetOUTsetPWM(channel, value)
+                                        elif len(cs_split) == 3:
+                                            serial=cs_split[2]
+                                            aw.ser.phidgetOUTsetPWM(channel, value, serial)
                                 elif cs.startswith('frequency(') and len(cs)>14:
                                     cs_split = cs[10:-1].split(',')
                                     if len(cs_split) == 2:
-                                        aw.ser.phidgetOUTsetPWMfrequency(int(cs_split[0]),float(eval(cs_split[1]))) # pylint: disable=eval-used
+                                        aw.ser.phidgetOUTsetPWMfrequency(int(cs_split[0]),toFloat(eval(cs_split[1]))) # pylint: disable=eval-used
                                     elif len(cs_split) == 3:
-                                        aw.ser.phidgetOUTsetPWMfrequency(int(cs_split[0]),float(eval(cs_split[1]),cs_split[2])) # pylint: disable=eval-used
+                                        aw.ser.phidgetOUTsetPWMfrequency(int(cs_split[0]),toFloat(eval(cs_split[1]),cs_split[2])) # pylint: disable=eval-used
                                 elif cs.startswith('toggle(') and len(cs)>8:
                                     cs_split = cs[7:-1].split(',')
                                     if len(cs_split) == 1:
@@ -22864,9 +22872,9 @@ class ApplicationWindow(QMainWindow):
                                 elif cs.startswith('outhub(') and len(cs)>10:
                                     cs_split = cs[7:-1].split(',')
                                     if len(cs_split) == 2:
-                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),int(round(eval(cs_split[1])))) # pylint: disable=eval-used
+                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),toInt(eval(cs_split[1]))) # pylint: disable=eval-used
                                     elif len(cs_split) == 3:
-                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),int(round(eval(cs_split[1])),cs_split[2])) # pylint: disable=eval-used
+                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),toInt(eval(cs_split[1]),cs_split[2])) # pylint: disable=eval-used
                                 elif cs.startswith('togglehub(') and len(cs)>11:
                                     cs_split = cs[10:-1].split(',')
                                     if len(cs_split) == 1:
@@ -22899,9 +22907,9 @@ class ApplicationWindow(QMainWindow):
                                     try:
                                         cs_split = cs[len('enabled('):-1].split(',')
                                         if len(cs_split) > 2:
-                                            aw.ser.yoctoPWMenabled(int(cs_split[0]),bool(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
+                                            aw.ser.yoctoPWMenabled(int(cs_split[0]),toBool(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
                                         else:
-                                            aw.ser.yoctoPWMenabled(int(cs_split[0]),bool(eval(cs_split[1]))) # pylint: disable=eval-used
+                                            aw.ser.yoctoPWMenabled(int(cs_split[0]),toBool(eval(cs_split[1]))) # pylint: disable=eval-used
                                     except Exception as e: # pylint: disable=broad-except
                                         _log.exception(e)
                                 # freq(c,f[,sn])
@@ -22909,9 +22917,9 @@ class ApplicationWindow(QMainWindow):
                                     try:
                                         cs_split = cs[len('freq('):-1].split(',')
                                         if len(cs_split) > 2:
-                                            aw.ser.yoctoPWMsetFrequency(int(cs_split[0]),int(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
+                                            aw.ser.yoctoPWMsetFrequency(int(cs_split[0]),toInt(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
                                         else:
-                                            aw.ser.yoctoPWMsetFrequency(int(cs_split[0]),int(eval(cs_split[1]))) # pylint: disable=eval-used
+                                            aw.ser.yoctoPWMsetFrequency(int(cs_split[0]),toInt(eval(cs_split[1]))) # pylint: disable=eval-used
                                     except Exception as e: # pylint: disable=broad-except
                                         _log.exception(e)
                                 # duty(c,d[,sn])
@@ -22919,9 +22927,9 @@ class ApplicationWindow(QMainWindow):
                                     try:
                                         cs_split = cs[len('duty('):-1].split(',')
                                         if len(cs_split) > 2:
-                                            aw.ser.yoctoPWMsetDuty(int(cs_split[0]),float(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
+                                            aw.ser.yoctoPWMsetDuty(int(cs_split[0]),toFloat(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
                                         else:
-                                            aw.ser.yoctoPWMsetDuty(int(cs_split[0]),float(eval(cs_split[1]))) # pylint: disable=eval-used
+                                            aw.ser.yoctoPWMsetDuty(int(cs_split[0]),toFloat(eval(cs_split[1]))) # pylint: disable=eval-used
                                     except Exception as e: # pylint: disable=broad-except
                                         _log.exception(e)
                                 # move(c,d,t[,sn])
@@ -22929,9 +22937,9 @@ class ApplicationWindow(QMainWindow):
                                     try:
                                         cs_split = cs[len('move('):-1].split(',')
                                         if len(cs_split) > 3:
-                                            aw.ser.yoctoPWMmove(int(cs_split[0]),float(eval(cs_split[1])),int(cs_split[2]),cs_split[3]) # pylint: disable=eval-used
+                                            aw.ser.yoctoPWMmove(int(cs_split[0]),toFloat(eval(cs_split[1])),int(cs_split[2]),cs_split[3]) # pylint: disable=eval-used
                                         else:
-                                            aw.ser.yoctoPWMmove(int(cs_split[0]),float(eval(cs_split[1])),int(cs_split[2])) # pylint: disable=eval-used
+                                            aw.ser.yoctoPWMmove(int(cs_split[0]),toFloat(eval(cs_split[1])),int(cs_split[2])) # pylint: disable=eval-used
                                     except Exception as e: # pylint: disable=broad-except
                                         _log.exception(e)
                             except Exception as e: # pylint: disable=broad-except
@@ -22946,9 +22954,9 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     cs_split = cs[4:-1].split(',')
                                     if len(cs_split) == 2:
-                                        aw.ser.phidgetVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1]))) # pylint: disable=eval-used
+                                        aw.ser.phidgetVOUTsetVOUT(int(cs_split[0]),toFloat(eval(cs_split[1]))) # pylint: disable=eval-used
                                     elif len(cs_split) == 3:
-                                        aw.ser.phidgetVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
+                                        aw.ser.phidgetVOUTsetVOUT(int(cs_split[0]),toFloat(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
                                 except Exception as e:  # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('range(') and len(cs)>7:
@@ -22965,9 +22973,9 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     cs_split = cs[5:-1].split(',')
                                     if len(cs_split) > 2:
-                                        aw.ser.yoctoVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
+                                        aw.ser.yoctoVOUTsetVOUT(int(cs_split[0]),toFloat(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
                                     else:
-                                        aw.ser.yoctoVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1]))) # pylint: disable=eval-used
+                                        aw.ser.yoctoVOUTsetVOUT(int(cs_split[0]),toFloat(eval(cs_split[1]))) # pylint: disable=eval-used
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # for YOCTOPUCE CURRENT OUT modules "cout(c[,sn])" with c the current as float [3.0-21.0] and the optional sn either the modules serial number or its name
@@ -22976,9 +22984,9 @@ class ApplicationWindow(QMainWindow):
                                     #c = cs[5:-1]
                                     cs_split = cs[5:-1].split(',')
                                     if len(cs_split) > 1:
-                                        aw.ser.yoctoCOUTsetCOUT(float(eval(cs_split[0])),cs_split[1]) # pylint: disable=eval-used
+                                        aw.ser.yoctoCOUTsetCOUT(toFloat(eval(cs_split[0])),cs_split[1]) # pylint: disable=eval-used
                                     else:
-                                        aw.ser.yoctoCOUTsetCOUT(float(eval(cs_split[0]))) # pylint: disable=eval-used
+                                        aw.ser.yoctoCOUTsetCOUT(toFloat(eval(cs_split[0]))) # pylint: disable=eval-used
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
@@ -23497,7 +23505,7 @@ class ApplicationWindow(QMainWindow):
                             # pidLookahead(<n>) adds <n> to the current SV. Note that n can be negativex
                             elif cs.startswith("pidLookahead(") and cs.endswith(")"):
                                 try:
-                                    lookahead = int(eval(cs[len("pidLookahead("):-1])) # pylint: disable=eval-used
+                                    lookahead = toInt(eval(cs[len("pidLookahead("):-1])) # pylint: disable=eval-used
                                     if self.qmc.device == 0 and self.fujipid and self.qmc.Controlbuttonflag: # FUJI PID
                                         self.fujipid.lookahead = lookahead
                                         self.sendmessage(QApplication.translate("Message","PID Lookahead: {0}").format(self.fujipid.lookahead))
@@ -23521,7 +23529,7 @@ class ApplicationWindow(QMainWindow):
                                     args = cs[len("showCurve("):-1].split(",")
                                     if len(args) == 2:
                                         curve_name = args[0]
-                                        state = bool(eval(args[1])) # pylint: disable=eval-used
+                                        state = toBool(eval(args[1])) # pylint: disable=eval-used
                                         self.qmc.showCurveSignal.emit(curve_name, state)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -23532,7 +23540,7 @@ class ApplicationWindow(QMainWindow):
                                     if len(args) == 3:
                                         extra_device = int(args[0])
                                         curve = args[1]
-                                        state = bool(eval(args[2])) # pylint: disable=eval-used
+                                        state = toBool(eval(args[2])) # pylint: disable=eval-used
                                         self.qmc.showExtraCurveSignal.emit(extra_device, curve, state)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -23542,7 +23550,7 @@ class ApplicationWindow(QMainWindow):
                                     args = cs[len("showEvents("):-1].split(",")
                                     if len(args) == 2:
                                         event_type = int(args[0])
-                                        state = bool(eval(args[1])) # pylint: disable=eval-used
+                                        state = toBool(eval(args[1])) # pylint: disable=eval-used
                                         self.qmc.showEventsSignal.emit(event_type, state)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -23551,7 +23559,7 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     args = cs[len("showBackgroundEvents("):-1].split(",")
                                     if len(args) == 1:
-                                        state = bool(eval(args[0])) # pylint: disable=eval-used
+                                        state = toBool(eval(args[0])) # pylint: disable=eval-used
                                         self.qmc.showBackgroundEventsSignal.emit(state)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -23627,7 +23635,7 @@ class ApplicationWindow(QMainWindow):
                                         sn = cs_split[n]
                                     else:
                                         sn = None
-                                    aw.ser.phidgetRCset(int(channel),float(eval(pos)),sn) # pylint: disable=eval-used
+                                    aw.ser.phidgetRCset(int(channel),toFloat(eval(pos)),sn) # pylint: disable=eval-used
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith("ramp(") and len(cs) > 8:
@@ -23697,7 +23705,7 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     cs_split = cs[8:-1].split(',')
                                     c = int(cs_split[0])
-                                    b = bool(eval(cs_split[1])) # pylint: disable=eval-used
+                                    b = toBool(eval(cs_split[1])) # pylint: disable=eval-used
                                     if len(cs_split) > 2:
                                         sn = cs_split[2]
                                         aw.ser.yoctoSERVOenabled(c,b,sn)
@@ -23710,7 +23718,7 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     cs_split = cs[5:-1].split(',')
                                     c = int(cs_split[0])
-                                    p = int(eval(cs_split[1])) # pylint: disable=eval-used
+                                    p = toInt(eval(cs_split[1])) # pylint: disable=eval-used
                                     if len(cs_split) > 2:
                                         try:
                                             t = int(cs_split[2])

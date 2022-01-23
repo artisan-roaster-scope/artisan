@@ -3777,8 +3777,14 @@ class serialport():
                     # also establish for the entry with serial number
                     s = self.aw.ser.PhidgetDigitalOut[serial][channel].getDeviceSerialNumber()
                     ser = self.serialPort2serialString(s,self.aw.ser.PhidgetDigitalOut[serial][channel].getHubPort())
-                    self.aw.ser.PhidgetDigitalOutLastToggle[ser][channel] = lastPWM # remember lastPWM to be able to switch on again
-                    self.aw.ser.PhidgetDigitalOutLastToggle[str(s)][channel] = lastPWM # remember lastPWM to be able to switch on again
+                    try:
+                        self.aw.ser.PhidgetDigitalOutLastToggle[ser][channel] = lastPWM # remember lastPWM to be able to switch on again
+                    except:
+                        pass
+                    try:
+                        self.aw.ser.PhidgetDigitalOutLastToggle[str(s)][channel] = lastPWM # remember lastPWM to be able to switch on again
+                    except:
+                        pass
     
     def phidgetOUTpulsePWM(self,channel,millis,serial=None):
         self.phidgetOUTsetPWM(channel,100,serial)
@@ -3807,10 +3813,16 @@ class serialport():
                         # also establish for the entry with serial number
                         s = out[channel].getDeviceSerialNumber()
                         sr = self.serialPort2serialString(s,out[channel].getHubPort())
-                        self.aw.ser.PhidgetDigitalOutLastPWM[sr][channel] = value
-                        self.aw.ser.PhidgetDigitalOutLastToggle[sr][channel] = None # clears the lastToggle value
-                        self.aw.ser.PhidgetDigitalOutLastPWM[str(s)][channel] = value
-                        self.aw.ser.PhidgetDigitalOutLastToggle[str(s)][channel] = None # clears the lastToggle value
+                        try:
+                            self.aw.ser.PhidgetDigitalOutLastPWM[sr][channel] = value
+                            self.aw.ser.PhidgetDigitalOutLastToggle[sr][channel] = None # clears the lastToggle value
+                        except:
+                            pass
+                        try:
+                            self.aw.ser.PhidgetDigitalOutLastPWM[str(s)][channel] = value
+                            self.aw.ser.PhidgetDigitalOutLastToggle[str(s)][channel] = None # clears the lastToggle value
+                        except:
+                            pass
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
