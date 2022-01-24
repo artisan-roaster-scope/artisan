@@ -14250,6 +14250,12 @@ class tgraphcanvas(FigureCanvas):
             #pylint: disable=E0611
             #reset (clear) plot
             self.ax_lines_clear()
+            # remove logo image while in Designer
+            if self.ai is not None:
+                try:
+                    self.ai.remove()
+                except Exception: # pylint: disable=broad-except
+                    pass
 
             fontprop_medium = aw.mpl_fontproperties.copy()
             fontprop_medium.set_size("medium")
@@ -29169,7 +29175,7 @@ class ApplicationWindow(QMainWindow):
                         fconv = str(QDir(outdir).filePath(fname + str(fileext)))
                         if not os.path.exists(fconv):
                             aw.qmc.reset(redraw=False,soundOn=False)
-                            self.setProfile(f,self.deserialize(f),quiet=True)
+                            self.setProfile(f,self.deserialize(f),quiet=False)
                             self.qmc.redraw()
                             image = aw.qmc.grab()
                             if filetype in ["JPEG","BMP","PNG"]:
