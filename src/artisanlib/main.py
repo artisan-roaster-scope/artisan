@@ -13732,10 +13732,11 @@ class tgraphcanvas(FigureCanvas):
                 ET_BT = ET - BT
                 delta = numpy.array([numpy.nan if x == -1 else x for x in self.delta2[-k:]], dtype='float64')
                 idx = numpy.isfinite(ET_BT) & numpy.isfinite(delta)
-                z = numpy.polyfit(ET_BT[idx],delta[idx], 1)
+                z, residuals, rank, singular_values, rcond = numpy.polyfit(ET_BT[idx],delta[idx], 1, full=True)
                 print("z",z)
+                print(residuals, rank)
                 f = numpy.poly1d(z)
-                return f(ET_BT[-1]), f(0)
+                return f(ET_BT[-1]), residuals #f(0)
             except Exception as e:
                 print(e)
                 _log.exception(e)

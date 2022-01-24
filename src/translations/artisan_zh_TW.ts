@@ -4767,7 +4767,7 @@ END</source>
       <translation>事件</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3244" />
+      <location filename="../artisanlib/events.py" line="3245" />
       <location filename="../artisanlib/events.py" line="751" />
       <location filename="../artisanlib/events.py" line="746" />
       <location filename="../artisanlib/events.py" line="742" />
@@ -4791,7 +4791,7 @@ END</source>
       <translation>事件說明幫助</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3280" />
+      <location filename="../artisanlib/events.py" line="3281" />
       <source>Event</source>
       <translation>事件</translation>
     </message>
@@ -10477,7 +10477,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
   <context>
     <name>Label</name>
     <message>
-      <location filename="../artisanlib/events.py" line="3202" />
+      <location filename="../artisanlib/events.py" line="3206" />
       <location filename="../artisanlib/events.py" line="831" />
       <location filename="../artisanlib/events.py" line="587" />
       <location filename="../artisanlib/pid_dialogs.py" line="319" />
@@ -10490,7 +10490,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <translation>最大</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3201" />
+      <location filename="../artisanlib/events.py" line="3205" />
       <location filename="../artisanlib/events.py" line="829" />
       <location filename="../artisanlib/events.py" line="585" />
       <location filename="../artisanlib/pid_dialogs.py" line="311" />
@@ -11151,14 +11151,14 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <translation>指令</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3206" />
+      <location filename="../artisanlib/events.py" line="3210" />
       <location filename="../artisanlib/events.py" line="581" />
       <source>Offset</source>
       <translation>補償</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1007" />
-      <location filename="../artisanlib/events.py" line="3205" />
+      <location filename="../artisanlib/events.py" line="3209" />
       <location filename="../artisanlib/events.py" line="583" />
       <source>Factor</source>
       <translation>因子</translation>
@@ -11218,12 +11218,12 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <translation>其文本</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3203" />
+      <location filename="../artisanlib/events.py" line="3207" />
       <source>Slider Value</source>
       <translation>滑塊值</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3204" />
+      <location filename="../artisanlib/events.py" line="3208" />
       <source>Target Value</source>
       <translation>目標價值</translation>
     </message>
@@ -17657,7 +17657,7 @@ Continue?</source>
       <location filename="../artisanlib/alarms.py" line="962" />
       <location filename="../artisanlib/roast_properties.py" line="4109" />
       <location filename="../artisanlib/background.py" line="597" />
-      <location filename="../artisanlib/events.py" line="3289" />
+      <location filename="../artisanlib/events.py" line="3290" />
       <location filename="../artisanlib/events.py" line="2193" />
       <location filename="../artisanlib/pid_dialogs.py" line="543" />
       <location filename="../artisanlib/pid_dialogs.py" line="391" />
@@ -17677,7 +17677,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4110" />
       <location filename="../artisanlib/background.py" line="598" />
-      <location filename="../artisanlib/events.py" line="3291" />
+      <location filename="../artisanlib/events.py" line="3292" />
       <location filename="../artisanlib/events.py" line="2194" />
       <source>Type</source>
       <translation>類型</translation>
@@ -17687,7 +17687,7 @@ Continue?</source>
       <location filename="../artisanlib/alarms.py" line="959" />
       <location filename="../artisanlib/roast_properties.py" line="4111" />
       <location filename="../artisanlib/background.py" line="599" />
-      <location filename="../artisanlib/events.py" line="3297" />
+      <location filename="../artisanlib/events.py" line="3298" />
       <location filename="../artisanlib/events.py" line="2195" />
       <source>Value</source>
       <translation>數值</translation>

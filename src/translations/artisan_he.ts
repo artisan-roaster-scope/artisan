@@ -4692,7 +4692,7 @@ END</source>
       <translation type="unfinished">שלבים</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3244" />
+      <location filename="../artisanlib/events.py" line="3245" />
       <location filename="../artisanlib/events.py" line="751" />
       <location filename="../artisanlib/events.py" line="746" />
       <location filename="../artisanlib/events.py" line="742" />
@@ -4716,7 +4716,7 @@ END</source>
       <translation>הערות לאירועים</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3280" />
+      <location filename="../artisanlib/events.py" line="3281" />
       <source>Event</source>
       <translation type="unfinished">שלב</translation>
     </message>
@@ -10377,7 +10377,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
   <context>
     <name>Label</name>
     <message>
-      <location filename="../artisanlib/events.py" line="3202" />
+      <location filename="../artisanlib/events.py" line="3206" />
       <location filename="../artisanlib/events.py" line="831" />
       <location filename="../artisanlib/events.py" line="587" />
       <location filename="../artisanlib/pid_dialogs.py" line="319" />
@@ -10390,7 +10390,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <translation type="unfinished">מקס</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3201" />
+      <location filename="../artisanlib/events.py" line="3205" />
       <location filename="../artisanlib/events.py" line="829" />
       <location filename="../artisanlib/events.py" line="585" />
       <location filename="../artisanlib/pid_dialogs.py" line="311" />
@@ -11051,14 +11051,14 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <translation type="unfinished">פקודה</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3206" />
+      <location filename="../artisanlib/events.py" line="3210" />
       <location filename="../artisanlib/events.py" line="581" />
       <source>Offset</source>
       <translation type="unfinished">קיזוז</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1007" />
-      <location filename="../artisanlib/events.py" line="3205" />
+      <location filename="../artisanlib/events.py" line="3209" />
       <location filename="../artisanlib/events.py" line="583" />
       <source>Factor</source>
       <translation type="unfinished">פקטור</translation>
@@ -11118,12 +11118,12 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <translation>הטקסט שלה</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3203" />
+      <location filename="../artisanlib/events.py" line="3207" />
       <source>Slider Value</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3204" />
+      <location filename="../artisanlib/events.py" line="3208" />
       <source>Target Value</source>
       <translation type="unfinished" />
     </message>
@@ -17035,7 +17035,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <location filename="../artisanlib/alarms.py" line="962" />
       <location filename="../artisanlib/roast_properties.py" line="4109" />
       <location filename="../artisanlib/background.py" line="597" />
-      <location filename="../artisanlib/events.py" line="3289" />
+      <location filename="../artisanlib/events.py" line="3290" />
       <location filename="../artisanlib/events.py" line="2193" />
       <location filename="../artisanlib/pid_dialogs.py" line="543" />
       <location filename="../artisanlib/pid_dialogs.py" line="391" />
@@ -17055,7 +17055,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4110" />
       <location filename="../artisanlib/background.py" line="598" />
-      <location filename="../artisanlib/events.py" line="3291" />
+      <location filename="../artisanlib/events.py" line="3292" />
       <location filename="../artisanlib/events.py" line="2194" />
       <source>Type</source>
       <translation type="unfinished">סוג</translation>
@@ -17065,7 +17065,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <location filename="../artisanlib/alarms.py" line="959" />
       <location filename="../artisanlib/roast_properties.py" line="4111" />
       <location filename="../artisanlib/background.py" line="599" />
-      <location filename="../artisanlib/events.py" line="3297" />
+      <location filename="../artisanlib/events.py" line="3298" />
       <location filename="../artisanlib/events.py" line="2195" />
       <source>Value</source>
       <translation type="unfinished">ערך</translation>
