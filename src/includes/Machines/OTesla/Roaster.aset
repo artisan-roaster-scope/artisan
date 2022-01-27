@@ -1,6 +1,6 @@
 [General]
 Delay=3000
-roastertype_setup=Tesla
+roastertype_setup=OTesla
 
 [Device]
 id=29

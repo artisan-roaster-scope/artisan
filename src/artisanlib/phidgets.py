@@ -127,8 +127,8 @@ class PhidgetManager():
                             except Exception: # pylint: disable=broad-except
                                 #_log.exception(e)
                                 pass
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
+            except Exception: # pylint: disable=broad-except
+                pass # raises an exception on non VINT Phidget modules
             self.attachedPhidgetChannels.pop(channel, None)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)

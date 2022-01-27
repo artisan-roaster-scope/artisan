@@ -1407,7 +1407,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 for i in range(nddevices):
                     try:
                         typeComboBox =  MyQComboBox()
-                        typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+#                        typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+#                        typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
                         typeComboBox.addItems(devices[:])
                         try:
                             dev_name = self.aw.qmc.devices[max(0,self.aw.qmc.extradevices[i]-1)]

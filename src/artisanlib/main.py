@@ -1360,7 +1360,7 @@ class tgraphcanvas(FigureCanvas):
         self.extradevicecolor2 = []                                 # extra line 2 color. list with colors.
         self.extratemp1,self.extratemp2 = [],[]                     # extra temp1, temp2. List of lists
         self.extrastemp1,self.extrastemp2 = [],[]                   # smoothed extra temp1, temp2. List of lists
-        self.extractimex1,self.extractimex2,self.extractemp1,self.extractemp2 = [],[],[],[] # variants of extratimex/extratemp1/extratemp2 with -1 dropout values removed
+        self.extractimex1,self.extractimex2,self.extractemp1,self.extractemp2 = [],[],[],[] # variants of extratimex/extratemp1/extratemp2 with -1 dropout values removed (or replaced by None)
         self.extratemp1lines,self.extratemp2lines = [],[]           # lists with extra lines for speed drawing
         self.extraname1,self.extraname2 = [],[]                     # name of labels for line (like ET or BT) - legend
         self.extramathexpression1,self.extramathexpression2 = [],[]           # list with user defined math evaluating strings. Example "2*cos(x)"
@@ -1725,7 +1725,7 @@ class tgraphcanvas(FigureCanvas):
         self.profile_meter = "Unknown" # will be updated on loading a profile
 
         self.optimalSmoothing = False
-        self.polyfitRoRcalc = True
+        self.polyfitRoRcalc = False
 
         self.patheffects = 1
         self.graphstyle = 0
@@ -3732,12 +3732,20 @@ class tgraphcanvas(FigureCanvas):
                                 sample_extratemp1[i].append(float(extrat1))
                                 sample_extratemp2[i].append(float(extrat2))
                                 
+                                # gaps larger than 3 readings are not connected in the graph (as util.py:fill_gaps() is not interpolating them)
                                 if extrat1 != -1:
                                     sample_extractimex1[i].append(float(extratx))
                                     sample_extractemp1[i].append(float(extrat1))
-                                if extrat2 != -1:
+                                elif len(sample_extratemp1[i])>3 and all(v == -1 for v in sample_extratemp1[i][-3:]):
+                                    sample_extractimex1[i].append(float(extratx))
+                                    sample_extractemp1[i].append(None)
+                                if extrat2 != -1 or (len(sample_extractemp2[i])>3 and all(v == -1 for v in sample_extractemp2[i][-3:])):
                                     sample_extractimex2[i].append(float(extratx))
                                     sample_extractemp2[i].append(float(extrat2))
+                                elif len(sample_extratemp2[i])>3 and all(v == -1 for v in sample_extratemp2[i][-3:]):
+                                    sample_extractimex2[i].append(float(extratx))
+                                    sample_extractemp2[i].append(None)
+                                    
                                 # update extra lines
 
                                 if aw.extraCurveVisibility1[i] and len(aw.qmc.extratemp1lines) > xtra_dev_lines1:
@@ -3823,9 +3831,15 @@ class tgraphcanvas(FigureCanvas):
                     if t1_final != -1:
                         sample_ctimex1.append(tx)
                         sample_ctemp1.append(t1_final)
+                    elif len(sample_temp1)>3 and all(v == -1 for v in sample_temp1[-3:]):
+                        sample_ctimex1.append(tx)
+                        sample_ctemp1.append(None)
                     if t2_final != -1:
                         sample_ctimex2.append(tx)
                         sample_ctemp2.append(t2_final)
+                    elif len(sample_temp2)>3 and all(v == -1 for v in sample_temp2[-3:]):
+                        sample_ctimex2.append(tx)
+                        sample_ctemp2.append(None)
                     
 
                     #we populate the temporary smoothed ET/BT data arrays (with readings cleansed from -1 dropouts)
@@ -6330,7 +6344,7 @@ class tgraphcanvas(FigureCanvas):
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     # returns False if action was canceled, True otherwise
     # if keepProperties=True (a call from OnMonitor()), we keep all the pre-set roast properties
-    def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False,fireResetAction=True,forceRestoreSettings=False):
+    def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False,fireResetAction=True):
         try:
             focused_widget = QApplication.focusWidget()
             if focused_widget and focused_widget != aw.centralWidget():
@@ -6342,7 +6356,7 @@ class tgraphcanvas(FigureCanvas):
             return False
         
         # restore and clear extra device settings which might have been created on loading a profile with different extra devices settings configuration
-        aw.restoreExtraDeviceSettingsBackup(forceRestoreSettings)
+        aw.restoreExtraDeviceSettingsBackup()
         
         if sampling and self.flagOpenCompleted and aw.curFile is not None:
             # always if ON is pressed while a profile is loaded, the profile is send to the Viewer
@@ -6698,6 +6712,7 @@ class tgraphcanvas(FigureCanvas):
     # re_sample: if true re-sample readings to a linear spaced time before smoothing
     # back_sample: if true results are back-sampled to original timestamps given in "a" after smoothing
     # a_lin: pre-computed linear spaced timestamps of equal length than a
+    # NOTE: result can contain NaN items on places where the input array contains the error element -1
     def smooth_list(self, a, b, window_len=7, window='hanning',decay_weights=None,decay_smoothing=False,fromIndex=-1,toIndex=0,re_sample=True,back_sample=True,a_lin=None):  # default 'hanning'
         if len(a) > 1 and len(a) == len(b) and (aw.qmc.filterDropOuts or window_len>2):
             #pylint: disable=E1103
@@ -6708,8 +6723,9 @@ class tgraphcanvas(FigureCanvas):
             else: # smooth list on full length
                 fromIndex = 0
                 toIndex = len(a)
-            a = numpy.array(a,dtype='float64')[fromIndex:toIndex]
-            b = numpy.array(b,dtype='float64')[fromIndex:toIndex]
+            # we replace the error value -1 by numpy.nan to avoid strange smoothing artifacts
+            a = numpy.array([numpy.nan if x == -1 else x for x in a],dtype='float64')[fromIndex:toIndex]
+            b = numpy.array([numpy.nan if x == -1 else x for x in b],dtype='float64')[fromIndex:toIndex]
             # 2. re-sample
             if re_sample:
                 if a_lin is None or len(a_lin) != len(a):
@@ -7381,6 +7397,8 @@ class tgraphcanvas(FigureCanvas):
                     self.l_temp1.remove()
             except Exception: # pylint: disable=broad-except
                 pass
+            # don't draw -1:
+            temp = [r if r !=-1 else None for r in temp]
             self.l_temp1, = self.ax.plot(
                 self.timex,
                 temp,
@@ -7401,6 +7419,8 @@ class tgraphcanvas(FigureCanvas):
                     self.l_temp2.remove()
             except Exception: # pylint: disable=broad-except
                 pass
+            # don't draw -1:
+            temp = [r if r !=-1 else None for r in temp]
             self.l_temp2, = self.ax.plot(
                 self.timex,
                 temp,
@@ -7935,6 +7955,8 @@ class tgraphcanvas(FigureCanvas):
                                     self.l_back3.remove()
                             except Exception: # pylint: disable=broad-except
                                 pass
+                            # don't draw -1:
+                            stemp3B = [r if r !=-1 else None for r in stemp3B]
                             self.l_back3, = self.ax.plot(self.extratimexB[n3], stemp3B, markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
                                                         sketch_params=None,path_effects=[],transform=trans,
                                                         linewidth=self.XTbacklinewidth,linestyle=self.XTbacklinestyle,drawstyle=self.XTbackdrawstyle,color=self.backgroundxtcolor,
@@ -7974,7 +7996,9 @@ class tgraphcanvas(FigureCanvas):
                                 if self.l_back4 is not None:
                                     self.l_back4.remove()
                             except Exception: # pylint: disable=broad-except
-                                pass                                
+                                pass  
+                            # don't draw -1:
+                            stemp4B = [r if r !=-1 else None for r in stemp4B]
                             self.l_back4, = self.ax.plot(self.extratimexB[n4], stemp4B, markersize=self.YTbackmarkersize,marker=self.YTbackmarker,
                                                         sketch_params=None,path_effects=[],transform=trans,
                                                         linewidth=self.YTbacklinewidth,linestyle=self.YTbacklinestyle,drawstyle=self.YTbackdrawstyle,color=self.backgroundytcolor,
@@ -7995,6 +8019,8 @@ class tgraphcanvas(FigureCanvas):
                             self.l_back1.remove()
                     except Exception: # pylint: disable=broad-except
                         pass
+                    # don't draw -1:
+                    temp_etb = [r if r !=-1 else None for r in temp_etb]
                     self.l_back1, = self.ax.plot(self.timeB,temp_etb,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
                                                 sketch_params=None,path_effects=[],
                                                 linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
@@ -8012,6 +8038,8 @@ class tgraphcanvas(FigureCanvas):
                             self.l_back2.remove()
                     except Exception: # pylint: disable=broad-except
                         pass
+                    # don't draw -1:
+                    temp_btb = [r if r !=-1 else None for r in temp_btb]
                     self.l_back2, = self.ax.plot(self.timeB, temp_btb,markersize=self.BTbackmarkersize,marker=self.BTbackmarker,
                                                 linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
                                                 sketch_params=None,path_effects=[],
@@ -9087,6 +9115,8 @@ class tgraphcanvas(FigureCanvas):
                                 visible_extratemp1 = [None]*charge_idx + self.extrastemp1[i][charge_idx:drop_idx+1] + [None]*(len(self.extratimex[i])-drop_idx-1)
                             else:
                                 visible_extratemp1 = self.extrastemp1[i]
+                            # don't draw -1:
+                            visible_extratemp1 = [r if r !=-1 else None for r in visible_extratemp1]
                             # first draw the fill if any, but not during recording!
                             if not aw.qmc.flagstart and aw.extraFill1[i] > 0:
                                 self.ax.fill_between(self.extratimex[i], 0, visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],alpha=aw.extraFill1[i]/100.,sketch_params=None)
@@ -9112,6 +9142,8 @@ class tgraphcanvas(FigureCanvas):
                                 visible_extratemp2 = [None]*charge_idx + self.extrastemp2[i][charge_idx:drop_idx+1] + [None]*(len(self.extratimex[i])-drop_idx-1)
                             else:
                                 visible_extratemp2 = self.extrastemp2[i]
+                            # don't draw -1:
+                            visible_extratemp2 = [r if r !=-1 else None for r in visible_extratemp2]
                             # first draw the fill if any
                             if not aw.qmc.flagstart and aw.extraFill2[i] > 0:
                                 self.ax.fill_between(self.extratimex[i], 0, visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],alpha=aw.extraFill2[i]/100.,sketch_params=None)
@@ -13722,27 +13754,42 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " univariateinfo() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
     
-    def test(self):
-        p = 60 # period in seconds
-        k = int(round(p / self.delay * 1000)) # number of past readings to consider
-        if len(self.timex)>k:
-            try:
-                ET = numpy.array([numpy.nan if x == -1 else x for x in self.temp1[-k:]], dtype='float64')
-                BT = numpy.array([numpy.nan if x == -1 else x for x in self.temp2[-k:]], dtype='float64')
-                ET_BT = ET - BT
-                delta = numpy.array([numpy.nan if x == -1 else x for x in self.delta2[-k:]], dtype='float64')
-                idx = numpy.isfinite(ET_BT) & numpy.isfinite(delta)
-                z, residuals, rank, singular_values, rcond = numpy.polyfit(ET_BT[idx],delta[idx], 1, full=True)
-                print("z",z)
-                print(residuals, rank)
-                f = numpy.poly1d(z)
-                return f(ET_BT[-1]), residuals #f(0)
-            except Exception as e:
-                print(e)
-                _log.exception(e)
-                return -1, -1
-        else:
-            return -1, -1
+#    def test(self):
+##        p = 120 # period in seconds
+##        k = int(round(p / self.delay * 1000)) # number of past readings to consider
+#        k = 70
+#        if len(self.timex)>k:
+#            try:
+#                ET = numpy.array([numpy.nan if x == -1 else x for x in self.temp1[-k:]], dtype='float64')
+#                BT = numpy.array([numpy.nan if x == -1 else x for x in self.temp2[-k:]], dtype='float64')
+#                ET_BT = ET - BT
+##                delta = numpy.array([numpy.nan if x == -1 else x for x in self.delta2[-k:]], dtype='float64')
+#                delta = numpy.array([numpy.nan if x == -1 else x for x in self.unfiltereddelta2[-k:]], dtype='float64')
+#                idx = numpy.isfinite(ET_BT) & numpy.isfinite(delta)
+#                z, residuals, _, _, _ = numpy.polyfit(ET_BT[idx],delta[idx], 1, full=True)
+#                print("z",z)
+#                f = numpy.poly1d(z)
+#                v = f(ET_BT[-1])
+##                v = (f(ET_BT[-2]) + f(ET_BT[-1])) / 2 # this smoothing seems to delay too much
+#                print("res",residuals, f(0), abs(delta[-1] - v))
+#                if abs(delta[-1] - v) > 10:
+#                    return -1, -1
+#                else:
+#                    return f(0), v
+##                    return residuals, v
+#
+##                    if residuals > 280:
+##                        return -1, -1
+##                    elif residuals > 50:
+##                        return v, -1
+##                    else:
+##                        return -1, v
+#            except Exception as e: # pylint: disable=broad-except
+#                print(e)
+#                _log.exception(e)
+#                return -1, -1
+#        else:
+#            return -1, -1
 
     def polyfit(self,xarray,yarray,deg,startindex,endindex,_=False,onDeltaAxis=False):
         xa = xarray[startindex:endindex]
@@ -15813,46 +15860,50 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
     @staticmethod
     def subscription():
-        remaining_days = max(0,(aw.plus_paidUntil.date() - datetime.datetime.now().date()).days)
-        if remaining_days == 1:
-            days = QApplication.translate("Plus","1 day left")
-        else:
-            days = QApplication.translate("Plus","{} days left").format(remaining_days)
-        pu = aw.plus_paidUntil.date()
-        message = f'{QApplication.translate("Plus","Paid until")} {QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))}'
-        reminder_message = ''
-        if aw.plus_rlimit > 0:
-            percent_used = aw.plus_used/(aw.plus_rlimit/100)
-            unit = 1 # 1: kg, 2: lb
-            if aw.qmc.weight[2] in ["lb", "oz"]:
-                unit = 2
-            rlimit = plus.stock.renderAmount(aw.plus_rlimit, target_unit_idx=unit)
-            used = plus.stock.renderAmount(aw.plus_used, target_unit_idx=unit)
-            percent_used_formatted = f'{percent_used:.0f}% {QApplication.translate("Label","roasted")} ({used} / {rlimit})'
-            # if 90% of quota is used, render usage in red
-            if percent_used >= 90:
-                style = "background-color:#cc0f50;color:white;"
-            else:
-                style = ""
-            reminder_message += f'<blockquote><b><span style="{style}">{percent_used_formatted}</span></b></blockquote>'
-        if remaining_days <31:
-            if remaining_days <= 3:
-                style = "background-color:#cc0f50;color:white;"
-            else:
-                style = ""
-            reminder_message += f'<blockquote><b><span style="{style}">{days}</span></b></blockquote>'
-        if reminder_message == '':
-            message += '<br><br>'
-        else:
-            message += reminder_message
-        message += QApplication.translate("Plus","Please visit our {0}shop{1} to extend your subscription").format('<a href="' + plus.config.shop_base_url + '">','</a>')
-        #
-        # if less then 31 days:
-        # n days left <= red if <=3
-        #  3 days, 2 days, 1 day, 0 days left
-        #
-        subscription_message_box = ArtisanMessageBox(aw,QApplication.translate("Message", "Subscription"),message)
-        subscription_message_box.show()
+        if aw.plus_paidUntil != None: # after reset and authentification, it might still take a moment until the paidUntil is set via its signal
+            try:
+                remaining_days = max(0,(aw.plus_paidUntil.date() - datetime.datetime.now().date()).days)
+                if remaining_days == 1:
+                    days = QApplication.translate("Plus","1 day left")
+                else:
+                    days = QApplication.translate("Plus","{} days left").format(remaining_days)
+                pu = aw.plus_paidUntil.date()
+                message = f'{QApplication.translate("Plus","Paid until")} {QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))}'
+                reminder_message = ''
+                if aw.plus_rlimit > 0:
+                    percent_used = aw.plus_used/(aw.plus_rlimit/100)
+                    unit = 1 # 1: kg, 2: lb
+                    if aw.qmc.weight[2] in ["lb", "oz"]:
+                        unit = 2
+                    rlimit = plus.stock.renderAmount(aw.plus_rlimit, target_unit_idx=unit)
+                    used = plus.stock.renderAmount(aw.plus_used, target_unit_idx=unit)
+                    percent_used_formatted = f'{percent_used:.0f}% {QApplication.translate("Label","roasted")} ({used} / {rlimit})'
+                    # if 90% of quota is used, render usage in red
+                    if percent_used >= 90:
+                        style = "background-color:#cc0f50;color:white;"
+                    else:
+                        style = ""
+                    reminder_message += f'<blockquote><b><span style="{style}">{percent_used_formatted}</span></b></blockquote>'
+                if remaining_days <31:
+                    if remaining_days <= 3:
+                        style = "background-color:#cc0f50;color:white;"
+                    else:
+                        style = ""
+                    reminder_message += f'<blockquote><b><span style="{style}">{days}</span></b></blockquote>'
+                if reminder_message == '':
+                    message += '<br><br>'
+                else:
+                    message += reminder_message
+                message += QApplication.translate("Plus","Please visit our {0}shop{1} to extend your subscription").format('<a href="' + plus.config.shop_base_url + '">','</a>')
+                #
+                # if less then 31 days:
+                # n days left <= red if <=3
+                #  3 days, 2 days, 1 day, 0 days left
+                #
+                subscription_message_box = ArtisanMessageBox(aw,QApplication.translate("Message", "Subscription"),message)
+                subscription_message_box.show()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -15943,8 +15994,8 @@ class SampleThread(QThread):
                 tx = aw.qmc.timeclock.elapsedMilli()
                 t1,t2 = aw.simulator.readextra(i,(tx if aw.qmc.flagstart else 0))
             return tx,float(t1),float(t2)
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception: # pylint: disable=broad-except
+#            _log.exception(e)
             tx = aw.qmc.timeclock.elapsedMilli()
             return tx,-1.0,-1.0
     
@@ -26178,7 +26229,10 @@ class ApplicationWindow(QMainWindow):
                         times.append(startendB[2])
                         self.qmc.timebackgroundindexupdate(times[:])
                 self.qmc.timeindexB = self.qmc.timeindexB + [0 for i in range(8-len(self.qmc.timeindexB))]
-                self.qmc.background_profile_sampling_interval = profile["samplinginterval"]
+                try:
+                    self.qmc.background_profile_sampling_interval = profile["samplinginterval"]
+                except Exception: # pylint: disable=broad-except
+                    pass # might not exist in older profiles
                 try:
                     try:
                         self.qmc.TP_time_B_loaded = None
@@ -27592,33 +27646,30 @@ class ApplicationWindow(QMainWindow):
             self.extraser[i].timeout = self.extratimeout[i]
     
     # this should only be called from reset()
-    def restoreExtraDeviceSettingsBackup(self, force=False):
+    def restoreExtraDeviceSettingsBackup(self):
         try:
             filename = self.getExtraDeviceSettingsPath()
             if os.path.isfile(filename):
-                modifiers = QApplication.keyboardModifiers()
-                control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple key on macOS, Control key on Windows
-                if force or not control_modifier:
-                    settings = QSettings(filename, QSettings.Format.IniFormat)
-                    settings.beginGroup("ExtraDev")
-                    self.getExtraDeviceSettings(settings)
-                    settings.endGroup()
-                    
-                    settings.beginGroup("CurveStyles")
-                    self.getExtraDeviceCurveStyles(settings)
-                    settings.endGroup()
-                    
-                    # ensure that extra list length are of the size of the extradevices:
-                    self.ensureCorrectExtraDeviceListLenght()
-                    self.updateExtradeviceSettings()
-                    
-                    settings.beginGroup("ExtraComm")
-                    self.getExtraDeviceCommSettings(settings)
-                    settings.endGroup()
-                    
-                    settings.beginGroup("events")
-                    self.qmc.etypes = toStringList(settings.value("etypes",self.qmc.etypes))
-                    settings.endGroup()
+                settings = QSettings(filename, QSettings.Format.IniFormat)
+                settings.beginGroup("ExtraDev")
+                self.getExtraDeviceSettings(settings)
+                settings.endGroup()
+                
+                settings.beginGroup("CurveStyles")
+                self.getExtraDeviceCurveStyles(settings)
+                settings.endGroup()
+                
+                # ensure that extra list length are of the size of the extradevices:
+                self.ensureCorrectExtraDeviceListLenght()
+                self.updateExtradeviceSettings()
+                
+                settings.beginGroup("ExtraComm")
+                self.getExtraDeviceCommSettings(settings)
+                settings.endGroup()
+                
+                settings.beginGroup("events")
+                self.qmc.etypes = toStringList(settings.value("etypes",self.qmc.etypes))
+                settings.endGroup()
                 # now remove the settings file
                 os.unlink(filename)
         except Exception as e: # pylint: disable=broad-except
@@ -27655,10 +27706,6 @@ class ApplicationWindow(QMainWindow):
 # on reset, thus we default to StandardButton.Yes instead of asking in the dialog:
 
                         reply = QMessageBox.StandardButton.Yes
-                        modifiers = QApplication.keyboardModifiers()
-                        control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple key on macOS, Control key on Windows
-                        if control_modifier:
-                            reply = QMessageBox.StandardButton.No
                         
 #                        string = QApplication.translate("Message","To fully load this profile the extra device configuration needs to be modified.\n\nOverwrite your extra device definitions using the values from the profile?\n\nIt is advisable to save your current settings beforehand via menu Help >> Save Settings.")
 #                        if quiet:
@@ -36132,7 +36179,7 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.fileDirtySignal.emit()
             else:
                 # reset
-                aw.qmc.reset(soundOn=False,forceRestoreSettings=True)
+                aw.qmc.reset(soundOn=False)
             if foreground_profile_path:
                 # load foreground into background
                 aw.loadbackground(foreground_profile_path)
