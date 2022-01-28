@@ -52,7 +52,7 @@ class flavorDlg(ArtisanResizeablDialog):
             
         defaultlabel = QLabel(QApplication.translate("Label","Default"))
         self.defaultcombobox = QComboBox()
-        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC","WCRC","*CUSTOM*"])
+        self.defaultcombobox.addItems(["","Artisan","SCA","SCAA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC","WCRC","*CUSTOM*"])
         self.defaultcombobox.setCurrentIndex(0)
         self.lastcomboboxIndex = 0
         self.defaultcombobox.currentIndexChanged.connect(self.setdefault)
@@ -216,7 +216,7 @@ class flavorDlg(ArtisanResizeablDialog):
                 label = chr(10).join(parts)
             self.aw.qmc.flavorlabels[i] = label
             self.aw.qmc.flavors[i] = valueSpinBox.value()
-        if self.lastcomboboxIndex == 10:
+        if self.lastcomboboxIndex == self.defaultcombobox.count()-1:
             # store the current labels as *CUSTOM*
             self.aw.qmc.customflavorlabels = self.aw.qmc.flavorlabels
 
@@ -240,34 +240,36 @@ class flavorDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def setdefault(self,_):
-        if self.lastcomboboxIndex == 10:
+        if self.lastcomboboxIndex == self.defaultcombobox.count()-1:
             # store the current labels as *CUSTOM*
             self.aw.qmc.customflavorlabels = self.aw.qmc.flavorlabels
         dindex =  self.defaultcombobox.currentIndex()
-        #["","Artisan","SCCA","CQI","SweetMarias","C","E","coffeegeek","Intelligentsia","WCRC"]
-        if dindex > 0 or dindex < 11:
+        #["","Artisan","SCAA","CQI","SweetMarias","C","E","coffeegeek","Intelligentsia","WCRC"]
+        if dindex > 0 or dindex < self.defaultcombobox.count()-1:
             self.aw.qmc.flavorstartangle = 90
         if dindex == 1:
             self.aw.qmc.flavorlabels = list(self.aw.qmc.artisanflavordefaultlabels)
         elif dindex == 2:
-            self.aw.qmc.flavorlabels = list(self.aw.qmc.SCCAflavordefaultlabels)
+            self.aw.qmc.flavorlabels = list(self.aw.qmc.SCAflavordefaultlabels)
         elif dindex == 3:
-            self.aw.qmc.flavorlabels = list(self.aw.qmc.CQIflavordefaultlabels)
+            self.aw.qmc.flavorlabels = list(self.aw.qmc.SCAAflavordefaultlabels)
         elif dindex == 4:
-            self.aw.qmc.flavorlabels = list(self.aw.qmc.SweetMariasflavordefaultlabels)
+            self.aw.qmc.flavorlabels = list(self.aw.qmc.CQIflavordefaultlabels)
         elif dindex == 5:
-            self.aw.qmc.flavorlabels = list(self.aw.qmc.Cflavordefaultlabels)
+            self.aw.qmc.flavorlabels = list(self.aw.qmc.SweetMariasflavordefaultlabels)
         elif dindex == 6:
-            self.aw.qmc.flavorlabels = list(self.aw.qmc.Eflavordefaultlabels)
+            self.aw.qmc.flavorlabels = list(self.aw.qmc.Cflavordefaultlabels)
         elif dindex == 7:
-            self.aw.qmc.flavorlabels = list(self.aw.qmc.coffeegeekflavordefaultlabels)
+            self.aw.qmc.flavorlabels = list(self.aw.qmc.Eflavordefaultlabels)
         elif dindex == 8:
-            self.aw.qmc.flavorlabels = list(self.aw.qmc.Intelligentsiaflavordefaultlabels)
+            self.aw.qmc.flavorlabels = list(self.aw.qmc.coffeegeekflavordefaultlabels)
         elif dindex == 9:
-            self.aw.qmc.flavorlabels = list(self.aw.qmc.IstitutoInternazionaleAssaggiatoriCaffe)
+            self.aw.qmc.flavorlabels = list(self.aw.qmc.Intelligentsiaflavordefaultlabels)
         elif dindex == 10:
-            self.aw.qmc.flavorlabels = list(self.aw.qmc.WorldCoffeeRoastingChampionship)
+            self.aw.qmc.flavorlabels = list(self.aw.qmc.IstitutoInternazionaleAssaggiatoriCaffe)
         elif dindex == 11:
+            self.aw.qmc.flavorlabels = list(self.aw.qmc.WorldCoffeeRoastingChampionship)
+        elif dindex == 12:
             self.aw.qmc.flavorlabels = list(self.aw.qmc.customflavorlabels)
         else:
             return

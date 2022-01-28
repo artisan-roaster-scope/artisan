@@ -663,7 +663,7 @@ class tgraphcanvas(FigureCanvas):
     }
 
     __slots__ = [ 'locale_str', 'alpha', 'palette', 'palette1', 'EvalueColor_default', 'EvalueTextColor_default', 'artisanflavordefaultlabels', 'customflavorlabels',
-        'SCCAflavordefaultlabels', 'CQIflavordefaultlabels', 'SweetMariasflavordefaultlabels', 'Cflavordefaultlabels', 'Eflavordefaultlabels', 'coffeegeekflavordefaultlabels',
+        'SCAAflavordefaultlabels', 'SCAflavordefaultlabels', 'CQIflavordefaultlabels', 'SweetMariasflavordefaultlabels', 'Cflavordefaultlabels', 'Eflavordefaultlabels', 'coffeegeekflavordefaultlabels',
         'Intelligentsiaflavordefaultlabels', 'IstitutoInternazionaleAssaggiatoriCaffe', 'WorldCoffeeRoastingChampionship', 'ax1', 'ax2', 'ambiWorker', 'ambiThread', 'afterTP',
         'decay_weights', 'temp_decay_weights', 'flavorlabels', 'flavors', 'flavorstartangle', 'flavoraspect', 'flavorchart_plotf', 'flavorchart_angles', 'flavorchart_plot',
         'flavorchart_fill', 'flavorchart_labels', 'flavorchart_total', 'mode', 'mode_tempsliders', 'errorlog', 'default_delay', 'delay', 'min_delay', 'extra_event_sampling_delay',
@@ -820,24 +820,49 @@ class tgraphcanvas(FigureCanvas):
         # custom labels are stored in the application settings and can be edited by the user
         self.customflavorlabels = self.artisanflavordefaultlabels
 
-        self.SCCAflavordefaultlabels: Final = [QApplication.translate("Textbox", "Sour"),
+# old SCAA spec (note the typo in the variable name):
+# replaced by the specification below for v2.6.0:
+#        self.SCCAflavordefaultlabels: Final = [[QApplication.translate("Textbox", "Sour"),
+#                                        QApplication.translate("Textbox", "Flavor"),
+#                                        QApplication.translate("Textbox", "Critical\nStimulus"),
+#                                        QApplication.translate("Textbox", "Aftertaste"),
+#                                        QApplication.translate("Textbox", "Bitter"),
+#                                        QApplication.translate("Textbox", "Astringency"),
+#                                        QApplication.translate("Textbox", "Solubles\nConcentration"),
+#                                        QApplication.translate("Textbox", "Mouthfeel"),
+#                                        QApplication.translate("Textbox", "Other"),
+#                                        QApplication.translate("Textbox", "Aromatic\nComplexity"),
+#                                        QApplication.translate("Textbox", "Roast\nColor"),
+#                                        QApplication.translate("Textbox", "Aromatic\nPungency"),
+#                                        QApplication.translate("Textbox", "Sweet"),
+#                                        QApplication.translate("Textbox", "Acidity"),
+#                                        QApplication.translate("Textbox", "pH"),
+#                                        QApplication.translate("Textbox", "Balance")]
+        
+        self.SCAAflavordefaultlabels: Final = [QApplication.translate("Textbox", "Fragrance-Aroma"),
                                         QApplication.translate("Textbox", "Flavor"),
-                                        QApplication.translate("Textbox", "Critical\nStimulus"),
                                         QApplication.translate("Textbox", "Aftertaste"),
-                                        QApplication.translate("Textbox", "Bitter"),
-                                        QApplication.translate("Textbox", "Astringency"),
-                                        QApplication.translate("Textbox", "Solubles\nConcentration"),
-                                        QApplication.translate("Textbox", "Mouthfeel"),
-                                        QApplication.translate("Textbox", "Other"),
-                                        QApplication.translate("Textbox", "Aromatic\nComplexity"),
-                                        QApplication.translate("Textbox", "Roast\nColor"),
-                                        QApplication.translate("Textbox", "Aromatic\nPungency"),
-                                        QApplication.translate("Textbox", "Sweet"),
                                         QApplication.translate("Textbox", "Acidity"),
-                                        QApplication.translate("Textbox", "pH"),
-                                        QApplication.translate("Textbox", "Balance")]
-
-        self.CQIflavordefaultlabels: Final =  [QApplication.translate("Textbox", "Fragance"),
+                                        QApplication.translate("Textbox", "Body"),
+                                        QApplication.translate("Textbox", "Uniformity"),
+                                        QApplication.translate("Textbox", "Balance"),
+                                        QApplication.translate("Textbox", "Clean Cup"),
+                                        QApplication.translate("Textbox", "Sweetness"),
+                                        QApplication.translate("Textbox", "Overall")]
+        
+        self.SCAflavordefaultlabels: Final = [QApplication.translate("Textbox", "Fragrance-Aroma"),
+                                        QApplication.translate("Textbox", "Flavor"),
+                                        QApplication.translate("Textbox", "Aftertaste"),
+                                        QApplication.translate("Textbox", "Acidity"),
+                                        QApplication.translate("Textbox", "Intensity"),
+                                        QApplication.translate("Textbox", "Body"),
+                                        QApplication.translate("Textbox", "Uniformity"),
+                                        QApplication.translate("Textbox", "Balance"),
+                                        QApplication.translate("Textbox", "Clean Cup"),
+                                        QApplication.translate("Textbox", "Sweetness"),
+                                        QApplication.translate("Textbox", "Overall")]
+        
+        self.CQIflavordefaultlabels: Final = [QApplication.translate("Textbox", "Fragance"),
                                         QApplication.translate("Textbox", "Aroma"),
                                         QApplication.translate("Textbox", "Flavor"),
                                         QApplication.translate("Textbox", "Acidity"),
@@ -3558,11 +3583,21 @@ class tgraphcanvas(FigureCanvas):
     # the temp get's averaged using the given decay weights after resampling
     # to linear time based on tx and the current sampling interval
     @staticmethod
-    def decay_average(tx,temp,decay_weights):
-        if len(tx) != len(temp):
-            if len(temp)>0:
-                return temp[-1]
+    def decay_average(tx_in,temp_in,decay_weights):
+        if len(tx_in) != len(temp_in):
+            if len(temp_in)>0:
+                return temp_in[-1]
             return -1
+        # remove items where temp[i]=None to fulfil precond. of numpy.interp
+        tx = []
+        temp = []
+        for i in range(len(temp_in)):
+            if temp_in[i] is not None:
+                tx.append(tx_in[i])
+                temp.append(temp_in[i])
+        if len(temp) == 0:
+            return -1
+        #
         l = min(len(decay_weights),len(temp))
         d = aw.qmc.delay / 1000.
         tx_org = tx[-l:] # as len(tx)=len(temp) here, it is guranteed that len(tx_org)=l
@@ -4811,7 +4846,7 @@ class tgraphcanvas(FigureCanvas):
                             ts = 0
 
                     self.setLCDtime(ts)
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             finally:
                 QTimer.singleShot(int(round(nextreading)),self.updateLCDtime)
@@ -5223,8 +5258,8 @@ class tgraphcanvas(FigureCanvas):
             #needed when using device NONE
             if len(self.timex) and self.timeindexB[6] and not self.timeindex[6]:
                 if ((aw.qmc.replayType == 0 and self.timeB[self.timeindexB[6]] - self.timeclock.elapsed()/1000. <= 0) or # by time
-                    (aw.qmc.replayType == 1 and aw.qmc.TPalarmtimeindex and self.stemp2B[self.timeindexB[6]] - self.ctemp2[-1] <= 0) or # by BT
-                    (aw.qmc.replayType == 2 and aw.qmc.TPalarmtimeindex and self.stemp21[self.timeindexB[6]] - self.ctemp1[-1] <= 0)): # by ET
+                    (aw.qmc.replayType == 1 and aw.qmc.TPalarmtimeindex and self.ctemp2[-1] != None and self.stemp2B[self.timeindexB[6]] - self.ctemp2[-1] <= 0) or # by BT
+                    (aw.qmc.replayType == 2 and aw.qmc.TPalarmtimeindex and self.ctemp1[-1] != None and self.stemp21[self.timeindexB[6]] - self.ctemp1[-1] <= 0)): # by ET
                     aw.qmc.autoDropIdx = len(aw.qmc.timex) - 2
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -5344,7 +5379,7 @@ class tgraphcanvas(FigureCanvas):
     #make a projection of change of rate of BT on the graph
     def updateProjection(self):
         try:
-            if len(aw.qmc.ctemp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
+            if len(aw.qmc.ctemp2) > 1 and aw.qmc.ctemp2[-1] not in [None, -1]:  #Need this because viewProjections use rate of change (two values needed)
                 #self.resetlines()
                 if self.timeindex[0] != -1:
                     starttime = self.timex[self.timeindex[0]]
@@ -5388,7 +5423,7 @@ class tgraphcanvas(FigureCanvas):
                     # 3 Gas or electric power: gas heats BT _faster_ because of hoter air.
                     # Every roaster will have a different constantN (self.projectionconstant).
 
-                    if len(self.ctemp1) > 0 and len(self.ctemp2) > 0:
+                    if len(self.ctemp1) > 0 and len(self.ctemp2) > 0  and aw.qmc.ctemp1[-1] not in [None, -1] and aw.qmc.ctemp2[-1] not in [None, -1]:
                         den = self.ctemp1[-1] - self.ctemp2[-1]  #denominator ETn - BTn
                         if den > 0 and len(aw.qmc.delta2)>0 and aw.qmc.delta2[-1]: # if ETn > BTn
                             #get x points
@@ -6166,7 +6201,7 @@ class tgraphcanvas(FigureCanvas):
                 self.updateBackground()
             else:
                 self.ax_background = None
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
     def fmt_timedata(self,x):
@@ -6191,7 +6226,7 @@ class tgraphcanvas(FigureCanvas):
                 # depending on the z-order of ax vs delta_ax the one or the other one is correct
                 #res = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,x))[1]))[1])
                 res = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
-            except Exception:
+            except Exception: # pylint: disable=broad-except
                 pass
         if aw.qmc.LCDdecimalplaces:
             return aw.float2float(res)
@@ -6333,11 +6368,11 @@ class tgraphcanvas(FigureCanvas):
             # detach IO Phidgets
             try:
                 aw.qmc.closePhidgetOUTPUTs()
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
             try:
                 aw.qmc.closePhidgetAMBIENTs()
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
         self.reset()
 
@@ -10993,7 +11028,7 @@ class tgraphcanvas(FigureCanvas):
                 self.ambient_pressure = aw.float2float(pressure,1)
                 self.ambient_pressure_sampled = self.ambient_pressure
                 aw.sendmessage(QApplication.translate("Message","Pressure: {}hPa").format(self.ambient_pressure))
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         finally:
             sys.stderr = _stderr
@@ -11152,25 +11187,25 @@ class tgraphcanvas(FigureCanvas):
             if aw.ser.TMP1000temp is not None and aw.ser.TMP1000temp.getAttached():
                 aw.ser.TMP1000temp.close()
                 _log.debug("Phidget TMP1000 temperature channel closed")
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         try:
             if aw.ser.PhidgetHUMtemp is not None and aw.ser.PhidgetHUMtemp.getAttached():
                 aw.ser.PhidgetHUMtemp.close()
                 _log.debug("Phidget HUM100x temperature channel closed")
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         try:
             if aw.ser.PhidgetHUMhum is not None and aw.ser.PhidgetHUMhum.getAttached():
                 aw.ser.PhidgetHUMhum.close()
                 _log.debug("Phidget HUM100x humidity channel closed")
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         try:
             if aw.ser.PhidgetPREpre is not None and aw.ser.PhidgetPREpre.getAttached():
                 aw.ser.PhidgetPREpre.close()
                 _log.debug("Phidget PRE1000 pressure channel closed")
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             
 
