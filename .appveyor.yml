@@ -91,7 +91,7 @@ for:
     PYTHON_PATH: "C:\\Python310-x64"
     QT_PATH: "C:\\qt\\6.2\\msvc2019_64"
     PYUIC: "pyuic6.exe"
-    PYINSTALLER_VER: "4.8"
+    PYINSTALLER_VER: "4.7"
     ARTISAN_LEGACY: "False"
     ARTISAN_SPEC: "win"
     VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"
