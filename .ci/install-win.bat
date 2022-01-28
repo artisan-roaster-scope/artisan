@@ -1,4 +1,4 @@
-@echo on
+@echo off
 :: the current directory on entry to this script must be the folder above src
 
 ::
@@ -34,7 +34,7 @@ python -V
 %PYTHON_PATH%\python.exe -m pip install wheel
 
 :: custom build the pyinstaller bootloader or install a prebuilt
-:: %BUILD_APPVEYOR%=False
+%BUILD_APPVEYOR%=True
 if /i "%BUILD_APPVEYOR%"=="True" (
     echo curl pyinstaller v%PYINSTALLER_VER%
     curl -L -O https://github.com/pyinstaller/pyinstaller/archive/refs/tags/v%PYINSTALLER_VER%.zip
