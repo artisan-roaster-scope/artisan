@@ -1,4 +1,4 @@
- @echo off
+@echo on
 :: the current directory on entry to this script must be the folder above src
 
 ::
