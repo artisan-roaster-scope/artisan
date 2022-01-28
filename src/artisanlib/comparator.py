@@ -304,8 +304,8 @@ class RoastProfile():
         # calculate start/end index
         self.startTimeIdx = (self.timeindex[0] if self.timeindex[0] != -1 else 0)
         self.endTimeIdx = (self.timeindex[6] if self.timeindex[6] != 0 else len(self.timex)-1)
-        self.stemp1 = [None if i < self.startTimeIdx or i > self.endTimeIdx else t for i,t in enumerate(self.stemp1)]
-        self.stemp2 = [None if i < self.startTimeIdx or i > self.endTimeIdx else t for i,t in enumerate(self.stemp2)]
+        self.stemp1 = [None if (not self.aw.qmc.compareBBP and i < self.startTimeIdx) or i > self.endTimeIdx else t for i,t in enumerate(self.stemp1)]
+        self.stemp2 = [None if (not self.aw.qmc.compareBBP and i < self.startTimeIdx) or i > self.endTimeIdx else t for i,t in enumerate(self.stemp2)]
         # calculate max deltas
         self.max_DeltaET = 1
         if len(self.delta1) > 0:
@@ -406,6 +406,12 @@ class RoastProfile():
             if self.E4:
                 self.E4.append((end,self.E4[-1][1]))
     
+    def firstTime(self):
+        try:
+            return self.timex[0]
+        except Exception: # pylint: disable=broad-except
+            return 0
+        
     def startTime(self):
         try:
             return self.timex[self.startTimeIdx]
@@ -762,6 +768,10 @@ class roastCompareDlg(ArtisanDialog):
         self.alignComboBox.setCurrentIndex(self.aw.qmc.compareAlignEvent)
         self.alignComboBox.currentIndexChanged.connect(self.changeAlignEventidx)
         #
+        self.BBPCheckBox = QCheckBox(QApplication.translate("CheckBox","BBP"))
+        self.BBPCheckBox.setChecked(bool(self.aw.qmc.compareBBP))
+        self.BBPCheckBox.stateChanged.connect(self.betweenBatchProtocolChanged)
+        #
         self.etypes = self.aw.qmc.etypes[:-1]
         self.etypes.insert(0,"")
         self.eventsComboBox = MyQComboBox()
@@ -794,11 +804,13 @@ class roastCompareDlg(ArtisanDialog):
         self.cb.flagChanged.connect(self.flagChanged)
         
         settings1Layout = QHBoxLayout()
+        settings1Layout.addSpacing(10)
+        settings1Layout.addWidget(self.BBPCheckBox)
+        settings1Layout.addStretch()
+        settings1Layout.addSpacing(10)
         settings1Layout.addStretch()
         settings1Layout.addWidget(alignLabel)
-        settings1Layout.addSpacing(5)
         settings1Layout.addWidget(self.alignComboBox)
-        settings1Layout.addStretch()
         
         settings2Layout = QHBoxLayout()
         settings2Layout.addWidget(self.cb)
@@ -1269,6 +1281,14 @@ class roastCompareDlg(ArtisanDialog):
         self.realign()
         self.updateZorders()
         self.repaint()
+
+    @pyqtSlot(int)
+    def betweenBatchProtocolChanged(self,_=0):
+        if self.BBPCheckBox.isChecked():
+            self.aw.qmc.compareBBP = True
+        else:
+            self.aw.qmc.compareBBP = False
+        self.redraw()
     
     @pyqtSlot(int)
     def visibilityChanged(self,state):
@@ -1424,7 +1444,7 @@ class roastCompareDlg(ArtisanDialog):
             top.setTimeoffset(delta)
             top.aligned = True
             # we calculate the min/max timex to to show all data considering this alignment to automatically set the time axis limits
-            top.min_time = 0
+            top.min_time = (top.firstTime() - delta if self.aw.qmc.compareBBP else 0)
             top.max_time = top.endTime() - delta
             # align all other profiles to the top profile w.r.t. self.aw.qmc.compareAlignEvent
             if self.aw.qmc.compareAlignEvent == 0:
@@ -1447,7 +1467,7 @@ class roastCompareDlg(ArtisanDialog):
                     delta = eventTime - refTime
                     p.setTimeoffset(delta)
                     p.aligned = True
-                    p.min_time = refTime - eventTime + p.startTime()
+                    p.min_time = refTime - eventTime + (p.firstTime() if self.aw.qmc.compareBBP else p.startTime())
                     p.max_time = p.endTime() - eventTime + refTime
                 elif self.aw.qmc.compareAlignEvent==1 and p.TP > 0:
                     p_offset = 0
@@ -1457,14 +1477,14 @@ class roastCompareDlg(ArtisanDialog):
                     delta = eventTime - refTime
                     p.setTimeoffset(delta)
                     p.aligned = True
-                    p.min_time = refTime - eventTime + p.startTime()
+                    p.min_time = refTime - eventTime + (p.firstTime() if self.aw.qmc.compareBBP else p.startTime())
                     p.max_time = p.endTime() - eventTime + refTime
                 elif self.aw.qmc.compareAlignEvent>1 and p.timeindex[self.aw.qmc.compareAlignEvent-1] > 0:
                     eventTime = p.timex[p.timeindex[self.aw.qmc.compareAlignEvent-1]]
                     delta = eventTime - refTime
                     p.setTimeoffset(delta)
                     p.aligned = True
-                    p.min_time = refTime - eventTime + p.startTime()
+                    p.min_time = refTime - eventTime + (p.firstTime() if self.aw.qmc.compareBBP else p.startTime())
                     p.max_time = p.endTime() - eventTime + refTime
                 elif (self.aw.qmc.compareAlignEvent == 0 or (self.aw.qmc.compareAlignEvent == 1 and top.TP == 0) or \
                         (self.aw.qmc.compareAlignEvent>1 and top.timeindex[self.aw.qmc.compareAlignEvent-1] == 0)):
@@ -1476,7 +1496,7 @@ class roastCompareDlg(ArtisanDialog):
                     delta = eventTime - refTime
                     p.setTimeoffset(delta)
                     p.aligned = True
-                    p.min_time = refTime - eventTime + p.startTime()
+                    p.min_time = refTime - eventTime + (p.firstTime() if self.aw.qmc.compareBBP else p.startTime())
                     p.max_time = p.endTime() - eventTime + refTime
                 else:
                     p.aligned = False

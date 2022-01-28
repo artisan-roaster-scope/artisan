@@ -687,7 +687,7 @@ class tgraphcanvas(FigureCanvas):
         'extralinewidths1', 'extralinewidths2', 'extramarkers1', 'extramarkers2', 'extramarkersizes1', 'extramarkersizes2', 'devicetablecolumnwidths', 'extraNoneTempHint1',
         'extraNoneTempHint2', 'plotcurves', 'plotcurvecolor', 'overlapList', 'tight_layout_params', 'fig', 'ax', 'delta_ax', 'legendloc', 'legendloc_pos', 'onclick_cid',
         'oncpick_cid', 'ondraw_cid', 'rateofchange1', 'rateofchange2', 'flagon', 'flagstart', 'flagKeepON', 'flagOpenCompleted', 'flagsampling', 'flagsamplingthreadrunning',
-        'manuallogETflag', 'zoom_follow', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents',
+        'manuallogETflag', 'zoom_follow', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents', 'compareBBP',
         'replayType', 'replayedBackgroundEvents', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
         'title', 'title_show_always', 'ambientTemp', 'ambientTempSource', 'ambient_temperature_device', 'ambient_pressure', 'ambient_pressure_device', 'ambient_humidity',
         'ambient_humidity_device', 'elevation', 'temperaturedevicefunctionlist', 'humiditydevicefunctionlist', 'pressuredevicefunctionlist', 'moisture_greens', 'moisture_roasted',
@@ -1475,6 +1475,7 @@ class tgraphcanvas(FigureCanvas):
         self.compareDeltaET = False
         self.compareDeltaBT = True
         self.compareMainEvents = True
+        self.compareBBP = False
 
         self.replayType = 0 # 0: by time, 1: by BT, 2: by ET
         self.replayedBackgroundEvents = [] # set of BackgroundEvent indicies that have already been replayed (cleared in ClearMeasurements)
@@ -30895,6 +30896,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.compareDeltaBT = bool(toBool(settings.value("compareDeltaBT",self.qmc.compareDeltaBT)))
             if settings.contains("compareMainEvents"):
                 self.qmc.compareMainEvents = bool(toBool(settings.value("compareMainEvents",self.qmc.compareMainEvents)))
+            if settings.contains("compareMainEvents"):
+                self.qmc.compareBBP = bool(toBool(settings.value("compareBBP",self.qmc.compareBBP)))
             if settings.contains("autosaveflag"):
                 self.qmc.autosaveflag = toInt(settings.value("autosaveflag",self.qmc.autosaveflag))
             if settings.contains("autosaveaddtorecentfilesflag"):
@@ -32153,6 +32156,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("compareDeltaET",self.qmc.compareDeltaET)
             settings.setValue("compareDeltaBT",self.qmc.compareDeltaBT)
             settings.setValue("compareMainEvents",self.qmc.compareMainEvents)
+            settings.setValue("compareBBP",self.qmc.compareBBP)
             settings.setValue("autosaveflag",self.qmc.autosaveflag)
             settings.setValue("autosaveaddtorecentfilesflag",self.qmc.autosaveaddtorecentfilesflag)
             settings.setValue("autosavepdf",self.qmc.autosaveimage)
