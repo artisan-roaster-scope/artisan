@@ -22,6 +22,12 @@ if /i "%APPVEYOR%" NEQ "True" (
         set QT_PATH=c:\qt\6.2\msvc2019_64
     )
     set PATH=!PYTHON_PATH!;!PYTHON_PATH!\Scripts;!PATH!
+) else (
+    if /i "%ARTISAN_LEGACY%" NEQ "True" (
+        set ARTISAN_SPEC=win
+    ) else (
+        set ARTISAN_SPEC=win-legacy
+    )
 )
 
 ::

@@ -13,19 +13,27 @@ if /i "%APPVEYOR%" NEQ "True" (
         set QT_PATH=c:\qt\5.15\msvc2019_64
         set ARTISAN_SPEC=win-legacy
         set PYINSTALLER_VER=4.3
+        set BUILD_PYINSTALLER=False
         set VC_REDIST=https://aka.ms/vs/16/release/vc_redist.x64.exe
     ) else (
         set PYTHON_PATH=c:\Python310-64
         set QT_PATH=c:\qt\6.2\msvc2019_64
         set ARTISAN_SPEC=win
-        set PYINSTALLER_VER=4.7
+        set PYINSTALLER_VER=4.8
+        set BUILD_PYINSTALLER=True
         set VC_REDIST=https://aka.ms/vs/17/release/vc_redist.x64.exe
     )
     set PATH=!PYTHON_PATH!;!PYTHON_PATH!\Scripts;!PATH!
+) else (
+    if /i "%ARTISAN_LEGACY%" NEQ "True" (
+        set ARTISAN_SPEC=win
+    ) else (
+        set ARTISAN_SPEC=win-legacy
+    )
 )
 
 echo Python Version
-python -V
+%PYTHON_PATH%\python -V
 
 ::
 :: get pip up to date
@@ -33,27 +41,29 @@ python -V
 %PYTHON_PATH%\python.exe -m pip install --upgrade pip
 %PYTHON_PATH%\python.exe -m pip install wheel
 
+::
+:: install Artisan required libraries from pip
+::
+%PYTHON_PATH%\python.exe -m pip install -r src\requirements.txt
+%PYTHON_PATH%\python.exe -m pip install -r src\requirements-%ARTISAN_SPEC%.txt
+
 :: custom build the pyinstaller bootloader or install a prebuilt
-%BUILD_APPVEYOR%=False
-if /i "%BUILD_APPVEYOR%"=="True" (
+::%BUILD_PYINSTALLER%=False
+if /i "%BUILD_PYINSTALLER%"=="True" (
     echo curl pyinstaller v%PYINSTALLER_VER%
     curl -L -O https://github.com/pyinstaller/pyinstaller/archive/refs/tags/v%PYINSTALLER_VER%.zip
     7z x v%PYINSTALLER_VER%.zip
     del v%PYINSTALLER_VER%.zip
+    if not exist pyinstaller-%PYINSTALLER_VER%\bootloader\ (exit /b 101)
     cd pyinstaller-%PYINSTALLER_VER%\bootloader
     %PYTHON_PATH%\python.exe ./waf all --target-arch=64bit
     cd ..
     %PYTHON_PATH%\python.exe setup.py -q install
     cd ..
 ) else (
+    if not exist .ci\\pyinstaller-%PYINSTALLER_VER%-py3-none-any.whl (exit /b 102)
     %PYTHON_PATH%\\python.exe -m pip install .ci\\pyinstaller-%PYINSTALLER_VER%-py3-none-any.whl
 )
-
-::
-:: install Artisan required libraries from pip
-::
-%PYTHON_PATH%\python.exe -m pip install -r src\requirements.txt
-%PYTHON_PATH%\python.exe -m pip install -r src\requirements-%ARTISAN_SPEC%.txt
 
 ::
 :: download and install required libraries not available on pip
