@@ -944,7 +944,8 @@ class tgraphcanvas(FigureCanvas):
 
         self.flavorlabels = list(self.artisanflavordefaultlabels)
         #Initial flavor parameters.
-        self.flavors = [5., 5., 5., 5., 5., 5., 5., 5., 5.]
+        self.flavors_default_value = 5.
+        self.flavors = [5.]*len(self.flavorlabels)
         self.flavorstartangle = 90
         self.flavoraspect = 1.0  #aspect ratio
         # flavor chart graph plots and annotations
@@ -6697,6 +6698,7 @@ class tgraphcanvas(FigureCanvas):
             y[:-j,-(i+1)] = x[j:]
             y[-j:,-(i+1)] = x[-1]
         return numpy.median(y, axis=1)
+#        return numpy.nanmedian(y, axis=1) # produces artefacts
 
     # smoothes a list of values 'y' at taken at times indicated by the numbers in list 'x'
     # 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
@@ -6760,8 +6762,8 @@ class tgraphcanvas(FigureCanvas):
                 fromIndex = 0
                 toIndex = len(a)
             # we replace the error value -1 by numpy.nan to avoid strange smoothing artifacts
-            a = numpy.array([numpy.nan if x == -1 else x for x in a],dtype='float64')[fromIndex:toIndex]
-            b = numpy.array([numpy.nan if x == -1 else x for x in b],dtype='float64')[fromIndex:toIndex]
+            a = numpy.array([numpy.nan if x in [-1, None] else x for x in a],dtype='float64')[fromIndex:toIndex]
+            b = numpy.array([numpy.nan if x in [-1, None] else x for x in b],dtype='float64')[fromIndex:toIndex]
             # 2. re-sample
             if re_sample:
                 if a_lin is None or len(a_lin) != len(a):
@@ -6775,12 +6777,13 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.filterDropOuts:
                 try:
                     b = self.medfilt(numpy.array(b),5)  # k=3 seems not to catch all spikes in all cases; k must be odd!
-## scipy alternative which performs equal
+## scipy alternative which performs equal, but produces larger artefacts at the borders and for intermediate NaN values for k>3
 #                    from scipy.signal import medfilt as scipy_medfilt
-#                    b = scipy_medfilt(numpy.array(b),5)
+#                    b = scipy_medfilt(numpy.array(b),3)
                     res = b
-                except Exception: # pylint: disable=broad-except
-                    pass
+                except Exception as e: # pylint: disable=broad-except
+                    _log.error(e)
+                    res = numpy.array(b)
             # 4. smooth data
             if window_len>2:
                 if decay_smoothing:
@@ -6816,7 +6819,8 @@ class tgraphcanvas(FigureCanvas):
             # 4. sample back
             if re_sample and back_sample:
                 res = numpy.interp(a, a_mod, res) # re-sampled back to orginal timestamps
-            return numpy.concatenate(([None]*(fromIndex),res.tolist(),[None]*(len(a)-toIndex))).tolist()
+            # Note: at this point res might be a list or a numpy array!
+            return numpy.concatenate(([None]*(fromIndex),res,[None]*(len(a)-toIndex))).tolist()
         return b
 
     # returns the position of the main event annotations as list of lists of the form
@@ -7539,7 +7543,7 @@ class tgraphcanvas(FigureCanvas):
                     self.stemp1 = self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
             if smooth or len(self.stemp2) != len(self.timex):
                 if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon:  # we don't smooth, but remove the dropouts
-                    self.stemp2 = fill_gaps(self.temp2)
+                    self.stemp2 = temp2_nogaps
                 else:
                     self.stemp2 = self.smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
 
@@ -9865,17 +9869,25 @@ class tgraphcanvas(FigureCanvas):
                     if "CO2_batch_per_green_kg" in cp and cp["CO2_batch_per_green_kg"]:
                         statstr_segments += [" (", str(aw.float2float(cp["CO2_batch_per_green_kg"],0)), "g/kg)"]
                 if cp["AUC"]:
-                    statstr_segments += ['\n', QApplication.translate("AddlInfo", "AUC"), ': ', str(cp["AUC"]), 'C*min [', str(cp["AUCbase"]), aw.qmc.mode, "]"]
+                    statstr_segments += ['\n', QApplication.translate("AddlInfo", "AUC"), ': ', str(cp["AUC"]), 'C*min [', str(cp["AUCbase"]), '\u00b0', aw.qmc.mode, "]"]
 
-                for notes in [aw.qmc.roastingnotes, aw.qmc.cuppingnotes]:
+                def render_notes(notes,statstr_segments):
                     if notes is not None and len(notes)>0:
-                        roasting_notes_lines = textwrap.wrap(notes, width=aw.qmc.statsmaxchrperline)
-                        if len(roasting_notes_lines)>0:
-                            statstr_segments += [skipline, roasting_notes_lines[0]]
-                            if len(roasting_notes_lines)>1:
-                                statstr_segments += [skipline, "  ", roasting_notes_lines[1]]
-                                if len(roasting_notes_lines)>2:
+                        notes_lines = textwrap.wrap(notes, width=aw.qmc.statsmaxchrperline)
+                        if len(notes_lines)>0:
+                            statstr_segments += [skipline, notes_lines[0]]
+                            if len(notes_lines)>1:
+                                statstr_segments += [skipline, "  ", notes_lines[1]]
+                                if len(notes_lines)>2:
                                     statstr_segments.append("..")
+                
+                render_notes(aw.qmc.roastingnotes,statstr_segments)
+                
+                cupping_score, cupping_all_default = aw.cuppingSum(self.flavors)
+                if not cupping_all_default:
+                    statstr_segments += ['\n', QApplication.translate("HTML Report Template", "Cupping:"), " ", str(aw.float2float(cupping_score))]
+                
+                render_notes(aw.qmc.cuppingnotes,statstr_segments)
 
                 # Trim the long lines
                 trimmedstatstr_segments = []
@@ -15826,7 +15838,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                     else:
                         self.set_message(f"{xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{aw.qmc.mode}{'/min' if aw.qmc.fmt_data_RoR else ''}")
             # update running LCDs
-            if not aw.qmc.flagon:
+            if not aw.qmc.flagon and not bool(aw.comparator):
                 if aw.qmc.running_LCDs == 1: # show foreground profile readings at cursor position in LCDs
                     if timeindex is None:
                         timeindex = aw.qmc.time2index(self._last_event.xdata, nearest=False)
@@ -21296,6 +21308,7 @@ class ApplicationWindow(QMainWindow):
         # try to select the right font for matplotlib according to the given locale and plattform
         if self.qmc.graphfont == 0:
             try:
+                rcParams['axes.unicode_minus'] = True
                 rcParams['font.size'] = 12.0
                 if platf == "Darwin":
                     mpl.rcParams['font.family'] = "Arial Unicode MS"
@@ -21333,30 +21346,36 @@ class ApplicationWindow(QMainWindow):
             # font WenQuanYi selected
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['WenQuanYi Zen Hei']
+            rcParams['axes.unicode_minus'] = False
 #            aw.set_mpl_fontproperties(self.getResourcePath() + "wqy-zenhei.ttc") # .ttc fonts are not supported yet by the PDF backend
             aw.set_mpl_fontproperties(getResourcePath() + "WenQuanYiZenHei-01.ttf")
         elif self.qmc.graphfont == 4: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Simplified Chinese
+            rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans CN']
             aw.set_mpl_fontproperties(getResourcePath() + "SourceHanSansCN-Regular.otf")
         elif self.qmc.graphfont == 5: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Traditional Chinese, Taiwan
+            rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans TW']
             aw.set_mpl_fontproperties(getResourcePath() + "SourceHanSansTW-Regular.otf")
         elif self.qmc.graphfont == 6: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Traditional Chinese, Hong Kong
+            rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans HK']
             aw.set_mpl_fontproperties(getResourcePath() + "SourceHanSansHK-Regular.otf")
         elif self.qmc.graphfont == 7: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Korean
+            rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans KR']
             aw.set_mpl_fontproperties(getResourcePath() + "SourceHanSansKR-Regular.otf")
         elif self.qmc.graphfont == 8: # Source Han Sans (CN, TW, HK, KR, JP)
             # font Source Han Sans selected, Japanese
+            rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans JP']
             aw.set_mpl_fontproperties(getResourcePath() + "SourceHanSansJP-Regular.otf")
@@ -21364,9 +21383,11 @@ class ApplicationWindow(QMainWindow):
             # font Dijkstra selected
             rcParams['font.size'] = 10.0
             rcParams['font.family'] = ['Dijkstra']
+            rcParams['axes.unicode_minus'] = False
             aw.set_mpl_fontproperties(getResourcePath() + "dijkstra.ttf")
         elif self.qmc.graphfont == 1 or platf == "Linux": # no Comic on Linux!
             # font Humor selected
+            rcParams['axes.unicode_minus'] = False
             rcParams['font.size'] = 16.0
             if platf == 'Linux':
                 rcParams['font.family'] = ['Humor Sans']
@@ -21375,6 +21396,7 @@ class ApplicationWindow(QMainWindow):
             aw.set_mpl_fontproperties(getResourcePath() + "Humor-Sans.ttf")
         elif self.qmc.graphfont == 2 and not platf == "Linux":
             # font Comic selected
+            rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Comic Sans MS','Humor Sans']
             self.mpl_fontproperties = mpl.font_manager.FontProperties()
@@ -34634,6 +34656,9 @@ class ApplicationWindow(QMainWindow):
             if beans_html is not None and beans_html != "" and aw.qmc.plus_coffee is not None:
                 beans_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.coffeeLink(aw.qmc.plus_coffee),beans_html)
                 # note that blends are hard to link back as it requires to link component by component
+            cupping_score, cupping_all_default = self.cuppingSum(self.qmc.flavors)
+            cupping_notes = self.note2html(self.qmc.cuppingnotes).strip()
+            special_events = self.specialevents2html().strip()
             html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
                 title=title_html,
                 titlecolor=QColor(aw.qmc.palette["title"]).name(),
@@ -34654,8 +34679,8 @@ class ApplicationWindow(QMainWindow):
                 operator=str(htmllib.escape(self.qmc.operator)),
                 organization_label=QApplication.translate("HTML Report Template", "Organization:"),
                 organization=str(htmllib.escape(self.qmc.organization)),
-                cup_label=QApplication.translate("HTML Report Template", "Cupping:"),
-                cup=str(aw.float2float(self.cuppingSum(self.qmc.flavors))),
+                cup_label=("" if cupping_all_default else QApplication.translate("HTML Report Template", "Cupping:")),
+                cup=("" if cupping_all_default else str(aw.float2float(cupping_score))),
                 color_label=QApplication.translate("HTML Report Template", "Color:"),
                 color=color,
                 energy_label=QApplication.translate("HTML Report Template", "Energy:"),
@@ -34714,10 +34739,12 @@ class ApplicationWindow(QMainWindow):
                 roast_attributes=self.roastattributes(),
                 graph_image=graph_image,
                 flavor_image=flavor_image,
+                show_cupping=("none" if cupping_all_default else "inline"),
                 specialevents_label=QApplication.translate("HTML Report Template", "Events"),
-                specialevents=self.specialevents2html(),
+                specialevents=special_events,
+                show_special_events=("none" if special_events == "" else "inline"),
                 cupping_notes_label=(QApplication.translate("HTML Report Template", "Cupping Notes") if self.qmc.cuppingnotes != "" else ""),
-                cupping_notes=self.note2html(self.qmc.cuppingnotes))
+                cupping_notes=cupping_notes)
             f = None
             try:
                 filename = str(QDir(tmpdir).filePath("Roastlog.html"))
@@ -34781,15 +34808,18 @@ class ApplicationWindow(QMainWindow):
             return "\n<center><pre>" + ', '.join(res) + "</pre></center>"
         return ""
 
-    @staticmethod
-    def cuppingSum(flavors):
+    # returns the overal cupping score and as second value a flag if True indicating that all individual ratings were set to their default value
+    def cuppingSum(self, flavors):
         score = 0.
+        all_default = True
         nflavors = len(flavors)
         for i in range(nflavors):
             score += flavors[i]
+            if flavors[i] != self.qmc.flavors_default_value:
+                all_default = False
         score /= (nflavors)
         score *= 10.
-        return score
+        return score, all_default
 
     @staticmethod
     def volume_weight2html(amount, out, unit, change):
@@ -34844,7 +34874,7 @@ class ApplicationWindow(QMainWindow):
     def specialevents2html(self):
         html = ""
         if self.qmc.specialevents and len(self.qmc.specialevents) > 0:
-            html += '<center>\n<table cellpadding="10" cellspacing="8">\n'
+            html += '\n<table cellpadding="10" cellspacing="8">\n'
             if self.qmc.timeindex[0] != -1:
                 start = self.qmc.timex[self.qmc.timeindex[0]]
             else:
@@ -34897,7 +34927,7 @@ class ApplicationWindow(QMainWindow):
                      stringfromseconds(self.qmc.timex[sevents[i][0]] - start) +
                      "</td><td align='right'>" + temps + "</td><td>" + 
                      "</td><td align='right'>" + deltas + "</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + str(self.qmc.etypesf(seventsType[i])) + " " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
-            html += '</table>\n</center>'
+            html += '</table>\n'
         return html
 
     @staticmethod
@@ -38476,6 +38506,9 @@ def main():
     
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):
+        # the next line is needed to capture MPL warnings (emitted through logging) of the format 
+        # "UserWarning: Glyph 231 (\N{LATIN SMALL LETTER C WITH CEDILLA}) missing from current font."
+        logging.captureWarnings(True)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             app.exec()
