@@ -193,12 +193,15 @@ def toFloat(x):
     except Exception: # pylint: disable=broad-except
         return 0.
 def toBool(x):
-    if x is None:
-        return False
     if isinstance(x,str):
-        if x in ["false","False"]:
+        if x == "false":
             return False
-        return True
+        if x == "true":
+            return True
+        try:
+            return bool(eval(x)) # pylint: disable=eval-used
+        except Exception: # pylint: disable=broad-except
+            return False
     return bool(x)
 def toStringList(x):
     if x:

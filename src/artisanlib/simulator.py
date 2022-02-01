@@ -19,19 +19,79 @@
 import numpy
 import logging
 from typing import Final
-
+from artisanlib.util import fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF
 
 _log: Final = logging.getLogger(__name__)
 
 class Simulator():
-    def __init__(self, profile = None):
+    __slots__ = [ 'profile', 'temp1', 'temp2', 'timex', 'extratemp1', 'extratemp2', 'extratimex',
+        'extraDelta1', 'extraDelta2', 'extraNoneTempHint1', 'extraNoneTempHint2' ]
+    
+    # mode is the current temperature of Artisan, either "C" or "F"
+    def __init__(self, mode, profile = None):
+   
         self.profile = profile
         self.temp1 = profile["temp1"]
         self.temp2 = profile["temp2"]
         self.timex = profile["timex"]
-        self.extratemp1 = profile["extratemp1"]
-        self.extratemp2 = profile["extratemp2"]
-        self.extratimex = profile["extratimex"]
+        if "extratemp1" in profile and "extratemp2" in profile and "extratimex" in profile:
+            self.extratemp1 = profile["extratemp1"]
+            self.extratemp2 = profile["extratemp2"]
+            self.extratimex = profile["extratimex"]
+        else:
+            self.extratemp1 = []
+            self.extratemp2 = []
+            self.extratimex = []
+        if "extraDelta1" in profile and "extraDelta2" in profile:
+            self.extraDelta1 = profile["extraDelta1"]
+            self.extraDelta2 = profile["extraDelta2"]
+        else:
+            self.extraDelta1 = [False]*len(self.extratimex) 
+            self.extraDelta2 = [False]*len(self.extratimex)    
+        if "extraNoneTempHint1" in profile:
+            self.extraNoneTempHint1 = profile["extraNoneTempHint1"]
+        else:
+            self.extraNoneTempHint1 = []
+        if "extraNoneTempHint2" in profile:
+            self.extraNoneTempHint2 = profile["extraNoneTempHint2"]
+        else:
+            self.extraNoneTempHint2 = []
+        
+        # convert temperature unit if needed
+        if "mode" in profile:
+            m = str(profile["mode"])
+        else:
+            m = mode
+        if mode == "C" and m == "F":
+            self.temp1 = [fromFtoC(t) for t in self.temp1]
+            self.temp2 = [fromFtoC(t) for t in self.temp2]
+            for e in range(len(self.extratimex)):
+                if self.extraDelta1[e]:
+                    self.extratemp1[e] = [RoRfromFtoC(t) for t in self.extratemp1[e]]
+                else:
+                    if not (len(self.extraNoneTempHint1) > e and self.extraNoneTempHint1[e]):
+                        self.extratemp1[e] = [fromFtoC(t) for t in self.extratemp1[e]]
+                if self.extraDelta2[e]:
+                    self.extratemp2[e] = [RoRfromFtoC(t) for t in self.extratemp2[e]]
+                else:
+                    if not (len(self.extraNoneTempHint2) > e and self.extraNoneTempHint2[e]):
+                        self.extratemp2[e] = [fromFtoC(t) for t in self.extratemp2[e]]            
+        elif mode == "F" and m == "C":
+            self.temp1 = [fromCtoF(t) for t in self.temp1]
+            self.temp2 = [fromCtoF(t) for t in self.temp2]
+
+            for e in range(len(self.extratimex)):
+                if self.extraDelta1[e]:
+                    self.extratemp1[e] = [RoRfromCtoF(t) for t in self.extratemp1[e]]
+                else:
+                    if not (len(self.extraNoneTempHint1) > e and self.extraNoneTempHint1[e]):
+                        self.extratemp1[e] = [fromCtoF(t) for t in self.extratemp1[e]]
+                if self.extraDelta2[e]:
+                    self.extratemp2[e] = [RoRfromCtoF(t) for t in self.extratemp2[e]]
+                else:
+                    if not (len(self.extraNoneTempHint2) > e and self.extraNoneTempHint2[e]):
+                        self.extratemp2[e] = [fromCtoF(t) for t in self.extratemp2[e]]
+        
         self.removeEmptyPrefix()
     
     def removeEmptyPrefix(self):

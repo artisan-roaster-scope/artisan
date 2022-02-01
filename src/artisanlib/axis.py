@@ -419,9 +419,10 @@ class WindowsDlg(ArtisanDialog):
 
     @pyqtSlot(bool)
     def autoAxis(self,_=False):
-        if self.aw.qmc.backgroundpath and len(self.aw.qmc.timex)<2:
+        if self.aw.qmc.backgroundpath and (self.aw.qmc.flagon or len(self.aw.qmc.timex)<2):
             # no foreground profile
             t_min,t_max = self.aw.calcAutoAxisBackground()
+            t_min = min(-60,t_min)
         else:
             t_min,t_max = self.aw.calcAutoAxis()
             if self.aw.qmc.backgroundpath:

@@ -1,18 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-# results in a three digits resolution (eg. 1.234)
-#class ArtisanTime():
-#    def __init__(self):
-#        self.clock = QTime()
-#
-#    def setHMS(self,a,b,c,d):
-#        self.clock.setHMS(a,b,c,d)
-#        
-#    def start(self):
-#        self.clock.start()
-#        
-#    def elapsed(self):
-#        return self.clock.elapsed()
 
 import time
 
@@ -37,6 +24,9 @@ class ArtisanTime():
         
     def start(self):
         self.clock = time.perf_counter()
+    
+    def addClock(self, period):
+        self.clock = self.clock + period
         
     def elapsed(self):
         return (time.perf_counter() - self.clock)*self.base

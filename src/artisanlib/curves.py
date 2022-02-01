@@ -420,7 +420,9 @@ class CurvesDlg(ArtisanDialog):
         self.projectCheck = QCheckBox(QApplication.translate("CheckBox", "Projection"))
         self.projectionmodeComboBox = QComboBox()
         self.projectionmodeComboBox.addItems([QApplication.translate("ComboBox","linear"),
-                                              QApplication.translate("ComboBox","newton")])
+                                              QApplication.translate("ComboBox","quadratic")
+#                                              ,QApplication.translate("ComboBox","newton") # disabled
+                                              ])
         self.projectionmodeComboBox.setCurrentIndex(self.aw.qmc.projectionmode)
         self.projectionmodeComboBox.currentIndexChanged.connect(self.changeProjectionMode)
         self.projectCheck.setChecked(self.aw.qmc.projectFlag)

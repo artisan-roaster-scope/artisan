@@ -2444,8 +2444,8 @@ class EventsDlg(ArtisanResizeablDialog):
             self.aw.extraeventbuttontextcolor[visualIndex] = self.extraeventbuttontextcolor[i]
 
         #Apply Event Button Changes
-        self.aw.settooltip()
         self.aw.realignbuttons()
+        self.aw.settooltip() # has to be done after realignbuttons() to have set the aw.buttonlist correctly!
         self.aw.update_extraeventbuttons_visibility()
 
     @pyqtSlot()
@@ -2586,7 +2586,6 @@ class EventsDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def delextraeventbutton(self,_):
-        self.disconnectTableItemActions() # we ensure that signals from to be deleted items are not fired anymore
         bindex = len(self.extraeventstypes)-1
         selected = self.eventbuttontable.selectedRanges()
 
@@ -2594,6 +2593,7 @@ class EventsDlg(ArtisanResizeablDialog):
             bindex = selected[0].topRow()
 
         if bindex >= 0:
+            self.disconnectTableItemActions() # we ensure that signals from to be deleted items are not fired anymore
             self.extraeventslabels.pop(bindex)
             self.extraeventsdescriptions.pop(bindex)
             self.extraeventstypes.pop(bindex)
