@@ -693,7 +693,7 @@ class tgraphcanvas(FigureCanvas):
         'ambient_humidity_device', 'elevation', 'temperaturedevicefunctionlist', 'humiditydevicefunctionlist', 'pressuredevicefunctionlist', 'moisture_greens', 'moisture_roasted',
         'greens_temp', 'beansize', 'beansize_min', 'beansize_max', 'whole_color', 'ground_color', 'color_systems', 'color_system_idx', 'heavyFC_flag', 'lowFC_flag', 'lightCut_flag',
         'darkCut_flag', 'drops_flag', 'oily_flag', 'uneven_flag', 'tipping_flag', 'scorching_flag', 'divots_flag', 'timex', 'smooth_curves_on_recording', 
-        'temp1', 'temp2', 'delta1', 'delta2', 'stemp1', 'stemp2', 'tstemp1', 'tstemp2', 'ctimex1', 'ctimex2', 'ctemp1', 'ctemp2', 'unfiltereddelta1', 'unfiltereddelta2',
+        'temp1', 'temp2', 'delta1', 'delta2', 'stemp1', 'stemp2', 'tstemp1', 'tstemp2', 'ctimex1', 'ctimex2', 'ctemp1', 'ctemp2', 'unfiltereddelta1', 'unfiltereddelta2',  'unfiltereddelta1_pure', 'unfiltereddelta2_pure',
         'on_timex', 'on_temp1', 'on_temp2', 'on_ctimex1', 'on_ctimex2', 'on_ctemp1', 'on_ctemp2','on_tstemp1', 'on_tstemp2', 'on_stemp1', 'on_stemp2', 'on_unfiltereddelta1', 
         'on_unfiltereddelta2', 'on_delta1', 'on_delta2', 'on_extratemp1', 'on_extratemp2', 'on_extratimex', 'on_extractimex1', 'on_extractemp1', 'on_extractimex2', 'on_extractemp2',
         'timeindex', 'ETfunction', 'BTfunction', 'DeltaETfunction', 'DeltaBTfunction', 'safesaveflag', 'pid', 'background', 'backgroundprofile', 'backgroundDetails',
@@ -742,7 +742,7 @@ class tgraphcanvas(FigureCanvas):
         'locktimex_end', 'xgrid', 'ygrid', 'zgrid', 'gridstyles', 'gridlinestyle', 'gridthickness', 'gridalpha', 'xrotation',
         'statisticsheight', 'statisticsupper', 'statisticslower', 'autosaveflag', 'autosaveprefix', 'autosavepath', 'autosavealsopath',
         'autosaveaddtorecentfilesflag', 'autosaveimage', 'autosaveimageformat', 'autoasaveimageformat_types', 'ystep_down', 'ystep_up', 'backgroundETcurve', 'backgroundBTcurve',
-        'l_temp1', 'l_temp2', 'l_delta1', 'l_delta2', 'l_back1', 'l_back2', 'l_back3', 'l_back4', 'l_delta1B', 'l_delta2B', 'l_BTprojection',
+        'l_temp1', 'l_temp2', 'l_delta1', 'l_delta2', 'l_back1', 'l_back2', 'l_back3', 'l_back4', 'l_delta1B', 'l_delta2B', 'l_BTprojection', 'l_DeltaETprojection', 'l_DeltaBTprojection',
         'l_ETprojection', 'l_AUCguide', 'l_horizontalcrossline', 'l_verticalcrossline', 'l_timeline', 'legend', 'l_eventtype1dots', 'l_eventtype2dots',
         'l_eventtype3dots', 'l_eventtype4dots', 'l_eteventannos', 'l_bteventannos', 'l_eventtype1annos', 'l_eventtype2annos', 'l_eventtype3annos',
         'l_eventtype4annos', 'l_annotations', 'l_background_annotations', 'l_annotations_dict', 'l_annotations_pos_dict', 'l_event_flags_dict',
@@ -1553,7 +1553,8 @@ class tgraphcanvas(FigureCanvas):
         self.stemp1,self.stemp2 = [],[] # smoothed versions of temp1/temp2 used in redraw()
         self.tstemp1,self.tstemp2 = [],[] # (temporarily) smoothed version of temp1/temp2 used in sample() to compute the RoR
         self.ctimex1, self.ctimex2, self.ctemp1,self.ctemp2 = [], [],[],[] # (potential shorter) variants of timex/temp1/temp2 with -1 dropout values removed
-        self.unfiltereddelta1, self.unfiltereddelta2 = [],[] # used in sample()
+        self.unfiltereddelta1, self.unfiltereddelta2 = [],[] # Delta mathexpressions applied; used in sample()
+        self.unfiltereddelta1_pure, self.unfiltereddelta2_pure = [],[] # Delta mathexpressions not applied; used in sample() and by projections
 
         # arrays to use while monitoring but not recording
         self.on_timex = []
@@ -2075,8 +2076,8 @@ class tgraphcanvas(FigureCanvas):
         # system fixed RoR limits (only applied if flag is True; usually higher than the user configurable once and always applied)
         self.maxRoRlimit: Final = 170
         # axis limits
-        self.endofx = self.endofx_default
-        self.startofx = self.startofx_default
+        self.endofx = self.endofx_default     # endofx is the display time in seconds of the right x-axis limit (excluding any shift of CHARGE time)
+        self.startofx = self.startofx_default # startofx is the time in seconds of the left x-axis limit in data time (display time in seconds of the left x-axis limit plus the CHARGE time in seconds)
         self.resetmaxtime = 600  #time when pressing RESET: 10min*60
         self.chargemintime = self.startofx_default  #time when pressing CHARGE: -30sec
         self.fixmaxtime = False # if true, do not automatically extend the endofx by 3min if needed because the measurements get out of the x-axis
@@ -2162,6 +2163,8 @@ class tgraphcanvas(FigureCanvas):
 
         self.l_BTprojection = None
         self.l_ETprojection = None
+        self.l_DeltaBTprojection = None
+        self.l_DeltaETprojection = None
 
         self.l_AUCguide = None
 
@@ -3514,6 +3517,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.ax.draw_artist(self.l_BTprojection)
             if self.l_ETprojection is not None and aw.qmc.ETcurve:
                 aw.qmc.ax.draw_artist(self.l_ETprojection)
+            if self.l_DeltaBTprojection is not None and aw.qmc.DeltaBTflag:
+                aw.qmc.ax.draw_artist(self.l_DeltaBTprojection)
+            if self.l_DeltaETprojection is not None and aw.qmc.DeltaETflag:
+                aw.qmc.ax.draw_artist(self.l_DeltaETprojection)
+                
         if aw.qmc.AUCguideFlag and aw.qmc.AUCguideTime and aw.qmc.AUCguideTime > 0:
             aw.qmc.ax.draw_artist(self.l_AUCguide)
 
@@ -3647,8 +3655,8 @@ class tgraphcanvas(FigureCanvas):
                     sample_tstemp2 = aw.qmc.tstemp2
                     sample_stemp1 = aw.qmc.stemp1
                     sample_stemp2 = aw.qmc.stemp2
-                    sample_unfiltereddelta1 = aw.qmc.unfiltereddelta1
-                    sample_unfiltereddelta2 = aw.qmc.unfiltereddelta2
+                    sample_unfiltereddelta1 = aw.qmc.unfiltereddelta1 # no sample_unfiltereddelta1_pure as used only during recording for projections
+                    sample_unfiltereddelta2 = aw.qmc.unfiltereddelta2 # no sample_unfiltereddelta2_pure as used only during recording for projections
                     sample_delta1 = aw.qmc.delta1
                     sample_delta2 = aw.qmc.delta2
                     # list of lists:
@@ -3672,8 +3680,8 @@ class tgraphcanvas(FigureCanvas):
                     sample_tstemp2 = aw.qmc.on_tstemp2 = aw.qmc.on_tstemp2[-m_len:]
                     sample_stemp1 = aw.qmc.on_stemp1 = aw.qmc.on_stemp1[-m_len:]
                     sample_stemp2 = aw.qmc.on_stemp2 = aw.qmc.on_stemp2[-m_len:]
-                    sample_unfiltereddelta1 = aw.qmc.on_unfiltereddelta1 = aw.qmc.on_unfiltereddelta1[-m_len:]
-                    sample_unfiltereddelta2 = aw.qmc.on_unfiltereddelta2 = aw.qmc.on_unfiltereddelta2[-m_len:]
+                    sample_unfiltereddelta1 = aw.qmc.on_unfiltereddelta1 = aw.qmc.on_unfiltereddelta1[-m_len:] # no sample_unfiltereddelta1_pure as used only during recording for projections
+                    sample_unfiltereddelta2 = aw.qmc.on_unfiltereddelta2 = aw.qmc.on_unfiltereddelta2[-m_len:] # no sample_unfiltereddelta2_pure as used only during recording for projections
                     sample_delta1 = aw.qmc.on_delta1 = aw.qmc.on_delta1[-m_len:]
                     sample_delta2 = aw.qmc.on_delta2 = aw.qmc.on_delta2[-m_len:]
                     # list of lists:
@@ -3975,11 +3983,6 @@ class tgraphcanvas(FigureCanvas):
                                 timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
                                 aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
                             
-                            if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction):
-                                try:
-                                    aw.qmc.rateofchange1 = aw.qmc.eval_math_expression(aw.qmc.DeltaETfunction,tx,RTsname="R1",RTsval=aw.qmc.rateofchange1)
-                                except Exception as e: # pylint: disable=broad-except
-                                    _log.exception(e)
                         # compute T2 RoR
                         if t2_final == -1 or len(sample_ctimex2)<2:  # we repeat the last RoR if underlying temperature dropped
                             if sample_unfiltereddelta2:
@@ -4009,15 +4012,27 @@ class tgraphcanvas(FigureCanvas):
                                 timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
                                 aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
 
-                            if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
-                                try:
-                                    aw.qmc.rateofchange2 = aw.qmc.eval_math_expression(aw.qmc.DeltaBTfunction,tx,RTsname="R2",RTsval=aw.qmc.rateofchange2)
-                                except Exception as e: # pylint: disable=broad-except
-                                    _log.exception(e)
 
+                        # aw.qmc.unfiltereddelta{1,2}_pure contain the RoR values respecting the delta_span, but without any delta smoothing NOR delta mathformulas applied
+                        aw.qmc.unfiltereddelta1_pure.append(aw.qmc.rateofchange1)
+                        aw.qmc.unfiltereddelta2_pure.append(aw.qmc.rateofchange2)
+
+                        # apply the math formula before the delta smoothing
+                        if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction):
+                            try:
+                                aw.qmc.rateofchange1 = aw.qmc.eval_math_expression(aw.qmc.DeltaETfunction,tx,RTsname="R1",RTsval=aw.qmc.rateofchange1)
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.exception(e)
+                        if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
+                            try:
+                                aw.qmc.rateofchange2 = aw.qmc.eval_math_expression(aw.qmc.DeltaBTfunction,tx,RTsname="R2",RTsval=aw.qmc.rateofchange2)
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.exception(e)
+
+                        # unfiltereddelta1/2 contains the RoRs respecting the delta_span, but without any delta smoothing AND delta mathformulas applied
                         sample_unfiltereddelta1.append(aw.qmc.rateofchange1)
                         sample_unfiltereddelta2.append(aw.qmc.rateofchange2)
-
+                                    
                         #######   filter deltaBT deltaET
                         # decay smoothing
                         if aw.qmc.deltaETfilter:
@@ -4037,6 +4052,8 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         sample_unfiltereddelta1.append(0.)
                         sample_unfiltereddelta2.append(0.)
+                        aw.qmc.unfiltereddelta1.append(0.)
+                        aw.qmc.unfiltereddelta2.append(0.)
                         aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
 
                     # limit displayed RoR #(only before TP is recognized) # WHY?
@@ -5393,81 +5410,120 @@ class tgraphcanvas(FigureCanvas):
     def updateProjection(self):
         try:
             # projections are only drawn after CHARGE and before DROP
-            if (self.timeindex[0] != -1 and self.timeindex[6] == 0):
+            if (self.timeindex[0] != -1 and self.timeindex[6] == 0) and len(self.timex)>0:
+                charge = self.timex[self.timeindex[0]] # in data time (corresponds to display time 00:00)
+                now = self.timex[-1]                   # in data time (incl. time to charge)
+                _,xlim_right = self.ax.get_xlim()      # in data time like timex (incl. time to charge)
                 #self.resetlines()
                 if self.projectionmode == 0: # linear temperature projection mode based on current RoR
                     #calculate the temperature endpoint at endofx acording to the latest rate of change
-                    xcoords = None
                     if self.l_BTprojection is not None:
-                        if self.BTcurve and len(self.delta2) > 0 and self.delta2[-1] is not None and len(self.ctemp2) > 0:
+                        if self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and self.unfiltereddelta2_pure[-1] is not None and len(self.ctemp2) > 0:
                             # projection extended to the plots current endofx
-                            left = self.timex[-1]
-                            _,right = self.ax.get_xlim()
-                            right = max(left,right) # never have the right point be left of left;)
-                            xcoords = [left,right]
-                            BTprojection = self.ctemp2[-1] + self.delta2[-1]*(right - self.timex[-1])/60.
-                            #plot projections
-                            self.l_BTprojection.set_data(xcoords, [self.ctemp2[-1], BTprojection])
+                            left = now
+                            right = max(left, xlim_right + charge) # never have the right point be left of left;)
+                            BTprojection = self.ctemp2[-1] + self.unfiltereddelta2_pure[-1]*(right - left)/60.
+                            #plot projection
+                            self.l_BTprojection.set_data([left,right], [self.ctemp2[-1], BTprojection])
                         else:
                             self.l_BTprojection.set_data([],[])
                     if self.l_ETprojection is not None:
-                        if self.ETcurve and len(self.delta1) > 0 and self.delta1[-1] is not None and len(self.ctemp1) > 0:
-                            if xcoords is None:
-                                # projection extended to the plots current endofx
-                                left = self.timex[-1]
-                                _,right = self.ax.get_xlim()
-                                right = max(left,right) # never have the right point be left of left;)
-                                xcoords = [left,right]
-                            ETprojection = self.ctemp1[-1] + self.delta1[-1]*(xcoords[1] - self.timex[-1])/60.
-                            self.l_ETprojection.set_data(xcoords, [self.ctemp1[-1], ETprojection])
+                        if self.ETcurve and len(self.unfiltereddelta1_pure) > 0 and self.unfiltereddelta1_pure[-1] is not None and len(self.ctemp1) > 0:
+                            # projection extended to the plots current endofx
+                            left = now
+                            right = max(left,xlim_right + charge) # never have the right point be left of left;)
+                            ETprojection = self.ctemp1[-1] + self.unfiltereddelta1_pure[-1]*(right - left)/60.
+                            #plot projection
+                            self.l_ETprojection.set_data([left,right], [self.ctemp1[-1], ETprojection])
                         else:
                             self.l_ETprojection.set_data([],[])
 
                 # quadratic temperature projection based on linear RoR approximation
                 # only active 5min after CHARGE
-                elif self.projectionmode == 1 and (aw.qmc.timex[-1]-aw.qmc.timex[aw.qmc.timeindex[0]])>60*5:
+                elif self.projectionmode == 1 and (self.timex[-1]-charge)>60*5:
                     delta_interval_BT = max(10, self.deltaBTsamples) # at least a span of 10 readings
                     delta_interval_ET = max(10, self.deltaETsamples) # at least a span of 10 readings
-                    deltadeltalimit = 0.002
-                    starttime = self.timex[self.timeindex[0]]
+                    deltadeltalimit = 0.0020
                     delay = self.delay/1000.
                     
                     if self.l_BTprojection is not None:
                         if (len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1] and
-                            len(self.delta2)>delta_interval_BT and self.delta2[-1] and self.delta2[-1]>0 and self.delta2[-delta_interval_BT] and self.delta2[-delta_interval_BT]>0):
+                                len(self.unfiltereddelta2_pure)>delta_interval_BT and 
+                                self.unfiltereddelta2_pure[-1] and 
+                                self.unfiltereddelta2_pure[-1]>0 and 
+                                self.unfiltereddelta2_pure[-delta_interval_BT] and
+                                self.unfiltereddelta2_pure[-delta_interval_BT]>0):
                             
-                            deltadelta_secsec = ((self.delta2[-1] - self.delta2[-delta_interval_BT])/60) / (self.timex[-1] - self.timex[-delta_interval_BT]) # linear BT RoRoR   C/sec/sec
+                            deltadelta_secsec = (((self.unfiltereddelta2_pure[-1] - self.unfiltereddelta2_pure[-delta_interval_BT])/60) / 
+                                    (now - self.timex[-delta_interval_BT])) # linear BT RoRoR   C/sec/sec
                             # limit deltadelta
                             deltadelta_secsec = max(-deltadeltalimit,min(deltadeltalimit,deltadelta_secsec))
-                            xpoints = numpy.arange(self.timex[-1],self.endofx + starttime, delay)
+                            xpoints = numpy.arange(now, xlim_right, delay)
                             ypoints = [self.ctemp2[-1]]
-                            delta_sec = self.delta2[-1]/60
+                            delta_sec = self.unfiltereddelta2_pure[-1]/60
                             for _ in range(len(xpoints)-1):
                                 ypoints.append(ypoints[-1] + delta_sec*delay)
                                 delta_sec = delta_sec + deltadelta_secsec*delay
                             #plot BT curve
-                            self.l_BTprojection.set_data(xpoints, ypoints)                       
+                            self.l_BTprojection.set_data(xpoints, ypoints)
+                            
+                            # compute the deltaBT projection line based on the computed deltadelta_secsec
+                            if self.l_DeltaBTprojection is not None:
+                                if self.DeltaBTflag and len(self.delta2)>0:
+                                    # recompute deltadelta_secsec to adjust to delta math forumlas
+                                    deltadelta_secsec = (((self.delta2[-1] - self.delta2[-delta_interval_BT])/60) / 
+                                        (now - self.timex[-delta_interval_BT])) # linear BT RoRoR   C/sec/sec
+                                    left = now
+                                    right = max(left, xlim_right) # never have the right point be left of left;)
+                                    DeltaBTprojection = self.delta2[-1] + deltadelta_secsec * (right - left) * 60
+                                    # projection extended to the plots current endofx
+                                    self.l_DeltaBTprojection.set_data([left,right], [self.delta2[-1], DeltaBTprojection])
+                                else:
+                                    self.l_DeltaBTprojection.set_data([],[])
                         else:
                             self.l_BTprojection.set_data([],[])
+                            if self.l_DeltaBTprojection is not None:
+                                self.l_DeltaBTprojection.set_data([],[])
+                            
 
                     if self.l_ETprojection is not None:
                         if (len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1] and
-                            len(self.delta1)>delta_interval_ET and self.delta1[-1] and self.delta1[-delta_interval_ET]):                            
-#                            len(self.delta1)>delta_interval_ET and self.delta1[-1] and self.delta1[-1]>0 and self.delta1[-delta_interval_ET] and self.delta1[-delta_interval_ET]>0):
+                                len(self.unfiltereddelta1_pure)>delta_interval_BT and 
+                                self.unfiltereddelta1_pure[-1] and 
+                                self.unfiltereddelta1_pure[-1]>0 and 
+                                self.unfiltereddelta1_pure[-delta_interval_BT] and
+                                self.unfiltereddelta1_pure[-delta_interval_BT]>0):
                             
-                            deltadelta_secsec = ((self.delta1[-1] - self.delta1[-delta_interval_ET])/60) / (self.timex[-1] - self.timex[-delta_interval_ET]) # linear BT RoRoR   C/sec/sec
+                            deltadelta_secsec = (((self.unfiltereddelta1_pure[-1] - self.unfiltereddelta1_pure[-delta_interval_ET])/60) / 
+                                    (self.timex[-1] - self.timex[-delta_interval_ET])) # linear ET RoRoR   C/sec/sec
                             # limit deltadelta
                             deltadelta_secsec = max(-deltadeltalimit,min(deltadeltalimit,deltadelta_secsec))
-                            xpoints = numpy.arange(self.timex[-1],self.endofx + starttime, delay)
+                            xpoints = numpy.arange(now, xlim_right, delay)
                             ypoints = [self.ctemp1[-1]]
-                            delta_sec = self.delta1[-1]/60
+                            delta_sec = self.unfiltereddelta1_pure[-1]/60
                             for _ in range(len(xpoints)-1):
                                 ypoints.append(ypoints[-1] + delta_sec*delay)
                                 delta_sec = delta_sec + deltadelta_secsec*delay
                             #plot ET curve
-                            self.l_ETprojection.set_data(xpoints, ypoints)                       
+                            self.l_ETprojection.set_data(xpoints, ypoints)
+
+                            # compute the deltaET projection line based on the computed deltadelta_secsec
+                            if self.l_DeltaETprojection is not None:
+                                if self.DeltaETflag and len(self.delta1)>0:
+                                    # recompute deltadelta_secsec to adjust to delta math forumlas
+                                    deltadelta_secsec = (((self.delta1[-1] - self.delta1[-delta_interval_BT])/60) / 
+                                        (now - self.timex[-delta_interval_BT])) # linear ET RoRoR   C/sec/sec
+                                    left = now
+                                    right = max(left, xlim_right) # never have the right point be left of left;)
+                                    DeltaETprojection = self.delta1[-1] + deltadelta_secsec * (right - left) * 60
+                                    # projection extended to the plots current endofx
+                                    self.l_DeltaETprojection.set_data([left,right], [self.delta1[-1], DeltaETprojection])
+                                else:
+                                    self.l_DeltaETprojection.set_data([],[])
                         else:   
-                            self.l_ETprojection.set_data([],[])
+                            self.l_ETprojection.set_data([],[])   
+                            if self.l_DeltaETprojection is not None:
+                                self.l_DeltaETprojection.set_data([],[])                       
 
 # disabled
 #                elif self.projectionmode == 2:
@@ -5510,16 +5566,24 @@ class tgraphcanvas(FigureCanvas):
                     self.l_BTprojection.set_data([],[])
                 if self.l_ETprojection is not None:
                     self.l_ETprojection.set_data([],[])
+                if self.l_DeltaBTprojection is not None:
+                    self.l_DeltaBTprojection.set_data([],[])
+                if self.l_DeltaETprojection is not None:
+                    self.l_DeltaETprojection.set_data([],[])
                     
                     
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " updateProjection() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.adderror((QApplication.translate("Error Message","Exception:") + " updateProjection() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.l_BTprojection is not None:
                 self.l_BTprojection.set_data([],[])
             if self.l_ETprojection is not None:
                 self.l_ETprojection.set_data([],[])
+            if self.l_DeltaBTprojection is not None:
+                self.l_DeltaBTprojection.set_data([],[])
+            if self.l_DeltaETprojection is not None:
+                self.l_DeltaETprojection.set_data([],[])
 
     # takes array with readings, the current index, the sign of the shift as character and the shift value
     # returns val, evalsign
@@ -6402,6 +6466,7 @@ class tgraphcanvas(FigureCanvas):
             self.temp1, self.temp2, self.delta1, self.delta2, self.timex, self.stemp1, self.stemp2, self.ctimex1, self.ctimex2, self.ctemp1, self.ctemp2 = [],[],[],[],[],[],[],[],[],[],[]
             self.tstemp1,self.tstemp2 = [],[]
             self.unfiltereddelta1,self.unfiltereddelta2 = [],[]
+            self.unfiltereddelta1_pure,self.unfiltereddelta2_pure = [],[]
             self.timeindex = [-1,0,0,0,0,0,0,0]
             #extra devices
             for i in range(min(len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2),len(self.extrastemp1),len(self.extrastemp2))):
@@ -9179,14 +9244,15 @@ class tgraphcanvas(FigureCanvas):
                         if self.delta_ax:
                             trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
                             # if not recording or if during recording CHARGE was set already
-                            if (not self.flagon or self.timeindex[0] > 1 and 
-                                    len(self.timex) == len(self.delta1) and len(self.timex) == len(self.delta2)):
+                            if ((not self.flagon or self.timeindex[0] > 1) and 
+                                    len(self.timex) == len(self.delta1) and len(self.timex) == len(self.delta2) and len(self.timex)>charge_idx+2):
+                                # to avoid drawing of RoR artifacts directly after CHARGE we skip the first two samples after CHARGE before starting to draw
                                 if aw.qmc.swapdeltalcds:
-                                    self.drawDeltaET(trans,charge_idx,drop_idx)
-                                    self.drawDeltaBT(trans,charge_idx,drop_idx)
+                                    self.drawDeltaET(trans,charge_idx+2,drop_idx)
+                                    self.drawDeltaBT(trans,charge_idx+2,drop_idx)
                                 else:
-                                    self.drawDeltaBT(trans,charge_idx,drop_idx)
-                                    self.drawDeltaET(trans,charge_idx,drop_idx)
+                                    self.drawDeltaBT(trans,charge_idx+2,drop_idx)
+                                    self.drawDeltaET(trans,charge_idx+2,drop_idx)
                             else:
                                 # instead of drawing we still have to establish the self.ax artists to keep the linecount correct!
                                 self.drawDeltaET(trans,0,0)
@@ -9457,16 +9523,32 @@ class tgraphcanvas(FigureCanvas):
                 #######################################
 
                 # add projection and AUC guide lines last as those are removed by updategraphics for optimized redrawing and not cached
-                if aw.qmc.projectFlag and aw.qmc.BTcurve:
-                    self.l_BTprojection, = self.ax.plot([], [],color = self.palette["bt"],
-                                                dashes=dashes_setup,
-                                                label=aw.arabicReshape(QApplication.translate("Label", "BTprojection")),
-                                                linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
-                if aw.qmc.projectFlag and aw.qmc.ETcurve:
-                    self.l_ETprojection, = self.ax.plot([], [],color = self.palette["et"],
-                                                dashes=dashes_setup,
-                                                label=aw.arabicReshape(QApplication.translate("Label", "ETprojection")),
-                                                linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
+                if aw.qmc.projectFlag:
+                    if aw.qmc.BTcurve:
+                        self.l_BTprojection, = self.ax.plot([], [],color = self.palette["bt"],
+                                                    dashes=dashes_setup,
+                                                    label=aw.arabicReshape(QApplication.translate("Label", "BTprojection")),
+                                                    linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
+                    if aw.qmc.ETcurve:
+                        self.l_ETprojection, = self.ax.plot([], [],color = self.palette["et"],
+                                                    dashes=dashes_setup,
+                                                    label=aw.arabicReshape(QApplication.translate("Label", "ETprojection")),
+                                                    linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
+    
+                    if aw.qmc.DeltaBTflag or aw.qmc.DeltaETflag:
+                        trans = self.delta_ax.transData
+                        if aw.qmc.DeltaBTflag:
+                            self.l_DeltaBTprojection, = self.ax.plot([], [],color = self.palette["deltabt"],
+                                                        dashes=dashes_setup,
+                                                        transform=trans,
+                                                        label=aw.arabicReshape(QApplication.translate("Label", "DeltaBTprojection")),
+                                                        linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
+                        if aw.qmc.DeltaETflag:
+                            self.l_DeltaETprojection, = self.ax.plot([], [],color = self.palette["deltaet"],
+                                                        dashes=dashes_setup,
+                                                        transform=trans,
+                                                        label=aw.arabicReshape(QApplication.translate("Label", "DeltaETprojection")),
+                                                        linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
 
                 if aw.qmc.AUCguideFlag:
                     self.l_AUCguide = self.ax.axvline(0,visible=False,color = self.palette["aucguide"],
@@ -11003,7 +11085,11 @@ class tgraphcanvas(FigureCanvas):
             #enable RESET button:
             aw.buttonRESET.setStyleSheet(aw.pushbuttonstyles["RESET"])
             aw.buttonRESET.setEnabled(True)
-            aw.buttonRESET.setVisible(True)          
+            aw.buttonRESET.setVisible(True)
+            
+            # reset a stopped simulator
+            aw.sample_loop_running = True
+            aw.time_stopped = 0
             
             # enable "green flag" menu:
             try:
@@ -19004,7 +19090,7 @@ class ApplicationWindow(QMainWindow):
             if bool(self.simulator) and self.simulatorpath:
                 # simulator running
                 speed = int(self.qmc.timeclock.getBase()/1000)
-                self.setWindowTitle("{}x {} ** {}".format(speed,self.strippedName(self.simulatorpath),appTitle))
+                self.setWindowTitle("@{}x {} ** {}".format(speed,self.strippedName(self.simulatorpath),appTitle))
             elif self.curFile:
                 # profile loaded
                 self.setWindowTitle("{}{} – {}".format(dirtySign,self.strippedName(self.curFile),appTitle))
