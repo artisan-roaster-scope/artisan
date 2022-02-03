@@ -22865,6 +22865,9 @@ class ApplicationWindow(QMainWindow):
                                             aw.setExtraEventButtonStyle(last, style="normal")
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+                            else:
+                                # command not recognized
+                                _log.info("MODBUS Command <%s> not recognized", cs)
                 elif action == 5: # DTA Command
                     try:
                         DTAvalue=cmd_str.split(':')[1]
@@ -23025,6 +23028,7 @@ class ApplicationWindow(QMainWindow):
                                 aw.ser.yoctoRELpulse(int(cs_a[1]),int(cs_a[2]),int(cs_a[3]),cs_a[4])
                             else:
                                 #print("no match for command [%s], continue" % (cs_a[0]))
+                                _log.info("IO Command <%s> not recognized", cs_a[0])
                                 aw.sendmessage(QApplication.translate("Message","No match for command [%s], continuing" % (cs_a[0])))
 
                 elif action == 7: # slider call-program action
@@ -23095,6 +23099,9 @@ class ApplicationWindow(QMainWindow):
                                         libtime.sleep(cmds)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+                            else:
+                                # command not recognized
+                                _log.info("HOTTOP Command <%s> not recognized", cs)
                 elif action == 11: # p-i-d, expects 3 float numbers separated by semicolon
                     if cmd_str:
                         cmds = list(filter(None, cmd_str.split(";"))) # "<p>;<i>;<d>"
@@ -23282,6 +23289,9 @@ class ApplicationWindow(QMainWindow):
                                             aw.ser.yoctoPWMmove(int(cs_split[0]),toFloat(eval(cs_split[1])),int(cs_split[2])) # pylint: disable=eval-used
                                     except Exception as e: # pylint: disable=broad-except
                                         _log.exception(e)
+                                else:
+                                    # command not recognized
+                                    _log.info("PMW Command <%s> not recognized", cs)
                             except Exception as e: # pylint: disable=broad-except
                                 _log.exception(e)
                 elif action == 14: # VOUT Command to drive Phidget/Yocto Output Modules
@@ -23337,6 +23347,9 @@ class ApplicationWindow(QMainWindow):
                                         libtime.sleep(cmds)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+                            else:
+                                # command not recognized
+                                _log.info("VOUT Command <%s> not recognized", cs)
                 elif action == 15: # S7 Command
                     # getDBbool(<dbnumber>,<start>,<index>)
                     # getDBint(<dbnumber>,<start>)
@@ -23420,6 +23433,9 @@ class ApplicationWindow(QMainWindow):
                                         libtime.sleep(cmds)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+                            else:
+                                # command not recognized
+                                _log.info("S7 Command <%s> not recognized", cs)
                 elif action == 16: # Aillio Heater
                     self.ser.R1.set_heater(int(cmd)/10)
                 elif action == 17 and self.ser.R1 is not None: # Aillio Fan
@@ -23905,7 +23921,7 @@ class ApplicationWindow(QMainWindow):
                                     _log.exception(e)
                             else:
                                 # command not recognized
-                                _log.info(f"Artisan Command <{cs}> not recognized")
+                                _log.info("Artisan Command <%s> not recognized", cs)
                 elif action == 21: # RC Command
                     # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
                     ##  pulse(ch,min,max[,sn]) : sets the min/max pulse width in microseconds
@@ -24101,6 +24117,9 @@ class ApplicationWindow(QMainWindow):
                                         aw.ser.yoctoSERVOrange(c,r)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+                            else:
+                                # command not recognized
+                                _log.info("RC Command <%s> not recognized", cs)
                 elif action == 22: # WebSocket Command
                     # send(<json>)
                     # sleep(xx.yy)  with xx.yy sleep time in seconds
@@ -24146,6 +24165,9 @@ class ApplicationWindow(QMainWindow):
                                             aw.setExtraEventButtonStyle(last, style="normal")
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+                            else:
+                                # command not recognized
+                                _log.info("WebSocket Command <%s> not recognized", cs)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
