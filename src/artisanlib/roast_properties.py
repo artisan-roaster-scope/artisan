@@ -2629,6 +2629,8 @@ class editGraphDlg(ArtisanResizeablDialog):
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
     def keyPressEvent(self,event):
         key = int(event.key())
+        modifiers = event.modifiers()
+        control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple k on macOS, CONTROL on Windows
         if event.matches(QKeySequence.StandardKey.Copy):
             if self.TabWidget.currentIndex() == 3: # datatable
                 self.aw.copy_cells_to_clipboard(self.datatable,adjustment=1)
@@ -2638,6 +2640,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.inWeight(True,overwrite=True) # we don't add to current reading but overwrite
             elif self.weightoutedit.hasFocus():
                 self.outWeight(True,overwrite=True) # we don't add to current reading but overwrite
+        if key == 76 and control_modifier and self.TabWidget.currentIndex() == 0: #ctrl 1 on Roast tab
+            self.volumeCalculatorTimer(True)
     
     @pyqtSlot(int)
     def tareChanged(self,i):
