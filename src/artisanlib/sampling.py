@@ -118,6 +118,6 @@ class SamplingDlg(ArtisanDialog):
         if self.aw.qmc.delay < self.aw.qmc.default_delay:
             QMessageBox.warning(self.aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.")) 
         self.storeSettings() 
-        self.aw.closeEventSettings()
+#        self.aw.closeEventSettings()
         self.accept()
 

@@ -784,7 +784,7 @@ class tgraphcanvas(FigureCanvas):
         #default palette of colors
         self.locale_str = locale
         self.alpha = {"analysismask":0.4,"statsanalysisbkgnd":1.0,"legendbg":0.4}
-        self.palette = {"background":'#FFFFFF',"grid":'#E5E5E5',"ylabel":'#808080',"xlabel":'#808080',"title":'#0C6AA6',
+        self.palette = {"background":'#FFFFFF',"grid":'#E5E5E5',"ylabel":'#808080',"xlabel":'#808080',"title":'#0C6AA6', "title_focus":'#cc0f50',
                         "rect1":'#E5E5E5',"rect2":'#B2B2B2',"rect3":'#E5E5E5',"rect4":'#BDE0EE',"rect5":'#D3D3D3',
                         "et":'#cc0f50',"bt":'#0A5C90',"xt":'#404040',"yt":'#404040',"deltaet":'#cc0f50',
                         "deltabt":'#0A5C90',"markers":'#000000',"text":'#000000',"watermarks":'#FFFF00',"timeguide":'#0A5C90',
@@ -1723,6 +1723,7 @@ class tgraphcanvas(FigureCanvas):
         
         #flags to show projections, draw Delta ET, and draw Delta BT
         self.projectFlag = True
+        self.projectDeltaFlag = False
         self.ETcurve = True
         self.BTcurve = True
         self.ETlcd = True
@@ -2160,6 +2161,8 @@ class tgraphcanvas(FigureCanvas):
         self.l_back4 = None # second extra background curve
         self.l_delta1B = None
         self.l_delta2B = None
+        
+        self.l_subtitle = None # the subtitle artist if any as used to render the background title
 
         self.l_BTprojection = None
         self.l_ETprojection = None
@@ -3517,10 +3520,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.ax.draw_artist(self.l_BTprojection)
             if self.l_ETprojection is not None and aw.qmc.ETcurve:
                 aw.qmc.ax.draw_artist(self.l_ETprojection)
-            if self.l_DeltaBTprojection is not None and aw.qmc.DeltaBTflag:
-                aw.qmc.ax.draw_artist(self.l_DeltaBTprojection)
-            if self.l_DeltaETprojection is not None and aw.qmc.DeltaETflag:
-                aw.qmc.ax.draw_artist(self.l_DeltaETprojection)
+            if aw.qmc.projectDeltaFlag:
+                if self.l_DeltaBTprojection is not None and aw.qmc.DeltaBTflag:
+                    aw.qmc.ax.draw_artist(self.l_DeltaBTprojection)
+                if self.l_DeltaETprojection is not None and aw.qmc.DeltaETflag:
+                    aw.qmc.ax.draw_artist(self.l_DeltaETprojection)
                 
         if aw.qmc.AUCguideFlag and aw.qmc.AUCguideTime and aw.qmc.AUCguideTime > 0:
             aw.qmc.ax.draw_artist(self.l_AUCguide)
@@ -5418,17 +5422,18 @@ class tgraphcanvas(FigureCanvas):
                 if self.projectionmode == 0: # linear temperature projection mode based on current RoR
                     #calculate the temperature endpoint at endofx acording to the latest rate of change
                     if self.l_BTprojection is not None:
-                        if self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and self.unfiltereddelta2_pure[-1] is not None and len(self.ctemp2) > 0:
+                        if self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and self.unfiltereddelta2_pure[-1] is not None and len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1]:
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left, xlim_right + charge) # never have the right point be left of left;)
+                            print("self.ctemp2[-1]",self.ctemp2[-1])
                             BTprojection = self.ctemp2[-1] + self.unfiltereddelta2_pure[-1]*(right - left)/60.
                             #plot projection
                             self.l_BTprojection.set_data([left,right], [self.ctemp2[-1], BTprojection])
                         else:
                             self.l_BTprojection.set_data([],[])
                     if self.l_ETprojection is not None:
-                        if self.ETcurve and len(self.unfiltereddelta1_pure) > 0 and self.unfiltereddelta1_pure[-1] is not None and len(self.ctemp1) > 0:
+                        if self.ETcurve and len(self.unfiltereddelta1_pure) > 0 and self.unfiltereddelta1_pure[-1] is not None and len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1]:
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left,xlim_right + charge) # never have the right point be left of left;)
@@ -5443,7 +5448,7 @@ class tgraphcanvas(FigureCanvas):
                 elif self.projectionmode == 1 and (self.timex[-1]-charge)>60*5:
                     delta_interval_BT = max(10, self.deltaBTsamples) # at least a span of 10 readings
                     delta_interval_ET = max(10, self.deltaETsamples) # at least a span of 10 readings
-                    deltadeltalimit = 0.0020
+                    deltadeltalimit = 0.002
                     delay = self.delay/1000.
                     
                     if self.l_BTprojection is not None:
@@ -5466,25 +5471,8 @@ class tgraphcanvas(FigureCanvas):
                                 delta_sec = delta_sec + deltadelta_secsec*delay
                             #plot BT curve
                             self.l_BTprojection.set_data(xpoints, ypoints)
-                            
-                            # compute the deltaBT projection line based on the computed deltadelta_secsec
-                            if self.l_DeltaBTprojection is not None:
-                                if self.DeltaBTflag and len(self.delta2)>0:
-                                    # recompute deltadelta_secsec to adjust to delta math forumlas
-                                    deltadelta_secsec = (((self.delta2[-1] - self.delta2[-delta_interval_BT])/60) / 
-                                        (now - self.timex[-delta_interval_BT])) # linear BT RoRoR   C/sec/sec
-                                    left = now
-                                    right = max(left, xlim_right) # never have the right point be left of left;)
-                                    DeltaBTprojection = self.delta2[-1] + deltadelta_secsec * (right - left) * 60
-                                    # projection extended to the plots current endofx
-                                    self.l_DeltaBTprojection.set_data([left,right], [self.delta2[-1], DeltaBTprojection])
-                                else:
-                                    self.l_DeltaBTprojection.set_data([],[])
                         else:
                             self.l_BTprojection.set_data([],[])
-                            if self.l_DeltaBTprojection is not None:
-                                self.l_DeltaBTprojection.set_data([],[])
-                            
 
                     if self.l_ETprojection is not None:
                         if (len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1] and
@@ -5506,24 +5494,48 @@ class tgraphcanvas(FigureCanvas):
                                 delta_sec = delta_sec + deltadelta_secsec*delay
                             #plot ET curve
                             self.l_ETprojection.set_data(xpoints, ypoints)
-
-                            # compute the deltaET projection line based on the computed deltadelta_secsec
-                            if self.l_DeltaETprojection is not None:
-                                if self.DeltaETflag and len(self.delta1)>0:
-                                    # recompute deltadelta_secsec to adjust to delta math forumlas
-                                    deltadelta_secsec = (((self.delta1[-1] - self.delta1[-delta_interval_BT])/60) / 
-                                        (now - self.timex[-delta_interval_BT])) # linear ET RoRoR   C/sec/sec
-                                    left = now
-                                    right = max(left, xlim_right) # never have the right point be left of left;)
-                                    DeltaETprojection = self.delta1[-1] + deltadelta_secsec * (right - left) * 60
-                                    # projection extended to the plots current endofx
-                                    self.l_DeltaETprojection.set_data([left,right], [self.delta1[-1], DeltaETprojection])
-                                else:
-                                    self.l_DeltaETprojection.set_data([],[])
                         else:   
                             self.l_ETprojection.set_data([],[])   
-                            if self.l_DeltaETprojection is not None:
-                                self.l_DeltaETprojection.set_data([],[])                       
+                
+                # RoR projections
+                if self.projectDeltaFlag and (self.timex[-1]-charge)>60*5:
+                    delay = self.delay/1000.
+                    
+                    if self.l_DeltaBTprojection is not None:
+                        delta_interval_BT = max(10, self.deltaBTsamples*2) # at least a span of 10 readings
+                        if (self.DeltaBTflag and len(self.delta2)>0 and len(self.delta2)>delta_interval_BT and
+                                self.delta2[-1] and 
+                                self.delta2[-1]>0 and 
+                                self.delta2[-delta_interval_BT] and
+                                self.delta2[-delta_interval_BT]>0):
+                            # compute deltadelta_secsec from delta2 adjusted to delta math forumlas
+                            deltadelta_secsec = (((self.delta2[-1] - self.delta2[-delta_interval_BT])/60) / 
+                                (now - self.timex[-delta_interval_BT])) # linear BT RoRoR   C/sec/sec
+                            left = now
+                            right = max(left, xlim_right) # never have the right point be left of left;)
+                            DeltaBTprojection = self.delta2[-1] + deltadelta_secsec * (right - left) * 60
+                            # projection extended to the plots current endofx
+                            self.l_DeltaBTprojection.set_data([left,right], [self.delta2[-1], DeltaBTprojection])
+                        else:
+                            self.l_DeltaBTprojection.set_data([],[])
+                    
+                    if self.l_DeltaETprojection is not None:
+                        delta_interval_ET = max(10, self.deltaETsamples*2) # at least a span of 10 readings
+                        if (self.DeltaETflag and len(self.delta1)>0 and len(self.delta1)>delta_interval_ET and
+                                self.delta1[-1] and 
+                                self.delta1[-1]>0 and 
+                                self.delta1[-delta_interval_ET] and
+                                self.delta1[-delta_interval_ET]>0):
+                            # compute deltadelta_secsec from delta1 adjusted to delta math forumlas
+                            deltadelta_secsec = (((self.delta1[-1] - self.delta1[-delta_interval_ET])/60) / 
+                                (now - self.timex[-delta_interval_ET])) # linear ET RoRoR   C/sec/sec
+                            left = now
+                            right = max(left, xlim_right) # never have the right point be left of left;)
+                            DeltaETprojection = self.delta1[-1] + deltadelta_secsec * (right - left) * 60
+                            # projection extended to the plots current endofx
+                            self.l_DeltaETprojection.set_data([left,right], [self.delta1[-1], DeltaETprojection])
+                        else:
+                            self.l_DeltaETprojection.set_data([],[])
 
 # disabled
 #                elif self.projectionmode == 2:
@@ -7496,19 +7508,19 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.graphfont in [1,9]: # if selected font is Humor we translate the unicode title into pure ascii
                 backgroundtitle = self.__to_ascii(backgroundtitle)
             backgroundtitle = f"\n{abbrevString(backgroundtitle, 32)}"
-            
-        st_artist = self.fig.suptitle(backgroundtitle,
+        
+        self.l_subtitle = self.fig.suptitle(backgroundtitle,
                 horizontalalignment="right",verticalalignment="top",
                 fontsize="x-small",
                 x=suptitleX,y=1,
-                color=self.palette["title"])
+                color=(self.palette["title_focus"] if (self.backgroundprofile and self.backgroundPlaybackEvents) else self.palette["title"]))
         try:
-            st_artist.set_in_layout(False)  # remove title from tight_layout calculation
+            self.l_subtitle.set_in_layout(False)  # remove title from tight_layout calculation
         except Exception: # pylint: disable=broad-except  # set_in_layout not available in mpl<3.x
             pass
         try:
             if len(backgroundtitle)>0:
-                self.background_title_width = st_artist.get_window_extent(renderer=self.fig.canvas.get_renderer()).width
+                self.background_title_width = self.l_subtitle.get_window_extent(renderer=self.fig.canvas.get_renderer()).width
             else:
                 self.background_title_width = 0
         except Exception: # pylint: disable=broad-except
@@ -9535,7 +9547,7 @@ class tgraphcanvas(FigureCanvas):
                                                     label=aw.arabicReshape(QApplication.translate("Label", "ETprojection")),
                                                     linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
     
-                    if aw.qmc.DeltaBTflag or aw.qmc.DeltaETflag:
+                    if aw.qmc.projectDeltaFlag and (aw.qmc.DeltaBTflag or aw.qmc.DeltaETflag):
                         trans = self.delta_ax.transData
                         if aw.qmc.DeltaBTflag:
                             self.l_DeltaBTprojection, = self.ax.plot([], [],color = self.palette["deltabt"],
@@ -23891,6 +23903,9 @@ class ApplicationWindow(QMainWindow):
                                         self.qmc.showBackgroundEventsSignal.emit(state)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+                            else:
+                                # command not recognized
+                                _log.info(f"Artisan Command <{cs}> not recognized")
                 elif action == 21: # RC Command
                     # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
                     ##  pulse(ch,min,max[,sn]) : sets the min/max pulse width in microseconds
@@ -24947,6 +24962,22 @@ class ApplicationWindow(QMainWindow):
     def toggleBackroundShowfullFlag(self):
         self.qmc.backgroundShowFullflag = not self.qmc.backgroundShowFullflag
         self.qmc.redraw(recomputeAllDeltas=False)
+    
+    def togglePlabackEvents(self):
+        self.qmc.backgroundPlaybackEvents = not self.qmc.backgroundPlaybackEvents
+        if self.qmc.backgroundPlaybackEvents:
+            self.sendmessage(QApplication.translate("Message","playback on"))
+        else:
+            self.sendmessage(QApplication.translate("Message","playback off"))
+        if self.qmc.l_subtitle is not None:
+            if self.qmc.backgroundprofile and self.qmc.backgroundPlaybackEvents:
+                self.qmc.l_subtitle.set_color(self.qmc.palette["title_focus"])
+            else:
+                self.qmc.l_subtitle.set_color(self.qmc.palette["title"])
+            self.qmc.ax.draw_artist(self.qmc.l_subtitle)
+            self.qmc.ax.figure.canvas.blit()
+            self.qmc.ax.figure.canvas.flush_events()
+            self.qmc.ax_background = None
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
     def keyPressEvent(self,event):
@@ -24968,11 +24999,12 @@ class ApplicationWindow(QMainWindow):
 
                 numberkeys = [48,49,50,51,52,53,54,55,56,57] # keycodes for number keys 0,1,...,9
 
-                if k == 70: # F SELECTS FULL SCREEN MODE
-                    aw.toggleFullscreen()
-                elif aw.buttonpalette_shortcuts and control_modifier and k in numberkeys: # palette switch via SHIFT-NUM-Keys
+                if k == 70:                         #F SELECTS FULL SCREEN MODE
+                    self.toggleFullscreen()
+                elif self.buttonpalette_shortcuts and control_modifier and k in numberkeys: # palette switch via SHIFT-NUM-Keys
                     self.setbuttonsfrom(numberkeys.index(k))
-
+                elif k == 74:                       #J (toggle Playback Events)
+                    self.togglePlabackEvents()
                 elif k == 73:                       #I (toggle foreground showfull flag)
                     self.toggleForegroundShowfullFlag()
                 elif k == 79:                       #O (toggle background showfull flag)
@@ -30071,6 +30103,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.segmentsamplesthreshold = toInt(settings.value("segmentsamplesthreshold",int(self.qmc.segmentsamplesthreshold)))
             if settings.contains("segmentdeltathreshold"):
                 self.qmc.segmentdeltathreshold = aw.float2float(toFloat(settings.value("segmentdeltathreshold",self.qmc.segmentdeltathreshold)),4)
+            if settings.contains("projectFlag"):
+                self.qmc.projectFlag = bool(toBool(settings.value("projectFlag",int(self.qmc.projectFlag))))
+            if settings.contains("projectDeltaFlag"):
+                self.qmc.projectDeltaFlag = bool(toBool(settings.value("projectDeltaFlag",int(self.qmc.projectDeltaFlag))) )               
             if settings.contains("projectionmode"):
                 self.qmc.projectionmode = toInt(settings.value("projectionmode",int(self.qmc.projectionmode)))
             if settings.contains("AUCbegin"):
@@ -31825,6 +31861,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("segmentsamplesthreshold",aw.qmc.segmentsamplesthreshold)
             settings.setValue("segmentdeltathreshold",aw.qmc.segmentdeltathreshold)
             #projection
+            settings.setValue("projectFlag",self.qmc.projectFlag)
+            settings.setValue("projectDeltaFlag",self.qmc.projectDeltaFlag)
             settings.setValue("projectionmode",self.qmc.projectionmode)
             #save AUC
             settings.setValue("AUCbegin",self.qmc.AUCbegin)

@@ -293,5 +293,5 @@ class StatisticsDlg(ArtisanDialog):
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue("StatisticsPosition",self.frameGeometry().topLeft())
-        self.aw.closeEventSettings()
+#        self.aw.closeEventSettings()
         self.close()

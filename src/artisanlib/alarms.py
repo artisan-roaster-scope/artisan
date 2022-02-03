@@ -690,7 +690,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         settings = QSettings()
         #save window geometry
         settings.setValue("AlarmsGeometry",self.saveGeometry())
-        self.aw.closeEventSettings()
+#        self.aw.closeEventSettings()
         
         self.aw.AlarmDlg_activeTab = self.TabWidget.currentIndex()
         self.accept()

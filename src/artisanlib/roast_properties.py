@@ -2569,7 +2569,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         #save window geometry
         settings.setValue("RoastGeometry",self.saveGeometry())
         self.aw.editGraphDlg_activeTab = self.TabWidget.currentIndex()
-        self.aw.closeEventSettings() # save all app settings
+#        self.aw.closeEventSettings() # save all app settings
         self.aw.editgraphdialog = None
 
     # triggered via the cancel button

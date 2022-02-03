@@ -1948,7 +1948,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         #save window geometry
         settings.setValue("DeviceAssignmentGeometry",self.saveGeometry()) 
         self.aw.DeviceAssignmentDlg_activeTab = self.TabWidget.currentIndex()
-        self.aw.closeEventSettings() # save all app settings
+#        self.aw.closeEventSettings() # save all app settings
     
     @pyqtSlot()
     def cancelEvent(self):

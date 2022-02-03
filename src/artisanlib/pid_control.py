@@ -32,7 +32,7 @@ import numpy
 import logging
 from typing import Final
 
-from artisanlib.util import decs2string, fromCtoF, fromFtoC, hex2int, str2cmd, stringfromseconds
+from artisanlib.util import decs2string, fromCtoF, fromFtoC, hex2int, str2cmd, stringfromseconds, cmd2str
 
 try:
     #pylint: disable = E, W, R, C
@@ -727,6 +727,7 @@ class FujiPID():
                 reg = self.aw.modbus.address2register(reg_dict[svkey][1],6)
                 self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,int(value*10))
             else:
+                value = int(round(value)) # not sure why this is needed, but a FUJI PXF seems not to work without this and value as full floating point numbers!?
                 command = self.message2send(self.aw.ser.controlETpid[1],6,reg_dict[svkey][1],int(value*10))
                 r = self.aw.ser.sendFUJIcommand(command,8)
             #check response
@@ -743,7 +744,12 @@ class FujiPID():
                 if move:
                     self.aw.moveSVslider(value,setValue=False)
             else:
-                self.aw.qmc.adderror(QApplication.translate("Error Message","Exception:") + " setsv()")
+                # error response
+                Rx = ""
+                if len(r):
+                    import binascii
+                    Rx = cmd2str(binascii.hexlify(r))
+                self.aw.qmc.adderror(QApplication.translate("Error Message","Exception:") + " setsv(): Rx = " + Rx)
         #Fuji PXR
         elif self.aw.ser.controlETpid[0] == 1:  
             if self.aw.ser.useModbusPort:

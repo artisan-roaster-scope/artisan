@@ -355,7 +355,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         #save window geometry
         settings.setValue("BackgroundGeometry",self.saveGeometry())
         self.aw.backgroundDlg_activeTab = self.TabWidget.currentIndex()
-        self.aw.closeEventSettings() # save all app settings
+#        self.aw.closeEventSettings() # save all app settings
         
     def getColorIdx(self,c):
         try:

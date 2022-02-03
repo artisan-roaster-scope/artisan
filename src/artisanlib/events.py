@@ -3094,7 +3094,7 @@ class EventsDlg(ArtisanResizeablDialog):
                 self.aw.updateSlidersProperties() # set visibility and event names on slider widgets
             #save special event annotations
             self.saveAnnotationsSettings()
-            self.aw.closeEventSettings()
+#            self.aw.closeEventSettings()
             # restart PhidgetManager
             try:
                 self.aw.qmc.restartPhidgetManager()
