@@ -103,6 +103,7 @@ except Exception: # pylint: disable=broad-except
 #    syslog.syslog(syslog.LOG_ALERT, str(e))
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
+QtWebEngineSupport = False # set to True if the QtWebEngine was successfully imported
 
 try:
     #pylint: disable-next = E, W, R, C
@@ -123,7 +124,12 @@ try:
                               QRegularExpression, QDate, QUrl, QDir, Qt, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtNetwork import QLocalSocket # @Reimport @UnresolvedImport @UnusedImport
     #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
-    from PyQt6.QtWebEngineWidgets import QWebEngineView # @Reimport @UnresolvedImport @UnusedImport
+    try:
+        from PyQt6.QtWebEngineWidgets import QWebEngineView # @Reimport @UnresolvedImport @UnusedImport
+        QtWebEngineSupport = True
+    except Exception: # pylint: disable=broad-except
+        # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine for Raspebarry 32bit
+        pass
     from PyQt6 import sip # @Reimport @UnresolvedImport @UnusedImport
 except Exception:
     #pylint: disable = E, W, R, C
@@ -144,7 +150,12 @@ except Exception:
                               QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtNetwork import QLocalSocket # @Reimport @UnresolvedImport @UnusedImport
     #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
-    from PyQt5.QtWebEngineWidgets import QWebEngineView # @Reimport @UnresolvedImport @UnusedImport
+    try:
+        from PyQt5.QtWebEngineWidgets import QWebEngineView # @Reimport @UnresolvedImport @UnusedImport
+        QtWebEngineSupport = True
+    except Exception: # pylint: disable=broad-except
+        # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine for Raspebarry 32bit
+        pass
     from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
 
 
@@ -581,7 +592,7 @@ from artisanlib.slider_style import artisan_slider_style
 from artisanlib.event_button_style import artisan_event_button_style
 from artisanlib.simulator import Simulator
 from artisanlib.dialogs import ArtisanMessageBox, HelpDlg, ArtisanInputDialog, ArtisanComboBoxDialog
-from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs)
+from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs, LargeScaleLCDs)
 from artisanlib.logs import (serialLogDlg, errorDlg, messageDlg)
 from artisanlib.comm import serialport, colorport, scaleport
 from artisanlib.pid_dialogs import (PXRpidDlgControl, PXG4pidDlgControl, 
@@ -3434,6 +3445,15 @@ class tgraphcanvas(FigureCanvas):
                 aw.largePIDLCDs_dialog.updateValues([sv],[duty])
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
+
+    # note that partial values might be given here    
+    @staticmethod
+    def updateLargeScaleLCDs(weight=None, total=None):
+        try:
+            if aw.largeScaleLCDs_dialog is not None:
+                aw.largeScaleLCDs_dialog.updateValues([weight],[total])
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
     
     @staticmethod
     def updateLargeExtraLCDs(extra1=None, extra2=None):
@@ -5426,7 +5446,6 @@ class tgraphcanvas(FigureCanvas):
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left, xlim_right + charge) # never have the right point be left of left;)
-                            print("self.ctemp2[-1]",self.ctemp2[-1])
                             BTprojection = self.ctemp2[-1] + self.unfiltereddelta2_pure[-1]*(right - left)/60.
                             #plot projection
                             self.l_BTprojection.set_data([left,right], [self.ctemp2[-1], BTprojection])
@@ -16448,7 +16467,7 @@ class ApplicationWindow(QMainWindow):
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
         'eventaction_running_threads', 'qtbase_additional_locales', 'qtbase_locales', 'curFile', 'MaxRecentFiles', 'recentFileActs', 'recentSettingActs',
-        'recentThemeActs', 'applicationDirectory', 'helpdialog', 'redrawTimer', 'lastLoadedProfile', 'lastLoadedBackground',
+        'recentThemeActs', 'applicationDirectory', 'helpdialog', 'redrawTimer', 'lastLoadedProfile', 'lastLoadedBackground', 'LargeScaleLCDsFlag', 'largeScaleLCDs_dialog',
         'analysisresultsanno', 'segmentresultsanno', 'largeLCDs_dialog', 'LargeLCDsFlag', 'largeDeltaLCDs_dialog', 'LargeDeltaLCDsFlag', 'largePIDLCDs_dialog',
         'LargePIDLCDsFlag', 'largeExtraLCDs_dialog', 'LargeExtraLCDsFlag', 'largePhasesLCDs_dialog', 'LargePhasesLCDsFlag', 'WebLCDs', 'WebLCDsPort',
         'WebLCDsAlerts', 'EventsDlg_activeTab', 'graphColorDlg_activeTab', 'PID_DlgControl_activeTab', 'CurveDlg_activeTab', 'editGraphDlg_activeTab',
@@ -16475,7 +16494,7 @@ class ApplicationWindow(QMainWindow):
         'analyzeMenu', 'fitIdealx2Action', 'fitIdealx3Action', 'fitIdealx0Action', 'fitBkgndAction', 'clearresultsAction', 'roastCompareAction',
         'designerAction', 'simulatorAction', 'wheeleditorAction', 'transformAction', 'temperatureMenu', 'ConvertToFahrenheitAction', 
         'ConvertToCelsiusAction', 'controlsAction', 'readingsAction', 'buttonsAction', 'slidersAction', 'lcdsAction', 'deltalcdsAction',
-        'pidlcdsAction', 'extralcdsAction', 'phaseslcdsAction', 'fullscreenAction', 'loadSettingsAction', 'openRecentSettingMenu',
+        'pidlcdsAction', 'scalelcdsAction', 'extralcdsAction', 'phaseslcdsAction', 'fullscreenAction', 'loadSettingsAction', 'openRecentSettingMenu',
         'saveAsSettingsAction', 'resetAction', 'messagelabel', 'button_font_size_pt', 'button_font_size', 'button_font_size_small', 'button_font_size_small_selected',
         'button_font_size_tiny', 'button_font_size_micro', 'main_button_min_width', 'standard_button_min_width', 'small_button_min_width', 'tiny_button_min_width',
         'pushbuttonstyles_simulator', 'pushbuttonstyles', 'standard_button_tiny_height', 'standard_button_small_height', 'standard_button_height',
@@ -16493,11 +16512,11 @@ class ApplicationWindow(QMainWindow):
         'DRYlabel', 'DRYlcd', 'DRYlcdFrame', 'DRY2FCslabel', 'DRY2FCsframe', 'FCslabel', 'FCslcd', 'FCslcdFrame', 'AUClabel', 'AUClcd', 'AUClcdFrame',
         'AUCLCD', 'phasesLCDs', 'extrabuttonsLayout', 'extrabuttondialogs', 'slider1', 'slider2', 'slider3', 'slider4', 'sliderLCD1', 'sliderLCD2', 'sliderLCD3',
         'sliderLCD4', 'sliderGrpBox1', 'sliderGrpBox2', 'sliderGrpBox3', 'sliderGrpBox4', 'sliderSV', 'sliderLCDSV', 'sliderGrpBoxSV', 'leftlayout',
-        'sliderFrame', 'lcdFrame', 'midlayout', 'editgraphdialog', 'html_loader' ]
+        'sliderFrame', 'lcdFrame', 'midlayout', 'editgraphdialog', 'html_loader', 'QtWebEngineSupport' ]
         
         
 
-    def __init__(self, parent = None, *, locale):
+    def __init__(self, parent = None, *, locale, WebEngineSupport):
     
         self.locale_str = locale
         self.app = app
@@ -16505,6 +16524,8 @@ class ApplicationWindow(QMainWindow):
         
         self.sample_loop_running = True
         self.time_stopped = 0
+        
+        self.QtWebEngineSupport = WebEngineSupport
 
 #PLUS
         self.plus_account = None # if set to a login string, Artisan plus features are enabled
@@ -16577,6 +16598,8 @@ class ApplicationWindow(QMainWindow):
         self.LargeDeltaLCDsFlag = False
         self.largePIDLCDs_dialog = None
         self.LargePIDLCDsFlag = False
+        self.largeScaleLCDs_dialog = None
+        self.LargeScaleLCDsFlag = False
         self.largeExtraLCDs_dialog = None
         self.LargeExtraLCDsFlag = False
         self.largePhasesLCDs_dialog = None
@@ -17034,6 +17057,8 @@ class ApplicationWindow(QMainWindow):
         fileConvertReportPDFAction = QAction(QApplication.translate("Menu", "Roast Report PDF..."), self)
         fileConvertReportPDFAction.triggered.connect(self.fileConvertReportPDF)
         self.convMenu.addAction(fileConvertReportPDFAction)
+        if not self.QtWebEngineSupport:
+            fileConvertReportPDFAction.setEnabled(False)
 
         self.fileMenu.addSeparator()
 
@@ -17099,6 +17124,8 @@ class ApplicationWindow(QMainWindow):
         self.roastReportPDFAction = QAction(QApplication.translate("Menu", "PDF..."), self)
         self.roastReportPDFAction.triggered.connect(self.pdfReport)
         self.roastReportMenu.addAction(self.roastReportPDFAction)
+        if not self.QtWebEngineSupport:
+            self.roastReportPDFAction.setEnabled(False)
 
         self.htmlAction = QAction(QApplication.translate("Menu", "Web..."), self)
         self.htmlAction.triggered.connect(self.htmlReport)
@@ -17111,6 +17138,8 @@ class ApplicationWindow(QMainWindow):
         self.productionPDFAction = QAction(QApplication.translate("Menu", "PDF..."), self)
         self.productionPDFAction.triggered.connect(self.productionPDFReport)
         self.productionMenu.addAction(self.productionPDFAction)
+        if not self.QtWebEngineSupport:
+            self.productionPDFAction.setEnabled(False)
         
         self.productionWebAction = QAction(QApplication.translate("Menu", "Web..."), self)
         self.productionWebAction.triggered.connect(self.productionHTMLReport)
@@ -17129,6 +17158,8 @@ class ApplicationWindow(QMainWindow):
         self.rankingPDFAction = QAction(QApplication.translate("Menu", "PDF..."), self)
         self.rankingPDFAction.triggered.connect(self.rankingPDFReport)
         self.rankingMenu.addAction(self.rankingPDFAction)
+        if not self.QtWebEngineSupport:
+            self.rankingPDFAction.setEnabled(False)
         
         self.rankingWebAction = QAction(QApplication.translate("Menu", "Web..."), self)
         self.rankingWebAction.triggered.connect(self.rankingHTMLReport)
@@ -17467,6 +17498,12 @@ class ApplicationWindow(QMainWindow):
         self.phaseslcdsAction.setCheckable(True)
         self.phaseslcdsAction.setChecked(False)
         self.viewMenu.addAction(self.phaseslcdsAction)
+
+        self.scalelcdsAction = QAction(QApplication.translate("Menu", "Scale LCDs"), self)
+        self.scalelcdsAction.triggered.connect(self.largeScaleLCDs)
+        self.scalelcdsAction.setCheckable(True)
+        self.scalelcdsAction.setChecked(False)
+        self.viewMenu.addAction(self.scalelcdsAction)
 
         self.viewMenu.addSeparator()
 
@@ -25750,7 +25787,7 @@ class ApplicationWindow(QMainWindow):
                             other_filename_path = other_filename_path[0:-5]
                         if self.qmc.autosaveimageformat == "PDF":
                             self.saveVectorGraph(extension=".pdf",fname=other_filename_path)
-                        elif self.qmc.autosaveimageformat == "PDF Report":
+                        elif self.qmc.autosaveimageformat == "PDF Report" and self.QtWebEngineSupport:
                             self.roastReport(pdf_filename=other_filename_path + ".pdf")
                         elif self.qmc.autosaveimageformat == "SVG":
                             self.saveVectorGraph(extension=".svg",fname=other_filename_path)
@@ -31243,6 +31280,10 @@ class ApplicationWindow(QMainWindow):
                 self.LargePIDLCDsFlag = toBool(settings.value("LargePIDLCDs",self.LargePIDLCDsFlag))
             if self.LargePIDLCDsFlag:
                 self.largePIDLCDs()
+            if settings.contains("LargeScaleLCDs"):
+                self.LargeScaleLCDsFlag = toBool(settings.value("LargeScaleLCDs",self.LargeScaleLCDsFlag))
+            if self.LargeScaleLCDsFlag:
+                self.largeScaleLCDs()
             if settings.contains("LargeExtraLCDs"):
                 self.LargeExtraLCDsFlag = toBool(settings.value("LargeExtraLCDs",self.LargeExtraLCDsFlag))
             if self.LargeExtraLCDsFlag:
@@ -32493,6 +32534,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("LargeLCDs",self.LargeLCDsFlag)
             settings.setValue("LargeDeltaLCDs",self.LargeDeltaLCDsFlag)
             settings.setValue("LargePIDLCDs",self.LargePIDLCDsFlag)
+            settings.setValue("LargeScaleLCDs",self.LargeScaleLCDsFlag)
             settings.setValue("LargeExtraLCDs",self.LargeExtraLCDsFlag)
             settings.setValue("LargePhasesLCDs",self.LargePhasesLCDsFlag)
             #custom event buttons
@@ -32701,6 +32743,10 @@ class ApplicationWindow(QMainWindow):
             tmp_LargeLCDs = self.LargePIDLCDsFlag # we keep the state to properly store it in the settings
             self.largePIDLCDs_dialog.close()
             self.LargePIDLCDsFlag = tmp_LargeLCDs
+        if self.LargeScaleLCDsFlag and self.largeScaleLCDs_dialog:
+            tmp_LargeLCDs = self.LargeScaleLCDsFlag # we keep the state to properly store it in the settings
+            self.largeScaleLCDs_dialog.close()
+            self.LargeScaleLCDsFlag = tmp_LargeLCDs
         if self.LargeExtraLCDsFlag and self.largeExtraLCDs_dialog:
             tmp_LargeLCDs = self.LargeExtraLCDsFlag # we keep the state to properly store it in the settings
             self.largeExtraLCDs_dialog.close()
@@ -35682,6 +35728,11 @@ class ApplicationWindow(QMainWindow):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         try:
+            from Phidget22 import __version__ as phidget_lib_version # @UnresolvedImport
+            otherlibs += f" ({phidget_lib_version})"
+        except Exception: # pylint: disable=broad-except
+            pass
+        try:
             yocto_version = YAPI.GetAPIVersion()
             otherlibs += ", Yoctopuce " + yocto_version
         except Exception as e: # pylint: disable=broad-except
@@ -36406,6 +36457,18 @@ class ApplicationWindow(QMainWindow):
             self.largePIDLCDs_dialog.show()
         else:
             self.largePIDLCDs_dialog.close()
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def largeScaleLCDs(self,_=False):
+        if self.largeScaleLCDs_dialog is None:
+            self.largeScaleLCDs_dialog = LargeScaleLCDs(self,self)
+            self.largeScaleLCDs_dialog.setModal(False)
+            self.LargeScaleLCDsFlag = True
+            self.scalelcdsAction.setChecked(True)
+            self.largeScaleLCDs_dialog.show()
+        else:
+            self.largeScaleLCDs_dialog.close()
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -38695,7 +38758,7 @@ def main():
 
     aw = None # this is to ensure that the variable aw is already defined during application initialization
 
-    aw = ApplicationWindow(locale=locale_str)
+    aw = ApplicationWindow(locale=locale_str, WebEngineSupport=QtWebEngineSupport)
     
     app.setActivationWindow(aw,activateOnMessage=False) # set the activation window for the QtSingleApplication
 

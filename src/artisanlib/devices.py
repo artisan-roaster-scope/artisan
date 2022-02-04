@@ -2020,34 +2020,37 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.useModbusPort = False
                 #If fuji pid
                 if str1 != "Delta DTA":
-                    self.aw.qmc.device = 0
-                    #self.aw.ser.comport = "COM4"
-                    self.aw.ser.baudrate = 9600
-                    self.aw.ser.bytesize = 8
-                    self.aw.ser.parity= 'O'
-                    self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    if self.aw.qmc.device != 0:
+                        self.aw.qmc.device = 0
+                        #self.aw.ser.comport = "COM4"
+                        self.aw.ser.baudrate = 9600
+                        self.aw.ser.bytesize = 8
+                        self.aw.ser.parity= 'O'
+                        self.aw.ser.stopbits = 1
+                        self.aw.ser.timeout = 1.0
                 #else if DTA pid
                 else:
-                    self.aw.qmc.device = 26
-                    #self.aw.ser.comport = "COM4"
-                    self.aw.ser.baudrate = 2400
-                    self.aw.ser.bytesize = 8
-                    self.aw.ser.parity= 'N'
-                    self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    if self.aw.qmc.device != 26:
+                        self.aw.qmc.device = 26
+                        #self.aw.ser.comport = "COM4"
+                        self.aw.ser.baudrate = 2400
+                        self.aw.ser.bytesize = 8
+                        self.aw.ser.parity= 'N'
+                        self.aw.ser.stopbits = 1
+                        self.aw.ser.timeout = 1.0
                 message = QApplication.translate("Message","PID to control ET set to {0} {1}" + \
                                                  " ; PID to read BT set to {2} {3}").format(str1,str(self.aw.ser.controlETpid[1]),str2,str(self.aw.ser.readBTpid[1]))
             elif self.arduinoButton.isChecked():
                 meter = "Arduino (TC4)"
-                self.aw.qmc.device = 19
-                self.aw.ser.baudrate = 115200
-                self.aw.ser.bytesize = 8
-                self.aw.ser.parity= 'N'
-                self.aw.ser.stopbits = 1
-                self.aw.ser.timeout = 1.0
-                self.aw.ser.ArduinoIsInitialized = 0 # ensure the Arduino gets reinitalized if settings changed
-                message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings").format(meter)
+                if self.aw.qmc.device != 19:
+                    self.aw.qmc.device = 19
+                    self.aw.ser.baudrate = 115200
+                    self.aw.ser.bytesize = 8
+                    self.aw.ser.parity= 'N'
+                    self.aw.ser.stopbits = 1
+                    self.aw.ser.timeout = 0.8
+                    self.aw.ser.ArduinoIsInitialized = 0 # ensure the Arduino gets reinitalized if settings changed
+                    message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings").format(meter)
             elif self.programButton.isChecked():
                 meter = self.programedit.text()
                 self.aw.ser.externalprogram = meter
@@ -2055,116 +2058,116 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings").format(meter)
             elif self.nonpidButton.isChecked():
                 meter = str(self.devicetypeComboBox.currentText())
-                if meter == "Omega HH806AU":
+                if meter == "Omega HH806AU" and self.aw.qmc.device != 1:
                     self.aw.qmc.device = 1
                     #self.aw.ser.comport = "COM11"
                     self.aw.ser.baudrate = 19200
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'E'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
-                elif meter == "Omega HH506RA":
+                elif meter == "Omega HH506RA" and self.aw.qmc.device != 2:
                     self.aw.qmc.device = 2
                     #self.aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
                     self.aw.ser.baudrate = 2400
                     self.aw.ser.bytesize = 7
                     self.aw.ser.parity= 'E'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     self.aw.ser.HH506RAid = "X" # ensure the HH506RA gets reinitalized if settings changed
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
-                elif meter == "CENTER 309":
+                elif meter == "CENTER 309" and self.aw.qmc.device != 3:
                     self.aw.qmc.device = 3
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
-                elif meter == "CENTER 306":
+                elif meter == "CENTER 306" and self.aw.qmc.device != 4:
                     self.aw.qmc.device = 4
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
-                elif meter == "CENTER 305":
+                elif meter == "CENTER 305" and self.aw.qmc.device != 5:
                     self.aw.qmc.device = 5
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to CENTER 305, which is equivalent to CENTER 306. Now, choose serial port").format(meter)
-                elif meter == "CENTER 304":
+                elif meter == "CENTER 304" and self.aw.qmc.device != 6:
                     self.aw.qmc.device = 6
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port").format(meter)
-                elif meter == "CENTER 303":
+                elif meter == "CENTER 303" and self.aw.qmc.device != 7:
                     self.aw.qmc.device = 7
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
-                elif meter == "CENTER 302":
+                elif meter == "CENTER 302" and self.aw.qmc.device != 8:
                     self.aw.qmc.device = 8
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port").format(meter)
-                elif meter == "CENTER 301":
+                elif meter == "CENTER 301" and self.aw.qmc.device != 9:
                     self.aw.qmc.device = 9
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port").format(meter)
-                elif meter == "CENTER 300":
+                elif meter == "CENTER 300" and self.aw.qmc.device != 10:
                     self.aw.qmc.device = 10
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port").format(meter)
-                elif meter == "VOLTCRAFT K204":
+                elif meter == "VOLTCRAFT K204" and self.aw.qmc.device != 11:
                     self.aw.qmc.device = 11
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port").format(meter)
-                elif meter == "VOLTCRAFT K202":
+                elif meter == "VOLTCRAFT K202" and self.aw.qmc.device != 12:
                     self.aw.qmc.device = 12
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 306. Now, choose serial port").format(meter)
-                elif meter == "VOLTCRAFT 300K":
+                elif meter == "VOLTCRAFT 300K" and self.aw.qmc.device != 13:
                     self.aw.qmc.device = 13
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
@@ -2173,41 +2176,41 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.stopbits = 1
                     self.aw.ser.timeout = 0.5
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port").format(meter)
-                elif meter == "VOLTCRAFT 302KJ":
+                elif meter == "VOLTCRAFT 302KJ" and self.aw.qmc.device != 14:
                     self.aw.qmc.device = 14
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port").format(meter)
-                elif meter == "EXTECH 421509":
+                elif meter == "EXTECH 421509" and self.aw.qmc.device != 15:
                     self.aw.qmc.device = 15
                     #self.aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
                     self.aw.ser.baudrate = 2400
                     self.aw.ser.bytesize = 7
                     self.aw.ser.parity= 'E'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to Omega HH506RA. Now, choose serial port").format(meter)
-                elif meter == "Omega HH802U":
+                elif meter == "Omega HH802U" and self.aw.qmc.device != 16:
                     self.aw.qmc.device = 16
                     #self.aw.ser.comport = "COM11"
                     self.aw.ser.baudrate = 19200
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'E'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to Omega HH806AU. Now, choose serial port").format(meter)
-                elif meter == "Omega HH309":
+                elif meter == "Omega HH309" and self.aw.qmc.device != 17:
                     self.aw.qmc.device = 17
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 #special device manual mode. No serial settings.
                 elif meter == "NONE":
@@ -2224,7 +2227,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 19 is the Arduino/TC4
                 ##########################
-                elif meter == "TE VA18B":
+                elif meter == "TE VA18B" and self.aw.qmc.device != 20:
                     self.aw.qmc.device = 20
                     #self.aw.ser.comport = "COM7"
                     self.aw.ser.baudrate = 2400
@@ -2239,7 +2242,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 22 is +PID DUTY% but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Omega HHM28[6]":
+                elif meter == "Omega HHM28[6]" and self.aw.qmc.device != 23:
                     self.aw.qmc.device = 23
                     #self.aw.ser.comport = "COM1"
                     self.aw.ser.baudrate = 2400
@@ -2264,32 +2267,32 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 28 is +ArduinoTC4 34 but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "MODBUS":
+                elif meter == "MODBUS" and self.aw.qmc.device != 29:
                     self.aw.qmc.device = 29
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 115200
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.6
                     message = QApplication.translate("Message","Device set to {0}. Now, choose Modbus serial port or IP address").format(meter)
-                elif meter == "VOLTCRAFT K201":
+                elif meter == "VOLTCRAFT K201" and self.aw.qmc.device != 30:
                     self.aw.qmc.device = 30
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 302. Now, choose serial port").format(meter)
-                elif meter == "Amprobe TMD-56":
+                elif meter == "Amprobe TMD-56" and self.aw.qmc.device != 31:
                     self.aw.qmc.device = 31
                     #self.aw.ser.comport = "COM11"
                     self.aw.ser.baudrate = 19200
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'E'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to Omega HH806AU. Now, choose serial port").format(meter)
                 ##########################
                 ####  DEVICE 32 is +ArduinoTC4 56 but +DEVICE cannot be set as main device
@@ -2312,14 +2315,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 38 is +Phidget 1046 4xRTD 23 but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Mastech MS6514":
+                elif meter == "Mastech MS6514" and self.aw.qmc.device != 39:
                     self.aw.qmc.device = 39
                     #self.aw.ser.comport = "COM11"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 elif meter == "Phidget IO 01":
@@ -2352,7 +2355,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 49 is an external program 56
                 ##########################
-                elif meter == "DUMMY": # including a dummy serial device (can be used for serial commands)
+                elif meter == "DUMMY" and self.aw.qmc.device != 50: # including a dummy serial device (can be used for serial commands)
                     self.aw.qmc.device = 50
                     message = QApplication.translate("Message","Device set to {0}").format(meter)
                     #self.aw.ser.comport = "COM4"
@@ -2360,55 +2363,55 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.5
                 ##########################
                 ####  DEVICE 51 is +304_34 but +DEVICE cannot be set as main device
                 ##########################
                 elif meter == "Phidget 1051 1xTC 01":
                     self.aw.qmc.device = 52
                     message = QApplication.translate("Message","Device set to {0}").format(meter)
-                elif meter == "Hottop BT/ET":
+                elif meter == "Hottop BT/ET" and self.aw.qmc.device != 53:
                     self.aw.qmc.device = 53
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 115200
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 ####  DEVICE 54 is +Hottop HF but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Omega HH806W":
+                elif meter == "Omega HH806W" and self.aw.qmc.device != 55:
                     self.aw.qmc.device = 55
                     #self.aw.ser.comport = "COM11"
                     self.aw.ser.baudrate = 38400
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'E'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 ####  DEVICE 55 is +MODBUS_56 but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Apollo DT301":
+                elif meter == "Apollo DT301" and self.aw.qmc.device != 56:
                     self.aw.qmc.device = 56
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
-                elif meter == "EXTECH 755":
+                elif meter == "EXTECH 755" and self.aw.qmc.device != 57:
                     self.aw.qmc.device = 57
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 elif meter == "Phidget TMP1101 4xTC 01":
@@ -2443,14 +2446,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ####  DEVICE 66 is -HH806W but -DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                elif meter == "VOLTCRAFT PL-125-T2":
+                elif meter == "VOLTCRAFT PL-125-T2" and self.aw.qmc.device != 67:
                     self.aw.qmc.device = 67
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 ##########################
@@ -2486,14 +2489,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ####  DEVICE 76 is +Phidget HUB IO Digital 45 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                elif meter == "VOLTCRAFT PL-125-T4":
+                elif meter == "VOLTCRAFT PL-125-T4" and self.aw.qmc.device != 77:
                     self.aw.qmc.device = 77
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 ##########################
@@ -2502,12 +2505,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 elif meter == "S7":
                     self.aw.qmc.device = 79
-                    #self.aw.ser.comport = "COM4"
-                    self.aw.ser.baudrate = 115200
-                    self.aw.ser.bytesize = 8
-                    self.aw.ser.parity= 'N'
-                    self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
                 ####  DEVICE 80 is +S7 34 but no serial setup
@@ -2572,26 +2569,26 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 elif meter == "Yocto IR":
                     self.aw.qmc.device = 100
                     message = QApplication.translate("Message","Device set to {0}").format(meter)
-                elif meter == "Behmor BT/CT":
+                elif meter == "Behmor BT/CT" and self.aw.qmc.device != 101:
                     self.aw.qmc.device = 101
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 57600
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 ####  DEVICE 102 Behmor 34 channel 3 and 4
                 ##########################
-                elif meter == "VICTOR 86B":
+                elif meter == "VICTOR 86B" and self.aw.qmc.device != 103:
                     self.aw.qmc.device = 103
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 2400
                     self.aw.ser.bytesize = 8
                     self.aw.ser.parity= 'N'
                     self.aw.ser.stopbits = 1
-                    self.aw.ser.timeout = 1.0
+                    self.aw.ser.timeout = 0.7
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
                 ##########################
                 ####  DEVICE 104 Behmor 56 channel 5 and 6
@@ -2629,7 +2626,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 114 is +TMP1200_2 (a second TMP1200 configuration)
                 ##########################
-                elif meter == "HB BT/ET":
+                elif meter == "HB BT/ET" and self.aw.qmc.device != 115:
                     self.aw.qmc.device = 115
                     #self.aw.ser.comport = "COM11"
                     self.aw.ser.baudrate = 9600

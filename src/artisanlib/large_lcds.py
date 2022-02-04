@@ -756,3 +756,79 @@ class LargePhasesLCDs(LargeLCDs):
         self.aw.largePhasesLCDs_dialog = None
         self.aw.LargePhasesLCDsFlag = False
         self.aw.phaseslcdsAction.setChecked(False)
+        
+class LargeScaleLCDs(LargeLCDs):
+    def __init__(self, parent = None, aw = None):
+        super().__init__(parent, aw)
+        settings = QSettings()
+        if settings.contains("ScaleLCDGeometry"):
+            self.restoreGeometry(settings.value("ScaleLCDGeometry"))
+        else:
+            self.resize(100,200)
+        self.setWindowTitle(QApplication.translate("Menu", "Scale LCDs"))
+        self.chooseLayout(self.width(),self.height())
+        self.updateValues([""],[""])
+    
+    def weightLabel(self, unit=None):
+        if unit is None:
+            unit = self.aw.qmc.weight[2]
+        return "<b>" + QApplication.translate("Label", "Weight") + f" ({unit})</b> "
+    
+    def totalLabel(self, unit=None):
+        if unit is None:
+            unit = self.aw.qmc.weight[2]
+        return "<b>" + QApplication.translate("Label", "Total") + f" ({unit})</b> "
+    
+    def updateWeightUnitWeight(self, unit=None):
+        if len(self.lcds1labelsUpper)>0:
+            self.lcds1labelsUpper[0].setText(self.weightLabel(unit))
+    
+    def updateWeightUnitTotal(self, unit=None):
+        if len(self.lcds2labelsUpper)>0:
+            self.lcds2labelsUpper[0].setText(self.totalLabel(unit))
+        
+    def updateWeightUnit(self, unit=None):
+        self.updateWeightUnitWeight(unit)
+        self.updateWeightUnitTotal(unit)
+    
+    def makeLCDs(self):
+        self.lcds1styles = ["slowcoolingtimer"]
+        self.lcds1 = [self.makeLCD(self.lcds1styles[0])] # Weight
+        label1Upper = self.makeLabel(self.weightLabel())
+        label1Lower = self.makeLabel(" ")
+        self.lcds1labelsUpper = [label1Upper]
+        self.lcds1labelsLower = [label1Lower]
+        self.lcds1frames = [self.makeLCDframe(label1Upper,self.lcds1[0],label1Lower)]
+        #
+        self.lcds2styles = ["sv"]
+        self.lcds2 = [self.makeLCD(self.lcds2styles[0])] # Total
+        label2Upper = self.makeLabel(self.totalLabel())
+        label2Lower = self.makeLabel(" ")
+        self.lcds2labelsUpper = [label2Upper]
+        self.lcds2labelsLower = [label2Lower]
+        self.lcds2frames = [self.makeLCDframe(label2Upper,self.lcds2[0],label2Lower)]
+        ##
+        self.updateVisiblitiesScale()
+        self.updateStyles()
+        self.updateDecimals()
+    
+    def updateVisiblitiesScale(self):
+        self.updateVisibilities([True],[True])
+        
+    def updateDecimals(self):
+        for (lcd1,lcd2) in zip(self.lcds1,self.lcds2):
+            for lcd in [lcd1,lcd2]:
+                if self.tight:
+                    lcd.setDigitCount(6)
+                else:
+                    lcd.setDigitCount(7)
+                if lcd.value() == 0:
+                    lcd.display("")
+        
+    def closeEvent(self, _):
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("ScaleLCDGeometry",self.saveGeometry())
+        self.aw.largeScaleLCDs_dialog = None
+        self.aw.LargeScaleLCDsFlag = False
+        self.aw.scalelcdsAction.setChecked(False)

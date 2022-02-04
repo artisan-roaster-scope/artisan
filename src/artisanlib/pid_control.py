@@ -727,7 +727,8 @@ class FujiPID():
                 reg = self.aw.modbus.address2register(reg_dict[svkey][1],6)
                 self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,int(value*10))
             else:
-                value = int(round(value)) # not sure why this is needed, but a FUJI PXF seems not to work without this and value as full floating point numbers!?
+#                value = int(round(value)) # not sure why this is needed, but a FUJI PXF seems not to work without this and value as full floating point numbers!?
+# this hack seems not to help
                 command = self.message2send(self.aw.ser.controlETpid[1],6,reg_dict[svkey][1],int(value*10))
                 r = self.aw.ser.sendFUJIcommand(command,8)
             #check response
