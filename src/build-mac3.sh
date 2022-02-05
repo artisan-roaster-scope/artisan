@@ -15,7 +15,7 @@ if [ ! -z $APPVEYOR ]; then
     export PYTHON_V=3.10
     export PYTHON=/usr/local/opt/python@3.10
     export PYTHONBIN=$PYTHON/bin
-    export PYTHONPATH=$PYTHON/lib/python${PYTHON_V}
+    export PYTHONPATH=/usr/local/lib/python${PYTHON_V}
 
 # for PyQt5:
 #    export PYLUPDATE=$PYTHONBIN/pylupdate5
