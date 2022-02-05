@@ -17606,7 +17606,10 @@ class ApplicationWindow(QMainWindow):
 
         self.messagelabel.setIndent(6)
         # set a few broad style parameters
-        self.button_font_size_pt = 13
+        if platf == "Linux":
+            self.button_font_size_pt = 11
+        else:
+            self.button_font_size_pt = 13
         
         #TODO: delete # pylint: disable=fixme
         if platf == 'Windows':
@@ -19170,9 +19173,9 @@ class ApplicationWindow(QMainWindow):
             lastdonationpopup = None
             settings = QSettings()
             if settings.contains("starts"):
-                starts = settings.value("starts")
+                starts = toInt(settings.value("starts"))
             if settings.contains("lastdonationpopup"):
-                lastdonationpopup = settings.value("lastdonationpopup")
+                lastdonationpopup = toInt(settings.value("lastdonationpopup"))
             now = int(libtime.time())
             if not(settings.status() == QSettings.Status.NoError and 
                     lastdonationpopup is not None and 
@@ -23676,7 +23679,7 @@ class ApplicationWindow(QMainWindow):
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # notifications(<bool>) enable/disable notifications
-                            if cs.startswith("notifications(") and cs.endswith(")"):
+                            elif cs.startswith("notifications(") and cs.endswith(")"):
                                 try:
                                     if aw.notificationManager:
                                         value = cs[len("notifications("):-1]
@@ -23960,7 +23963,7 @@ class ApplicationWindow(QMainWindow):
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             else:
-                                # command not recognized
+                            # command not recognized
                                 _log.info("Artisan Command <%s> not recognized", cs)
                 elif action == 21: # RC Command
                     # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
