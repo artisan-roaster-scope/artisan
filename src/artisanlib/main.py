@@ -23963,7 +23963,7 @@ class ApplicationWindow(QMainWindow):
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             else:
-                            # command not recognized
+                                # command not recognized
                                 _log.info("Artisan Command <%s> not recognized", cs)
                 elif action == 21: # RC Command
                     # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
