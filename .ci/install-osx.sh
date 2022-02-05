@@ -31,6 +31,7 @@ set -ex # reduced logging
 brew install python@3.10
 brew unlink python@3.9
 brew link --force python@3.10
+export PATH="/usr/local/opt/python@3.10/bin:$PATH"
 
 hash -r
 which python3

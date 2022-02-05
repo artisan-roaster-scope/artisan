@@ -8,10 +8,14 @@ set -e  # reduced logging
 if [ ! -z $APPVEYOR ]; then
     # Appveyor CI builds
     echo "NOTICE: Appveyor build"
-    export PYTHON_V=3.9
-    export PYTHON=/Users/appveyor/venv3.9 # venv3.9 => venv3.9.6
+#    export PYTHON_V=3.9
+#    export PYTHON=/Users/appveyor/venv3.9 # venv3.9 => venv3.9.6
+#    export PYTHONBIN=$PYTHON/bin
+#    export PYTHONPATH=$PYTHON/lib/python${PYTHON_V}
+    export PYTHON_V=3.10
+    export PYTHON=/usr/local/opt/python@3.10
     export PYTHONBIN=$PYTHON/bin
-    export PYTHONPATH=$PYTHON/lib/python3.9
+    export PYTHONPATH=$PYTHON/lib/python${PYTHON_V}
 
 # for PyQt5:
 #    export PYLUPDATE=$PYTHONBIN/pylupdate5

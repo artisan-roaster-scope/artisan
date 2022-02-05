@@ -133,7 +133,7 @@ for:
 
   environment:
     ARTISAN_OS: osx
-    PYTHON: ~/venv3.10
+    PYTHON: ~/venv3.9
     language: generic
     HOMEBREW_NO_INSTALL_CLEANUP: 1
     HOMEBREW_NO_ANALYTICS: 1
