@@ -25,7 +25,7 @@ openpyxl==3.0.9 # 3.0.7
 #PyQt 5.11.3 is preinstalled
 #PyQtWebEngine==5.15.5 # not available for 32bit platforms
 # what about 
-pyinstaller==4.8 #4.4
+pyinstaller==4.9 #4.4
 cffi==1.14.4
 cryptography==3.4.8 #3.4.7 #3.3.2
 keyring==23.5.0 #23.4.0 # versions beyond 23.0.1 require importlib_metadata >=v3.6 (RPi buster comes with v2.0)
