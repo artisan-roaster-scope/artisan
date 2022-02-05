@@ -5,6 +5,7 @@ set -ex # reduced logging
 
 #.ci/slience.sh brew update # this seems to help to work around some homebrew issues; and fails on others
 
+#------------
 # Python 3.7.5 is installed by default
 # to update use either:
 #brew upgrade python
@@ -19,14 +20,22 @@ set -ex # reduced logging
 #brew install python@3.8
 #brew link --force --overwrite python@3.8
 
-hash -r
-which python3
-python3 --version
 
 # following https://stackoverflow.com/questions/51125013/how-can-i-install-a-previous-version-of-python-3-in-macos-using-homebrew/51125014#51125014
 # to install Python 3.6.5
 #brew remove --ignore-dependencies python 1>/dev/null 2>&1
 #brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb 1>/dev/null 2>&1
+#------------
+
+# upgrade python from 3.9 to 3.10
+brew install python@3.10
+brew unlink python@3.9
+brew link --force python@3.10
+
+hash -r
+which python3
+python3 --version
+
 
 # to work around a wget open ssl issue: dyld: Library not loaded: /usr/local/opt/openssl/lib/libssl.1.0.0.dylib
 # however for now we settled to use curl instead to download the upload script

@@ -125,7 +125,7 @@ try:
     from PyQt6.QtNetwork import QLocalSocket # @Reimport @UnresolvedImport @UnusedImport
     #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
     try:
-        from PyQt6.QtWebEngineWidgets import QWebEngineView # @Reimport @UnresolvedImport @UnusedImport  # pylint: disable=import-error
+        from PyQt6.QtWebEngineWidgets import QWebEngineView # @Reimport @UnresolvedImport @UnusedImport  # pylint: disable=import-error,no-name-in-module
         QtWebEngineSupport = True
     except Exception: # pylint: disable=broad-except
         # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine for Raspebarry 32bit
@@ -151,7 +151,7 @@ except Exception:
     from PyQt5.QtNetwork import QLocalSocket # @Reimport @UnresolvedImport @UnusedImport
     #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
     try:
-        from PyQt5.QtWebEngineWidgets import QWebEngineView # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error
+        from PyQt5.QtWebEngineWidgets import QWebEngineView # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error,no-name-in-module
         QtWebEngineSupport = True
     except Exception: # pylint: disable=broad-except
         # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine for Raspebarry 32bit
