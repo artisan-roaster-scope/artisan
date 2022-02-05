@@ -8,10 +8,10 @@ set -e  # reduced logging
 if [ ! -z $APPVEYOR ]; then
     # Appveyor CI builds
     echo "NOTICE: Appveyor build"
-    export PYTHON_V=3.9
-    export PYTHON=/Users/appveyor/venv3.9 # venv3.9.6
+    export PYTHON_V=3.10
+    export PYTHON=/Users/appveyor/venv3.10 # venv3.9 => venv3.9.8; venv3.10 => venv3.10.0
     export PYTHONBIN=$PYTHON/bin
-    export PYTHONPATH=$PYTHON/lib/python3.9
+    export PYTHONPATH=$PYTHON/lib/python3.10
 
 # for PyQt5:
 #    export PYLUPDATE=$PYTHONBIN/pylupdate5
@@ -106,4 +106,4 @@ fi
 rm -rf build dist
 sleep .3 # sometimes it takes a little for dist to get really empty
 echo "************* 3 **************"
-$PYTHON/bin/python$PYTHON_V setup-mac3.py py2app | egrep -v '^(creating|copying file|byte-compiling|locate)'
+$PYTHONBIN/python3 setup-mac3.py py2app | egrep -v '^(creating|copying file|byte-compiling|locate)'

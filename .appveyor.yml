@@ -34,7 +34,7 @@ branches:
     - master
 
 stack:
-  python 3.9
+  python 3.10 # if nothing else is specified per platform, this indicates the Python version to be used
 
 for:
 -

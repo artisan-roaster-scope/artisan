@@ -38612,7 +38612,8 @@ def excepthook(excType, excValue, tracebackobj):
     sections = [timeString, separator, errmsg]
     msg = '\n'.join(sections)
     detailedmsg = '\n'.join([tbinfo, separator, variables])
-    aw.qmc.adderror("Error: " + detailedmsg)
+    if aw is not None:
+        aw.qmc.adderror("Error: " + detailedmsg)
     try:
         with open(logFile, "w", encoding='utf-8') as f:
             f.write(msg)

@@ -189,11 +189,10 @@ try:
 except:
     PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/'
 
-try:
-    PYTHON_V = os.environ["PYTHON_V"]
-except:
-    PYTHON_V = '3.10'
-    
+#try:
+#    PYTHON_V = os.environ["PYTHON_V"]
+#except:
+#    PYTHON_V = '3.10'
 # (independent) matplotlib (installed via pip) shared libs are not copied by py2app (both cp are needed!)
 # UPDATE 9/2020: pip install of MPL v3.3.x does not come with a .dylibs directory any longer
 #subprocess.check_call(r'mkdir Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs',shell = True)
