@@ -1,7 +1,7 @@
 #!/bin/sh
 
-set -ex
-#set -e  # reduced logging
+#set -ex
+set -e  # reduced logging
 
 
 export LD_LIBRARY_PATH=$LD_LIBTRARY_PATH:/usr/local/lib
@@ -107,8 +107,9 @@ mkdir dist/Icons
 find includes/Icons -name '.*.aset' -exec rm -r {} \;
 cp -R includes/Icons/* dist/Icons
 
-ls $PYTHON_PATH/yoctopuce/
-cp $PYTHON_PATH/yoctopuce/cdll/* dist
+mkdir dist/yoctopuce
+mkdir dist/yoctopuce/cdll
+cp $PYTHON_PATH/yoctopuce/cdll/* dist/yoctopuce/cdll
 
 cp /usr/lib/libsnap7.so dist
 
