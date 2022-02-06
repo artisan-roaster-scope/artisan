@@ -175,7 +175,7 @@ for:
 
   environment:
     ARTISAN_OS: linux
-    PYTHON: $HOME/venv3.9
+    PYTHON: $HOME/venv3.9.8
     # NOTE: there is an issue with Python 3.10.0 and pyinstaller fixed in Python 3.10.1 (not yet available on appveyor)
     # see pyinstaller Issue #6301
 
