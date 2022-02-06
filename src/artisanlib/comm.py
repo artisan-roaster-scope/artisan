@@ -148,7 +148,7 @@ class YoctoThread(threading.Thread):
 #########################################################################
 
 #inputs temperature
-class nonedevDlg(QDialog):
+class nonedevDlg(QDialog): # pylint: disable=too-few-public-methods
     __slots__ = ['etEdit','btEdit','ETbox','okButton','cancelButton'] # save some memory by using slots
     def __init__(self, parent = None, aw = None):
         super().__init__(parent)
@@ -481,6 +481,7 @@ class serialport():
     ######### functions used by Fuji PIDs
     # returns command binstring on success as returned from device or "0" on failure
     def sendFUJIcommand(self,binstring,nbytes):
+        _log.debug("sendFUJIcommand(%s,%s)",binstring,nbytes)
         try:
             ###  lock resources ##
             self.COMsemaphore.acquire(1)
@@ -601,6 +602,7 @@ class serialport():
         return self.aw.qmc.timeclock.elapsedMilli(),duty,sv
 
     def DTAtemperature(self):
+        _log.debug("DTAtemperature")
         ###########################################################
         ### create command
         command = self.aw.dtapid.message2send(self.controlETpid[1],3,self.aw.dtapid.dtamem["sv"][1],1)
@@ -634,6 +636,7 @@ class serialport():
         return tx,t1,t2
 
     def sendDTAcommand(self,command):
+        _log.debug("sendDTAcommand(%s)",command)
         try:
             ###  lock resources ##
             self.COMsemaphore.acquire(1)
@@ -1530,6 +1533,7 @@ class serialport():
     # NOTE: disconnected devices still physically attached can introduce signals that are not filtered by the HUB and thus
     # can disturb and even crash the HUB. Thus we keep the device channel attached as long as possible
     def PhidgetTMP1000temperature(self):
+        _log.debug("PhidgetTMP1000temperature")
         try:
             # Temperature
             if self.aw.ser.TMP1000temp is None:
@@ -1574,6 +1578,7 @@ class serialport():
     # NOTE: disconnected devices still physically attached can introduce signals that are not filtered by the HUB and thus
     # can disturb and even crash the HUB. Thus we keep the device channel attached as long as possible
     def PhidgetHUM1000temperature(self):
+        _log.debug("PhidgetHUM1000temperature")
         try:
             # HUM Temperature
             if self.aw.ser.PhidgetHUMtemp is None:
@@ -1625,6 +1630,7 @@ class serialport():
     # NOTE: disconnected devices still physically attached can introduce signals that are not filtered by the HUB and thus
     # can disturb and even crash the HUB. Thus we keep the device channel attached as long as possible
     def PhidgetHUM1000humidity(self):
+        _log.debug("PhidgetHUM1000humidity")
         try:
             # HUM Humidity
             if self.aw.ser.PhidgetHUMhum is None:
@@ -1676,6 +1682,7 @@ class serialport():
     # NOTE: disconnected devices still physically attached can introduce signals that are not filtered by the HUB and thus
     # can disturb and even crash the HUB. Thus we keep the device channel attached as long as possible
     def PhidgetPRE1000pressure(self):
+        _log.debug("PhidgetPRE1000pressure")
         try:
             # PRE Pressure
             if self.aw.ser.PhidgetPREpre is None:
@@ -2790,6 +2797,7 @@ class serialport():
             _log.exception(e)
 
     def phidget1045attached(self,serial,port,deviceType,alternative_conf=False):
+        _log.debug("phidget1045attached(%s,%s,%s,%s)",serial,port,deviceType,alternative_conf)
         try:
             self.aw.qmc.phidgetManager.reserveSerialPort(serial,port,0,"PhidgetTemperatureSensor",deviceType,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
             if deviceType != DeviceID.PHIDID_TMP1200:
@@ -2813,6 +2821,7 @@ class serialport():
             _log.exception(e)
 
     def phidget1045detached(self,serial,port,deviceType):
+        _log.debug("phidget1045detached(%s,%s,%s)",serial,port,deviceType)
         try:
             self.aw.qmc.phidgetManager.releaseSerialPort(serial,port,0,"PhidgetTemperatureSensor",deviceType,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
             if deviceType != DeviceID.PHIDID_TMP1200:
@@ -3096,6 +3105,7 @@ class serialport():
                 self.Phidget1048lastvalues[channel] = -1
 
     def phidget1048attached(self,serial,port,deviceType,idx):
+        _log.debug("phidget1048attached(%s,%s,%s,%s)",serial,port,deviceType,idx)
         try:
             self.configure1048(idx)
             if self.PhidgetTemperatureSensor is not None and len(self.PhidgetTemperatureSensor) > idx:
@@ -3107,6 +3117,7 @@ class serialport():
             _log.exception(e)
         
     def phidget1048detached(self,serial,port,deviceType,idx):
+        _log.debug("phidget1048detached(%s,%s,%s,%s)",serial,port,deviceType,idx)
         try:
             if self.PhidgetTemperatureSensor is not None and len(self.PhidgetTemperatureSensor) > idx:
                 channel = self.PhidgetTemperatureSensor[idx].getChannel()
@@ -3403,6 +3414,7 @@ class serialport():
                 self.Phidget1046lastvalues[channel] = -1
 
     def phidget1046attached(self,serial,port,deviceType,idx):
+        _log.debug("phidget1046attached(%s,%s,%s,%s)",serial,port,deviceType,idx)
         try:
             self.configure1046(idx)
             if self.PhidgetBridgeSensor is not None:
@@ -3414,6 +3426,7 @@ class serialport():
             _log.exception(e)
         
     def phidget1046detached(self,serial,port,deviceType,idx):
+        _log.debug("phidget1046detached(%s,%s,%s,%s)",serial,port,deviceType,idx)
         try:
             if self.PhidgetBridgeSensor is not None:
                 channel = self.PhidgetBridgeSensor[idx].getChannel()
@@ -3544,6 +3557,7 @@ class serialport():
         return str(serial) + ":" + str(port)
     
     def phidgetOUTattached(self,ch):
+        _log.debug("phidgetOUTattached(%s)",ch)
         self.aw.qmc.phidgetManager.reserveSerialPort(
             ch.getDeviceSerialNumber(), # serial
             ch.getHubPort(), # port
@@ -3554,6 +3568,7 @@ class serialport():
             remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
     
     def phidgetOUTdetached(self,ch):
+        _log.debug("phidgetOUTdetached(%s)",ch)
         self.aw.qmc.phidgetManager.releaseSerialPort(
             ch.getDeviceSerialNumber(), # serial
             ch.getHubPort(), # port
@@ -3572,6 +3587,7 @@ class serialport():
 
     # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
     def phidgetBinaryOUTattach(self,channel,serial=None):
+        _log.debug("phidgetBinaryOUTattach(%s,%s)",channel,serial)
         if not serial in self.aw.ser.PhidgetBinaryOut:
             if self.aw.qmc.phidgetManager is None:
                 self.aw.qmc.startPhidgetManager()
@@ -3644,6 +3660,7 @@ class serialport():
 
     # value: True or False
     def phidgetBinaryOUTset(self,channel,value,serial=None):
+        _log.debug("phidgetBinaryOUTset(%s,%s,%s)",channel,value,serial)
         res = False
         self.phidgetBinaryOUTattach(channel,serial)
         if serial in self.aw.ser.PhidgetBinaryOut:
@@ -3660,6 +3677,7 @@ class serialport():
 
     # returns: True or False (default)
     def phidgetBinaryOUTget(self,channel,serial=None):
+        _log.debug("phidgetBinaryOUTget(%s,%s)",channel,serial)
         self.phidgetBinaryOUTattach(channel,serial)
         res = False
         if serial in self.aw.ser.PhidgetBinaryOut:
@@ -3670,12 +3688,15 @@ class serialport():
                     res = out[channel].getState()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+        _log.debug(" => phidgetBinaryOUTget: %s",res)
         return res
     
     def phidgetBinaryOUTtoggle(self,channel,serial=None):
+        _log.debug("phidgetBinaryOUTtoggle(%s,%s)",channel,serial)
         self.phidgetBinaryOUTset(channel,not self.phidgetBinaryOUTget(channel,serial),serial)
         
     def phidgetBinaryOUTclose(self):
+        _log.debug("phidgetBinaryOUTclose()")
         for o in self.aw.ser.PhidgetBinaryOut:
             out = self.aw.ser.PhidgetBinaryOut[o]
             if out is not None:
@@ -3698,6 +3719,7 @@ class serialport():
 
     # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
     def phidgetOUTattach(self,channel,serial=None):
+        _log.debug("phidgetOUTattach(%s,%s)",channel,serial)
         if not serial in self.aw.ser.PhidgetDigitalOut:
             if self.aw.qmc.phidgetManager is None:
                 self.aw.qmc.startPhidgetManager()
@@ -3758,6 +3780,7 @@ class serialport():
             pass
 
     def phidgetOUTtogglePWM(self,channel,serial=None):
+        _log.debug("phidgetOUTtogglePWM(%s,%s)",channel,serial)
         self.phidgetOUTattach(channel,serial) # this is to ensure that the lastToggle/lastPWM structures are allocated
         if serial in self.aw.ser.PhidgetDigitalOut:
             lastPWM = self.aw.ser.PhidgetDigitalOutLastPWM[serial][channel]
@@ -3787,6 +3810,7 @@ class serialport():
                         pass
     
     def phidgetOUTpulsePWM(self,channel,millis,serial=None):
+        _log.debug("phidgetOUTpulsePWM(%s,%s,%s)",channel,millis,serial)
         self.phidgetOUTsetPWM(channel,100,serial)
 #        QTimer.singleShot(int(round(millis)),lambda : self.phidgetOUTsetPWM(channel,0))
 #        # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
@@ -3800,6 +3824,7 @@ class serialport():
 
     # value: 0-100
     def phidgetOUTsetPWM(self,channel,value,serial=None):
+        _log.debug("phidgetOUTsetPWM(%s,%s,%s)",channel,value,serial)
         self.phidgetOUTattach(channel,serial)
         if serial in self.aw.ser.PhidgetDigitalOut:
             out = self.aw.ser.PhidgetDigitalOut[serial]
@@ -3828,6 +3853,7 @@ class serialport():
 
     # value: real
     def phidgetOUTsetPWMfrequency(self,channel,value,serial=None):
+        _log.debug("phidgetOUTsetPWMfrequency(%s,%s,%s)",channel,value,serial)
         self.phidgetOUTattach(channel,serial)
         if serial in self.aw.ser.PhidgetDigitalOut:
             out = self.aw.ser.PhidgetDigitalOut[serial]
@@ -3840,6 +3866,7 @@ class serialport():
                 _log.exception(e)
 
     def phidgetOUTclose(self):
+        _log.debug("phidgetOUTclose()")
         for m in self.aw.ser.PhidgetDigitalOut:
             out = self.aw.ser.PhidgetDigitalOut[m]
             if out is not None:
@@ -3860,6 +3887,7 @@ class serialport():
 
     # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
     def phidgetOUTattachHub(self,channel,serial=None):
+        _log.debug("phidgetOUTattachHub(%s,%s)",channel,serial)
         if not serial in self.aw.ser.PhidgetDigitalOutHub:
             if self.aw.qmc.phidgetManager is None:
                 self.aw.qmc.startPhidgetManager()
@@ -3898,6 +3926,7 @@ class serialport():
             pass
     
     def phidgetOUTtogglePWMhub(self,channel,serial=None):
+        _log.debug("phidgetOUTtogglePWMhub(%s,%s)",channel,serial)
         self.phidgetOUTattachHub(channel,serial) # this is to ensure that the lastToggle/lastPWM structures are allocated
         if serial in self.aw.ser.PhidgetDigitalOutHub:
             lastToggle = self.aw.ser.PhidgetDigitalOutLastToggleHub[serial][channel]
@@ -3920,6 +3949,7 @@ class serialport():
     
 
     def phidgetOUTpulsePWMhub(self,channel,millis,serial=None):
+        _log.debug("phidgetOUTpulsePWMhub(%s,%s,%s)",channel,millis,serial)
         self.phidgetOUTsetPWMhub(channel,100,serial)
 #        QTimer.singleShot(int(round(millis)),lambda : self.phidgetOUTsetPWMhub(channel,0))
         # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
@@ -3935,6 +3965,7 @@ class serialport():
     # value: 0-100
     # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
     def phidgetOUTsetPWMhub(self,channel,value,serial=None):
+        _log.debug("phidgetOUTsetPWMhub(%s,%s,%s)",channel,value,serial)
         self.phidgetOUTattachHub(channel,serial)
         if serial in self.aw.ser.PhidgetDigitalOutHub:
             outHub = self.aw.ser.PhidgetDigitalOutHub[serial]
@@ -3953,6 +3984,7 @@ class serialport():
                 _log.exception(e)
     
     def phidgetOUTcloseHub(self):
+        _log.debug("phidgetOUTcloseHub")
         for h in self.aw.ser.PhidgetDigitalOutHub:
             outHub = self.aw.ser.PhidgetDigitalOutHub[h]
             if outHub is not None:
@@ -3978,6 +4010,7 @@ class serialport():
 
     # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
     def phidgetVOUTattach(self,channel,serial):
+        _log.debug("phidgetVOUTattach(%s,%s)",channel,serial)
         if not serial in self.aw.ser.PhidgetAnalogOut:
             if self.aw.qmc.phidgetManager is None:
                 self.aw.qmc.startPhidgetManager()
@@ -4040,6 +4073,7 @@ class serialport():
     # value: float
     # returns True or False indicating set status
     def phidgetVOUTsetVOUT(self,channel,value,serial=None):
+        _log.debug("phidgetVOUTsetVOUT(%s,%s,%s)",channel,value,serial)
         res = False
         self.phidgetVOUTattach(channel,serial)
         if serial in self.aw.ser.PhidgetAnalogOut:
@@ -4057,6 +4091,7 @@ class serialport():
     # value: int (either 5 or 10)
     # returns True or False indicating set status
     def phidgetVOUTsetRange(self,channel,value,serial=None):
+        _log.debug("phidgetVOUTsetRange(%s,%s,%s)",channel,value,serial)
         res = False
         self.phidgetVOUTattach(channel,serial)
         if serial in self.aw.ser.PhidgetAnalogOut:
@@ -4075,6 +4110,7 @@ class serialport():
         return res
 
     def phidgetVOUTclose(self):
+        _log.debug("phidgetVOUTclose")
         for c in self.aw.ser.PhidgetAnalogOut:
             out = self.aw.ser.PhidgetAnalogOut[c]
             for i in range(len(out)):
@@ -4101,6 +4137,7 @@ class serialport():
 
     # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
     def phidgetDCMotorAttach(self,channel,serial):
+        _log.debug("phidgetDCMotorAttach(%s,%s)",channel,serial)
         if not serial in self.aw.ser.PhidgetDCMotor:
             if self.aw.qmc.phidgetManager is None:
                 self.aw.qmc.startPhidgetManager()
@@ -4154,6 +4191,7 @@ class serialport():
 
     # value: float
     def phidgetDCMotorSetAcceleration(self,channel,value,serial=None):
+        _log.debug("phidgetDCMotorSetAcceleration(%s,%s,%s)",channel,value,serial)
         self.phidgetDCMotorAttach(channel,serial)
         if serial in self.aw.ser.PhidgetDCMotor:
             dcm = self.aw.ser.PhidgetDCMotor[serial]
@@ -4166,6 +4204,7 @@ class serialport():
 
     # value: float
     def phidgetDCMotorSetVelocity(self,channel,value,serial=None):
+        _log.debug("phidgetDCMotorSetVelocity(%s,%s,%s)",channel,value,serial)
         self.phidgetDCMotorAttach(channel,serial)
         if serial in self.aw.ser.PhidgetDCMotor:
             dcm = self.aw.ser.PhidgetDCMotor[serial]
@@ -4179,6 +4218,7 @@ class serialport():
                 
     # value: float
     def phidgetDCMotorSetCurrentLimit(self,channel,value,serial=None):
+        _log.debug("phidgetDCMotorSetCurrentLimit(%s,%s,%s)",channel,value,serial)
         self.phidgetDCMotorAttach(channel,serial)
         if serial in self.aw.ser.PhidgetDCMotor:
             dcm = self.aw.ser.PhidgetDCMotor[serial]
@@ -4190,6 +4230,7 @@ class serialport():
                 _log.exception(e)
     
     def phidgetDCMotorClose(self):
+        _log.debug("phidgetDCMotorClose")
         for c in self.aw.ser.PhidgetDCMotor:
             dcm = self.aw.ser.PhidgetDCMotor[c]
             for i in range(len(dcm)):
@@ -4213,6 +4254,7 @@ class serialport():
     # it is assumed that the modules two channels do not have custom function names different from
     # voltageOutput1 and voltageOutput2
     def yoctoVOUTattach(self,c,module_id):
+        _log.debug("yoctoVOUTattach(%s,%s)",c,module_id)
         # check if VoltageOutput object for channel c and module_id is already attached
         voltageOutputs = self.aw.ser.YOCTOvoltageOutputs
         m = next((x for x in voltageOutputs if 
@@ -4239,6 +4281,7 @@ class serialport():
         return None
     
     def yoctoVOUTsetVOUT(self,c,v,module_id=None):
+        _log.debug("yoctoVOUTsetVOUT(%s,%s,%s)",c,v,module_id)
         try:
             m = self.yoctoVOUTattach(c,module_id)
             if m is not None and m.isOnline():
@@ -4263,6 +4306,7 @@ class serialport():
     # it is assumed that the modules two channels do not have custom function names different from
     # voltageOutput1 and voltageOutput2
     def yoctoCOUTattach(self,module_id):
+        _log.debug("yoctoCOUTattach(%s)",module_id)
         # check if YOCTOcurrentOutput object for module_id is already attached
         currentOutputs = self.aw.ser.YOCTOcurrentOutputs
         m = next((x for x in currentOutputs if 
@@ -4289,6 +4333,7 @@ class serialport():
         return None
 
     def yoctoCOUTsetCOUT(self,c,module_id=None):
+        _log.debug("yoctoCOUTsetCOUT(%s,%s)",c,module_id)
         try:
             m = self.yoctoCOUTattach(module_id)
             if m is not None and m.isOnline():
@@ -4297,6 +4342,7 @@ class serialport():
             _log.exception(e)
 
     def yoctoCOUTclose(self):
+        _log.debug("yoctoCOUTclose")
         self.aw.ser.YOCTOcurrentOutputs = []
         try:
             YAPI.FreeAPI() 
@@ -4324,6 +4370,7 @@ class serialport():
     # it is assumed that the modules two channels do not have custom function names different from
     # pwmOutput1 and pwmOutput2
     def yoctoPWMattach(self,c,module_id):
+        _log.debug("yoctoPWMattach(%s,%s)",c,module_id)
         # check if YPwmOutput object for channel c and module_id is already attached
         pwmOutputs = self.aw.ser.YOCTOpwmOutputs
         m = next((x for x in pwmOutputs if 
@@ -4350,6 +4397,7 @@ class serialport():
         return None
     
     def yoctoPWMenabled(self,c,b,module_id=None):
+        _log.debug("yoctoPWMenabled(%s,%s,%s)",c,b,module_id)
         try:
             m = self.yoctoPWMattach(c,module_id)
             if m is not None and m.isOnline():
@@ -4362,6 +4410,7 @@ class serialport():
             _log.exception(e)
     
     def yoctoPWMsetFrequency(self,c,f,module_id=None):
+        _log.debug("yoctoPWMsetFrequency(%s,%s,%s)",c,f,module_id)
         try:
             m = self.yoctoPWMattach(c,module_id)
             if m is not None and m.isOnline():
@@ -4370,6 +4419,7 @@ class serialport():
             _log.exception(e)
     
     def yoctoPWMsetDuty(self,c,d,module_id=None):
+        _log.debug("yoctoPWMsetDuty(%s,%s,%s)",c,d,module_id)
         try:
             m = self.yoctoPWMattach(c,module_id)
             if m is not None and m.isOnline():
@@ -4378,6 +4428,7 @@ class serialport():
             _log.exception(e)
     
     def yoctoPWMmove(self,c,d,t,module_id=None):
+        _log.debug("yoctoPWMmove(%s,%s,%s,%s)",c,d,t,module_id)
         try:
             m = self.yoctoPWMattach(c,module_id)
             if m is not None and m.isOnline():
@@ -4386,6 +4437,7 @@ class serialport():
             _log.exception(e)
     
     def yoctoPWMclose(self):
+        _log.debug("yoctoPWMclose")
         self.aw.ser.YOCTOpwmOutputs = []
         try:
             YAPI.FreeAPI() 
@@ -4412,6 +4464,7 @@ class serialport():
     # it is assumed that the modules two channels do not have custom function names different from
     # relay1, relay2,...
     def yoctoRELattach(self,c,module_id):
+        _log.debug("yoctoRELattach(%s,%s)",c,module_id)
         # check if Relay object for channel c and module_id is already attached
         relays = self.aw.ser.YOCTOrelays
         m = next((x for x in relays if 
@@ -4440,6 +4493,7 @@ class serialport():
         return None
 
     def yoctoRELon(self,c,module_id=None):
+        _log.debug("yoctoRELon(%s,%s)",c,module_id)
         try:
             m = self.yoctoRELattach(c,module_id)
             if m is not None and m.isOnline():
@@ -4450,6 +4504,7 @@ class serialport():
             _log.exception(e)
     
     def yoctoRELoff(self,c,module_id=None):
+        _log.debug("yoctoRELoff(%s,%s)",c,module_id)
         try:
             m = self.yoctoRELattach(c,module_id)
             if m is not None and m.isOnline():
@@ -4460,6 +4515,7 @@ class serialport():
             _log.exception(e)
     
     def yoctoRELflip(self,c,module_id=None):
+        _log.debug("yoctoRELflip(%s,%s)",c,module_id)
         try:
             m = self.yoctoRELattach(c,module_id)
             if m is not None and m.isOnline():
@@ -4468,6 +4524,7 @@ class serialport():
             _log.exception(e)
     
     def yoctoRELpulse(self,c,delay,duration,module_id=None):
+        _log.debug("yoctoRELpulse(%s,%s,%s,%s)",c,delay,duration,module_id)
         try:
             m = self.yoctoRELattach(c,module_id)
             if m is not None and m.isOnline():
@@ -4476,6 +4533,7 @@ class serialport():
             _log.exception(e)
 
     def yoctoRELclose(self):
+        _log.debug("yoctoRELclose")
         self.aw.ser.YOCTOrelays = []
         try:
             YAPI.FreeAPI() 
@@ -4497,6 +4555,7 @@ class serialport():
     # it is assumed that the modules two channels do not have custom function names different from
     # relay1, relay2,...
     def yoctoSERVOattach(self,c,module_id):
+        _log.debug("yoctoSERVOattach(%s,%s)",c,module_id)
         # check if Servo object for channel c and module_id is already attached
         servos = self.aw.ser.YOCTOservos
         m = next((x for x in servos if 
@@ -4525,6 +4584,7 @@ class serialport():
         return None
 
     def yoctoSERVOenabled(self,c,b,module_id=None):
+        _log.debug("yoctoSERVOenabled(%s,%s,%s)",c,b,module_id)
         try:
             m = self.yoctoSERVOattach(c,module_id)
             if m is not None and m.isOnline():
@@ -4533,6 +4593,7 @@ class serialport():
             _log.exception(e)
 
     def yoctoSERVOposition(self,c,p,module_id=None):
+        _log.debug("yoctoSERVOposition(%s,%s,%s)",c,p,module_id)
         try:
             m = self.yoctoSERVOattach(c,module_id)
             if m is not None and m.isOnline():
@@ -4541,6 +4602,7 @@ class serialport():
             _log.exception(e)
 
     def yoctoSERVOmove(self,c,p,t,module_id=None):
+        _log.debug("yoctoSERVOmove(%s,%s,%s,%s)",c,p,t,module_id)
         try:
             m = self.yoctoSERVOattach(c,module_id)
             if m is not None and m.isOnline():
@@ -4549,6 +4611,7 @@ class serialport():
             _log.exception(e)
 
     def yoctoSERVOneutral(self,c,n,module_id=None):
+        _log.debug("yoctoSERVOmove(%s,%s,%s)",c,n,module_id)
         try:
             m = self.yoctoSERVOattach(c,module_id)
             if m is not None and m.isOnline():
@@ -4557,6 +4620,7 @@ class serialport():
             _log.exception(e)
 
     def yoctoSERVOrange(self,c,r,module_id=None):
+        _log.debug("yoctoSERVOrange(%s,%s,%s)",c,r,module_id)
         try:
             m = self.yoctoSERVOattach(c,module_id)
             if m is not None and m.isOnline():
@@ -4565,6 +4629,7 @@ class serialport():
             _log.exception(e)
 
     def yoctoSERVOclose(self):
+        _log.debug("yoctoSERVOclose")
         self.aw.ser.YOCTOservos = []
         try:
             YAPI.FreeAPI() 
@@ -4586,6 +4651,7 @@ class serialport():
 
     # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
     def phidgetRCattach(self,channel,serial=None):
+        _log.debug("phidgetRCattach(%s,%s)",channel,serial)
         if not serial in self.aw.ser.PhidgetRCServo:
             if self.aw.qmc.phidgetManager is None:
                 self.aw.qmc.startPhidgetManager()
@@ -4638,6 +4704,7 @@ class serialport():
 
     # sets min/max pulse width
     def phidgetRCpulse(self,channel,min_pulse,max_pulse,serial=None):
+        _log.debug("phidgetRCpulse(%s,%s,%s,%s)",channel,min_pulse,max_pulse,serial)
         self.phidgetRCattach(channel,serial)
         if serial in self.aw.ser.PhidgetRCServo and len(self.aw.ser.PhidgetRCServo[serial])>channel:
             self.aw.ser.PhidgetRCServo[serial][channel].setMinPulseWidth(min_pulse)
@@ -4645,6 +4712,7 @@ class serialport():
 
     # sets min/max position
     def phidgetRCpos(self,channel,min_pos,max_pos,serial=None):
+        _log.debug("phidgetRCpos(%s,%s,%s,%s)",channel,min_pos,max_pos,serial)
         self.phidgetRCattach(channel,serial)
         if serial in self.aw.ser.PhidgetRCServo and len(self.aw.ser.PhidgetRCServo[serial])>channel:
             self.aw.ser.PhidgetRCServo[serial][channel].setMinPosition(min_pos)
@@ -4652,24 +4720,28 @@ class serialport():
 
     # engage channel
     def phidgetRCengaged(self,channel,state,serial=None):
+        _log.debug("phidgetRCengaged(%s,%s,%s)",channel,state,serial)
         self.phidgetRCattach(channel,serial)
         if serial in self.aw.ser.PhidgetRCServo and len(self.aw.ser.PhidgetRCServo[serial])>channel:
             self.aw.ser.PhidgetRCServo[serial][channel].setEngaged(state)
 
     # sets position
     def phidgetRCset(self,channel,position,serial=None):
+        _log.debug("phidgetRCset(%s,%s,%s)",channel,position,serial)
         self.phidgetRCattach(channel,serial)
         if serial in self.aw.ser.PhidgetRCServo and len(self.aw.ser.PhidgetRCServo[serial])>channel:
             self.aw.ser.PhidgetRCServo[serial][channel].setTargetPosition(position)
 
     # set speed rampling state per channel
     def phidgetRCspeedRamping(self,channel,state,serial=None):
+        _log.debug("phidgetRCspeedRamping(%s,%s,%s)",channel,state,serial)
         self.phidgetRCattach(channel,serial)
         if serial in self.aw.ser.PhidgetRCServo and len(self.aw.ser.PhidgetRCServo[serial])>channel:
             self.aw.ser.PhidgetRCServo[serial][channel].setSpeedRampingState(state)
 
     # set voltage per channel
     def phidgetRCvoltage(self,channel,volt,serial=None):
+        _log.debug("phidgetRCvoltage(%s,%s,%s)",channel,volt,serial)
         self.phidgetRCattach(channel,serial)
         if serial in self.aw.ser.PhidgetRCServo and len(self.aw.ser.PhidgetRCServo[serial])>channel:
             from Phidget22.RCServoVoltage import RCServoVoltage
@@ -4686,17 +4758,20 @@ class serialport():
             
     # sets acceleration
     def phidgetRCaccel(self,channel,accel,serial=None):
+        _log.debug("phidgetRCaccel(%s,%s,%s)",channel,accel,serial)
         self.phidgetRCattach(channel,serial)
         if serial in self.aw.ser.PhidgetRCServo and len(self.aw.ser.PhidgetRCServo[serial])>channel:
             self.aw.ser.PhidgetRCServo[serial][channel].setAcceleration(accel)
             
     # sets velocity
     def phidgetRCveloc(self,channel,veloc,serial=None):
+        _log.debug("phidgetRCveloc(%s,%s,%s)",channel,veloc,serial)
         self.phidgetRCattach(channel,serial)
         if serial in self.aw.ser.PhidgetRCServo and len(self.aw.ser.PhidgetRCServo[serial])>channel:
             self.aw.ser.PhidgetRCServo[serial][channel].setVelocityLimit(veloc)
 
     def phidgetRCclose(self):
+        _log.debug("phidgetRCclose")
         for c in self.aw.ser.PhidgetRCServo:
             rc = self.aw.ser.PhidgetRCServo[c]
             for i in range(len(rc)):
@@ -4881,6 +4956,7 @@ class serialport():
             _log.exception(e)
 
     def phidget1018attached(self,serial,port,className,deviceType,idx,API="voltage"):
+        _log.debug("phidget1018attached(%s,%s,%s,%s,%s,%s)",serial,port,className,deviceType,idx,API)
         try:
             self.configure1018(deviceType,idx,API)
             if self.PhidgetIO is not None:
@@ -4907,6 +4983,7 @@ class serialport():
             _log.exception(e)
 
     def phidget1018detached(self,serial,port,className,deviceType,idx):
+        _log.debug("phidget1018detached(%s,%s,%s,%s,%s)",serial,port,className,deviceType,idx)
         try:
             if self.PhidgetIO is not None:
                 channel = self.PhidgetIO[idx].getChannel()

@@ -6755,9 +6755,7 @@ class tgraphcanvas(FigureCanvas):
             try:
                 # reset color of last pressed button
                 if aw.lastbuttonpressed != -1:
-                    buttonstyle = "min-width:75px;border-style:solid; border-radius:3;border-color:grey; border-width:1;"
-                    normalstyle = "QPushButton {" + buttonstyle + "font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[aw.lastbuttonpressed],createGradient(aw.extraeventbuttoncolor[aw.lastbuttonpressed]))
-                    aw.buttonlist[aw.lastbuttonpressed].setStyleSheet(normalstyle)
+                    aw.setExtraEventButtonStyle(aw.lastbuttonpressed, style="normal")
                 # reset lastbuttonpressed
                 aw.lastbuttonpressed = -1
             except Exception as e: # pylint: disable=broad-except
@@ -11650,7 +11648,7 @@ class tgraphcanvas(FigureCanvas):
                 settings = QSettings()
                 starts = 0
                 if settings.contains("starts"):
-                    starts = settings.value("starts")
+                    starts = toInt(settings.value("starts"))
                 settings.setValue("starts",starts+1)
                 settings.sync()
             except Exception as e: # pylint: disable=broad-except
@@ -16106,8 +16104,8 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
     @staticmethod
     def plus():
         modifiers = QApplication.keyboardModifiers()
-        if modifiers == (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ControlModifier):
-            # ALT+CTR-CLICK (OPTION+COMMAND on macOS) toggles
+        if modifiers in [(Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ControlModifier), (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier)]:
+            # ALT+CTR-CLICK (OPTION+COMMAND on macOS) toggles  or alternatively ALT-SHIFT-CLICK
             # toggle debug logging
             # first get all module loggers
             debug_level = debugLogLevelToggle()
@@ -24340,29 +24338,32 @@ class ApplicationWindow(QMainWindow):
             self.slider4.setValue(v)
 
     def extraEventButtonStyle(self,tee,style="normal"):
-        left_rounded_style = "border-top-left-radius:4px;border-bottom-left-radius:4px;"
-        right_rounded_style = "border-top-right-radius:4px; border-bottom-right-radius:4px;"
+        left_rounded_style = "border-radius:0px;border-top-left-radius:4px;border-bottom-left-radius:4px;"
+        right_rounded_style = "border-radius:0px;border-top-right-radius:4px;border-bottom-right-radius:4px;"
         fully_rounded_style = "border-radius:4px;"
         square_style = "border-radius:0px;"
         if aw.buttonsize == 0:
             # tiny
-            buttonstyle = """min-width:""" + self.tiny_button_min_width_str + """;margin:0px;padding:0px;border-style:solid;border-color:darkgrey;border-width:0px;font-size:""" + self.button_font_size_micro + """; font-weight: bold;"""
+            button_min_width = self.tiny_button_min_width_str
+            button_font_size = self.button_font_size_micro
         elif aw.buttonsize == 2:
             # large
-            buttonstyle = """min-width:""" + str(self.standard_button_min_width_px) + """px;margin:0px;padding:0px;border-style:solid;border-color:darkgrey;border-width:0px;font-size:""" + self.button_font_size_small + """; font-weight: bold;"""
+            button_min_width = str(self.standard_button_min_width_px)
+            button_font_size = self.button_font_size_small
         else:
             # small (default)
-            buttonstyle = """min-width:""" + self.small_button_min_width_str + """;margin:0px;padding:0px;border-style:solid;border-color:darkgrey;border-width:0px;font-size:""" + self.button_font_size_tiny + """; font-weight: bold;"""
+            button_min_width = self.small_button_min_width_str
+            button_font_size = self.button_font_size_tiny
         ##
         if len(self.extraeventbuttonround) > tee:
             if self.extraeventbuttonround[tee] == 1: # left-side rounded
-                buttonstyle += left_rounded_style
+                rounding = left_rounded_style
             elif self.extraeventbuttonround[tee] == 2: # right-side rounded
-                buttonstyle += right_rounded_style
+                rounding = right_rounded_style
             elif self.extraeventbuttonround[tee] == 3: # both-sides rounded
-                buttonstyle += fully_rounded_style
+                rounding = fully_rounded_style
             else:
-                buttonstyle += square_style
+                rounding = square_style
         #
         if style=="normal":
             color = self.extraeventbuttontextcolor[tee]
@@ -24371,12 +24372,12 @@ class ApplicationWindow(QMainWindow):
             # set color of this button to "pressed"
             color = self.extraeventbuttoncolor[tee]
             backgroundcolor = self.extraeventbuttontextcolor[tee]
-        core_style = """color:%s;background:%s}"""
+        buttonstyle = f"min-width:{button_min_width};margin:0px;padding:0px;border-style:solid;border-color:darkgrey;border-width:0px;font-size:{button_font_size};font-weight:bold;{rounding}color:{color};"
         #
-        plain_style = "QPushButton {" + buttonstyle + core_style%(color,createGradient(backgroundcolor))
-        pressed_style = "QPushButton:hover:pressed {" + buttonstyle + core_style%(color,createGradient(QColor(backgroundcolor).lighter(80).name()))
-        hover_style = "QPushButton:hover:!pressed {" + buttonstyle + core_style%(color,createGradient(QColor(backgroundcolor).lighter(110).name()))
-        return plain_style + hover_style + pressed_style
+        plain_style = f"QPushButton {{{buttonstyle}background:{createGradient(backgroundcolor)}}}"
+        pressed_style = f"QPushButton:hover:pressed {{background:{createGradient(QColor(backgroundcolor).lighter(80).name())}}}"
+        hover_style = f"QPushButton:hover:!pressed {{background:{createGradient(QColor(backgroundcolor).lighter(110).name())}}}"
+        return f"{plain_style}{hover_style}{pressed_style}"
 
     def setExtraEventButtonStyle(self, tee, style="normal"):
         button_style = self.extraEventButtonStyle(tee, style)
@@ -29872,7 +29873,7 @@ class ApplicationWindow(QMainWindow):
                     for s in ["RoastGeometry","FlavorProperties","CalculatorGeometry","EventsGeometry", "CompareGeometry",
                         "BackgroundGeometry","LCDGeometry","DeltaLCDGeometry","ExtraLCDGeometry","PhasesLCDGeometry","AlarmsGeometry","DeviceAssignmentGeometry","PortsGeometry",
                         "TransformatorPosition", "CurvesPosition", "StatisticsPosition", "AxisPosition","PhasesPosition", "BatchPosition",
-                        "SamplingPosition", "autosaveGeometry", "PIDPosition", "DesignerPosition"]:
+                        "SamplingPosition", "autosaveGeometry", "PIDPosition", "DesignerPosition","PIDLCDGeometry","ScaleLCDGeometry"]:
                         settings.remove(s)
                     #
                     aw.setFonts()

@@ -369,9 +369,9 @@ def createGradient(rgb, tint_factor=0.1, shade_factor=0.1, reverse=False):
     light_grad,dark_grad = createRGBGradient(rgb,tint_factor,shade_factor)
     if reverse:
         # dark to light
-        return f"QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {dark_grad}, stop: 1 {light_grad})"
+        return f"QLinearGradient(x1:0,y1:0,x2:0,y2:1,stop:0 {dark_grad}, stop:1 {light_grad})"
     # light to dark (default)
-    return f"QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {light_grad}, stop: 1 {dark_grad})"
+    return f"QLinearGradient(x1:0,y1:0,x2:0,y2:1,stop:0 {light_grad}, stop:1 {dark_grad})"
 
 def createRGBGradient(rgb, tint_factor=0.3, shade_factor=0.3):
     try:
