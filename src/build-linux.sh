@@ -113,6 +113,23 @@ cp /usr/lib/libsnap7.so dist
 cp README.txt dist
 cp ../LICENSE dist/LICENSE.txt
 
+# remove automatically collected PyQt6 libs that are not used to save space
+rm -f dist/libQt6Multimedia*.*
+rm -f dist/libQt6Quick3D*.*
+rm -f dist/libQt6QuickC*.*
+rm -f dist/libQt6QuickD*.*
+rm -f dist/libQt6QuickD*.*
+rm -f dist/libQt6QuickL*.*
+rm -f dist/libQt6QuickP*.*
+rm -f dist/libQt6QuickT*.*
+rm -f dist/libQt6QuickS*.*
+rm -f dist/libQt6RemoteObjects*.*
+rm -f dist/libQt6Sensors*.*
+rm -f dist/libQt6SerialPort*.*
+rm -f dist/libQt6ShaderTools*.*
+rm -f dist/libQt6Sql*.*
+rm -f dist/libQt6Test*.*
+
 # remove automatically collected libs that might break things on some installations (eg. Ubuntu 16.04)
 # so it is better to rely on the system installed once
 # see https://github.com/gridsync/gridsync/issues/47 and https://github.com/gridsync/gridsync/issues/43
