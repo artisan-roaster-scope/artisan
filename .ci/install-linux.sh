@@ -14,5 +14,7 @@ pip install -r src/requirements.txt
 pip install -r src/requirements-${ARTISAN_OS}.txt
 
 .ci/install-libusb.sh
-.ci/install-phidgets.sh
+# don't install the Phidget driver as it would overwrite the user installed one
+# the Phidget Python libs are installed via pid from requirements.txt
+#.ci/install-phidgets.sh 
 .ci/install-snap7.sh
