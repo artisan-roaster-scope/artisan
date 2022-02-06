@@ -109,7 +109,7 @@ cp -R includes/Icons/* dist/Icons
 
 mkdir dist/yoctopuce
 mkdir dist/yoctopuce/cdll
-cp $PYTHON_PATH/yoctopuce/cdll/* dist/yoctopuce/cdll
+cp $PYTHON_PATH/yoctopuce/cdll/*64.so dist/yoctopuce/cdll
 
 cp /usr/lib/libsnap7.so dist
 

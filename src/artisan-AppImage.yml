@@ -8,5 +8,5 @@ ingredients:
     - oDir=$(pwd)
     - cd ..
     - path="file://$(pwd)/$(ls artisan-*.deb)" # Search for the package
-    - cd $oDir # go back to orignal folder
+    - cd $oDir # go back to original folder
     - curl -O -C - $path  # use the deb package
