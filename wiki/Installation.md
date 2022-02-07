@@ -56,7 +56,7 @@ __Debian/Ubuntu/Raspian__
 ```
 
 
-## Step 3: Install serial driver (if needed)
+## Step 3: Install (serial/Phidget/..) device driver if needed
 
 To operate some devices like Phidget modules or certain meters you need to install corresponding drivers. See the corresponding Section under [Supported Devices](https://artisan-scope.org/devices/index) for further details.
 
