@@ -25,7 +25,12 @@
 
 #import logging
 #from logging.handlers import RotatingFileHandler
-from typing import Optional, Final
+from typing import Optional
+try:
+    from typing import Final
+except ImportError:
+    # for Python 3.7:
+    from typing_extensions import Final
 
 
 try:

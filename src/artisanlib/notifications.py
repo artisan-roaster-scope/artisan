@@ -32,7 +32,12 @@ import sys
 import time
 import logging
 from datetime import datetime
-from typing import Final, Optional
+from typing import Optional
+try:
+    from typing import Final
+except ImportError:
+    # for Python 3.7:
+    from typing_extensions import Final
 from enum import Enum
 from artisanlib.util import getResourcePath
 import plus.util

@@ -36,7 +36,12 @@ except Exception:
 from artisanlib.util import decodeLocal
 from pathlib import Path
 from plus import config
-from typing import Optional, Final, List
+from typing import Optional, List
+try:
+    from typing import Final
+except ImportError:
+    # for Python 3.7:
+    from typing_extensions import Final
 import datetime
 import dateutil.parser
 import logging

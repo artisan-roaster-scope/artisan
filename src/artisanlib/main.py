@@ -70,7 +70,12 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 import logging.config
 from yaml import safe_load as yaml_load
-from typing import Final, Optional, List
+from typing import Optional, List
+try:
+    from typing import Final
+except ImportError:
+    # for Python 3.7:
+    from typing_extensions import Final
 
 from functools import reduce as freduce
 

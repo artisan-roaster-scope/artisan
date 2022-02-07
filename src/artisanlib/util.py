@@ -9,7 +9,12 @@ import os
 import re
 import functools
 from pathlib import Path
-from typing import Final, Optional
+from typing import Optional
+try:
+    from typing import Final
+except ImportError:
+    # for Python 3.7:
+    from typing_extensions import Final
 from matplotlib import colors
 
 

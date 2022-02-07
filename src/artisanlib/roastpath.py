@@ -11,7 +11,11 @@ import re
 import json
 from lxml import html
 import logging
-from typing import Final
+try:
+    from typing import Final
+except ImportError:
+    # for Python 3.7:
+    from typing_extensions import Final
 
 try:
     #pylint: disable = E, W, R, C

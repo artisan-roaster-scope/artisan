@@ -21,7 +21,11 @@ import time as libtime
 import re
 import platform
 import logging
-from typing import Final
+try:
+    from typing import Final
+except ImportError:
+    # for Python 3.7:
+    from typing_extensions import Final
 
 from artisanlib.util import deltaLabelUTF8
 from artisanlib.dialogs import ArtisanResizeablDialog

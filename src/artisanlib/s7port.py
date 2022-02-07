@@ -22,7 +22,11 @@ import os
 import sys
 import struct
 import logging
-from typing import Final
+try:
+    from typing import Final
+except ImportError:
+    # for Python 3.7:
+    from typing_extensions import Final
 
 # imports avoided to speed up startup for non-S7 users
 #from snap7.types import Areas

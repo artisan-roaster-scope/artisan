@@ -34,7 +34,12 @@ except Exception:
 
 from artisanlib.util import getDirectory
 from plus import config, util, roast, connection, sync, controller
-from typing import Any, Dict, Final, List
+from typing import Any, Dict, List
+try:
+    from typing import Final
+except ImportError:
+    # for Python 3.7:
+    from typing_extensions import Final
 import threading
 import time
 import logging

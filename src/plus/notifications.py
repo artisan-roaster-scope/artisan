@@ -29,7 +29,12 @@ except Exception:
     #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
 
-from typing import Final, List
+from typing import List
+try:
+    from typing import Final
+except ImportError:
+    # for Python 3.7:
+    from typing_extensions import Final
 
 import logging
 

@@ -17,7 +17,11 @@
 # Marko Luther, 2019
 
 import logging
-from typing import Final
+try:
+    from typing import Final
+except ImportError:
+    # for Python 3.7:
+    from typing_extensions import Final
 from artisanlib.ble import BLE_CHAR_TYPE
 
 

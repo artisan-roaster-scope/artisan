@@ -23,7 +23,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from plus import config, util
-from typing import Any, Optional, Dict, List, Tuple, Final
+from typing import Any, Optional, Dict, List, Tuple
+try:
+    from typing import Final
+except ImportError:
+    # for Python 3.7:
+    from typing_extensions import Final
 import hashlib
 import logging
 

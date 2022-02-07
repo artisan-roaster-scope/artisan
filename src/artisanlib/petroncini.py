@@ -7,7 +7,11 @@ import io
 import csv
 import time as libtime
 import logging
-from typing import Final
+try:
+    from typing import Final
+except ImportError:
+    # for Python 3.7:
+    from typing_extensions import Final
 
 from artisanlib.util import fill_gaps, encodeLocal
 

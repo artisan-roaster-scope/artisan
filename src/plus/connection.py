@@ -30,7 +30,12 @@ except Exception:
     from PyQt5.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib import __version__
-from typing import Any, Optional, Dict, Final
+from typing import Any, Optional, Dict
+try:
+    from typing import Final
+except ImportError:
+    # for Python 3.7:
+    from typing_extensions import Final
 
 import datetime
 import gzip
