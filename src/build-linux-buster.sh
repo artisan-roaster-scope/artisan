@@ -31,6 +31,15 @@ else
     ln -s /usr/lib/libusb-1.0.so.0
 fi
 
+# update UI
+find ui -iname "*.ui" | while read f
+do
+    fullfilename=$(basename $f)
+    fn=${fullfilename%.*}
+    python3 -m PyQt5.uic.pyuic -o uic/${fn}.py --from-imports ui/${fn}.ui
+done
+
+
 pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream \
 	    --log-level=INFO artisan-linux.spec
 
