@@ -47,7 +47,10 @@ except Exception:
     from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QDoubleSpinBox, QWidget, QTabWidget, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGridLayout, QGroupBox, QTableWidget, QHeaderView, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5 import sip  # @UnusedImport @Reimport  @UnresolvedImport
+    try:
+        from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
+    except Exception: # pylint: disable=broad-except
+        import sip
 
 
 _log: Final = logging.getLogger(__name__)

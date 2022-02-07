@@ -62,7 +62,10 @@ except Exception:
                                  QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView,  # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5 import sip  # @UnusedImport @Reimport  @UnresolvedImport
+    try:
+        from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
+    except Exception: # pylint: disable=broad-except
+        import sip
 
 if sys.platform.startswith("darwin"):
     import darkdetect # @UnresolvedImport # pylint: disable=import-error

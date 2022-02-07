@@ -161,7 +161,11 @@ except Exception:
     except Exception: # pylint: disable=broad-except
         # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine for Raspebarry 32bit
         pass
-    from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
+    try:
+        from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
+    except Exception: # pylint: disable=broad-except
+        import sip
+        
 
 
 from artisanlib.suppress_errors import suppress_stdout_stderr
