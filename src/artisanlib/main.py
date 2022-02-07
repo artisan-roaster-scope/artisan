@@ -22429,8 +22429,8 @@ class ApplicationWindow(QMainWindow):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " fireslideraction() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def calcSliderSendValue(self,n):
-        slider_value = self.eventslidervalues[n]
+    # from a given value and the event type number, calc the event value respecting the event types slider offset, factor and bernulli settings
+    def calcEventValue(self, n, slider_value):
         if self.eventsliderBernoulli[n]:
             # if ticked we add the Bernoulli's gas law factor to the computed value
             # (see https://www.home-barista.com/home-roasting/coffee-roasting-best-practices-scott-rao-t65601-70.html#p724654)
@@ -22438,8 +22438,10 @@ class ApplicationWindow(QMainWindow):
             slider_delta = self.eventslidermax[n] - self.eventslidermin[n]
             slider_value = slider_delta * pow((slider_value - self.eventslidermin[n])/slider_delta,2) + self.eventslidermin[n]
         # f(x) = k*x + o
-        value = (self.eventsliderfactors[n] * slider_value) + self.eventslideroffsets[n]
-        return value
+        return (self.eventsliderfactors[n] * slider_value) + self.eventslideroffsets[n]
+    
+    def calcSliderSendValue(self,n):
+        return self.calcEventValue(n, self.eventslidervalues[n])
         
     def recordsliderevent(self,n):
         if aw.eventquantifierSV[n]:
@@ -24442,7 +24444,7 @@ class ApplicationWindow(QMainWindow):
                 new_value = min(aw.eventslidermax[etype],max(aw.eventslidermin[etype],new_value))
 
                 # the new_value is combined with the event factor and offset as specified in the slider definition
-                actionvalue = (self.eventsliderfactors[etype] * new_value) + self.eventslideroffsets[etype]
+                actionvalue = self.calcEventValue(etype, new_value)
                 if self.extraeventsactions[ee] != 14: # only for VOUT Commands we keep the floats
                     actionvalue = int(round(actionvalue))
                 if self.extraeventsactions[ee] in [8,9,16,17,18]: # for Hottop Heater/Fan/CoolingFan action we take the event value instead of the event string as cmd action
