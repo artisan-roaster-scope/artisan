@@ -70,7 +70,7 @@ cp translations/*.qm dist/translations
 #rm -rf dist/mpl-data/sample_data
 rm -rf dist/matplotlib/sample_data
 
-rm dist/libphidget22.so.0
+rm -f dist/libphidget22.so.0
 
 mkdir dist/yoctopuce
 mkdir dist/yoctopuce/cdll
