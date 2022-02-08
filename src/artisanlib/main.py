@@ -13540,8 +13540,8 @@ class tgraphcanvas(FigureCanvas):
                 w = aw.qmc.weight[0]
             bean_weight = aw.convertWeight(w,aw.qmc.weight_units.index(aw.qmc.weight[2]),1) # to kg
                         
-            #reference: https://www.eia.gov/environment/emissions/co2_vol_mass.php (dated 9/16/2021, accessed 11/15/2021) 
-            #           https://www.eia.gov/tools/faqs/faq.php?id=74&t=11 (referencing data from 2020, accessed 11/15/2021)
+            #reference: https://www.eia.gov/environment/emissions/co2_vol_mass.php (dated Nov-18-2021, accessed Jan-02-2022) 
+            #           https://www.eia.gov/tools/faqs/faq.php?id=74&t=11 (referencing data from 2020, accessed Jan-02-2022)
             # entries must match those in self.sourcenames
             CO2kg_per_BTU = {0:6.288e-05, 1:5.291e-05, 2:2.964e-04}  # "LPG", "NG", "Elec"
 
