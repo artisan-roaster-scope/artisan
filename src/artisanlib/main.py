@@ -1309,6 +1309,9 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget VCP1000",           #123
                        "Phidget VCP1001",           #124
                        "Phidget VCP1002",           #125
+                       "ARC BT/ET",                 #126
+                       "+ARC MET/IT",               #127
+                       "+ARC AT"                    #128
                        ]
 
         # ADD DEVICE:

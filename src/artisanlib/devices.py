@@ -2687,6 +2687,22 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.qmc.device = 125
                     message = QApplication.translate("Message","Device set to {0}").format(meter)
                 ##########################
+                ##########################
+                elif meter == "ARC BT/ET" and self.aw.qmc.device != 126:
+                    self.aw.qmc.device = 126
+                    #self.aw.ser.comport = "COM11"
+                    self.aw.ser.baudrate = 115200
+                    self.aw.ser.bytesize = 8
+                    self.aw.ser.parity= 'N'
+                    self.aw.ser.stopbits = 1
+                    self.aw.ser.timeout = 0.4
+                    message = QApplication.translate("Message","Device set to {0}. Now, choose serial port").format(meter)
+                ##########################
+                ####  DEVICE 127 is +ARC MET/IT
+                ##########################
+                ##########################
+                ####  DEVICE 128 is +ARC AT (points to "+HB AT")
+
 
                 # ADD DEVICE:
 
@@ -2700,8 +2716,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     # - add an elif entry above to specify the default serial settings
             #extra devices serial config
             #set of different serial settings modes options
-            ssettings: Final = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],
-                         [19200,8,'N',1,1],[2400,8,'N',1,1],[9600,8,'E',1,1],[38400,8,'E',1,1],[115200,8,'N',1,1],[57600,8,'N',1,1]]
+            ssettings: Final = [[9600,8,'O',1,0.5],[19200,8,'E',1,0.5],[2400,7,'E',1,1],[9600,8,'N',1,0.5],
+                         [19200,8,'N',1,0.5],[2400,8,'N',1,1],[9600,8,'E',1,0.5],[38400,8,'E',1,0.5],[115200,8,'N',1,0.4],[57600,8,'N',1,0.5]]
             #map device index to a setting mode (choose the one that matches the device)
     # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
     # - add an entry to devsettings below (and potentially to ssettings above)
@@ -2832,6 +2848,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 123
                 1, # 124
                 1, # 125
+                8, # 126
+                8, # 127
+                8  # 128
                 ] 
             #init serial settings of extra devices
             for i in range(len(self.aw.qmc.extradevices)):

@@ -50,7 +50,7 @@ except Exception:
     try:
         from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
     except Exception: # pylint: disable=broad-except
-        import sip
+        import sip  # @Reimport @UnresolvedImport @UnusedImport
 
 from Phidget22.DeviceID import DeviceID
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
@@ -476,7 +476,10 @@ class serialport():
                                    self.YOCTO_generic,        #122 # Yocto-Serial
                                    self.PHIDGET_VCP1000,      #123 Phidget VCP1000
                                    self.PHIDGET_VCP1001,      #124 Phidget VCP1001
-                                   self.PHIDGET_VCP1002       #125 Phidget VCP1002
+                                   self.PHIDGET_VCP1002,      #125 Phidget VCP1002
+                                   self.ARC_BTET,             #126
+                                   self.ARC_METIT,            #127
+                                   self.HB_AT                 #128 # labeled "ARC AT"
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -1289,6 +1292,17 @@ class serialport():
         tx = self.aw.qmc.timeclock.elapsedMilli()
         t1 = self.aw.qmc.extraArduinoT5
         t2 = self.aw.qmc.extraArduinoT6
+        return tx,t2,t1
+
+    def ARC_BTET(self):
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t2,t1 = self.ARDUINOTC4temperature("1200")
+        return tx,t2,t1
+    
+    def ARC_METIT(self):
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        self.SP = self.aw.ser.SP # we link to the serial port object of the main device
+        t2,t1 = self.ARDUINOTC4temperature("3400")
         return tx,t2,t1
     
     def HB_BTET(self):
@@ -5676,7 +5690,7 @@ class serialport():
                     else:
                         self.aw.qmc.extraArduinoT3 = -1.
                         self.aw.qmc.extraArduinoT4 = -1.
-                    if 44 in self.aw.qmc.extradevices or 117 in self.aw.qmc.extradevices: # +ArduinoTC4_78 or +HB AT
+                    if 44 in self.aw.qmc.extradevices or 117 in self.aw.qmc.extradevices or 128 in self.aw.qmc.extradevices: # +ArduinoTC4_78 or +HB AT or +ARC AT
                         # report SV as extraArduinoT5
                         try:
                             self.aw.qmc.extraArduinoT5 = float(res[5])
@@ -5703,10 +5717,17 @@ class serialport():
                         self.aw.qmc.extraArduinoT3 = float(res[0])
                     elif (28 in self.aw.qmc.extradevices and 32 in self.aw.qmc.extradevices) and self.aw.ser.arduinoATChannel == "T6":
                         self.aw.qmc.extraArduinoT4 = float(res[0])
-                if chan is not None and len(res) == 4 and res[3] == "F":
-                    # data is given in F, we convert it back to C
-                    t1 = fromFtoC(t1)
-                    t2 = fromFtoC(t2)
+                if chan is not None and len(res) == 4:
+                    if res[3] == "F" and self.aw.qmc.mode != "F":
+                        # data is given in F, we convert it back to C
+                        t1 = fromFtoC(t1)
+                        t2 = fromFtoC(t2)
+                        self.aw.qmc.extraArduinoT6 = fromFtoC(self.aw.qmc.extraArduinoT6)
+                    elif res[3] != "F" and self.aw.qmc.mode == "F":
+                        # data is given in C, we convert it back to F
+                        t1 = fromCtoF(t1)
+                        t2 = fromCtoF(t2)
+                        self.aw.qmc.extraArduinoT6 = fromCtoF(self.aw.qmc.extraArduinoT6)
             return t1, t2
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)

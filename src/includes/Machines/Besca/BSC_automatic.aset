@@ -141,7 +141,6 @@ fetch_max_blocks=false
 [Sliders]
 ModeTempSliders=C
 eventslidercoarse=0, 0, 0, 0
-eventslidersflag=0
 eventslidersflags=1, 1, 1
 eventslidertemp=0, 0, 0, 0
 eventsliderunits=, , , 
