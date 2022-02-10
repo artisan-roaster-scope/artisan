@@ -164,7 +164,7 @@ except Exception:
     try:
         from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
     except Exception: # pylint: disable=broad-except
-        import sip
+        import sip # @Reimport @UnresolvedImport @UnusedImport
         
 
 
@@ -712,7 +712,7 @@ class tgraphcanvas(FigureCanvas):
         'title', 'title_show_always', 'ambientTemp', 'ambientTempSource', 'ambient_temperature_device', 'ambient_pressure', 'ambient_pressure_device', 'ambient_humidity',
         'ambient_humidity_device', 'elevation', 'temperaturedevicefunctionlist', 'humiditydevicefunctionlist', 'pressuredevicefunctionlist', 'moisture_greens', 'moisture_roasted',
         'greens_temp', 'beansize', 'beansize_min', 'beansize_max', 'whole_color', 'ground_color', 'color_systems', 'color_system_idx', 'heavyFC_flag', 'lowFC_flag', 'lightCut_flag',
-        'darkCut_flag', 'drops_flag', 'oily_flag', 'uneven_flag', 'tipping_flag', 'scorching_flag', 'divots_flag', 'timex', 'smooth_curves_on_recording', 
+        'darkCut_flag', 'drops_flag', 'oily_flag', 'uneven_flag', 'tipping_flag', 'scorching_flag', 'divots_flag', 'timex', 
         'temp1', 'temp2', 'delta1', 'delta2', 'stemp1', 'stemp2', 'tstemp1', 'tstemp2', 'ctimex1', 'ctimex2', 'ctemp1', 'ctemp2', 'unfiltereddelta1', 'unfiltereddelta2',  'unfiltereddelta1_pure', 'unfiltereddelta2_pure',
         'on_timex', 'on_temp1', 'on_temp2', 'on_ctimex1', 'on_ctimex2', 'on_ctemp1', 'on_ctemp2','on_tstemp1', 'on_tstemp2', 'on_stemp1', 'on_stemp2', 'on_unfiltereddelta1', 
         'on_unfiltereddelta2', 'on_delta1', 'on_delta2', 'on_extratemp1', 'on_extratemp2', 'on_extratimex', 'on_extractimex1', 'on_extractemp1', 'on_extractimex2', 'on_extractemp2',
@@ -991,7 +991,7 @@ class tgraphcanvas(FigureCanvas):
         self.errorlog = []
 
         # default delay between readings in miliseconds
-        self.default_delay: Final = 3000 # default 3s
+        self.default_delay: Final = 2000 # default 2s
         self.delay = self.default_delay
         self.min_delay = 250 # 500 # 1000
 
@@ -1407,6 +1407,8 @@ class tgraphcanvas(FigureCanvas):
         self.extratemp1,self.extratemp2 = [],[]                     # extra temp1, temp2. List of lists
         self.extrastemp1,self.extrastemp2 = [],[]                   # smoothed extra temp1, temp2. List of lists
         self.extractimex1,self.extractimex2,self.extractemp1,self.extractemp2 = [],[],[],[] # variants of extratimex/extratemp1/extratemp2 with -1 dropout values removed (or replaced by None)
+        # NOTE: those extractimexN, extractempBN lists can be shorter than the regular extratimexN, extratempN lists,
+        # however, the invariants len(extractimex1) = len(extractemp1) and len(extractimex2) = len(extractemp2) always hold
         self.extratemp1lines,self.extratemp2lines = [],[]           # lists with extra lines for speed drawing
         self.extraname1,self.extraname2 = [],[]                     # name of labels for line (like ET or BT) - legend
         self.extramathexpression1,self.extramathexpression2 = [],[]           # list with user defined math evaluating strings. Example "2*cos(x)"
@@ -1565,14 +1567,14 @@ class tgraphcanvas(FigureCanvas):
         #list to store the time in seconds of each reading. Most IMPORTANT variable.
         self.timex = []
 
-        self.smooth_curves_on_recording = False # by default we do not smooth curves during recording
-
         #lists to store temps and rates of change. Second most IMPORTANT variables. All need same dimension.
         #self.temp1 = ET ; self.temp2 = BT; self.delta1 = deltaMET; self.delta2 = deltaBT
         self.temp1,self.temp2,self.delta1, self.delta2 = [],[],[],[]
         self.stemp1,self.stemp2 = [],[] # smoothed versions of temp1/temp2 used in redraw()
         self.tstemp1,self.tstemp2 = [],[] # (temporarily) smoothed version of temp1/temp2 used in sample() to compute the RoR
-        self.ctimex1, self.ctimex2, self.ctemp1,self.ctemp2 = [], [],[],[] # (potential shorter) variants of timex/temp1/temp2 with -1 dropout values removed
+        self.ctimex1, self.ctimex2, self.ctemp1,self.ctemp2 = [], [],[],[] # (potential shorter) variants of timex/temp1/temp2 with -1 dropout values removed (or replaced by None)
+        # NOTE: those ctimexN, ctempN lists can be shorter than the original timex/tempN lists as some dropout values may have been removed,
+        # however, the invariants len(ctimex1) = len(ctemp1) and len(timex2) = len(ctemp2) always hold
         self.unfiltereddelta1, self.unfiltereddelta2 = [],[] # Delta mathexpressions applied; used in sample()
         self.unfiltereddelta1_pure, self.unfiltereddelta2_pure = [],[] # Delta mathexpressions not applied; used in sample() and by projections
 
@@ -3680,14 +3682,12 @@ class tgraphcanvas(FigureCanvas):
                     sample_timex = aw.qmc.timex
                     sample_temp1 = aw.qmc.temp1
                     sample_temp2 = aw.qmc.temp2
-                    sample_ctimex1 = aw.qmc.ctimex1
-                    sample_ctemp1 = aw.qmc.ctemp1
-                    sample_ctimex2 = aw.qmc.ctimex2
-                    sample_ctemp2 = aw.qmc.ctemp2
+                    sample_ctimex1 = self.ctimex1
+                    sample_ctemp1 = self.ctemp1
+                    sample_ctimex2 = self.ctimex2
+                    sample_ctemp2 = self.ctemp2
                     sample_tstemp1 = aw.qmc.tstemp1
                     sample_tstemp2 = aw.qmc.tstemp2
-                    sample_stemp1 = aw.qmc.stemp1
-                    sample_stemp2 = aw.qmc.stemp2
                     sample_unfiltereddelta1 = aw.qmc.unfiltereddelta1 # no sample_unfiltereddelta1_pure as used only during recording for projections
                     sample_unfiltereddelta2 = aw.qmc.unfiltereddelta2 # no sample_unfiltereddelta2_pure as used only during recording for projections
                     sample_delta1 = aw.qmc.delta1
@@ -3705,14 +3705,12 @@ class tgraphcanvas(FigureCanvas):
                     sample_timex = aw.qmc.on_timex = aw.qmc.on_timex[-m_len:]
                     sample_temp1 = aw.qmc.on_temp1 = aw.qmc.on_temp1[-m_len:]
                     sample_temp2 = aw.qmc.on_temp2 = aw.qmc.on_temp2[-m_len:]
-                    sample_ctimex1 = aw.qmc.on_ctimex1 = aw.qmc.on_ctimex1[-m_len:]
-                    sample_ctemp1 = aw.qmc.on_ctemp1 = aw.qmc.on_ctemp1[-m_len:]
-                    sample_ctimex2 = aw.qmc.on_ctimex2 = aw.qmc.on_ctimex2[-m_len:]
-                    sample_ctemp2 = aw.qmc.on_ctemp2 = aw.qmc.on_ctemp2[-m_len:]
+                    sample_ctimex1 = self.on_ctimex1 = self.on_ctimex1[-m_len:]
+                    sample_ctemp1 = self.on_ctemp1 = self.on_ctemp1[-m_len:]
+                    sample_ctimex2 = self.on_ctimex2 = self.on_ctimex2[-m_len:]
+                    sample_ctemp2 = self.on_ctemp2 = self.on_ctemp2[-m_len:]
                     sample_tstemp1 = aw.qmc.on_tstemp1 = aw.qmc.on_tstemp1[-m_len:]
                     sample_tstemp2 = aw.qmc.on_tstemp2 = aw.qmc.on_tstemp2[-m_len:]
-                    sample_stemp1 = aw.qmc.on_stemp1 = aw.qmc.on_stemp1[-m_len:]
-                    sample_stemp2 = aw.qmc.on_stemp2 = aw.qmc.on_stemp2[-m_len:]
                     sample_unfiltereddelta1 = aw.qmc.on_unfiltereddelta1 = aw.qmc.on_unfiltereddelta1[-m_len:] # no sample_unfiltereddelta1_pure as used only during recording for projections
                     sample_unfiltereddelta2 = aw.qmc.on_unfiltereddelta2 = aw.qmc.on_unfiltereddelta2[-m_len:] # no sample_unfiltereddelta2_pure as used only during recording for projections
                     sample_delta1 = aw.qmc.on_delta1 = aw.qmc.on_delta1[-m_len:]
@@ -3944,44 +3942,12 @@ class tgraphcanvas(FigureCanvas):
                     # register smoothed values
                     sample_tstemp1.append(st1)
                     sample_tstemp2.append(st2)
-
-                    if aw.qmc.smooth_curves_on_recording:
-                        cf = aw.qmc.curvefilter
-                        if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
-                            self.temp_decay_weights = numpy.arange(1,cf+1)
-                        # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
-                        if -1 in sample_temp1[-(cf+1):]:
-                            dw1 = [1]
-                        else:
-                            dw1 = self.temp_decay_weights
-                        if -1 in sample_temp2[-(cf+1):]:
-                            dw2 = [1]
-                        else:
-                            dw2 = self.temp_decay_weights
-                        # average smoothing
-                        if len(sample_ctemp1) > 0:
-                            sst1 = self.decay_average(sample_ctimex1,sample_ctemp1,dw1)
-                        else:
-                            sst1 = -1
-                        if len(sample_ctemp2) > 0:
-                            sst2 = self.decay_average(sample_ctimex2,sample_ctemp2,dw2)
-                        else:
-                            sst2 = -1
-                        # register smoothed values
-                        sample_stemp1.append(sst1)
-                        sample_stemp2.append(sst2)
                     
                     if local_flagstart:
                         if aw.qmc.ETcurve:
-                            if aw.qmc.smooth_curves_on_recording:
-                                aw.qmc.l_temp1.set_data(sample_ctimex1, sample_stemp1)
-                            else:
-                                aw.qmc.l_temp1.set_data(sample_ctimex1, sample_ctemp1)
+                            aw.qmc.l_temp1.set_data(sample_ctimex1, sample_ctemp1)
                         if aw.qmc.BTcurve:
-                            if aw.qmc.smooth_curves_on_recording:
-                                aw.qmc.l_temp2.set_data(sample_ctimex2, sample_stemp2)
-                            else:
-                                aw.qmc.l_temp2.set_data(sample_ctimex2, sample_ctemp2)
+                            aw.qmc.l_temp2.set_data(sample_ctimex2, sample_ctemp2)
 
                     #we need a minimum of two readings to calculate rate of change
 #                    if local_flagstart and length_of_qmc_timex > 1:
@@ -6928,9 +6894,10 @@ class tgraphcanvas(FigureCanvas):
             else: # smooth list on full length
                 fromIndex = 0
                 toIndex = len(a)
-            # we replace the error value -1 by numpy.nan to avoid strange smoothing artifacts
-            a = numpy.array([numpy.nan if x in [-1, None] else x for x in a],dtype='float64')[fromIndex:toIndex]
-            b = numpy.array([numpy.nan if x in [-1, None] else x for x in b],dtype='float64')[fromIndex:toIndex]
+            # we replace the error value -1  in the temperature array by numpy.nan to avoid strange smoothing artifacts
+            # no need to substitute anything in the time array!
+            a = numpy.array(a[fromIndex:toIndex], dtype='float64')
+            b = numpy.array([numpy.nan if x in [-1, None] else x for x in b[fromIndex:toIndex]],dtype='float64')
             # 2. re-sample
             if re_sample:
                 if a_lin is None or len(a_lin) != len(a):
@@ -7704,12 +7671,12 @@ class tgraphcanvas(FigureCanvas):
             temp2_nogaps = fill_gaps(self.resizeList(self.temp2,len(self.timex)))
 
             if smooth or len(self.stemp1) != len(self.timex):
-                if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon: # we don't smooth, but remove the dropouts
+                if self.flagon: # we don't smooth, but remove the dropouts
                     self.stemp1 = temp1_nogaps
                 else:
                     self.stemp1 = self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
             if smooth or len(self.stemp2) != len(self.timex):
-                if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon:  # we don't smooth, but remove the dropouts
+                if self.flagon:  # we don't smooth, but remove the dropouts
                     self.stemp2 = temp2_nogaps
                 else:
                     self.stemp2 = self.smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
@@ -9325,7 +9292,7 @@ class tgraphcanvas(FigureCanvas):
                             timexi_lin = None
                         try:
                             if aw.extraCurveVisibility1[i]:
-                                if (not aw.qmc.flagon or aw.qmc.smooth_curves_on_recording) and (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
+                                if not aw.qmc.flagon and (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
                                     self.extrastemp1[i] = self.smooth_list(self.extratimex[i],fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
                                 else: # we don't smooth, but remove the dropouts
                                     self.extrastemp1[i] = fill_gaps(self.extratemp1[i])
@@ -9352,7 +9319,7 @@ class tgraphcanvas(FigureCanvas):
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " redraw() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                         try:
                             if aw.extraCurveVisibility2[i]:
-                                if (not aw.qmc.flagon or aw.qmc.smooth_curves_on_recording) and (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
+                                if not aw.qmc.flagon and (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
                                     self.extrastemp2[i] = self.smooth_list(self.extratimex[i],fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
                                 else:
                                     self.extrastemp2[i] = fill_gaps(self.extratemp2[i])
