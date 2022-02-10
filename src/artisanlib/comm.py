@@ -1296,25 +1296,25 @@ class serialport():
 
     def ARC_BTET(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
-        t2,t1 = self.ARDUINOTC4temperature("1200")
-        return tx,t2,t1
+        t2,t1 = self.ARDUINOTC4temperature("3400") # t1 = chan4 (ET/Drum); t2 = chan3 (BT)
+        return tx,t1,t2 # tx, ET, BT
     
     def ARC_METIT(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
         self.SP = self.aw.ser.SP # we link to the serial port object of the main device
-        t2,t1 = self.ARDUINOTC4temperature("3400")
-        return tx,t2,t1
+        t1,t2 = self.ARDUINOTC4temperature("1200") # t1 = chan1 (MET/Exhaust); t2 = chan2 (IT)
+        return tx,t2,t1 # tx, Extra2 (IT), Extra1 (MET)
     
     def HB_BTET(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
-        t2,t1 = self.ARDUINOTC4temperature("1300")
-        return tx,t2,t1
+        t2,t1 = self.ARDUINOTC4temperature("1300") # t2 = chan1 (Inlet); t1 = chan3 (BT)
+        return tx,t2,t1 # tx, ET, BT
     
     def HB_DTIT(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
         self.SP = self.aw.ser.SP # we link to the serial port object of the main device
-        t2,t1 = self.ARDUINOTC4temperature("2400")
-        return tx,t2,t1
+        t2,t1 = self.ARDUINOTC4temperature("2400")  # t2 = Extra2 = chan2 (Exhaust/MET); t1 = Extra1 = chan4 (ET/Drum)
+        return tx,t2,t1 # tx, Extra2, Extra1
 
     def HB_AT(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
@@ -5594,6 +5594,12 @@ class serialport():
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
                     if (not len(result) == 0 and not result.startswith("#")):
                         raise Exception(QApplication.translate("Error Message","Arduino could not set channels"))
+
+
+                    if self.aw.seriallogflag:
+                        settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                        self.aw.addserial("ArduinoTC4: " + settings + " || Tx = " + str(command) + " || Rx = " + str(result))
+                        
                     if result.startswith("#") and chan is None:
                         #OK. NOW SET UNITS
                         self.SP.reset_input_buffer()

@@ -19972,7 +19972,7 @@ class ApplicationWindow(QMainWindow):
                         QApplication.translate("Message", "Network name or IP address"),text=self.ws.host) #"127.0.0.1"
                     if res:
                         self.ws.host = host
-                elif self.qmc.device in [0,9,19,53,101,115] or (self.qmc.device == 29 and self.modbus.type in [0,1,2]): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial
+                elif self.qmc.device in [0,9,19,53,101,115,126] or (self.qmc.device == 29 and self.modbus.type in [0,1,2]): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
                     import serial.tools.list_ports
                     comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
                     if platf == 'Darwin':
@@ -25013,9 +25013,9 @@ class ApplicationWindow(QMainWindow):
     def togglePlabackEvents(self):
         self.qmc.backgroundPlaybackEvents = not self.qmc.backgroundPlaybackEvents
         if self.qmc.backgroundPlaybackEvents:
-            self.sendmessage(QApplication.translate("Message","playback on"))
+            self.sendmessage(QApplication.translate("ComboBox","Playback ON"))
         else:
-            self.sendmessage(QApplication.translate("Message","playback off"))
+            self.sendmessage(QApplication.translate("ComboBox","Playback OFF"))
         if self.qmc.l_subtitle is not None:
             if self.qmc.backgroundprofile and self.qmc.backgroundPlaybackEvents:
                 self.qmc.l_subtitle.set_color(self.qmc.palette["title_focus"])
