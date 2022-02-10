@@ -15,12 +15,11 @@ sidebar:
 * __Connection:__ USB
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT), inlet temperature (IT) and drum temperature (DT) as well as ambient temperature
 
-**Watch out!**
-The communication via USB requires to install the serial driver
-
-* Standard (M6, L2, L6): [CP210x VCP from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
-* Model S (M6-S, L2-S, L6-S): CH34x
-   - Windows: [http://www.wch.cn/download/CH341SER_EXE.html](http://www.wch.cn/download/CH341SER_EXE.html)
-   - macOS: [http://www.wch.cn/downloads/file/178.html](http://www.wch.cn/downloads/file/178.html)
-   - Linux: [http://www.wch.cn/download/CH341SER_LINUX_ZIP.html](http://www.wch.cn/download/CH341SER_LINUX_ZIP.html)
+> **Watch out!**
+> The communication via USB requires to install the serial driver   
+> * Standard (M6, L2, L6): [CP210x VCP from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
+> * Model S (M6-S, L2-S, L6-S): CH34x
+>    - Windows: [http://www.wch.cn/download/CH341SER_EXE.html](http://www.wch.cn/download/CH341SER_EXE.html)
+>   - macOS: [http://www.wch.cn/downloads/file/178.html](http://www.wch.cn/downloads/file/178.html)
+>   - Linux: [http://www.wch.cn/download/CH341SER_LINUX_ZIP.html](http://www.wch.cn/download/CH341SER_LINUX_ZIP.html)
 {: .notice--primary}
