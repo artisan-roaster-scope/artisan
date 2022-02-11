@@ -5579,8 +5579,8 @@ class serialport():
                                     vals.pop(vals.index(self.arduinoETChannel))
                                 if self.arduinoBTChannel and self.arduinoBTChannel != "None" and self.arduinoBTChannel in vals:
                                     vals.pop(vals.index(self.arduinoBTChannel))
-                            except Exception as e: # pylint: disable=broad-except
-                                _log.exception(e)
+                            except Exception: # pylint: disable=broad-except
+                                pass
                             command = "CHAN;" + et_channel + bt_channel + vals[0] + vals[1]
                         else:
                         #no extra device +ArduinoTC4_XX present. reads ambient T, ET, BT
@@ -5593,13 +5593,15 @@ class serialport():
                     libtime.sleep(.1)
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
                     if (not len(result) == 0 and not result.startswith("#")):
-                        raise Exception(QApplication.translate("Error Message","Arduino could not set channels"))
-
-
+                        raise Exception(QApplication.translate("Error Message","Arduino could not set channels",None))
+                        
                     if self.aw.seriallogflag:
                         settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                         self.aw.addserial("ArduinoTC4: " + settings + " || Tx = " + str(command) + " || Rx = " + str(result))
-                        
+                    
+                    _log.debug("command: %s",command)
+                    _log.debug("result: %s",result)
+                    
                     if result.startswith("#") and chan is None:
                         #OK. NOW SET UNITS
                         self.SP.reset_input_buffer()
@@ -5610,7 +5612,7 @@ class serialport():
                         libtime.sleep(.1)
                         result = self.SP.readline().decode('utf-8')[:-2]
                         if (not len(result) == 0 and not result.startswith("#")):
-                            raise Exception(QApplication.translate("Error Message","Arduino could not set temperature unit"))
+                            raise Exception(QApplication.translate("Error Message","Arduino could not set temperature unit",None))
                         #OK. NOW SET FILTER
                         self.SP.reset_input_buffer()
                         self.SP.reset_output_buffer()
@@ -5619,10 +5621,10 @@ class serialport():
                         self.SP.write(str2cmd(command))
                         result = self.SP.readline().decode('utf-8')[:-2]
                         if (not len(result) == 0 and not result.startswith("#")):
-                            raise Exception(QApplication.translate("Error Message","Arduino could not set filters"))
+                            raise Exception(QApplication.translate("Error Message","Arduino could not set filters",None))
                         ### EVERYTHING OK  ###
                         self.ArduinoIsInitialized = 1
-                        self.aw.sendmessage(QApplication.translate("Message","TC4 initialized"))
+                        self.aw.sendmessage(QApplication.translate("Message","TC4 initialized",None))
                 #READ TEMPERATURE
                 command = "READ\n"  #Read command.
                 self.SP.reset_input_buffer()
@@ -5632,6 +5634,8 @@ class serialport():
                 libtime.sleep(.1)
                 rl = self.SP.readline().decode('utf-8', 'ignore')[:-2]
                 res = rl.rsplit(',')
+                _log.debug("command: %s",command)
+                _log.debug("res: %s",res)
                 #response: list ["t0","t1","t2"]  with t0 = internal temp; t1 = ET; t2 = BT on "CHAN;1200" 
                 #response: list ["t0","t1","t2","t3","t4"]  with t0 = internal temp; t1 = ET; t2 = BT, t3 = chan3, t4 = chan4 on "CHAN;1234" if ArduinoTC4_34 is configured
                 # after PID_ON: + [,"Heater", "Fan", "SV"]
@@ -5640,47 +5644,41 @@ class serialport():
                 else:
                     try:
                         t1 = float(res[1])
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
+                    except Exception: # pylint: disable=broad-except
                         t1 = -1
                 if self.arduinoBTChannel == "None":
                     t2 = -1
                 else:
                     try:
                         t2 = float(res[2])
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
+                    except Exception: # pylint: disable=broad-except
                         t2 = -1
                 #if extra device +ArduinoTC4_34
-                if 28 in self.aw.qmc.extradevices and chan is None:
+                if chan is None and 28 in self.aw.qmc.extradevices:
                     #set the other values to extra temp variables
                     try:
                         self.aw.qmc.extraArduinoT1 = float(res[3])
                         self.aw.qmc.extraArduinoT2 = float(res[4])
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
+                    except Exception: # pylint: disable=broad-except
                         self.aw.qmc.extraArduinoT1 = 0
                         self.aw.qmc.extraArduinoT2 = 0
                     if 32 in self.aw.qmc.extradevices: # +ArduinoTC4_56
                         try:
                             self.aw.qmc.extraArduinoT3 = float(res[5])
                             self.aw.qmc.extraArduinoT4 = float(res[6])
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
+                        except Exception: # pylint: disable=broad-except
                             self.aw.qmc.extraArduinoT3 = 0
                             self.aw.qmc.extraArduinoT4 = 0
                     if 44 in self.aw.qmc.extradevices: # +ArduinoTC4_78
                         # report SV as extraArduinoT5
                         try:
                             self.aw.qmc.extraArduinoT5 = float(res[7])
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
+                        except Exception: # pylint: disable=broad-except
                             self.aw.qmc.extraArduinoT5 = 0
                         # report Ambient Temperature as extraArduinoT6
                         try:
                             self.aw.qmc.extraArduinoT6 = float(res[0])
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
+                        except Exception: # pylint: disable=broad-except
                             self.aw.qmc.extraArduinoT6 = 0
                 else:
                     self.aw.qmc.extraArduinoT1 = -1.
@@ -5689,25 +5687,22 @@ class serialport():
                         try:
                             self.aw.qmc.extraArduinoT3 = float(res[3])
                             self.aw.qmc.extraArduinoT4 = float(res[4])
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
+                        except Exception: # pylint: disable=broad-except
                             self.aw.qmc.extraArduinoT3 = 0
                             self.aw.qmc.extraArduinoT4 = 0
                     else:
                         self.aw.qmc.extraArduinoT3 = -1.
                         self.aw.qmc.extraArduinoT4 = -1.
-                    if 44 in self.aw.qmc.extradevices or 117 in self.aw.qmc.extradevices or 128 in self.aw.qmc.extradevices: # +ArduinoTC4_78 or +HB AT or +ARC AT
+                    if 44 in self.aw.qmc.extradevices or 117 in self.aw.qmc.extradevices: # +ArduinoTC4_78 or +HB AT
                         # report SV as extraArduinoT5
                         try:
                             self.aw.qmc.extraArduinoT5 = float(res[5])
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
+                        except Exception: # pylint: disable=broad-except
                             self.aw.qmc.extraArduinoT5 = 0
                         # report Ambient Temperature as extraArduinoT6
                         try:
                             self.aw.qmc.extraArduinoT6 = float(res[0])
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
+                        except Exception: # pylint: disable=broad-except
                             self.aw.qmc.extraArduinoT6 = 0
                 # overwrite temps by AT internal Ambient Temperature
                 if self.aw.ser.arduinoATChannel != "None":
@@ -5739,7 +5734,7 @@ class serialport():
             _log.exception(e)
             # self.closeport() # closing the port on error is to serve as the Arduino needs time to restart and has to be reinitialized!
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " ser.ARDUINOTC4temperature(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " ser.ARDUINOTC4temperature(): {0}").format(str(e)),exc_tb.tb_lineno)
             return -1.,-1.
         finally:
             if self.COMsemaphore.available() < 1:
@@ -5747,6 +5742,213 @@ class serialport():
             if self.aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 self.aw.addserial("ArduinoTC4: " + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.2f, %.2f, %.2f, %.2f, %.2f, %.2f"%(t1,t2,self.aw.qmc.extraArduinoT1,self.aw.qmc.extraArduinoT2,self.aw.qmc.extraArduinoT3,self.aw.qmc.extraArduinoT4))
+
+#    # if chan is given, it is expected to be a string <s> send along the "CHAN;<s>" command on each call 
+#    # (not sending the unit or filter commands afterwards) and overwriting the self.arduinoETChannel and self.arduinoBTChannel settings
+#    def ARDUINOTC4temperature(self,chan=None):
+#        try:
+#            #### lock shared resources #####
+#            self.COMsemaphore.acquire(1)
+#            command = ""
+#            res = ""
+#            result = ""
+#            t1,t2 = 0.,0.
+#            if not self.SP.isOpen():
+#                self.openport()
+#                #libtime.sleep(1)
+#                #Reinitialize Arduino in case communication was interupted
+#                self.ArduinoIsInitialized = 0
+#            if self.SP.isOpen():
+#                #INITIALIZE (ONLY ONCE)
+#                if not self.ArduinoIsInitialized or chan is not None:
+#                    self.SP.reset_input_buffer()
+#                    self.SP.reset_output_buffer()
+#                    #build initialization command
+#                    if chan is None:
+#                        et_channel = self.arduinoETChannel
+#                        if et_channel == "None":
+#                            et_channel = "0"
+#                        bt_channel = self.arduinoBTChannel
+#                        if bt_channel == "None":
+#                            bt_channel = "0"
+#                        #If extra device +ArduinoTC4_XX present. read all 4 Ts
+#                        if 28 in self.aw.qmc.extradevices: # +ArduinoTC4_34
+#                            vals = ["1","2","3","4"]
+#                            try:
+#                                if self.arduinoETChannel and self.arduinoETChannel != "None" and self.arduinoETChannel in vals:
+#                                    vals.pop(vals.index(self.arduinoETChannel))
+#                                if self.arduinoBTChannel and self.arduinoBTChannel != "None" and self.arduinoBTChannel in vals:
+#                                    vals.pop(vals.index(self.arduinoBTChannel))
+#                            except Exception as e: # pylint: disable=broad-except
+#                                _log.exception(e)
+#                            command = "CHAN;" + et_channel + bt_channel + vals[0] + vals[1]
+#                        else:
+#                        #no extra device +ArduinoTC4_XX present. reads ambient T, ET, BT
+#                            command = "CHAN;" + et_channel + bt_channel + "00"
+#                    else:
+#                        command = "CHAN;{}".format(chan)
+#                    #libtime.sleep(0.3)
+#                    self.SP.write(str2cmd(command + "\n"))       #send command
+#                    self.SP.flush()
+#                    libtime.sleep(.1)
+#                    result = self.SP.readline().decode('utf-8')[:-2]  #read
+#                    if (not len(result) == 0 and not result.startswith("#")):
+#                        raise Exception(QApplication.translate("Error Message","Arduino could not set channels"))
+#
+#
+#                    if self.aw.seriallogflag:
+#                        settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+#                        self.aw.addserial("ArduinoTC4: " + settings + " || Tx = " + str(command) + " || Rx = " + str(result))
+#                        
+#                    if result.startswith("#") and chan is None:
+#                        #OK. NOW SET UNITS
+#                        self.SP.reset_input_buffer()
+#                        self.SP.reset_output_buffer()
+#                        command = "UNITS;" + self.aw.qmc.mode + "\n"   #Set units
+#                        self.SP.write(str2cmd(command))
+#                        self.SP.flush()
+#                        libtime.sleep(.1)
+#                        result = self.SP.readline().decode('utf-8')[:-2]
+#                        if (not len(result) == 0 and not result.startswith("#")):
+#                            raise Exception(QApplication.translate("Error Message","Arduino could not set temperature unit"))
+#                        #OK. NOW SET FILTER
+#                        self.SP.reset_input_buffer()
+#                        self.SP.reset_output_buffer()
+#                        filt =  ",".join(map(str,self.aw.ser.ArduinoFILT))
+#                        command = "FILT;" + filt + "\n"   #Set filters
+#                        self.SP.write(str2cmd(command))
+#                        result = self.SP.readline().decode('utf-8')[:-2]
+#                        if (not len(result) == 0 and not result.startswith("#")):
+#                            raise Exception(QApplication.translate("Error Message","Arduino could not set filters"))
+#                        ### EVERYTHING OK  ###
+#                        self.ArduinoIsInitialized = 1
+#                        self.aw.sendmessage(QApplication.translate("Message","TC4 initialized"))
+#                #READ TEMPERATURE
+#                command = "READ\n"  #Read command.
+#                self.SP.reset_input_buffer()
+#                self.SP.reset_output_buffer()
+#                self.SP.write(str2cmd(command))
+#                self.SP.flush()
+#                libtime.sleep(.1)
+#                rl = self.SP.readline().decode('utf-8', 'ignore')[:-2]
+#                res = rl.rsplit(',')
+#                print(len(res),res)
+#                #response: list ["t0","t1","t2"]  with t0 = internal temp; t1 = ET; t2 = BT on "CHAN;1200" 
+#                #response: list ["t0","t1","t2","t3","t4"]  with t0 = internal temp; t1 = ET; t2 = BT, t3 = chan3, t4 = chan4 on "CHAN;1234" if ArduinoTC4_34 is configured
+#                # after PID_ON: + [,"Heater", "Fan", "SV"]
+#                if chan is None:
+#                    if self.arduinoETChannel == "None":
+#                        t1 = -1
+#                    else:
+#                        try:
+#                            t1 = float(res[1])
+#                        except Exception as e: # pylint: disable=broad-except
+#                            _log.exception(e)
+#                            t1 = -1
+#                    if self.arduinoBTChannel == "None":
+#                        t2 = -1
+#                    else:
+#                        try:
+#                            t2 = float(res[2])
+#                        except Exception as e: # pylint: disable=broad-except
+#                            _log.exception(e)
+#                            t2 = -1
+#                #if extra device +ArduinoTC4_34
+#                if chan is None and 28 in self.aw.qmc.extradevices:
+#                    #set the other values to extra temp variables
+#                    try:
+#                        self.aw.qmc.extraArduinoT1 = float(res[3])
+#                        self.aw.qmc.extraArduinoT2 = float(res[4])
+#                    except Exception as e: # pylint: disable=broad-except
+#                        _log.exception(e)
+#                        self.aw.qmc.extraArduinoT1 = 0
+#                        self.aw.qmc.extraArduinoT2 = 0
+#                    if 32 in self.aw.qmc.extradevices: # +ArduinoTC4_56
+#                        try:
+#                            self.aw.qmc.extraArduinoT3 = float(res[5])
+#                            self.aw.qmc.extraArduinoT4 = float(res[6])
+#                        except Exception as e: # pylint: disable=broad-except
+#                            _log.exception(e)
+#                            self.aw.qmc.extraArduinoT3 = 0
+#                            self.aw.qmc.extraArduinoT4 = 0
+#                    if 44 in self.aw.qmc.extradevices: # +ArduinoTC4_78
+#                        # report SV as extraArduinoT5
+#                        try:
+#                            self.aw.qmc.extraArduinoT5 = float(res[7])
+#                        except Exception as e: # pylint: disable=broad-except
+#                            _log.exception(e)
+#                            self.aw.qmc.extraArduinoT5 = 0
+#                        # report Ambient Temperature as extraArduinoT6
+#                        try:
+#                            self.aw.qmc.extraArduinoT6 = float(res[0])
+#                        except Exception as e: # pylint: disable=broad-except
+#                            _log.exception(e)
+#                            self.aw.qmc.extraArduinoT6 = 0
+#                else:
+#                    self.aw.qmc.extraArduinoT1 = -1.
+#                    self.aw.qmc.extraArduinoT2 = -1.
+#                    if 32 in self.aw.qmc.extradevices: # +ArduinoTC4_56
+#                        try:
+#                            self.aw.qmc.extraArduinoT3 = float(res[3])
+#                            self.aw.qmc.extraArduinoT4 = float(res[4])
+#                        except Exception as e: # pylint: disable=broad-except
+#                            _log.exception(e)
+#                            self.aw.qmc.extraArduinoT3 = 0
+#                            self.aw.qmc.extraArduinoT4 = 0
+#                    else:
+#                        self.aw.qmc.extraArduinoT3 = -1.
+#                        self.aw.qmc.extraArduinoT4 = -1.
+#                    if 44 in self.aw.qmc.extradevices or 117 in self.aw.qmc.extradevices or 128 in self.aw.qmc.extradevices: # +ArduinoTC4_78 or +HB AT or +ARC AT
+#                        # report SV as extraArduinoT5
+#                        try:
+#                            self.aw.qmc.extraArduinoT5 = float(res[5])
+#                        except Exception as e: # pylint: disable=broad-except
+#                            _log.exception(e)
+#                            self.aw.qmc.extraArduinoT5 = 0
+#                        # report Ambient Temperature as extraArduinoT6
+#                        try:
+#                            self.aw.qmc.extraArduinoT6 = float(res[0])
+#                        except Exception as e: # pylint: disable=broad-except
+#                            _log.exception(e)
+#                            self.aw.qmc.extraArduinoT6 = 0
+#                # overwrite temps by AT internal Ambient Temperature
+#                if self.aw.ser.arduinoATChannel != "None":
+#                    if self.aw.ser.arduinoATChannel == "T1":
+#                        t1 = float(res[0])
+#                    elif self.aw.ser.arduinoATChannel == "T2":
+#                        t2 = float(res[0])
+#                    elif (28 in self.aw.qmc.extradevices or (32 in self.aw.qmc.extradevices and not 28 in self.aw.qmc.extradevices)) and self.aw.ser.arduinoATChannel == "T3":
+#                        self.aw.qmc.extraArduinoT1 = float(res[0])
+#                    elif (28 in self.aw.qmc.extradevices or (32 in self.aw.qmc.extradevices and not 28 in self.aw.qmc.extradevices)) and self.aw.ser.arduinoATChannel == "T4":
+#                        self.aw.qmc.extraArduinoT2 = float(res[0])
+#                    elif (28 in self.aw.qmc.extradevices and 32 in self.aw.qmc.extradevices) and self.aw.ser.arduinoATChannel == "T5":
+#                        self.aw.qmc.extraArduinoT3 = float(res[0])
+#                    elif (28 in self.aw.qmc.extradevices and 32 in self.aw.qmc.extradevices) and self.aw.ser.arduinoATChannel == "T6":
+#                        self.aw.qmc.extraArduinoT4 = float(res[0])
+#                if chan is not None and len(res) == 4:
+#                    if res[3] == "F" and self.aw.qmc.mode != "F":
+#                        # data is given in F, we convert it back to C
+#                        t1 = fromFtoC(t1)
+#                        t2 = fromFtoC(t2)
+#                        self.aw.qmc.extraArduinoT6 = fromFtoC(self.aw.qmc.extraArduinoT6)
+#                    elif res[3] != "F" and self.aw.qmc.mode == "F":
+#                        # data is given in C, we convert it back to F
+#                        t1 = fromCtoF(t1)
+#                        t2 = fromCtoF(t2)
+#                        self.aw.qmc.extraArduinoT6 = fromCtoF(self.aw.qmc.extraArduinoT6)
+#            return t1, t2
+#        except Exception as e: # pylint: disable=broad-except
+#            _log.exception(e)
+#            # self.closeport() # closing the port on error is to serve as the Arduino needs time to restart and has to be reinitialized!
+#            _, _, exc_tb = sys.exc_info()
+#            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " ser.ARDUINOTC4temperature(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+#            return -1.,-1.
+#        finally:
+#            if self.COMsemaphore.available() < 1:
+#                self.COMsemaphore.release(1)
+#            if self.aw.seriallogflag:
+#                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+#                self.aw.addserial("ArduinoTC4: " + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.2f, %.2f, %.2f, %.2f, %.2f, %.2f"%(t1,t2,self.aw.qmc.extraArduinoT1,self.aw.qmc.extraArduinoT2,self.aw.qmc.extraArduinoT3,self.aw.qmc.extraArduinoT4))
 
 
     @staticmethod

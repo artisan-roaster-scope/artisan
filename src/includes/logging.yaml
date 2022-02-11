@@ -15,8 +15,8 @@ handlers:
     class: logging.handlers.RotatingFileHandler
     level: INFO
     delay: true
-    maxBytes: 500000
-    backupCount: 1
+    maxBytes: 800000
+    backupCount: 2
     encoding: "utf-8"
     formatter: advanced
 loggers:

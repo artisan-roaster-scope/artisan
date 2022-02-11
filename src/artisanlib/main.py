@@ -3614,11 +3614,11 @@ class tgraphcanvas(FigureCanvas):
                 return temp
             # try to improve a previously corrected reading timex/temp[-1] based on the current reading time/temp (just in this case the actual reading is not a drop)
             if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
-                if len(tempx) > 3 and tempx[-1] == tempx[-2] == tempx[-3] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2] and same for rthe one before
+                if len(tempx) > 2 and tempx[-1] == tempx[-2] == tempx[-3] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2] and same for the one before
                     delta = (tempx[-3] - temp) / 3.0
                     tempx[-1] = tempx[-3] - 2*delta
                     tempx[-2] = tempx[-3] - delta
-                elif len(tempx) > 2 and tempx[-1] == tempx[-2] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2]
+                elif len(tempx) > 1 and tempx[-1] == tempx[-2] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2]
                     tempx[-1] = (tempx[-2] + temp) / 2.0
             return temp
         except Exception as e: # pylint: disable=broad-except
@@ -16906,9 +16906,9 @@ class ApplicationWindow(QMainWindow):
         importK204Action.triggered.connect(self.importK204)
         self.importMenu.addAction(importK204Action)
 
-        importRubaseAction = QAction("Rubase CSV...", self)
-        importRubaseAction.triggered.connect(self.importRubase)
-        self.importMenu.addAction(importRubaseAction)
+        importRubasseAction = QAction("Rubasse CSV...", self)
+        importRubasseAction.triggered.connect(self.importRubasse)
+        self.importMenu.addAction(importRubasseAction)
 
         importPetronciniAction = QAction("Petroncini CSV...", self)
         importPetronciniAction.triggered.connect(self.importPetroncini)
@@ -37205,9 +37205,9 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def importRubase(self,_=False):
-        from artisanlib.rubase import extractProfileRubaseCSV
-        self.importExternal(extractProfileRubaseCSV,QApplication.translate("Message","Import Rubase CSV"),"*.csv")
+    def importRubasse(self,_=False):
+        from artisanlib.rubasse import extractProfileRubasseCSV
+        self.importExternal(extractProfileRubasseCSV,QApplication.translate("Message","Import Rubasse CSV"),"*.csv")
 
     @pyqtSlot()
     @pyqtSlot(bool)

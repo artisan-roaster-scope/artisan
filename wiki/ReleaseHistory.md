@@ -87,7 +87,7 @@ v2.4.4 (December 14, 2020)
 * New Features
   - adds machine setups for the PLC equipped machines from [Nordic](https://artisan-scope.org/machines/nordic/), [Fabrica Roasters](https://artisan-scope.org/machines/fabrica/) and [MCR Series in C](https://artisan-scope.org/machines/mcr/)
   - adds support for [Phidget HUM1001](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=1179)
-  - adds [Rubase](https://rubasseroasters.com/) importer
+  - adds [Rubasse](https://rubasseroasters.com/) importer
   - adds [Aillio](https://aillio.com/) RoastWorld importer
   - adds MODBUS BCD Integer reading
   - adds flag to toggle polyfit RoR calculation
