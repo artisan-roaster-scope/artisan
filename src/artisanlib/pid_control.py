@@ -1305,7 +1305,7 @@ class PIDcontrol():
     def pidOn(self):
         if self.aw.qmc.flagon:
             if not self.pidActive:
-                self.aw.sendmessage(QApplication.translate("Message","PID ON"))
+                self.aw.sendmessage(QApplication.translate("StatusBar","PID ON"))
             self.pidModeInit()
                     
             self.aw.qmc.temporayslider_force_move = True

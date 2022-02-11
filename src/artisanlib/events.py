@@ -195,7 +195,7 @@ class EventsDlg(ArtisanResizeablDialog):
         C7Widget.setLayout(tab7Layout)
 
         ## TAB 1
-        self.eventsbuttonflag = QCheckBox(QApplication.translate("CheckBox","Button"))
+        self.eventsbuttonflag = QCheckBox(QApplication.translate("ComboBox","Event Button"))
         self.eventsbuttonflag.setChecked(bool(self.aw.eventsbuttonflag))
         self.eventsbuttonflag.stateChanged.connect(self.eventsbuttonflagChanged)
         self.annotationsflagbox = QCheckBox(QApplication.translate("CheckBox","Annotations"))

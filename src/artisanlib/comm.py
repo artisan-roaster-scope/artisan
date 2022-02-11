@@ -4868,7 +4868,7 @@ class serialport():
                 self.PhidgetIOlastvalues[i] = res
                 return res
             if API == "digital":
-                v = self.PhidgetIOvalues[i] = int(self.PhidgetIO[idx].getState())
+                v = int(self.PhidgetIO[idx].getState())
             elif API == "current":
                 v = self.PhidgetIO[idx].getCurrent() * self.aw.qmc.phidget1018valueFactor
             elif API == "frequency":

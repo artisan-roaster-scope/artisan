@@ -17436,7 +17436,7 @@ class ApplicationWindow(QMainWindow):
         self.readingsAction.setChecked(False)
         self.viewMenu.addAction(self.readingsAction)
 
-        self.eventsEditorAction = QAction(QApplication.translate("Menu", "Events"), self)
+        self.eventsEditorAction = QAction(QApplication.translate("Menu", "Events Editor"), self)
         self.eventsEditorAction.triggered.connect(self.toggle_minieventline)
         self.eventsEditorAction.setCheckable(True)
         self.eventsEditorAction.setChecked(False)
@@ -18191,6 +18191,7 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDframe1[i].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             self.extraLCDframe1[i].customContextMenuRequested.connect(self.setTare_slot)
             self.extraLCDframe1[i].left_clicked.connect(self.toggleExtraCurve1)
+            self.extraLCDframe1[i].setVisible(False)
             self.extraLCDframe2[i].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             self.extraLCDframe2[i].customContextMenuRequested.connect(self.setTare_slot)
             self.extraLCDframe2[i].left_clicked.connect(self.toggleExtraCurve2)
@@ -19388,15 +19389,15 @@ class ApplicationWindow(QMainWindow):
     def setTare_slot(self,_):
         sender = self.sender()
         try:
-            idx = self.extraLCD1.index(sender)
+            idx = self.extraLCDframe1.index(sender)
             self.setTare(2+idx*2)
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception: # pylint: disable=broad-except
+            pass
         try:
-            idx = self.extraLCD2.index(sender)
+            idx = self.extraLCDframe2.index(sender)
             self.setTare(2+idx*2 + 1)
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception: # pylint: disable=broad-except
+            pass
 
     # set the tare values per channel (0: ET, 1:BT, 2:E1c0, 3:E1c1, 4:E1c0, 5:E1c1,...)
     def setTare(self,n):
