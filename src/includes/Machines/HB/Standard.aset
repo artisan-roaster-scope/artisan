@@ -3,7 +3,7 @@ AmbientTempSource=5
 Delay=4000
 Oversampling=false
 dropDuplicates=true
-dropDuplicatesLimit=0.3
+dropDuplicatesLimit=0.1
 roastertype_setup=HB Standard
 
 [Device]

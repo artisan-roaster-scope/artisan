@@ -5,6 +5,7 @@ Oversampling=false
 dropDuplicates=true
 dropDuplicatesLimit=0.1
 roastertype_setup=Arc 800
+ETfunction=
 
 [Device]
 id=115

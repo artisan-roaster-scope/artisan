@@ -42,7 +42,7 @@ class PID():
     __slots__ = [ 'pidSemaphore', 'outMin', 'outMax', 'dutySteps', 'dutyMin', 'dutyMax', 'control', 'Kp', 
             'Ki', 'Kd', 'pOnE', 'Pterm', 'errSum', 'Iterm', 'lastError', 'lastInput', 'lastOutput', 'lastTime',
             'lastDerr', 'target', 'active', 'derivative_on_error', 'output_smoothing_factor', 'output_decay_weights',
-            'previous_outputs', 'input_smoothing_factor', 'input_decay_weights', 'previous_inputs' ]
+            'previous_outputs', 'input_smoothing_factor', 'input_decay_weights', 'previous_inputs', 'force_duty', 'iterations_since_duty' ]
 
     def __init__(self, control=lambda _: _, p=2.0, i=0.03, d=0.0):
         self.pidSemaphore = QSemaphore(1)
@@ -77,6 +77,8 @@ class PID():
         self.input_smoothing_factor = 0 # off if 0
         self.input_decay_weights = None
         self.previous_inputs = []
+        self.force_duty = 3 # at least every n update cycles a new duty value is send, even if its duplicating a previous duty (within the duty step)
+        self.iterations_since_duty = 0 # reset once a duty is send; incremented on every update cycle
 
     def _smooth_output(self,output):
         # create or update smoothing decay weights
@@ -197,10 +199,12 @@ class PID():
                         output = self.outMin
                     
                     int_output = min(self.dutyMax,max(self.dutyMin,int(round(output))))
-                    if self.lastOutput == None or int_output >= self.lastOutput + self.dutySteps or int_output <= self.lastOutput - self.dutySteps:
+                    if self.lastOutput == None or self.iterations_since_duty >= self.force_duty or int_output >= self.lastOutput + self.dutySteps or int_output <= self.lastOutput - self.dutySteps:
                         if self.active:
                             self.control(int_output)
-                        self.lastOutput = output # kept to initialize Iterm on reactivating the PID   
+                            self.iterations_since_duty = 0
+                        self.lastOutput = output # kept to initialize Iterm on reactivating the PID
+                    self.iterations_since_duty += 1
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         finally:

@@ -3350,7 +3350,8 @@ class tgraphcanvas(FigureCanvas):
                 self.specialeventstype.append(dlg.type) # default: "--"
                 self.specialeventsStrings.append(dlg.description)
                 self.specialeventsvalue.append(dlg.value)
-                aw.qmc.fileDirtySignal.emit()
+                aw.orderEvents()
+                self.fileDirtySignal.emit()
                 self.redraw(recomputeAllDeltas=(action.key[0] in [0,6])) # on moving CHARGE or DROP, we have to recompute the Deltas
             try:
                 dlg.dialogbuttons.accepted.disconnect()
@@ -11042,6 +11043,7 @@ class tgraphcanvas(FigureCanvas):
             aw.update_extraeventbuttons_visibility()
             aw.updateExtraButtonsVisibility()
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
+            aw.update_minieventline_visibility()
             aw.pidcontrol.activateONOFFeasySV(aw.pidcontrol.svButtons and aw.buttonONOFF.isVisible())
             aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider and aw.buttonONOFF.isVisible())
             self.block_update = False # unblock the updating of the bitblit canvas
@@ -11124,6 +11126,7 @@ class tgraphcanvas(FigureCanvas):
             if not aw.HottopControlActive:
                 aw.hideExtraButtons(changeDefault=False)
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
+            aw.update_minieventline_visibility()
             aw.updateExtraButtonsVisibility()
             aw.pidcontrol.activateONOFFeasySV(False)
             self.StopAsyncSamplingAction()
@@ -11528,6 +11531,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.buttonCHARGE.startAnimation()
 
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
+            aw.update_minieventline_visibility()
             aw.updateReadingsLCDsVisibility() # update visiblity of reading LCDs based on the user preference
             if aw.qmc.phasesLCDflag:
                 aw.phasesLCDs.show()
@@ -12989,23 +12993,22 @@ class tgraphcanvas(FigureCanvas):
                         message = QApplication.translate("Message","Event # {0} recorded at BT = {1} Time = {2}").format(str(Nevents+1),temp,timed)
                         aw.sendmessage(message)
                         #write label in mini recorder if flag checked
-                        if aw.minieventsflag:
-                            aw.eventlabel.setText(QApplication.translate("Label", "Event #<b>{0} </b>").format(Nevents+1))
-                            aw.eNumberSpinBox.blockSignals(True)
-                            try:
-                                aw.eNumberSpinBox.setValue(Nevents+1)
-                            except Exception: # pylint: disable=broad-except
-                                pass
-                            finally:
-                                aw.eNumberSpinBox.blockSignals(False)
-                            if aw.qmc.timeindex[0] > -1:
-                                timez = stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Nevents]]-aw.qmc.timex[aw.qmc.timeindex[0]])
-                            else:
-                                timez = stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Nevents]])
-                            aw.etimeline.setText(timez)
-                            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents])
-                            aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents]))
-                            aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+                        aw.eventlabel.setText(QApplication.translate("Label", "Event #<b>{0} </b>").format(Nevents+1))
+                        aw.eNumberSpinBox.blockSignals(True)
+                        try:
+                            aw.eNumberSpinBox.setValue(Nevents+1)
+                        except Exception: # pylint: disable=broad-except
+                            pass
+                        finally:
+                            aw.eNumberSpinBox.blockSignals(False)
+                        if aw.qmc.timeindex[0] > -1:
+                            timez = stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Nevents]]-aw.qmc.timex[aw.qmc.timeindex[0]])
+                        else:
+                            timez = stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Nevents]])
+                        aw.etimeline.setText(timez)
+                        aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents])
+                        aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents]))
+                        aw.lineEvent.setText(self.specialeventsStrings[Nevents])
             else:
                 aw.sendmessage(QApplication.translate("Message","Timer is OFF"))
         except Exception as e: # pylint: disable=broad-except
@@ -13043,11 +13046,10 @@ class tgraphcanvas(FigureCanvas):
                     message = QApplication.translate("Message","Computer Event # {0} recorded at BT = {1} Time = {2}").format(str(Nevents+1),temp,timed)
                     aw.sendmessage(message)
                     #write label in mini recorder if flag checked
-                    if aw.minieventsflag:
-                        aw.eNumberSpinBox.setValue(Nevents+1)
-                        aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                        aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
-                        aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+                    aw.eNumberSpinBox.setValue(Nevents+1)
+                    aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                    aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
+                    aw.lineEvent.setText(self.specialeventsStrings[Nevents])
                 #if Event show flag
                 if self.eventsshowflag:
                     index = self.specialevents[-1]
@@ -15356,7 +15358,7 @@ class tgraphcanvas(FigureCanvas):
                 self.fig.delaxes(self.ax2)
             except Exception: # pylint: disable=broad-except
                 pass
-        self.redraw(recomputeAllDeltas=False)
+        self.redraw(recomputeAllDeltas=False,forceRenewAxis=True)
 
     def connectWheel(self):
         self.wheelflag = True
@@ -16453,7 +16455,7 @@ class ApplicationWindow(QMainWindow):
         'WebLCDsAlerts', 'EventsDlg_activeTab', 'graphColorDlg_activeTab', 'PID_DlgControl_activeTab', 'CurveDlg_activeTab', 'editGraphDlg_activeTab',
         'backgroundDlg_activeTab', 'DeviceAssignmentDlg_activeTab', 'AlarmDlg_activeTab', 'resetqsettings', 'settingspath', 'wheelpath', 'profilepath',
         'userprofilepath', 'printer', 'main_widget', 'defaultdpi', 'dpi', 'qmc', 'HottopControlActive', 'AsyncSamplingAction', 'wheeldialog',
-        'simulator', 'simulatorpath', 'comparator', 'stack', 'eventsbuttonflag', 'minieventsflag', 'seriallogflag',
+        'simulator', 'simulatorpath', 'comparator', 'stack', 'eventsbuttonflag', 'minieventsflags', 'seriallogflag',
         'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'ws', 'scale', 'color', 'extraser', 'extracomport', 'extrabaudrate',
         'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
@@ -16669,7 +16671,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.setContentsMargins(0,0,0,0)
         #events config
         self.eventsbuttonflag = 0
-        self.minieventsflag = 0   #minieditor flag
+        self.minieventsflags = [0,0,0] # minieditor visibility per state OFF, ON, START
 
         #records serial comm (Help menu)
         self.seriallogflag = False
@@ -17433,6 +17435,12 @@ class ApplicationWindow(QMainWindow):
         self.readingsAction.setCheckable(True)
         self.readingsAction.setChecked(False)
         self.viewMenu.addAction(self.readingsAction)
+
+        self.eventsEditorAction = QAction(QApplication.translate("Menu", "Events"), self)
+        self.eventsEditorAction.triggered.connect(self.toggle_minieventline)
+        self.eventsEditorAction.setCheckable(True)
+        self.eventsEditorAction.setChecked(False)
+        self.viewMenu.addAction(self.eventsEditorAction)
 
         self.buttonsAction = QAction(QApplication.translate("Menu", "Buttons"), self)
         self.buttonsAction.triggered.connect(self.toggleExtraButtons)
@@ -18216,13 +18224,19 @@ class ApplicationWindow(QMainWindow):
         #### EVENT MINI EDITOR: View&Edits events without opening roast properties Dlg.
         self.eventlabel = QLabel(QApplication.translate("Label","Event #<b>0 </b>"))
         self.eventlabel.setIndent(5)
+        
         self.eNumberSpinBox = QSpinBox()
-
         self.eNumberSpinBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.eNumberSpinBox.setToolTip(QApplication.translate("Tooltip", "Number of events found"))
         self.eNumberSpinBox.setRange(0,99)
         self.eNumberSpinBox.valueChanged.connect(self.changeEventNumber)
         self.eNumberSpinBox.setMaximumWidth(40)
+        
+        self.minieventleft = QPushButton("<")
+        self.minieventleft.clicked.connect(self.decrEventNumber)
+        self.minieventright = QPushButton(">")
+        self.minieventright.clicked.connect(self.incrEventNumber)
+        
         self.lineEvent = QLineEdit()
         self.lineEvent.setMinimumWidth(200)
 
@@ -18432,6 +18446,9 @@ class ApplicationWindow(QMainWindow):
         EventsLayout.addWidget(self.valueEdit)
         EventsLayout.addSpacing(4)
         EventsLayout.addWidget(self.eNumberSpinBox)
+        EventsLayout.addSpacing(4)
+        EventsLayout.addWidget(self.minieventleft)
+        EventsLayout.addWidget(self.minieventright)
         EventsLayout.addSpacing(4)
         EventsLayout.addWidget(self.buttonminiEvent)
         self.EventsGroupLayout = QGroupBox()
@@ -20727,32 +20744,36 @@ class ApplicationWindow(QMainWindow):
         return res_last
 
     # order event table by time
-    @staticmethod
-    def orderEvents(lock=True):
+    def orderEvents(self, lock=True):
         try:
             #### lock shared resources #####
             if lock:
-                aw.qmc.profileDataSemaphore.acquire(1)
+                self.qmc.profileDataSemaphore.acquire(1)
             nevents = len(aw.qmc.specialevents)
             packed_events = []
             # pack
             for i in range(nevents):
                 packed_events.append(
-                    (aw.qmc.specialevents[i],
-                     aw.qmc.specialeventstype[i],
-                     aw.qmc.specialeventsStrings[i],
-                     aw.qmc.specialeventsvalue[i]))
+                    (self.qmc.specialevents[i],
+                     self.qmc.specialeventstype[i],
+                     self.qmc.specialeventsStrings[i],
+                     self.qmc.specialeventsvalue[i]))
             # sort
             packed_events.sort(key=lambda tup: tup[0])
             # unpack
             for i in range(nevents):
-                aw.qmc.specialevents[i] = packed_events[i][0]
-                aw.qmc.specialeventstype[i] = packed_events[i][1]
-                aw.qmc.specialeventsStrings[i] = packed_events[i][2]
-                aw.qmc.specialeventsvalue[i] = packed_events[i][3]
+                self.qmc.specialevents[i] = packed_events[i][0]
+                self.qmc.specialeventstype[i] = packed_events[i][1]
+                self.qmc.specialeventsStrings[i] = packed_events[i][2]
+                self.qmc.specialeventsvalue[i] = packed_events[i][3]
+            # we have to clear the event flag positions as those are now out of order
+            self.qmc.l_event_flags_dict = {}
+            self.qmc.l_event_flags_pos_dict = {}
+            # update minievent editor
+            self.changeEventNumber(0)
         finally:
-            if lock and aw.qmc.profileDataSemaphore.available() < 1:
-                aw.qmc.profileDataSemaphore.release(1)
+            if lock and self.qmc.profileDataSemaphore.available() < 1:
+                self.qmc.profileDataSemaphore.release(1)
 
 
     # if only_active then only the event types with quantifiers activated are grouped
@@ -24597,19 +24618,20 @@ class ApplicationWindow(QMainWindow):
 
     # update the visibility of the sliders based on the users preference for the current state
     def updateSlidersVisibility(self):
-        # update visibility (based on the app state)
-        if aw.qmc.flagstart:
-            visible = aw.eventslidersflags[2]
-        elif aw.qmc.flagon:
-            visible = aw.eventslidersflags[1]
-        else:
-            visible = aw.eventslidersflags[0]
-        if visible:
-            self.showSliders(False)
-        else:
-            self.hideSliders(False)
         if app.artisanviewerMode:
             self.hideSliders(True)
+        else:
+            # update visibility (based on the app state)
+            if aw.qmc.flagstart:
+                visible = aw.eventslidersflags[2]
+            elif aw.qmc.flagon:
+                visible = aw.eventslidersflags[1]
+            else:
+                visible = aw.eventslidersflags[0]
+            if visible:
+                self.showSliders(False)
+            else:
+                self.hideSliders(False)
 
     def hideSliders(self,changeDefault=True):
         focused_widget = QApplication.focusWidget()
@@ -24889,6 +24911,12 @@ class ApplicationWindow(QMainWindow):
         self.WindowconfigAction.setEnabled(True)
         self.colorsAction.setEnabled(True)
         self.themeMenu.setEnabled(True)
+        self.controlsAction.setEnabled(True)
+        self.readingsAction.setEnabled(True)
+        self.eventsEditorAction.setEnabled(True)
+        self.buttonsAction.setEnabled(True)
+        self.slidersAction.setEnabled(True)
+        
         if self.qmc.statssummary:
             self.savestatisticsAction.setEnabled(True)
         self.displayonlymenus()
@@ -24966,6 +24994,13 @@ class ApplicationWindow(QMainWindow):
         self.transformAction.setEnabled(False)
         self.temperatureMenu.setEnabled(False)
         # VIEW menu
+        if wheel:
+            self.controlsAction.setEnabled(False)
+        if wheel or designer:
+            self.readingsAction.setEnabled(False)
+            self.eventsEditorAction.setEnabled(False)
+            self.buttonsAction.setEnabled(False)
+            self.slidersAction.setEnabled(False)
         # HELP menu
         self.loadSettingsAction.setEnabled(False)
         self.openRecentSettingMenu.setEnabled(False)
@@ -24991,16 +25026,59 @@ class ApplicationWindow(QMainWindow):
             self.buttonsAction.setEnabled(False)
             self.slidersAction.setChecked(False)
             self.slidersAction.setEnabled(False)
+            self.eventsEditorAction.setChecked(False)
+            self.eventsEditorAction.setEnabled(False)
             self.lcdsAction.setEnabled(False)
             self.simulatorAction.setEnabled(False)
         else:
             return
 
     def update_minieventline_visibility(self):
-        if self.minieventsflag:
-            self.EventsGroupLayout.setVisible(True)
+        # update visibility (based on the app state)
+        if aw.qmc.flagstart:
+            visible = aw.minieventsflags[2]
+        elif aw.qmc.flagon:
+            visible = aw.minieventsflags[1]
         else:
-            self.EventsGroupLayout.setVisible(False)
+            visible = aw.minieventsflags[0]
+        if visible:
+            self.show_minieventline(False)
+        else:
+            self.hide_minieventline(False)                     
+
+    @pyqtSlot()
+    @pyqtSlot(bool)    
+    def toggle_minieventline(self,_=False):
+        if self.EventsGroupLayout.isVisible():
+            self.hide_minieventline()
+        else:
+            self.show_minieventline()
+
+    def hide_minieventline(self, changeDefault=True):
+        self.releaseminieditor()
+        focused_widget = QApplication.focusWidget()
+        if focused_widget and focused_widget != aw.centralWidget():
+            focused_widget.clearFocus()
+        self.EventsGroupLayout.setVisible(False)
+        self.eventsEditorAction.setChecked(False)
+        if changeDefault:
+            if aw.qmc.flagstart:
+                aw.minieventsflags[2] = 0
+            elif aw.qmc.flagon:
+                aw.minieventsflags[1] = 0
+            else:
+                aw.minieventsflags[0] = 0
+            
+    def show_minieventline(self, changeDefault=True):
+        self.EventsGroupLayout.setVisible(True)
+        self.eventsEditorAction.setChecked(True)
+        if changeDefault:
+            if aw.qmc.flagstart:
+                aw.minieventsflags[2] = 1
+            elif aw.qmc.flagon:
+                aw.minieventsflags[1] = 1
+            else:
+                aw.minieventsflags[0] = 1
     
     def toggleForegroundShowfullFlag(self):
         self.qmc.foregroundShowFullflag = not self.qmc.foregroundShowFullflag
@@ -25179,8 +25257,7 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.exitviewmode()
                             aw.enableEditMenus()
                             aw.showControls()
-                        if self.minieventsflag:
-                            self.releaseminieditor()
+                        self.releaseminieditor()
                 elif k == 16777234:               #MOVES CURRENT BUTTON LEFT
                     if self.keyboardmoveflag:
                         self.moveKbutton("left")
@@ -25251,19 +25328,16 @@ class ApplicationWindow(QMainWindow):
                         else:
                             aw.ntb.update_message()
                 elif k == 67:                     #letter C (controls)
-                    self.toggleControls()
+                    if not self.qmc.wheelflag:
+                        self.toggleControls()
                 elif k == 88:                     #letter X (readings)
-                    if not app.artisanviewerMode:
+                    if not app.artisanviewerMode and not self.qmc.designerflag and not self.qmc.wheelflag:
                         self.toggleReadings()
                 elif k == 89:                     #letter Y (minieditor)
-                    if self.qmc.flagstart:
-                        if self.minieventsflag:
-                            self.minieventsflag = 0
-                        else: 
-                            self.minieventsflag = 1
-                        self.update_minieventline_visibility()
+                    if not self.qmc.designerflag and not self.qmc.wheelflag:
+                        self.toggle_minieventline()
                 elif k == 83:                     #letter S (sliders)
-                    if not app.artisanviewerMode:
+                    if not app.artisanviewerMode and not self.qmc.designerflag and not self.qmc.wheelflag:
                         self.toggleSliders()
                 elif k == 84 and not self.qmc.flagon:  #letter T (mouse cross)
                     self.qmc.togglecrosslines()
@@ -25288,7 +25362,7 @@ class ApplicationWindow(QMainWindow):
                         self.quickEventShortCut = (4,"")
                         aw.sendmessage("SV")
                 elif k == 66:  #letter b hides/shows extra rows of event buttons
-                    if not app.artisanviewerMode:
+                    if not app.artisanviewerMode and not self.qmc.designerflag and not self.qmc.wheelflag:
                         self.toggleextraeventrows()
                 elif k == 77:  #letter m hides/shows standard buttons row
                     if aw.qmc.flagstart:
@@ -25342,18 +25416,17 @@ class ApplicationWindow(QMainWindow):
                 self.processingKeyEvent = False
 
     def releaseminieditor(self):
-        if self.minieventsflag:
-            self.lineEvent.releaseKeyboard()
-            self.valueEdit.releaseKeyboard()
-            self.etimeline.releaseKeyboard()
-            self.etypeComboBox.releaseKeyboard()
-            self.eNumberSpinBox.releaseKeyboard()
-            self.lineEvent.clearFocus()
-            self.valueEdit.clearFocus()
-            self.etimeline.clearFocus()
-            self.etypeComboBox.clearFocus()
-            self.eNumberSpinBox.clearFocus()
-            self.buttonminiEvent.clearFocus()
+        self.lineEvent.releaseKeyboard()
+        self.valueEdit.releaseKeyboard()
+        self.etimeline.releaseKeyboard()
+        self.etypeComboBox.releaseKeyboard()
+        self.eNumberSpinBox.releaseKeyboard()
+        self.lineEvent.clearFocus()
+        self.valueEdit.clearFocus()
+        self.etimeline.clearFocus()
+        self.etypeComboBox.clearFocus()
+        self.eNumberSpinBox.clearFocus()
+        self.buttonminiEvent.clearFocus()
 
     # this function respects the button visibility via aw.qmc.buttonvisibility and if button.isDisabled()
     # button = 0:CHARGE, 1:DRY_END, 2:FC_START, 3:FC_END, 4:SC_START, 5:SC_END, 6:DROP, 7:COOL_END; 8:EVENT (EVENT is always enabled!)
@@ -25816,6 +25889,14 @@ class ApplicationWindow(QMainWindow):
                 self.helpdialog, # the existing help dialog
                 QApplication.translate("Form Caption","Keyboard Shortcuts Help"),
                 keyboardshortcuts_help.content())
+
+    @pyqtSlot(bool)
+    def decrEventNumber(self, _):
+        self.eNumberSpinBox.stepBy(-1)
+        
+    @pyqtSlot(bool)
+    def incrEventNumber(self, _):
+        self.eNumberSpinBox.stepBy(1)
 
     #moves events in minieditor
     @pyqtSlot(int)
@@ -30065,8 +30146,8 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("events")
             if settings.contains("eventsbuttonflag"):
                 self.eventsbuttonflag = toInt(settings.value("eventsbuttonflag",int(self.eventsbuttonflag)))
-            if settings.contains("minieventsflag"):
-                self.minieventsflag = toInt(settings.value("minieventsflag",int(self.minieventsflag)))
+            if settings.contains("minieventsflags"):
+                self.minieventsflags = [toInt(x) for x in toList(settings.value("minieventsflags",self.minieventsflags))]
             if settings.contains("eventsGraphflag"):
                 self.qmc.eventsGraphflag = toInt(settings.value("eventsGraphflag",int(self.qmc.eventsGraphflag)))
             if settings.contains("etypes"):
@@ -31434,6 +31515,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.clearLCDs()
 
             self.updateSlidersVisibility() # update visibility of sliders based on the users preference
+            self.update_minieventline_visibility()
             self.updateReadingsLCDsVisibility() # update visibility of reading LCD based on the users preference
 
             if filename is None and self.full_screen_mode_active:
@@ -31929,7 +32011,7 @@ class ApplicationWindow(QMainWindow):
             #save Events settings
             settings.beginGroup("events")
             settings.setValue("eventsbuttonflag",self.eventsbuttonflag)
-            settings.setValue("minieventsflag",self.minieventsflag)
+            settings.setValue("minieventsflags",self.minieventsflags)
             settings.setValue("eventsGraphflag",self.qmc.eventsGraphflag)
             # we only store etype names if they have been modified by the user to allow automatic translations otherwise
             if ((self.qmc.etypes[0] != QApplication.translate("ComboBox", "Air")) or
@@ -36499,11 +36581,16 @@ class ApplicationWindow(QMainWindow):
             self.qmc.exitviewmode()
             aw.enableEditMenus()
             aw.showControls()
+            aw.updateReadingsLCDsVisibility()
+            aw.updateSlidersVisibility()
+            aw.update_minieventline_visibility()
+            aw.updateExtraButtonsVisibility()
         else:
             aw.redrawOnResize = False
             aw.hideControls()
             aw.hideLCDs(False)
             aw.hideSliders(False)
+            aw.hide_minieventline(False)
             aw.hideExtraButtons()
             aw.disableEditMenus(wheel=True)
             aw.qmc.connectWheel()
@@ -36641,10 +36728,18 @@ class ApplicationWindow(QMainWindow):
 
     def startdesigner(self):
         self.qmc.designer()
+        self.hideLCDs(False)
+        self.hideSliders(False)
+        self.hide_minieventline(False)
+        self.hideExtraButtons()
 
     def stopdesigner(self):
         aw.enableEditMenus()
         self.qmc.convert_designer()
+        self.updateReadingsLCDsVisibility()
+        self.updateSlidersVisibility()
+        self.update_minieventline_visibility()
+        self.updateExtraButtonsVisibility()
 
     @pyqtSlot()
     @pyqtSlot(bool)

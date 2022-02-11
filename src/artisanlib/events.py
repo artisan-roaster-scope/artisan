@@ -50,7 +50,7 @@ except Exception:
     try:
         from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
     except Exception: # pylint: disable=broad-except
-        import sip
+        import sip  # @Reimport @UnresolvedImport @UnusedImport
 
 
 _log: Final = logging.getLogger(__name__)
@@ -220,10 +220,6 @@ class EventsDlg(ArtisanResizeablDialog):
         
         if self.aw.qmc.eventsGraphflag not in [2,3,4]:
             self.eventsclampflag.setEnabled(False)
-        self.minieventsflag = QCheckBox(QApplication.translate("CheckBox","Mini Editor"))
-        self.minieventsflag.setToolTip(QApplication.translate("Tooltip","Allows to enter a description of the last event"))
-        self.minieventsflag.setChecked(bool(self.aw.minieventsflag))
-        self.minieventsflag.stateChanged.connect(self.minieventsflagChanged)
         barstylelabel = QLabel(QApplication.translate("Label","Markers"))
         barstyles = ["",
                     QApplication.translate("ComboBox","Flag"),
@@ -878,15 +874,19 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E1quantifierSV = QCheckBox()
         self.E1quantifierSV.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E1quantifierSV.setChecked(bool(self.aw.eventquantifierSV[0]))
+        self.E1quantifierSV.setToolTip(QApplication.translate("Tooltip", "If source is a Set Value quantification gets never blocked"))
         self.E2quantifierSV = QCheckBox()
         self.E2quantifierSV.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E2quantifierSV.setChecked(bool(self.aw.eventquantifierSV[1]))
+        self.E2quantifierSV.setToolTip(QApplication.translate("Tooltip", "If source is a Set Value quantification gets never blocked"))
         self.E3quantifierSV = QCheckBox()
         self.E3quantifierSV.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E3quantifierSV.setChecked(bool(self.aw.eventquantifierSV[2]))
+        self.E3quantifierSV.setToolTip(QApplication.translate("Tooltip", "If source is a Set Value quantification gets never blocked"))
         self.E4quantifierSV = QCheckBox()
         self.E4quantifierSV.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E4quantifierSV.setChecked(bool(self.aw.eventquantifierSV[3]))
+        self.E4quantifierSV.setToolTip(QApplication.translate("Tooltip", "If source is a Set Value quantification gets never blocked"))
         
         self.curvenames = []
         self.curvenames.append(QApplication.translate("ComboBox","ET"))
@@ -958,8 +958,6 @@ class EventsDlg(ArtisanResizeablDialog):
         FlagsLayout = QHBoxLayout()
         FlagsLayout.addStretch()
         FlagsLayout.addWidget(self.eventsbuttonflag)
-        FlagsLayout.addSpacing(5)
-        FlagsLayout.addWidget(self.minieventsflag)
         FlagsLayout.addSpacing(5)
         FlagsLayout.addWidget(self.showeventsonbtbox)
         FlagsLayout.addSpacing(5)
@@ -2743,15 +2741,6 @@ class EventsDlg(ArtisanResizeablDialog):
     def changeShowEtypes(self,etype):
         self.aw.qmc.showEtypes[etype] = not self.aw.qmc.showEtypes[etype]
         self.aw.qmc.redraw(recomputeAllDeltas=False)
-        
-    @pyqtSlot(int)
-    def minieventsflagChanged(self,_):
-        if self.minieventsflag.isChecked():
-            self.aw.minieventsflag = 1
-        else:
-            self.aw.minieventsflag = 0
-        if self.aw.qmc.flagon:
-            self.aw.update_minieventline_visibility()
 
     @pyqtSlot(int)
     def eventsGraphTypeflagChanged(self,_):
@@ -2884,7 +2873,6 @@ class EventsDlg(ArtisanResizeablDialog):
         self.annotationsflagstored = self.aw.qmc.annotationsflag
         self.showeventsonbtstored = self.aw.qmc.showeventsonbt
         self.showEtypesstored = self.aw.qmc.showEtypes[:]
-        self.minieventsflagstored = self.aw.minieventsflag
         self.eventsGraphflagstored = self.aw.qmc.eventsGraphflag
         self.etypesstored = self.aw.qmc.etypes
         self.etypeComboBoxstored = self.aw.etypeComboBox
@@ -2947,7 +2935,6 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.qmc.annotationsflag = self.annotationsflagstored
         self.aw.qmc.showeventsonbt = self.showeventsonbtstored
         self.aw.qmc.showEtypes = self.showEtypesstored[:]
-        self.aw.minieventsflag = self.minieventsflagstored
         self.aw.qmc.eventsGraphflag = self.eventsGraphflagstored
         self.aw.qmc.etypes = self.etypesstored
         self.aw.etypeComboBox = self.etypeComboBoxstored

@@ -5599,8 +5599,8 @@ class serialport():
                         settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                         self.aw.addserial("ArduinoTC4: " + settings + " || Tx = " + str(command) + " || Rx = " + str(result))
                     
-                    _log.debug("command: %s",command)
-                    _log.debug("result: %s",result)
+#                    _log.debug("command: %s",command)
+#                    _log.debug("result: %s",result)
                     
                     if result.startswith("#") and chan is None:
                         #OK. NOW SET UNITS
@@ -5634,8 +5634,8 @@ class serialport():
                 libtime.sleep(.1)
                 rl = self.SP.readline().decode('utf-8', 'ignore')[:-2]
                 res = rl.rsplit(',')
-                _log.debug("command: %s",command)
-                _log.debug("res: %s",res)
+#                _log.debug("command: %s",command)
+#                _log.debug("res: %s",res)
                 #response: list ["t0","t1","t2"]  with t0 = internal temp; t1 = ET; t2 = BT on "CHAN;1200" 
                 #response: list ["t0","t1","t2","t3","t4"]  with t0 = internal temp; t1 = ET; t2 = BT, t3 = chan3, t4 = chan4 on "CHAN;1234" if ArduinoTC4_34 is configured
                 # after PID_ON: + [,"Heater", "Fan", "SV"]

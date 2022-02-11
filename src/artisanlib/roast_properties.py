@@ -65,7 +65,7 @@ except Exception:
     try:
         from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
     except Exception: # pylint: disable=broad-except
-        import sip
+        import sip  # @Reimport @UnresolvedImport @UnusedImport
 
 if sys.platform.startswith("darwin"):
     import darkdetect # @UnresolvedImport # pylint: disable=import-error
@@ -318,7 +318,7 @@ class volumeCalculatorDlg(ArtisanDialog):
             self.aw.largeScaleLCDs_dialog.updateWeightUnit("g")
         
 
-    pyqtSlot()
+    @pyqtSlot()
     def ble_scan_failed(self):
         self.scale_weight = None
         self.scale_battery = None
@@ -329,7 +329,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.scaleWeight.setText(txt_value+txt_unit)
         self.aw.qmc.updateLargeScaleLCDs(txt_value)
 
-    pyqtSlot(float)
+    @pyqtSlot(float)
     def ble_weight_changed(self,w):
         if w is not None:
             self.scale_weight = w
@@ -368,17 +368,17 @@ class volumeCalculatorDlg(ArtisanDialog):
             # updating this widget in a separate thread seems to be important on OS X 10.14 to avoid delayed updates and widget redraw problesm
             QTimer.singleShot(2,lambda : widget.setText("%g" % self.aw.float2float(v)))
     
-    pyqtSlot(bool)
+    @pyqtSlot(bool)
     def unitWeight(self,_):
         self.widgetWeight(self.unitvolumeEdit)
         
-    pyqtSlot(bool)
+    @pyqtSlot(bool)
     def inWeight(self,_):
         QTimer.singleShot(1,lambda : self.widgetWeight(self.coffeeinweightEdit))
         QTimer.singleShot(10,self.resetInVolume)
         QApplication.processEvents()
         
-    pyqtSlot(bool)
+    @pyqtSlot(bool)
     def outWeight(self,_):
         QTimer.singleShot(1,lambda : self.widgetWeight(self.coffeeoutweightEdit))
         QTimer.singleShot(10,self.resetOutVolume)
@@ -1730,7 +1730,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.largeScaleLCDs_dialog.updateWeightUnitTotal(unit)
         self.aw.qmc.updateLargeScaleLCDs(txt_value, total_txt)
             
-    pyqtSlot(bool)
+    @pyqtSlot(bool)
     def SetupSetDefaults(self,_):
         # set default machine settings from setup dialog
         self.aw.qmc.organization_setup = self.setup_ui.lineEditOrganization.text()
@@ -1742,7 +1742,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.populateSetupDefaults()
         self.setupEdited()
     
-    pyqtSlot(bool)
+    @pyqtSlot(bool)
     def SetupDefaults(self,_):
         # set default machine setup from settings
         self.setup_ui.lineEditOrganization.setText(self.aw.qmc.organization_setup)

@@ -5,6 +5,7 @@ Oversampling=false
 dropDuplicates=true
 dropDuplicatesLimit=0.1
 roastertype_setup=ARC S RTD
+ETfunction=Y3
 
 [Device]
 id=126
