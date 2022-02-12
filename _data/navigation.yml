@@ -36,6 +36,8 @@ machines:
         url: /machines/brambati/
       - title: "Bühler"
         url: /machines/buhler/
+      - title: "Caparaó"
+        url: /machines/caparao/
       - title: "Carmomaq"
         url: /machines/carmomaq/
       - title: "Coffeed"

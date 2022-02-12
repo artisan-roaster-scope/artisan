@@ -34,7 +34,7 @@ You need to install the corresponding serial driver for the chipset of this conv
 Machine                         | Driver | Remarks
 ------------------------------- | ------ | -----
 [Ambex](/machines/ambex/) | FTDI
-[Arc](/machines/arc/) | CP210x | CH34x on newer S Models
+[Arc](/machines/arc/) | CP210x | CH34x on newer Models
 [Besca](/machines/besca/) | FTDI | CH34x on some older machines
 [BellaTW](/machines/bellatw/) | PL2303 | CH34x on some machines
 [BlueKing](/machines/blueking/) | CP210x | on some older machines FTDI, on others CH34x
@@ -56,7 +56,7 @@ Machine                         | Driver | Remarks
 [Proaster](/machines/proaster/) | FTDI
 [Roastmax](/machines/roastmax/) | FTDI
 [Rolltech](/machines/rolltech/) | CH34x
-[Santoker](/machines/santoker/) | CP210x
+[Santoker](/machines/santoker/) | CP210x | FTDI on some machines
 [Sedona](/machines/sedona/) | CP210x
 [Toper](/machines/toper/) | CP210x | CH34x on some machines
 	
