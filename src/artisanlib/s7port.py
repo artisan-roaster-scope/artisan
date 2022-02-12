@@ -33,7 +33,6 @@ except ImportError:
 #from snap7.util import get_bool, set_bool, get_int, set_int, get_real, set_real
 
 import artisanlib.util
-from artisanlib.suppress_errors import suppress_stdout_stderr
 
 try:
     #pylint: disable = E, W, R, C
@@ -389,13 +388,12 @@ class s7port():
                     self.plc.disconnect()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
-            with suppress_stdout_stderr():
+            time.sleep(0.2)
+            try:
+                self.plc.connect(self.host,self.rack,self.slot,self.port)
                 time.sleep(0.2)
-                try:
-                    self.plc.connect(self.host,self.rack,self.slot,self.port)
-                    time.sleep(0.2)
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
             
             if self.isConnected():
                 _log.debug("connect(): connected")
@@ -412,19 +410,18 @@ class s7port():
                 self.initArrays() # initialize S7 arrays
                 # we try a second time
                 _log.debug("connect(): connecting (2nd attempt)")
-                with suppress_stdout_stderr():
-                    time.sleep(0.3)
-                    self.plc.connect(self.host,self.rack,self.slot,self.port)
-                    time.sleep(0.3)
-                    
-                    if self.isConnected():
-                        _log.debug("connect(): connected")
-                        self.is_connected = True
-                        self.clearReadingsCache()
-                        self.aw.sendmessage(QApplication.translate("Message","S7 Connected") + " (2)")
-                        time.sleep(0.1)
-                    else:
-                        _log.debug("connect(): connecting failed")
+                time.sleep(0.3)
+                self.plc.connect(self.host,self.rack,self.slot,self.port)
+                time.sleep(0.3)
+                
+                if self.isConnected():
+                    _log.debug("connect(): connected")
+                    self.is_connected = True
+                    self.clearReadingsCache()
+                    self.aw.sendmessage(QApplication.translate("Message","S7 Connected") + " (2)")
+                    time.sleep(0.1)
+                else:
+                    _log.debug("connect(): connecting failed")
             self.updateActiveRegisters()
 
 
@@ -541,12 +538,11 @@ class s7port():
             self.COMsemaphore.acquire(1)
             self.connect()
             if self.isConnected():
-                with suppress_stdout_stderr():
-                    self.waitToEnsureMinTimeBetweenRequests()
-                    ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
-                    set_real(ba, 0, float(value))
-                    self.waitToEnsureMinTimeBetweenRequests()
-                    self.plc.write_area(self.areas[area],dbnumber,start,ba)
+                self.waitToEnsureMinTimeBetweenRequests()
+                ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
+                set_real(ba, 0, float(value))
+                self.waitToEnsureMinTimeBetweenRequests()
+                self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:
                 self.commError = True
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed"))
@@ -568,12 +564,11 @@ class s7port():
             self.COMsemaphore.acquire(1)
             self.connect()
             if self.isConnected():
-                with suppress_stdout_stderr():
-                    self.waitToEnsureMinTimeBetweenRequests()
-                    ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                    set_int(ba, 0, int(round(value)))
-                    self.waitToEnsureMinTimeBetweenRequests()
-                    self.plc.write_area(self.areas[area],dbnumber,start,ba)
+                self.waitToEnsureMinTimeBetweenRequests()
+                ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
+                set_int(ba, 0, int(round(value)))
+                self.waitToEnsureMinTimeBetweenRequests()
+                self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:
                 self.commError = True
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed"))
@@ -595,13 +590,12 @@ class s7port():
             self.COMsemaphore.acquire(1)
             self.connect()
             if self.isConnected():
-                with suppress_stdout_stderr():
-                    self.waitToEnsureMinTimeBetweenRequests()
-                    ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                    new_val = (int(round(value)) & and_mask) | (or_mask & (and_mask ^ 0xFFFF))
-                    set_int(ba, 0, int(new_val))
-                    self.waitToEnsureMinTimeBetweenRequests()
-                    self.plc.write_area(self.areas[area],dbnumber,start,ba)
+                self.waitToEnsureMinTimeBetweenRequests()
+                ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
+                new_val = (int(round(value)) & and_mask) | (or_mask & (and_mask ^ 0xFFFF))
+                set_int(ba, 0, int(new_val))
+                self.waitToEnsureMinTimeBetweenRequests()
+                self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:
                 self.commError = True
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed"))
@@ -623,12 +617,11 @@ class s7port():
             self.COMsemaphore.acquire(1)
             self.connect()
             if self.isConnected():
-                with suppress_stdout_stderr():
-                    self.waitToEnsureMinTimeBetweenRequests()
-                    ba = self.plc.read_area(self.areas[area],dbnumber,start,1)
-                    set_bool(ba, 0, int(index), bool(value))
-                    self.waitToEnsureMinTimeBetweenRequests()
-                    self.plc.write_area(self.areas[area],dbnumber,start,ba)
+                self.waitToEnsureMinTimeBetweenRequests()
+                ba = self.plc.read_area(self.areas[area],dbnumber,start,1)
+                set_bool(ba, 0, int(index), bool(value))
+                self.waitToEnsureMinTimeBetweenRequests()
+                self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:
                 self.commError = True
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed"))
@@ -672,8 +665,7 @@ class s7port():
                 while True:
                     self.waitToEnsureMinTimeBetweenRequests()
                     try:
-                        with suppress_stdout_stderr():
-                            res = self.plc.read_area(self.areas[area],dbnumber,start,4)
+                        res = self.plc.read_area(self.areas[area],dbnumber,start,4)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                         res = None
@@ -719,8 +711,7 @@ class s7port():
             self.connect()
             if self.isConnected():
                 self.waitToEnsureMinTimeBetweenRequests()
-                with suppress_stdout_stderr():
-                    res = self.plc.read_area(self.areas[area],dbnumber,start,4)
+                res = self.plc.read_area(self.areas[area],dbnumber,start,4)
                 return get_real(res,0)
             return None
         except Exception as e: # pylint: disable=broad-except
@@ -753,8 +744,7 @@ class s7port():
                 while True:
                     self.waitToEnsureMinTimeBetweenRequests()
                     try:
-                        with suppress_stdout_stderr():
-                            res = self.plc.read_area(self.areas[area],dbnumber,start,2)
+                        res = self.plc.read_area(self.areas[area],dbnumber,start,2)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                         res = None
@@ -803,9 +793,8 @@ class s7port():
         try:
             self.connect()
             if self.isConnected(): 
-                with suppress_stdout_stderr():
-                    self.waitToEnsureMinTimeBetweenRequests()
-                    res = self.plc.read_area(self.areas[area],dbnumber,start,2)
+                self.waitToEnsureMinTimeBetweenRequests()
+                res = self.plc.read_area(self.areas[area],dbnumber,start,2)
                 return get_int(res,0)
             return None
         except Exception as e: # pylint: disable=broad-except
@@ -836,8 +825,7 @@ class s7port():
                 while True:
                     self.waitToEnsureMinTimeBetweenRequests()
                     try:
-                        with suppress_stdout_stderr():
-                            res = self.plc.read_area(self.areas[area],dbnumber,start,1)                            
+                        res = self.plc.read_area(self.areas[area],dbnumber,start,1)                            
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                         res = None
