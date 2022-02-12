@@ -56,9 +56,9 @@ class calculatorDlg(ArtisanDialog):
         self.startEdit.editingFinished.connect(self.calculateRC)
         self.endEdit.editingFinished.connect(self.calculateRC)
         nevents = len(self.aw.qmc.specialevents)
-        events_found = [QApplication.translate("ComboBox","Event #0")]
+        events_found = [f'{QApplication.translate("Form Caption", "Event")} #0']
         for i in range(nevents):
-            events_found.append(QApplication.translate("ComboBox","Event #{0}").format(str(i+1)))
+            events_found.append(f'{QApplication.translate("Form Caption", "Event")} #{str(i+1)}')
         self.eventAComboBox = QComboBox()
         self.eventAComboBox.addItems(events_found)
         self.eventAComboBox.currentIndexChanged.connect(self.calcEventRC)

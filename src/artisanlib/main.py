@@ -18223,7 +18223,8 @@ class ApplicationWindow(QMainWindow):
         self.buttonSVm5.setVisible(False)
 
         #### EVENT MINI EDITOR: View&Edits events without opening roast properties Dlg.
-        self.eventlabel = QLabel(QApplication.translate("Label","Event #<b>0 </b>"))
+        self.eventlabel = QLabel(f'{QApplication.translate("Form Caption", "Event")} #<b>0 </b>')
+        
         self.eventlabel.setIndent(5)
         
         self.eNumberSpinBox = QSpinBox()
@@ -25909,7 +25910,8 @@ class ApplicationWindow(QMainWindow):
         currentevent = self.eNumberSpinBox.value()
         self.eNumberSpinBox.setDisabled(True)
         try:
-            self.eventlabel.setText(QApplication.translate("Label", "Event #<b>{0} </b>").format(currentevent))
+            self.eventlabel.setText(f'{QApplication.translate("Form Caption", "Event")} #<b>{currentevent} </b>')
+            
             if currentevent == 0:
                 self.lineEvent.setText("")
                 self.valueEdit.setText("")
