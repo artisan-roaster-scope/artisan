@@ -106,6 +106,8 @@ machines:
         url: /machines/phoenix/
       - title: "Proaster"
         url: /machines/proaster/
+      - title: "Prometheus"
+        url: /machines/prometheus/
       - title: "Probat"
         url: /machines/probat/
       - title: "Rasco Mac"
