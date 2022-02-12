@@ -4,9 +4,9 @@ permalink: /machines/prometheus/
 title: "Prometheus"
 excerpt: "Ignis"
 header:
-  overlay_image: /assets/images/prometheus-large
-  image: /assets/images/prometheus-large
-  teaser: assets/images/prometheus-large
+  overlay_image: /assets/images/prometheus-large.jpeg
+  image: /assets/images/prometheus-large.jpeg
+  teaser: assets/images/prometheus-large.jpeg
 sidebar:
   nav: "machines"
 ---
