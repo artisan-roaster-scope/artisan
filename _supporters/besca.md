@@ -21,6 +21,13 @@ sidebar:
   - slider control of fan speed, burner level and drum speed (only BSC automatic)
   - control buttons to operate the drum, cooler, and mixer (only BSC automatic)
 
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-besca-automatic.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-besca-automatic.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
  
 **Watch out!** 
 for manual machines produced after 15.09.2019, those with the touch screen, the Artisan machine setup _"Besca BSC manual v2"_ included in Artisan v2.1 and later should be used. For all other manual machines the _"Besca BSC manual v1"_ (or _"Besca BSC manual"_ in Artisan v2.0 and earlier)

@@ -20,9 +20,11 @@ sidebar:
   - control of actors like stirrer and release doors
 
 <figure>
+<center>
 <a href="{{ site.baseurl }}/assets/images/buttons-caparao-prime.png">
-<img src="{{ site.baseurl }}/assets/images/buttons-caparao-prime.png" style="width: 50%;"></a>
+<img src="{{ site.baseurl }}/assets/images/buttons-caparao-prime.png" style="width: 80%;"></a>
     <figcaption>custom event buttons</figcaption>
+</center>
 </figure>
 
 ### Setup
