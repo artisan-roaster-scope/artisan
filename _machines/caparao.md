@@ -21,7 +21,7 @@ sidebar:
 
 <figure>
 <a href="{{ site.baseurl }}/assets/images/buttons-caparao-prime.png">
-<img src="{{ site.baseurl }}/assets/images/buttons-caparao-prime.png"></a>
+<img src="{{ site.baseurl }}/assets/images/buttons-caparao-prime.png" style="width: 50%;"></a>
     <figcaption>custom event buttons</figcaption>
 </figure>
 
