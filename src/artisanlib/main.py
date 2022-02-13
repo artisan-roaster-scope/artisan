@@ -16334,36 +16334,35 @@ class SampleThread(QThread):
     
             interval = aw.qmc.delay/aw.qmc.timeclock.getBase()
             next_time = None
-            with suppress_stdout_stderr():
-                while True:
-                    if aw.qmc.flagon:
-                        if next_time is None:
-                            next_time = libtime.perf_counter() + interval
-                        else:
-#                            libtime.sleep(max(0, next_time - libtime.time())) # sleep is not very accurate
-                            self.accurate_delay(max(0, next_time - libtime.perf_counter())) # more accurate, but keeps the CPU busy
-    
-#                        _log.info(datetime.datetime.now()) # use this to check for drifts
-    
-                        #collect information
-                        if aw.sample_loop_running and aw.qmc.flagon:
-                            try:
-                                aw.qmc.flagsampling = True # we signal that we are sampling
-                                self.sample()
-                            finally:
-                                aw.qmc.flagsampling = False # we signal that we are done with sampling
+            while True:
+                if aw.qmc.flagon:
+                    if next_time is None:
+                        next_time = libtime.perf_counter() + interval
                     else:
-                        aw.qmc.flagsampling = False # we signal that we are done with sampling
+                        #libtime.sleep(max(0, next_time - libtime.time())) # sleep is not very accurate
+                        self.accurate_delay(max(0, next_time - libtime.perf_counter())) # more accurate, but keeps the CPU busy
+    
+                    #_log.info(datetime.datetime.now()) # use this to check for drifts
+    
+                    #collect information
+                    if aw.sample_loop_running and aw.qmc.flagon:
                         try:
-                            if aw.ser.SP.isOpen():
-                                aw.ser.closeport()
-                            QApplication.processEvents()
-                        except Exception: # pylint: disable=broad-except
-                            pass
-                        self.quit()
-                        break  #thread ends
-                    # skip tasks if we are behind schedule:
-                    next_time += (libtime.perf_counter() - next_time) // interval * interval + interval
+                            aw.qmc.flagsampling = True # we signal that we are sampling
+                            self.sample()
+                        finally:
+                            aw.qmc.flagsampling = False # we signal that we are done with sampling
+                else:
+                    aw.qmc.flagsampling = False # we signal that we are done with sampling
+                    try:
+                        if aw.ser.SP.isOpen():
+                            aw.ser.closeport()
+                        QApplication.processEvents()
+                    except Exception: # pylint: disable=broad-except
+                        pass
+                    self.quit()
+                    break  #thread ends
+                # skip tasks if we are behind schedule:
+                next_time += (libtime.perf_counter() - next_time) // interval * interval + interval
         finally:
             aw.qmc.flagsampling = False # we signal that we are done with sampling
             aw.qmc.flagsamplingthreadrunning = False
@@ -24551,8 +24550,7 @@ class ApplicationWindow(QMainWindow):
                 self.messagehist.append(f"{timez}{message}")
             self.messagelabel.setText(message)
             if repaint: # if repaint is executed in the main thread we receive "QWidget::repaint: Recursive repaint detected"
-                with suppress_stdout_stderr():
-                    self.messagelabel.repaint()
+                self.messagelabel.repaint()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         finally:
@@ -38973,7 +38971,8 @@ def main():
         logging.captureWarnings(True)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            app.exec()
+            with suppress_stdout_stderr():
+                app.exec()
         # alternative:
         # ret = app.exec()
         # app = None
