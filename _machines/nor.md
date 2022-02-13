@@ -21,3 +21,11 @@ sidebar:
 * __Features:__ 
   - logging of bean temperature (BT) and environmental temperature (ET)
   - control of burner and damper on A Series machines
+
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-NOR.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-NOR.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>

@@ -20,6 +20,14 @@ sidebar:
   - logging of the optional infrared (IR) and/or environmental temperature sensor (Env)
   - operation of actors (intake, flavouring, discharge, cooling, stirrer) on W30 and larger machines via custom buttons (press CMD-2 to switch to this extended button set; CMD-1 switches back to the standard button set)
 
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-giesen.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-giesen.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
+
 **Watch out!** The WxA coarse setup is for older machines, which allow burner changes only in 10% steps.
 {: .notice--primary}
 

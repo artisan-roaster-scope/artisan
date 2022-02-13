@@ -25,6 +25,13 @@ sidebar:
   - logging of environmental temperature (ET), bean temperature (BT), air pressure and related rate-of-rise curves
   - control of burner level, drum- and fan speed
 
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-Probat-Series-III.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-Probat-Series-III.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
   
 
 ### Notes

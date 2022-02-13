@@ -17,6 +17,13 @@ sidebar:
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
   - additional the Supreme Automatic allows logging and control of drum speed, fan speed, burner power and mixer speed
  
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-kuban.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-kuban.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
  
 ### Setup Supreme Automatic
 

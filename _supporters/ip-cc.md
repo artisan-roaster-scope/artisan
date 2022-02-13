@@ -20,6 +20,14 @@ sidebar:
   - logging and control of airflow, drum speed and burner power
   - activation of transfer, charge and drop doors
 
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-IP-CC.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-IP-CC.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
+
 ### Setup
 
 The computer running Artisan must be on the same IP network as the roaster. The default IP address of the roaster is 10.100.0.15. Configure your computer to use a static IP address in the range of the roaster (10.100.0.x) but with x different from that of the roaster (eg. 10.100.0.42). Choose 255.255.255.0 as subnet mask. 

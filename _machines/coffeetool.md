@@ -18,6 +18,14 @@ sidebar:
   - logging of burner temperature, burner level (0-100%), drum speed (0-100%) and air flow (0-100%)
   - some machines (at least the newer automatic models with Mitsubishi FX5 PLC) also allow the control of the burner level, drum speed and air flow using Artisan sliders and/or button
 
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-coffeetool.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-coffeetool.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
+
 ### Setup
 
 The computer running Artisan must be on the same IP network as the Coffeetool roaster. Configure your computer to use a static IP address in the range of the roaster (192.168.1.x) but with x different from that of the roaster (which by default is 192.168.1.42). Choose for example 192.168.1.55. Set the subnet mask of your computers network setup to 255.255.255.0.

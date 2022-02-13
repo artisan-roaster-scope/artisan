@@ -16,3 +16,11 @@ sidebar:
 * __Features:__
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
   - logging and control of burner level (0-100%), drum speed (0-100%) and air flow (0-100%)
+
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-carmomaq.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-carmomaq.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>

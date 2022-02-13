@@ -22,6 +22,14 @@ sidebar:
   - button control of motor, door solenoid, and stirrer 
 
 
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-hottop-2k+.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-hottop-2k+.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
+
 
 **Watch out!** Artisan doesn't monitor unsafe temperatures, so you should never leave the roaster alone.
 {: .notice--primary}
