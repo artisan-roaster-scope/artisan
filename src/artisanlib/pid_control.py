@@ -1189,7 +1189,6 @@ class PIDcontrol():
              
     # v is from [-min,max]
     def setEnergy(self,v):
-        # only update control signal if different to previous (cache reset by PID_ON)
         try: 
             if self.aw.pidcontrol.pidPositiveTarget:
                 slidernr = self.aw.pidcontrol.pidPositiveTarget - 1

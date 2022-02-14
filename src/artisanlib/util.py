@@ -155,18 +155,13 @@ def convertRoR(r,source_unit,target_unit):
             return r
         return RoRfromFtoC(r)
     return r
-        
-def convertTemp(t,source_unit,target_unit):
-    if source_unit == "C":
-        if target_unit == "C":
-            return t
-        return fromCtoF(t)
-    if source_unit == "F":
-        if target_unit == "F":
-            return t
-        return fromFtoC(t)
-    return t
 
+def convertTemp(t,source_unit,target_unit):
+    if source_unit == target_unit:
+        return t
+    elif source_unit == "C":
+        return fromCtoF(t)
+    return fromFtoC(t)
 
 def path2url(path):
     import urllib.parse as urlparse  # @Reimport

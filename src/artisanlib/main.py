@@ -714,7 +714,7 @@ class tgraphcanvas(FigureCanvas):
         'greens_temp', 'beansize', 'beansize_min', 'beansize_max', 'whole_color', 'ground_color', 'color_systems', 'color_system_idx', 'heavyFC_flag', 'lowFC_flag', 'lightCut_flag',
         'darkCut_flag', 'drops_flag', 'oily_flag', 'uneven_flag', 'tipping_flag', 'scorching_flag', 'divots_flag', 'timex', 
         'temp1', 'temp2', 'delta1', 'delta2', 'stemp1', 'stemp2', 'tstemp1', 'tstemp2', 'ctimex1', 'ctimex2', 'ctemp1', 'ctemp2', 'unfiltereddelta1', 'unfiltereddelta2',  'unfiltereddelta1_pure', 'unfiltereddelta2_pure',
-        'on_timex', 'on_temp1', 'on_temp2', 'on_ctimex1', 'on_ctimex2', 'on_ctemp1', 'on_ctemp2','on_tstemp1', 'on_tstemp2', 'on_stemp1', 'on_stemp2', 'on_unfiltereddelta1', 
+        'on_timex', 'on_temp1', 'on_temp2', 'on_ctimex1', 'on_ctimex2', 'on_ctemp1', 'on_ctemp2','on_tstemp1', 'on_tstemp2', 'on_unfiltereddelta1', 
         'on_unfiltereddelta2', 'on_delta1', 'on_delta2', 'on_extratemp1', 'on_extratemp2', 'on_extratimex', 'on_extractimex1', 'on_extractemp1', 'on_extractimex2', 'on_extractemp2',
         'timeindex', 'ETfunction', 'BTfunction', 'DeltaETfunction', 'DeltaBTfunction', 'safesaveflag', 'pid', 'background', 'backgroundprofile', 'backgroundDetails',
         'backgroundeventsflag', 'backgroundpath', 'backgroundUUID', 'backgroundUUID', 'backgroundShowFullflag', 'titleB', 'roastbatchnrB', 'roastbatchprefixB',
@@ -1591,8 +1591,6 @@ class tgraphcanvas(FigureCanvas):
         self.on_ctemp2 = []
         self.on_tstemp1 = []
         self.on_tstemp2 = []
-        self.on_stemp1 = []
-        self.on_stemp2 = []
         self.on_unfiltereddelta1 = []
         self.on_unfiltereddelta2 = []
         self.on_delta1 = []
@@ -3630,6 +3628,7 @@ class tgraphcanvas(FigureCanvas):
 
     # the temp get's averaged using the given decay weights after resampling
     # to linear time based on tx and the current sampling interval
+    # -1 and None values are skipped/ignored
     @staticmethod
     def decay_average(tx_in,temp_in,decay_weights):
         if len(tx_in) != len(temp_in):
@@ -3640,7 +3639,7 @@ class tgraphcanvas(FigureCanvas):
         tx = []
         temp = []
         for i in range(len(temp_in)):
-            if temp_in[i] is not None:
+            if temp_in[i] not in [None, -1]:
                 tx.append(tx_in[i])
                 temp.append(temp_in[i])
         if len(temp) == 0:
@@ -5311,20 +5310,25 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(len(self.backgroundEvents)):
                     if i not in aw.qmc.replayedBackgroundEvents: # never replay one event twice
                         timed = self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.
+                        delta = 1 # by default don't trigger this one
                         if aw.qmc.replayType == 0: # replay by time
                             delta = timed
                         elif not next_byTemp_checked and aw.qmc.replayType == 1: # replay by BT (after TP)
                             if aw.qmc.TPalarmtimeindex:
-                                delta = self.stemp2B[self.backgroundEvents[i]] - self.ctemp2[-1]
+                                if self.ctemp2[-1] != None:
+                                    delta = self.stemp2B[self.backgroundEvents[i]] - self.ctemp2[-1]
+                                    next_byTemp_checked = True
                             else: # before TP we switch back to time-based
                                 delta = timed
-                            next_byTemp_checked = True
+                                next_byTemp_checked = True
                         elif not next_byTemp_checked and aw.qmc.replayType == 2: # replay by ET (after TP)
                             if aw.qmc.TPalarmtimeindex:
-                                delta = self.stemp1B[self.backgroundEvents[i]] - self.ctemp1[-1]
+                                if self.ctemp1[-1] != None:
+                                    delta = self.stemp1B[self.backgroundEvents[i]] - self.ctemp1[-1]
+                                    next_byTemp_checked = True
                             else: # before TP we switch back to time-based
                                 delta = timed
-                            next_byTemp_checked = True
+                                next_byTemp_checked = True
                         else:
                             delta = 1 # don't trigger this one
                         if reproducing is None and aw.qmc.backgroundReproduce and 0 < timed < self.detectBackgroundEventTime:
@@ -6837,11 +6841,12 @@ class tgraphcanvas(FigureCanvas):
         return numpy.median(y, axis=1)
 #        return numpy.nanmedian(y, axis=1) # produces artefacts
 
-    # smoothes a list of values 'y' at taken at times indicated by the numbers in list 'x'
+    # smoothes a list (or numpy.array) of values 'y' at taken at times indicated by the numbers in list 'x'
     # 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
     # 'flat' results in moving average
     # window_len should be odd
     # based on http://wiki.scipy.org/Cookbook/SignalSmooth
+    # returns a smoothed numpy array or the original y argument
     @staticmethod
     def smooth(x, y, window_len=15, window='hanning'):
         try:
@@ -6881,14 +6886,79 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " smooth() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return x
 
+    # re-sample, filter and smooth slice
+    # takes numpy arrays a (time) and b (temp) of the same length and returns a numpy array representing the processed b values
+    def smooth_slice(self, a, b, 
+        window_len=7, window='hanning',decay_weights=None,decay_smoothing=False,
+        re_sample=True,back_sample=True,a_lin=None):
 
+        # 1. re-sample
+        if re_sample:
+            if a_lin is None or len(a_lin) != len(a):
+                a_mod = numpy.linspace(a[0],a[-1],len(a))
+            else:
+                a_mod = a_lin
+            b = numpy.interp(a_mod, a, b) # resample data to linear spaced time
+        else:
+            a_mod = a
+        # 2. filter spikes
+        if aw.qmc.filterDropOuts:
+            try:
+                b = self.medfilt(b,5)  # k=3 seems not to catch all spikes in all cases; k must be odd!
+# scipyernative which performs equal, but produces larger artefacts at the borders and for intermediate NaN values for k>3
+#                from scipy.signal import medfilt as scipy_medfilt
+#                b = scipy_medfilt(b,3)
+                res = b
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
+                res = b
+        # 3. smooth data
+        if window_len>2:
+            if decay_smoothing:
+                # decay smoothing
+                if decay_weights is None:
+                    decay_weights = numpy.arange(1,window_len+1)
+                else:
+                    window_len = len(decay_weights)
+                # invariant: window_len = len(decay_weights)
+                if decay_weights.sum() == 0:
+                    res = b
+                else:
+                    res = []
+                    # ignore -1 readings in averaging and ensure a good ramp
+                    for i in range(len(b)):
+                        seq = b[max(0,i-window_len + 1):i+1]
+#                        # we need to surpress -1 drop out values from this
+#                        seq = list(filter(lambda item: item != -1,seq)) # -1 drop out values in b have already been replaced by numpy.nan above
+                        
+                        w = decay_weights[max(0,window_len-len(seq)):]  # preCond: len(decay_weights)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
+                        if len(w) == 0:
+                            res.append(b[i]) # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
+                        else:
+                            res.append(numpy.average(seq,weights=w)) # works only if len(seq) = len(w)
+                    # postCond: len(res) = len(b)
+            else:
+                # optimal smoothing (the default)
+                win_len = max(0,window_len)
+                if win_len != 1: # at the lowest level we turn smoothing completely off
+                    res = self.smooth(a_mod,b,win_len,window)
+                else:
+                    res = b
+        # 4. sample back
+        if re_sample and back_sample:
+            res = numpy.interp(a, a_mod, res) # re-sampled back to orginal timestamps        
+        # return result
+        return res
+
+    # takes lists a (time array) and b (temperature array) containing invalid segments of -1/None values and returns a list with all segments of valid values smoothed
     # a: list of timestamps
     # b: list of readings
     # re_sample: if true re-sample readings to a linear spaced time before smoothing
     # back_sample: if true results are back-sampled to original timestamps given in "a" after smoothing
     # a_lin: pre-computed linear spaced timestamps of equal length than a
     # NOTE: result can contain NaN items on places where the input array contains the error element -1
-    def smooth_list(self, a, b, window_len=7, window='hanning',decay_weights=None,decay_smoothing=False,fromIndex=-1,toIndex=0,re_sample=True,back_sample=True,a_lin=None):  # default 'hanning'
+    # result is a numpy array or the original list like structure b
+    def smooth_list(self, a, b, window_len=7, window='hanning',decay_weights=None,decay_smoothing=False,fromIndex=-1,toIndex=0,re_sample=True,back_sample=True,a_lin=None):
         if len(a) > 1 and len(a) == len(b) and (aw.qmc.filterDropOuts or window_len>2):
             #pylint: disable=E1103
             # 1. truncate
@@ -6898,68 +6968,109 @@ class tgraphcanvas(FigureCanvas):
             else: # smooth list on full length
                 fromIndex = 0
                 toIndex = len(a)
-            # we replace the error value -1  in the temperature array by numpy.nan to avoid strange smoothing artifacts
-            # no need to substitute anything in the time array!
-            a = numpy.array(a[fromIndex:toIndex], dtype='float64')
-            b = numpy.array([numpy.nan if x in [-1, None] else x for x in b[fromIndex:toIndex]],dtype='float64')
-            # 2. re-sample
-            if re_sample:
-                if a_lin is None or len(a_lin) != len(a):
-                    a_mod = numpy.linspace(a[0],a[-1],len(a))
+            a = numpy.array(a[fromIndex:toIndex], dtype=numpy.double)
+            # we mask the error value -1 and Numpy  in the temperature array
+            mb = numpy.ma.masked_equal(numpy.ma.masked_equal(b[fromIndex:toIndex], -1), None)
+            # split in masked and
+            unmasked_slices = [(x,False) for x in numpy.ma.clump_unmasked(mb)] # the valid readings
+            masked_slices = [(x,True) for x in numpy.ma.clump_masked(mb)] # the dropped values
+            sorted_slices = sorted(unmasked_slices + masked_slices, key=lambda tup: tup[0].start)
+            b_smoothed = [] # b_smoothed collects the smoothed segments in order
+            b_smoothed.append(numpy.full(fromIndex, numpy.nan, dtype=numpy.double)) # append initial segment to the list of resulting segments
+            # we just smooth the unmsked slices and add the unmasked slices with NaN values
+            for (s, m) in sorted_slices:
+                if m:
+                    # a slice with all masked (invalid) readings
+                    b_smoothed.append(numpy.full(s.stop - s.start, numpy.nan, dtype=numpy.double))
                 else:
-                    a_mod = a_lin
-                b = numpy.interp(a_mod, a, b) # resample data to linear spaced time
-            else:
-                a_mod = a
-            # 3. filter spikes
-            if aw.qmc.filterDropOuts:
-                try:
-                    b = self.medfilt(numpy.array(b),5)  # k=3 seems not to catch all spikes in all cases; k must be odd!
-## scipy alternative which performs equal, but produces larger artefacts at the borders and for intermediate NaN values for k>3
-#                    from scipy.signal import medfilt as scipy_medfilt
-#                    b = scipy_medfilt(numpy.array(b),3)
-                    res = b
-                except Exception as e: # pylint: disable=broad-except
-                    _log.error(e)
-                    res = numpy.array(b)
-            # 4. smooth data
-            if window_len>2:
-                if decay_smoothing:
-                    # decay smoothing
-                    if decay_weights is None:
-                        decay_weights = numpy.arange(1,window_len+1)
-                    else:
-                        window_len = len(decay_weights)
-                    # invariant: window_len = len(decay_weights)
-                    if decay_weights.sum() == 0:
-                        res = b
-                    else:
-                        res = []
-                        # ignore -1 readings in averaging and ensure a good ramp
-                        for i in range(len(b)):
-                            seq = b[max(0,i-window_len + 1):i+1]
-                            # we need to surpress -1 drop out values from this
-                            seq = list(filter(lambda item: item != -1,seq))
-                            
-                            w = decay_weights[max(0,window_len-len(seq)):]  # preCond: len(decay_weights)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
-                            if len(w) == 0:
-                                res.append(b[i]) # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
-                            else:
-                                res.append(numpy.average(seq,weights=w)) # works only if len(seq) = len(w)
-                        # postCond: len(res) = len(b)
-                else:
-                    # optimal smoothing (the default)
-                    win_len = max(0,window_len)
-                    if win_len != 1: # at the lowest level we turn smoothing completely off
-                        res = self.smooth(a_mod,b,win_len,window)
-                    else:
-                        res = b
-            # 4. sample back
-            if re_sample and back_sample:
-                res = numpy.interp(a, a_mod, res) # re-sampled back to orginal timestamps
-            # Note: at this point res might be a list or a numpy array!
-            return numpy.concatenate(([None]*(fromIndex),res,[None]*(len(a)-toIndex))).tolist()
+                    # a slice with proper data
+                    b_smoothed.append(self.smooth_slice(a[s], mb[s], window_len, window, decay_weights, decay_smoothing, re_sample, back_sample, a_lin))
+            b_smoothed.append(numpy.full(len(a)-toIndex, numpy.nan, dtype=numpy.double)) # append the final segment to the list of resulting segments
+            return numpy.concatenate(b_smoothed)
         return b
+
+
+# REPLACED BY above slicing smooth_list
+#    # a: list of timestamps
+#    # b: list of readings
+#    # re_sample: if true re-sample readings to a linear spaced time before smoothing
+#    # back_sample: if true results are back-sampled to original timestamps given in "a" after smoothing
+#    # a_lin: pre-computed linear spaced timestamps of equal length than a
+#    # NOTE: result can contain NaN items on places where the input array contains the error element -1
+#    # result is always a list (and not a numpy array)
+#    def smooth_list(self, a, b, window_len=7, window='hanning',decay_weights=None,decay_smoothing=False,fromIndex=-1,toIndex=0,re_sample=True,back_sample=True,a_lin=None):  # default 'hanning'
+#        if len(a) > 1 and len(a) == len(b) and (aw.qmc.filterDropOuts or window_len>2):
+#            #pylint: disable=E1103
+#            # 1. truncate
+#            if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
+#                if toIndex==0: # no limit
+#                    toIndex=len(a)
+#            else: # smooth list on full length
+#                fromIndex = 0
+#                toIndex = len(a)
+#            # we replace the error value -1  in the temperature array by numpy.nan to avoid strange smoothing artifacts
+#            # no need to substitute anything in the time array!
+#            a = numpy.array(a[fromIndex:toIndex], dtype=numpy.double)
+#            b = numpy.array(b[fromIndex:toIndex], dtype=numpy.double) # None replaced by numpy.nan
+#            b[b==-1] = numpy.nan # -1 replaced by numpy.nan
+#            # 2. re-sample
+#            if re_sample:
+#                if a_lin is None or len(a_lin) != len(a):
+#                    a_mod = numpy.linspace(a[0],a[-1],len(a))
+#                else:
+#                    a_mod = a_lin
+#                b = numpy.interp(a_mod, a, b) # resample data to linear spaced time
+#            else:
+#                a_mod = a
+#            # 3. filter spikes
+#            if aw.qmc.filterDropOuts:
+#                try:
+#                    b = self.medfilt(b,5)  # k=3 seems not to catch all spikes in all cases; k must be odd!
+### scipy alternative which performs equal, but produces larger artefacts at the borders and for intermediate NaN values for k>3
+##                    from scipy.signal import medfilt as scipy_medfilt
+##                    b = scipy_medfilt(b,3)
+#                    res = b
+#                except Exception as e: # pylint: disable=broad-except
+#                    _log.error(e)
+#                    res = b
+#            # 4. smooth data
+#            if window_len>2:
+#                if decay_smoothing:
+#                    # decay smoothing
+#                    if decay_weights is None:
+#                        decay_weights = numpy.arange(1,window_len+1)
+#                    else:
+#                        window_len = len(decay_weights)
+#                    # invariant: window_len = len(decay_weights)
+#                    if decay_weights.sum() == 0:
+#                        res = b
+#                    else:
+#                        res = []
+#                        # ignore -1 readings in averaging and ensure a good ramp
+#                        for i in range(len(b)):
+#                            seq = b[max(0,i-window_len + 1):i+1]
+##                            # we need to surpress -1 drop out values from this
+##                            seq = list(filter(lambda item: item != -1,seq)) # -1 drop out values in b have already been replaced by numpy.nan above
+#                            
+#                            w = decay_weights[max(0,window_len-len(seq)):]  # preCond: len(decay_weights)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
+#                            if len(w) == 0:
+#                                res.append(b[i]) # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
+#                            else:
+#                                res.append(numpy.average(seq,weights=w)) # works only if len(seq) = len(w)
+#                        # postCond: len(res) = len(b)
+#                else:
+#                    # optimal smoothing (the default)
+#                    win_len = max(0,window_len)
+#                    if win_len != 1: # at the lowest level we turn smoothing completely off
+#                        res = self.smooth(a_mod,b,win_len,window)
+#                    else:
+#                        res = b
+#            # 4. sample back
+#            if re_sample and back_sample:
+#                res = numpy.interp(a, a_mod, res) # re-sampled back to orginal timestamps
+#            # Note: at this point res might be a list or a numpy array as decay smoothing generates a list which might not be back_sampled and optimal smoothing a numpy array.
+#            return numpy.concatenate(([None]*(fromIndex),res,[None]*(len(a)-toIndex))).tolist()
+#        return b
 
     # returns the position of the main event annotations as list of lists of the form
     #   [[id,temp_x,temp_y,time_x,time_y],...]
@@ -8134,14 +8245,17 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         stemp3B = self.stemp2BX[n3]
                                 if not self.backgroundShowFullflag:
-                                    stemp3B = [None]*bcharge_idx + stemp3B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
+                                    stemp3B = numpy.concatenate((
+                                        numpy.full(bcharge_idx, numpy.nan, dtype=numpy.double),
+                                        stemp3B[bcharge_idx:bdrop_idx+1],
+                                        numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
                                 try:
                                     if self.l_back3 is not None:
                                         self.l_back3.remove()
                                 except Exception: # pylint: disable=broad-except
                                     pass
                                 # don't draw -1:
-                                stemp3B = [r if r !=-1 else None for r in stemp3B]
+                                stemp3B = numpy.array(stemp3B, dtype=numpy.double)
                                 self.l_back3, = self.ax.plot(self.extratimexB[n3], stemp3B, markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
                                                             sketch_params=None,path_effects=[],transform=trans,
                                                             linewidth=self.XTbacklinewidth,linestyle=self.XTbacklinestyle,drawstyle=self.XTbackdrawstyle,color=self.backgroundxtcolor,
@@ -8176,14 +8290,17 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         stemp4B = self.stemp2BX[n4]
                                 if not self.backgroundShowFullflag:
-                                    stemp4B = [None]*bcharge_idx + stemp4B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
+                                    stemp4B = numpy.concatenate((
+                                        numpy.full(bcharge_idx, numpy.nan, dtype=numpy.double),
+                                        stemp4B[bcharge_idx:bdrop_idx+1],
+                                        numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
                                 try:
                                     if self.l_back4 is not None:
                                         self.l_back4.remove()
                                 except Exception: # pylint: disable=broad-except
                                     pass  
                                 # don't draw -1:
-                                stemp4B = [r if r !=-1 else None for r in stemp4B]
+                                stemp4B = numpy.array(stemp4B, dtype=numpy.double)
                                 self.l_back4, = self.ax.plot(self.extratimexB[n4], stemp4B, markersize=self.YTbackmarkersize,marker=self.YTbackmarker,
                                                             sketch_params=None,path_effects=[],transform=trans,
                                                             linewidth=self.YTbacklinewidth,linestyle=self.YTbacklinestyle,drawstyle=self.YTbackdrawstyle,color=self.backgroundytcolor,
@@ -8196,9 +8313,12 @@ class tgraphcanvas(FigureCanvas):
                                 temp_etb = self.stemp1B
                             else:
                                 # only draw background curve from CHARGE to DROP
-                                temp_etb = [None]*bcharge_idx + self.stemp1B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
+                                temp_etb = numpy.concatenate((
+                                    numpy.full(bcharge_idx, numpy.nan, dtype=numpy.double),
+                                    self.stemp1B[bcharge_idx:bdrop_idx+1],
+                                    numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
                         else:
-                            temp_etb = [None]*len(self.timeB)
+                            temp_etb = numpy.full(len(self.timeB), numpy.nan, dtype=numpy.double)
                         try:
                             if self.l_back1 is not None:
                                 self.l_back1.remove()
@@ -8215,9 +8335,12 @@ class tgraphcanvas(FigureCanvas):
                                 temp_btb = self.stemp2B
                             else:
                                 # only draw background curve from CHARGE to DROP
-                                temp_btb = [None]*bcharge_idx + self.stemp2B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
+                                temp_btb = numpy.concatenate((
+                                    numpy.full(bcharge_idx, numpy.nan, dtype=numpy.double),
+                                    self.stemp2B[bcharge_idx:bdrop_idx+1],
+                                    numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
                         else:
-                            temp_btb = [None]*len(self.timeB)
+                            temp_btb = numpy.full(len(self.timeB), numpy.nan, dtype=numpy.double)
                         try:
                             if self.l_back2 is not None:
                                 self.l_back2.remove()
@@ -9305,11 +9428,13 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     trans = self.ax.transData
                                 if not self.flagstart and not self.foregroundShowFullflag and len(self.extrastemp1[i]) > 0:
-                                    visible_extratemp1 = [None]*charge_idx + self.extrastemp1[i][charge_idx:drop_idx+1] + [None]*(len(self.extratimex[i])-drop_idx-1)
+                                    visible_extratemp1 = numpy.concatenate((
+                                        numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
+                                        self.extrastemp1[i][charge_idx:drop_idx+1],
+                                        numpy.full(len(self.extratimex[i])-drop_idx-1, numpy.nan, dtype=numpy.double)))
+                                    
                                 else:
-                                    visible_extratemp1 = self.extrastemp1[i]
-                                # don't draw -1:
-                                visible_extratemp1 = [r if r !=-1 else None for r in visible_extratemp1]
+                                    visible_extratemp1 = numpy.array(self.extrastemp1[i], dtype=numpy.double)
                                 # first draw the fill if any, but not during recording!
                                 if not aw.qmc.flagstart and aw.extraFill1[i] > 0:
                                     self.ax.fill_between(self.extratimex[i], 0, visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],alpha=aw.extraFill1[i]/100.,sketch_params=None)
@@ -9332,11 +9457,13 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     trans = self.ax.transData
                                 if not self.flagstart and not self.foregroundShowFullflag and len(self.extrastemp2[i]) > 0:
-                                    visible_extratemp2 = [None]*charge_idx + self.extrastemp2[i][charge_idx:drop_idx+1] + [None]*(len(self.extratimex[i])-drop_idx-1)
+                                    visible_extratemp2 = numpy.concatenate((
+                                        numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
+                                        self.extrastemp2[i][charge_idx:drop_idx+1],
+                                        numpy.full(len(self.extratimex[i])-drop_idx-1, numpy.nan, dtype=numpy.double)))
                                 else:
                                     visible_extratemp2 = self.extrastemp2[i]
-                                # don't draw -1:
-                                visible_extratemp2 = [r if r !=-1 else None for r in visible_extratemp2]
+                                    visible_extratemp2 = numpy.array(self.extrastemp2[i], dtype=numpy.double)
                                 # first draw the fill if any
                                 if not aw.qmc.flagstart and aw.extraFill2[i] > 0:
                                     self.ax.fill_between(self.extratimex[i], 0, visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],alpha=aw.extraFill2[i]/100.,sketch_params=None)
@@ -16273,7 +16400,7 @@ class SampleThread(QThread):
                     temp2_readings.append(t2)
                     timex_readings.append(tx)
                     
-                    # the software PID needs to be updated here in sampling thread to ensure constant timing for the deriv computation
+                    # the software PID needs to be updated here to ensure constant timing for the deriv computation
                     if (aw.qmc.Controlbuttonflag and
                         not aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
                         # and aw.pidcontrol.pidActive # we feed the PID algorithm also while it is not actively controlling
@@ -27930,8 +28057,6 @@ class ApplicationWindow(QMainWindow):
         self.qmc.on_ctemp2 = []
         self.qmc.on_tstemp1 = []
         self.qmc.on_tstemp2 = []
-        self.qmc.on_stemp1 = []
-        self.qmc.on_stemp2 = []
         self.qmc.on_unfiltereddelta1 = []
         self.qmc.on_unfiltereddelta2 = []
         self.qmc.on_delta1 = []
@@ -34116,7 +34241,10 @@ class ApplicationWindow(QMainWindow):
                             stemp = self.qmc.smooth_list(timex,fill_gaps(temp),window_len=self.qmc.curvefilter,decay_smoothing=not aw.qmc.optimalSmoothing)
                             charge = max(0,rd["charge_idx"]) # start of visible data
                             drop = rd["drop_idx"] # end of visible data
-                            stemp = numpy.concatenate(([None]*charge,stemp[charge:drop],[None]*(len(timex)-drop)))
+                            stemp = numpy.concatenate((
+                                numpy.full(charge, numpy.nan, dtype=numpy.double),
+                                stemp[charge:drop],
+                                numpy.full(len(timex)-drop, numpy.nan, dtype=numpy.double)))
                             timeindex = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(p["timeindex"])]
                             if len(timex) > rd["charge_idx"]:
                                 if first_profile:

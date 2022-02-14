@@ -3,3 +3,5 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5741", MODE="0660
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="a27e", MODE="0660", GROUP="sudo"
 # udev rule to allow write access to all users for Yoctopuce USB devices
 SUBSYSTEM=="usb", ATTR{idVendor}=="24e0", MODE="0666", GROUP="sudo"
+# udeve rule for all current and future Phidgets - Vendor = 0x06c2, Product = 0x0030 - 0x00af
+SUBSYSTEMS=="usb", ACTION=="add", ATTRS{idVendor}=="06c2", ATTRS{idProduct}=="00[3-a][0-f]", MODE="666"

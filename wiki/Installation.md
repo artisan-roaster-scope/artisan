@@ -80,6 +80,13 @@ that your account was successful added to the dialout group.
 
 Note that for apps running by non-root users access to Phidgets or Yoctopuce devices require the installation of corresponding udev rules. Check the [Phidgets](https://www.phidgets.com/docs/OS_-_Linux#Advanced_Information) and [Yoctopuce](https://www.yoctopuce.com/EN/article/how-to-begin-with-yoctopuce-devices-on-linux) platform installation notes. Those rules are installed automatically by Artisan, but require the users to be in the `sudo` group for security considerations.
 
+To allow Artisan to remember the artisan.plus password gnome-keyring needs to be installed. You can install this on Ubuntu and Raspbian via
+
+```
+sudo apt-get update
+sudo apt-get install gnome-keyring
+```
+
 
 
 ## Step 4: Configure Artisan for your setup
