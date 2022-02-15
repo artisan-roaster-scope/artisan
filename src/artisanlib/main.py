@@ -9482,7 +9482,7 @@ class tgraphcanvas(FigureCanvas):
                     if not self.flagstart and not self.foregroundShowFullflag:
                         visible_et = numpy.concatenate((
                                         numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
-                                        self.stemp2[charge_idx:drop_idx+1],
+                                        self.stemp1[charge_idx:drop_idx+1],
                                         numpy.full(len(self.timex)-drop_idx-1, numpy.nan, dtype=numpy.double)))
                         visible_bt = numpy.concatenate((
                                         numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
