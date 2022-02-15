@@ -324,9 +324,8 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.scale_battery = None
         self.updateWeightLCD("----")
     
-    # total, if given, is the total accumulated weight as float
     def updateWeightLCD(self,txt_value, txt_unit=""):
-        self.scaleWeight.setText(txt_value+txt_unit)
+        self.scaleWeight.setText(("" if txt_value == "" else txt_value+txt_unit))
         self.aw.qmc.updateLargeScaleLCDs(txt_value)
 
     @pyqtSlot(float)
@@ -1821,7 +1820,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     
     # takes total accumulated weight and renders it as text; returns the empty string if the total weight is not given
     def updateScaleWeightAccumulated(self,weight=None):
-        unit = self.aw.qmc.weight[2]
+        unit = ""
         v_formatted = ""
         if self.scale_set is not None and weight is not None:
             v = weight + self.scale_set
@@ -1836,6 +1835,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 v = self.aw.convertWeight(v,0,self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]))
                 v_formatted = "{0:.2f}".format(v)
+                unit = self.aw.qmc.weight[2]
         return v_formatted, unit
 
     def ble_scan_failed(self):

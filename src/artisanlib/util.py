@@ -159,7 +159,7 @@ def convertRoR(r,source_unit,target_unit):
 def convertTemp(t,source_unit,target_unit):
     if source_unit == target_unit:
         return t
-    elif source_unit == "C":
+    if source_unit == "C":
         return fromCtoF(t)
     return fromFtoC(t)
 
@@ -216,7 +216,7 @@ def removeAll(l,s):
 # fills in intermediate interpolated values replacing -1 values based on surrounding values
 # [1, 2, 3, -1, -1, -1, 10, 11] => [1, 2, 3, 4.75, 6.5, 8.25, 11]
 # [1,2,3,-1,-1,-1,-1] => [1,2,3,-1,-1,-1,-1] # no final value to interpolate too, so trailing -1 are kept!
-# [-1,-1,2] => [2, 2, 2] # a prefix of -1 of max length 5 will be replaced by the first value in l that is not -1
+# [-1,-1,2] => [2, 2, 2] # a prefix of -1 of max length 'interpolate_max' will be replaced by the first value in l that is not -1
 # INVARIANT: the resulting list has always the same lenght as l
 # only gaps of length interpolate_max, if not None, are interpolated
 def fill_gaps(l, interpolate_max=3):
@@ -269,6 +269,7 @@ def fill_gaps(l, interpolate_max=3):
 # setting of the app
 # eg. ~/Library/Application Support/Artisan-Scope/Artisan (macOS)
 #     C:/Users/<USER>/AppData/Local/Artisan-Scope/Artisan" (Windows)
+#     ~/.local/shared/Artisan-Scope/Artisan" (Linux)
 
 # getDataDirectory() returns the Artisan data directory
 # if app is not yet initialized None is returned

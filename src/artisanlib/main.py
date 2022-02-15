@@ -6888,6 +6888,7 @@ class tgraphcanvas(FigureCanvas):
 
     # re-sample, filter and smooth slice
     # takes numpy arrays a (time) and b (temp) of the same length and returns a numpy array representing the processed b values
+    # precondition: (aw.qmc.filterDropOuts or window_len>2)
     def smooth_slice(self, a, b, 
         window_len=7, window='hanning',decay_weights=None,decay_smoothing=False,
         re_sample=True,back_sample=True,a_lin=None):
@@ -6901,6 +6902,7 @@ class tgraphcanvas(FigureCanvas):
             b = numpy.interp(a_mod, a, b) # resample data to linear spaced time
         else:
             a_mod = a
+        res = b # just in case the precondition (aw.qmc.filterDropOuts or window_len>2) does not hold
         # 2. filter spikes
         if aw.qmc.filterDropOuts:
             try:
@@ -6946,8 +6948,7 @@ class tgraphcanvas(FigureCanvas):
                     res = b
         # 4. sample back
         if re_sample and back_sample:
-            res = numpy.interp(a, a_mod, res) # re-sampled back to orginal timestamps        
-        # return result
+            res = numpy.interp(a, a_mod, res) # re-sampled back to orginal timestamps
         return res
 
     # takes lists a (time array) and b (temperature array) containing invalid segments of -1/None values and returns a list with all segments of valid values smoothed
@@ -6957,7 +6958,7 @@ class tgraphcanvas(FigureCanvas):
     # back_sample: if true results are back-sampled to original timestamps given in "a" after smoothing
     # a_lin: pre-computed linear spaced timestamps of equal length than a
     # NOTE: result can contain NaN items on places where the input array contains the error element -1
-    # result is a numpy array or the original list like structure b
+    # result is a numpy array or the b as numpy array with drop out readings -1 replaced by NaN
     def smooth_list(self, a, b, window_len=7, window='hanning',decay_weights=None,decay_smoothing=False,fromIndex=-1,toIndex=0,re_sample=True,back_sample=True,a_lin=None):
         if len(a) > 1 and len(a) == len(b) and (aw.qmc.filterDropOuts or window_len>2):
             #pylint: disable=E1103
@@ -6987,6 +6988,8 @@ class tgraphcanvas(FigureCanvas):
                     b_smoothed.append(self.smooth_slice(a[s], mb[s], window_len, window, decay_weights, decay_smoothing, re_sample, back_sample, a_lin))
             b_smoothed.append(numpy.full(len(a)-toIndex, numpy.nan, dtype=numpy.double)) # append the final segment to the list of resulting segments
             return numpy.concatenate(b_smoothed)
+        b = numpy.array(b, dtype=numpy.double)
+        b[b == -1] = numpy.nan
         return b
 
 
@@ -17981,7 +17984,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background-color: #54b5ff;
+                    background-color: #7FC8FF;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
