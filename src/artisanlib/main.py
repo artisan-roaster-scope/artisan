@@ -124,7 +124,7 @@ try:
                                 QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
                                 QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor, QFont) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog) # @Reimport @UnresolvedImport @UnusedImport
-    from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, pyqtProperty, QSize, # @Reimport @UnresolvedImport @UnusedImport
                               qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @Reimport @UnresolvedImport @UnusedImport
                               QRegularExpression, QDate, QUrl, QDir, Qt, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtNetwork import QLocalSocket # @Reimport @UnresolvedImport @UnusedImport
@@ -150,7 +150,7 @@ except Exception:
                                 QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
                                 QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor, QFont) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog) # @Reimport @UnresolvedImport @UnusedImport
-    from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, pyqtProperty, QSize, # @Reimport @UnresolvedImport @UnusedImport
                               qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,  # @Reimport @UnresolvedImport @UnusedImport
                               QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtNetwork import QLocalSocket # @Reimport @UnresolvedImport @UnusedImport
@@ -9480,8 +9480,14 @@ class tgraphcanvas(FigureCanvas):
                     ##### ET,BT curves
                     
                     if not self.flagstart and not self.foregroundShowFullflag:
-                        visible_et = [None]*charge_idx + self.stemp1[charge_idx:drop_idx+1] + [None]*(len(self.timex)-drop_idx-1)
-                        visible_bt = [None]*charge_idx + self.stemp2[charge_idx:drop_idx+1] + [None]*(len(self.timex)-drop_idx-1)
+                        visible_et = numpy.concatenate((
+                                        numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
+                                        self.stemp2[charge_idx:drop_idx+1],
+                                        numpy.full(len(self.timex)-drop_idx-1, numpy.nan, dtype=numpy.double)))
+                        visible_bt = numpy.concatenate((
+                                        numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
+                                        self.stemp2[charge_idx:drop_idx+1],
+                                        numpy.full(len(self.timex)-drop_idx-1, numpy.nan, dtype=numpy.double)))
                     else:
                         visible_et = self.stemp1
                         visible_bt = self.stemp2
@@ -14339,7 +14345,7 @@ class tgraphcanvas(FigureCanvas):
     # calculates the (interpolated) temperature from the given time/temp arrays at timepoint "seconds"
     @staticmethod
     def timetemparray2temp(timearray, temparray, seconds):
-        if timearray and temparray and len(timearray) and len(temparray) and len(timearray) == len(temparray):
+        if timearray is not None and temparray is not None and len(timearray) and len(temparray) and len(timearray) == len(temparray):
             if seconds > timearray[-1] or seconds < timearray[0]:
                 # requested timepoint out of bonds
                 return -1
@@ -15880,6 +15886,43 @@ def my_fedit(data, title="", comment="", icon=None, parent=None, apply=None):
 
 #####
 
+# monkey patching MPL 3.5.1 _formlayout.py:ColorButton to work on Qt6
+# (see https://github.com/matplotlib/matplotlib/issues/22471)
+class MPLColorButtonPatched(QPushButton):
+    """
+    Color choosing push button
+    """
+    colorChanged = pyqtSignal(QColor)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedSize(20, 20)
+        self.setIconSize(QSize(12, 12))
+        self.clicked.connect(self.choose_color)
+        self._color = QColor()
+
+    def choose_color(self):
+        color = QColorDialog.getColor(
+            self._color, self.parentWidget(), "",
+            QColorDialog.ColorDialogOption.ShowAlphaChannel)
+        if color.isValid():
+            self.set_color(color)
+
+    def get_color(self):
+        return self._color
+
+    @pyqtSlot(QColor)
+    def set_color(self, color):
+        if color != self._color:
+            self._color = color
+            self.colorChanged.emit(self._color)
+            pixmap = QPixmap(self.iconSize())
+            pixmap.fill(color)
+            self.setIcon(QIcon(pixmap))
+
+    color = pyqtProperty(QColor, get_color, set_color)
+    
+
 class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
     def __init__(self, plotCanvas, parent,white_icons=False):
         # toolitem entries of the form (text, tooltip_text, image_file, callback)
@@ -15969,11 +16012,14 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             # not yet monkey patched
             formlayout.fedit_org = formlayout.fedit
             formlayout.fedit = my_fedit
-            
+        # monkey patch _formlayout to work around a MPL3.5.1 issue on Qt6
+        # (see https://github.com/matplotlib/matplotlib/issues/22471)
+        formlayout.ColorButton = MPLColorButtonPatched
+
     def enable_edit_curve_parameters(self):
         if self.edit_curve_parameters_action is not None:
             self.edit_curve_parameters_action.setEnabled(True)
-    
+
     def disable_edit_curve_parameters(self):
         if self.edit_curve_parameters_action is not None:
             self.edit_curve_parameters_action.setEnabled(False)
@@ -18210,7 +18256,6 @@ class ApplicationWindow(QMainWindow):
 
         # NavigationToolbar VMToolbar
         self.ntb = VMToolbar(self.qmc, self.main_widget)
-
         #self.ntb.setMinimumHeight(50)
 
         #create LCD displays
