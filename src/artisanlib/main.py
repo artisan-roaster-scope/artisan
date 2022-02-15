@@ -3639,7 +3639,7 @@ class tgraphcanvas(FigureCanvas):
         tx = []
         temp = []
         for i in range(len(temp_in)):
-            if temp_in[i] not in [None, -1]:
+            if temp_in[i] not in [None, -1, numpy.NaN]:
                 tx.append(tx_in[i])
                 temp.append(temp_in[i])
         if len(temp) == 0:
@@ -4375,7 +4375,7 @@ class tgraphcanvas(FigureCanvas):
             ## ET LCD:
             etstr = resLCD
             try: # if temp1 is None, which should never be the case, this fails
-                if temp1 and idx is not None and idx < len(temp1) and temp1[idx] not in [None, -1]:
+                if temp1 and idx is not None and idx < len(temp1) and temp1[idx] not in [None, -1, numpy.NaN]:
                     if -100 < temp1[idx] < 1000:
                         etstr = lcdformat%temp1[idx]
                     elif self.LCDdecimalplaces and -10000 < temp1[idx] < 100000:
@@ -4387,7 +4387,7 @@ class tgraphcanvas(FigureCanvas):
             ## BT LCD:
             btstr = resLCD
             try:
-                if temp2 and idx is not None and idx < len(temp2) and temp2[idx] not in [None, -1]:
+                if temp2 and idx is not None and idx < len(temp2) and temp2[idx] not in [None, -1, numpy.NaN]:
                     if -100 < temp2[idx] < 1000:
                         btstr = lcdformat%temp2[idx]            # BT
                     elif self.LCDdecimalplaces and -10000 < temp2[idx] < 100000:
@@ -4400,13 +4400,13 @@ class tgraphcanvas(FigureCanvas):
             deltaetstr = resLCD
             deltabtstr = resLCD
             try:
-                if delta1 and idx is not None and idx < len(delta1) and delta1[idx] not in [None, -1]:
+                if delta1 and idx is not None and idx < len(delta1) and delta1[idx] not in [None, -1, numpy.NaN]:
                     if -100 < delta1[idx] < 1000:
                         deltaetstr = lcdformat%delta1[idx]        # rate of change ET (degress per minute)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             try:
-                if delta2 and idx is not None and idx < len(delta2) and delta2[idx] not in [None, -1]:
+                if delta2 and idx is not None and idx < len(delta2) and delta2[idx] not in [None, -1, numpy.NaN]:
                     if -100 < delta2[idx] < 1000:
                         deltabtstr = lcdformat%delta2[idx]        # rate of change BT (degrees per minute)
             except Exception as e: # pylint: disable=broad-except
@@ -4423,7 +4423,7 @@ class tgraphcanvas(FigureCanvas):
                 if aw.ser.showFujiLCDs and self.device in (0, 26):
                     pidsvstr = resLCD
                     piddutystr = resLCD
-                    if PID_SV not in [None, -1] and PID_DUTY not in [None, -1]:
+                    if PID_SV not in [None, -1, numpy.NaN] and PID_DUTY not in [None, -1, numpy.NaN]:
                         pidsvstr = lcdformat%PID_SV
                         piddutystr = lcdformat%PID_DUTY
                     aw.lcd6.display(pidsvstr)
@@ -5425,7 +5425,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.projectionmode == 0: # linear temperature projection mode based on current RoR
                     #calculate the temperature endpoint at endofx acording to the latest rate of change
                     if self.l_BTprojection is not None:
-                        if self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and self.unfiltereddelta2_pure[-1] is not None and len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1]:
+                        if self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and self.unfiltereddelta2_pure[-1] is not None and len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1, numpy.NaN]:
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left, xlim_right + charge) # never have the right point be left of left;)
@@ -5435,7 +5435,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             self.l_BTprojection.set_data([],[])
                     if self.l_ETprojection is not None:
-                        if self.ETcurve and len(self.unfiltereddelta1_pure) > 0 and self.unfiltereddelta1_pure[-1] is not None and len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1]:
+                        if self.ETcurve and len(self.unfiltereddelta1_pure) > 0 and self.unfiltereddelta1_pure[-1] is not None and len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1, numpy.NaN]:
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left,xlim_right + charge) # never have the right point be left of left;)
@@ -5454,7 +5454,7 @@ class tgraphcanvas(FigureCanvas):
                     delay = self.delay/1000.
                     
                     if self.l_BTprojection is not None:
-                        if (len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1] and
+                        if (len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1, numpy.NaN] and
                                 len(self.unfiltereddelta2_pure)>delta_interval_BT and 
                                 self.unfiltereddelta2_pure[-1] and 
                                 self.unfiltereddelta2_pure[-1]>0 and 
@@ -5477,7 +5477,7 @@ class tgraphcanvas(FigureCanvas):
                             self.l_BTprojection.set_data([],[])
 
                     if self.l_ETprojection is not None:
-                        if (len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1] and
+                        if (len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1, numpy.NaN] and
                                 len(self.unfiltereddelta1_pure)>delta_interval_BT and 
                                 self.unfiltereddelta1_pure[-1] and 
                                 self.unfiltereddelta1_pure[-1]>0 and 
@@ -5552,7 +5552,7 @@ class tgraphcanvas(FigureCanvas):
 #                    # Every roaster will have a different constantN (self.projectionconstant).
 #                    
 #                    if self.l_BTprojection is not None:
-#                        if len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1] and len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1]:
+#                        if len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1, numpy.NaN] and len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1, numpy.NaN]:
 #                            den = self.ctemp1[-1] - self.ctemp2[-1]  #denominator ETn - BTn
 #                            if den > 0 and len(self.delta2)>0 and self.delta2[-1]: # if ETn > BTn
 #                                starttime = self.timex[self.timeindex[0]]
@@ -5570,7 +5570,7 @@ class tgraphcanvas(FigureCanvas):
 #                        else:
 #                            self.l_BTprojection.set_data([],[])
 #                    if self.l_ETprojection is not None:
-#                        if len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1]:
+#                        if len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1, numpy.NaN]:
 #                            starttime = self.timex[self.timeindex[0]]
 #                            self.l_ETprojection.set_data([self.timex[-1],self.endofx + starttime], [self.ctemp1[-1], self.ctemp1[-1]])
 #                        else:
@@ -14366,7 +14366,7 @@ class tgraphcanvas(FigureCanvas):
     # if smoothed=True, the smoothed data is taken if available
     # if relative=True, the given time in seconds is interpreted relative to CHARGE, otherwise absolute from the first mesasurement
     def BTat(self,seconds,smoothed=True,relative=False):
-        if smoothed and self.stemp2 and self.stemp2 != []:
+        if smoothed and self.stemp2 is not None and len(self.stemp2) != 0:
             temp = self.stemp2
         else:
             temp = self.temp2
@@ -14377,7 +14377,7 @@ class tgraphcanvas(FigureCanvas):
         return self.timetemparray2temp(self.timex,temp,seconds + offset)
 
     def ETat(self,seconds,smoothed=True,relative=False):
-        if smoothed and self.stemp1 and self.stemp1 != []:
+        if smoothed and self.stemp1 is not None and len(self.stemp1) != 0:
             temp = self.stemp1
         else:
             temp = self.temp1
@@ -21529,13 +21529,13 @@ class ApplicationWindow(QMainWindow):
 #                _log.debug(f"curveSimilarity: {self.qmc.background_profile_sampling_interval=}")  #pylint: disable=logging-fstring-interpolation
 
                 # create arrays using smoothed data if available
-                if aw.qmc.stemp1 and len(aw.qmc.stemp1) == len(aw.qmc.temp1):
+                if aw.qmc.stemp1 is not None and len(aw.qmc.stemp1) == len(aw.qmc.temp1):
                     # take smoothed data if available
                     np_et = numpy.array(aw.qmc.stemp1)
                 else:
                     np_et = numpy.array(aw.qmc.temp1)
                     _log.debug("curveSimilarity: using non-smoothed ET")
-                if aw.qmc.stemp2 and len(aw.qmc.stemp2) == len(aw.qmc.temp2):
+                if aw.qmc.stemp2 is not None and len(aw.qmc.stemp2) == len(aw.qmc.temp2):
                     # take smoothed data if available
                     np_bt = numpy.array(aw.qmc.stemp2)
                 else:
@@ -21624,12 +21624,12 @@ class ApplicationWindow(QMainWindow):
                 count = 0
                 for i in range(aw.qmc.timeindex[6],0,-1):
                     # iterate backward from DROP to BTlimit
-                    if aw.qmc.stemp1 and len(aw.qmc.stemp1) > i:
+                    if aw.qmc.stemp1 is not None and len(aw.qmc.stemp1) > i:
                         # take smoothed data if available
                         et = aw.qmc.stemp1[i]
                     else:
                         et = aw.qmc.temp1[i]
-                    if aw.qmc.stemp2 and len(aw.qmc.stemp2) > i:
+                    if aw.qmc.stemp2 is not None and len(aw.qmc.stemp2) > i:
                         # take smoothed data if available
                         bt = aw.qmc.stemp2[i]
                     else:
@@ -38300,6 +38300,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def clearResults(self,_=False):
         self.qmc.fig.canvas.mpl_disconnect(self.qmc.analyzer_connect_id)
+        aw.autoAdjustAxis()
         aw.qmc.redraw(recomputeAllDeltas=True)
 
     def analysisfitCurves(self, exp=-1):

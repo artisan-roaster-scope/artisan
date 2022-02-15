@@ -7,6 +7,7 @@ import sys
 import math
 import os
 import re
+import numpy
 import functools
 from pathlib import Path
 from typing import Optional
@@ -126,35 +127,31 @@ def stringtoseconds(string):
     return seconds    #return negative number
 
 def fromFtoC(Ffloat):
-    if Ffloat in [-1,None]:
+    if Ffloat in [-1,None,numpy.nan]:
         return Ffloat
     return (Ffloat-32.0)*(5.0/9.0)
 
 def fromCtoF(Cfloat):
-    if Cfloat in [-1,None]:
+    if Cfloat in [-1,None,numpy.nan]:
         return Cfloat
     return (Cfloat*9.0/5.0)+32.0
         
 def RoRfromCtoF(CRoR):
-    if CRoR in [-1,None]:
+    if CRoR in [-1,None,numpy.nan]:
         return CRoR
     return (CRoR*9.0/5.0)
 
 def RoRfromFtoC(FRoR):
-    if FRoR in [-1,None]:
+    if FRoR in [-1,None,numpy.nan]:
         return FRoR
     return FRoR*(5.0/9.0)
 
 def convertRoR(r,source_unit,target_unit):
+    if source_unit == target_unit:
+        return r
     if source_unit == "C":
-        if target_unit == "C":
-            return r
         return RoRfromCtoF(r)
-    if source_unit == "F":
-        if target_unit == "F":
-            return r
-        return RoRfromFtoC(r)
-    return r
+    return RoRfromFtoC(r)
 
 def convertTemp(t,source_unit,target_unit):
     if source_unit == target_unit:
