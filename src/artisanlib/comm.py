@@ -1296,16 +1296,18 @@ class serialport():
 
     def ARC_BTET(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
-#        t2,t1 = self.ARDUINOTC4temperature("3400") # t1 = chan4 (ET/Drum); t2 = chan3 (BT)
-        t2,t1 = self.ARDUINOTC4temperature("3412") # t1 = chan4 (ET/Drum); t2 = chan3 (BT); t3 = chan1 (MET/Exhaust); t4 = chan2 (IT)  
+        t2,t1 = self.ARDUINOTC4temperature("3400") # t1 = chan4 (ET/Drum); t2 = chan3 (BT)
+# if the machine would return 4 channel (see comment in ARC_BTET above, one could fetch data with two requests (still a CHAN is needed before every READ!)
+#        t2,t1 = self.ARDUINOTC4temperature("3412") # t1 = chan4 (ET/Drum); t2 = chan3 (BT); t3 = chan1 (MET/Exhaust); t4 = chan2 (IT)  
         return tx,t1,t2 # tx, ET, BT
     
     def ARC_METIT(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
-#        self.SP = self.aw.ser.SP # we link to the serial port object of the main device
-#        t1,t2 = self.ARDUINOTC4temperature("1200") # t1 = chan1 (MET/Exhaust); t2 = chan2 (IT)       
-        t1 = self.aw.qmc.extraArduinoT1
-        t2 = self.aw.qmc.extraArduinoT2
+        self.SP = self.aw.ser.SP # we link to the serial port object of the main device
+        t1,t2 = self.ARDUINOTC4temperature("1200") # t1 = chan1 (MET/Exhaust); t2 = chan2 (IT)       
+# if the machine would return 4 channel (see comment in ARC_BTET above, one could fetch data with two requests (still a CHAN is needed before every READ!)
+#        t1 = self.aw.qmc.extraArduinoT1
+#        t2 = self.aw.qmc.extraArduinoT2
         return tx,t2,t1 # tx, Extra2 (IT), Extra1 (MET)
     
     def HB_BTET(self):
@@ -5563,7 +5565,7 @@ class serialport():
                 self.ArduinoIsInitialized = 0
             if self.SP.isOpen():
                 #INITIALIZE (ONLY ONCE)
-                if not self.ArduinoIsInitialized:# or chan is not None:
+                if not self.ArduinoIsInitialized or chan is not None:
                     self.SP.reset_input_buffer()
                     self.SP.reset_output_buffer()
                     #build initialization command
@@ -5603,9 +5605,6 @@ class serialport():
                         settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                         self.aw.addserial("ArduinoTC4: " + settings + " || Tx = " + str(command) + " || Rx = " + str(result))
                     
-#                    _log.debug("command: %s",command)
-#                    _log.debug("result: %s",result)
-                    
                     if result.startswith("#") and chan is None:
                         #OK. NOW SET UNITS
                         self.SP.reset_input_buffer()
@@ -5638,8 +5637,10 @@ class serialport():
                 libtime.sleep(.1)
                 rl = self.SP.readline().decode('utf-8', 'ignore')[:-2]
                 res = rl.rsplit(',')
+
 #                _log.debug("command: %s",command)
 #                _log.debug("res: %s",res)
+
                 #response: list ["t0","t1","t2"]  with t0 = internal temp; t1 = ET; t2 = BT on "CHAN;1200" 
                 #response: list ["t0","t1","t2","t3","t4"]  with t0 = internal temp; t1 = ET; t2 = BT, t3 = chan3, t4 = chan4 on "CHAN;1234" if ArduinoTC4_34 is configured
                 # after PID_ON: + [,"Heater", "Fan", "SV"]
@@ -5730,16 +5731,20 @@ class serialport():
                         self.aw.qmc.extraArduinoT3 = float(res[0])
                     elif (28 in self.aw.qmc.extradevices and 32 in self.aw.qmc.extradevices) and self.aw.ser.arduinoATChannel == "T6":
                         self.aw.qmc.extraArduinoT4 = float(res[0])
-                if chan is not None and len(res) == 4:
-                    if res[3] == "F" and self.aw.qmc.mode != "F":
+                if chan is not None:
+                    if ((len(res)==4 and res[3] == "F") or (len(res)==6 and res[5] == "F")) and self.aw.qmc.mode != "F":
                         # data is given in F, we convert it back to C
                         t1 = fromFtoC(t1)
                         t2 = fromFtoC(t2)
+                        self.aw.qmc.extraArduinoT1 = fromFtoC(self.aw.qmc.extraArduinoT1)
+                        self.aw.qmc.extraArduinoT2 = fromFtoC(self.aw.qmc.extraArduinoT2)
                         self.aw.qmc.extraArduinoT6 = fromFtoC(self.aw.qmc.extraArduinoT6)
-                    elif res[3] != "F" and self.aw.qmc.mode == "F":
+                    elif ((len(res)==4 and res[3] != "F") or (len(res)==6 and res[5] != "F")) and self.aw.qmc.mode == "F":
                         # data is given in C, we convert it back to F
                         t1 = fromCtoF(t1)
                         t2 = fromCtoF(t2)
+                        self.aw.qmc.extraArduinoT1 = fromCtoF(self.aw.qmc.extraArduinoT1)
+                        self.aw.qmc.extraArduinoT2 = fromCtoF(self.aw.qmc.extraArduinoT2)
                         self.aw.qmc.extraArduinoT6 = fromCtoF(self.aw.qmc.extraArduinoT6)
             return t1, t2
         except Exception as e: # pylint: disable=broad-except

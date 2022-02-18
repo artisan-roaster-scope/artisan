@@ -32,7 +32,7 @@ extradevicecolor2=#2086bb, black
 extradevices=127, 128
 extramathexpression1=, 
 extramathexpression2=, 
-extraname1=MET, AT
+extraname1=Exhaust, AT
 extraname2=Inlet, Extra 2
 
 [SerialPort]
