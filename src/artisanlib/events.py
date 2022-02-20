@@ -27,7 +27,7 @@ except ImportError:
 
 from artisanlib.util import uchr
 from artisanlib.dialogs import ArtisanResizeablDialog, ArtisanDialog
-from artisanlib.widgets import MyQComboBox
+from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox
 
 from uic import SliderCalculatorDialog
 
@@ -37,7 +37,7 @@ try:
     from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import (QColor, QFont, QIntValidator) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QSpinBox, QDoubleSpinBox, QWidget, QTabWidget, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QWidget, QTabWidget, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGridLayout, QGroupBox, QTableWidget, QHeaderView, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:
@@ -45,7 +45,7 @@ except Exception:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QColor, QFont, QIntValidator) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QSpinBox, QDoubleSpinBox, QWidget, QTabWidget, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QWidget, QTabWidget, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGridLayout, QGroupBox, QTableWidget, QHeaderView, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
     try:
         from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
@@ -387,28 +387,28 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E4thicknessSpinBox.setRange(1,10)
         self.E4thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[3])))
         self.E4thicknessSpinBox.valueChanged.connect(self.setElinethickness3)
-        self.E1alphaSpinBox = QDoubleSpinBox()
+        self.E1alphaSpinBox = MyQDoubleSpinBox()
         self.E1alphaSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E1alphaSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E1alphaSpinBox.setRange(.1,1.)
         self.E1alphaSpinBox.setSingleStep(.1)
         self.E1alphaSpinBox.setValue(self.aw.qmc.Evaluealpha[0])
         self.E1alphaSpinBox.valueChanged.connect(self.setElinealpha0)
-        self.E2alphaSpinBox = QDoubleSpinBox()
+        self.E2alphaSpinBox = MyQDoubleSpinBox()
         self.E2alphaSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E2alphaSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E2alphaSpinBox.setRange(.1,1.)
         self.E2alphaSpinBox.setSingleStep(.1)
         self.E2alphaSpinBox.setValue(self.aw.qmc.Evaluealpha[1])
         self.E1alphaSpinBox.valueChanged.connect(self.setElinealpha1)
-        self.E3alphaSpinBox = QDoubleSpinBox()
+        self.E3alphaSpinBox = MyQDoubleSpinBox()
         self.E3alphaSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E3alphaSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E3alphaSpinBox.setRange(.1,1.)
         self.E3alphaSpinBox.setSingleStep(.1)
         self.E3alphaSpinBox.setValue(self.aw.qmc.Evaluealpha[2])
         self.E3alphaSpinBox.valueChanged.connect(self.setElinealpha2)
-        self.E4alphaSpinBox = QDoubleSpinBox()
+        self.E4alphaSpinBox = MyQDoubleSpinBox()
         self.E4alphaSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E4alphaSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E4alphaSpinBox.setRange(.1,1.)
@@ -659,45 +659,45 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E2command = QLineEdit(self.aw.eventslidercommands[1])
         self.E3command = QLineEdit(self.aw.eventslidercommands[2])
         self.E4command = QLineEdit(self.aw.eventslidercommands[3])
-        self.E1offset = QDoubleSpinBox()
+        self.E1offset = MyQDoubleSpinBox()
         self.E1offset.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E1offset.setRange(-9999,9999)
         self.E1offset.setDecimals(2)
         self.E1offset.setValue(self.aw.eventslideroffsets[0])
-        self.E2offset = QDoubleSpinBox()
+        self.E2offset = MyQDoubleSpinBox()
         self.E2offset.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E2offset.setRange(-9999,9999)
         self.E2offset.setDecimals(2)
         self.E2offset.setValue(self.aw.eventslideroffsets[1])
-        self.E3offset = QDoubleSpinBox()
+        self.E3offset = MyQDoubleSpinBox()
         self.E3offset.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E3offset.setRange(-9999,9999)
         self.E3offset.setDecimals(2)
         self.E3offset.setValue(self.aw.eventslideroffsets[2])
-        self.E4offset = QDoubleSpinBox()
+        self.E4offset = MyQDoubleSpinBox()
         self.E4offset.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E4offset.setRange(-9999,9999)
         self.E4offset.setDecimals(2)
         self.E4offset.setValue(self.aw.eventslideroffsets[3])
-        self.E1factor = QDoubleSpinBox()
+        self.E1factor = MyQDoubleSpinBox()
         self.E1factor.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E1factor.setRange(-999,999)
         self.E1factor.setDecimals(4)
         self.E1factor.setValue(self.aw.eventsliderfactors[0])
         self.E1factor.setMaximumWidth(70)
-        self.E2factor = QDoubleSpinBox()
+        self.E2factor = MyQDoubleSpinBox()
         self.E2factor.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E2factor.setRange(-999,999)
         self.E2factor.setDecimals(4)
         self.E2factor.setValue(self.aw.eventsliderfactors[1])
         self.E2factor.setMaximumWidth(70)
-        self.E3factor = QDoubleSpinBox()
+        self.E3factor = MyQDoubleSpinBox()
         self.E3factor.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E3factor.setRange(-999,999)
         self.E3factor.setDecimals(4)
         self.E3factor.setValue(self.aw.eventsliderfactors[2])
         self.E3factor.setMaximumWidth(70)
-        self.E4factor = QDoubleSpinBox()
+        self.E4factor = MyQDoubleSpinBox()
         self.E4factor.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E4factor.setRange(-999,999)
         self.E4factor.setDecimals(4)

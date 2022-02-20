@@ -623,6 +623,7 @@ import plus.queue
 import plus.controller
 import plus.register
 import plus.notifications
+import plus.blend
 
 #######################################################################################
 #################### Ambient Data Collection  #########################################
@@ -729,7 +730,7 @@ class tgraphcanvas(FigureCanvas):
         'organization_setup', 'operator_setup', 'roastertype_setup', 'roastersize_setup', 'roasterheating_setup', 'drumspeed_setup', 'machinesetup_energy_ratings',
         'machinesetup', 'roastingnotes', 'cuppingnotes', 'roastdate', 'roastepoch', 'lastroastepoch', 'batchcounter', 'batchsequence', 'batchprefix', 'neverUpdateBatchCounter', 
         'roastbatchnr', 'roastbatchprefix', 'roastbatchpos', 'roasttzoffset', 'roastUUID', 'plus_default_store', 'plus_store', 'plus_store_label', 'plus_coffee',
-        'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_sync_record_hash', 'beans', 'projectFlag', 'curveVisibilityCache', 'ETcurve', 'BTcurve',
+        'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_custom_blend', 'plus_sync_record_hash', 'beans', 'projectFlag', 'curveVisibilityCache', 'ETcurve', 'BTcurve',
         'ETlcd', 'BTlcd', 'swaplcds', 'LCDdecimalplaces', 'foregroundShowFullflag', 'DeltaETflag', 'DeltaBTflag', 'DeltaETlcdflag', 'DeltaBTlcdflag', 
         'swapdeltalcds', 'PIDbuttonflag', 'Controlbuttonflag', 'deltaETfilter', 'deltaBTfilter', 'curvefilter', 'deltaETspan', 'deltaBTspan',
         'deltaETsamples', 'deltaBTsamples', 'profile_sampling_interval', 'background_profile_sampling_interval', 'profile_meter', 'optimalSmoothing', 'polyfitRoRcalc',
@@ -1738,6 +1739,7 @@ class tgraphcanvas(FigureCanvas):
         self.plus_blend_spec = None # the plus blend structure [<blend_label>,[[<coffee_label>,<hr_id>,<ratio>],...,[<coffee_label>,<hr_id>,<ratio>]]] # label + ingredients
         self.plus_blend_spec_labels = None # a list of labels as long as the list of ingredients in self.plus_blend_spec or None
         self.plus_blend_label = None # holds the plus selected label of the selected blend of the current profile or None
+        self.plus_custom_blend = None # holds the one custom blend, an instance of plus.blend.Blend, or None
         self.plus_sync_record_hash = None
 
         self.beans = ""
@@ -5453,6 +5455,7 @@ class tgraphcanvas(FigureCanvas):
                     deltadeltalimit = 0.002
                     delay = self.delay/1000.
                     
+                    # NOTE: we use the unfiltered deltas here to make this work also with a delta symbolic formula like x/2 to render RoR in C/30sec
                     if self.l_BTprojection is not None:
                         if (len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1, numpy.NaN] and
                                 len(self.unfiltereddelta2_pure)>delta_interval_BT and 
@@ -15886,8 +15889,9 @@ def my_fedit(data, title="", comment="", icon=None, parent=None, apply=None):
 
 #####
 
-# monkey patching MPL 3.5.1 _formlayout.py:ColorButton to work on Qt6
+# monkey patching MPL 3.5.1 _formlayout.py:ColorButton to work on Qt6 (not relevant on Qt5)
 # (see https://github.com/matplotlib/matplotlib/issues/22471)
+# to be removed on upgrading to 3.5.2 which fixes this
 class MPLColorButtonPatched(QPushButton):
     """
     Color choosing push button
@@ -21080,7 +21084,32 @@ class ApplicationWindow(QMainWindow):
                 if self.sample_loop_running:
                     period_stopped = (self.qmc.timeclock.elapsed() / self.qmc.timeclock.getBase()) - aw.time_stopped
                     self.qmc.timeclock.addClock(period_stopped)
+                    
+                    # restart the stopped simulator
+                    modifiers = QApplication.keyboardModifiers()
+                    control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple key on macOS, Control key on Windows
+                    alt_modifier = modifiers == Qt.KeyboardModifier.AltModifier # OPTION on macOS, ALT on Windows
+                    shift_modifier = modifiers == Qt.KeyboardModifier.ShiftModifier # SHIFT
+                    if control_modifier or alt_modifier or shift_modifier:
+                        # if a modifier we change the speed instead of leaving the simulator (shift: 1x, alt: 2x, control: 4x):
+                        speed = 1
+                        if alt_modifier:
+                            speed = 2
+                        elif control_modifier:
+                            speed = 4
+                        old_base = self.qmc.timeclock.getBase()
+                        old_speed = old_base/1000
+                        if old_speed != speed:
+                            old_elapsed = self.qmc.timeclock.elapsed()
+                            # switch to new speed:
+                            new_base = 1000*speed
+                            self.qmc.timeclock.setBase(new_base)
+                            # time-base changed, we have to adjust our clock
+                            new_elapsed = self.qmc.timeclock.elapsed()
+                            offset = (new_elapsed - old_elapsed)/new_base
+                            self.qmc.timeclock.addClock(offset)
                 else:
+                    # remember the time on stopping the simulator
                     aw.time_stopped = self.qmc.timeclock.elapsed() / self.qmc.timeclock.getBase()
             finally:
                 if self.qmc.samplingSemaphore.available() < 1:
@@ -26153,6 +26182,7 @@ class ApplicationWindow(QMainWindow):
 
             if not aw.qmc.flagstart:
                 self.qmc.fig.canvas.draw()
+                self.qmc.fileDirtySignal.emit()
 
             string = ""
             if len(self.qmc.specialeventsStrings[lenevents-1]) > 5:
@@ -30107,7 +30137,7 @@ class ApplicationWindow(QMainWindow):
                     if "canvas" in aw.qmc.palette:
                         aw.updateCanvasColors(checkColors=False)
                     # remove window geometry settings
-                    for s in ["RoastGeometry","FlavorProperties","CalculatorGeometry","EventsGeometry", "CompareGeometry",
+                    for s in ["BlendGeometry","RoastGeometry","FlavorProperties","CalculatorGeometry","EventsGeometry", "CompareGeometry",
                         "BackgroundGeometry","LCDGeometry","DeltaLCDGeometry","ExtraLCDGeometry","PhasesLCDGeometry","AlarmsGeometry","DeviceAssignmentGeometry","PortsGeometry",
                         "TransformatorPosition", "CurvesPosition", "StatisticsPosition", "AxisPosition","PhasesPosition", "BatchPosition",
                         "SamplingPosition", "autosaveGeometry", "PIDPosition", "DesignerPosition","PIDLCDGeometry","ScaleLCDGeometry"]:
@@ -31242,6 +31272,22 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.beansize_max = toInt(settings.value("beansize_max",self.qmc.beansize_max))
             if filename is None and settings.contains("plus_default_store"):
                 self.qmc.plus_default_store = toString(settings.value("plus_default_store",self.qmc.plus_default_store))
+            if filename is None and settings.contains("plus_custom_blend_name"):
+                # we don't import plus custom blend data from external settings file as the custom blend is considered temporary
+                plus_custom_blend_name = toString(settings.value("plus_custom_blend_name",""))
+                plus_custom_blend_coffees = [toString(x) for x in toList(settings.value("plus_custom_blend_coffees"))]
+                plus_custom_blend_ratios = [toFloat(x) for x in toList(settings.value("plus_custom_blend_ratios"))]
+                if plus_custom_blend_name != "" and len(plus_custom_blend_coffees)>1 and len(plus_custom_blend_ratios) == len(plus_custom_blend_coffees):
+                    try:
+                        plus_custom_blend_components = [plus.blend.Component(c,r) for (c,r) in zip(plus_custom_blend_coffees, plus_custom_blend_ratios)]
+                        self.qmc.plus_custom_blend = plus.blend.Blend(
+                            plus_custom_blend_name,
+                            plus_custom_blend_components)
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+                        self.qmc.plus_custom_blend = None
+                else:
+                    self.qmc.plus_custom_blend = None
             settings.endGroup()
 
             self.userprofilepath = toString(settings.value("profilepath",self.userprofilepath))
@@ -32618,7 +32664,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("electricEnergyMix_setup",self.qmc.electricEnergyMix_setup)
             settings.setValue("energyresultunit_setup",self.qmc.energyresultunit_setup)
 #            settings.setValue("energytablecolumnwidths",self.qmc.energytablecolumnwidths)
-            settings.endGroup()        
+            settings.endGroup()
             
             settings.beginGroup("RoastProperties")
             settings.setValue("machinesetup",self.qmc.machinesetup)
@@ -32627,7 +32673,12 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("beansize_min",self.qmc.beansize_min)
             settings.setValue("beansize_max",self.qmc.beansize_max)
             if filename is None:
+                # we don't export plus default store and custom blend data to external settings file as the custom blend is considered temporary
                 settings.setValue("plus_default_store",self.qmc.plus_default_store)
+                if self.qmc.plus_custom_blend is not None:
+                    settings.setValue("plus_custom_blend_name", self.qmc.plus_custom_blend.name)
+                    settings.setValue("plus_custom_blend_coffees", [c.coffee for c in self.qmc.plus_custom_blend.components])
+                    settings.setValue("plus_custom_blend_ratios",  [c.ratio for c in self.qmc.plus_custom_blend.components])
             settings.endGroup()
             settings.beginGroup("XT")
             settings.setValue("color",self.qmc.backgroundxtcolor)
@@ -38773,16 +38824,32 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def simulate(self,_=False):
+        modifiers = QApplication.keyboardModifiers()
+        control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple key on macOS, Control key on Windows
+        alt_modifier = modifiers == Qt.KeyboardModifier.AltModifier # OPTION on macOS, ALT on Windows
+        shift_modifier = modifiers == Qt.KeyboardModifier.ShiftModifier # SHIFT
         if bool(self.simulator):
-            self.simulator = None
-            self.qmc.timeclock.setBase(1000)
-            self.sample_loop_running = True # we enable the sampling loop again that might have been stopped during the simulation via a timerLCD click
-            aw.buttonONOFF.setStyleSheet(aw.pushbuttonstyles["OFF"])
-            aw.buttonSTARTSTOP.setStyleSheet(aw.pushbuttonstyles["STOP"])
-            self.sendmessage(QApplication.translate("Message","Simulator stopped"))
-            self.updateWindowTitle()
-            self.enableLoadImportConvertMenus()
-            self.qmc.redraw(recomputeAllDeltas=False)
+            if control_modifier or alt_modifier or shift_modifier:
+                # if a modifier we change the speed instead of leaving the simulator (shift: 1x, alt: 2x, control: 4x):
+                speed = 1
+                if alt_modifier:
+                    speed = 2
+                elif control_modifier:
+                    speed = 4
+                self.qmc.timeclock.setBase(1000*speed)
+                self.sendmessage(QApplication.translate("Message","Simulator started @{}x").format(speed))
+                self.simulatorAction.setChecked(True)
+            else:
+                # we leave the simulator
+                self.simulator = None
+                self.qmc.timeclock.setBase(1000)
+                self.sample_loop_running = True # we enable the sampling loop again that might have been stopped during the simulation via a timerLCD click
+                aw.buttonONOFF.setStyleSheet(aw.pushbuttonstyles["OFF"])
+                aw.buttonSTARTSTOP.setStyleSheet(aw.pushbuttonstyles["STOP"])
+                self.sendmessage(QApplication.translate("Message","Simulator stopped"))
+                self.updateWindowTitle()
+                self.enableLoadImportConvertMenus()
+                self.qmc.redraw(recomputeAllDeltas=False)
         else:
             try:
                 if aw.curFile is None:
@@ -38798,9 +38865,6 @@ class ApplicationWindow(QMainWindow):
                     firstChar = stream.read(1)
                     if firstChar == "{":
                         f.close()
-                        modifiers = QApplication.keyboardModifiers()
-                        control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple key on macOS, Control key on Windows
-                        alt_modifier = modifiers == Qt.KeyboardModifier.AltModifier # OPTION on macOS, ALT on Windows
                         #meta_modifier = modifiers == Qt.KeyboardModifier.MetaModifier # Control on macOS, Meta/Windows on Windows
                         speed = 1
                         if alt_modifier:

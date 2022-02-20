@@ -26,12 +26,13 @@ except ImportError:
     # for Python 3.7:
     from typing_extensions import Final
 
-# import artisan.plus module
+# import artisan.plus modules
 import plus.config  # @UnusedImport
 import plus.util
 import plus.stock
 import plus.controller
 import plus.queue
+import plus.blend
 
 #from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import deltaLabelUTF8, appFrozen, stringfromseconds,stringtoseconds, toInt, toFloat, abbrevString
@@ -47,21 +48,21 @@ _log: Final = logging.getLogger(__name__)
 
 try:
     #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView,  # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:
     #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView,  # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
     try:
         from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
     except Exception: # pylint: disable=broad-except
@@ -1378,6 +1379,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.plus_blend_selected_spec = None # holds the blend dict specification of the selected blend
         self.plus_blend_selected_spec_labels = None # the list of coffee labels of the selected blend specification
         if self.aw.plus_account is not None:
+            plus.stock.init() # we try to init the stock from the cache before populating the popups
             # variables populated by stock data as rendered in the corresponding popups
             self.plus_stores = None
             self.plus_coffees = None
@@ -1406,6 +1408,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_stores_combo.currentIndexChanged.connect(self.storeSelectionChanged)
             self.plus_coffees_combo.currentIndexChanged.connect(self.coffeeSelectionChanged)
             self.plus_blends_combo.currentIndexChanged.connect(self.blendSelectionChanged)
+            self.plus_custom_blend_button = QToolButton()
+            self.plus_custom_blend_button.setText("...")
+            self.plus_custom_blend_button.clicked.connect(self.customBlendButton_triggered)
             self.plus_selected_line = QLabel()
             self.plus_selected_line.setOpenExternalLinks(True)
             label_font = self.plus_selected_line.font()
@@ -1430,6 +1435,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             plusLine.addWidget(self.plusBlendslabel)
             plusLine.addSpacing(5)
             plusLine.addWidget(self.plus_blends_combo)
+            plusLine.addWidget(self.plus_custom_blend_button)
             plusLine.addSpacing(15)
             plusLine.addWidget(self.plusStoreslabel)
             plusLine.addSpacing(5)
@@ -1720,6 +1726,39 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         else:
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+
+## CUSTOM BLEND DIALOG
+
+    @pyqtSlot(bool)
+    def customBlendButton_triggered(self,_):
+        inWeight = float(self.aw.comma2dot(str(self.weightinedit.text())))
+        
+        
+        coffees = plus.stock.getCoffeeLabels()
+        
+        if len(coffees)>2:
+            if self.aw.qmc.plus_custom_blend is not None and self.aw.qmc.plus_custom_blend.isValid(coffees.values()):
+                blend = self.aw.qmc.plus_custom_blend
+            else:
+                coffee_tuples = sorted(coffees.items(), key=lambda x: x[0])
+                blend = plus.blend.Blend(QApplication.translate("Form Caption","Custom Blend"),[
+                    plus.blend.Component(coffee_tuples[0][1], 0.5),
+                    plus.blend.Component(coffee_tuples[1][1], 0.5)
+                ])
+            res, total_weight = plus.blend.openCustomBlendDialog(self, self.aw, inWeight, self.aw.qmc.weight[2], coffees, blend)
+            if res: # not canceled
+                self.aw.qmc.plus_custom_blend = res
+                self.populatePlusCoffeeBlendCombos() # we update the blend menu to reflect the current custom blend
+                if self.aw.qmc.plus_custom_blend.name.strip() == "" and self.plus_blend_selected_spec is not None and 'hr_id' in self.plus_blend_selected_spec and self.plus_blend_selected_spec['hr_id'] == '':
+                    # if the custom blend entry was selected before, which is now removed, we select the empty first entry
+                    self.plus_blends_combo.setCurrentIndex(0)
+                    self.blendSelectionChanged(0)
+                # update inweight
+                inw = "%g" % self.aw.float2floatWeightVolume(total_weight)
+                self.weightinedit.setText(inw)
+                self.weightineditChanged()
+
+## 
 
     def updateWeightLCD(self,txt_value, txt_unit="", total=None):
         self.scaleWeight.setText(txt_value+txt_unit)
@@ -2012,6 +2051,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 
                 mark_coffee_fields = False
                 
+                
                 #---- Coffees
                 
                 self.plus_coffees = plus.stock.getCoffees(self.unitsComboBox.currentIndex(),self.plus_default_store)
@@ -2043,10 +2083,18 @@ class editGraphDlg(ArtisanResizeablDialog):
                         self.plus_coffees_combo.setCurrentIndex(p+1)
                     mark_coffee_fields = True
                 
-                
                 #---- Blends  
         
-                self.plus_blends = plus.stock.getBlends(self.unitsComboBox.currentIndex(),self.plus_default_store)
+                custom_blend = None
+                # if a valid custom_blend with a non-empty name exists, we add it to the blend popups
+                if self.aw.qmc.plus_custom_blend is not None and self.aw.qmc.plus_custom_blend.name.strip() != "":
+                    coffees = plus.stock.getCoffeeLabels()
+                    if len(coffees)>2 and self.aw.qmc.plus_custom_blend.isValid(coffees.values()):
+                        custom_blend = { 
+                            'hr_id': '',
+                            'label': self.aw.qmc.plus_custom_blend.name.strip(),
+                            'ingredients': [{'ratio': c.ratio, 'coffee': c.coffee} for c in self.aw.qmc.plus_custom_blend.components]}
+                self.plus_blends = plus.stock.getBlends(self.unitsComboBox.currentIndex(),self.plus_default_store, custom_blend)
                 self.plus_blends_combo.blockSignals(True)  
                 self.plus_blends_combo.clear()
                 blend_items = plus.stock.getBlendLabels(self.plus_blends)
@@ -2088,6 +2136,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 _log.exception(e)
             finally:
                 self.plus_popups_set_enabled(True)
+                self.plus_stores_combo.blockSignals(False)
+                self.plus_coffees_combo.blockSignals(False)
+                self.plus_blends_combo.blockSignals(False)
 
     def markPlusCoffeeFields(self,b):
         # for QTextEdit
@@ -3770,6 +3821,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             # fill Setup tab
             self.setup_ui = SetupWidget.Ui_SetupWidget()
             self.setup_ui.setupUi(self.C6Widget)
+            self.setup_ui.doubleSpinBoxRoasterSize.setLocale(QLocale("C"))
             # explicitly reset labels to have them translated with a controlled context
             self.setup_ui.doubleSpinBoxRoasterSize.setToolTip(QApplication.translate("Tooltip", "The maximum nominal batch size of the machine in kg"))
             self.setup_ui.labelOrganization.setText(QApplication.translate("Label", "Organization"))
@@ -5140,4 +5192,5 @@ class EnergyMeasuringDialog(ArtisanDialog):
         applyButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply)
         self.ui.buttonBox.removeButton(applyButton)
         self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
+
 

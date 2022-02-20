@@ -118,7 +118,7 @@ class Worker(QObject):
                     stock = j["result"]
                     stock["retrieved"] = time.time()
                     _log.debug("-> retrieved")
-    #                _log.debug("stock = %s", stock)
+#                    _log.debug("stock = %s", stock)
                 finally:
                     if stock_semaphore.available() < 1:
                         stock_semaphore.release(1)
@@ -166,7 +166,12 @@ def save() -> None:
         if stock_semaphore.available() < 1:
             stock_semaphore.release(1)
 
-
+# try to load stock from cache if empty
+def init() -> None:
+    _log.info("init()")
+    if stock is None:
+        load()
+            
 # load stock data from local file cache
 def load() -> None:
     global stock  # pylint: disable=global-statement
@@ -475,6 +480,61 @@ def coffee2beans(coffee):
         pass
     return "{}{}{}{}".format(origin, label, bean, year)
 
+
+# returns a dict with all coffees with stock associated as string of the form  "<origin> <picked>, <label>" 
+# associated to their hr_id
+def getCoffeeLabels():
+    _log.debug("getCoffeeList()")
+    try:
+        stock_semaphore.acquire(1)
+        if stock is not None and "coffees" in stock:
+            res = {}
+            for c in stock["coffees"]:
+                try:
+                    if "hr_id" in c:
+                        hr_id = c["hr_id"]
+                        origin = ""
+                        try:
+                            origin_str = c["origin"].strip()
+                            if len(origin_str) > 0 and origin_str != "null":
+                                origin = QApplication.translate(
+                                    "Countries", origin_str
+                                )
+                        except Exception:  # pylint: disable=broad-except
+                            pass
+                        if origin != "":
+                            try:
+                                if "crop_date" in c:
+                                    cy = c["crop_date"]
+                                    if (
+                                        "picked" in cy
+                                        and len(cy["picked"]) > 0
+                                        and cy["picked"][0] is not None
+                                    ):
+                                        origin += " {:d}".format(cy["picked"][0])
+                            except Exception as e:  # pylint: disable=broad-except
+                                _log.exception(e)
+                            origin = f"{origin}, "
+                        if "label" in c:
+                            label = c["label"]
+                        else:
+                            label = ""
+    
+                        if "stock" in c:
+                            for s in c["stock"]:
+                                if "amount" in s:
+                                    amount = s["amount"]
+                                    if amount > stock_epsilon: 
+                                        res[f"{origin}{label}"] = hr_id
+                except Exception as e:  # pylint: disable=broad-except
+                    _log.exception(e)
+            return res
+        return {}
+                    
+    finally:
+        if stock_semaphore.available() < 1:
+            stock_semaphore.release(1)
+    
 
 def getCoffees(weight_unit_idx, store=None):
     _log.debug("getCoffees(%s,%s)", weight_unit_idx, store)
@@ -881,11 +941,13 @@ def blend2beans(blend, weight_unit_idx, weightIn=0):
 #        or <blendLabel,[blendDict,stockDict,maxAmount,coffeeLabelDict,
 #            replaceMaxAmount,replacementBlends]>
 #       for blends with replacement coffees defined
-def getBlends(weight_unit_idx, store=None):
+# customBlend is an extra locally defined blend that get's added to the result if it has a non-empty ingredients list
+#    it is a dict of the form { 'hr_id': '', 'label': <some string>, 'ingredients': [ {'ratio':<num>, 'coffee':<hr_id_str>},...] }
+def getBlends(weight_unit_idx, store=None, customBlend=None):
     _log.debug("getBlends(%s,%s)", weight_unit_idx, store)
     try:
         stock_semaphore.acquire(1)
-        if stock is not None and "blends" in stock:
+        if stock is not None and ("blends" in stock or customBlend is not None):
             res = {}
             if store is None:
                 stores = [getStoreId(s) for s in getStores(acquire_lock=False)]
@@ -894,6 +956,8 @@ def getBlends(weight_unit_idx, store=None):
             for s in stores:
                 location_label = ""
                 store_blends = []
+                if customBlend is not None:
+                    store_blends.append(customBlend)
                 if "blends" in stock and stock["blends"] is not None:
                     store_blends.extend(stock["blends"])
                 if "replBlends" in stock and stock["replBlends"] is not None:
@@ -916,7 +980,8 @@ def getBlends(weight_unit_idx, store=None):
                     # the replacement blends computed join those components
                     # according to their ratio. Thus a replacement blend may
                     # have less ingredients than the original blend
-                    if "ingredients" in blend:
+                    # blends without ingredients (like the default Custom Blend) are ignored
+                    if "ingredients" in blend and len(blend["ingredients"])>0:
                         # associates all coffees incl. replacements with
                         # their long labels, if known
                         coffeeLabels = {}
@@ -1103,13 +1168,16 @@ def getBlends(weight_unit_idx, store=None):
                             # we first compute the minimum reach
                             # over all components
                             reach_per_ingredients = [
-                                coffee_stock[i["coffee"]] / i["ratio"]
+                                (0 if i["ratio"]<=0 else coffee_stock[i["coffee"]] / i["ratio"])
                                 for i in ingredients
                             ]
                             # if the minimum reach over all ingredients is
                             # larger than 0 we add an entry to the result list
                             # replacementBlends
-                            reach = min(reach_per_ingredients)
+                            if reach_per_ingredients is not None and len(reach_per_ingredients) > 0:
+                                reach = min(reach_per_ingredients)
+                            else:
+                                break
                             # we also add the initial blend and blends with
                             # empty reach to replacementBlends and filter
                             # those out later

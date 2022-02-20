@@ -29,7 +29,7 @@ except ImportError:
 
 from artisanlib.util import deltaLabelUTF8
 from artisanlib.dialogs import ArtisanResizeablDialog
-from artisanlib.widgets import MyQComboBox
+from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox
 
 
 _log: Final = logging.getLogger(__name__)
@@ -40,7 +40,7 @@ try:
     from PyQt6.QtGui import (QStandardItem, QColor) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,  # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QRadioButton, QDoubleSpinBox, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QRadioButton, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
                                  QTableWidget, QMessageBox, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:
     #pylint: disable = E, W, R, C
@@ -48,7 +48,7 @@ except Exception:
     from PyQt5.QtGui import (QStandardItem, QColor) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QRadioButton, QDoubleSpinBox, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QRadioButton, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
                                  QTableWidget, QMessageBox, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
 
 
@@ -436,7 +436,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.dataRateCombo1045.setMaximumWidth(width)
         
         EmissivityLabel = QLabel(QApplication.translate("Label","Emissivity"))
-        self.emissivitySpinBox = QDoubleSpinBox()
+        self.emissivitySpinBox = MyQDoubleSpinBox()
         self.emissivitySpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.emissivitySpinBox.setRange(0.,1.)
         self.emissivitySpinBox.setSingleStep(.1) 
@@ -986,7 +986,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         yoctoServerIdLabel = QLabel(QApplication.translate("Label","VirtualHub"))
         self.yoctoServerId = QLineEdit(self.aw.qmc.yoctoServerID)
         YoctoEmissivityLabel = QLabel(QApplication.translate("Label","Emissivity"))
-        self.yoctoEmissivitySpinBox = QDoubleSpinBox()
+        self.yoctoEmissivitySpinBox = MyQDoubleSpinBox()
         self.yoctoEmissivitySpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.yoctoEmissivitySpinBox.setRange(0.,1.)
         self.yoctoEmissivitySpinBox.setSingleStep(.1) 

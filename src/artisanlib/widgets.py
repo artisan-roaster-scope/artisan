@@ -22,19 +22,19 @@ from typing import Optional
 try:
     #pylint: disable = E, W, R, C
     from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # @UnusedImport @Reimport  @UnresolvedImport
-        QByteArray, QPropertyAnimation, QEasingCurve) # @UnusedImport @Reimport  @UnresolvedImport
+        QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
         QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QFontMetrics, QColor, QCursor # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:
     #pylint: disable = E, W, R, C
     from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # @UnusedImport @Reimport  @UnresolvedImport
-        QByteArray, QPropertyAnimation, QEasingCurve) # @UnusedImport @Reimport  @UnresolvedImport
+        QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
         QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QFontMetrics, QColor, QCursor # @UnusedImport @Reimport  @UnresolvedImport
 
-class MyQComboBox(QComboBox):
+class MyQComboBox(QComboBox): # pylint: disable=too-few-public-methods
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
@@ -49,6 +49,7 @@ class MyQDoubleSpinBox(QDoubleSpinBox):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setLocale(QLocale("C"))
 
     def wheelEvent(self, *args, **kwargs):
         if self.hasFocus():
@@ -174,7 +175,7 @@ class MyQLabel(QLabel):
         self.setFont(f)
 
 
-class ClickableQLabel(QLabel):
+class ClickableQLabel(QLabel): # pylint: disable=too-few-public-methods
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
@@ -187,7 +188,7 @@ class ClickableQLabel(QLabel):
         elif event.button() == Qt.MouseButton.RightButton:
             self.right_clicked.emit()
 
-class ClickableQGroupBox(QGroupBox):
+class ClickableQGroupBox(QGroupBox): # pylint: disable=too-few-public-methods
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
@@ -200,7 +201,7 @@ class ClickableQGroupBox(QGroupBox):
         elif event.button() == Qt.MouseButton.RightButton:
             self.right_clicked.emit()
 
-class MyQLCDNumber(QLCDNumber):
+class MyQLCDNumber(QLCDNumber): # pylint: disable=too-few-public-methods
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
@@ -213,7 +214,7 @@ class MyQLCDNumber(QLCDNumber):
         elif event.button() == Qt.MouseButton.RightButton:
             self.right_clicked.emit()
 
-class ClickableLCDFrame(QFrame):
+class ClickableLCDFrame(QFrame): # pylint: disable=too-few-public-methods
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
@@ -228,7 +229,7 @@ class ClickableLCDFrame(QFrame):
 
 
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
-class ClickableTextEdit(QTextEdit):
+class ClickableTextEdit(QTextEdit): # pylint: disable=too-few-public-methods
     clicked = pyqtSignal()
     editingFinished = pyqtSignal()
     receivedFocus = pyqtSignal()
@@ -284,7 +285,7 @@ def pushButtonColorStyle(
     font_size = ("" if font_size is None else f"font-size:{font_size}pt;")
     return f"{class_name}{selector}{state}{{{color}{background}{font_size}}}"
 
-class EventPushButton(QPushButton):
+class EventPushButton(QPushButton): # pylint: disable=too-few-public-methods
     def __init__(self, background_color, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.default_background_color = background_color
@@ -303,7 +304,7 @@ class EventPushButton(QPushButton):
         self.setStyle(self.style())
                 
 
-class MajorEventPushButton(EventPushButton):
+class MajorEventPushButton(EventPushButton): # pylint: disable=too-few-public-methods
     def __init__(self, *args, background_color = '#147bb3', **kwargs):
         super().__init__(background_color, *args, **kwargs)
 
@@ -389,10 +390,10 @@ class AnimatedMajorEventPushButton(MajorEventPushButton):
         
     zcolor = pyqtProperty(QColor, getBackColor, setBackColor)
 
-class MinorEventPushButton(EventPushButton):
+class MinorEventPushButton(EventPushButton): # pylint: disable=too-few-public-methods
     def __init__(self, *args, background_color = '#66b8d7', **kwargs):
         super().__init__(background_color, *args, **kwargs)
 
-class AuxEventPushButton(EventPushButton):
+class AuxEventPushButton(EventPushButton): # pylint: disable=too-few-public-methods
     def __init__(self, *args, background_color = '#bdbdbd', **kwargs):
         super().__init__(background_color, *args, **kwargs)
