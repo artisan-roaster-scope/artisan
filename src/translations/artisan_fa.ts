@@ -17151,32 +17151,32 @@ Repeat Operation at the end: {0}</source>
       <translation>artisan.plus قطع شد</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="237" />
+      <location filename="../plus/stock.py" line="235" />
       <source>bag</source>
       <translation>کیسه</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="238" />
+      <location filename="../plus/stock.py" line="236" />
       <source>box</source>
       <translation>جعبه</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="239" />
+      <location filename="../plus/stock.py" line="237" />
       <source>barrel</source>
       <translation>بشکه</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="242" />
+      <location filename="../plus/stock.py" line="240" />
       <source>bags</source>
       <translation>کیف</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="243" />
+      <location filename="../plus/stock.py" line="241" />
       <source>boxes</source>
       <translation>جعبه ها</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="244" />
+      <location filename="../plus/stock.py" line="242" />
       <source>barrels</source>
       <translation>بشکه</translation>
     </message>

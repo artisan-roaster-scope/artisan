@@ -16745,32 +16745,32 @@ Repeat Operation at the end: {0}</source>
       <translation>remeselník.plus odpojený</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="237" />
+      <location filename="../plus/stock.py" line="235" />
       <source>bag</source>
       <translation>taška</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="238" />
+      <location filename="../plus/stock.py" line="236" />
       <source>box</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../plus/stock.py" line="239" />
+      <location filename="../plus/stock.py" line="237" />
       <source>barrel</source>
       <translation>sud</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="242" />
+      <location filename="../plus/stock.py" line="240" />
       <source>bags</source>
       <translation>tašky</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="243" />
+      <location filename="../plus/stock.py" line="241" />
       <source>boxes</source>
       <translation>škatule</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="244" />
+      <location filename="../plus/stock.py" line="242" />
       <source>barrels</source>
       <translation>sudy</translation>
     </message>

@@ -17459,32 +17459,32 @@ Repeat Operation at the end: {0}</source>
       <translation>artisan.plus 연결 해제</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="237" />
+      <location filename="../plus/stock.py" line="235" />
       <source>bag</source>
       <translation>가방</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="238" />
+      <location filename="../plus/stock.py" line="236" />
       <source>box</source>
       <translation>상자</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="239" />
+      <location filename="../plus/stock.py" line="237" />
       <source>barrel</source>
       <translation>통</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="242" />
+      <location filename="../plus/stock.py" line="240" />
       <source>bags</source>
       <translation>바지</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="243" />
+      <location filename="../plus/stock.py" line="241" />
       <source>boxes</source>
       <translation>상자</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="244" />
+      <location filename="../plus/stock.py" line="242" />
       <source>barrels</source>
       <translation>배럴</translation>
     </message>

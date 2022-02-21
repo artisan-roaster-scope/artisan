@@ -16747,32 +16747,32 @@ Repeat Operation at the end: {0}</source>
       <translation>artisan.plus afbrudt</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="237" />
+      <location filename="../plus/stock.py" line="235" />
       <source>bag</source>
       <translation>taske</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="238" />
+      <location filename="../plus/stock.py" line="236" />
       <source>box</source>
       <translation>boks</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="239" />
+      <location filename="../plus/stock.py" line="237" />
       <source>barrel</source>
       <translation>tønde</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="242" />
+      <location filename="../plus/stock.py" line="240" />
       <source>bags</source>
       <translation>poser</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="243" />
+      <location filename="../plus/stock.py" line="241" />
       <source>boxes</source>
       <translation>kasser</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="244" />
+      <location filename="../plus/stock.py" line="242" />
       <source>barrels</source>
       <translation>tønder</translation>
     </message>

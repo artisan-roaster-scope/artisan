@@ -16733,32 +16733,32 @@ Repeat Operation at the end: {0}</source>
       <translation>artisan.plus air a dhì-cheangal</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="237" />
+      <location filename="../plus/stock.py" line="235" />
       <source>bag</source>
       <translation>poca</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="238" />
+      <location filename="../plus/stock.py" line="236" />
       <source>box</source>
       <translation>bogsa</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="239" />
+      <location filename="../plus/stock.py" line="237" />
       <source>barrel</source>
       <translation>baraille</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="242" />
+      <location filename="../plus/stock.py" line="240" />
       <source>bags</source>
       <translation>pocannan</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="243" />
+      <location filename="../plus/stock.py" line="241" />
       <source>boxes</source>
       <translation>bogsaichean</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="244" />
+      <location filename="../plus/stock.py" line="242" />
       <source>barrels</source>
       <translation>baraillean</translation>
     </message>

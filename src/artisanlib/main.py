@@ -3615,11 +3615,11 @@ class tgraphcanvas(FigureCanvas):
                 return temp
             # try to improve a previously corrected reading timex/temp[-1] based on the current reading time/temp (just in this case the actual reading is not a drop)
             if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
-                if len(tempx) > 2 and tempx[-1] == tempx[-2] == tempx[-3] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2] and same for the one before
+                if len(tempx) > 2 and tempx[-1] == tempx[-2] == tempx[-3] and tempx[-1] != -1 and tempx[-1] != temp and temp!=-1: # previous reading was a drop and replaced by reading[-2] and same for the one before
                     delta = (tempx[-3] - temp) / 3.0
                     tempx[-1] = tempx[-3] - 2*delta
                     tempx[-2] = tempx[-3] - delta
-                elif len(tempx) > 1 and tempx[-1] == tempx[-2] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2]
+                elif len(tempx) > 1 and tempx[-1] == tempx[-2] and tempx[-1] != -1 and tempx[-1] != temp and temp!=-1: # previous reading was a drop and replaced by reading[-2]
                     tempx[-1] = (tempx[-2] + temp) / 2.0
             return temp
         except Exception as e: # pylint: disable=broad-except
@@ -3816,13 +3816,13 @@ class tgraphcanvas(FigureCanvas):
                                 if extrat1 != -1:
                                     sample_extractimex1[i].append(float(extratx))
                                     sample_extractemp1[i].append(float(extrat1))
-                                elif len(sample_extratemp1[i])>3 and all(v == -1 for v in sample_extratemp1[i][-3:]):
+                                elif len(sample_extratemp1[i])>4 and all(v == -1 for v in sample_extratemp1[i][-4:]):
                                     sample_extractimex1[i].append(float(extratx))
                                     sample_extractemp1[i].append(None)
-                                if extrat2 != -1 or (len(sample_extractemp2[i])>3 and all(v == -1 for v in sample_extractemp2[i][-3:])):
+                                if extrat2 != -1:
                                     sample_extractimex2[i].append(float(extratx))
                                     sample_extractemp2[i].append(float(extrat2))
-                                elif len(sample_extratemp2[i])>3 and all(v == -1 for v in sample_extratemp2[i][-3:]):
+                                elif len(sample_extratemp2[i])>4 and all(v == -1 for v in sample_extratemp2[i][-4:]):
                                     sample_extractimex2[i].append(float(extratx))
                                     sample_extractemp2[i].append(None)
                                     
@@ -3911,13 +3911,13 @@ class tgraphcanvas(FigureCanvas):
                     if t1_final != -1:
                         sample_ctimex1.append(tx)
                         sample_ctemp1.append(t1_final)
-                    elif len(sample_temp1)>3 and all(v == -1 for v in sample_temp1[-3:]):
+                    elif len(sample_temp1)>4 and all(v == -1 for v in sample_temp1[-4:]):
                         sample_ctimex1.append(tx)
                         sample_ctemp1.append(None)
                     if t2_final != -1:
                         sample_ctimex2.append(tx)
                         sample_ctemp2.append(t2_final)
-                    elif len(sample_temp2)>3 and all(v == -1 for v in sample_temp2[-3:]):
+                    elif len(sample_temp2)>4 and all(v == -1 for v in sample_temp2[-4:]):
                         sample_ctimex2.append(tx)
                         sample_ctemp2.append(None)
                     
