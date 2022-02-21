@@ -26794,7 +26794,8 @@ class ApplicationWindow(QMainWindow):
                 idx4 = aw.qmc.ytcurveidx - 1
                 n3 = idx3 // 2
                 n4 = idx4 // 2
-                for i in range(min(len(t1x),len(t2x))):
+                
+                for i in range(min(len(t1x),len(t2x),len(timex))):
 # we smooth also that 3rd and 4th background courve only on redraw with the actual smoothing parameters
                     if (aw.qmc.xtcurveidx > 0 and n3 == i) or (aw.qmc.ytcurveidx > 0 and n4 == i): # this is the 3rd or 4th background curve to be drawn, we smooth it
                         tx=timex[i]
@@ -29537,9 +29538,9 @@ class ApplicationWindow(QMainWindow):
             profile["extradevices"] = self.qmc.extradevices
             profile["extraname1"] = [encodeLocal(n) for n in self.qmc.extraname1]
             profile["extraname2"] = [encodeLocal(n) for n in self.qmc.extraname2]
-            profile["extratimex"] = [[self.float2float(t,8) for t in x] for x in self.qmc.extratimex]
-            profile["extratemp1"] = [[self.float2float(t,6) for t in x] for x in self.qmc.extratemp1]
-            profile["extratemp2"] = [[self.float2float(t,6) for t in x] for x in self.qmc.extratemp2]
+            profile["extratimex"] = [[self.float2float(t,10) for t in x] for x in self.qmc.extratimex]
+            profile["extratemp1"] = [[self.float2float(t,8) for t in x] for x in self.qmc.extratemp1]
+            profile["extratemp2"] = [[self.float2float(t,8) for t in x] for x in self.qmc.extratemp2]
             profile["extramathexpression1"] = [encodeLocal(x) for x in self.qmc.extramathexpression1]
             profile["extramathexpression2"] = [encodeLocal(x) for x in self.qmc.extramathexpression2]
             profile["extradevicecolor1"] = [encodeLocal(x) for x in self.qmc.extradevicecolor1]
