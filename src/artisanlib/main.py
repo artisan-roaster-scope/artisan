@@ -773,7 +773,7 @@ class tgraphcanvas(FigureCanvas):
         'filterDropOut_replaceRoR_period', 'filterDropOut_spikeRoR_period', 'filterDropOut_tmin_C_default', 'filterDropOut_tmax_C_default', 
         'filterDropOut_tmin_F_default', 'filterDropOut_tmax_F_default', 'filterDropOut_spikeRoR_dRoR_limit_C_default', 'filterDropOut_spikeRoR_dRoR_limit_F_default',
         'filterDropOuts', 'filterDropOut_tmin', 'filterDropOut_tmax', 'filterDropOut_spikeRoR_dRoR_limit', 'minmaxLimits',
-        'dropSpikes', 'dropDuplicates', 'dropDuplicatesLimit', 'swapETBT', 'wheelflag', 'wheelnames', 'segmentlengths', 'segmentsalpha',
+        'dropSpikes', 'dropDuplicates', 'dropDuplicatesLimit', 'interpolatemax', 'swapETBT', 'wheelflag', 'wheelnames', 'segmentlengths', 'segmentsalpha',
         'wheellabelparent', 'wheelcolor', 'wradii', 'startangle', 'projection', 'wheeltextsize', 'wheelcolorpattern', 'wheeledge',
         'wheellinewidth', 'wheellinecolor', 'wheeltextcolor', 'wheelconnections', 'wheelx', 'wheelz', 'wheellocationx', 'wheellocationz',
         'wheelaspect', 'samplingSemaphore', 'profileDataSemaphore', 'messagesemaphore', 'errorsemaphore', 'serialsemaphore', 'seriallogsemaphore',
@@ -2281,6 +2281,8 @@ class tgraphcanvas(FigureCanvas):
         self.dropSpikes = False
         self.dropDuplicates = False
         self.dropDuplicatesLimit = 0.3
+
+        self.interpolatemax = 3 # maximal number of droppped readings (-1) that will be interpolated
 
         self.swapETBT = False
 
@@ -3816,13 +3818,13 @@ class tgraphcanvas(FigureCanvas):
                                 if extrat1 != -1:
                                     sample_extractimex1[i].append(float(extratx))
                                     sample_extractemp1[i].append(float(extrat1))
-                                elif len(sample_extratemp1[i])>4 and all(v == -1 for v in sample_extratemp1[i][-4:]):
+                                elif len(sample_extratemp1[i])>(aw.qmc.interpolatemax+1) and all(v == -1 for v in sample_extratemp1[i][-(aw.qmc.interpolatemax+1):]):
                                     sample_extractimex1[i].append(float(extratx))
                                     sample_extractemp1[i].append(None)
                                 if extrat2 != -1:
                                     sample_extractimex2[i].append(float(extratx))
                                     sample_extractemp2[i].append(float(extrat2))
-                                elif len(sample_extratemp2[i])>4 and all(v == -1 for v in sample_extratemp2[i][-4:]):
+                                elif len(sample_extratemp2[i])>(aw.qmc.interpolatemax+1) and all(v == -1 for v in sample_extratemp2[i][-(aw.qmc.interpolatemax+1):]):
                                     sample_extractimex2[i].append(float(extratx))
                                     sample_extractemp2[i].append(None)
                                     
@@ -3911,13 +3913,13 @@ class tgraphcanvas(FigureCanvas):
                     if t1_final != -1:
                         sample_ctimex1.append(tx)
                         sample_ctemp1.append(t1_final)
-                    elif len(sample_temp1)>4 and all(v == -1 for v in sample_temp1[-4:]):
+                    elif len(sample_temp1)>(aw.qmc.interpolatemax+1) and all(v == -1 for v in sample_temp1[-(aw.qmc.interpolatemax+1):]):
                         sample_ctimex1.append(tx)
                         sample_ctemp1.append(None)
                     if t2_final != -1:
                         sample_ctimex2.append(tx)
                         sample_ctemp2.append(t2_final)
-                    elif len(sample_temp2)>4 and all(v == -1 for v in sample_temp2[-4:]):
+                    elif len(sample_temp2)>(aw.qmc.interpolatemax+1) and all(v == -1 for v in sample_temp2[-(aw.qmc.interpolatemax+1):]):
                         sample_ctimex2.append(tx)
                         sample_ctemp2.append(None)
                     
@@ -20834,12 +20836,12 @@ class ApplicationWindow(QMainWindow):
         if self.full_screen_mode_active or self.isFullScreen():
             self.full_screen_mode_active = False
             self.showNormal()
-            if platf != 'Darwin':
+            if not (platf == 'Darwin' and self.qmc.locale_str == "en"):
                 aw.fullscreenAction.setChecked(False)
         else:
             self.full_screen_mode_active = True
             self.showFullScreen()
-            if platf != 'Darwin':
+            if not (platf == 'Darwin' and self.qmc.locale_str == "en"):
                 aw.fullscreenAction.setChecked(True)
 
     # returns time axis min and max
@@ -25437,15 +25439,7 @@ class ApplicationWindow(QMainWindow):
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                     if self.full_screen_mode_active or self.isFullScreen() or macfullscreen:
-                        self.full_screen_mode_active = False
-                        if platf != 'Darwin':
-                            aw.fullscreenAction.setChecked(False)
-                        self.showNormal()
-                        try:
-                            if macfullscreen and platf == 'Darwin':
-                                app.allWindows()[0].setVisibility(QWindow.Visibility.Windowed)
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
+                        self.toggleFullscreen()
                     else:
                         #if designer ON
                         if self.qmc.designerflag:
@@ -28201,6 +28195,7 @@ class ApplicationWindow(QMainWindow):
         settings.setValue("extratimeout",self.extratimeout)
     
     def createExtraDeviceSettingsBackup(self):
+        _log.debug("createExtraDeviceSettingsBackup()")
         if not(bool(self.simulator)):
             try:
                 filename = self.getExtraDeviceSettingsPath()
@@ -28229,6 +28224,7 @@ class ApplicationWindow(QMainWindow):
                 _log.exception(e)
     
     def clearExtraDeviceSettingsBackup(self, filename=None):
+        _log.debug("clearExtraDeviceSettingsBackup()")
         if filename is None:
             filename = self.getExtraDeviceSettingsPath()
         try:
@@ -28296,6 +28292,7 @@ class ApplicationWindow(QMainWindow):
     
     # this should only be called from reset()
     def restoreExtraDeviceSettingsBackup(self):
+        _log.debug("restoreExtraDeviceSettingsBackup()")
         if not(bool(self.simulator)):
             try:
                 filename = self.getExtraDeviceSettingsPath()
@@ -28428,12 +28425,12 @@ class ApplicationWindow(QMainWindow):
                 # c) set extra temp curves and prepare empty extra smoothed temp curves
                 if "extratimex" in profile:
                     self.qmc.extratimex = profile["extratimex"] + [[]]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
-                if "extratemp1" in profile and len(self.qmc.extratimex) > 0:
+                if "extratemp1" in profile:
                     self.qmc.extratemp1 = profile["extratemp1"] + [[]]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
                     self.qmc.extrastemp1 = [[]]*len(self.qmc.extratemp1)
                     self.qmc.extractemp1 = [[]]*len(self.qmc.extratemp1)
                     self.qmc.extractimex1 = [[]]*len(self.qmc.extratemp1)
-                if "extratemp2" in profile and len(self.qmc.extratimex) > 0:
+                if "extratemp2" in profile:
                     self.qmc.extratemp2 = profile["extratemp2"] + [[]]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
                     self.qmc.extrastemp2 = [[]]*len(self.qmc.extratemp2)
                     self.qmc.extractemp2 = [[]]*len(self.qmc.extratemp2)
@@ -31742,7 +31739,7 @@ class ApplicationWindow(QMainWindow):
 
             if filename is None and self.full_screen_mode_active:
                 self.showFullScreen()
-                if platf != 'Darwin':
+                if not (platf == 'Darwin' and self.qmc.locale_str == "en"):
                     aw.fullscreenAction.setChecked(True)
 
             if filename is None and self.plus_account is not None:
@@ -33017,7 +33014,7 @@ class ApplicationWindow(QMainWindow):
 
     def stopActivities(self):
         if self.full_screen_mode_active:
-            if platf != 'Darwin':
+            if not (platf == 'Darwin' and self.qmc.locale_str == "en"):
                 self.fullscreenAction.setChecked(False)
             self.showNormal()
         if aw.qmc.device == 53:

@@ -172,6 +172,7 @@ class HelpDlg(ArtisanDialog):
         settings = QSettings()
         #save window geometry
         settings.setValue("HelpGeometry",self.saveGeometry())
+        self.dialogbuttons.rejected.emit()
 
 class ArtisanInputDialog(ArtisanDialog):
     

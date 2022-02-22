@@ -215,7 +215,7 @@ def removeAll(l,s):
 # [1,2,3,-1,-1,-1,-1] => [1,2,3,-1,-1,-1,-1] # no final value to interpolate too, so trailing -1 are kept!
 # [-1,-1,2] => [2, 2, 2] # a prefix of -1 of max length 'interpolate_max' will be replaced by the first value in l that is not -1
 # INVARIANT: the resulting list has always the same lenght as l
-# only gaps of length interpolate_max, if not None, are interpolated
+# only gaps of length interpolate_max (should be set to the global aw.qmc.interpolatemax), if not None, are interpolated
 def fill_gaps(l, interpolate_max=3):
     res = []
     last_val = -1
