@@ -100,7 +100,7 @@ Step and Step+ will have new Annotation options allowing the user to customize t
 
 *Event Annotations*
 
-The last tab in the Events dialog box offers advanced display features coverered in detail in this [blog post](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html. The special event annotations are only displayed when the Events display selection on the Config tab is Step or Step+:
+The last tab in the Events dialog box offers advanced display features coverered in detail in this [blog post](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html). The special event annotations are only displayed when the Events display selection on the Config tab is Step or Step+:
 
 ![Event Annotations Dialog24](/assets/images/gsg/Event Annotations 24.jpg)
 
