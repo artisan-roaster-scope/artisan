@@ -163,10 +163,10 @@ class nonedevDlg(QDialog): # pylint: disable=too-few-public-methods
         self.setWindowTitle(QApplication.translate("Form Caption","Manual Temperature Logger"))
         if len(self.aw.qmc.timex):
             if self.aw.qmc.manuallogETflag:
-                etval = str(int(aw.qmc.temp1[-1]))
+                etval = str(int(round(aw.qmc.temp1[-1])))
             else:
                 etval = "0"
-            btval = str(int(aw.qmc.temp2[-1])) 
+            btval = str(int(round(aw.qmc.temp2[-1])))
         else:
             etval = "0"
             btval = "0"
@@ -2235,13 +2235,16 @@ class serialport():
         #print(asizeof.asizeof(dialogx)) # 2440 using slots; 2568 without using slots
         if dialogx.exec():
             try:
-                ET = (int(str(dialogx.etEdit.text())) * 10)/10.
+                ETraw = dialogx.etEdit.text().split(".")
+                ET = (int(str(ETraw[0])) * 10)/10.
             except Exception: # pylint: disable=broad-except
-                ET = 0
+                ET = -1
             try:
-                BT = (int(str(dialogx.btEdit.text())) * 10)/10.
-            except Exception: # pylint: disable=broad-except
-                BT = 0
+                BTraw = dialogx.btEdit.text().split(".")
+                BT = (int(str(BTraw[0])) * 10)/10.
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+                BT = -1
             try:
                 dialogx.okButton.disconnect()
                 dialogx.cancelButton.disconnect()

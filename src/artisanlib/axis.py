@@ -635,10 +635,12 @@ class WindowsDlg(ArtisanDialog):
         self.xlimitEdit_min.setText(stringfromseconds(self.aw.qmc.startofx_default))
         try:
             self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(self.aw.qmc.xgrid_default))
+            self.aw.qmc.xgrid(self.aw.qmc.xgrid_default)
         except Exception: # pylint: disable=broad-except
             self.xaxislencombobox.setCurrentIndex(1)
         if self.aw.qmc.mode == "F":
             self.ygridSpinBox.setValue(self.aw.qmc.ygrid_F_default)
+            self.aw.qmc.ygrid = self.aw.qmc.ygrid_F_default
             self.ylimitEdit.setText(str(self.aw.qmc.ylimit_F_default))
             self.ylimitEdit_min.setText(str(self.aw.qmc.ylimit_min_F_default))
             self.zlimitEdit.setText(str(self.aw.qmc.zlimit_F_default))
@@ -646,8 +648,10 @@ class WindowsDlg(ArtisanDialog):
             self.zgridSpinBox.setValue(self.aw.qmc.zgrid_F_default)
         else:
             self.ygridSpinBox.setValue(self.aw.qmc.ygrid_C_default)
+            self.aw.qmc.ygrid = self.aw.qmc.ygrid_C_default
             self.ylimitEdit.setText(str(self.aw.qmc.ylimit_C_default))
             self.ylimitEdit_min.setText(str(self.aw.qmc.ylimit_min_C_default))
             self.zlimitEdit.setText(str(self.aw.qmc.zlimit_C_default))
             self.zlimitEdit_min.setText(str(self.aw.qmc.zlimit_min_C_default))
-            self.zgridSpinBox.setValue(self.aw.qmc.zgrid_C_default)            
+            self.zgridSpinBox.setValue(self.aw.qmc.zgrid_C_default)
+        self.aw.qmc.redraw(recomputeAllDeltas=False)

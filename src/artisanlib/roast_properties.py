@@ -4531,24 +4531,40 @@ class editGraphDlg(ArtisanResizeablDialog):
             w.setStyleSheet("")
         
     def checkWeightOut(self):
-        wi = float(self.weightinedit.text())
-        wo = float(self.weightoutedit.text())
-        self.markWidget(self.weightoutedit,wi != 0 and wo != 0 and wo > wi)
+        try:
+            wi = float(self.weightinedit.text())
+            wo = float(self.weightoutedit.text())
+            self.markWidget(self.weightoutedit,wi != 0 and wo != 0 and wo > wi)
+        except Exception: # pylint: disable=broad-except
+            # weightinedit or weightoutedit could be the empty string
+            pass
     
     def checkVolumeOut(self):
-        vi = float(self.volumeinedit.text())
-        vo = float(self.volumeoutedit.text())
-        self.markWidget(self.volumeoutedit,vi != 0 and vo != 0 and vo < vi)
+        try:
+            vi = float(self.volumeinedit.text())
+            vo = float(self.volumeoutedit.text())
+            self.markWidget(self.volumeoutedit,vi != 0 and vo != 0 and vo < vi)
+        except Exception: # pylint: disable=broad-except
+            # volumeinedit or volumeoutedit could be the empty string
+            pass
     
     def checkDensityOut(self):
-        di = float(self.bean_density_in_edit.text())
-        do = float(self.bean_density_out_edit.text())
-        self.markWidget(self.bean_density_out_edit,di != 0 and do != 0 and do > di)
+        try:
+            di = float(self.bean_density_in_edit.text())
+            do = float(self.bean_density_out_edit.text())
+            self.markWidget(self.bean_density_out_edit,di != 0 and do != 0 and do > di)
+        except Exception: # pylint: disable=broad-except
+            # bean_density_in_out or bean_density_out_edit could be the empty string
+            pass
     
     def checkMoistureOut(self):
-        mi = float(self.moisture_greens_edit.text())
-        mo = float(self.moisture_roasted_edit.text())
-        self.markWidget(self.moisture_roasted_edit,mi != 0 and mo != 0 and mo > mi)
+        try:
+            mi = float(self.moisture_greens_edit.text())
+            mo = float(self.moisture_roasted_edit.text())
+            self.markWidget(self.moisture_roasted_edit,mi != 0 and mo != 0 and mo > mi)
+        except Exception: # pylint: disable=broad-except
+            # moisture_greens_edit or moisture_roasted_edit could be the empty string
+            pass
     
     @pyqtSlot()
     def weightouteditChanged(self):

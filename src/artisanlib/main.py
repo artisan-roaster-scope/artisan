@@ -796,9 +796,7 @@ class tgraphcanvas(FigureCanvas):
         'analysisstartchoice', 'analysisoffset', 'curvefitstartchoice', 'curvefitoffset', 'segmentresultsloc_default', 'segmentresultsloc',
         'segmentpickflag', 'segmentdeltathreshold', 'segmentsamplesthreshold', 'stats_summary_rect', 'title_text', 'title_artist', 'title_width',
         'background_title_width', 'xlabel_text', 'xlabel_artist', 'xlabel_width', 'lazyredraw_on_resize_timer', 'mathdictionary_base' ]
-        
-        
-        
+    
     
     def __init__(self, parent, dpi, *, locale):
 
@@ -9750,6 +9748,12 @@ class tgraphcanvas(FigureCanvas):
         overlap = False
         try:
             annocorners = self.annoboxCorners(anno)
+            anno_x = anno.get_unitless_position()[0]
+            ax_xlim = self.ax.get_xlim()
+            # if annotation is off canvas, the display coordinates are not reliable thus we exclude this one from the check
+            if anno_x < ax_xlim[0] or anno_x > ax_xlim[1]:
+                _log.debug("Event annotation off canvas: %s, ax_xlim=%s", anno,ax_xlim)
+                return False
             xl = annocorners[0]
             xr = annocorners[1]
             yl = annocorners[2]
@@ -11573,7 +11577,7 @@ class tgraphcanvas(FigureCanvas):
     def toggleMonitorTigger(self):
         self.ToggleMonitor()
     
-    #Turns ON/OFF flag self.flagon to read and print values. Called from push button_1.
+    #Turns ON/OFF flag self.flagon to read and print values. Called from push buttonONOFF.
     @pyqtSlot(bool)
     def ToggleMonitor(self,_=False):
         #turn ON
@@ -11700,8 +11704,8 @@ class tgraphcanvas(FigureCanvas):
 
     def OffRecorder(self, autosave=True):
         try:
-            # mark DROP if not yet set and DROP button is hidden
-            if self.timeindex[6] == 0 and not self.buttonvisibility[6]:
+            # mark DROP if not yet set, CHARGE is set and and autoDROP is active
+            if self.timeindex[6] == 0 and self.timeindex[0]>-1 and self.autoDropFlag:
                 self.markDrop()
             aw.enableSaveActions()
             aw.resetCurveVisibilities()
@@ -11755,7 +11759,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             self.ToggleRecorder()
 
-    #Turns START/STOP flag self.flagon to read and plot. Called from push button_2.
+    #Turns START/STOP flag self.flagon to read and plot. Called from push buttonSTARTSTOP.
     @pyqtSlot(bool)
     def ToggleRecorder(self,_=False):
         #turn START
@@ -12078,7 +12082,7 @@ class tgraphcanvas(FigureCanvas):
     def markFCsTrigger(self):
         self.mark1Cstart()
         
-    #record 1C start markers of BT. called from push button_3 of application window
+    #record 1C start markers of BT. called from push buttonFCs of application window
     @pyqtSlot(bool)
     def mark1Cstart(self,_=False):
         if len(self.timex) > 1:
@@ -12191,7 +12195,7 @@ class tgraphcanvas(FigureCanvas):
     def markFCeTrigger(self):
         self.mark1Cend()
     
-    #record 1C end markers of BT. called from button_4 of application window
+    #record 1C end markers of BT. called from buttonFCe of application window
     @pyqtSlot(bool)
     def mark1Cend(self,_=False):
         if len(self.timex) > 1:
@@ -12296,7 +12300,7 @@ class tgraphcanvas(FigureCanvas):
     def markSCsTrigger(self):
         self.mark2Cstart()
 
-    #record 2C start markers of BT. Called from button_5 of application window
+    #record 2C start markers of BT. Called from buttonSCs of application window
     @pyqtSlot(bool)
     def mark2Cstart(self,_=False):
         if len(self.timex) > 1:
@@ -12411,7 +12415,7 @@ class tgraphcanvas(FigureCanvas):
     def markSCeTrigger(self):
         self.mark2Cend()
 
-    #record 2C end markers of BT. Called from button_6  of application window
+    #record 2C end markers of BT. Called from buttonSCe of application window
     @pyqtSlot(bool)
     def mark2Cend(self,_=False):
         if len(self.timex) > 1:
@@ -16020,7 +16024,8 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             formlayout.fedit = my_fedit
         # monkey patch _formlayout to work around a MPL3.5.1 issue on Qt6
         # (see https://github.com/matplotlib/matplotlib/issues/22471)
-        formlayout.ColorButton = MPLColorButtonPatched
+        if mpl_version in [[3,5,0], [3,5,1]]:
+            formlayout.ColorButton = MPLColorButtonPatched
 
     def enable_edit_curve_parameters(self):
         if self.edit_curve_parameters_action is not None:
@@ -16662,8 +16667,9 @@ class ApplicationWindow(QMainWindow):
         'saveAsSettingsAction', 'resetAction', 'messagelabel', 'button_font_size_pt', 'button_font_size', 'button_font_size_small', 'button_font_size_small_selected',
         'button_font_size_tiny', 'button_font_size_micro', 'main_button_min_width', 'standard_button_min_width', 'small_button_min_width', 'tiny_button_min_width',
         'pushbuttonstyles_simulator', 'pushbuttonstyles', 'standard_button_tiny_height', 'standard_button_small_height', 'standard_button_height',
-        'button_1', 'button_2', 'button_3', 'button_4', 'button_5', 'button_6', 'button_7', 'button_8', 'button_9', 'button_10', 'button_11', 'button_12',
-        'button_13',  'button_14', 'button_15', 'button_16', 'button_17', 'button_19', 'button_20', 'lcd1', 'lcd2', 'lcd3', 'lcd4', 'lcd5', 
+        'buttonONOFF', 'buttonSTARTSTOP', 'buttonFCs', 'buttonFCe', 'buttonSCs', 'buttonSCe', 'buttonRESET', 'buttonCHARGE', 'buttonDROP',
+        'buttonCONTROL', 'buttonEVENT', 'buttonSVp5', 'buttonSVp10', 'buttonSVp20', 'buttonSVm20', 'buttonSVm10', 'buttonSVm5', 'buttonDRY',
+        'buttonCOOL', 'lcd1', 'lcd2', 'lcd3', 'lcd4', 'lcd5', 
         'lcd6', 'lcd7', 'label2', 'label3', 'label4', 'label5', 'label6', 'label7', 'nLCDs', 'extraLCD1', 'extraLCD2', 'extraLCDlabel1', 'extraLCDlabel2',
         'extraLCDframe1', 'extraLCDframe2', 'extraLCDvisibility1', 'extraLCDvisibility2', 'extraCurveVisibility1', 'extraCurveVisibility2',
         'extraDelta1', 'extraDelta2', 'extraFill1', 'extraFill2', 'channel_tare_values', 'messagehist', 'eventlabel', 'eNumberSpinBox', 
@@ -29593,7 +29599,7 @@ class ApplicationWindow(QMainWindow):
             try:
                 ds = list(self.qmc.extradevices)
                 ds.insert(0,self.qmc.device)
-                profile["devices"] = [self.qmc.devices[d-1] for d in ds]
+                profile["devices"] = [("PID" if d==0 else self.qmc.devices[d-1]) for d in ds]
             except Exception: # pylint: disable=broad-except
                 pass
             profile["elevation"] = self.qmc.elevation
