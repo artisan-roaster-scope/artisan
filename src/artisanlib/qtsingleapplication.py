@@ -29,7 +29,8 @@ except Exception:
 class QtSingleApplication(QApplication):
     messageReceived = pyqtSignal(str)
     
-    __slots__ = [ '_id', '_viewer_id', '_activationWindow', '_activateOnMessage', '_outSocket', '_isRunning', '_server' ]
+    __slots__ = [ '_id', '_viewer_id', '_activationWindow', '_activateOnMessage', '_inSocket', '_outSocket', '_isRunning', '_server',
+        '_isRunningViewer', '_outSocketViewer', '_inStream', '_outStream', '_outStreamViewer' ]
 
     def __init__(self, _id,_viewer_id, *argv):
     

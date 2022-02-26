@@ -645,6 +645,8 @@ class AmbientWorker(QObject): # pylint: disable=too-few-public-methods
 #################### GRAPH DRAWING WINDOW  ############################################
 #######################################################################################
 
+# NOTE: to have pylint to verify proper __slot__ definitions one has to remove the super class FigureCanvas here temporarily
+#   as this does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
 class tgraphcanvas(FigureCanvas):
     updategraphicsSignal = pyqtSignal()
     updateLargeLCDsTimeSignal = pyqtSignal(str)
@@ -795,7 +797,9 @@ class tgraphcanvas(FigureCanvas):
         'eventmessagetimer', 'resizeredrawing', 'logoimg', 'analysisresultsloc_default', 'analysisresultsloc', 'analysispickflag', 'analysisresultsstr',
         'analysisstartchoice', 'analysisoffset', 'curvefitstartchoice', 'curvefitoffset', 'segmentresultsloc_default', 'segmentresultsloc',
         'segmentpickflag', 'segmentdeltathreshold', 'segmentsamplesthreshold', 'stats_summary_rect', 'title_text', 'title_artist', 'title_width',
-        'background_title_width', 'xlabel_text', 'xlabel_artist', 'xlabel_width', 'lazyredraw_on_resize_timer', 'mathdictionary_base' ]
+        'background_title_width', 'xlabel_text', 'xlabel_artist', 'xlabel_width', 'lazyredraw_on_resize_timer', 'mathdictionary_base',
+        'ambient_pressure_sampled', 'ambient_humidity_sampled', 'ambientTemp_sampled', 'backgroundmovespeed', 'chargeTimerPeriod', 'flavors_default_value',
+        'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'weight_units']
     
     
     def __init__(self, parent, dpi, *, locale):
@@ -5293,7 +5297,7 @@ class tgraphcanvas(FigureCanvas):
             if len(self.timex) and self.timeindexB[6] and not self.timeindex[6]:
                 if ((aw.qmc.replayType == 0 and self.timeB[self.timeindexB[6]] - self.timeclock.elapsed()/1000. <= 0) or # by time
                     (aw.qmc.replayType == 1 and aw.qmc.TPalarmtimeindex and self.ctemp2[-1] != None and self.stemp2B[self.timeindexB[6]] - self.ctemp2[-1] <= 0) or # by BT
-                    (aw.qmc.replayType == 2 and aw.qmc.TPalarmtimeindex and self.ctemp1[-1] != None and self.stemp21[self.timeindexB[6]] - self.ctemp1[-1] <= 0)): # by ET
+                    (aw.qmc.replayType == 2 and aw.qmc.TPalarmtimeindex and self.ctemp1[-1] != None and self.stemp1B[self.timeindexB[6]] - self.ctemp1[-1] <= 0)): # by ET
                     aw.qmc.autoDropIdx = len(aw.qmc.timex) - 2
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -11704,8 +11708,8 @@ class tgraphcanvas(FigureCanvas):
 
     def OffRecorder(self, autosave=True):
         try:
-            # mark DROP if not yet set, CHARGE is set and and autoDROP is active
-            if self.timeindex[6] == 0 and self.timeindex[0]>-1 and self.autoDropFlag:
+            # mark DROP if not yet set, CHARGE is set and and either autoDROP is active or DROP button is hidden
+            if self.timeindex[6] == 0 and (self.autoDropFlag or not self.buttonvisibility[6]):
                 self.markDrop()
             aw.enableSaveActions()
             aw.resetCurveVisibilities()
@@ -12538,6 +12542,10 @@ class tgraphcanvas(FigureCanvas):
     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
+                    elif self.autoChargeFlag:
+                        # we automatically set CHARGE to the first reading (but we do not trigger autoCHARGE, another redraw and its associated action at this point)
+                        self.timeindex[0] = 0
+                        start = self.timex[0]
                     else:
                         start = 0
                     # we check if this is the first DROP mark on this roast
@@ -16610,6 +16618,8 @@ class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-met
 aw = None # assigned to the single instance of ApplicationWindow on creation
 artisanviewerFirstStart = False
 
+# NOTE: to have pylint to verify proper __slot__ definitions one has to remove the super class QMainWindow here temporarily
+#   as this does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
 class ApplicationWindow(QMainWindow):
 
     singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
@@ -16662,7 +16672,7 @@ class ApplicationWindow(QMainWindow):
         'batchAction', 'temperatureConfMenu', 'FahrenheitAction', 'CelsiusAction', 'languageMenu', 'analyzeMenu', 'fitIdealautoAction',
         'analyzeMenu', 'fitIdealx2Action', 'fitIdealx3Action', 'fitIdealx0Action', 'fitBkgndAction', 'clearresultsAction', 'roastCompareAction',
         'designerAction', 'simulatorAction', 'wheeleditorAction', 'transformAction', 'temperatureMenu', 'ConvertToFahrenheitAction', 
-        'ConvertToCelsiusAction', 'controlsAction', 'readingsAction', 'buttonsAction', 'slidersAction', 'lcdsAction', 'deltalcdsAction',
+        'ConvertToCelsiusAction', 'controlsAction', 'readingsAction', 'eventsEditorAction', 'buttonsAction', 'slidersAction', 'lcdsAction', 'deltalcdsAction',
         'pidlcdsAction', 'scalelcdsAction', 'extralcdsAction', 'phaseslcdsAction', 'fullscreenAction', 'loadSettingsAction', 'openRecentSettingMenu',
         'saveAsSettingsAction', 'resetAction', 'messagelabel', 'button_font_size_pt', 'button_font_size', 'button_font_size_small', 'button_font_size_small_selected',
         'button_font_size_tiny', 'button_font_size_micro', 'main_button_min_width', 'standard_button_min_width', 'small_button_min_width', 'tiny_button_min_width',
@@ -16682,7 +16692,12 @@ class ApplicationWindow(QMainWindow):
         'DRYlabel', 'DRYlcd', 'DRYlcdFrame', 'DRY2FCslabel', 'DRY2FCsframe', 'FCslabel', 'FCslcd', 'FCslcdFrame', 'AUClabel', 'AUClcd', 'AUClcdFrame',
         'AUCLCD', 'phasesLCDs', 'extrabuttonsLayout', 'extrabuttondialogs', 'slider1', 'slider2', 'slider3', 'slider4', 'sliderLCD1', 'sliderLCD2', 'sliderLCD3',
         'sliderLCD4', 'sliderGrpBox1', 'sliderGrpBox2', 'sliderGrpBox3', 'sliderGrpBox4', 'sliderSV', 'sliderLCDSV', 'sliderGrpBoxSV', 'leftlayout',
-        'sliderFrame', 'lcdFrame', 'midlayout', 'editgraphdialog', 'html_loader', 'QtWebEngineSupport' ]
+        'sliderFrame', 'lcdFrame', 'midlayout', 'editgraphdialog', 'html_loader', 'QtWebEngineSupport',
+        'buttonpalette', 'extraeventbuttontextcolor', 'extraeventsactions', 'extraeventsdescriptions', 'extraeventstypes', 'extraeventsvalues',
+        'extraeventsvisibility', 'fileSaveAction', 'fileSaveAsAction', 'keyboardButtonStyles', 'language_menu_actions', 'loadThemeAction', 'main_button_min_width_str',
+        'minieventleft', 'minieventright', 'nLCDS', 'notificationManager', 'notificationsflag', 'ntb', 'pdf_page_layout', 'pdf_rendering', 'productionPDFAction',
+        'rankingPDFAction', 'roastReportMenu', 'roastReportPDFAction', 'saveAsThemeAction', 'sliderGrpBox1x', 'sliderGrpBox2x', 'sliderGrpBox3x', 'sliderGrpBox4x',
+        'small_button_min_width_str', 'standard_button_min_width_px', 'tiny_button_min_width_str' ]
         
         
 
@@ -21624,16 +21639,6 @@ class ApplicationWindow(QMainWindow):
                 det = numpy.sqrt(numpy.mean(numpy.square(np_et - interp_np_etb)))
                 dbt = numpy.sqrt(numpy.mean(numpy.square(np_bt - interp_np_btb)))
 
-#                #TODO remove this check  #pylint: disable=fixme
-#                if debugLogLevelActive():
-#                    old_det,old_dbt = aw.OLDcurveSimilarity()
-#                    if abs(old_det - det) > .1 or abs(old_dbt - dbt) > .1:
-#                        aw.sendmessage("curveSimilarity: det, dbt results DO NOT MATCH with old method!!")
-#                        _log.debug("curveSimilarity: OLDcurvesimilarity results %.2f/%.2f %s", old_det,old_dbt,aw.qmc.mode)
-#                        _log.debug("curveSimilarity: curvesimilarity results    %.2f/%.2f %s", det,dbt,aw.qmc.mode)
-#                    else:
-#                        _log.debug("curveSimilarity: det, dbt results MATCH with old method!!")
-
                 return det,dbt
 
             # no DROP event registered
@@ -21642,56 +21647,6 @@ class ApplicationWindow(QMainWindow):
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " curveSimilatrity(): {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-            return None, None
-
-    #TODO remove this function, left only for cross checking new funciton  #pylint: disable=fixme
-    # computes the similarity between BT and backgroundBT as well as ET and backgroundET
-    # iterates over all BT/ET values backward from DROP to the specified BT temperature
-    # returns None in case no similarity can be computed
-    @staticmethod
-    def OLDcurveSimilarity(): 
-        BTlimit = aw.qmc.phases[1]
-        try:
-            # if background profile is loaded and both profiles have a DROP even set
-            if aw.qmc.backgroundprofile is not None and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
-                # calculate time delta between background and foreground DROP event
-                dropTimeDelta = aw.qmc.timex[aw.qmc.timeindex[6]] - aw.qmc.timeB[aw.qmc.timeindexB[6]]
-                totalQuadraticDeltaET = 0
-                totalQuadraticDeltaBT = 0
-                count = 0
-                for i in range(aw.qmc.timeindex[6],0,-1):
-                    # iterate backward from DROP to BTlimit
-                    if aw.qmc.stemp1 is not None and len(aw.qmc.stemp1) > i:
-                        # take smoothed data if available
-                        et = aw.qmc.stemp1[i]
-                    else:
-                        et = aw.qmc.temp1[i]
-                    if aw.qmc.stemp2 is not None and len(aw.qmc.stemp2) > i:
-                        # take smoothed data if available
-                        bt = aw.qmc.stemp2[i]
-                    else:
-                        bt = aw.qmc.temp2[i]
-                    if BTlimit and bt > BTlimit:
-                        # still above the limit
-                        # retrieve corresponding values from the background (is always smoothed)
-                        # first compute closest index at that time point in the background data
-                        #j = aw.qmc.backgroundtime2index((aw.qmc.timex[i] - dropTimeDelta))
-                        #etb = aw.qmc.temp1B[j]
-                        #btb = aw.qmc.temp2B[j]
-                        etb = aw.qmc.backgroundETat(aw.qmc.timex[i] - dropTimeDelta)
-                        btb = aw.qmc.backgroundBTat(aw.qmc.timex[i] - dropTimeDelta)
-                        det = (et - etb)
-                        totalQuadraticDeltaET += det * det
-                        dbt = (bt - btb)
-                        totalQuadraticDeltaBT += dbt * dbt
-                        count += 1
-                    else:
-                        break
-                return math.sqrt(totalQuadraticDeltaET/float(count)), math.sqrt(totalQuadraticDeltaBT/float(count))
-            # no DROP event registered
-            return None, None
-        except Exception: # pylint: disable=broad-except
-#            traceback.print_exc(file=sys.stdout)
             return None, None
 
     def setLCDsDigitCount(self,n):
@@ -38159,7 +38114,7 @@ class ApplicationWindow(QMainWindow):
             if len(copy)>25:
                 self.buttonpalette_label = copy[25]
             else:
-                self.buttonpalette_label = self.aw.buttonpalette_default_label
+                self.buttonpalette_label = self.buttonpalette_default_label
             # quantifier actions
             if len(copy)>26 and len(copy[26]) == 4:
                 self.eventquantifieraction = copy[26][:]

@@ -30,7 +30,8 @@ v2.6.0 (XX XX, 2022)
   - adds shortcut to start recording from monitoring by hitting the SPACE bar
   - adds shortcut to stop recording by hitting the SPACE bar in keyboard mode if all main event buttons already have been activated
   - adds shortcuts CTR+ key i, o, p and l to Roast Properties dialog to send scale weight to weight input field, weight output field, reset the accumulated scale weight and to open the volume calculator
-  - adds automatic DROP mark on OFF if CHARGE is set and Auto DROP is active
+  - adds automatic mark DROP on OFF if either Auto DROP is active or DROP button is hidden
+  - adds automatic set of CHARGE to the first reading on DROP if not yet set and Auto CHARGE is active
   - adds PDF as export format of roast, production and ranking reports
   - adds "PDF Report" as additional format to autosave ([Issue #478](../../../issues/478))
   - adds notifications incl. Artisan Commands `notify` and `notifications` with support for artisan.plus reminders

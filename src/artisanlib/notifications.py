@@ -131,7 +131,8 @@ def sendPlusNotificationSeen(hr_id:str, date):
 class NotificationManager(QObject):
     
     __slots__ = ( 'notification_timeout', 'notification_queue_max_length', 'notification_queue_max_age', 'tray_menu', 'tray_icon', 
-                'notifications_available', 'notifications_enabled', 'notifications_visible', 'notifications_queue', 'active_notification' )
+                'notifications_available', 'notifications_enabled', 'notifications_visible', 'notifications_queue', 
+                'active_notification', 'notification_menu_actions' )
 
     def __init__(self):
         super().__init__()
