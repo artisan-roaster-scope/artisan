@@ -11,7 +11,7 @@ sidebar:
   nav: "machines"
 ---
 
-<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Producer:__ [Özstar](https://www.ozstarmakina.com/){:target="_blank"}, Turkey
 * __Machines:__ all Twino/Ozstar machines with networked PLC

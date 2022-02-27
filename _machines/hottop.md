@@ -11,7 +11,7 @@ sidebar:
   nav: "machines"
 ---
 
-<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Producer:__ [Hottop](https://www.hottopusa.com){:target="_blank"}, USA/Taiwan
 * __Machine:__ KN-8828B-2K+

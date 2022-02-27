@@ -3,6 +3,8 @@ main:
     url: /machines/index
   - title: "Supported Devices"
     url: /devices/index
+  - title: "News"
+    url: /news/index
   - title: "Donate"
     url: /donate/
   - title: "About"
@@ -132,12 +134,12 @@ machines:
         url: /machines/tostabar/
       - title: "Trinitas"
         url: /machines/trinitas/
-      - title: "Trobrat"
-        url: /machines/trobrat/
+#      - title: "Trobrat"
+#        url: /machines/trobrat/
       - title: "Twino/Ozstar"
         url: /machines/twino-ozstar/
-      - title: "Typhoon"
-        url: /machines/typhoon/
+#      - title: "Typhoon"
+#        url: /machines/typhoon/
       - title: "US Roaster Corp"
         url: /machines/usroaster/
       - title: "VNT"
@@ -173,6 +175,17 @@ devices:
         url: /devices/websockets/
       - title: "Yoctopuce"
         url: /devices/yoctopuce/
+
+news:
+  - title: "News"
+    url: /news/
+    children:
+      - title: "archive"
+        url: /year-archive/
+      - title: "tags"
+        url: /tags/
+      - title: "categories"
+        url: /categories/
 
 docs:
   - title: Getting Started

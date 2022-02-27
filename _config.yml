@@ -15,6 +15,7 @@ remote_theme             : "mmistakes/minimal-mistakes@4.23.0"
 minimal_mistakes_skin    : "default" # "default" "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
 # Site Settings
+future                   : true # show future posts
 locale                   : "en-US"
 title                    : "artisan"
 title_separator          : "-"
@@ -239,6 +240,20 @@ defaults:
     values:
       layout: single
       author_profile: false
+  # posts / news
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: single
+      author_profile: true
+      show_date: true
+      read_time: false
+      comments: false
+      share: true
+      related: true
+      sidebar:
+        nav: "news"
   # _devices
   - scope:
       path: ""

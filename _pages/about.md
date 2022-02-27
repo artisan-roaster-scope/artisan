@@ -43,10 +43,6 @@ gallery:
     image_path: /assets/images/IP-CC-logo.jpg
     alt: "IP-CC"
     title: "IP-CC"
-  - url: https://www.hottopusa.com/
-    image_path: /assets/images/hottop-logo.png
-    alt: "Hottop"
-    title: "Hottop"
   - url: https://www.bescaroasters.com/
     image_path: /assets/images/besca-logo.jpg
     alt: "Besca Roasters"
@@ -67,31 +63,34 @@ gallery:
     image_path: /assets/images/showroom-logo.png
     alt: "Showroom"
     title: "Showroom"
-  - url: https://typhoon.coffee/
-    image_path: /assets/images/typhoon-logo.png
-    alt: "Typhoon"
-    title: "Typhoon"
   - url: https://www.kapokcoffee.com/
     image_path: /assets/images/kapok-logo.png
     alt: "KapoK"
     title: "KapoK"
-  - url: http://novustec.co.kr/
-    image_path: /assets/images/novustec-logo.png
-    alt: "Novustec"
-    title: "Novustec"
-  - url: http://www.twinoroasters.com/
-    image_path: /assets/images/twino-logo.png
-    alt: "Twino"
-    title: "Twino"
   - url: https://acaia.co/
     image_path: /assets/images/acaia-logo.jpeg
     alt: "acaia"
     title: "acaia"
-
-    
-
 ---
 
+<!--
+  - url: http://www.twinoroasters.com/
+    image_path: /assets/images/twino-logo.png
+    alt: "Twino"
+    title: "Twino"
+  - url: https://www.hottopusa.com/
+    image_path: /assets/images/hottop-logo.png
+    alt: "Hottop"
+    title: "Hottop"
+  - url: http://novustec.co.kr/
+    image_path: /assets/images/novustec-logo.png
+    alt: "Novustec"
+    title: "Novustec"
+  - url: https://typhoon.coffee/
+    image_path: /assets/images/typhoon-logo.png
+    alt: "Typhoon"
+    title: "Typhoon"
+-->
 
 Artisan is an open-source software that helps coffee roasters record, analyze, and control roast profiles. This software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.
 
