@@ -394,8 +394,11 @@ class Artisan(QtSingleApplication):
             self._isRunning = self._outSocket.waitForConnected(-1)
             if self.isRunning():
                 self._outStream = QTextStream(self._outSocket)
-                self._outStream.setCodec('UTF-8')
+#                self._outStream.setCodec('UTF-8')
                 return self.sendMessage(message)
+            return False
+        except Exception as e:
+            _log.exception(e)
             return False
         finally:
             self._outSocket = None
@@ -6634,7 +6637,6 @@ class tgraphcanvas(FigureCanvas):
                 self.weight = [0,0,self.weight[2]]
                 self.volume = [0,0,self.volume[2]]
                 self.density = [0,self.density[1],1,self.density[3]]
-                self.density_roasted = [0,self.density_roasted[1],1,self.density_roasted[3]]
                 # we reset ambient values to the last sampled readings in this session
                 self.ambientTemp = self.ambientTemp_sampled
                 self.ambient_humidity = self.ambient_humidity_sampled
@@ -6652,6 +6654,7 @@ class tgraphcanvas(FigureCanvas):
             self.whole_color = 0
             self.ground_color = 0
             self.moisture_roasted = 0.
+            self.density_roasted = [0,self.density_roasted[1],1,self.density_roasted[3]]
 
             # reset running AUC values
             self.AUCvalue = 0
@@ -8703,7 +8706,7 @@ class tgraphcanvas(FigureCanvas):
                                         else:
                                             height = 20
     
-                                        if self.eventsGraphflag == 4 and self.backgroundEtypes[i] < 4 and aw.qmc.showEtypes[self.backgroundEtypes[i]]:
+                                        if self.eventsGraphflag == 4 and self.backgroundEtypes[i] < 4 and aw.qmc.showEtypes[self.backgroundEtypes[i]] and len(Bevalues[self.backgroundEtypes[i]])>0:
                                             Btemp = Bevalues[self.backgroundEtypes[i]][0]
                                             Bevalues[self.backgroundEtypes[i]] = Bevalues[self.backgroundEtypes[i]][1:]
                                         else:
@@ -9299,7 +9302,8 @@ class tgraphcanvas(FigureCanvas):
                                         if not self.flagstart and not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
                                             continue
         
-                                        if self.eventsGraphflag == 4 and self.specialeventstype[i] < 4 and aw.qmc.showEtypes[self.specialeventstype[i]]:
+                                        # combo events
+                                        if self.eventsGraphflag == 4 and self.specialeventstype[i] < 4 and aw.qmc.showEtypes[self.specialeventstype[i]] and len(evalues[self.specialeventstype[i]])>0:
                                             temp = evalues[self.specialeventstype[i]][0]
                                             evalues[self.specialeventstype[i]] = evalues[self.specialeventstype[i]][1:]
                                         

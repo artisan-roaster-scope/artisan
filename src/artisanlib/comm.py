@@ -4900,7 +4900,8 @@ class serialport():
                 channel = self.PhidgetIO[idx].getChannel()
             # set rate
             try:
-                self.PhidgetIO[idx].setDataInterval(self.aw.qmc.phidget1018_dataRates[channel])
+                if API != "digital":
+                    self.PhidgetIO[idx].setDataInterval(self.aw.qmc.phidget1018_dataRates[channel])
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             # set VCP100x voltage range
