@@ -16748,7 +16748,7 @@ class ApplicationWindow(QMainWindow):
         # renamed via setText to link them to artisan translations (which hopefully provides those translations)
 
         self.qtbase_additional_locales = ["da","el","fa","gd","lv","nl","pt_BR","pt","sk","sv","zh_CN"] # additionally added to /translations
-        self.qtbase_locales = ["ar","de","en","es","fi","fr","he","hu","it","ja","ko","pl","ru","tr","zh_TW"] # from Qt distribution
+        self.qtbase_locales = ["ar","de","en","es","fi","fr","he","hu","it","ja","ko","pl","uk","tr","zh_TW"] # from Qt distribution
 
         #############################  Define variables that need to exist before calling settingsload()
         self.curFile = None
@@ -17510,6 +17510,7 @@ class ApplicationWindow(QMainWindow):
         # language_menu_actions holds a dict associating iso2 locale strings to language menu actions
         self.language_menu_actions = {}
         
+        # use s.encode("ascii", 'backslashreplace').decode("utf-8") and remove the duplicate \\
         for iso, name in [
                 ("ar", "\u0627\u0644\u0639\u0631\u0628\u064a\u0629"),
                 ("da", "Dansk"),
@@ -17517,6 +17518,7 @@ class ApplicationWindow(QMainWindow):
                 ("en", "English"),
                 ("es", "Espa\u00f1ol"),
                 ("fa", "\u0641\u0627\u0631\u0633\u06cc"),
+                ("fi", "Suomalainen"),
                 ("fr", "Fran\u00e7ais"),
                 ("gd", "G\u00e0idhlig na h-Alba"),
                 ("el", "\u03b5\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac"),
@@ -17532,10 +17534,10 @@ class ApplicationWindow(QMainWindow):
                 ("pl", "Polski"),
                 ("pt", "Portugu\xeas"),
                 ("pt_BR", "Portugu\u00EAs do Brasil"),
-                ("ru", "\u0420\u0443\u0441\u0441\u043a\u0438\u0439"),
+#                ("ru", "\u0420\u0443\u0441\u0441\u043a\u0438\u0439"),
                 ("sk", "Slov\u00e1k"),
                 ("sv", "Svenska"),
-                ("fi", "Suomalainen"),
+                ("uk", "\u0443\u043a\u0440\u0430\u0457\u043d\u0435\u0446\u044c"), #"\u0443\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0438\u0439"),
                 ("th", "Thai"),
                 ("tr", "T\xfcrk\u00e7e"),
                 ("vi", "Ti\u1EBFng Vi\u1EC7t"),
@@ -38960,11 +38962,12 @@ def initialize_locale(my_app) -> str:
         "pt",
         "pt_BR",
         "pl",
-        "ru",
+#        "ru",
         "sk",
         "sv",
         "th",
         "tr",
+        "uk",
         "vi",
         "zh",
         "zh_CN",

@@ -92,7 +92,7 @@ for tr in [
     'qtbase_ja.qm',
     'qtbase_ko.qm',
     'qtbase_pl.qm',
-    'qtbase_ru.qm',
+    'qtbase_uk.qm',
     'qtbase_tr.qm',
     'qtbase_zh_TW.qm',
     ]:

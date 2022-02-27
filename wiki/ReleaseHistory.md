@@ -62,11 +62,14 @@ v2.6.0 (XX XX, 2022)
   - keep ambient phidgets attached until app termination to increase system stability
   - default sampling interval set to 2sec (from 3sec)
   - updated libarary infrastructure (Python, Qt, PyQt, matplotlib, ...)
+  - adds Ukrainian localization
 * DELETIONS
   - removes oversampling
   - removes HUD
-  - removes Probat middleware and MCR support
   - removes Newton projections
+  - removes Probat middleware and MCR support
+  - removes support for Trobrat and Typhoon machines
+  - removes Russian localization
 * FIXES
   - fixes positioning of combo event annotations if "Show Full" is deactivated
   - fixes Acia Pearl disconnects and speeds up BLE connects

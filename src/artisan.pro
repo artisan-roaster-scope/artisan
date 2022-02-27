@@ -95,11 +95,11 @@ TRANSLATIONS = \
 	translations/artisan_pl.ts \
 	translations/artisan_pt_BR.ts \
 	translations/artisan_pt.ts \
-	translations/artisan_ru.ts \
 	translations/artisan_sk.ts \
 	translations/artisan_sv.ts \
 	translations/artisan_th.ts \
 	translations/artisan_tr.ts \
+	translations/artisan_uk.ts \
 	translations/artisan_vi.ts \
 	translations/artisan_zh_CN.ts \
 	translations/artisan_zh_TW.ts
