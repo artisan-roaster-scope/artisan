@@ -30,8 +30,7 @@ v2.6.0 (XX XX, 2022)
   - adds shortcut to start recording from monitoring by hitting the SPACE bar
   - adds shortcut to stop recording by hitting the SPACE bar in keyboard mode if all main event buttons already have been activated
   - adds shortcuts CTR+ key i, o, p and l to Roast Properties dialog to send scale weight to weight input field, weight output field, reset the accumulated scale weight and to open the volume calculator
-  - adds automatic mark DROP on OFF if either Auto DROP is active or DROP button is hidden
-  - adds automatic set of CHARGE to the first reading on DROP if not yet set and Auto CHARGE is active
+  - adds automatic mark DROP on OFF if at least 7min were recorded and either Auto DROP is active or DROP button is hidden
   - adds PDF as export format of roast, production and ranking reports
   - adds "PDF Report" as additional format to autosave ([Issue #478](../../../issues/478))
   - adds notifications incl. Artisan Commands `notify` and `notifications` with support for artisan.plus reminders
@@ -43,6 +42,7 @@ v2.6.0 (XX XX, 2022)
   - implements Artisan Commands `PIDon`, `PIDoff`, `PIDtoggle`, `pidmode` for Fujji PIDs
   - adds symbolic variables `aTMP`, `aHUM` and `aPRE` to hold the last ambient temperature, humidity and pressure readings ([Issue #786](../../../issues/786))
   - adds logging infrastructure
+  - adds Ukrainian localization
 * CHANGES
   - seamless loading of profiles recorded under a different device setup
   - faster startup
@@ -62,7 +62,6 @@ v2.6.0 (XX XX, 2022)
   - keep ambient phidgets attached until app termination to increase system stability
   - default sampling interval set to 2sec (from 3sec)
   - updated libarary infrastructure (Python, Qt, PyQt, matplotlib, ...)
-  - adds Ukrainian localization
 * DELETIONS
   - removes oversampling
   - removes HUD
@@ -95,6 +94,7 @@ v2.6.0 (XX XX, 2022)
   - button event actions now respecting the event types Bernoulli settings as slider actions do
   - fixes temperature conversion for HB/Arc roasters
   - fixes "too many open file handles" errors on S7 communication under Windows ([Issue #816](../../../issues/816))
+  - fixes ArtisanViewer file open action when Artisan is recording and a file link on Wndows ([Discussion #828](../../../issues/828))
 
 ----
 v2.4.6 (July 30, 2021)

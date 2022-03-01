@@ -722,7 +722,7 @@ class tgraphcanvas(FigureCanvas):
         'temp1', 'temp2', 'delta1', 'delta2', 'stemp1', 'stemp2', 'tstemp1', 'tstemp2', 'ctimex1', 'ctimex2', 'ctemp1', 'ctemp2', 'unfiltereddelta1', 'unfiltereddelta2',  'unfiltereddelta1_pure', 'unfiltereddelta2_pure',
         'on_timex', 'on_temp1', 'on_temp2', 'on_ctimex1', 'on_ctimex2', 'on_ctemp1', 'on_ctemp2','on_tstemp1', 'on_tstemp2', 'on_unfiltereddelta1', 
         'on_unfiltereddelta2', 'on_delta1', 'on_delta2', 'on_extratemp1', 'on_extratemp2', 'on_extratimex', 'on_extractimex1', 'on_extractemp1', 'on_extractimex2', 'on_extractemp2',
-        'timeindex', 'ETfunction', 'BTfunction', 'DeltaETfunction', 'DeltaBTfunction', 'safesaveflag', 'pid', 'background', 'backgroundprofile', 'backgroundDetails',
+        'timeindex', 'ETfunction', 'BTfunction', 'DeltaETfunction', 'DeltaBTfunction', 'safesaveflag', 'pid', 'background', 'backgroundprofile', 'backgroundprofile_moved_x', 'backgroundprofile_moved_y', 'backgroundDetails',
         'backgroundeventsflag', 'backgroundpath', 'backgroundUUID', 'backgroundUUID', 'backgroundShowFullflag', 'titleB', 'roastbatchnrB', 'roastbatchprefixB',
         'roastbatchposB', 'temp1B', 'temp2B', 'temp1BX', 'temp2BX', 'timeB', 'temp1Bdelta', 'temp2Bdelta',
         'stemp1B', 'stemp2B', 'stemp1BX', 'stemp2BX', 'extraname1B', 'extraname2B', 'extratimexB', 'xtcurveidx', 'ytcurveidx', 'delta1B', 'delta2B', 'timeindexB',
@@ -1632,6 +1632,8 @@ class tgraphcanvas(FigureCanvas):
         #background profile 
         self.background = False # set to True if loaded background profile is shown and False if hidden
         self.backgroundprofile = None # if not None, a background profile is loaded
+        self.backgroundprofile_moved_x = 0 # background profile moved in horizontal direction
+        self.backgroundprofile_moved_y = 0 # background profile moved in vertical direction
         self.backgroundDetails = True
         self.backgroundeventsflag = True
         self.backgroundpath = ""
@@ -3743,7 +3745,7 @@ class tgraphcanvas(FigureCanvas):
                     sample_extractemp1 = aw.qmc.on_extractemp1
                     sample_extractimex2 = aw.qmc.on_extractimex2
                     sample_extractemp2 = aw.qmc.on_extractemp2
-
+                
                 #if using a meter (thermocouple device)
                 if aw.qmc.device != 18 or aw.simulator is not None: # not NONE device
 
@@ -4063,8 +4065,6 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         sample_unfiltereddelta1.append(0.)
                         sample_unfiltereddelta2.append(0.)
-                        aw.qmc.unfiltereddelta1.append(0.)
-                        aw.qmc.unfiltereddelta2.append(0.)
                         aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
 
                     # limit displayed RoR #(only before TP is recognized) # WHY?
@@ -5431,7 +5431,7 @@ class tgraphcanvas(FigureCanvas):
                 now = self.timex[-1]                   # in data time (incl. time to charge)
                 _,xlim_right = self.ax.get_xlim()      # in data time like timex (incl. time to charge)
                 #self.resetlines()
-                if self.projectionmode == 0: # linear temperature projection mode based on current RoR
+                if self.projectionmode == 0 or (self.projectionmode == 1 and (self.timex[-1]-charge)<=60*5): # linear temperature projection mode based on current RoR
                     #calculate the temperature endpoint at endofx acording to the latest rate of change
                     if self.l_BTprojection is not None:
                         if self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and self.unfiltereddelta2_pure[-1] is not None and len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1, numpy.NaN]:
@@ -6688,11 +6688,18 @@ class tgraphcanvas(FigureCanvas):
             #used to find length of arms in annotations
             self.ystep_down = 0
             self.ystep_up = 0
-
+            
             # reset keyboard mode
             aw.keyboardmoveindex = 0 # points to the last activated button in keyboardButtonList; we start with the CHARGE button            aw.resetKeyboardButtonMarks()
+            
+            # if background is loaded we move it back to its original position:
+            if self.backgroundprofile:
+                if self.backgroundprofile_moved_x != 0:
+                    self.movebackground("left",self.backgroundprofile_moved_x)
+                if self.backgroundprofile_moved_y != 0:
+                    self.movebackground("down",self.backgroundprofile_moved_y)
 
-            if not (aw.qmc.autotimex and aw.qmc.background):
+            if not (aw.qmc.autotimex and self.background):
                 if self.locktimex:
                     self.startofx = self.locktimex_start
                     self.endofx = self.locktimex_end
@@ -6781,9 +6788,10 @@ class tgraphcanvas(FigureCanvas):
             self.autoFCsIdx = 0
 
             self.l_annotations = [] # initiate the event annotations
-            self.l_annotations_dict = {} # initiate the event id to temp/time annotation dict for annotations
+            # we initialize the annotation position dict of the foreground profile
+            self.deleteAnnoPositions(foreground=True, background=False)
             self.l_event_flags_dict = {} # initiate the event id to temp/time annotation dict for flags
-            self.l_background_annotations = [] # initiate the event annotations
+            self.l_background_annotations = [] # initiate the background event annotations
 
             if not sampling:
                 aw.hideDefaultButtons()
@@ -7085,17 +7093,42 @@ class tgraphcanvas(FigureCanvas):
 #            return numpy.concatenate(([None]*(fromIndex),res,[None]*(len(a)-toIndex))).tolist()
 #        return b
 
+    # deletes saved annotation positions from l_annotations_dict
+    # forground annotations have position keys <=6, background annotation positions have keys > 6, 
+    def deleteAnnoPositions(self, foreground:bool = False, background:bool = False):
+        if background and foreground:
+            self.l_annotations_dict = {}
+        else:
+            for k in list(self.l_annotations_dict.keys()):
+                if (background and k > 6) or (foreground and k <= 6):
+                    self.l_annotations_dict.pop(k)
+    
+    def moveBackgroundAnnoPositionsX(self, step):
+        for k in list(self.l_annotations_dict.keys()):
+            if k > 6:
+                for anno in self.l_annotations_dict[k]:
+                    x,y = anno.get_position()
+                    anno.set_position((x+step,y))
+                    
+    def moveBackgroundAnnoPositionsY(self, step):
+        for k in list(self.l_annotations_dict.keys()):
+            if k > 6:
+                for anno in self.l_annotations_dict[k]:
+                    x,y = anno.get_position()
+                    anno.set_position((x,y+step))
+
     # returns the position of the main event annotations as list of lists of the form
     #   [[id,temp_x,temp_y,time_x,time_y],...]
-    # with id the main event id like -1 for TP, 0 for CHARGE, 1 for DRY,..
+    # with id the main event id like -1 for TP, 0 for CHARGE, 1 for DRY,.., 6 for DROP (keys above 6 as used for background profile annotations are ignored)
     def getAnnoPositions(self):
         res = []
         for k,v in self.l_annotations_dict.items():
-            temp_anno = v[0].xyann
-            time_anno = v[1].xyann
-            if all((not numpy.isnan(e) for e in temp_anno + time_anno)):
-                # we add the entry only if all of the coordinates are proper numpers and not nan
-                res.append([k,temp_anno[0],temp_anno[1],time_anno[0],time_anno[1]])
+            if k<7:
+                temp_anno = v[0].xyann
+                time_anno = v[1].xyann
+                if all((not numpy.isnan(e) for e in temp_anno + time_anno)):
+                    # we add the entry only if all of the coordinates are proper numpers and not nan
+                    res.append([k,temp_anno[0],temp_anno[1],time_anno[0],time_anno[1]])
         return res
 
     def setAnnoPositions(self,anno_positions):
@@ -7145,7 +7178,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             fmtstr = "%.0f"
         if draggable and draggable_anno_key is not None and draggable_anno_key in self.l_annotations_pos_dict:
-            # we first look into the position dictionary loaded from file
+            # we first look into the position dictionary loaded from file, those are removed after first rendering
             xytext = self.l_annotations_pos_dict[draggable_anno_key][0]
         elif draggable and draggable_anno_key is not None and draggable_anno_key in self.l_annotations_dict:
             # next we check the "live" dictionary
@@ -7160,8 +7193,9 @@ class tgraphcanvas(FigureCanvas):
                             fontproperties=fontprop_small)
         try:
             temp_anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-            temp_anno.draggable(use_blit=True)
-            temp_anno.set_picker(aw.draggable_text_box_picker)
+            if draggable:
+                temp_anno.draggable(use_blit=True)
+                temp_anno.set_picker(aw.draggable_text_box_picker)
         except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
             pass
         #anotate time
@@ -7193,6 +7227,11 @@ class tgraphcanvas(FigureCanvas):
         ystep_down = ystep_up = 0
         anno_artists = []
         #Add markers for CHARGE
+        # add offset to annotation keys for background annotations to prevent them from being confused with those of the foreground profile and to prevent persisting them to alog files
+        if startB == None:
+            anno_key_offset = 0
+        else:
+            anno_key_offset = 10
         try:
             if len(timex) > 0:
                 if timeindex[0] != -1 and len(timex) > timeindex[0]:
@@ -7214,7 +7253,7 @@ class tgraphcanvas(FigureCanvas):
                             st1 = self.__to_ascii(st1)
                         e = 0
                         a = 1.
-                    time_temp_annos = self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a,draggable,0)
+                    time_temp_annos = self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a,draggable,0+anno_key_offset)
                     anno_artists += time_temp_annos
 
                 #Add TP marker
@@ -7224,7 +7263,7 @@ class tgraphcanvas(FigureCanvas):
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}"), stringfromseconds(timex[TP_index]-t0,False))
                         a = 1.
                         e = 0
-                        anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1)
+                        anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1+anno_key_offset)
                     elif TP_time_loaded is not None:
                         if timeindex2:
                             a = aw.qmc.backgroundalpha
@@ -7239,7 +7278,7 @@ class tgraphcanvas(FigureCanvas):
                         TP_index = self.backgroundtime2index(TP_time_loaded + shift)
                         ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}"),stringfromseconds(TP_time_loaded,False))
-                        anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1)
+                        anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1+anno_key_offset)
                 #Add Dry End markers
                 if timeindex[1]:
                     tidx = timeindex[1]
@@ -7250,7 +7289,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         a = 1.
                     e = 0
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,1)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,1+anno_key_offset)
 
                 #Add 1Cs markers
                 if timeindex[2]:
@@ -7265,7 +7304,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         a = 1.
                     e = 0
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,2)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,2+anno_key_offset)
                 #Add 1Ce markers
                 if timeindex[3]:
                     tidx = timeindex[3]
@@ -7276,7 +7315,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         a = 1.
                     e = 0
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,3)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,3+anno_key_offset)
                     #add a water mark if FCs
                     if timeindex[2] and not timeindex2 and self.watermarksflag:
                         self.ax.axvspan(timex[timeindex[2]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
@@ -7293,7 +7332,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         a = 1.
                     e = 0
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,4)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,4+anno_key_offset)
                 #Add 2Ce markers
                 if timeindex[5]:
                     tidx = timeindex[5]
@@ -7304,7 +7343,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         a = 1.
                     e = 0
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,5)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,5+anno_key_offset)
                     #do water mark if SCs
                     if timeindex[4] and not timeindex2 and self.watermarksflag:
                         self.ax.axvspan(timex[timeindex[4]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
@@ -7333,7 +7372,7 @@ class tgraphcanvas(FigureCanvas):
                         a = 1.
                     e = 0
 
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,6)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,6+anno_key_offset)
 
                     #do water mark if FCs, but no FCe nor SCs nor SCe
                     if timeindex[2] and not timeindex[3] and not timeindex[4] and not timeindex[5] and not timeindex2 and self.watermarksflag:
@@ -8789,7 +8828,7 @@ class tgraphcanvas(FigureCanvas):
                                     startB,
                                     self.timeindex, # timeindex2
                                     TP_time_loaded=self.TP_time_B_loaded, 
-                                    draggable=False))
+                                    draggable=True))
                             except Exception: # pylint: disable=broad-except
                                 pass
     
@@ -11712,9 +11751,14 @@ class tgraphcanvas(FigureCanvas):
 
     def OffRecorder(self, autosave=True):
         try:
-            # mark DROP if not yet set, CHARGE is set and and either autoDROP is active or DROP button is hidden
+            # mark DROP if not yet set, at least 7min roast time and and either autoDROP is active or DROP button is hidden
             if self.timeindex[6] == 0 and (self.autoDropFlag or not self.buttonvisibility[6]):
-                self.markDrop()
+                if aw.qmc.timeindex[0] != -1:
+                    start = aw.qmc.timex[aw.qmc.timeindex[0]]
+                else:
+                    start = 0
+                if (len(self.timex)>0 and self.timex[-1] - start) > 7*60: # only after 7min into the roast
+                    self.markDrop()
             aw.enableSaveActions()
             aw.resetCurveVisibilities()
             self.flagstart = False
@@ -12546,10 +12590,6 @@ class tgraphcanvas(FigureCanvas):
     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
-                    elif self.autoChargeFlag:
-                        # we automatically set CHARGE to the first reading (but we do not trigger autoCHARGE, another redraw and its associated action at this point)
-                        self.timeindex[0] = 0
-                        start = self.timex[0]
                     else:
                         start = 0
                     # we check if this is the first DROP mark on this roast
@@ -14026,6 +14066,8 @@ class tgraphcanvas(FigureCanvas):
                     for j in range(len(self.extratimexB[i])):
                         self.stemp1BX[i][j] += step
                         self.stemp2BX[i][j] += step
+                self.backgroundprofile_moved_y += step
+                self.moveBackgroundAnnoPositionsY(step)
 
             elif direction == "left":
                 for i in range(lt):
@@ -14033,6 +14075,8 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(len(self.extratimexB)):
                     for j in range(len(self.extratimexB[i])):
                         self.extratimexB[i][j] -= step
+                self.backgroundprofile_moved_x -= step
+                self.moveBackgroundAnnoPositionsX(-step)
 
             elif direction == "right":
                 for i in range(lt):
@@ -14040,6 +14084,8 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(len(self.extratimexB)):
                     for j in range(len(self.extratimexB[i])):
                         self.extratimexB[i][j] += step
+                self.backgroundprofile_moved_x += step
+                self.moveBackgroundAnnoPositionsX(step)
 
             elif direction == "down":
                 for i in range(lt):
@@ -14052,6 +14098,8 @@ class tgraphcanvas(FigureCanvas):
                     for j in range(len(self.extratimexB[i])):
                         self.stemp1BX[i][j] -= step
                         self.stemp2BX[i][j] -= step
+                self.backgroundprofile_moved_y -= step
+                self.moveBackgroundAnnoPositionsY(-step)
         else:
             aw.sendmessage(QApplication.translate("Message","Unable to move background"))
             return
@@ -18133,8 +18181,8 @@ class ApplicationWindow(QMainWindow):
         self.buttonONOFF.setToolTip(QApplication.translate("Tooltip", "Start monitoring"))
         self.buttonONOFF.setStyleSheet(self.pushbuttonstyles["OFF"])
         self.buttonONOFF.setGraphicsEffect(self.makeShadow())
-        self.buttonONOFF.pressed.connect(self.mainButtonPressed)
-        self.buttonONOFF.released.connect(self.mainButtonReleased)
+#        self.buttonONOFF.pressed.connect(self.mainButtonPressed)
+#        self.buttonONOFF.released.connect(self.mainButtonReleased)
         self.buttonONOFF.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.buttonONOFF.setMinimumHeight(self.standard_button_height)
         self.buttonONOFF.clicked.connect(self.qmc.ToggleMonitor)
@@ -18147,8 +18195,8 @@ class ApplicationWindow(QMainWindow):
         self.buttonSTARTSTOP.setToolTip(QApplication.translate("Tooltip", "Start recording"))
         self.buttonSTARTSTOP.setStyleSheet(self.pushbuttonstyles["STOP"])
         self.buttonSTARTSTOP.setGraphicsEffect(self.makeShadow())
-        self.buttonSTARTSTOP.pressed.connect(self.mainButtonPressed)
-        self.buttonSTARTSTOP.released.connect(self.mainButtonReleased)
+#        self.buttonSTARTSTOP.pressed.connect(self.mainButtonPressed)
+#        self.buttonSTARTSTOP.released.connect(self.mainButtonReleased)
         self.buttonSTARTSTOP.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         self.buttonSTARTSTOP.setMinimumHeight(self.standard_button_height)
@@ -18178,8 +18226,8 @@ class ApplicationWindow(QMainWindow):
         self.buttonRESET.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonRESET.setStyleSheet(self.pushbuttonstyles["RESET"])
         self.buttonRESET.setGraphicsEffect(self.makeShadow())
-        self.buttonRESET.pressed.connect(self.mainButtonPressed)
-        self.buttonRESET.released.connect(self.mainButtonReleased)
+#        self.buttonRESET.pressed.connect(self.mainButtonPressed)
+#        self.buttonRESET.released.connect(self.mainButtonReleased)
         self.buttonRESET.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.buttonRESET.setMinimumHeight(self.standard_button_height)
         self.buttonRESET.setToolTip(QApplication.translate("Tooltip", "Reset"))
@@ -18200,8 +18248,8 @@ class ApplicationWindow(QMainWindow):
         self.buttonCONTROL.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonCONTROL.setStyleSheet(self.pushbuttonstyles["PID"])
         self.buttonCONTROL.setGraphicsEffect(self.makeShadow())
-        self.buttonCONTROL.pressed.connect(self.mainButtonPressed)
-        self.buttonCONTROL.released.connect(self.mainButtonReleased)
+#        self.buttonCONTROL.pressed.connect(self.mainButtonPressed)
+#        self.buttonCONTROL.released.connect(self.mainButtonReleased)
         self.buttonCONTROL.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.buttonCONTROL.setMinimumHeight(self.standard_button_height)
         self.buttonCONTROL.clicked.connect(self.PIDcontrol)
@@ -18818,7 +18866,6 @@ class ApplicationWindow(QMainWindow):
         self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE"))
 
         #level 1
-#        self.level1layout.addWidget(self.ntb)
         self.level1layout.addStretch()
         self.level1layout.addWidget(self.phasesLCDs)
         self.level1layout.addWidget(self.AUCLCD)
@@ -19133,6 +19180,13 @@ class ApplicationWindow(QMainWindow):
     def setTimerColor(self, timer_color:str):
         self.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF[timer_color],self.lcdpaletteB[timer_color]))
         self.qmc.setTimerLargeLCDcolorSignal.emit(self.lcdpaletteF[timer_color], self.lcdpaletteB[timer_color])
+        # HACK: PID/CONTROL button changes shape/shadow on setTimerColor() as triggered by RESET
+        # there reason remains unclear
+        # the following prevents this
+        try:
+            self.buttonCONTROL.setStyleSheet(self.buttonCONTROL.styleSheet())
+        except Exception:  # pylint: disable=broad-except
+            pass
         
     def mousePressEvent(self, event):
         super().mousePressEvent(event)
@@ -19555,13 +19609,13 @@ class ApplicationWindow(QMainWindow):
         validator.setLocale(QLocale.c())
         return validator
     
-    @pyqtSlot()
-    def mainButtonPressed(self):
-        self.sender().setGraphicsEffect(self.makeShadow(strong=True))
-        
-    @pyqtSlot()
-    def mainButtonReleased(self):
-        self.sender().setGraphicsEffect(self.makeShadow())
+#    @pyqtSlot()
+#    def mainButtonPressed(self):
+#        self.sender().setGraphicsEffect(self.makeShadow(strong=True))
+#        
+#    @pyqtSlot()
+#    def mainButtonReleased(self):
+#        self.sender().setGraphicsEffect(self.makeShadow())
 
     # for use in widgets that expects a double via a aw.createCLocalDoubleValidator that accepts both,
     # one dot and several commas. If there is no dot, the last comma is interpreted as decimal separator and the others removed
@@ -36807,6 +36861,8 @@ class ApplicationWindow(QMainWindow):
     def deleteBackground(self):
         self.qmc.background = False
         self.qmc.backgroundprofile = None
+        self.qmc.backgroundprofile_moved_x = 0
+        self.qmc.backgroundprofile_moved_y = 0
         self.qmc.backgroundpath = ""
         self.qmc.backgroundUUID = None
         self.qmc.titleB = ""
@@ -38738,6 +38794,8 @@ class ApplicationWindow(QMainWindow):
                             aw.qmc.timeindexB[6] = max(0,aw.qmc.backgroundtime2index(t2))
                         aw.qmc.background = True
                         aw.qmc.backgroundprofile = True
+                        aw.qmc.backgroundprofile_moved_x = 0
+                        aw.qmc.backgroundprofile_moved_y = 0
                         if doDraw:
                             aw.qmc.redraw(recomputeAllDeltas=recomputeAllDeltas)
                             aw.sendmessage(QApplication.translate("Message","B1 = [%s] ; B2 = [%s]"%(EQU[0],EQU[1])))
@@ -39152,6 +39210,8 @@ def main():
                     _log.exception(e)
                     aw.qmc.background = False
                     aw.qmc.backgroundprofile = None
+                    aw.qmc.backgroundprofile_moved_x = 0
+                    aw.qmc.backgroundprofile_moved_y = 0
             if not aw.lastLoadedBackground and not aw.lastLoadedProfile:
                 # redraw once to get geometry right
                 aw.qmc.redraw(False,sampling=False,smooth=aw.qmc.optimalSmoothing)
