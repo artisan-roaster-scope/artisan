@@ -6834,6 +6834,7 @@ class tgraphcanvas(FigureCanvas):
             self.endofx = 60
             
         aw.autoAdjustAxis(background=not keepProperties) # if reset() triggered by ON, we ignore background on adjusting the axis and adjust according to RESET min/max
+
         ### REDRAW  ##
         if redraw:
             self.redraw(True,sampling=sampling,smooth=aw.qmc.optimalSmoothing) # we need to re-smooth with standard smoothing if ON and optimal-smoothing is ticked
@@ -35727,9 +35728,9 @@ class ApplicationWindow(QMainWindow):
         res = 0
         if len(self.qmc.timex)>5 and i < len(self.qmc.timex):
             if self.checkTop(offset,self.qmc.temp2[i-5],self.qmc.temp2[i-4],self.qmc.temp2[i-3],self.qmc.temp2[i-2],self.qmc.temp2[i-1],self.qmc.temp2[i]):
-                res = 3
+                res = 2
             elif len(self.qmc.timex)>10 and self.checkTop(offset,self.qmc.temp2[i-10],self.qmc.temp2[i-8],self.qmc.temp2[i-6],self.qmc.temp2[i-4],self.qmc.temp2[i-2],self.qmc.temp2[i]):
-                res = 6
+                res = 5
         return res
 
     # this can be used to find the CHARGE index as well as the DROP index by using
