@@ -26764,8 +26764,11 @@ class ApplicationWindow(QMainWindow):
                 t1x = profile["extratemp1"]
                 t2x = profile["extratemp2"]
                 
+                # reset the movebackground cache:
                 self.qmc.backgroundprofile_moved_x = 0
                 self.qmc.backgroundprofile_moved_y = 0
+                # delete background annotation positions
+                self.qmc.deleteAnnoPositions(foreground=False, background=True)
                 
                 #remove the analysis results annotation if it exists
                 aw.qmc.analysisresultsstr = ""
@@ -36892,6 +36895,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.l_background_annotations = []
         self.qmc.analysisresultsstr = ""
         self.qmc.resetlinecountcaches()
+        self.qmc.deleteAnnoPositions(foreground=False, background=True)
 
     @pyqtSlot()
     @pyqtSlot(bool)
