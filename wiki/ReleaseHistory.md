@@ -19,7 +19,7 @@ v2.6.0 (XX XX, 2022)
   - adds indicator of simulator source file and simulation speed in main window title
   - adds automatic temperature conversion to simulator
   - adds CHARGE timer
-  - adds quadratic BT/ET and RoR projections
+  - adds quadratic BT/ET and RoR projections, active after 5min into the roast
   - adds possibility to show/hide curves by a click on the corresponding LCD
   - adds slider mapping calculator
   - adds large scale LCD window
@@ -62,6 +62,7 @@ v2.6.0 (XX XX, 2022)
   - keep ambient phidgets attached until app termination to increase system stability
   - default sampling interval set to 2sec (from 3sec)
   - updated libarary infrastructure (Python, Qt, PyQt, matplotlib, ...)
+  - enables drag-and-drop of background annotations
 * DELETIONS
   - removes oversampling
   - removes HUD

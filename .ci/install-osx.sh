@@ -27,10 +27,11 @@ set -e # reduced logging
 #brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb 1>/dev/null 2>&1
 #------------
 
-# upgrade python from 3.9 to 3.10
-brew install python@3.10
-brew unlink python@3.9
-brew link --force python@3.10
+## upgrade python from 3.9 to 3.10
+# 3.10.2 now already installed on AppVeyor
+#brew install python@3.10
+#brew unlink python@3.9
+#brew link --force python@3.10
 export PATH="/usr/local/opt/python@3.10/bin:$PATH"
 
 hash -r
