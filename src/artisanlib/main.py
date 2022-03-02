@@ -6691,23 +6691,6 @@ class tgraphcanvas(FigureCanvas):
             
             # reset keyboard mode
             aw.keyboardmoveindex = 0 # points to the last activated button in keyboardButtonList; we start with the CHARGE button            aw.resetKeyboardButtonMarks()
-            
-            # if background is loaded we move it back to its original position:
-            if self.backgroundprofile:
-                if self.backgroundprofile_moved_x != 0:
-                    self.movebackground("left",self.backgroundprofile_moved_x)
-                if self.backgroundprofile_moved_y != 0:
-                    self.movebackground("down",self.backgroundprofile_moved_y)
-
-            if not (aw.qmc.autotimex and self.background):
-                if self.locktimex:
-                    self.startofx = self.locktimex_start
-                    self.endofx = self.locktimex_end
-                else:
-                    self.startofx = self.chargemintime
-                    self.endofx = self.resetmaxtime
-            if self.endofx < 1:
-                self.endofx = 60
 
             aw.setTimerColor("timer")
 
@@ -6829,8 +6812,28 @@ class tgraphcanvas(FigureCanvas):
         aw.updatePhasesLCDs()
         #clear AUC LCD
         aw.updateAUCLCD()
+
+        # if background is loaded we move it back to its original position (after regular load):
+        if self.backgroundprofile:
+            moved = self.backgroundprofile_moved_x != 0 or self.backgroundprofile_moved_y != 0
+            if self.backgroundprofile_moved_x != 0:
+                self.movebackground("left",self.backgroundprofile_moved_x)
+            if self.backgroundprofile_moved_y != 0:
+                self.movebackground("down",self.backgroundprofile_moved_y)
+            if moved:
+                self.timealign(redraw=False)
+
+        if not (aw.qmc.autotimex and self.background):
+            if self.locktimex:
+                self.startofx = self.locktimex_start
+                self.endofx = self.locktimex_end
+            else:
+                self.startofx = self.chargemintime
+                self.endofx = self.resetmaxtime
+        if self.endofx < 1:
+            self.endofx = 60
             
-        aw.autoAdjustAxis()
+        aw.autoAdjustAxis(background=not keepProperties) # if reset() triggered by ON, we ignore background on adjusting the axis and adjust according to RESET min/max
         ### REDRAW  ##
         if redraw:
             self.redraw(True,sampling=sampling,smooth=aw.qmc.optimalSmoothing) # we need to re-smooth with standard smoothing if ON and optimal-smoothing is ticked
@@ -20840,6 +20843,11 @@ class ApplicationWindow(QMainWindow):
         self.FCslabel.setStyleSheet(label_style)
         self.AUClabel.setStyleSheet(label_style)
 
+    # timex: if True, adjust time axis
+    # deltas: if True adjust delta axis
+    # background: if True, adjust such that background from CHARGE to DROP is fully in view 
+    #      (automatic set if time axis adjust is active, timex=True, during sampling and recording)
+    #      if background is False, the RESET min/max times are respected even if a background profile is loaded
     @staticmethod
     def autoAdjustAxis(background=False,timex=True,deltas=True):
         try:
@@ -26755,6 +26763,9 @@ class ApplicationWindow(QMainWindow):
                 t2 = profile["temp2"]
                 t1x = profile["extratemp1"]
                 t2x = profile["extratemp2"]
+                
+                self.qmc.backgroundprofile_moved_x = 0
+                self.qmc.backgroundprofile_moved_y = 0
                 
                 #remove the analysis results annotation if it exists
                 aw.qmc.analysisresultsstr = ""
