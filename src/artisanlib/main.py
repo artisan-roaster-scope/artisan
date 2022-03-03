@@ -33787,7 +33787,7 @@ class ApplicationWindow(QMainWindow):
             res["color"] = profile["ground_color"]
         # cup
         if "flavors" in profile:
-            res["cupping"] = self.cuppingSum(profile["flavors"])
+            res["cupping"],_ = self.cuppingSum(profile["flavors"])
         return res
 
 
@@ -34198,593 +34198,596 @@ class ApplicationWindow(QMainWindow):
         self.rankingReport()
     
     def rankingReport(self, pdf=False):
-        import string as libstring
-        # get profile filenames
-        files = self.reportFiles()
-        if files and len(files) > 0:
-            cont = aw.qmc.reset(soundOn=False)
-            if cont:
-                profiles = [self.deserialize(f) for f in files]
-                # let's sort by isodate
-                profiles = sorted(profiles,
-                    key=lambda p: (QDateTime(QDate.fromString(p["roastisodate"], Qt.DateFormat.ISODate),QTime.fromString(p["roasttime"])).toMSecsSinceEpoch()
-                         if "roastisodate" in p and "roasttime" in p else 0))
-                with open(getResourcePath() + 'ranking-template.htm', 'r', encoding='utf-8') as myfile:
-                    HTML_REPORT_TEMPLATE=myfile.read()
-                entries = ""
-                charges = 0
-                charges_count = 0
-                charges_temp = 0
-                charges_temp_count = 0
-                FCs_time = 0
-                FCs_time_count = 0
-                FCs_temp = 0
-                FCs_temp_count = 0
-                DROP_time = 0
-                DROP_time_count = 0
-                DROP_temp = 0
-                DROP_temp_count = 0
-                DRY_percent = 0
-                DRY_percent_count = 0
-                MAI_percent = 0
-                MAI_percent_count = 0
-                DEV_percent = 0
-                DEV_percent_count = 0
-                AUC = 0
-                AUC_count = 0
-                loss = 0
-                loss_count = 0
-                colors_list = 0
-                colors_count = 0
-                cuppings = 0
-                cuppings_count = 0
-                energies = 0
-                energies_count = 0
-                co2s = 0
-                co2s_count = 0
-                co2kgs = 0
-                co2kgs_count = 0
-                handles = []
-                labels = []
-                timex_list = []
-                stemp_list = []
-                cl_list = []
-                max_profiles = 20
-                color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
-                # collect data
-                c = 1
-                foreground_profile_path = aw.curFile  # @UndefinedVariable
-                min_start_time = max_end_time = 0
-                first_profile = True
-                first_profile_event_time = 0
-                max_drop_time = 0
-                label_chr_nr = 0
-                
-                delta_max = 1 # computed the delta max over all delta curves if visible
-
-                for p in profiles:
-                    pd = self.profileProductionData(p)
-                    c += 1
-                    try:
-                        cl = next(color) # here to keep colors_list in sync with the pct graph colors_list
-                    except Exception: # pylint: disable=broad-except
-                        color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
-                        cl = next(color)
-                    try:
-                        rd = self.profileRankingData(p)
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
-                        _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):") + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-                        continue
-                    i = aw.convertWeight(pd["weight"][0],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
-                    #o = aw.convertWeight(pd["weight"][1],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
-                    if i > 0:
-                        charges += i
-                        charges_count += 1
-                    if "charge_temp" in rd:
-                        charges_temp += convertTemp(rd["charge_temp"],rd["temp_unit"],aw.qmc.mode)
-                        charges_temp_count += 1
-                    if "FCs_time" in rd:
-                        FCs_time += rd["FCs_time"]
-                        FCs_time_count += 1
-                    if "FCs_temp" in rd:
-                        FCs_temp += convertTemp(rd["FCs_temp"],rd["temp_unit"],aw.qmc.mode)
-                        FCs_temp_count += 1
-                    if "DROP_time" in rd:
-                        if rd["DROP_time"] > max_drop_time:
-                            max_drop_time = rd["DROP_time"]
-                        DROP_time += rd["DROP_time"]
-                        DROP_time_count += 1
-                    if "DROP_temp" in rd:
-                        DROP_temp += convertTemp(rd["DROP_temp"],rd["temp_unit"],aw.qmc.mode)
-                        DROP_temp_count += 1
-                    if "DRY_percent" in rd:
-                        DRY_percent += rd["DRY_percent"]
-                        DRY_percent_count += 1
-                    if "MAI_percent" in rd:
-                        MAI_percent += rd["MAI_percent"]
-                        MAI_percent_count += 1
-                    if "DEV_percent" in rd:
-                        DEV_percent += rd["DEV_percent"]
-                        DEV_percent_count += 1
-                    # -- recompute AUC with actual settings
-                    try:
-                        AUCidx = max(0,aw.AUCstartidx(p["timeindex"],p["computed"]["TP_idx"]))
-                        if aw.qmc.AUCbaseFlag:
-                            # we take the base temperature from the BT at st
-                            rtbt = p["temp2"][AUCidx]
-                        else:
-                            rtbt = aw.qmc.AUCbase
-                        rtbt = convertTemp(rtbt,aw.qmc.mode,"C")
-                        ed = min(len(p["timex"]),p["timeindex"][6])
-                        BT_AUC = 0
-                        for i in range(AUCidx,ed):
-                            BT_AUC += self.calcAUC(rtbt,p["timex"],p["temp2"],i)
-                        BT_AUC = int(round(BT_AUC/60.))
-                        rd["AUC"] = BT_AUC
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
-                    # --
-                    if "AUC" in rd:
-                        AUC += rd["AUC"]
-                        AUC_count += 1
-
-                    if pd["weight"][0] > 0 and pd["weight"][1] > 0:
-                        l = aw.weight_loss(pd["weight"][0],pd["weight"][1])
-                        if 0 < l < 100:
-                            loss += l
-                            loss_count += 1
-                    if "color" in rd and rd["color"] > 0:
-                        colors_list += rd["color"]
-                        colors_count += 1
-                    if rd["cupping"] > 0:
-                        cuppings += rd["cupping"]
-                        cuppings_count += 1
-                    if "energy" in rd and rd["energy"] > 0:
-                        energies += rd["energy"]
-                        energies_count += 1
-                    if "co2" in rd and rd["co2"] > 0:
-                        co2s += rd["co2"]
-                        co2s_count += 1
-                    if "co2kg" in rd and rd["co2kg"] > 0:
-                        co2kgs += rd["co2kg"]
-                        co2kgs_count += 1
-                    if len(profiles) > max_profiles:
-                        entries += self.rankingData2htmlentry(pd,rd, cl) + "\n"
-                    else:
-                        # add BT curve to graph
-                        try:
-
-                            if pd["batchnr"] > 0:
-                                label = pd["batchprefix"] + str(pd["batchnr"])
-                            elif label_chr_nr < 26:
-                                label = str(libstring.ascii_uppercase[label_chr_nr])
-                                pd["batchnr"] = ""
-                                pd["batchprefix"] = label
-                                label_chr_nr = label_chr_nr + 1
-                            # surpress default description
-#                            if pd["title"] == QApplication.translate("Scope Title", "Roaster Scope"):
-#                                pd["title"] = ""
-
-                            entries += self.rankingData2htmlentry(pd,rd, cl) + "\n"
-
-                            temp = [convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
-                            timex = rd["timex"]
-                            stemp = self.qmc.smooth_list(timex,fill_gaps(temp),window_len=self.qmc.curvefilter,decay_smoothing=not aw.qmc.optimalSmoothing)
-                            charge = max(0,rd["charge_idx"]) # start of visible data
-                            drop = rd["drop_idx"] # end of visible data
-                            stemp = numpy.concatenate((
-                                numpy.full(charge, numpy.nan, dtype=numpy.double),
-                                stemp[charge:drop],
-                                numpy.full(len(timex)-drop, numpy.nan, dtype=numpy.double)))
-                            timeindex = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(p["timeindex"])]
-                            if len(timex) > rd["charge_idx"]:
-                                if first_profile:
-                                # align with CHARGE
-                                    delta = timex[rd["charge_idx"]]
-                                    # store relative time of align event of first profile
-                                    # CHARGE, DRY, FCs, FCe, SCs, SCe, DROP
-                                    first_profile_event_time = delta # CHARGE
-                                    for j in range(6,0,-1):
-                                        if aw.qmc.alignEvent in [j] and timeindex[j]:
-                                            first_profile_event_time = timex[timeindex[j]] - timex[rd["charge_idx"]]
-                                            break
-                                else:
-                                    delta = timex[rd["charge_idx"]]
-                                    for j in range(6,0,-1):
-                                        if aw.qmc.alignEvent in [j] and timeindex[j]:
-                                            delta = delta + (timex[timeindex[j]] - timex[rd["charge_idx"]] - first_profile_event_time)
-                                            break
-                            else:
-                                delta = 0
-                            timex = [t-delta for t in timex]
-                            if len(timex) > charge:
-                                min_start_time = min(min_start_time,timex[charge])
-                            if len(timex) > drop:
-                                max_end_time = max(max_end_time,timex[drop])
-                            # cut-out only CHARGE to DROP
-
-                            labels.append(label)
-                            timex_list.append(timex)
-                            stemp_list.append(stemp)
-                            cl_list.append(cl)
-
-                            if self.qmc.DeltaBTflag and self.qmc.delta_ax:
-                                tx = numpy.array(timex)
-                                cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-                                t1 = self.qmc.smooth_list(timex,fill_gaps(temp),window_len=cf,decay_smoothing=not aw.qmc.optimalSmoothing)
-                                if len(t1)>10 and len(tx) > 10:
-                                    # we start RoR computation 10 readings after CHARGE to avoid this initial peak
-                                    RoR_start = min(rd["charge_idx"]+10,len(tx)-1)
-                                    _,delta = self.qmc.recomputeDeltas(tx,RoR_start,drop,None,t1,optimalSmoothing=aw.qmc.optimalSmoothing)
-                                    delta_max = max(delta_max,self.calcAutoDelta([],delta,timeindex,False,True))
-                                    if self.qmc.BTlinewidth > 1 and self.qmc.BTlinewidth == self.qmc.BTdeltalinewidth:
-                                        dlinewidth = self.qmc.BTlinewidth-1 # we render the delta lines a bit thinner
-                                        dlinestyle = self.qmc.BTdeltalinestyle
-                                    else:
-                                        dlinewidth = self.qmc.BTdeltalinewidth
-                                        dlinestyle = self.qmc.BTdeltalinestyle
-                                    trans = self.qmc.delta_ax.transData
-                                    self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
-                                        sketch_params=None,path_effects=[],
-                                        linewidth=dlinewidth,linestyle=dlinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl,alpha=0.7)
-
-                            first_profile = False
-
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
-                            _, _, exc_tb = sys.exc_info()
-                            aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-
-                # draw BT curves on top of all others
-                for i in range(len(timex_list)):
-                    label = labels[i]
-                    timex = timex_list[i]
-                    stemp = stemp_list[i]
-                    cl = cl_list[i]
-                    l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
-#                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground=path_effects_color)],
-                        sketch_params=None,path_effects=[],
-                        linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
-                    handles.append(l_temp)
-
-                tmpdir = str(QDir.tempPath() + "/")
-                graph_image = ""
-                graph_image_pct = ''
-
-                prop = aw.mpl_fontproperties.copy()
-                prop.set_size("x-small")
-
-                if len(profiles) > max_profiles:
-                    QMessageBox.information(aw,QApplication.translate("Message", "Ranking Report"),
-                                              QApplication.translate("Message", "Ranking graphs are only generated up to {0} profiles").format(str(max_profiles)))
-                else:
-                    try:
-
-                        # remove annotations, lines and other artists from background profile
-                        try:
-                            for l in aw.qmc.l_annotations + aw.qmc.l_background_annotations:
-                                if l:
-                                    try:
-                                        l.remove()
-                                    except Exception: # pylint: disable=broad-except
-                                        pass
-                            for l in [
-                                    aw.qmc.l_back1,
-                                    aw.qmc.l_back2,
-                                    aw.qmc.l_back3,
-                                    aw.qmc.l_back4,
-                                    aw.qmc.l_delta1B,
-                                    aw.qmc.l_delta2B
-                                    ]:
-                                if l:
-                                    try:
-                                        aw.qmc.ax.lines.remove(l)
-                                    except Exception: # pylint: disable=broad-except
-                                        pass
-                            for a in [
-                                    aw.qmc.l_eventtype1dots,
-                                    aw.qmc.l_eventtype2dots,
-                                    aw.qmc.l_eventtype3dots,
-                                    aw.qmc.l_eventtype4dots,
-                                    aw.qmc.l_backgroundeventtype1dots,
-                                    aw.qmc.l_backgroundeventtype2dots,
-                                    aw.qmc.l_backgroundeventtype3dots,
-                                    aw.qmc.l_backgroundeventtype4dots]:
-                                if a:
-                                    try:
-                                        aw.qmc.ax.lines.remove(a)
-                                    except Exception: # pylint: disable=broad-except
-                                        pass
-
-                            # we also have to remove those extra event annotations if in combo mode
-                            if aw.qmc.eventsGraphflag == 4:
-                                for child in aw.qmc.ax.get_children():
-                                    if isinstance(child, mpl.text.Annotation):
-                                        try:
-                                            aw.qmc.ax.texts.remove(child)
-                                        except Exception: # pylint: disable=broad-except
-                                            pass
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
-                        # we only adjust the upper limit of the delta axis automatically
-                        if self.qmc.autodeltaxBT:
-                            self.qmc.delta_ax.set_ylim(self.qmc.zlimit_min,delta_max)                        
-                        # adjust zgrid
-                        if aw.qmc.zgrid != 0:
-                            d = delta_max - self.qmc.zlimit_min
-                            steps = int(round(d/5))
-                            if steps > 50: 
-                                steps = int(round(steps/10))*10
-                            elif steps > 10:
-                                steps = int(round(steps/5))*5
-                            auto_grid = max(2,steps)
-                            aw.qmc.zgrid = auto_grid
-                            self.qmc.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(aw.qmc.zgrid))
-                            self.qmc.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-                        # adjust time limits
-                        aw.qmc.ax.set_xlim(min_start_time-15,max_end_time+15) # we adjust the min, max time scale to ensure all data is visible
-                        graph_image = "roastlog-graph"
-                        self.qmc.setProfileTitle("")
-                        self.qmc.fig.suptitle("")
-                        rcParams['path.effects'] = []
-                        if len(handles) > 7:
-                            ncol = int(math.ceil(len(handles)/4.))
-                        elif len(handles) > 3:
-                            ncol = int(math.ceil(len(handles)/2.))
-                        else:
-                            ncol = int(math.ceil(len(handles)))
-                        self.qmc.ax.legend(handles,labels,loc=self.qmc.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=False)
-
-                        # Remove and update the logo image
-                        try:
-                            aw.qmc.ai.remove()
-                        except Exception: # pylint: disable=broad-except
-                            pass
-                        try:
-                            self.qmc.placelogoimage()
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
-
-                        # generate graph
-                        self.qmc.fig.set_tight_layout(False)
-                        self.qmc.fig.canvas.draw()
-                        # save graph
-                        graph_image = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
-                        try:
-                            os.remove(graph_image)
-                        except OSError:
-                            pass
-                        self.qmc.fig.set_tight_layout(self.qmc.tight_layout_params)
-                        self.qmc.fig.savefig(graph_image,transparent=True)
-
-                        #add some random number to force HTML reloading
-                        graph_image = path2url(graph_image)
-                        graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
-                        graph_image = "<img alt='roast graph' style=\"width:100%;\" src='" + graph_image + "'>"
-
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
-                        _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-
-                try:
-                    # Create a roast phase visualization graph
-                    #import matplotlib.pyplot as plt
-
-                    fig_height = 3.2       # in inches when there are 10 profiles, will be scaled for number of profiles
-                    fig_width = 10         # in inches
-
-                    # values that define the bars and spacing
-                    barspacer =  2     # vertical space between bars
-                    barheight =  18    # height of each bar
-                    textoffset = 6     # shifts text annotations upward to toward middle of the bar
-                    m = 10             # width of batch number field and drop time field
-                    g = 2              # gap
-                    n = m + g          # start of horiz stacked bar
-                    ind = 7            # width of color legend indicator
-
-                    # setup the font
-                    if sys.platform.startswith("darwin") and darkdetect.isDark() and appFrozen():
-                        headerfontcolor = '#B2B2B2'
-                    else:
-                        headerfontcolor = '#707070'
-                    fontcolor = '#303030'
-                    lightfontcolor = 'grey'
-                    prop.set_family(mpl.rcParams['font.family'])
-
-                    # generate graph  ( not written to support MPL < v2.0 )
-                    #fig = plt.figure(figsize=(fig_width, (fig_height * len(profiles)/10 + 0.2)))
-                    fig = Figure(figsize=(fig_width, (fig_height * len(profiles)/10 + 0.2)))
-                    
-                    ax = fig.add_subplot(111, frameon=False)
-#                    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
-                    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
-
-                    # no grid or tick marks
-                    ax.grid(False)
-                    ax.axes.get_xaxis().set_ticks([])
-                    ax.axes.get_yaxis().set_ticks([])
-
-                    # set graph xy limits
-                    ylim = (barheight + barspacer) * (1 + len(profiles))
-                    xlim = m+g+100+g+m +1
-                    ax.set_ylim(0, ylim)
-                    ax.set_xlim(0, xlim)
-
-                    graph_image_pct = "roastlog-graph-pct"
-
-                    i = len(profiles)   # bar counter
-
-                    # generate the legend at the top
-                    facecolors = ('#00b950', '#ffb347', '#9f7960')
-                    prop.set_size("medium")
-                    ax.broken_barh( [ (n, g),                         #Dry indicator
-                                      (n+g+ind, g),                   #MAI indicator
-                                      (n+g+ind+g+ind, g)              #DEV indicator
-                                    ],
-                                    (i*(barheight + barspacer), barheight*0.75), facecolors=facecolors
-                                  )
-                    ax.text(    m/2,             i*(barheight + barspacer) + textoffset/3, 'Nr', ha='center', color=headerfontcolor, fontproperties=prop)
-                    ax.text( 1+ n+g,             i*(barheight + barspacer) + textoffset/3, 'Dry', ha='left', color=headerfontcolor, fontproperties=prop)
-                    ax.text( 1+ n+g+ind+g,       i*(barheight + barspacer) + textoffset/3, 'Mai', ha='left', color=headerfontcolor, fontproperties=prop)
-                    ax.text( 1+ n+g+ind+g+ind+g, i*(barheight + barspacer) + textoffset/3, 'Dev', ha='left', color=headerfontcolor, fontproperties=prop)
-                    ax.text(    n+100 + 10/2,    i*(barheight + barspacer) + textoffset/3, 'Drop', ha='center', color=headerfontcolor, fontproperties=prop)
-
-                    # generate the bar graph
-                    prop.set_size("small")
-                    color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable # pylint: disable=maybe-no-member
+        try:
+            import string as libstring
+            # get profile filenames
+            files = self.reportFiles()
+            if files and len(files) > 0:
+                cont = aw.qmc.reset(soundOn=False)
+                if cont:
+                    profiles = [self.deserialize(f) for f in files]
+                    # let's sort by isodate
+                    profiles = sorted(profiles,
+                        key=lambda p: (QDateTime(QDate.fromString(p["roastisodate"], Qt.DateFormat.ISODate),QTime.fromString(p["roasttime"])).toMSecsSinceEpoch()
+                             if "roastisodate" in p and "roasttime" in p else 0))
+                    with open(getResourcePath() + 'ranking-template.htm', 'r', encoding='utf-8') as myfile:
+                        HTML_REPORT_TEMPLATE=myfile.read()
+                    entries = ""
+                    charges = 0
+                    charges_count = 0
+                    charges_temp = 0
+                    charges_temp_count = 0
+                    FCs_time = 0
+                    FCs_time_count = 0
+                    FCs_temp = 0
+                    FCs_temp_count = 0
+                    DROP_time = 0
+                    DROP_time_count = 0
+                    DROP_temp = 0
+                    DROP_temp_count = 0
+                    DRY_percent = 0
+                    DRY_percent_count = 0
+                    MAI_percent = 0
+                    MAI_percent_count = 0
+                    DEV_percent = 0
+                    DEV_percent_count = 0
+                    AUC = 0
+                    AUC_count = 0
+                    loss = 0
+                    loss_count = 0
+                    colors_list = 0
+                    colors_count = 0
+                    cuppings = 0
+                    cuppings_count = 0
+                    energies = 0
+                    energies_count = 0
+                    co2s = 0
+                    co2s_count = 0
+                    co2kgs = 0
+                    co2kgs_count = 0
+                    handles = []
+                    labels = []
+                    timex_list = []
+                    stemp_list = []
+                    cl_list = []
+                    max_profiles = 20
+                    color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
+                    # collect data
+                    c = 1
+                    foreground_profile_path = aw.curFile  # @UndefinedVariable
+                    min_start_time = max_end_time = 0
+                    first_profile = True
+                    first_profile_event_time = 0
+                    max_drop_time = 0
                     label_chr_nr = 0
+                    
+                    delta_max = 1 # computed the delta max over all delta curves if visible
+    
                     for p in profiles:
-                        i -= 1
+                        pd = self.profileProductionData(p)
+                        c += 1
                         try:
-                            cl = mcolors.to_hex(next(color)), '#00b950', '#ffb347', '#9f7960'
+                            cl = next(color) # here to keep colors_list in sync with the pct graph colors_list
                         except Exception: # pylint: disable=broad-except
-                            color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable # pylint: disable=maybe-no-member
-                            cl = mcolors.to_hex(next(color)), '#00b950', '#ffb347', '#9f7960'
+                            color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
+                            cl = next(color)
                         try:
                             rd = self.profileRankingData(p)
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):") + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-                            i += 1   #avoid a blank line
                             continue
-                        pd = self.profileProductionData(p)
-                        if pd["batchnr"] > 0:
-                            label = (pd["batchprefix"] + str(pd["batchnr"]))[:8]
-                        elif label_chr_nr < 26:
-                            label = str(libstring.ascii_uppercase[label_chr_nr])
-                            label_chr_nr = label_chr_nr + 1
+                        i = aw.convertWeight(pd["weight"][0],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
+                        #o = aw.convertWeight(pd["weight"][1],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
+                        if i > 0:
+                            charges += i
+                            charges_count += 1
+                        if "charge_temp" in rd:
+                            charges_temp += convertTemp(rd["charge_temp"],rd["temp_unit"],aw.qmc.mode)
+                            charges_temp_count += 1
+                        if "FCs_time" in rd:
+                            FCs_time += rd["FCs_time"]
+                            FCs_time_count += 1
+                        if "FCs_temp" in rd:
+                            FCs_temp += convertTemp(rd["FCs_temp"],rd["temp_unit"],aw.qmc.mode)
+                            FCs_temp_count += 1
+                        if "DROP_time" in rd:
+                            if rd["DROP_time"] > max_drop_time:
+                                max_drop_time = rd["DROP_time"]
+                            DROP_time += rd["DROP_time"]
+                            DROP_time_count += 1
+                        if "DROP_temp" in rd:
+                            DROP_temp += convertTemp(rd["DROP_temp"],rd["temp_unit"],aw.qmc.mode)
+                            DROP_temp_count += 1
+                        if "DRY_percent" in rd:
+                            DRY_percent += rd["DRY_percent"]
+                            DRY_percent_count += 1
+                        if "MAI_percent" in rd:
+                            MAI_percent += rd["MAI_percent"]
+                            MAI_percent_count += 1
+                        if "DEV_percent" in rd:
+                            DEV_percent += rd["DEV_percent"]
+                            DEV_percent_count += 1
+                        # -- recompute AUC with actual settings
+                        try:
+                            AUCidx = max(0,aw.AUCstartidx(p["timeindex"],p["computed"]["TP_idx"]))
+                            if aw.qmc.AUCbaseFlag:
+                                # we take the base temperature from the BT at st
+                                rtbt = p["temp2"][AUCidx]
+                            else:
+                                rtbt = aw.qmc.AUCbase
+                            rtbt = convertTemp(rtbt,aw.qmc.mode,"C")
+                            ed = min(len(p["timex"]),p["timeindex"][6])
+                            BT_AUC = 0
+                            for i in range(AUCidx,ed):
+                                BT_AUC += self.calcAUC(rtbt,p["timex"],p["temp2"],i)
+                            BT_AUC = int(round(BT_AUC/60.))
+                            rd["AUC"] = BT_AUC
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
+                        # --
+                        if "AUC" in rd:
+                            AUC += rd["AUC"]
+                            AUC_count += 1
+    
+                        if pd["weight"][0] > 0 and pd["weight"][1] > 0:
+                            l = aw.weight_loss(pd["weight"][0],pd["weight"][1])
+                            if 0 < l < 100:
+                                loss += l
+                                loss_count += 1
+                        if "color" in rd and rd["color"] > 0:
+                            colors_list += rd["color"]
+                            colors_count += 1
+                        if rd["cupping"] > 0:
+                            cuppings += rd["cupping"]
+                            cuppings_count += 1
+                        if "energy" in rd and rd["energy"] > 0:
+                            energies += rd["energy"]
+                            energies_count += 1
+                        if "co2" in rd and rd["co2"] > 0:
+                            co2s += rd["co2"]
+                            co2s_count += 1
+                        if "co2kg" in rd and rd["co2kg"] > 0:
+                            co2kgs += rd["co2kg"]
+                            co2kgs_count += 1
+                        if len(profiles) > max_profiles:
+                            entries += self.rankingData2htmlentry(pd,rd, cl) + "\n"
                         else:
-                            label = ""
-                        if "DRY_percent" in rd and "MAI_percent" in rd and "DEV_percent" in rd:
-                            ax.broken_barh( [ (0, m),
-                                              (n, rd["DRY_percent"]),
-                                              (n+rd["DRY_percent"], rd["MAI_percent"]),
-                                              (n+rd["DRY_percent"] + rd["MAI_percent"], rd["DEV_percent"]),
-                                              (n+rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"] + g, m*rd["DROP_time"]/max_drop_time)
-                                            ],
-                                            (i*(barheight + barspacer), barheight), facecolors=cl
-                                          )
-                            ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
-                            ax.text( n + rd["DRY_percent"]/2,                                               i*(barheight + barspacer) + textoffset, str(round(rd["DRY_percent"],1)) + '%  ' + stringfromseconds(rd["DRY_time"]), ha='center', color=fontcolor, fontproperties=prop)
-                            ax.text( n + rd["DRY_percent"] + rd["MAI_percent"]/2,                           i*(barheight + barspacer) + textoffset, str(round(rd["MAI_percent"],1)) + '%  ' + stringfromseconds(rd["MAI_time"]), ha='center', color=fontcolor, fontproperties=prop)
-                            ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"]/2,       i*(barheight + barspacer) + textoffset, str(round(rd["DEV_percent"],1)) + '%  ' + stringfromseconds(rd["DEV_time"]), ha='center', color=fontcolor, fontproperties=prop)
-                            ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"] + g + 1, i*(barheight + barspacer) + textoffset, stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
-                        elif "DEV_percent" in rd:   # has FCs but no Dry event
-                            cl = cl[0],'white',cl[3]
-                            missingDryevent = QApplication.translate("Message", "Profile missing Dry event")
-                            ax.broken_barh( [ (0, m),
-                                              (n, 100 - rd["DEV_percent"]),
-                                              (n+ 100 - rd["DEV_percent"], rd["DEV_percent"]),
-                                              (n+ 100 + g, m*rd["DROP_time"]/max_drop_time)
-                                            ],
-                                            (i*(barheight + barspacer), barheight), facecolors=cl
-                                          )
-                            ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
-                            ax.text( n + (100 - rd["DEV_percent"])/2,                                       i*(barheight + barspacer) + textoffset, missingDryevent, ha='center', color=lightfontcolor, fontproperties=prop)
-                            ax.text( n + 100 - rd["DEV_percent"] + rd["DEV_percent"]/2,                     i*(barheight + barspacer) + textoffset, str(round(rd["DEV_percent"],1)) + '%  ' + stringfromseconds(rd["DEV_time"]), ha='center', color=fontcolor, fontproperties=prop)
-                            ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
-                        else:    # no useful events
-                            drop_time= rd.get("DROP_time", 0)
-                            cl = cl[0],'white'
-                            missingPhaseevents = QApplication.translate("Message", "Profile missing phase events")
-                            ax.broken_barh( [ (0, m),
-                                              (n, 100),
-                                              (n+ 100 + g, m*(0 if max_drop_time == 0 else drop_time/max_drop_time))
-                                            ],
-                                            (i*(barheight + barspacer), barheight), facecolors=cl
-                                          )
-                            ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
-                            ax.text( n + 100/2,                                                             i*(barheight + barspacer) + textoffset, missingPhaseevents, ha='center', color=lightfontcolor, fontproperties=prop)
-                            ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, stringfromseconds(drop_time), ha='left', color=fontcolor, fontproperties=prop)
-
-                    # save graph
-                    graph_image_pct = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + ".svg")))
-                    try:
-                        os.remove(graph_image_pct)
-                    except OSError:
-                        pass
-                    fig.savefig(graph_image_pct,transparent=True)
-                    #add some random number to force HTML reloading
-                    graph_image_pct = path2url(graph_image_pct)
-                    graph_image_pct = graph_image_pct + "?dummy=" + str(int(libtime.time()))
-                    graph_image_pct = "<img alt='roast graph pct' style=\"width: 95%;\" src='" + graph_image_pct + "'>"
-
-#                    plt.close() # release memory
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
-                    _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-
-                try:
-                    # redraw original graph
-                    if foreground_profile_path:
-                        aw.loadFile(foreground_profile_path)
-                    if aw.qmc.backgroundpath:
-                        aw.loadbackground(aw.qmc.backgroundpath)
-                    self.qmc.redraw(recomputeAllDeltas=False)
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
-
-                weight_fmt = ('{0:.2f}' if aw.qmc.weight[2] in ["Kg", "lb", "oz"] else '{0:.0f}')
-                html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
-                    resources = str(getResourcePath()),
-                    title = QApplication.translate("HTML Report Template", "Roast Ranking"),
-                    time = QApplication.translate("HTML Report Template", "Date"),
-                    profile = QApplication.translate("Label", "Title"),
-                    weightin = QApplication.translate("HTML Report Template", "In"),
-                    weightloss = QApplication.translate("HTML Report Template", "Loss"),
-                    colorHeader = QApplication.translate("HTML Report Template", "Color"),
-                    weight_unit = aw.qmc.weight[2].lower(),
-                    temp_unit = aw.qmc.mode,
-                    entries = entries,
-                    charges_avg = (weight_fmt.format(charges / charges_count) if charges_count > 0 and charges > 0 else ""),
-                    charges_temp_avg = ('{0:.1f}'.format(charges_temp / charges_temp_count) if charges_temp > 0 and charges_temp_count > 0 else ""),
-                    FCs_time_avg = (self.eventtime2string(FCs_time / FCs_time_count) if FCs_time > 0 and FCs_time_count > 0 else ""),
-                    FCs_temp_avg = ('{0:.1f}'.format(FCs_temp / FCs_temp_count) if FCs_temp > 0 and FCs_temp_count > 0 else ""),
-                    DROP_time_avg = (self.eventtime2string(DROP_time / DROP_time_count) if DROP_time > 0 and DROP_time_count > 0 else ""),
-                    DROP_temp_avg = ('{0:.1f}'.format(DROP_temp / DROP_temp_count) if DROP_temp > 0 and DROP_temp_count > 0 else ""),
-                    DRY_percent_avg = ('{0:.1f}'.format(DRY_percent / DRY_percent_count) if DRY_percent > 0 and DRY_percent_count > 0 else ""),
-                    MAI_percent_avg = ('{0:.1f}'.format(MAI_percent / MAI_percent_count) if MAI_percent > 0 and MAI_percent_count > 0 else ""),
-                    DEV_percent_avg = ('{0:.1f}'.format(DEV_percent / DEV_percent_count) if DEV_percent > 0 and DEV_percent_count > 0 else ""),
-                    AUC_avg = ('{0:.1f}'.format(AUC / AUC_count) if AUC > 0 and AUC_count > 0 else ""),
-                    loss_avg = ('{0:.1f}'.format(loss / loss_count) if loss_count > 0 and loss > 0 else ""),
-                    colors_avg = ('{0:.1f}'.format(colors_list / colors_count) if colors_list > 0 and colors_count > 0 else ""),
-                    cup_avg = ('{0:.2f}'.format(cuppings / cuppings_count) if cuppings > 0 and cuppings_count > 0 else ""),
-                    energy_avg = ('{0:.2f}'.format(energies / energies_count) if energies > 0 and energies_count > 0 else ""),
-                    co2_avg = ('{0:.2f}'.format(co2s / co2s_count) if co2s > 0 and co2s_count > 0 else ""),
-                    co2kg_avg = ('{0:.2f}'.format(co2kgs / co2kgs_count) if co2kgs > 0 and co2kgs_count > 0 else ""),
-                    graph_image=graph_image,
-                    graph_image_pct=graph_image_pct
-                )
-                try:
-                    filename = str(QDir(tmpdir).filePath("RankingReport.html"))
-                    try:
-                        os.remove(filename)
-                    except OSError:
-                        pass
-                    import codecs # @Reimport
-                    with codecs.open(filename, 'w', encoding='utf-8') as f:
-                        for i in range(len(html)):
-                            f.write(html[i])
-                    if platf == 'Darwin':
-                        full_path = "file://" + filename # Safari refuses to load the javascript lib (sorttable) otherwise
+                            # add BT curve to graph
+                            try:
+    
+                                if pd["batchnr"] > 0:
+                                    label = pd["batchprefix"] + str(pd["batchnr"])
+                                elif label_chr_nr < 26:
+                                    label = str(libstring.ascii_uppercase[label_chr_nr])
+                                    pd["batchnr"] = ""
+                                    pd["batchprefix"] = label
+                                    label_chr_nr = label_chr_nr + 1
+                                # surpress default description
+    #                            if pd["title"] == QApplication.translate("Scope Title", "Roaster Scope"):
+    #                                pd["title"] = ""
+    
+                                entries += self.rankingData2htmlentry(pd,rd, cl) + "\n"
+    
+                                temp = [convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
+                                timex = rd["timex"]
+                                stemp = self.qmc.smooth_list(timex,fill_gaps(temp),window_len=self.qmc.curvefilter,decay_smoothing=not aw.qmc.optimalSmoothing)
+                                charge = max(0,rd["charge_idx"]) # start of visible data
+                                drop = rd["drop_idx"] # end of visible data
+                                stemp = numpy.concatenate((
+                                    numpy.full(charge, numpy.nan, dtype=numpy.double),
+                                    stemp[charge:drop],
+                                    numpy.full(len(timex)-drop, numpy.nan, dtype=numpy.double)))
+                                timeindex = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(p["timeindex"])]
+                                if len(timex) > rd["charge_idx"]:
+                                    if first_profile:
+                                    # align with CHARGE
+                                        delta = timex[rd["charge_idx"]]
+                                        # store relative time of align event of first profile
+                                        # CHARGE, DRY, FCs, FCe, SCs, SCe, DROP
+                                        first_profile_event_time = delta # CHARGE
+                                        for j in range(6,0,-1):
+                                            if aw.qmc.alignEvent in [j] and timeindex[j]:
+                                                first_profile_event_time = timex[timeindex[j]] - timex[rd["charge_idx"]]
+                                                break
+                                    else:
+                                        delta = timex[rd["charge_idx"]]
+                                        for j in range(6,0,-1):
+                                            if aw.qmc.alignEvent in [j] and timeindex[j]:
+                                                delta = delta + (timex[timeindex[j]] - timex[rd["charge_idx"]] - first_profile_event_time)
+                                                break
+                                else:
+                                    delta = 0
+                                timex = [t-delta for t in timex]
+                                if len(timex) > charge:
+                                    min_start_time = min(min_start_time,timex[charge])
+                                if len(timex) > drop:
+                                    max_end_time = max(max_end_time,timex[drop])
+                                # cut-out only CHARGE to DROP
+    
+                                labels.append(label)
+                                timex_list.append(timex)
+                                stemp_list.append(stemp)
+                                cl_list.append(cl)
+    
+                                if self.qmc.DeltaBTflag and self.qmc.delta_ax:
+                                    tx = numpy.array(timex)
+                                    cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                                    t1 = self.qmc.smooth_list(timex,fill_gaps(temp),window_len=cf,decay_smoothing=not aw.qmc.optimalSmoothing)
+                                    if len(t1)>10 and len(tx) > 10:
+                                        # we start RoR computation 10 readings after CHARGE to avoid this initial peak
+                                        RoR_start = min(rd["charge_idx"]+10,len(tx)-1)
+                                        _,delta = self.qmc.recomputeDeltas(tx,RoR_start,drop,None,t1,optimalSmoothing=aw.qmc.optimalSmoothing)
+                                        delta_max = max(delta_max,self.calcAutoDelta([],delta,timeindex,False,True))
+                                        if self.qmc.BTlinewidth > 1 and self.qmc.BTlinewidth == self.qmc.BTdeltalinewidth:
+                                            dlinewidth = self.qmc.BTlinewidth-1 # we render the delta lines a bit thinner
+                                            dlinestyle = self.qmc.BTdeltalinestyle
+                                        else:
+                                            dlinewidth = self.qmc.BTdeltalinewidth
+                                            dlinestyle = self.qmc.BTdeltalinestyle
+                                        trans = self.qmc.delta_ax.transData
+                                        self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
+                                            sketch_params=None,path_effects=[],
+                                            linewidth=dlinewidth,linestyle=dlinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl,alpha=0.7)
+    
+                                first_profile = False
+    
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.exception(e)
+                                _, _, exc_tb = sys.exc_info()
+                                aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+    
+                    # draw BT curves on top of all others
+                    for i in range(len(timex_list)):
+                        label = labels[i]
+                        timex = timex_list[i]
+                        stemp = stemp_list[i]
+                        cl = cl_list[i]
+                        l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
+    #                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground=path_effects_color)],
+                            sketch_params=None,path_effects=[],
+                            linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
+                        handles.append(l_temp)
+    
+                    tmpdir = str(QDir.tempPath() + "/")
+                    graph_image = ""
+                    graph_image_pct = ''
+    
+                    prop = aw.mpl_fontproperties.copy()
+                    prop.set_size("x-small")
+    
+                    if len(profiles) > max_profiles:
+                        QMessageBox.information(aw,QApplication.translate("Message", "Ranking Report"),
+                                                  QApplication.translate("Message", "Ranking graphs are only generated up to {0} profiles").format(str(max_profiles)))
                     else:
-                        full_path = "file:///" + filename # Explorer refuses to start otherwise
-                    
-                    if pdf:
-                        # select file
-                        filename = self.ArtisanSaveFileDialog(msg="Export PDF",ext="*.pdf")
-                        if filename:
-                            self.html2pdf(full_path, filename, landscape=True)
-                    else:
-                        QDesktopServices.openUrl(QUrl(full_path, QUrl.ParsingMode.TolerantMode))
-
-                except IOError as e:
-                    aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:") + " rankingReport() {0}").format(str(e)))
+                        try:
+    
+                            # remove annotations, lines and other artists from background profile
+                            try:
+                                for l in aw.qmc.l_annotations + aw.qmc.l_background_annotations:
+                                    if l:
+                                        try:
+                                            l.remove()
+                                        except Exception: # pylint: disable=broad-except
+                                            pass
+                                for l in [
+                                        aw.qmc.l_back1,
+                                        aw.qmc.l_back2,
+                                        aw.qmc.l_back3,
+                                        aw.qmc.l_back4,
+                                        aw.qmc.l_delta1B,
+                                        aw.qmc.l_delta2B
+                                        ]:
+                                    if l:
+                                        try:
+                                            aw.qmc.ax.lines.remove(l)
+                                        except Exception: # pylint: disable=broad-except
+                                            pass
+                                for a in [
+                                        aw.qmc.l_eventtype1dots,
+                                        aw.qmc.l_eventtype2dots,
+                                        aw.qmc.l_eventtype3dots,
+                                        aw.qmc.l_eventtype4dots,
+                                        aw.qmc.l_backgroundeventtype1dots,
+                                        aw.qmc.l_backgroundeventtype2dots,
+                                        aw.qmc.l_backgroundeventtype3dots,
+                                        aw.qmc.l_backgroundeventtype4dots]:
+                                    if a:
+                                        try:
+                                            aw.qmc.ax.lines.remove(a)
+                                        except Exception: # pylint: disable=broad-except
+                                            pass
+    
+                                # we also have to remove those extra event annotations if in combo mode
+                                if aw.qmc.eventsGraphflag == 4:
+                                    for child in aw.qmc.ax.get_children():
+                                        if isinstance(child, mpl.text.Annotation):
+                                            try:
+                                                aw.qmc.ax.texts.remove(child)
+                                            except Exception: # pylint: disable=broad-except
+                                                pass
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.exception(e)
+                            # we only adjust the upper limit of the delta axis automatically
+                            if self.qmc.autodeltaxBT:
+                                self.qmc.delta_ax.set_ylim(self.qmc.zlimit_min,delta_max)                        
+                            # adjust zgrid
+                            if aw.qmc.zgrid != 0:
+                                d = delta_max - self.qmc.zlimit_min
+                                steps = int(round(d/5))
+                                if steps > 50: 
+                                    steps = int(round(steps/10))*10
+                                elif steps > 10:
+                                    steps = int(round(steps/5))*5
+                                auto_grid = max(2,steps)
+                                aw.qmc.zgrid = auto_grid
+                                self.qmc.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(aw.qmc.zgrid))
+                                self.qmc.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                            # adjust time limits
+                            aw.qmc.ax.set_xlim(min_start_time-15,max_end_time+15) # we adjust the min, max time scale to ensure all data is visible
+                            graph_image = "roastlog-graph"
+                            self.qmc.setProfileTitle("")
+                            self.qmc.fig.suptitle("")
+                            rcParams['path.effects'] = []
+                            if len(handles) > 7:
+                                ncol = int(math.ceil(len(handles)/4.))
+                            elif len(handles) > 3:
+                                ncol = int(math.ceil(len(handles)/2.))
+                            else:
+                                ncol = int(math.ceil(len(handles)))
+                            self.qmc.ax.legend(handles,labels,loc=self.qmc.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=False)
+    
+                            # Remove and update the logo image
+                            try:
+                                aw.qmc.ai.remove()
+                            except Exception: # pylint: disable=broad-except
+                                pass
+                            try:
+                                self.qmc.placelogoimage()
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.exception(e)
+    
+                            # generate graph
+                            self.qmc.fig.set_tight_layout(False)
+                            self.qmc.fig.canvas.draw()
+                            # save graph
+                            graph_image = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
+                            try:
+                                os.remove(graph_image)
+                            except OSError:
+                                pass
+                            self.qmc.fig.set_tight_layout(self.qmc.tight_layout_params)
+                            self.qmc.fig.savefig(graph_image,transparent=True)
+    
+                            #add some random number to force HTML reloading
+                            graph_image = path2url(graph_image)
+                            graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
+                            graph_image = "<img alt='roast graph' style=\"width:100%;\" src='" + graph_image + "'>"
+    
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
+                            _, _, exc_tb = sys.exc_info()
+                            aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+    
+                    try:
+                        # Create a roast phase visualization graph
+                        #import matplotlib.pyplot as plt
+    
+                        fig_height = 3.2       # in inches when there are 10 profiles, will be scaled for number of profiles
+                        fig_width = 10         # in inches
+    
+                        # values that define the bars and spacing
+                        barspacer =  2     # vertical space between bars
+                        barheight =  18    # height of each bar
+                        textoffset = 6     # shifts text annotations upward to toward middle of the bar
+                        m = 10             # width of batch number field and drop time field
+                        g = 2              # gap
+                        n = m + g          # start of horiz stacked bar
+                        ind = 7            # width of color legend indicator
+    
+                        # setup the font
+                        if sys.platform.startswith("darwin") and darkdetect.isDark() and appFrozen():
+                            headerfontcolor = '#B2B2B2'
+                        else:
+                            headerfontcolor = '#707070'
+                        fontcolor = '#303030'
+                        lightfontcolor = 'grey'
+                        prop.set_family(mpl.rcParams['font.family'])
+    
+                        # generate graph  ( not written to support MPL < v2.0 )
+                        #fig = plt.figure(figsize=(fig_width, (fig_height * len(profiles)/10 + 0.2)))
+                        fig = Figure(figsize=(fig_width, (fig_height * len(profiles)/10 + 0.2)))
+                        
+                        ax = fig.add_subplot(111, frameon=False)
+    #                    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+                        fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+    
+                        # no grid or tick marks
+                        ax.grid(False)
+                        ax.axes.get_xaxis().set_ticks([])
+                        ax.axes.get_yaxis().set_ticks([])
+    
+                        # set graph xy limits
+                        ylim = (barheight + barspacer) * (1 + len(profiles))
+                        xlim = m+g+100+g+m +1
+                        ax.set_ylim(0, ylim)
+                        ax.set_xlim(0, xlim)
+    
+                        graph_image_pct = "roastlog-graph-pct"
+    
+                        i = len(profiles)   # bar counter
+    
+                        # generate the legend at the top
+                        facecolors = ('#00b950', '#ffb347', '#9f7960')
+                        prop.set_size("medium")
+                        ax.broken_barh( [ (n, g),                         #Dry indicator
+                                          (n+g+ind, g),                   #MAI indicator
+                                          (n+g+ind+g+ind, g)              #DEV indicator
+                                        ],
+                                        (i*(barheight + barspacer), barheight*0.75), facecolors=facecolors
+                                      )
+                        ax.text(    m/2,             i*(barheight + barspacer) + textoffset/3, 'Nr', ha='center', color=headerfontcolor, fontproperties=prop)
+                        ax.text( 1+ n+g,             i*(barheight + barspacer) + textoffset/3, 'Dry', ha='left', color=headerfontcolor, fontproperties=prop)
+                        ax.text( 1+ n+g+ind+g,       i*(barheight + barspacer) + textoffset/3, 'Mai', ha='left', color=headerfontcolor, fontproperties=prop)
+                        ax.text( 1+ n+g+ind+g+ind+g, i*(barheight + barspacer) + textoffset/3, 'Dev', ha='left', color=headerfontcolor, fontproperties=prop)
+                        ax.text(    n+100 + 10/2,    i*(barheight + barspacer) + textoffset/3, 'Drop', ha='center', color=headerfontcolor, fontproperties=prop)
+    
+                        # generate the bar graph
+                        prop.set_size("small")
+                        color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable # pylint: disable=maybe-no-member
+                        label_chr_nr = 0
+                        for p in profiles:
+                            i -= 1
+                            try:
+                                cl = mcolors.to_hex(next(color)), '#00b950', '#ffb347', '#9f7960'
+                            except Exception: # pylint: disable=broad-except
+                                color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable # pylint: disable=maybe-no-member
+                                cl = mcolors.to_hex(next(color)), '#00b950', '#ffb347', '#9f7960'
+                            try:
+                                rd = self.profileRankingData(p)
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.exception(e)
+                                _, _, exc_tb = sys.exc_info()
+                                aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):") + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+                                i += 1   #avoid a blank line
+                                continue
+                            pd = self.profileProductionData(p)
+                            if pd["batchnr"] > 0:
+                                label = (pd["batchprefix"] + str(pd["batchnr"]))[:8]
+                            elif label_chr_nr < 26:
+                                label = str(libstring.ascii_uppercase[label_chr_nr])
+                                label_chr_nr = label_chr_nr + 1
+                            else:
+                                label = ""
+                            if "DRY_percent" in rd and "MAI_percent" in rd and "DEV_percent" in rd:
+                                ax.broken_barh( [ (0, m),
+                                                  (n, rd["DRY_percent"]),
+                                                  (n+rd["DRY_percent"], rd["MAI_percent"]),
+                                                  (n+rd["DRY_percent"] + rd["MAI_percent"], rd["DEV_percent"]),
+                                                  (n+rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"] + g, m*rd["DROP_time"]/max_drop_time)
+                                                ],
+                                                (i*(barheight + barspacer), barheight), facecolors=cl
+                                              )
+                                ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
+                                ax.text( n + rd["DRY_percent"]/2,                                               i*(barheight + barspacer) + textoffset, str(round(rd["DRY_percent"],1)) + '%  ' + stringfromseconds(rd["DRY_time"]), ha='center', color=fontcolor, fontproperties=prop)
+                                ax.text( n + rd["DRY_percent"] + rd["MAI_percent"]/2,                           i*(barheight + barspacer) + textoffset, str(round(rd["MAI_percent"],1)) + '%  ' + stringfromseconds(rd["MAI_time"]), ha='center', color=fontcolor, fontproperties=prop)
+                                ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"]/2,       i*(barheight + barspacer) + textoffset, str(round(rd["DEV_percent"],1)) + '%  ' + stringfromseconds(rd["DEV_time"]), ha='center', color=fontcolor, fontproperties=prop)
+                                ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"] + g + 1, i*(barheight + barspacer) + textoffset, stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
+                            elif "DEV_percent" in rd:   # has FCs but no Dry event
+                                cl = cl[0],'white',cl[3]
+                                missingDryevent = QApplication.translate("Message", "Profile missing Dry event")
+                                ax.broken_barh( [ (0, m),
+                                                  (n, 100 - rd["DEV_percent"]),
+                                                  (n+ 100 - rd["DEV_percent"], rd["DEV_percent"]),
+                                                  (n+ 100 + g, m*rd["DROP_time"]/max_drop_time)
+                                                ],
+                                                (i*(barheight + barspacer), barheight), facecolors=cl
+                                              )
+                                ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
+                                ax.text( n + (100 - rd["DEV_percent"])/2,                                       i*(barheight + barspacer) + textoffset, missingDryevent, ha='center', color=lightfontcolor, fontproperties=prop)
+                                ax.text( n + 100 - rd["DEV_percent"] + rd["DEV_percent"]/2,                     i*(barheight + barspacer) + textoffset, str(round(rd["DEV_percent"],1)) + '%  ' + stringfromseconds(rd["DEV_time"]), ha='center', color=fontcolor, fontproperties=prop)
+                                ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
+                            else:    # no useful events
+                                drop_time= rd.get("DROP_time", 0)
+                                cl = cl[0],'white'
+                                missingPhaseevents = QApplication.translate("Message", "Profile missing phase events")
+                                ax.broken_barh( [ (0, m),
+                                                  (n, 100),
+                                                  (n+ 100 + g, m*(0 if max_drop_time == 0 else drop_time/max_drop_time))
+                                                ],
+                                                (i*(barheight + barspacer), barheight), facecolors=cl
+                                              )
+                                ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
+                                ax.text( n + 100/2,                                                             i*(barheight + barspacer) + textoffset, missingPhaseevents, ha='center', color=lightfontcolor, fontproperties=prop)
+                                ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, stringfromseconds(drop_time), ha='left', color=fontcolor, fontproperties=prop)
+    
+                        # save graph
+                        graph_image_pct = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + ".svg")))
+                        try:
+                            os.remove(graph_image_pct)
+                        except OSError:
+                            pass
+                        fig.savefig(graph_image_pct,transparent=True)
+                        #add some random number to force HTML reloading
+                        graph_image_pct = path2url(graph_image_pct)
+                        graph_image_pct = graph_image_pct + "?dummy=" + str(int(libtime.time()))
+                        graph_image_pct = "<img alt='roast graph pct' style=\"width: 95%;\" src='" + graph_image_pct + "'>"
+    
+    #                    plt.close() # release memory
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+                        _, _, exc_tb = sys.exc_info()
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " rankingReport() {0}").format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+    
+                    try:
+                        # redraw original graph
+                        if foreground_profile_path:
+                            aw.loadFile(foreground_profile_path)
+                        if aw.qmc.backgroundpath:
+                            aw.loadbackground(aw.qmc.backgroundpath)
+                        self.qmc.redraw(recomputeAllDeltas=False)
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+    
+                    weight_fmt = ('{0:.2f}' if aw.qmc.weight[2] in ["Kg", "lb", "oz"] else '{0:.0f}')
+                    html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
+                        resources = str(getResourcePath()),
+                        title = QApplication.translate("HTML Report Template", "Roast Ranking"),
+                        time = QApplication.translate("HTML Report Template", "Date"),
+                        profile = QApplication.translate("Label", "Title"),
+                        weightin = QApplication.translate("HTML Report Template", "In"),
+                        weightloss = QApplication.translate("HTML Report Template", "Loss"),
+                        colorHeader = QApplication.translate("HTML Report Template", "Color"),
+                        weight_unit = aw.qmc.weight[2].lower(),
+                        temp_unit = aw.qmc.mode,
+                        entries = entries,
+                        charges_avg = (weight_fmt.format(charges / charges_count) if charges_count > 0 and charges > 0 else ""),
+                        charges_temp_avg = ('{0:.1f}'.format(charges_temp / charges_temp_count) if charges_temp > 0 and charges_temp_count > 0 else ""),
+                        FCs_time_avg = (self.eventtime2string(FCs_time / FCs_time_count) if FCs_time > 0 and FCs_time_count > 0 else ""),
+                        FCs_temp_avg = ('{0:.1f}'.format(FCs_temp / FCs_temp_count) if FCs_temp > 0 and FCs_temp_count > 0 else ""),
+                        DROP_time_avg = (self.eventtime2string(DROP_time / DROP_time_count) if DROP_time > 0 and DROP_time_count > 0 else ""),
+                        DROP_temp_avg = ('{0:.1f}'.format(DROP_temp / DROP_temp_count) if DROP_temp > 0 and DROP_temp_count > 0 else ""),
+                        DRY_percent_avg = ('{0:.1f}'.format(DRY_percent / DRY_percent_count) if DRY_percent > 0 and DRY_percent_count > 0 else ""),
+                        MAI_percent_avg = ('{0:.1f}'.format(MAI_percent / MAI_percent_count) if MAI_percent > 0 and MAI_percent_count > 0 else ""),
+                        DEV_percent_avg = ('{0:.1f}'.format(DEV_percent / DEV_percent_count) if DEV_percent > 0 and DEV_percent_count > 0 else ""),
+                        AUC_avg = ('{0:.1f}'.format(AUC / AUC_count) if AUC > 0 and AUC_count > 0 else ""),
+                        loss_avg = ('{0:.1f}'.format(loss / loss_count) if loss_count > 0 and loss > 0 else ""),
+                        colors_avg = ('{0:.1f}'.format(colors_list / colors_count) if colors_list > 0 and colors_count > 0 else ""),
+                        cup_avg = ('{0:.2f}'.format(cuppings / cuppings_count) if cuppings > 0 and cuppings_count > 0 else ""),
+                        energy_avg = ('{0:.2f}'.format(energies / energies_count) if energies > 0 and energies_count > 0 else ""),
+                        co2_avg = ('{0:.2f}'.format(co2s / co2s_count) if co2s > 0 and co2s_count > 0 else ""),
+                        co2kg_avg = ('{0:.2f}'.format(co2kgs / co2kgs_count) if co2kgs > 0 and co2kgs_count > 0 else ""),
+                        graph_image=graph_image,
+                        graph_image_pct=graph_image_pct
+                    )
+                    try:
+                        filename = str(QDir(tmpdir).filePath("RankingReport.html"))
+                        try:
+                            os.remove(filename)
+                        except OSError:
+                            pass
+                        import codecs # @Reimport
+                        with codecs.open(filename, 'w', encoding='utf-8') as f:
+                            for i in range(len(html)):
+                                f.write(html[i])
+                        if platf == 'Darwin':
+                            full_path = "file://" + filename # Safari refuses to load the javascript lib (sorttable) otherwise
+                        else:
+                            full_path = "file:///" + filename # Explorer refuses to start otherwise
+                        
+                        if pdf:
+                            # select file
+                            filename = self.ArtisanSaveFileDialog(msg="Export PDF",ext="*.pdf")
+                            if filename:
+                                self.html2pdf(full_path, filename, landscape=True)
+                        else:
+                            QDesktopServices.openUrl(QUrl(full_path, QUrl.ParsingMode.TolerantMode))
+    
+                    except IOError as e:
+                        aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:") + " rankingReport() {0}").format(str(e)))
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
 
     @pyqtSlot()
     @pyqtSlot(bool)
