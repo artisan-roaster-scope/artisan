@@ -2221,9 +2221,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.qmc.device = 18
                     message = QApplication.translate("Message","Device set to {0}").format(meter)
                     st = ""
-                    if self.aw.qmc.delay != self.aw.qmc.min_delay:
-                        self.aw.qmc.delay = self.aw.qmc.min_delay
-                        st += ". Sampling rate changed to 1 second"
                     # ensure that events button is shown
                     self.aw.eventsbuttonflag = 1
                     self.aw.buttonEVENT.setVisible(True)

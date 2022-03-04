@@ -303,7 +303,7 @@ class CustomBlendDialog(ArtisanDialog):
     # returns True if all component rations sum up to 1 and all individual ratios are above 0 and below 100
     def checkRatio(self):
         ratios = [c.ratio for c in self.blend.components]
-        return all((0 < r < 100 for r in ratios)) and 1 == sum(ratios)
+        return all((0 < r < 100 for r in ratios)) and ((1 - sum(ratios)) < 0.001)
     
     def updateComponentTable(self):
         try:

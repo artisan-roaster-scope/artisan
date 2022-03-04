@@ -21217,7 +21217,7 @@ class ApplicationWindow(QMainWindow):
                             offset = (new_elapsed - old_elapsed)/new_base
                             self.qmc.timeclock.addClock(offset)
                             self.updateWindowTitle()
-                        self.sendmessage(QApplication.translate("Message","Simulator restarted @{}x").format(speed))
+                        self.sendmessage(QApplication.translate("Message","Simulator started @{}x").format(speed))
                     self.qmc.updateDeltaSamples() # to get the delta_spans right
                 else:
                     # remember the time on stopping the simulator
