@@ -2735,11 +2735,12 @@ class tgraphcanvas(FigureCanvas):
     # both deltaBTsamples and deltaETsamples are at least one
     def updateDeltaSamples(self):
         if self.flagstart or self.profile_sampling_interval is None:
-            interval = self.delay / 1000.
+            speed = self.timeclock.getBase()/1000
+            interval = speed * (self.delay / 1000)
         else:
             interval = self.profile_sampling_interval
-        self.deltaBTsamples = max(1,int(self.deltaBTspan / interval))
-        self.deltaETsamples = max(1,int(self.deltaETspan / interval))
+        self.deltaBTsamples = max(1,int(round(self.deltaBTspan / interval)))
+        self.deltaETsamples = max(1,int(round(self.deltaETspan / interval)))
 
     def updateBackground(self):
         if not self.block_update and aw.qmc.ax is not None:
@@ -3314,13 +3315,24 @@ class tgraphcanvas(FigureCanvas):
         if action.key[0] >= 0:
             # we check if this is the first DROP mark on this roast
             firstDROP = (action.key[0] == 6 and self.timeindex[6] == 0)
+            timeindex_before = self.timeindex[action.key[0]]
             self.timeindex[action.key[0]] = action.key[1]
             # clear custom label positions cache entry
             if action.key[0] in aw.qmc.l_annotations_dict:
                 del aw.qmc.l_annotations_dict[action.key[0]]
             if action.key[0] == 0: # CHARGE
                 # realign to background
-                if not self.flagon:
+                if self.flagon:
+                    try:
+                        if self.locktimex:
+                            self.startofx = self.locktimex_start + self.timex[self.timeindex[0]]
+                        else:
+                            self.startofx = self.chargemintime + self.timex[self.timeindex[0]] # we set the min x-axis limit to the CHARGE Min time
+                    except Exception: # pylint: disable=broad-except
+                        pass
+                else:
+                    # we keep xaxis limit the same but adjust to updated timeindex[0] mark
+                    self.startofx += (self.timex[self.timeindex[0]] - self.timex[timeindex_before])
                     aw.autoAdjustAxis(deltas=False)
                 aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             elif action.key[0] == 6: # DROP
@@ -3341,6 +3353,8 @@ class tgraphcanvas(FigureCanvas):
                         plus.queue.addRoast()
                     except Exception: # pylint: disable=broad-except
                         pass
+                if not self.flagon:
+                    aw.autoAdjustAxis(deltas=False)
 
             # update phases
             elif action.key[0] == 1 and self.phasesbuttonflag: # DRY
@@ -11917,8 +11931,10 @@ class tgraphcanvas(FigureCanvas):
                         if self.chargeTimerPeriod > 0:
                             aw.setTimerColor("timer")
                         try:
-                            if not aw.qmc.locktimex:
-                                aw.qmc.startofx = aw.qmc.chargemintime + self.timex[self.timeindex[0]] # we set the min x-axis limit to the CHARGE Min time
+                            if self.locktimex:
+                                self.startofx = self.locktimex_start + self.timex[self.timeindex[0]]
+                            else:
+                                self.startofx = self.chargemintime + self.timex[self.timeindex[0]] # we set the min x-axis limit to the CHARGE Min time
                         except Exception: # pylint: disable=broad-except
                             pass
                         
@@ -21200,6 +21216,9 @@ class ApplicationWindow(QMainWindow):
                             new_elapsed = self.qmc.timeclock.elapsed()
                             offset = (new_elapsed - old_elapsed)/new_base
                             self.qmc.timeclock.addClock(offset)
+                            self.updateWindowTitle()
+                        self.sendmessage(QApplication.translate("Message","Simulator restarted @{}x").format(speed))
+                    self.qmc.updateDeltaSamples() # to get the delta_spans right
                 else:
                     # remember the time on stopping the simulator
                     aw.time_stopped = self.qmc.timeclock.elapsed() / self.qmc.timeclock.getBase()
@@ -22039,6 +22058,11 @@ class ApplicationWindow(QMainWindow):
                 else: # before drop
                     totaltime = tx - chrg
 
+                if self.qmc.backgroundprofile is not None and self.qmc.timeindexB[1] and not aw.qmc.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
+                    drytarget = self.qmc.temp2B[self.qmc.timeindexB[1]] # Background DRY BT temperature
+                else:
+                    drytarget = self.qmc.phases[1] # Drying max phases definition
+                                
                 if aw.qmc.phasesLCDmode_all[2] and self.qmc.timeindex[1] and self.qmc.timeindex[2]: # DRY and FCs
                     # show all finish phase values: time/percent/temp
                     # FIN phase temp on LCD1
@@ -22177,10 +22201,6 @@ class ApplicationWindow(QMainWindow):
                             DRYlabel = "&raquo;" + QApplication.translate("Label", "DRY")
                         if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                             # display expected time to reach DRY as defined in the background profile or the phases dialog
-                            if self.qmc.backgroundprofile is not None and self.qmc.timeindexB[1] and not aw.qmc.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
-                                drytarget = self.qmc.temp2B[self.qmc.timeindexB[1]] # Background DRY BT temperature
-                            else:
-                                drytarget = self.qmc.phases[1] # Drying max phases definition
                             if drytarget > self.qmc.temp2[-1]:
                                 dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
                                 if aw.qmc.phasesLCDmode == 2:
@@ -22257,7 +22277,7 @@ class ApplicationWindow(QMainWindow):
                             DRY2FCsframeTooltip = QApplication.translate("Label","TEMP MODE")
                             TP2DRYframeTooltip = QApplication.translate("Label","TEMP MODE")
                             FCslabel = "&darr;" + QApplication.translate("Label", "FCs")
-                        if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
+                        if self.qmc.timeindex[0] > -1 and (self.qmc.timeindex[1] or (drytarget <= self.qmc.temp2[-1])) and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                             ## after DRY:
                             # display expected time to reach FCs as defined in the background profile or the phases dialog
                             if self.qmc.backgroundprofile is not None and self.qmc.timeindexB[2]:
@@ -33111,16 +33131,20 @@ class ApplicationWindow(QMainWindow):
     def closeApp(self):
         aw.quitAction.setEnabled(False)
         try:
+            unsaved_changes = bool(self.qmc.safesaveflag == True)
             if self.qmc.checkSaved(): # if not canceled
                 flagKeepON = aw.qmc.flagKeepON
-                aw.qmc.flagKeepON = False # temporarily turn keepOn off
+                self.qmc.flagKeepON = False # temporarily turn keepOn off
                 self.stopActivities()
-                aw.qmc.flagKeepON = flagKeepON
+                self.qmc.flagKeepON = flagKeepON
+                if unsaved_changes:
+                    # in case we have unsaved changes and the user decided to discard those, we first reset to have the correct settings (like axis limits) saved
+                    self.qmc.reset(redraw=False,soundOn=False,sampling=False,keepProperties=False,fireResetAction=False)
                 self.closeEventSettings()
                 gc.collect()
                 QApplication.exit()
                 return True
-            aw.quitAction.setEnabled(True)
+            self.quitAction.setEnabled(True)
             return False
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -38879,6 +38903,7 @@ class ApplicationWindow(QMainWindow):
                 elif control_modifier:
                     speed = 4
                 self.qmc.timeclock.setBase(1000*speed)
+                self.qmc.updateDeltaSamples() # to get the delta_spans right
                 self.sendmessage(QApplication.translate("Message","Simulator started @{}x").format(speed))
                 self.simulatorAction.setChecked(True)
             else:
@@ -38888,6 +38913,7 @@ class ApplicationWindow(QMainWindow):
                 self.sample_loop_running = True # we enable the sampling loop again that might have been stopped during the simulation via a timerLCD click
                 aw.buttonONOFF.setStyleSheet(aw.pushbuttonstyles["OFF"])
                 aw.buttonSTARTSTOP.setStyleSheet(aw.pushbuttonstyles["STOP"])
+                self.qmc.updateDeltaSamples() # to get the delta_spans right
                 self.sendmessage(QApplication.translate("Message","Simulator stopped"))
                 self.updateWindowTitle()
                 self.enableLoadImportConvertMenus()
@@ -38918,6 +38944,7 @@ class ApplicationWindow(QMainWindow):
                         self.simulatorpath = filename
                         aw.buttonONOFF.setStyleSheet(aw.pushbuttonstyles_simulator["OFF"])
                         aw.buttonSTARTSTOP.setStyleSheet(aw.pushbuttonstyles_simulator["STOP"])
+                        self.qmc.updateDeltaSamples() # to get the delta_spans right
                         self.sendmessage(QApplication.translate("Message","Simulator started @{}x").format(speed))
                         self.updateWindowTitle()
                     else:

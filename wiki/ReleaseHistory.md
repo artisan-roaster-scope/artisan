@@ -33,10 +33,10 @@ v2.6.0 (XX XX, 2022)
   - adds automatic mark DROP on OFF if at least 7min were recorded and either Auto DROP is active or DROP button is hidden
   - adds PDF as export format of roast, production and ranking reports
   - adds "PDF Report" as additional format to autosave ([Issue #478](../../../issues/478))
-  - adds notifications incl. Artisan Commands `notify` and `notifications` with support for artisan.plus reminders
+  - adds notifications incl. Artisan Commands `notify` and `notifications` with support for [artisan.plus](https://artisan.plus) reminders
   - improves fidelity of analyzer calculations when samples are missing and other circumstances
-  - adds support for the artisan.plus HOME quota system
-  - adds custom blend editor for artisan.plus ([Issue #760](../../../issues/760))
+  - adds support for the [artisan.plus](https://artisan.plus) HOME quota system
+  - adds custom blend editor for [artisan.plus](https://artisan.plus) ([Issue #760](../../../issues/760))
   - adds Artisan Command "keyboard" to enable/disable keyboard mode
   - adds Artisan Commands `showCurve`, `showExtraCurve`, `showEvents`, and `showBackgroundEvents` to show/hide curves and events
   - implements Artisan Commands `PIDon`, `PIDoff`, `PIDtoggle`, `pidmode` for Fujji PIDs
@@ -146,7 +146,7 @@ v2.4.6 (July 30, 2021)
   - allows for a y-axis step sizes below 10
   - a step size of 0 (or the empty step entry for the x-axis) removes the ticks on the corresponding axis
   - better handling of decimal number input in Roast Properties by automatic conversion of decimal separators
-  - dynamically update recent roasts according to artisan.plus stock blend replacement situations
+  - dynamically update recent roasts according to [artisan.plus](https://artisan.plus) stock blend replacement situations
   - when available use greens temp in linear regressions computed by the profile analyzer
   - slider actions do now bind floats to the placeholder `{}` instead of integers, also for S7 commands (in previous versions only for IO, VOUT and RC Commands)
   - replaces the AUC readings per phase in the statistic line by the temperature delta per phase
