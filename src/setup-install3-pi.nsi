@@ -341,6 +341,7 @@ Section Uninstall
   RMDir /r "$INSTDIR\win32com"
   RMDir /r "$INSTDIR\wx"
   RMDir /r "$INSTDIR\yaml"
+  RMDir /r "$INSTDIR\yoctopuce"
   RMDir /r "$INSTDIR\zope"
 
   !insertmacro Rmdir_Wildcard "$INSTDIR\PyQt*" ${__LINE__}
