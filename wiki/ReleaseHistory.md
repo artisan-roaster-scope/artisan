@@ -63,6 +63,7 @@ v2.6.0 (XX XX, 2022)
   - default sampling interval set to 2sec (from 3sec)
   - updated libarary infrastructure (Python, Qt, PyQt, matplotlib, ...)
   - enables drag-and-drop of background annotations
+  - PhasesLCDs show time to FCs if DRY is not set after DRY target passed
 * DELETIONS
   - removes oversampling
   - removes HUD

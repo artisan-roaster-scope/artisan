@@ -4807,22 +4807,30 @@ class editGraphDlg(ArtisanResizeablDialog):
     
     def saveMainEvents(self):
         if self.chargeedit.text() == "":
+            if self.aw.qmc.timeindex[0]>-1:
+                # if charge was set before and got removed,
+                # we keep xaxis limit the same but adjust to updated timeindex[0] mark
+                self.aw.qmc.startofx -= self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
             self.aw.qmc.timeindex[0] = -1
-            self.aw.qmc.xaxistosm(redraw=False)
         elif self.chargeeditcopy != str(self.chargeedit.text()):
             #if there is a CHARGE recorded and the time entered is positive. Use relative time
             if stringtoseconds(str(self.chargeedit.text())) > 0 and self.aw.qmc.timeindex[0] != -1:
                 startindex = self.aw.qmc.time2index(self.aw.qmc.timex[self.aw.qmc.timeindex[0]] + stringtoseconds(str(self.chargeedit.text())))
+                timeindex_before = self.aw.qmc.timeindex[0]
                 self.aw.qmc.timeindex[0] = max(-1,startindex)
+                self.aw.qmc.startofx += (self.aw.qmc.timex[self.aw.qmc.timeindex[0]] - self.aw.qmc.timex[timeindex_before])
             #if there is a CHARGE recorded and the time entered is negative. Use relative time
             elif stringtoseconds(str(self.chargeedit.text())) < 0 and self.aw.qmc.timeindex[0] != -1:
                 relativetime = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]-abs(stringtoseconds(str(self.chargeedit.text())))
                 startindex = self.aw.qmc.time2index(relativetime)
+                timeindex_before = self.aw.qmc.timeindex[0]
                 self.aw.qmc.timeindex[0] = max(-1,startindex)
+                self.aw.qmc.startofx += (self.aw.qmc.timex[self.aw.qmc.timeindex[0]] - self.aw.qmc.timex[timeindex_before])
             #if there is _no_ CHARGE recorded and the time entered is positive. Use absolute time 
             elif stringtoseconds(str(self.chargeedit.text())) > 0 and self.aw.qmc.timeindex[0] == -1:
                 startindex = self.aw.qmc.time2index(stringtoseconds(str(self.chargeedit.text())))
                 self.aw.qmc.timeindex[0] = max(-1,startindex)
+                self.aw.qmc.startofx += self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
             #if there is _no_ CHARGE recorded and the time entered is negative. ERROR
             elif stringtoseconds(str(self.chargeedit.text())) < 0 and self.aw.qmc.timeindex[0] == -1:
                 self.aw.qmc.adderror(QApplication.translate("Error Message", "Unable to move CHARGE to a value that does not exist"))
@@ -4904,6 +4912,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.saveMainEvents()
             if self.aw.qmc.timeindex[0] != self.org_timeindex[0]:
                 self.aw.qmc.xaxistosm(redraw=False) # we update axis if CHARGE event changed
+                self.aw.qmc.timealign(redraw=False)
             
             self.saveEventTable()
         # Update Title

@@ -3332,7 +3332,10 @@ class tgraphcanvas(FigureCanvas):
                         pass
                 else:
                     # we keep xaxis limit the same but adjust to updated timeindex[0] mark
-                    self.startofx += (self.timex[self.timeindex[0]] - self.timex[timeindex_before])
+                    if timeindex_before > -1:
+                        self.startofx += (self.timex[self.timeindex[0]] - self.timex[timeindex_before])
+                    else:
+                        self.startofx += self.timex[self.timeindex[0]]
                     aw.autoAdjustAxis(deltas=False)
                 aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             elif action.key[0] == 6: # DROP
@@ -6501,11 +6504,16 @@ class tgraphcanvas(FigureCanvas):
             self.fileCleanSignal.emit()
             self.rateofchange1 = 0.0
             self.rateofchange2 = 0.0
+            charge = 0
+            if self.timeindex[0] > -1:
+                charge = self.timex[self.timeindex[0]]
             self.temp1, self.temp2, self.delta1, self.delta2, self.timex, self.stemp1, self.stemp2, self.ctimex1, self.ctimex2, self.ctemp1, self.ctemp2 = [],[],[],[],[],[],[],[],[],[],[]
             self.tstemp1,self.tstemp2 = [],[]
             self.unfiltereddelta1,self.unfiltereddelta2 = [],[]
             self.unfiltereddelta1_pure,self.unfiltereddelta2_pure = [],[]
             self.timeindex = [-1,0,0,0,0,0,0,0]
+            # we set startofx to x-axis min limit as timeindex[0] is no cleared, to keep the axis limits constant (note that startx depends on timeindex[0]!)
+            self.startofx = self.startofx - charge
             #extra devices
             for i in range(min(len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2),len(self.extrastemp1),len(self.extrastemp2))):
                 self.extratimex[i],self.extratemp1[i],self.extratemp2[i],self.extrastemp1[i],self.extrastemp2[i] = [],[],[],[],[]            #reset all variables that need to be reset (but for the actually measurements that will be treated separately at the end of this function)
@@ -6821,12 +6829,13 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.profileDataSemaphore.available() < 1:
                 aw.qmc.profileDataSemaphore.release(1)
         # now clear all measurements and redraw
+        
         self.clearMeasurements()
         #clear PhasesLCDs
         aw.updatePhasesLCDs()
         #clear AUC LCD
         aw.updateAUCLCD()
-
+        
         # if background is loaded we move it back to its original position (after regular load):
         if self.backgroundprofile:
             moved = self.backgroundprofile_moved_x != 0 or self.backgroundprofile_moved_y != 0
@@ -6836,12 +6845,12 @@ class tgraphcanvas(FigureCanvas):
                 self.movebackground("down",self.backgroundprofile_moved_y)
             if moved:
                 self.timealign(redraw=False)
-
-        if not (aw.qmc.autotimex and self.background):
+                
+        if not (self.autotimex and self.background):
             if self.locktimex:
                 self.startofx = self.locktimex_start
                 self.endofx = self.locktimex_end
-            else:
+            elif keepProperties:
                 self.startofx = self.chargemintime
                 self.endofx = self.resetmaxtime
         if self.endofx < 1:
@@ -6852,6 +6861,7 @@ class tgraphcanvas(FigureCanvas):
         ### REDRAW  ##
         if redraw:
             self.redraw(True,sampling=sampling,smooth=aw.qmc.optimalSmoothing) # we need to re-smooth with standard smoothing if ON and optimal-smoothing is ticked
+                
         #QApplication.processEvents() # this one seems to be needed for a proper redraw in fullscreen mode on OS X if a profile was loaded and NEW is pressed
         #   this processEvents() seems not to be needed any longer!?
         return True
@@ -11931,6 +11941,7 @@ class tgraphcanvas(FigureCanvas):
                         if self.chargeTimerPeriod > 0:
                             aw.setTimerColor("timer")
                         try:
+                            # adjust startofx to the new timeindex[0] as it depends on timeindex[0]
                             if self.locktimex:
                                 self.startofx = self.locktimex_start + self.timex[self.timeindex[0]]
                             else:
@@ -26459,7 +26470,7 @@ class ApplicationWindow(QMainWindow):
                     org_obj_extra_devs = []
                 if res:
                     # we avoid the reset within setProfile as we just did a reset and do not want to confuse the ExtraDeviceSettingsBackup
-                    res = self.setProfile(filename,obj,quiet=quiet,reset=False) 
+                    res = self.setProfile(filename,obj,quiet=quiet,reset=False)
             else:
                 self.sendmessage(QApplication.translate("Message","Invalid artisan format"))
                 res = False
@@ -28378,7 +28389,8 @@ class ApplicationWindow(QMainWindow):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
-    #called by fileLoad()
+    #called by fileLoad() and various import functions
+    # we assume that before a reset action was issues and among others timeindex got initalized to its defaults
     def setProfile(self,filename,profile,quiet=False,reset=True):
         try:
             updateRender = False
@@ -28982,6 +28994,10 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.startofx = self.qmc.timex[aw.qmc.timeindex[0]] + self.qmc.locktimex_start
                     else:
                         self.qmc.startofx = self.qmc.locktimex_start
+                elif not self.qmc.loadaxisfromprofile and self.qmc.timeindex[0] != -1:
+                    # we still need to adjust startx as it depends on timeindex[0] to keep x-axis min limit as is
+                    # we assume here that the previous reset did initalize timeindex[0] and adjusted startx correctly
+                    self.qmc.startofx += self.qmc.timex[self.qmc.timeindex[0]]
             elif len(profile) > 0 and ("startend" in profile or "dryend" in profile or "cracks" in profile):
                 ###########      OLD PROFILE FORMAT
                 if "startend" in profile:
@@ -30100,11 +30116,14 @@ class ApplicationWindow(QMainWindow):
             filename = self.ArtisanOpenFileDialog(msg=msg,ext=ext)
             if filename:
                 if reset:
-                    aw.qmc.reset(True,False)
-                loader(filename)
-                self.sendmessage(QApplication.translate("Message","Readings imported"))
-            else:
-                self.sendmessage(QApplication.translate("Message","Cancelled"))
+                    res = aw.qmc.reset(True,False)
+                else:
+                    res = True
+                if res:
+                    loader(filename)
+                    self.sendmessage(QApplication.translate("Message","Readings imported"))
+                    return
+            self.sendmessage(QApplication.translate("Message","Cancelled"))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
