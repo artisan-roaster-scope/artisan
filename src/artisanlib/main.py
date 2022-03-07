@@ -2110,7 +2110,7 @@ class tgraphcanvas(FigureCanvas):
         self.maxRoRlimit: Final = 170
         # axis limits
         self.endofx = self.endofx_default     # endofx is the display time in seconds of the right x-axis limit (excluding any shift of CHARGE time)
-        self.startofx = self.startofx_default # startofx is the time in seconds of the left x-axis limit in data time (display time in seconds of the left x-axis limit plus the CHARGE time in seconds)
+        self.startofx = self.startofx_default # startofx is the time in seconds of the left x-axis limit in data time (display time in seconds of the left x-axis limit plus the CHARGE time in seconds); NOTE: as startofx depends CHARGE it has to be adjusted whenever CHARGE is adjusted
         self.resetmaxtime = 600  #time when pressing RESET: 10min*60
         self.chargemintime = self.startofx_default  #time when pressing CHARGE: -30sec
         self.fixmaxtime = False # if true, do not automatically extend the endofx by 3min if needed because the measurements get out of the x-axis
@@ -16051,12 +16051,14 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         # lets make the font of the coordinates QLabel a little larger
         f = self.locLabel.font()
         if platf == "Linux":
-            f.setPointSize(f.pointSize()+2)
+            f.setPointSize(f.pointSize()+1)
         else:
-            f.setPointSize(f.pointSize()+4)
+            f.setPointSize(f.pointSize()+2)
 #        f.setStyleHint(QFont.StyleHint.TypeWriter) # not monospaced!
         f.setStyleHint(QFont.StyleHint.Monospace)
         f.setFamily('monospace')
+#        f.setWeight(QFont.Bold)
+        f.setBold(True)
         self.locLabel.setFont(f)
 
 
@@ -17526,6 +17528,7 @@ class ApplicationWindow(QMainWindow):
 
         self.curvesAction = QAction(QApplication.translate("Menu", "Curves..."), self)
         self.curvesAction.triggered.connect(self.setCurves)
+        self.curvesAction.setShortcut("Ctrl+U")
         self.ConfMenu.addAction(self.curvesAction)
 
         self.ConfMenu.addSeparator()
