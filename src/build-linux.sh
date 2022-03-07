@@ -10,7 +10,8 @@ export PATH=$PATH:$HOME/.local/bin
 if [ ! -z $APPVEYOR ]; then
     # Appveyor environment
     echo "NOTICE: Appveyor build"
-    export PYTHON_PATH=/home/appveyor/venv3.9.8/lib/python3.9/site-packages
+#    export PYTHON_PATH=/home/appveyor/venv3.9.10/lib/python3.9/site-packages
+    export PYTHON_PATH=/home/appveyor/venv3.10.2/lib/python3.10/site-packages
     export QT_PATH=$PYTHON_PATH/PyQt6/Qt6
 elif [ -d /usr/lib/python3/dist-packages/PyQt5 ]; then
     # ARM builds
@@ -45,7 +46,7 @@ rm -rf dist/artisan.d
 mkdir dist/translations
 
 
-for lan in ar, da, de, en, el, es, fa, fi, fr, gd, he, hu, id, it, ja, ko, lv, nl, no, pl, pt_BR, pt, ru, sk, sv, th, tr, vi, zh_CN, zh_TW; do
+for lan in ar, da, de, en, el, es, fa, fi, fr, gd, he, hu, id, it, ja, ko, lv, nl, no, pl, pt_BR, pt, sk, sv, th, tr, uk, vi, zh_CN, zh_TW; do
      QTBASE_FILE=$QT_PATH/translations/qtbase_${lan}.qm
      QT_FILE=$QT_PATH/translations/qt_${lan}.qm
      if [ -e ${QTBASE_FILE} ]

@@ -208,7 +208,7 @@ except:
     subprocess.check_call(r'cp -f /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib',shell = True)
 
 # add localization stubs to make OS X translate the systems menu item and native dialogs
-for lang in ['ar', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id','it','ja','ko','lv', 'nl','no','pl','pt_BR','pt','ru','sk', 'sv','th','tr','vi','zh_CN','zh_TW']:
+for lang in ['ar', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id','it','ja','ko','lv', 'nl','no','pl','pt_BR','pt','sk', 'sv','th','tr','uk','vi','zh_CN','zh_TW']:
     loc_dir = r'Artisan.app/Contents/Resources/' + lang + r'.lproj'
     subprocess.check_call(r'mkdir ' + loc_dir,shell = True)
     subprocess.check_call(r'touch ' + loc_dir + r'/Localizable.string',shell = True)
