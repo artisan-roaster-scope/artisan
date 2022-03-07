@@ -34,7 +34,7 @@ branches:
     - master
 
 stack:
-  python 3.9 # if nothing else is specified per platform, this indicates the Python version to be used
+  python 3.10 # if nothing else is specified per platform, this indicates the Python version to be used
 
 for:
 -
@@ -124,8 +124,7 @@ for:
     - cmd: curl -L -O https://github.com/roasterdave/uploadtool/raw/master/upload.sh
     - cmd: bash upload.sh artisan-*.zip
 
-stack:
-  python 3.10
+
 -
   matrix:
     only:
@@ -168,8 +167,6 @@ stack:
     - export UPLOADTOOL_ISPRERELEASE=true
     - bash upload.sh artisan-*.dmg
 
-stack:
-  python 3.10
 -
   matrix:
     only:
