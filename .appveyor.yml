@@ -124,7 +124,8 @@ for:
     - cmd: curl -L -O https://github.com/roasterdave/uploadtool/raw/master/upload.sh
     - cmd: bash upload.sh artisan-*.zip
 
-
+stack:
+  python 3.10
 -
   matrix:
     only:
@@ -133,7 +134,7 @@ for:
 
   environment:
     ARTISAN_OS: osx
-    PYTHON: ~/venv3.9
+    PYTHON: ~/venv3.10
     language: generic
     HOMEBREW_NO_INSTALL_CLEANUP: 1
     HOMEBREW_NO_ANALYTICS: 1
@@ -167,6 +168,8 @@ for:
     - export UPLOADTOOL_ISPRERELEASE=true
     - bash upload.sh artisan-*.dmg
 
+stack:
+  python 3.10
 -
   matrix:
     only:
