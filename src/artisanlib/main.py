@@ -16051,14 +16051,14 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         # lets make the font of the coordinates QLabel a little larger
         f = self.locLabel.font()
         if platf == "Linux":
-            f.setPointSize(f.pointSize()+1)
-        else:
             f.setPointSize(f.pointSize()+2)
+        else:
+            f.setPointSize(f.pointSize()+4)
 #        f.setStyleHint(QFont.StyleHint.TypeWriter) # not monospaced!
         f.setStyleHint(QFont.StyleHint.Monospace)
         f.setFamily('monospace')
 #        f.setWeight(QFont.Bold)
-        f.setBold(True)
+#        f.setBold(True)
         self.locLabel.setFont(f)
 
 
