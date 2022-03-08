@@ -9,14 +9,14 @@
 ######
 # platform specifics
 #
-distro==1.6.0 #1.5.0
+distro==1.7.0 #1.6.0
 #
 ######
 # packages that differ per platform:
 #
 gevent==21.12.0
 gevent-websocket==0.10.1
-numpy==1.22.2
+numpy==1.22.3 #1.22.2
 scipy==1.8.0 # 1.7.3 # depends on numpy thus needs to be put after
 matplotlib==3.5.1 # 3.4.1 requires pyinstaller > 4.2
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
@@ -30,7 +30,7 @@ cffi==1.15.0
 cryptography==3.4.8
 keyring==23.5.0 #23.4.0 # versions beyond 23.0.1 require importlib_metadata >=v3.6 (RPi buster comes with v2.0)
 SecretStorage==3.3.1 # 3.3.0
-lxml==4.7.1 #4.6.5 #4.6.4
+lxml==4.7.1 #4.6.5
 prettytable==0.7.2 # >1.0.0 fail to be packed and the monkey patch in main.py does not help here due the old python version
 #
 # NOTES:

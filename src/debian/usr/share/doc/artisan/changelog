@@ -1,3 +1,11 @@
+artisan (2.6.0-0) precise; urgency=low
+  * new upstream release
+  * changes since 2.4.6:
+   - adds logging
+   - performance improvements
+   - bug fixes
+ --  <marko.luther@gmx.net>  Fri, 11 Mar 2022 19:32:14 +0200
+
 artisan (2.4.6-0) precise; urgency=low
   * new upstream release
   * changes since 2.4.4:

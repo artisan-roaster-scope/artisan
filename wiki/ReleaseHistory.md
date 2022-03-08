@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v2.6.0 (XX XX, 2022)
+v2.6.0 (March 11, 2022)
 ------------------
 
 * NEW FEATURES
