@@ -25,5 +25,5 @@ PyQtWebEngine==5.15.5
 #PyQt6-WebEngine==6.2.1 # Qt6 not supported on macOS 10.13
 openpyxl==3.0.9 # 3.0.7
 keyring==23.5.0 #23.4.0 # builds using 19.3.0 and 20.0.0 fail with py2app/pyinstaller, 21.21 seems to have fixed this
-prettytable==3.0.0 #2.4.0 # >1.0.0 fail to be packed, but a main.py monkey patch helps
+prettytable==3.2.0 #2.4.0 # >1.0.0 fail to be packed, but a main.py monkey patch helps
 lxml==4.7.1 # compiled from source; latest version with binaries for macOS 10.13 is 4.6.3 which comes without build for Python 3.10
