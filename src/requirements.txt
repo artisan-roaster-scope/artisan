@@ -1,4 +1,4 @@
-setuptools==60.9.3 # 60.6.0 # v60.7.0 and v60.7.1 break builds on py2app and pyinstaller4.8
+setuptools==60.6.0 # v60.7.0 and v60.7.1 break builds on py2app and pyinstaller4.8; with 60.8.1 or newer (tested until 60.9.3) py2app builds fail on start
 wheel==0.37.1 # 0.37.0
 pyserial==3.5 # 3.4
 pymodbus==2.5.3 # 2.5.2
