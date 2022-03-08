@@ -2,8 +2,8 @@
 # platform specifics:
 #
 appnope==0.1.2
-pyobjc-core==8.4 # 8.2
-pyobjc-framework-Cocoa==8.4 #8.2
+pyobjc-core==8.2 # 8.4 seems to have a packaging problem
+pyobjc-framework-Cocoa==8.2 # 8.4 seems to have a packaging problem
 #py2app==0.23 # we stay on 0.23 due to our darkmode patch which needs to be redone for later versions like 0.24 to avoid the patch to be overwritten
 # NOTE: py2app is installed again for builds from custom wheel via .ci/install-osx.sh to allow for dark mode support
 py-cpuinfo==8.0.0 # used for proper CPU arch detection running under Rosetta2

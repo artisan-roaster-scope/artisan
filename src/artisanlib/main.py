@@ -268,11 +268,11 @@ class Artisan(QtSingleApplication):
     @pyqtSlot("QWidget*","QWidget*")
     def appRaised(self,oldFocusWidget,newFocusWidget):
         try:
-            if not sip.isdeleted(aw): # sip not supported on older PyQt versions (eg. RPi)
+            if aw is not None and not sip.isdeleted(aw): # sip not supported on older PyQt versions (eg. RPi)
                 if oldFocusWidget is None and newFocusWidget is not None and aw is not None and aw.centralWidget() == newFocusWidget and self.sentToBackground is not None:
                     #focus gained
                     try:
-                        if aw is not None and aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None and \
+                        if aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None and \
                                 libtime.time() - self.sentToBackground > self.plus_sync_cache_expiration:
                             plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
                     except Exception as e: # pylint: disable=broad-except
