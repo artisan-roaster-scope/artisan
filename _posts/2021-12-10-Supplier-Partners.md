@@ -11,6 +11,7 @@ categories:
   - announcement
 tags: 
   - artisan.plus
+  - partner
 gallery_USA:
   - url: https://www.genuineorigin.com/
     image_path: /assets/images/partners/genuineorigin-logo.png
@@ -27,7 +28,7 @@ gallery_USA:
 link: https://doc.artisan.plus/partners/
 ---
 
-Today we started our [parternship program](https://doc.artisan.plus/partners/){:target="_blank"} with green bean suppliers around the globe. To remove our customers pain point of having to enter green coffee data manually for each purchase, we decided to link our [artisan.plus platform](https://artisan.plus){:target="_blank"} directly to the systems of leading green bean importers. Further, our partners provide coupon codes to artisan.plus subscribers providing them discounts on their green coffee offerings, while helping to streamline inventory management for home roasters and commercial roasters alike.
+Today we started our [partnership program](https://doc.artisan.plus/partners/){:target="_blank"} with green bean suppliers around the globe. To remove our customers pain point of having to enter green coffee data manually for each purchase, we decided to link our [artisan.plus platform](https://artisan.plus){:target="_blank"} directly to the systems of leading green bean importers. Further, our partners provide coupon codes to artisan.plus subscribers providing them discounts on their green coffee offerings, while helping to streamline inventory management for home roasters and commercial roasters alike.
 
 In combination with the recent [price drop for our HOME customers]({% post_url 2021-12-01-price-drop %}), those partner discounts may offset the subscription costs completely.
 

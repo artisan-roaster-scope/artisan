@@ -32,7 +32,6 @@ If you need support please check the [documentation](#documentation) or ask the 
 - [Artisan Discussion Forum](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} (technical discussions and support; [GitHub registration](https://github.com/join){:target="_blank"} required to post; [Learn how to Subscribe to Discussions](/discussions))
 - Public Forums or Facebook Groups (not monitored by the team)
    - [Home-Barista.com](https://www.home-barista.com/roasting/){:target="_blank"}
-   - [Homeroasters.org](https://homeroasters.org/){:target="_blank"}
    - [Kaffee Netz](https://www.kaffee-netz.de/forums/){:target="_blank"} (in German)
    - ...
 - [Tutorial videos](https://artisan-scope.org/docs/videos/)
