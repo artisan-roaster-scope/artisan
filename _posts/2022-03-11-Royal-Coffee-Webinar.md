@@ -21,6 +21,8 @@ Join Dave to learn the best ways to use Artisan to improve your workflow and imp
 
 Roasting experience with Artisan is recommended but not required.
 
+**UPDATE: a recording of this sesssion is now available on [Vimeo](https://vimeo.com/687294869){:target="_blank"}**
+
 
 > <a href="https://events.royalcoffee.com/navigating_artisan" target="_blank">Getting the Most From Your Curves</a> (Royal Coffee)   
 > Friday, Mar 11 \| 1-2 pm PST   

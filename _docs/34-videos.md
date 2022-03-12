@@ -8,6 +8,8 @@ author: Michael Herbert
 author_profile: true
 ---
 
+  * by Dave from the Artisan team
+    - [RoyalCoffee Webinar: Navigating Artisan (11.3.2022)](https://vimeo.com/687294869)
   * By [Rick Groszkiewicz](https://www.youtube.com/channel/UCrLDJbbG8c6fO1KXjbDTllw)
     - [YouTube video on Alarms](https://www.youtube.com/watch?v=KLnb8lZwHjE)
     - [YouTube video on Events](https://www.youtube.com/watch?v=614R8i-EoHI)
