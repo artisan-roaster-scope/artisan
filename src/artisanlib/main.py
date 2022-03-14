@@ -2570,7 +2570,7 @@ class tgraphcanvas(FigureCanvas):
         self.markCoolSignal.connect(self.markCoolTrigger)
         self.toggleMonitorSignal.connect(self.toggleMonitorTigger)
         self.toggleRecorderSignal.connect(self.toggleRecorderTigger)
-        self.processAlarmSignal.connect(self.processAlarm)
+        self.processAlarmSignal.connect(self.processAlarm, type=Qt.ConnectionType.QueuedConnection) # queued to avoid deadlock between RampSoak processing and EventRecordAction, both accessing the same critical section protected by profileDataSemaphore
         self.alarmsetSignal.connect(self.selectAlarmSet)
         self.moveBackgroundSignal.connect(self.moveBackgroundAndRedraw)
         self.eventRecordSignal.connect(self.EventRecordSlot)
