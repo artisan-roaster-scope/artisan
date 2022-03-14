@@ -42,6 +42,6 @@ On macOS and Windows 10 a direct Bluetooth Low Energy connection to the Acaia Lu
 *Custom Blend Editor for artisan.plus users*
 The blend editor allows you to quickly define an ad-hoc blend. This is useful for blends that you do not plan to reuse as this avoids having to define a blend on the artisan.plus platform beforehand. If you set the weight to 0 this editor allows you to enter the components by weight instead of ratio, calculating the total weight.
 
-![blend editor](/assets/images/gsg/blend editor.gif)
+![blend editor](/assets/images/gsg/Blend Editor.gif)
 
 
