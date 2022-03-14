@@ -35,7 +35,9 @@ And here is what a slider looks like. NOTE if you have sliders checked on the co
 In order to set up custom events, you need to create Event types, under `Config` >> `Events`:
 ![config events](/assets/images/gsg/events config dialog 14.png)
 
-You can label up to 4 event types. You can edit how they work with the tabs Buttons and Sliders.  When you click a button or move a slider Artisan records an event on a scale of 0-999.  You can display these events on your roasting graph.  You may need to set your temperature axis to a low of 0° in order to see these the best.  `Config` >> `Axes`.  If you check Mini Editor you will be able to add or edit existing events during the roast.  The Mini-Editor will appear below your Buttons.  
+You can label up to 4 event types. You can edit how they work with the tabs Buttons and Sliders.  When you click a button or move a slider Artisan records an event on a scale of 0-999.  You can display these events on your roasting graph.  You may need to set your temperature axis to a low of 0° in order to see these the best.  `Config` >> `Axes`.  
+
+The mini Events Editor is available at any time and can be used to edit events while roasting or to browse and edit custom events of a profile later. It an be enabled via the menu entry Events Editor from the View menu or simply by pressing the y key.
 
 ![events editor](/assets/images/gsg/events editor.png)
 
@@ -86,7 +88,12 @@ The above screenshot shows the Button Label and Description, Type, Value, Action
 
 *ADVANCED USERS* - The Action column is where you can add automation commands.  Check the Help page for the Events dialog to see all the possibitites.  The number of Artisan commands and other commands continues to grow with each release.  
 
-**Note** in particular the Automation check marks at the bottom. If you want the event Charge to be automatically recorded, you need to press Start and let it be on for 5x your sampling rate in order to have AutoCharge work properly.  So for a sample rate of 3, don't charge the roaster until at least 15 seconds after you push Start.    
+
+The autoCHARGE feature (menu Config » Events) allows you to have the hands free while charging the bean for the next batch, having the CHARGE event set automatically by Artisan. For those who prefer to set the CHARGE event manually by hitting the CHARGE button we now added the Charge Timer (menu Config » Events) as alternative. If active, the timer counts down the specified seconds after START until it automatically set the CHARGE event. With the Charge Timer set to 0sec, Artisan will set the CHARGE event to the first reading it records.
+
+**Note** in particular the Automation check marks at the bottom. If you want the event Charge to be automatically recorded, you need to press Start and let it be on for 5x your sampling rate in order to have AutoCharge work properly.  So for a sample rate of 2, don't charge the roaster until at least 10 seconds after you push Start.    
+
+
 
 *Sliders Configuration Sample*
 
