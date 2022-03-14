@@ -36,5 +36,12 @@ https://artisan-roasterscope.blogspot.de/2014/11/batch-volume-and-bean-density.h
 
 You need a beaker that is smaller than your batch size for this calculator.  You will put in your unit of measurement at the top (say a 400ml beaker), and then you put in your pre and post roast weights to fill that measure of beans on the left. The calculator will return the density both pre and post roast using the actual pre and post grams.   Once you know the density of the bean you are using there is shortcut. Assume you know the bean’s density you can enter the known density in the Density field within the roast properties, select the correct density weight (e.g. grams) and volume units (e.g. one liter – put 1 in the box).  Put the cursor in the Volume field after putting in the weight and press the Enter key. Artisan will take the specified density and batch weight of the greens and compute the volume for you.
 
-NOTE-
+*Use your Acaia Lunar or Pearl*
 On macOS and Windows 10 a direct Bluetooth Low Energy connection to the Acaia Lunar and Pearl scales is supported. This connection is demonstrated in the post [weight • volume • density](https://artisan-roasterscope.blogspot.com/2019/04/weight-volume-density.html).
+
+*Custom Blend Editor for artisan.plus users*
+The blend editor allows you to quickly define an ad-hoc blend. This is useful for blends that you do not plan to reuse as this avoids having to define a blend on the artisan.plus platform beforehand. If you set the weight to 0 this editor allows you to enter the components by weight instead of ratio, calculating the total weight.
+
+![blend editor](/assets/images/gsg/blend editor.gif)
+
+
