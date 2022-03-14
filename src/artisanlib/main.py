@@ -3979,6 +3979,13 @@ class tgraphcanvas(FigureCanvas):
                             aw.qmc.l_temp1.set_data(sample_ctimex1, sample_ctemp1)
                         if aw.qmc.BTcurve:
                             aw.qmc.l_temp2.set_data(sample_ctimex2, sample_ctemp2)
+                    
+                    if (aw.qmc.Controlbuttonflag and aw.pidcontrol.pidActive and \
+                            not aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
+                        if aw.pidcontrol.pidSource == 1:
+                            aw.qmc.pid.update(st2) # smoothed BT
+                        else:
+                            aw.qmc.pid.update(st1) # smoothed ET
 
                     #we need a minimum of two readings to calculate rate of change
 #                    if local_flagstart and length_of_qmc_timex > 1:
@@ -16552,16 +16559,6 @@ class SampleThread(QThread):
                     temp1_readings.append(t1)
                     temp2_readings.append(t2)
                     timex_readings.append(tx)
-                    
-                    # the software PID needs to be updated here to ensure constant timing for the deriv computation
-                    if (aw.qmc.Controlbuttonflag and
-                        not aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
-                        # and aw.pidcontrol.pidActive # we feed the PID algorithm also while it is not actively controlling
-                        if aw.pidcontrol.pidSource == 1:
-                            aw.qmc.pid.update(t2)
-                        else:
-                            aw.qmc.pid.update(t1)
-                    
                     
                     ##############  if using Extra devices
                     for i in range(len(aw.qmc.extradevices)):
