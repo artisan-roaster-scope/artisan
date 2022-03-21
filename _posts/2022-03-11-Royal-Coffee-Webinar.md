@@ -10,6 +10,7 @@ date: 2022-03-11
 last_modified_at: 2022-02-25
 categories:
   - event
+  - webinar
 tags: 
   - artisan
 link: https://events.royalcoffee.com/navigating_artisan

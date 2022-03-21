@@ -9,6 +9,7 @@ author: Marko Luther
 date: 2022-03-17
 categories:
   - event
+  - webinar
 tags: 
   - normroast
 link: https://www.probat.com/events/detail/show/das-norm-roast-protokoll_276/
