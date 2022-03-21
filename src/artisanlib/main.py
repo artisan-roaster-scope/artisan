@@ -4624,6 +4624,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.message_dlg.update()
 
                 #check quantified events; do this before the canvas is redraw as additional annotations might be added here, but do not recursively call updategraphics
+                # NOTE: that EventRecordAction has to be called from outside the critical section protected by the profileDataSemaphore as it is itself accessing this section!!
                 for el in self.quantifiedEvent:
                     try:
                         aw.moveslider(el[0],el[1])
@@ -11786,12 +11787,9 @@ class tgraphcanvas(FigureCanvas):
 
     def OffRecorder(self, autosave=True):
         try:
-            # mark DROP if not yet set, at least 7min roast time and and either autoDROP is active or DROP button is hidden
-            if self.timeindex[6] == 0 and (self.autoDropFlag or not self.buttonvisibility[6]):
-                if aw.qmc.timeindex[0] != -1:
-                    start = aw.qmc.timex[aw.qmc.timeindex[0]]
-                else:
-                    start = 0
+            # mark DROP if not yet set, at least 7min roast time and CHARGE is set and either autoDROP is active or DROP button is hidden
+            if self.timeindex[6] == 0 and aw.qmc.timeindex[0] != -1 and (self.autoDropFlag or not self.buttonvisibility[6]):
+                start = aw.qmc.timex[aw.qmc.timeindex[0]]
                 if (len(self.timex)>0 and self.timex[-1] - start) > 7*60: # only after 7min into the roast
                     self.markDrop()
             aw.enableSaveActions()
@@ -12685,7 +12683,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]],d)
                             elif self.timeindex[1]:
                                 self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
-                            self.l_annotations += self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],self.ystep_up,self.ystep_down,draggable_anno_key=6)
+                            self.l_annotations += self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],19,19,draggable_anno_key=6)
                             #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                             self.updateBackground() # but we need
     
