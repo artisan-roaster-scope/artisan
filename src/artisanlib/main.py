@@ -16722,6 +16722,7 @@ class ApplicationWindow(QMainWindow):
     sendnotificationMessageSignal = pyqtSignal(str,str,NotificationType)
     updateSubscriptionSignal = pyqtSignal(str)
     updateLimitsSignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int
+    updatePlaybackIndicatorSignal = pyqtSignal()
     
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
@@ -19189,6 +19190,7 @@ class ApplicationWindow(QMainWindow):
         self.sendnotificationMessageSignal.connect(self.sendNotificationMessage)
         self.updateSubscriptionSignal.connect(self.updateSubscription)
         self.updateLimitsSignal.connect(self.updateLimits)
+        self.updatePlaybackIndicatorSignal.connect(self.updatePlaybackIndicator)
         
         self.notificationManager = None
         if not app.artisanviewerMode:
@@ -23891,6 +23893,7 @@ class ApplicationWindow(QMainWindow):
                                         aw.qmc.replayType = 2
                                         aw.qmc.backgroundPlaybackEvents = True
                                         aw.sendmessage(QApplication.translate("Message","playback by ET"))
+                                    self.updatePlaybackIndicatorSignal.emit()
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # openProperties : open Roast Properties dialog
@@ -25354,12 +25357,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.backgroundShowFullflag = not self.qmc.backgroundShowFullflag
         self.qmc.redraw(recomputeAllDeltas=False)
     
-    def togglePlabackEvents(self):
-        self.qmc.backgroundPlaybackEvents = not self.qmc.backgroundPlaybackEvents
-        if self.qmc.backgroundPlaybackEvents:
-            self.sendmessage(QApplication.translate("ComboBox","Playback ON"))
-        else:
-            self.sendmessage(QApplication.translate("ComboBox","Playback OFF"))
+    def updatePlaybackIndicator(self):
         if self.qmc.l_subtitle is not None:
             if self.qmc.backgroundprofile and self.qmc.backgroundPlaybackEvents:
                 self.qmc.l_subtitle.set_color(self.qmc.palette["title_focus"])
@@ -25369,6 +25367,14 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ax.figure.canvas.blit()
             self.qmc.ax.figure.canvas.flush_events()
             self.qmc.ax_background = None
+    
+    def togglePlaybackEvents(self):
+        self.qmc.backgroundPlaybackEvents = not self.qmc.backgroundPlaybackEvents
+        if self.qmc.backgroundPlaybackEvents:
+            self.sendmessage(QApplication.translate("ComboBox","Playback ON"))
+        else:
+            self.sendmessage(QApplication.translate("ComboBox","Playback OFF"))
+        self.updatePlaybackIndicatorSignal.emit()
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
     def keyPressEvent(self,event):
@@ -25395,7 +25401,7 @@ class ApplicationWindow(QMainWindow):
                 elif self.buttonpalette_shortcuts and control_modifier and k in numberkeys: # palette switch via SHIFT-NUM-Keys
                     self.setbuttonsfrom(numberkeys.index(k))
                 elif k == 74:                       #J (toggle Playback Events)
-                    self.togglePlabackEvents()
+                    self.togglePlaybackEvents()
                 elif k == 73:                       #I (toggle foreground showfull flag)
                     self.toggleForegroundShowfullFlag()
                 elif k == 79:                       #O (toggle background showfull flag)
