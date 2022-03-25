@@ -16642,7 +16642,8 @@ class SampleThread(QThread):
             aw.qmc.flagsampling = False # we signal that we are done with sampling
             aw.qmc.flagsamplingthreadrunning = False
             if sys.platform.startswith("darwin"):
-                del pool # pylint: disable=E0602 (undefined variable)
+                # disable undefined variable warning:
+                del pool # pylint: disable=E0602
 
 
 #########################################################################################################
