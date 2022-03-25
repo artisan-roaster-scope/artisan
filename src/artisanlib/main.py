@@ -16596,7 +16596,6 @@ class SampleThread(QThread):
     def run(self):
         try:
             aw.qmc.flagsamplingthreadrunning = True
-            pool = None
             if sys.platform.startswith("darwin"):
                 from Foundation import NSAutoreleasePool  # @UnresolvedImport  # pylint: disable=import-error
                 pool = NSAutoreleasePool.alloc().init()  # @UndefinedVariable # pylint: disable=maybe-no-member
@@ -16642,7 +16641,8 @@ class SampleThread(QThread):
         finally:
             aw.qmc.flagsampling = False # we signal that we are done with sampling
             aw.qmc.flagsamplingthreadrunning = False
-            del pool
+            if sys.platform.startswith("darwin"):
+                del pool # pylint: disable=E0602 (undefined variable)
 
 
 #########################################################################################################
