@@ -102,8 +102,8 @@ def addSyncShelve(uuid: str, modified_at, fh):
             _log.debug(
                 "DB type: %s", str(dbm.whichdb(getSyncPath()))
             )
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception as ex:  # pylint: disable=broad-except
+            _log.exception(ex)
     finally:
         fh.flush()
         os.fsync(fh.fileno())
@@ -182,8 +182,8 @@ def getSync(uuid):
                     except Exception:  # pylint: disable=broad-except
                         _log.debug(" -> sync:getSync = None")
                         return None
-            except Exception as e:  # pylint: disable=broad-except
-                _log.exception(e)
+            except Exception as ex:  # pylint: disable=broad-except
+                _log.exception(ex)
                 return None
             finally:
                 fh.flush()
@@ -224,8 +224,8 @@ def delSync(uuid):
             try:
                 with shelve.open(getSyncPath()) as db:
                     del db[uuid]
-            except Exception as e:  # pylint: disable=broad-except
-                _log.exception(e)
+            except Exception as ex:  # pylint: disable=broad-except
+                _log.exception(ex)
             finally:
                 fh.flush()
                 os.fsync(fh.fileno())

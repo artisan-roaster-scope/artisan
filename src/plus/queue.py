@@ -159,8 +159,8 @@ class Worker(QObject):
                                 controller.disconnect(
                                     remove_credentials=False, stop_queue=True
                                 )
-                        except Exception as e:  # pylint: disable=broad-except
-                            _log.exception(e)
+                        except Exception as ex:  # pylint: disable=broad-except
+                            _log.exception(ex)
                         # we don't change the iter, but retry to connect after
                         # a delay in the next iteration
                         time.sleep(config.queue_retry_delay)
@@ -189,8 +189,8 @@ class Worker(QObject):
                                         remove_credentials=False,
                                         stop_queue=False,
                                     )
-                            except Exception as e:  # pylint: disable=broad-except
-                                _log.exception(e)
+                            except Exception as ex:  # pylint: disable=broad-except
+                                _log.exception(ex)
                             iters = iters - 1
                             # we retry to connect after a delay in the next
                             # iteration

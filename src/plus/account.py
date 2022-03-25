@@ -75,8 +75,8 @@ def setAccountShelve(account_id: str, fh) -> Optional[int]:
         _log.debug(
             "DB type: %s", str(dbm.whichdb(account_cache_path))
         )
-    except Exception as e:  # pylint: disable=broad-except
-        _log.exception(e)
+    except Exception as ex:  # pylint: disable=broad-except
+        _log.exception(ex)
         try:
             # in case we couldn't open the shelve file as "shelve.open db type
             # could not be determined" remove all files name account_cache

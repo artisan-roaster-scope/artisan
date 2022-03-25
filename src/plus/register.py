@@ -87,8 +87,8 @@ def addPathShelve(uuid: str, path: str, fh) -> None:
                 "Generated db type: %s",
                 str(dbm.whichdb(uuid_cache_path)),
             )
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception as ex:  # pylint: disable=broad-except
+            _log.exception(ex)
     finally:
         fh.flush()
         os.fsync(fh.fileno())
@@ -116,8 +116,8 @@ def addPath(uuid: str, path: str) -> None:
             )
             with portalocker.Lock(uuid_cache_path_lock, timeout=0.3) as fh:
                 addPathShelve(uuid, path, fh)
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception as ex:  # pylint: disable=broad-except
+            _log.exception(ex)
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
     finally:
@@ -171,14 +171,14 @@ def getPath(uuid: str) -> Optional[str]:
                             return res_path
                         except Exception:  # pylint: disable=broad-except
                             return None
-                except Exception as e:  # pylint: disable=broad-except
-                    _log.exception(e)
+                except Exception as ex:  # pylint: disable=broad-except
+                    _log.exception(ex)
                     return None
                 finally:
                     fh.flush()
                     os.fsync(fh.fileno())
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception as ex:  # pylint: disable=broad-except
+            _log.exception(ex)
             return None
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
