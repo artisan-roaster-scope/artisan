@@ -3212,8 +3212,8 @@ class serialport():
                             libtime.sleep(.8)
                         else:
                             libtime.sleep(.5)
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
+                    except Exception as ex: # pylint: disable=broad-except
+                        _log.exception(ex)
                         #_, _, exc_tb = sys.exc_info()
                         #self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " PHIDGET1048temperature() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                         try:
@@ -3234,7 +3234,7 @@ class serialport():
                         probe1 = self.phidget1048getSensorReading(mode*2,0)
                         if self.aw.qmc.mode == "F":
                             probe1 = fromCtoF(probe1)
-                    except PhidgetException as e:
+                    except PhidgetException:
                         pass  # the value might be still unknown. This can happen right after attach.
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
@@ -3242,7 +3242,7 @@ class serialport():
                         probe2 = self.phidget1048getSensorReading(mode*2 + 1,1)
                         if self.aw.qmc.mode == "F":
                             probe2 = fromCtoF(probe2)
-                    except PhidgetException as e:
+                    except PhidgetException:
                         pass  # the value might be still unknown. This can happen right after attach.
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
@@ -3253,7 +3253,7 @@ class serialport():
                         if self.aw.qmc.mode == "F":
                             at = fromCtoF(at)
                         return at,-1
-                    except PhidgetException as e:
+                    except PhidgetException:
                         pass  # the value might be still unknown. This can happen right after attach.
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
@@ -3529,7 +3529,7 @@ class serialport():
                         _log.exception(e)
                     try:
                         probe2 = self.phidget1046getSensorReading(mode*2+1,1)
-                    except PhidgetException as e:
+                    except PhidgetException:
                         pass  # the value might be still unknown. This can happen right after attach.
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)

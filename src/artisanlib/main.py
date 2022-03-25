@@ -126,7 +126,7 @@ try:
     from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, pyqtProperty, QSize, # @Reimport @UnresolvedImport @UnusedImport
                               qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @Reimport @UnresolvedImport @UnusedImport
-                              QRegularExpression, QDate, QUrl, QDir, Qt, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler) # @Reimport @UnresolvedImport @UnusedImport
+                              QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QEvent, QDateTime, QObject, QThread, QSemaphore, qInstallMessageHandler) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtNetwork import QLocalSocket # @Reimport @UnresolvedImport @UnusedImport
     #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
     try:
@@ -16596,6 +16596,7 @@ class SampleThread(QThread):
     def run(self):
         try:
             aw.qmc.flagsamplingthreadrunning = True
+            pool = None
             if sys.platform.startswith("darwin"):
                 from Foundation import NSAutoreleasePool  # @UnresolvedImport  # pylint: disable=import-error
                 pool = NSAutoreleasePool.alloc().init()  # @UndefinedVariable # pylint: disable=maybe-no-member
@@ -16641,8 +16642,7 @@ class SampleThread(QThread):
         finally:
             aw.qmc.flagsampling = False # we signal that we are done with sampling
             aw.qmc.flagsamplingthreadrunning = False
-            if sys.platform.startswith("darwin"):
-                del pool
+            del pool
 
 
 #########################################################################################################
@@ -27239,10 +27239,7 @@ class ApplicationWindow(QMainWindow):
             if (len(s) < 2 or len(s) > 2):
                 QMessageBox.warning(aw,QApplication.translate("Message", "Warning"),QApplication.translate("Message", "The Probat Shop Pilot Software expects files named <Name>_<Index>.xml like in Test_0.xml on import"))
 
-            try:
-                import xml.etree.cElementTree as ET
-            except ImportError:
-                import xml.etree.ElementTree as ET
+            import xml.etree.ElementTree as ET
             tree = ET.Element("recipe")
 
             charge = ET.SubElement(tree, "charge")
@@ -37303,10 +37300,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def importPilot(self,_=False):
         try:
-            try:
-                import xml.etree.cElementTree as ET
-            except ImportError:
-                import xml.etree.ElementTree as ET
+            import xml.etree.ElementTree as ET
             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import Probat Recipe"))
             if len(filename) == 0:
                 return
