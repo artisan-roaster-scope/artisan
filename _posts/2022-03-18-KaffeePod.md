@@ -23,7 +23,7 @@ Schon eine Weile erstellt der Christian entspannte Podcasts zum Thema Kaffee. Gu
 Nun hat er Marko zum Gespräch über Artisan und seine weiteren Projekte zum Thema Kaffee eingeladen.
 
 
-> <a href="https://zwcvdl.podcaster.de/kp016-artisan/" target="_blank">Kaffeepod KP016 – Artisan </a> (Probat)   
+> <a href="https://zwcvdl.podcaster.de/kp016-artisan/" target="_blank">Kaffeepod KP016 – Artisan </a>    
 Friday, Mar 18
 
 ---
