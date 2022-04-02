@@ -30259,6 +30259,9 @@ class ApplicationWindow(QMainWindow):
                 if settings.contains("plus_language"):
                     self.plus_language = settings.value("plus_language",self.plus_language)
 
+            #remember swaplcds and swapdeltalcds
+            old_swaplcds = self.qmc.swaplcds
+            old_swapdeltalcds = self.qmc.swapdeltalcds
             #restore mode
             old_mode = self.qmc.mode
             self.qmc.mode = str(settings.value("Mode",self.qmc.mode))
@@ -31807,6 +31810,21 @@ class ApplicationWindow(QMainWindow):
 
             #update individual visibility of each buttons
             self.realignbuttons()
+            
+            # swap BT/ET lcds if needed
+            if self.qmc.swaplcds != old_swaplcds:
+                tmp = QWidget()
+                tmp.setLayout(self.LCD2frame.layout())
+                self.LCD2frame.setLayout(self.LCD3frame.layout())
+                self.LCD3frame.setLayout(tmp.layout())
+                if self.largeLCDs_dialog is not None:
+                    self.largeLCDs_dialog.reLayout()            
+            # swap DeltaBT/ET lcds if needed
+            if self.qmc.swapdeltalcds != old_swapdeltalcds:
+                tmp = QWidget()
+                tmp.setLayout(self.LCD4frame.layout())
+                self.LCD4frame.setLayout(self.LCD5frame.layout())
+                self.LCD5frame.setLayout(tmp.layout())
             
             self.qmc.clearLCDs()
 
@@ -39192,19 +39210,6 @@ def main():
     # inform the user the debug logging is on
     if debugLogLevelActive():
         aw.sendmessage(QApplication.translate("Message", "debug logging ON"))
-    
-    # swap BT/ET lcds on startup
-    if aw.qmc.swaplcds:
-        tmp = QWidget()
-        tmp.setLayout(aw.LCD2frame.layout())
-        aw.LCD2frame.setLayout(aw.LCD3frame.layout())
-        aw.LCD3frame.setLayout(tmp.layout())
-    # swap DeltaBT/ET lcds on startup
-    if aw.qmc.swapdeltalcds:
-        tmp = QWidget()
-        tmp.setLayout(aw.LCD4frame.layout())
-        aw.LCD4frame.setLayout(aw.LCD5frame.layout())
-        aw.LCD5frame.setLayout(tmp.layout())
         
     aw.show()
 
