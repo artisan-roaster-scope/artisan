@@ -280,9 +280,9 @@ def getRoast() -> Dict[str, Any]:
             if "computed" in p:
                 cp = p["computed"]
                 if "det" in cp:
-                    util.addTemp2dict(cp, "det", d, "CM_ETD")
+                    util.addTempDiff2dict(cp, "det", d, "CM_ETD")
                 if "dbt" in cp:
-                    util.addTemp2dict(cp, "dbt", d, "CM_BTD")
+                    util.addTempDiff2dict(cp, "dbt", d, "CM_BTD")
                 # Energy Consumption data only added if not zero
                 util.addAllNum2dict(
                     cp,

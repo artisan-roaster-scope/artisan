@@ -126,6 +126,14 @@ def temp2C(temp: Optional[float],mode=None) -> Optional[float]:
         return fromFtoC(temp)  # @UndefinedVariable
     return temp
 
+def tempDiff2C(temp: Optional[float]) -> Optional[float]:
+    if (
+        temp is not None and config.app_window is not None and config.app_window.qmc is not None and
+            config.app_window.qmc.mode == "F"
+    ):  # @UndefinedVariable
+        return temp * 5.0/9.0  # @UndefinedVariable
+    return temp
+
 
 def RoRfromFtoC(Ffloat: Optional[float]) -> Optional[float]:
     if Ffloat in [-1, None]:
@@ -285,6 +293,11 @@ def addTemp2dict(dict_source, key_source, dict_target, key_target, mode=None):
         if temp is not None:
             dict_target[key_target] = float2floatMin(temp)
 
+def addTempDiff2dict(dict_source, key_source, dict_target, key_target):
+    if key_source in dict_source and dict_source[key_source]:
+        temp = limittemp(tempDiff2C(dict_source[key_source]))
+        if temp is not None:
+            dict_target[key_target] = float2floatMin(temp)
 
 # consumes a list of source-target pairs, or just strings used as both source
 # and target key, to be processed with add2dict
