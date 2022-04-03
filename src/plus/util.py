@@ -118,10 +118,10 @@ def fromFtoC(Ffloat: Optional[float]) -> Optional[float]:
     return (Ffloat - 32.0) * (5.0 / 9.0)
 
 
-def temp2C(temp: Optional[float]) -> Optional[float]:
+def temp2C(temp: Optional[float],mode=None) -> Optional[float]:
     if (
-        temp is not None and config.app_window is not None and config.app_window.qmc is not None and
-            config.app_window.qmc.mode == "F"
+        temp is not None and (mode == "F" or (mode is None and config.app_window is not None and config.app_window.qmc is not None and
+            config.app_window.qmc.mode == "F"))
     ):  # @UndefinedVariable
         return fromFtoC(temp)  # @UndefinedVariable
     return temp
@@ -134,10 +134,10 @@ def RoRfromFtoC(Ffloat: Optional[float]) -> Optional[float]:
     return Ffloat * (5.0 / 9.0)
 
 
-def RoRtemp2C(temp: Optional[float]) -> Optional[float]:
+def RoRtemp2C(temp: Optional[float],mode=None) -> Optional[float]:
     if (
-        temp is not None and config.app_window.qmc.mode == "F"
-    ):  # @UndefinedVariable
+        temp is not None and (mode == "F" or (mode is None and config.app_window.qmc.mode == "F"
+    ))):  # @UndefinedVariable
         return RoRfromFtoC(temp)  # @UndefinedVariable
     return temp
 
@@ -278,9 +278,10 @@ def addAllTime2dict(dict_source, dict_target, key_source_target_pairs):
         addTime2dict(dict_source, key_source, dict_target, key_target)
 
 
-def addTemp2dict(dict_source, key_source, dict_target, key_target):
+# mode indicates the temperature unit, "C" or "F", of the data if not None
+def addTemp2dict(dict_source, key_source, dict_target, key_target, mode=None):
     if key_source in dict_source and dict_source[key_source]:
-        temp = limittemp(temp2C(dict_source[key_source]))
+        temp = limittemp(temp2C(dict_source[key_source],mode))
         if temp is not None:
             dict_target[key_target] = float2floatMin(temp)
 
@@ -296,9 +297,10 @@ def addAllTemp2dict(dict_source, dict_target, key_source_target_pairs):
         addTemp2dict(dict_source, key_source, dict_target, key_target)
 
 
-def addRoRTemp2dict(dict_source, key_source, dict_target, key_target):
+# mode indicates the temperature unit, "C" or "F", of the data if not None
+def addRoRTemp2dict(dict_source, key_source, dict_target, key_target, mode=None):
     if key_source in dict_source and dict_source[key_source]:
-        temp = limittemp(RoRtemp2C(dict_source[key_source]))
+        temp = limittemp(RoRtemp2C(dict_source[key_source],mode))
         if temp is not None:
             dict_target[key_target] = float2floatMin(temp)
 

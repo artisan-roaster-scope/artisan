@@ -35,7 +35,8 @@ import logging
 _log: Final = logging.getLogger(__name__)
 
 # given a profile dictionary extract key parameters to populate a Roast element
-def getTemplate(bp: Dict[str, Any]) -> Dict[str, Any]:
+# backgrund=True if the bp is holding a background profile (ambientTemp, AUCbase not converted to current temp mode)
+def getTemplate(bp: Dict[str, Any],background=False) -> Dict[str, Any]:
     _log.debug("getTemplate()")
     d: Dict[str, Any] = {}
     try:
@@ -156,6 +157,19 @@ def getTemplate(bp: Dict[str, Any]) -> Dict[str, Any]:
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
 
+        try:
+            mode = None
+            if background and "mode" in bp:
+                # background profile data is not converted to the current temperature mode
+                mode = bp["mode"]
+            util.addTemp2dict(bp, "ambientTemp", d, "temperature", mode)
+            util.addNum2dict(
+                bp, "ambient_pressure", d, "pressure", 800, 1200, 1
+            )
+            util.addNum2dict(bp, "ambient_humidity", d, "humidity", 0, 100, 1)
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+
         if "computed" in bp:
             cp = bp["computed"]
 
@@ -186,7 +200,11 @@ def getTemplate(bp: Dict[str, Any]) -> Dict[str, Any]:
             )
 
             if "fcs_ror" in cp:
-                util.addRoRTemp2dict(cp, "fcs_ror", d, "FCs_RoR")
+                mode = None
+                if background and "mode" in bp:
+                    # background profile data is not converted to the current temperature mode
+                    mode = bp["mode"]
+                util.addRoRTemp2dict(cp, "fcs_ror", d, "FCs_RoR", mode)
 
             if "finishphasetime" in cp:
                 util.addTime2dict(cp, "finishphasetime", d, "DEV_time")
@@ -340,22 +358,13 @@ def getRoast() -> Dict[str, Any]:
             d["location"] = None
 
         try:
-            util.addTemp2dict(p, "ambientTemp", d, "temperature")
-            util.addNum2dict(
-                p, "ambient_pressure", d, "pressure", 800, 1200, 1
-            )
-            util.addNum2dict(p, "ambient_humidity", d, "humidity", 0, 100, 1)
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
-
-        try:
             util.addString2dict(p, "roastingnotes", d, "notes", 1023)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
 
         if aw.qmc.backgroundprofile:
             bp = aw.qmc.backgroundprofile
-            template = getTemplate(bp)
+            template = getTemplate(bp,background=True)
             d["template"] = template
 
         # if profile is already saved, that modification date is send along to

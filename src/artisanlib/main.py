@@ -6845,7 +6845,7 @@ class tgraphcanvas(FigureCanvas):
         aw.updateAUCLCD()
         
         # if background is loaded we move it back to its original position (after regular load):
-        if self.backgroundprofile:
+        if self.backgroundprofile is not None:
             moved = self.backgroundprofile_moved_x != 0 or self.backgroundprofile_moved_y != 0
             if self.backgroundprofile_moved_x != 0:
                 self.movebackground("left",self.backgroundprofile_moved_x)
@@ -7709,7 +7709,7 @@ class tgraphcanvas(FigureCanvas):
                 horizontalalignment="right",verticalalignment="top",
                 fontsize="x-small",
                 x=suptitleX,y=1,
-                color=(self.palette["title_focus"] if (self.backgroundprofile and self.backgroundPlaybackEvents) else self.palette["title"]))
+                color=(self.palette["title_focus"] if (self.backgroundprofile is not None and self.backgroundPlaybackEvents) else self.palette["title"]))
         try:
             self.l_subtitle.set_in_layout(False)  # remove title from tight_layout calculation
         except Exception: # pylint: disable=broad-except  # set_in_layout not available in mpl<3.x
@@ -7938,7 +7938,7 @@ class tgraphcanvas(FigureCanvas):
 
     def twoAxisMode(self):
         return (self.DeltaETflag or self.DeltaBTflag or
-                    (self.background and self.backgroundprofile and (self.DeltaETBflag or self.DeltaBTBflag)))
+                    (self.background and self.backgroundprofile is not None and (self.DeltaETBflag or self.DeltaBTBflag)))
     
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
@@ -8277,7 +8277,7 @@ class tgraphcanvas(FigureCanvas):
                     rcParams['path.sketch'] = (scale, length, randomness)
     
                     #check BACKGROUND flag
-                    if self.background and self.backgroundprofile:
+                    if self.background and self.backgroundprofile is not None:
                         if smooth:
                             # re-smooth background curves
                             tb = self.timeB
@@ -21668,7 +21668,7 @@ class ApplicationWindow(QMainWindow):
         return result
 
     # computes the similarity between BT and backgroundBT as well as ET and backgroundET
-    # known as CM
+    # known as CM (idea by Hungary roasting company Casino Mocca)
     # computes from profile DRY END as set in Phases dialog through DROP 
     # returns None in case no similarity can be computed
     # refactored to use numpy arrays.
@@ -25360,7 +25360,7 @@ class ApplicationWindow(QMainWindow):
     
     def updatePlaybackIndicator(self):
         if self.qmc.l_subtitle is not None:
-            if self.qmc.backgroundprofile and self.qmc.backgroundPlaybackEvents:
+            if self.qmc.backgroundprofile is not None and self.qmc.backgroundPlaybackEvents:
                 self.qmc.l_subtitle.set_color(self.qmc.palette["title_focus"])
             else:
                 self.qmc.l_subtitle.set_color(self.qmc.palette["title"])
@@ -38872,7 +38872,7 @@ class ApplicationWindow(QMainWindow):
                             t2 = aw.qmc.timex[aw.qmc.timeindex[6]]
                             aw.qmc.timeindexB[6] = max(0,aw.qmc.backgroundtime2index(t2))
                         aw.qmc.background = True
-                        aw.qmc.backgroundprofile = True
+                        aw.qmc.backgroundprofile = {}
                         aw.qmc.backgroundprofile_moved_x = 0
                         aw.qmc.backgroundprofile_moved_y = 0
                         if doDraw:
