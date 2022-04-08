@@ -469,7 +469,6 @@ if sys.platform.startswith("linux"):
 #        pass
 app = Artisan(app_args)
 
-
 # On the first run if there are legacy settings under "YourQuest" but no new settings under "artisan-scope" then the legacy settings
 # will be copied to the new settings location. Once settings exist under "artisan-scope" the legacy settings under "YourQuest" will
 # no longer be read or saved.  At start-up, versions of Artisan before to v2.0 will no longer share settings with versions v2.0 and after.
@@ -533,7 +532,10 @@ try:
         conf = yaml_load(logging_conf)
         try:
             # set log file to Artisan data directory
-            conf["handlers"]["file"]["filename"] = os.path.join(getDataDirectory(),"artisan.log")
+            if app.artisanviewerMode:
+                conf["handlers"]["file"]["filename"] = os.path.join(getDataDirectory(),"artisanViewer.log")
+            else:
+                conf["handlers"]["file"]["filename"] = os.path.join(getDataDirectory(),"artisan.log")
         except Exception:
             pass
         logging.config.dictConfig(conf)
@@ -735,7 +737,7 @@ class tgraphcanvas(FigureCanvas):
         'organization_setup', 'operator_setup', 'roastertype_setup', 'roastersize_setup', 'roasterheating_setup', 'drumspeed_setup', 'machinesetup_energy_ratings',
         'machinesetup', 'roastingnotes', 'cuppingnotes', 'roastdate', 'roastepoch', 'lastroastepoch', 'batchcounter', 'batchsequence', 'batchprefix', 'neverUpdateBatchCounter', 
         'roastbatchnr', 'roastbatchprefix', 'roastbatchpos', 'roasttzoffset', 'roastUUID', 'plus_default_store', 'plus_store', 'plus_store_label', 'plus_coffee',
-        'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_custom_blend', 'plus_sync_record_hash', 'beans', 'projectFlag', 'curveVisibilityCache', 'ETcurve', 'BTcurve',
+        'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_custom_blend', 'plus_sync_record_hash', 'plus_file_last_modified', 'beans', 'projectFlag', 'curveVisibilityCache', 'ETcurve', 'BTcurve',
         'ETlcd', 'BTlcd', 'swaplcds', 'LCDdecimalplaces', 'foregroundShowFullflag', 'DeltaETflag', 'DeltaBTflag', 'DeltaETlcdflag', 'DeltaBTlcdflag', 
         'swapdeltalcds', 'PIDbuttonflag', 'Controlbuttonflag', 'deltaETfilter', 'deltaBTfilter', 'curvefilter', 'deltaETspan', 'deltaBTspan',
         'deltaETsamples', 'deltaBTsamples', 'profile_sampling_interval', 'background_profile_sampling_interval', 'profile_meter', 'optimalSmoothing', 'polyfitRoRcalc',
@@ -1748,6 +1750,9 @@ class tgraphcanvas(FigureCanvas):
         self.plus_blend_label = None # holds the plus selected label of the selected blend of the current profile or None
         self.plus_custom_blend = None # holds the one custom blend, an instance of plus.blend.Blend, or None
         self.plus_sync_record_hash = None
+        self.plus_file_last_modified = None # holds the last_modified timestamp of the loaded profile as EPOCH (float incl. milliseconds as returned by time.time())
+             # plus_file_last_modified is set on load, reset on RESET, and updated on save. It is also update, if not None and new data is received from the server (sync:applyServerUpdates)
+             # this timestamp is used in sync:fetchServerUpdate to ask server for updated data
 
         self.beans = ""
 
@@ -3667,7 +3672,7 @@ class tgraphcanvas(FigureCanvas):
         tx = []
         temp = []
         for i in range(len(temp_in)):
-            if temp_in[i] not in [None, -1, numpy.NaN]:
+            if temp_in[i] not in [None, -1] and not numpy.isnan(temp_in[i]):
                 tx.append(tx_in[i])
                 temp.append(temp_in[i])
         if len(temp) == 0:
@@ -4408,7 +4413,7 @@ class tgraphcanvas(FigureCanvas):
             ## ET LCD:
             etstr = resLCD
             try: # if temp1 is None, which should never be the case, this fails
-                if temp1 and idx is not None and idx < len(temp1) and temp1[idx] not in [None, -1, numpy.NaN]:
+                if temp1 and idx is not None and idx < len(temp1) and temp1[idx] not in [None, -1] and not numpy.isnan(temp1[idx]):
                     if -100 < temp1[idx] < 1000:
                         etstr = lcdformat%temp1[idx]
                     elif self.LCDdecimalplaces and -10000 < temp1[idx] < 100000:
@@ -4420,7 +4425,7 @@ class tgraphcanvas(FigureCanvas):
             ## BT LCD:
             btstr = resLCD
             try:
-                if temp2 and idx is not None and idx < len(temp2) and temp2[idx] not in [None, -1, numpy.NaN]:
+                if temp2 and idx is not None and idx < len(temp2) and temp2[idx] not in [None, -1] and not numpy.isnan(temp2[idx]):
                     if -100 < temp2[idx] < 1000:
                         btstr = lcdformat%temp2[idx]            # BT
                     elif self.LCDdecimalplaces and -10000 < temp2[idx] < 100000:
@@ -4433,13 +4438,13 @@ class tgraphcanvas(FigureCanvas):
             deltaetstr = resLCD
             deltabtstr = resLCD
             try:
-                if delta1 and idx is not None and idx < len(delta1) and delta1[idx] not in [None, -1, numpy.NaN]:
+                if delta1 and idx is not None and idx < len(delta1) and delta1[idx] not in [None, -1] and not numpy.isnan(delta1[idx]):
                     if -100 < delta1[idx] < 1000:
                         deltaetstr = lcdformat%delta1[idx]        # rate of change ET (degress per minute)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             try:
-                if delta2 and idx is not None and idx < len(delta2) and delta2[idx] not in [None, -1, numpy.NaN]:
+                if delta2 and idx is not None and idx < len(delta2) and delta2[idx] not in [None, -1] and not numpy.isnan(delta2[idx]):
                     if -100 < delta2[idx] < 1000:
                         deltabtstr = lcdformat%delta2[idx]        # rate of change BT (degrees per minute)
             except Exception as e: # pylint: disable=broad-except
@@ -4456,7 +4461,7 @@ class tgraphcanvas(FigureCanvas):
                 if aw.ser.showFujiLCDs and self.device in (0, 26):
                     pidsvstr = resLCD
                     piddutystr = resLCD
-                    if PID_SV not in [None, -1, numpy.NaN] and PID_DUTY not in [None, -1, numpy.NaN]:
+                    if PID_SV not in [None, -1] and not numpy.isnan(PID_SV) and PID_DUTY not in [None, -1] and not numpy.isnan(PID_DUTY):
                         pidsvstr = lcdformat%PID_SV
                         piddutystr = lcdformat%PID_DUTY
                     aw.lcd6.display(pidsvstr)
@@ -5459,7 +5464,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.projectionmode == 0 or (self.projectionmode == 1 and (self.timex[-1]-charge)<=60*5): # linear temperature projection mode based on current RoR
                     #calculate the temperature endpoint at endofx acording to the latest rate of change
                     if self.l_BTprojection is not None:
-                        if self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and self.unfiltereddelta2_pure[-1] is not None and len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1, numpy.NaN]:
+                        if self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and self.unfiltereddelta2_pure[-1] is not None and len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1] and not numpy.isnan(self.ctemp2[-1]):
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left, xlim_right + charge) # never have the right point be left of left;)
@@ -5469,7 +5474,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             self.l_BTprojection.set_data([],[])
                     if self.l_ETprojection is not None:
-                        if self.ETcurve and len(self.unfiltereddelta1_pure) > 0 and self.unfiltereddelta1_pure[-1] is not None and len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1, numpy.NaN]:
+                        if self.ETcurve and len(self.unfiltereddelta1_pure) > 0 and self.unfiltereddelta1_pure[-1] is not None and len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1] and not numpy.isnan(self.ctemp1[-1]):
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left,xlim_right + charge) # never have the right point be left of left;)
@@ -5489,7 +5494,7 @@ class tgraphcanvas(FigureCanvas):
                     
                     # NOTE: we use the unfiltered deltas here to make this work also with a delta symbolic formula like x/2 to render RoR in C/30sec
                     if self.l_BTprojection is not None:
-                        if (len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1, numpy.NaN] and
+                        if (len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1] and not numpy.isnan(self.ctemp2[-1]) and
                                 len(self.unfiltereddelta2_pure)>delta_interval_BT and 
                                 self.unfiltereddelta2_pure[-1] and 
                                 self.unfiltereddelta2_pure[-1]>0 and 
@@ -5512,7 +5517,7 @@ class tgraphcanvas(FigureCanvas):
                             self.l_BTprojection.set_data([],[])
 
                     if self.l_ETprojection is not None:
-                        if (len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1, numpy.NaN] and
+                        if (len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1] and not numpy.isnan(self.ctemp1[-1]) and
                                 len(self.unfiltereddelta1_pure)>delta_interval_BT and 
                                 self.unfiltereddelta1_pure[-1] and 
                                 self.unfiltereddelta1_pure[-1]>0 and 
@@ -5587,7 +5592,7 @@ class tgraphcanvas(FigureCanvas):
 #                    # Every roaster will have a different constantN (self.projectionconstant).
 #                    
 #                    if self.l_BTprojection is not None:
-#                        if len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1, numpy.NaN] and len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1, numpy.NaN]:
+#                        if len(self.ctemp2) > 0 and self.ctemp2[-1] not in [None, -1] and not numpy.isnan(self.ctemp2[-1]) and len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1] and  not numpy.isnan(self.ctemp1[-1]):
 #                            den = self.ctemp1[-1] - self.ctemp2[-1]  #denominator ETn - BTn
 #                            if den > 0 and len(self.delta2)>0 and self.delta2[-1]: # if ETn > BTn
 #                                starttime = self.timex[self.timeindex[0]]
@@ -5605,7 +5610,7 @@ class tgraphcanvas(FigureCanvas):
 #                        else:
 #                            self.l_BTprojection.set_data([],[])
 #                    if self.l_ETprojection is not None:
-#                        if len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1, numpy.NaN]:
+#                        if len(self.ctemp1) > 0 and self.ctemp1[-1] not in [None, -1] and not numpy.isnan(self.ctemp1[-1]):
 #                            starttime = self.timex[self.timeindex[0]]
 #                            self.l_ETprojection.set_data([self.timex[-1],self.endofx + starttime], [self.ctemp1[-1], self.ctemp1[-1]])
 #                        else:
@@ -6643,6 +6648,10 @@ class tgraphcanvas(FigureCanvas):
             # (eg. after a change of the event value by button or slider actions)
             aw.block_quantification_sampling_ticks = [0,0,0,0]
             #aw.extraeventsactionslastvalue = [None,None,None,None] # used by +-% event buttons in ON mode when no event was registered yet
+
+            # reset plus sync
+            self.plus_sync_record_hash = None
+            self.plus_file_last_modified = None
 
             # if we are in KeepON mode, the reset triggered by ON should resepect the roastpropertiesflag ("Delete Properties on Reset")
             if self.roastpropertiesflag and (self.flagKeepON or not keepProperties):
@@ -13436,8 +13445,16 @@ class tgraphcanvas(FigureCanvas):
 
                     #curveSimilarity
                     det,dbt = aw.curveSimilarity() # we analyze from DRY-END as specified in the phases dialog to DROP
-
+                    
                     #end temperature
+                    if det in [None, -1] or numpy.isnan(det):
+                        det_txt = "––"
+                    else:
+                        det_txt = "%.1f" % det
+                    if dbt in [None, -1] or numpy.isnan(dbt):
+                        dbt_txt = "––"
+                    else:
+                        dbt_txt = "%.1f" % dbt
                     if self.locale_str == "ar":
                         strline = (
                                     f'C*min{int(tsb)}={aw.arabicReshape(QApplication.translate("Label", "AUC"))}   '
@@ -13446,7 +13463,7 @@ class tgraphcanvas(FigureCanvas):
                                     f'{ETmax}=aw.arabicReshape(QApplication.translate("Label", "MET"))'
                                    )
                         if det is not None:
-                            strline = ("%.1f/%.1f" % (det,dbt)) + self.mode + "=" + QApplication.translate("Label", "CM") + " " + strline
+                            strline = ("%s/%s" % (det_txt,dbt_txt)) + self.mode + "=" + QApplication.translate("Label", "CM") + " " + strline
                         if FCperiod is not None:
                             strline = "min%s=" % FCperiod + QApplication.translate("Label", "FC") + "   " + strline
                     else:
@@ -13458,8 +13475,8 @@ class tgraphcanvas(FigureCanvas):
                                     + QApplication.translate("Label", "AUC") + "={1}C*min") \
                                     .format(str(ror), \
                                     str(int(tsb)))
-                        if det is not None:
-                            strline = strline + "   " + QApplication.translate("Label", "CM") + ("=%.1f/%.1f" % (det,dbt)) + self.mode
+                        if det is not None or dbt is not None:
+                            strline = strline + "   " + QApplication.translate("Label", "CM") + ("=%s/%s" % (det_txt,dbt_txt)) + self.mode
                         if FCperiod is not None:
                             strline = strline + "   " + QApplication.translate("Label", "FC") + "=%smin" % FCperiod
                     self.set_xlabel(strline)
@@ -16373,7 +16390,6 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         if modifiers in [(Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ControlModifier), (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier)]:
             # ALT+CTR-CLICK (OPTION+COMMAND on macOS) toggles  or alternatively ALT-SHIFT-CLICK
             # toggle debug logging
-            # first get all module loggers
             debug_level = debugLogLevelToggle()
             aw.sendmessage(
                 (
@@ -19374,22 +19390,22 @@ class ApplicationWindow(QMainWindow):
             )
         )
         try:
-            log_file_name = "artisan.log"
-            with open(os.path.join(getDataDirectory(),log_file_name), "rb") as attachment:
-                # Add file as application/octet-stream
-                # Email client can usually download this automatically
-                # as attachment
-                part = MIMEBase("application", "octet-stream")
-                part.set_payload(attachment.read())
-            # Encode file in ASCII characters to send by email
-            encoders.encode_base64(part)
-            # Add header as key/value pair to attachment part
-            part.add_header(
-                "Content-Disposition",
-                "attachment; filename= {}".format(log_file_name),
-            )
-            # Add attachment to message and convert message to string
-            message.attach(part)
+            for log_file_name in ["artisan.log", "artisanViewer.log"]:
+                with open(os.path.join(getDataDirectory(),log_file_name), "rb") as attachment:
+                    # Add file as application/octet-stream
+                    # Email client can usually download this automatically
+                    # as attachment
+                    part = MIMEBase("application", "octet-stream")
+                    part.set_payload(attachment.read())
+                # Encode file in ASCII characters to send by email
+                encoders.encode_base64(part)
+                # Add header as key/value pair to attachment part
+                part.add_header(
+                    "Content-Disposition",
+                    "attachment; filename= {}".format(log_file_name),
+                )
+                # Add attachment to message and convert message to string
+                message.attach(part)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         try:
@@ -21709,7 +21725,7 @@ class ApplicationWindow(QMainWindow):
                 rev_dry_idx = numpy.argmin(numpy.sign(rev_np_bt[rev_drop_idx:rev_min_idx] - BTlimit))
 
                 # Flip the index to forward looking
-                dry_idx = len_bt - (rev_drop_idx + rev_dry_idx) 
+                dry_idx = len_bt - (rev_drop_idx + rev_dry_idx)
 
                 # set start and end indexes
                 start = dry_idx
@@ -21738,6 +21754,11 @@ class ApplicationWindow(QMainWindow):
 
                 det = numpy.sqrt(numpy.mean(numpy.square(np_et - interp_np_etb)))
                 dbt = numpy.sqrt(numpy.mean(numpy.square(np_bt - interp_np_btb)))
+
+                if numpy.isnan(det):
+                    det = None
+                if numpy.isnan(dbt):
+                    dbt = None
 
                 return det,dbt
 
@@ -26502,6 +26523,8 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(message)
                 _log.info("profile loaded: %s", filename)
 
+                # update plus data set modification date
+                self.qmc.plus_file_last_modified = plus.util.getModificationDate(filename)
                 if aw is not None:
                     aw.updatePlusStatus()
                     if aw.plus_account is not None:
@@ -29766,6 +29789,9 @@ class ApplicationWindow(QMainWindow):
                         self.setCurrentFile(filename)
                         aw.curFile = filename
                         self.qmc.fileCleanSignal.emit()
+                    
+                    # update plus data set modification date
+                    self.qmc.plus_file_last_modified = plus.util.getModificationDate(filename)
 
                     if self.qmc.autosaveimage:
                         #

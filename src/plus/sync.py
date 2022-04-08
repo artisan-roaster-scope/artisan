@@ -35,6 +35,7 @@ from pathlib import Path
 from artisanlib.util import getDirectory
 from plus import config, util, connection, controller, roast
 import os
+import time
 import logging
 try:
     from typing import Final
@@ -659,13 +660,13 @@ def fetchServerUpdate(uuid: str, file=None):
         )
         last_modified = ""
         if file is not None:
-            file_last_modified = util.getModificationDate(file)
-            # if file modification data is newer than what we have in our sync
-            # cache (as the file was externally modified),
-            # we update our sync cache
-        #   DON'T UPDATE the sync cache timestamp here as the changes might not
-        # have been submitted to the server yet
-        #            addSync(uuid,file_last_modified)
+            #file_last_modified = util.getModificationDate(file)
+            # we now use the timestamp as set on loading the file and not of the file itself as the file might have been
+            # modified, eg. by another Artisan instance, since this instance loaded it
+            # the variable aw.qmc.plus_file_last_modified keeps the timestamp of the data loaded into this instance
+            file_last_modified = aw.qmc.plus_file_last_modified
+            # DON'T UPDATE the sync cache timestamp here as the changes might not
+            # have been submitted to the server yet
         else:
             file_last_modified = None
 
@@ -743,6 +744,9 @@ def fetchServerUpdate(uuid: str, file=None):
                     > file_last_modified
                 ):
                     applyServerUpdates(r)
+                    if aw.qmc.plus_file_last_modified is not None:
+                        # we update the loaded profile timestamp to avoid receiving the same update again
+                        aw.qmc.plus_file_last_modified = time.time()
                 else:
                     _log.debug(
                         "-> data received from server was older!?"

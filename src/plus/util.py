@@ -46,6 +46,7 @@ import datetime
 import dateutil.parser
 import logging
 import os
+import numpy
 
 
 _log: Final = logging.getLogger(__name__)
@@ -112,7 +113,7 @@ def extractInfo(res, attr: str, default):
 
 
 def fromFtoC(Ffloat: Optional[float]) -> Optional[float]:
-    if Ffloat in [-1, None]:
+    if Ffloat in [-1, None] or numpy.isnan(Ffloat):
         return Ffloat
     assert Ffloat is not None
     return (Ffloat - 32.0) * (5.0 / 9.0)
@@ -131,12 +132,14 @@ def tempDiff2C(temp: Optional[float]) -> Optional[float]:
         temp is not None and config.app_window is not None and config.app_window.qmc is not None and
             config.app_window.qmc.mode == "F"
     ):  # @UndefinedVariable
+        if temp in [-1, None] or numpy.isnan(temp):
+            return temp
         return temp * 5.0/9.0  # @UndefinedVariable
     return temp
 
 
 def RoRfromFtoC(Ffloat: Optional[float]) -> Optional[float]:
-    if Ffloat in [-1, None]:
+    if Ffloat in [-1, None] or numpy.isnan(Ffloat):
         return Ffloat
     assert Ffloat is not None
     return Ffloat * (5.0 / 9.0)
@@ -181,7 +184,7 @@ def limitnum(
 # Prepare temperature in C to the interval [-50,1000] for sending
 # for numbers out of range None is returned
 def limittemp(temp: Optional[float]) -> Optional[float]:
-    if temp is None or temp > 1000 or temp < -50:
+    if temp is None or numpy.isnan(temp) or temp > 1000 or temp < -50:
         return None
     return temp
 
@@ -189,7 +192,7 @@ def limittemp(temp: Optional[float]) -> Optional[float]:
 # Prepare time in s to the interval [0,3600] for sending
 # for numbers out of range None is returned
 def limittime(tx: Optional[float]) -> Optional[float]:
-    if tx is None or tx > 3600 or tx < 0:
+    if tx is None or numpy.isnan(tx) or  tx > 3600 or tx < 0:
         return None
     return tx
 
@@ -290,13 +293,13 @@ def addAllTime2dict(dict_source, dict_target, key_source_target_pairs):
 def addTemp2dict(dict_source, key_source, dict_target, key_target, mode=None):
     if key_source in dict_source and dict_source[key_source]:
         temp = limittemp(temp2C(dict_source[key_source],mode))
-        if temp is not None:
+        if temp is not None and temp != -1 and not numpy.isnan(temp):
             dict_target[key_target] = float2floatMin(temp)
 
 def addTempDiff2dict(dict_source, key_source, dict_target, key_target):
     if key_source in dict_source and dict_source[key_source]:
         temp = limittemp(tempDiff2C(dict_source[key_source]))
-        if temp is not None:
+        if temp is not None and temp != -1 and not numpy.isnan(temp):
             dict_target[key_target] = float2floatMin(temp)
 
 # consumes a list of source-target pairs, or just strings used as both source

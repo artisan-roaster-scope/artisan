@@ -127,22 +127,22 @@ def stringtoseconds(string):
     return seconds    #return negative number
 
 def fromFtoC(Ffloat):
-    if Ffloat in [-1,None,numpy.nan]:
+    if Ffloat in [-1,None] or numpy.isnan(Ffloat):
         return Ffloat
     return (Ffloat-32.0)*(5.0/9.0)
 
 def fromCtoF(Cfloat):
-    if Cfloat in [-1,None,numpy.nan]:
+    if Cfloat in [-1,None] or numpy.isnan(Cfloat):
         return Cfloat
     return (Cfloat*9.0/5.0)+32.0
         
 def RoRfromCtoF(CRoR):
-    if CRoR in [-1,None,numpy.nan]:
+    if CRoR in [-1,None] or numpy.isnan(CRoR):
         return CRoR
     return (CRoR*9.0/5.0)
 
 def RoRfromFtoC(FRoR):
-    if FRoR in [-1,None,numpy.nan]:
+    if FRoR in [-1,None] or numpy.isnan(FRoR):
         return FRoR
     return FRoR*(5.0/9.0)
 

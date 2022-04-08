@@ -46,7 +46,7 @@ import logging
 
 _log: Final = logging.getLogger(__name__)
 
-queue_path = getDirectory(config.outbox_cache, share=True)
+queue_path = getDirectory(config.outbox_cache, share=False)
 
 app = QCoreApplication.instance()
 
@@ -237,44 +237,43 @@ def processReply(rlimit:float, rused:float, pu:str, notifications:int, machines:
         pass
 
 def start():
-    if app.artisanviewerMode:
-        _log.info(
-            "start(): queue not started in ArtisanViewer mode"
+#    if app.artisanviewerMode:
+#        _log.info(
+#            "start(): queue not started in ArtisanViewer mode"
+#        )
+#        return
+    global queue  # pylint: disable=global-statement
+    global worker, worker_thread  # pylint: disable=global-statement
+    
+    if queue is None:
+        # we initialize the queue
+        import persistqueue
+        queue = persistqueue.SQLiteQueue(
+            queue_path, multithreading=True, auto_commit=False
         )
-    else:
-        global queue  # pylint: disable=global-statement
-        global worker, worker_thread  # pylint: disable=global-statement
-        
-        if queue is None:
-            # we initialize the queue
-            import persistqueue
-            queue = persistqueue.SQLiteQueue(
-                queue_path, multithreading=True, auto_commit=False
-            )
-            # we keep items in the queue if not explicit marked as task_done:
-            # auto_commit=False
+        # we keep items in the queue if not explicit marked as task_done:
+        # auto_commit=False
 
-        
-        _log.info("start()")
-        _log.debug("-> qsize: %s", queue.qsize())
-        if worker_thread is None:
-            worker = Worker()
-            worker_thread = QThread()
-            worker_thread.start()
-            worker.moveToThread(worker_thread)
-            worker.startSignal.connect(worker.task)
-            worker.replySignal.connect(util.updateLimits)
-#            app.aboutToQuit.connect(end)
-            worker.startSignal.emit()
-        else:
-            worker.resume()
+    
+    _log.info("start()")
+    _log.debug("-> qsize: %s", queue.qsize())
+    if worker_thread is None:
+        worker = Worker()
+        worker_thread = QThread()
+        worker_thread.start()
+        worker.moveToThread(worker_thread)
+        worker.startSignal.connect(worker.task)
+        worker.replySignal.connect(util.updateLimits)
+        #app.aboutToQuit.connect(end)
+        worker.startSignal.emit()
+    else:
+        worker.resume()
 
 
 # the queue worker thread cannot really be stopped, but we can pause it
 def stop():
-    if not app.artisanviewerMode:
-        if worker is not None:
-            worker.pause()
+    if worker is not None:
+        worker.pause()
 
 
 # check if a full roast record (one with date) with roast_id is in the queue
@@ -324,6 +323,11 @@ def addRoast(roast_record=None):
             _log.info(
                 ("-> roast not queued as users"
                  " account access is readonly")
+            )
+        elif queue is None:
+            _log.info(
+                ("-> roast not queued as queue"
+                 " is not running")
             )
         else:
             if roast_record is None:
