@@ -9897,28 +9897,39 @@ class tgraphcanvas(FigureCanvas):
                     delta2 = str(aw.float2float(self.delta2B[self.backgroundEvents[eventnum]])) if self.delta2B[self.backgroundEvents[eventnum]] != None else "--"
                 except Exception: # pylint: disable=broad-except
                     delta2 = "\u03C5\u03c5"
-                descr = self.backgroundEStrings[eventnum]
-                etype = self.Betypes[self.backgroundEtypes[eventnum]]
-                sliderunit = aw.eventsliderunits[self.backgroundEtypes[eventnum]]
+                descr = str(self.backgroundEStrings[eventnum])
+                etype = str(self.Betypes[self.backgroundEtypes[eventnum]])
+                sliderunit = str(aw.eventsliderunits[self.backgroundEtypes[eventnum]])
 
                 if self.timeindexB[2] > 0 and self.timeB[self.backgroundEvents[eventnum]] > self.timeB[self.timeindexB[2]]:
                     postFCs = True
-                    dtr = aw.float2float(100 * (self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[2]]) / (self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[0]]),1)
+                    dtr = str(aw.float2float(100 * (self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[2]]) / (self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[0]]),1))
                 else:
                     postFCs = False
-                    dtr = 0
+                    dtr = "0"
                 if self.timeindexB[2] > 0:
-                    dfcs = aw.float2float(self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[2]],0)
+                    _dfcs = aw.float2float(self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[2]],0)
+                    dfcs = str(_dfcs)
+                    dfcs_ms = stringfromseconds(_dfcs,False)
                 else:
                     dfcs = "*"
+                    dfcs_ms = "*"
                 if self.timeindexB[2] > 0 and self.timeB[self.backgroundEvents[eventnum]] < self.timeB[self.timeindexB[2]]:
-                    prefcs = aw.float2float(self.timeB[self.timeindexB[2]] - self.timeB[self.backgroundEvents[eventnum]],0)
+                    _prefcs = aw.float2float(self.timeB[self.timeindexB[2]] - self.timeB[self.backgroundEvents[eventnum]],0)
+                    prefcs = str(_prefcs)
+                    prefcs_ms = stringfromseconds(_prefcs,False)
                 else:
                     prefcs = '*'
-                if self.timeindexB[0] > -1 and self.timeB[self.backgroundEvents[eventnum]] > self.timeB[self.timeindexB[0]]:
-                    dcharge = aw.float2float(self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[0]],0)
+                    prefcs_ms = '*'
+#dave                if self.timeindexB[0] > -1 and self.timeB[self.backgroundEvents[eventnum]] > self.timeB[self.timeindexB[0]]:
+                if self.timeindexB[0] > -1:
+                    _dcharge = aw.float2float(self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[0]],0)
+                    dcharge = str(_dcharge)
+                    dcharge_ms = stringfromseconds(_dcharge,False)
                 else:
-                    dcharge = 0
+#dave                    dcharge = "0"
+                    dcharge = "*"
+                    dcharge_ms = "*"
                 fcsWindow = not postFCs and (self.timeB[self.timeindexB[2]] - self.timeB[self.backgroundEvents[eventnum]]) < 90
 
             # plug values for the previews
@@ -9931,17 +9942,20 @@ class tgraphcanvas(FigureCanvas):
                     e = 7.0  #60
                 else:
                     e = 6.0  #50
-                y1 = 420 if self.mode=='F' else 210
-                y2 = 340 if self.mode=='F' else 170
-                delta1 = str(18.2 if self.mode=='F' else 9.1)
-                delta2 = str(33.4 if self.mode=='F' else 16.2)
+                y1 = "420" if self.mode=='F' else "210"
+                y2 = "340" if self.mode=='F' else "170"
+                delta1 = "18.2" if self.mode=='F' else "9.1"
+                delta2 = "33.4" if self.mode=='F' else "16.2"
                 descr = "Full"
                 etype = "Air"
                 sliderunit = "kPa"
-                dcharge = 340 if self.mode=='F' else 170
-                dfcs = 47
-                prefcs = 50
-                dtr = 12
+                dcharge = "340" if self.mode=='F' else "170"
+                dcharge_ms = stringfromseconds(int(dcharge))
+                dfcs = "47"
+                dfcs_ms = stringfromseconds(int(dfcs))
+                prefcs = "50"
+                prefcs_ms = stringfromseconds(int(prefcs))
+                dtr = "12"
                 fcsWindow = not bool(postFCs)
                 #postFCs supplied in the parseSpecialeventannotation() call
 
@@ -9958,28 +9972,41 @@ class tgraphcanvas(FigureCanvas):
                     delta2 = str(aw.float2float(self.delta2[self.specialevents[eventnum]])) if self.delta2[self.specialevents[eventnum]] != None else "--"
                 except Exception: # pylint: disable=broad-except
                     delta2 = "\u03C5\u03c5"
-                descr = self.specialeventsStrings[eventnum]
-                etype = self.etypes[self.specialeventstype[eventnum]]
-                sliderunit = aw.eventsliderunits[self.specialeventstype[eventnum]]
+                descr = str(self.specialeventsStrings[eventnum])
+                etype = str(self.etypes[self.specialeventstype[eventnum]])
+                sliderunit = str(aw.eventsliderunits[self.specialeventstype[eventnum]])
 
                 if self.timeindex[2] > 0 and self.timex[self.specialevents[eventnum]] > self.timex[self.timeindex[2]]:
                     postFCs = True
-                    dtr = aw.float2float(100 * (self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[2]]) / (self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[0]]),1)
+                    dtr = str(aw.float2float(100 * (self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[2]]) / (self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[0]]),1))
                 else:
                     postFCs = False
-                    dtr = 0
-                if self.timeindex[2] > 0 and self.timex[self.specialevents[eventnum]] >= self.timex[self.timeindex[2]]:
-                    dfcs = aw.float2float(self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[2]],0)
+                    dtr = "0"
+#dave                if self.timeindex[2] > 0 and self.timex[self.specialevents[eventnum]] >= self.timex[self.timeindex[2]]:
+                if self.timeindex[2] > 0:
+                    _dfcs = aw.float2float(self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[2]],0)
+                    dfcs = str(_dfcs)
+                    dfcs_ms = stringfromseconds(_dfcs,False)
+#                    print(f'{dfcs_ms=}')
                 else:
                     dfcs = "*"
+                    dfcs_ms = "*"
                 if self.timeindex[2] > 0 and self.timex[self.specialevents[eventnum]] < self.timex[self.timeindex[2]]:
-                    prefcs = aw.float2float(self.timex[self.timeindex[2]] - self.timex[self.specialevents[eventnum]],0)
+                    _prefcs = aw.float2float(self.timex[self.timeindex[2]] - self.timex[self.specialevents[eventnum]],0)
+                    prefcs = str(_prefcs)
+                    prefcs_ms = stringfromseconds(_prefcs,False)
                 else:
                     prefcs = '*'
-                if self.timeindex[0] > -1 and self.timex[self.specialevents[eventnum]] > self.timex[self.timeindex[0]]:
-                    dcharge = aw.float2float(self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[0]],0)
+                    prefcs_ms = '*'
+#dave                if self.timeindex[0] > -1 and self.timex[self.specialevents[eventnum]] > self.timex[self.timeindex[0]]:
+                if self.timeindex[0] > -1:
+                    _dcharge = aw.float2float(self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[0]],0)
+                    dcharge = str(_dcharge)
+                    dcharge_ms = stringfromseconds(_dcharge,False)
                 else:
-                    dcharge = 0
+#dave                    dcharge = "0"
+                    dcharge = "*"
+                    dcharge_ms = "*"
                 fcsWindow = not postFCs and self.timex[self.timeindex[2]] - self.timex[self.specialevents[eventnum]] < 90
 
             # Caution - the event field "E" is position dependent and must be the first entry in the fields list
@@ -9987,13 +10014,16 @@ class tgraphcanvas(FigureCanvas):
                 ("E", str(aw.qmc.eventsInternal2ExternalValue(e))),
                 ("Y1", str(aw.float2float(y1,aw.qmc.LCDdecimalplaces))),
                 ("Y2", str(aw.float2float(y2,aw.qmc.LCDdecimalplaces))),
-                ("descr", str(descr)),
-                ("type", str(etype)),
-                ("sldrunit", str(sliderunit)),
-                ("dCHARGE", str(dcharge)),
-                ("dFCs", str(dfcs)),
-                ("preFCs", str(prefcs)),
-                ("DTR", str(dtr)),
+                ("descr", descr),
+                ("type", etype),
+                ("sldrunit", sliderunit),
+                ("dCHARGE_ms", dcharge_ms),
+                ("dFCs_ms", dfcs_ms),
+                ("dCHARGE", dcharge),
+                ("dFCs", dfcs),
+                ("preFCs_ms", prefcs_ms),
+                ("preFCs", prefcs),
+                ("DTR", dtr),
                 ("mode", self.mode),
                 ("degmode", f'\u00b0{self.mode}'),
                 ("degmin", f'\u00b0{self.mode}/min'),

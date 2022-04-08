@@ -107,10 +107,12 @@ def stringfromseconds(seconds_raw, leadingzero=True):
     if seconds >= 0:
         if leadingzero:
             return "%02d:%02d"% divmod(seconds, 60)
-        return ("%2d:%02d"% divmod(seconds, 60)).strip()
+        return ("%d:%02d"% divmod(seconds, 60))
     #usually the timex[timeindex[0]] is alreday taken away in seconds before calling stringfromseconds()
     negtime = abs(seconds)
-    return "-%02d:%02d"% divmod(negtime, 60)
+    if leadingzero:
+        return f'-{("%02d:%02d"% divmod(negtime, 60))}'
+    return f'-{("%d:%02d"% divmod(negtime, 60))}'
 
 #Converts a string into a seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
 #accepted formats: "00:00","-00:00"
