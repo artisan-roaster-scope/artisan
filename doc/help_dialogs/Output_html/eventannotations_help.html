@@ -39,22 +39,37 @@
         </tr>
         <tr>
             <td>~dCHARGE</td>
-            <td>Number of seconds since CHARGE</td>
+            <td>Number of seconds before or after CHARGE <br>Before CHARGE shows negative <br>Displays &#39;*&#39; when no CHARGE event exists</td>
             <td>522</td>
         </tr>
         <tr>
+            <td>~dCHARGE_ms</td>
+            <td>Time before or after CHARGE in min:sec <br>Before CHARGE shows negative <br>Displays &#39;*&#39; when no CHARGE event exists</td>
+            <td>8:42</td>
+        </tr>
+        <tr>
             <td>~dFCs</td>
-            <td>Number of seconds after FCs <br>Best used inside double quotes (see notes below) <br>Displays &#39;*&#39; prior to FCs</td>
+            <td>Number of seconds before or after FCs <br>Best used inside double quotes (see notes below) <br>Negative value before FCs <br>Displays &#39;*&#39; when no FCs event exists</td>
             <td>47</td>
         </tr>
         <tr>
+            <td>~dFCs_ms</td>
+            <td>Time after FCs in min:sec <br>Best used inside double quotes (see notes below) <br>Negative value before FCs <br>Displays &#39;*&#39; when no FCs event exists</td>
+            <td>1:35</td>
+        </tr>
+        <tr>
             <td>~preFCs</td>
-            <td>Number of seconds before FCs <br>Best used inside single quotes or back ticks (see notes below) <br>Displays &#39;*&#39; after FCs</td>
+            <td>Number of seconds before FCs <br>Best used inside single quotes or back ticks (see notes below) <br>Positive value only <br>Displays &#39;*&#39; after FCs or when no FCs event exists</td>
             <td>50</td>
         </tr>
         <tr>
+            <td>~preFCs_ms</td>
+            <td>Time before FCs  in min:sec <br>Best used inside single quotes or back ticks (see notes below) <br>Positive value only <br>Displays &#39;*&#39; after FCs or when no FCs event exists</td>
+            <td>1:25</td>
+        </tr>
+        <tr>
             <td>~DTR</td>
-            <td>Development time ratio. Note: DTR=0 before FCs <br>100*(t{Event}-t{FCs})/(t{FCs}-t{CHARGE})</td>
+            <td>Development time ratio (percent). Note: DTR=0 before FCs <br>100*(t{Event}-t{FCs})/(t{FCs}-t{CHARGE})</td>
             <td>12</td>
         </tr>
         <tr>
