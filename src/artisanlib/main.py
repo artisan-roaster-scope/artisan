@@ -9921,13 +9921,11 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     prefcs = '*'
                     prefcs_ms = '*'
-#dave                if self.timeindexB[0] > -1 and self.timeB[self.backgroundEvents[eventnum]] > self.timeB[self.timeindexB[0]]:
                 if self.timeindexB[0] > -1:
                     _dcharge = aw.float2float(self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[0]],0)
                     dcharge = str(_dcharge)
                     dcharge_ms = stringfromseconds(_dcharge,False)
                 else:
-#dave                    dcharge = "0"
                     dcharge = "*"
                     dcharge_ms = "*"
                 fcsWindow = not postFCs and (self.timeB[self.timeindexB[2]] - self.timeB[self.backgroundEvents[eventnum]]) < 90
@@ -9982,7 +9980,6 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     postFCs = False
                     dtr = "0"
-#dave                if self.timeindex[2] > 0 and self.timex[self.specialevents[eventnum]] >= self.timex[self.timeindex[2]]:
                 if self.timeindex[2] > 0:
                     _dfcs = aw.float2float(self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[2]],0)
                     dfcs = str(_dfcs)
@@ -9998,13 +9995,11 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     prefcs = '*'
                     prefcs_ms = '*'
-#dave                if self.timeindex[0] > -1 and self.timex[self.specialevents[eventnum]] > self.timex[self.timeindex[0]]:
                 if self.timeindex[0] > -1:
                     _dcharge = aw.float2float(self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[0]],0)
                     dcharge = str(_dcharge)
                     dcharge_ms = stringfromseconds(_dcharge,False)
                 else:
-#dave                    dcharge = "0"
                     dcharge = "*"
                     dcharge_ms = "*"
                 fcsWindow = not postFCs and self.timex[self.timeindex[2]] - self.timex[self.specialevents[eventnum]] < 90
