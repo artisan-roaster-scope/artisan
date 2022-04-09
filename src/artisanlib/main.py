@@ -21372,7 +21372,7 @@ class ApplicationWindow(QMainWindow):
     @staticmethod
     def quantifier2tempandtime(i):
         temp = None
-        if aw.qmc.flagstart:
+        if aw.qmc.flagstart or not aw.qmc.flagon:
             timex = aw.qmc.timex
         else:
             timex = aw.qmc.on_timex
