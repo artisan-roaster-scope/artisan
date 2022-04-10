@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # connection.py
 #
@@ -30,7 +29,7 @@ except Exception:
     from PyQt5.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib import __version__
-from typing import Any, Optional, Dict
+from typing import Any, Optional
 try:
     from typing import Final
 except ImportError:
@@ -86,9 +85,9 @@ def setToken(token: str, nickname: str = None) -> None:
         config.nickname = nickname
         if (
             config.app_window.qmc.operator is None
-            or config.app_window.qmc.operator == ""
+            or config.app_window.qmc.operator == ''
             and nickname is not None
-            and nickname != ""
+            and nickname != ''
         ):  # @UndefinedVariable
             config.app_window.qmc.operator = nickname
     finally:
@@ -97,7 +96,7 @@ def setToken(token: str, nickname: str = None) -> None:
 
 
 def clearCredentials(remove_from_keychain: bool = True) -> None:
-    _log.info("clearCredentials()")
+    _log.info('clearCredentials()')
     # remove credentials from keychain
     try:
         if (
@@ -106,15 +105,15 @@ def clearCredentials(remove_from_keychain: bool = True) -> None:
             and remove_from_keychain
         ):  # @UndefinedVariable
             try:
-            
-                if platform.system().startswith("Windows"):
+
+                if platform.system().startswith('Windows'):
                     import keyring.backends.Windows  # @UnusedImport
-                elif platform.system() == "Darwin":
+                elif platform.system() == 'Darwin':
                     import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
                 else:
                     import keyring.backends.SecretService  # @UnusedImport
                 import keyring  # @Reimport # imported last to make py2app work
-            
+
                 keyring.delete_password(
                     config.app_name, config.app_window.plus_account
                 )  # @UndefinedVariable
@@ -136,20 +135,20 @@ def clearCredentials(remove_from_keychain: bool = True) -> None:
 
 def setKeyring() -> None:
     try:
-        if platform.system().startswith("Windows"):
+        if platform.system().startswith('Windows'):
             import keyring.backends.Windows  # @UnusedImport
-        elif platform.system() == "Darwin":
+        elif platform.system() == 'Darwin':
             import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
         else:
             import keyring.backends.SecretService  # @UnusedImport
         import keyring  # @Reimport # imported last to make py2app work
-    
+
         # HACK set keyring backend explicitly
-        if platform.system().startswith("Windows"):
+        if platform.system().startswith('Windows'):
             keyring.set_keyring(
                 keyring.backends.Windows.WinVaultKeyring()
             )  # @UndefinedVariable
-        elif platform.system() == "Darwin":
+        elif platform.system() == 'Darwin':
             try:
                 keyring.set_keyring(keyring.backends.macOS.Keyring())
             except Exception:  # pylint: disable=broad-except
@@ -163,7 +162,7 @@ def setKeyring() -> None:
 # returns True on successful authentification
 # NOTE: authentify might be called from outside the GUI thread
 def authentify() -> bool:
-    _log.info("authentify()")
+    _log.info('authentify()')
     import requests # @Reimport
     try:
         if (
@@ -174,9 +173,9 @@ def authentify() -> bool:
             if config.passwd is None:
                 setKeyring()
                 try:
-                    if platform.system().startswith("Windows"):
+                    if platform.system().startswith('Windows'):
                         import keyring.backends.Windows  # @UnusedImport
-                    elif platform.system() == "Darwin":
+                    elif platform.system() == 'Darwin':
                         import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
                     else:
                         import keyring.backends.SecretService  # @UnusedImport
@@ -188,127 +187,125 @@ def authentify() -> bool:
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
             if config.passwd is None:
-                _log.debug("-> password not found")
+                _log.debug('-> password not found')
                 clearCredentials()
                 return False
             _log.debug(
-                "-> authentifying %s",
+                '-> authentifying %s',
                 config.app_window.plus_account,
             )  # @UndefinedVariable
             data = {
-                "email": config.app_window.plus_account,
-                "password": config.passwd,
+                'email': config.app_window.plus_account,
+                'password': config.passwd,
             }  # @UndefinedVariable
-            r = sendData(config.auth_url, data, "POST", False)
+            r = sendData(config.auth_url, data, 'POST', False)
             _log.debug(
-                "-> authentifying reply status code: %s",
+                '-> authentifying reply status code: %s',
                 r.status_code,
             )  # @UndefinedVariable
             # returns 404: login wrong and 401: passwd wrong
             res = r.json()
             if (
-                "success" in res
-                and res["success"]
-                and "result" in res
-                and "user" in res["result"]
-                and "token" in res["result"]["user"]
+                'success' in res
+                and res['success']
+                and 'result' in res
+                and 'user' in res['result']
+                and 'token' in res['result']['user']
             ):
                 _log.debug(
-                    "-> authentified, token received"
+                    '-> authentified, token received'
                 )
                 # extract in user/account data
                 nickname = util.extractInfo(
-                    res["result"]["user"], "nickname", None
+                    res['result']['user'], 'nickname', None
                 )
                 config.app_window.plus_language = util.extractInfo(
-                    res["result"]["user"], "language", "en"
+                    res['result']['user'], 'language', 'en'
                 )
-                
+
                 config.app_window.plus_paidUntil = None
                 config.app_window.plus_subscription = None
                 config.app_window.plus_rlimit = 0
                 config.app_window.plus_used = 0
-                if "account" in res["result"]["user"]:
-                    res_account = res["result"]["user"]["account"]
+                if 'account' in res['result']['user']:
+                    res_account = res['result']['user']['account']
                     subscription = util.extractInfo(
-                        res_account, "subscription", ""
+                        res_account, 'subscription', ''
                     )
                     config.app_window.updateSubscriptionSignal.emit(subscription)
                     paidUntil = util.extractInfo(
-                        res_account, "paidUntil", ""
+                        res_account, 'paidUntil', ''
                     )
                     rlimit = -1
                     rused = -1
                     notifications = 0 # unqualified notifications
                     machines = [] # list of machine names with matching notifications
                     try:
-                        if "limit" in res["result"]["user"]["account"]:
-                            ol = res_account["limit"]
-                            if "rlimit" in ol:
-                                rlimit = ol["rlimit"]
-                            if "rused" in ol:
-                                rused = ol["rused"]
+                        if 'limit' in res['result']['user']['account']:
+                            ol = res_account['limit']
+                            if 'rlimit' in ol:
+                                rlimit = ol['rlimit']
+                            if 'rused' in ol:
+                                rused = ol['rused']
                     except Exception as e:  # pylint: disable=broad-except
                         _log.exception(e)
-                    
-                    if "notifications" in res:
-                        notificationDict = res["notifications"]
+
+                    if 'notifications' in res:
+                        notificationDict = res['notifications']
                         if notificationDict:
-                            notifications = util.extractInfo(notificationDict, "unqualified", 0)
-                            machines = util.extractInfo(notificationDict, "machines", [])
+                            notifications = util.extractInfo(notificationDict, 'unqualified', 0)
+                            machines = util.extractInfo(notificationDict, 'machines', [])
                         try:
                             config.app_window.updateLimitsSignal.emit(rlimit,rused,paidUntil,notifications,machines)
                         except Exception as e:  # pylint: disable=broad-except
                             _log.exception(e)
-                    
-                    
+
+
                     # note, here we have to convert the dateUtil string locally here, instead of accessing aw.plus_paidUntil which might not yet set via the signal processing above
                     try:
-                        if paidUntil != "" and (
+                        if paidUntil != '' and (
                             dateutil.parser.parse(paidUntil).date()
                             - datetime.datetime.now().date()
                         ).days < (-config.expired_subscription_max_days):
                             _log.debug(
-                                (
-                                    "-> authentication failed due to"
-                                    " long expired subscription"
-                                )
+                                    '-> authentication failed due to'
+                                    ' long expired subscription'
                             )
-                            if "error" in res:
+                            if 'error' in res:
                                 config.app_window.sendmessage(
-                                    res["error"]
+                                    res['error']
                                 )  # @UndefinedVariable
                             clearCredentials()
                             return False
                     except Exception as e:  # pylint: disable=broad-except
                         _log.exception(e)
-                
-                if "readonly" in res["result"]["user"] and isinstance(
-                    res["result"]["user"]["readonly"], bool
+
+                if 'readonly' in res['result']['user'] and isinstance(
+                    res['result']['user']['readonly'], bool
                 ):
-                    config.app_window.plus_readonly = res["result"]["user"][
-                        "readonly"
+                    config.app_window.plus_readonly = res['result']['user'][
+                        'readonly'
                     ]
                 else:
                     config.app_window.plus_readonly = False
                 #
-                setToken(res["result"]["user"]["token"], nickname)
+                setToken(res['result']['user']['token'], nickname)
                 if (
-                    "account" in res["result"]["user"]
-                    and "_id" in res["result"]["user"]["account"]
+                    'account' in res['result']['user']
+                    and '_id' in res['result']['user']['account']
                 ):
                     account_nr = account.setAccount(
-                        res["result"]["user"]["account"]["_id"]
+                        res['result']['user']['account']['_id']
                     )
                     config.account_nr = account_nr
                     _log.debug(
-                        "-> account: %s", account_nr
+                        '-> account: %s', account_nr
                     )
                 return True
-            _log.debug("-> authentication failed")
-            if "error" in res:
+            _log.debug('-> authentication failed')
+            if 'error' in res:
                 config.app_window.sendmessage(
-                    res["error"]
+                    res['error']
                 )  # @UndefinedVariable
             clearCredentials()
             return False
@@ -323,37 +320,37 @@ def authentify() -> bool:
 
 
 def getHeaders(
-    authorized: bool = True, decompress: bool = True) -> Dict[str, str]:
+    authorized: bool = True, decompress: bool = True) -> dict[str, str]:
     os, os_version, os_arch = config.app_window.get_os()  # @UndefinedVariable
     headers = {
-        "user-agent": f"Artisan/{__version__} ({os}; {os_version}; {os_arch})"
+        'user-agent': f'Artisan/{__version__} ({os}; {os_version}; {os_arch})'
     }
     try:
         locale = config.app_window.locale_str
-        if locale is not None and locale != "":
+        if locale is not None and locale != '':
             assert isinstance(locale, str)
-            locale = locale.lower().replace("_", "-")
-            headers["Accept-Language"] = locale
+            locale = locale.lower().replace('_', '-')
+            headers['Accept-Language'] = locale
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
     if authorized:
         token = getToken()
         if token is not None:
-            headers["Authorization"] = f"Bearer {token}"
+            headers['Authorization'] = f'Bearer {token}'
     if decompress:
         headers[
-            "Accept-Encoding"
-        ] = "deflate, compress, gzip"  # identity should not be in here!
+            'Accept-Encoding'
+        ] = 'deflate, compress, gzip'  # identity should not be in here!
     return headers
 
 
 def getHeadersAndData(authorized: bool, compress: bool, jsondata: JSON):
     headers = getHeaders(authorized, decompress=compress)
-    headers["Content-Type"] = "application/json"
+    headers['Content-Type'] = 'application/json'
     if compress and len(jsondata) > config.post_compression_threshold:
         postdata = gzip.compress(jsondata)
-        _log.debug("-> compressed size %s", len(postdata))
-        headers["Content-Encoding"] = "gzip"
+        _log.debug('-> compressed size %s', len(postdata))
+        headers['Content-Encoding'] = 'gzip'
     else:
         postdata = jsondata
     return headers, postdata
@@ -361,18 +358,18 @@ def getHeadersAndData(authorized: bool, compress: bool, jsondata: JSON):
 
 def sendData(
     url: str,
-    data: Dict[Any, Any],
+    data: dict[Any, Any],
     verb: str, # POST or PUT
     authorized: bool = True,
     compress: bool = config.compress_posts,
 ) -> Any:
     # don't log POST data as it might contain credentials!
-    _log.info("sendData(%s,_data_,%s,%s)", url, verb, authorized)
-    jsondata = json.dumps(data).encode("utf8")
-    _log.debug("-> size %s", len(jsondata))
+    _log.info('sendData(%s,_data_,%s,%s)', url, verb, authorized)
+    jsondata = json.dumps(data).encode('utf8')
+    _log.debug('-> size %s', len(jsondata))
     headers, postdata = getHeadersAndData(authorized, compress, jsondata)
     import requests  # @Reimport
-    if verb == "POST":
+    if verb == 'POST':
         r = requests.post(
             url,
             headers=headers,
@@ -388,15 +385,15 @@ def sendData(
             verify=config.verify_ssl,
             timeout=(config.connect_timeout, config.read_timeout),
         )
-    _log.debug("-> status %s, time %s", r.status_code, r.elapsed.total_seconds())
+    _log.debug('-> status %s, time %s', r.status_code, r.elapsed.total_seconds())
     if authorized and r.status_code == 401:  # authorisation failed
-        _log.debug("-> session token outdated (401)")
+        _log.debug('-> session token outdated (401)')
         # we re-authentify by renewing the session token and try again
         if authentify():
             headers, postdata = getHeadersAndData(
                 authorized, compress, jsondata
             )  # recreate header with new token
-            if verb == "POST":
+            if verb == 'POST':
                 r = requests.post(
                     url,
                     headers=headers,
@@ -412,12 +409,12 @@ def sendData(
                     verify=config.verify_ssl,
                     timeout=(config.connect_timeout, config.read_timeout),
                 )
-            _log.debug("-> status %s, time %s", r.status_code, r.elapsed.total_seconds())
+            _log.debug('-> status %s, time %s', r.status_code, r.elapsed.total_seconds())
     return r
 
 
 def getData(url: str, authorized: bool = True, params=None) -> Any:
-    _log.info("getData(%s,%s,%s)", url, authorized, params)
+    _log.info('getData(%s,%s,%s)', url, authorized, params)
     headers = getHeaders(authorized)
     params = params or {}
     #    _log.debug("-> request headers %s",headers)
@@ -429,12 +426,12 @@ def getData(url: str, authorized: bool = True, params=None) -> Any:
         params=params,
         timeout=(config.connect_timeout, config.read_timeout),
     )
-    _log.debug("-> status %s", r.status_code)
+    _log.debug('-> status %s', r.status_code)
     #    _log.debug("-> headers %s",r.headers)
-    _log.debug("-> time %s", r.elapsed.total_seconds())
+    _log.debug('-> time %s', r.elapsed.total_seconds())
     if authorized and r.status_code == 401:  # authorisation failed
         _log.debug(
-            "-> session token outdated (404) - re-authentify"
+            '-> session token outdated (404) - re-authentify'
         )
         # we re-authentify by renewing the session token and try again
         authentify()
@@ -446,16 +443,14 @@ def getData(url: str, authorized: bool = True, params=None) -> Any:
             params=params,
             timeout=(config.connect_timeout, config.read_timeout),
         )
-        _log.debug("-> status %s", r.status_code)
+        _log.debug('-> status %s', r.status_code)
         #        _log.debug("-> headers %s",r.headers)
         _log.debug(
-            "-> time %s", r.elapsed.total_seconds()
+            '-> time %s', r.elapsed.total_seconds()
         )
     try:
-        _log.debug("-> size %s", len(r.content))
+        _log.debug('-> size %s', len(r.content))
 #        _log.debug("-> data %s",r.json())
     except Exception:  # pylint: disable=broad-except
         pass
     return r
-
-

@@ -10,9 +10,9 @@ def content():
     helpstr = ''  #@UnusedVariable
     newline = '\n'  #@UnusedVariable
     strlist.append('<head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body>')
-    strlist.append("<b>")
+    strlist.append('<b>')
     strlist.append(QApplication.translate('HelpDlg','AUTOSAVE DIALOG'))
-    strlist.append("</b>")
+    strlist.append('</b>')
     tbl_Autosave = prettytable.PrettyTable()
     tbl_Autosave.field_names = [QApplication.translate('HelpDlg','Dialog Field'),QApplication.translate('HelpDlg','Meaning')]
     tbl_Autosave.add_row([QApplication.translate('HelpDlg','Autosave [a]'),QApplication.translate('HelpDlg','Turn Autosave ON or OFF.  When sampling, the keyboard &#39;a&#39; will save the profile at that moment.\nNOTE: Files with the same file name will be silently overwritten.  Use ~currdatetime in the file name prefix to get unique file names.')])
@@ -22,10 +22,10 @@ def content():
     tbl_Autosave.add_row([QApplication.translate('HelpDlg','Path'),QApplication.translate('HelpDlg','Where to store the Autosaved files.')])
     tbl_Autosave.add_row([QApplication.translate('HelpDlg','Save Also'),QApplication.translate('HelpDlg','Allows to save an additional file.  Choose the file type from the pull-down menu.')])
     tbl_Autosave.add_row([QApplication.translate('HelpDlg','Path'),QApplication.translate('HelpDlg','Where to store the additional files.')])
-    strlist.append(tbl_Autosave.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
-    strlist.append("<br/><br/><b>")
+    strlist.append(tbl_Autosave.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
+    strlist.append('<br/><br/><b>')
     strlist.append(QApplication.translate('HelpDlg','AUTOSAVE FIELDS'))
-    strlist.append("</b>")
+    strlist.append('</b>')
     tbl_AutosaveFields = prettytable.PrettyTable()
     tbl_AutosaveFields.field_names = [QApplication.translate('HelpDlg','Prefix Field'),QApplication.translate('HelpDlg','Source'),QApplication.translate('HelpDlg','Example')]
     tbl_AutosaveFields.add_row(['~batchprefix',QApplication.translate('HelpDlg','The batch prefix set in Config>Batch>Prefix'),'Prod-'])
@@ -104,18 +104,18 @@ def content():
     tbl_AutosaveFields.add_row(['~bturoast',QApplication.translate('HelpDlg','From the Profile Energy Use - Energy used from CHARGE to DROP in BTU'),7843.2])
     tbl_AutosaveFields.add_row(['~co2roast',QApplication.translate('HelpDlg','From the Profile Energy Use - CO2 produced from CHARGE to DROP in g'),873.9])
     tbl_AutosaveFields.add_row(['~co2pergreenkg',QApplication.translate('HelpDlg','From the Profile Energy Use - CO2 produced per kg of green beans in g'),354.3])
-    strlist.append(tbl_AutosaveFields.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
+    strlist.append(tbl_AutosaveFields.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
     tbl_AutosaveFieldsbottom = prettytable.PrettyTable()
     tbl_AutosaveFieldsbottom.header = False
     tbl_AutosaveFieldsbottom.add_row(['NOTES:\nAnything between single quotes &#39; will show in the file name only when ON.\nExample: &#39;REC ~batch&#39;\n\nAnything between double quotes " will show in the file name only when OFF. \nExample: "~operator"\n\nFor backward compatibility, when the Prefix field is text only the date and time are appended to the file name.\nExample: &#39;Autosave&#39; will result in file name &#39;Autosave_20-01-13_1705&#39;.\nTo show only the text place a single &#39;!&#39; at the start of the Prefix field\nExample: &#39;!Autosave&#39; will result in file name &#39;Autosave&#39;.\n\nTo maintain cross platform compatibility, file names may contain only letters, numbers, spaces, \nand the following special characters:  \n_ - . ( )'])
-    strlist.append(tbl_AutosaveFieldsbottom.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
-    strlist.append("<br/><br/><b>")
+    strlist.append(tbl_AutosaveFieldsbottom.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
+    strlist.append('<br/><br/><b>')
     strlist.append(QApplication.translate('HelpDlg','EXAMPLES'))
-    strlist.append("</b>")
+    strlist.append('</b>')
     tbl_Examplestop = prettytable.PrettyTable()
     tbl_Examplestop.header = False
     tbl_Examplestop.add_row([QApplication.translate('HelpDlg','Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.  ')])
-    strlist.append(tbl_Examplestop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
+    strlist.append(tbl_Examplestop.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
     tbl_Examples = prettytable.PrettyTable()
     tbl_Examples.field_names = [QApplication.translate('HelpDlg','Autosave Field'),QApplication.translate('HelpDlg','Example File Name')]
     tbl_Examples.add_row([QApplication.translate('HelpDlg','~title Roasted on ~date'),QApplication.translate('HelpDlg','Burundi Roasted on 20-04-25.alog')])
@@ -123,8 +123,8 @@ def content():
     tbl_Examples.add_row([QApplication.translate('HelpDlg','~beans ~machine ~drumspeedRPM ~weight~weightunits ~poisturePCT ~operator ~date ~batch(~batchposition)'),QApplication.translate('HelpDlg','Burundi Kiganda Murambi Lot44 SF-25 64RPM 10.3Kg 10.2PCT Roberto 20-04-25 Prod-1380(6).alog')])
     tbl_Examples.add_row([QApplication.translate('HelpDlg','\u0027Recording ~batchcounter&#39; "~batch" ~title ~datetime_long'),QApplication.translate('HelpDlg','When OFF:\nProd-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog\nWhile Recording:\nRecording 1380  Burundi KigandaMurambi 2020-04-25_1136.alog')])
     tbl_Examples.add_row([QApplication.translate('HelpDlg','\u0027Recording ~batchcounter&#39; "~batch" ~title ~date_long_&#39;~currtime&#39;"~time"'),QApplication.translate('HelpDlg','Creates a unique filename for multiple saves while sampling by using ~currtime.\nWhen OFF:\nProd-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog\nWhile Recording. \nRecording 1380  Burundi KigandaMurambi 2020-04-25_113809.alog')])
-    strlist.append(tbl_Examples.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
-    strlist.append("</body>")
-    helpstr = "".join(strlist)
-    helpstr = re.sub(r"&amp;", r"&",helpstr)
+    strlist.append(tbl_Examples.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
+    strlist.append('</body>')
+    helpstr = ''.join(strlist)
+    helpstr = re.sub(r'&amp;', r'&',helpstr)
     return helpstr

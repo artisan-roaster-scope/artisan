@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # Artisan Sampling Dialog
@@ -33,42 +32,42 @@ except Exception:
 class SamplingDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
-        self.setWindowTitle(QApplication.translate("Message","Sampling"))
+        self.setWindowTitle(QApplication.translate('Message','Sampling'))
         self.setModal(True)
-        
+
         self.org_delay = self.aw.qmc.delay
         self.org_flagKeepON = self.aw.qmc.flagKeepON
         self.org_flagOpenCompleted = self.aw.qmc.flagOpenCompleted
-        
-        self.keepOnFlag = QCheckBox(QApplication.translate("Label","Keep ON"))
+
+        self.keepOnFlag = QCheckBox(QApplication.translate('Label','Keep ON'))
         self.keepOnFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.keepOnFlag.setChecked(bool(self.aw.qmc.flagKeepON))
-        
-        self.openCompletedFlag = QCheckBox(QApplication.translate("Label","Open Completed Roast in Viewer"))
+
+        self.openCompletedFlag = QCheckBox(QApplication.translate('Label','Open Completed Roast in Viewer'))
         self.openCompletedFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.openCompletedFlag.setChecked(bool(self.aw.qmc.flagOpenCompleted))
-        
+
         self.interval = MyQDoubleSpinBox()
         self.interval.setSingleStep(1)
         self.interval.setValue(self.aw.qmc.delay/1000.)
         self.interval.setRange(self.aw.qmc.min_delay/1000.,40.)
         self.interval.setDecimals(2)
         self.interval.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.interval.setSuffix("s")
-        
+        self.interval.setSuffix('s')
+
         intervalLayout = QHBoxLayout()
         intervalLayout.addStretch()
         intervalLayout.addWidget(self.interval)
         intervalLayout.addStretch()
-        
+
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.ok)
         self.dialogbuttons.rejected.connect(self.close)
-        
+
         flagGrid = QGridLayout()
         flagGrid.addWidget(self.keepOnFlag,0,0)
         flagGrid.addWidget(self.openCompletedFlag,1,0)
-        
+
         flagLayout = QHBoxLayout()
         flagLayout.addStretch()
         flagLayout.addLayout(flagGrid)
@@ -76,26 +75,26 @@ class SamplingDlg(ArtisanDialog):
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
         buttonsLayout.addWidget(self.dialogbuttons)
-        
+
         #incorporate layouts
         layout = QVBoxLayout()
         layout.addLayout(intervalLayout)
         layout.addLayout(flagLayout)
         layout.addStretch()
         layout.addLayout(buttonsLayout)
-        self.setLayout(layout) 
+        self.setLayout(layout)
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
-        
+
         settings = QSettings()
-        if settings.contains("SamplingPosition"):
-            self.move(settings.value("SamplingPosition"))
-        
+        if settings.contains('SamplingPosition'):
+            self.move(settings.value('SamplingPosition'))
+
         layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
-    
+
     #window close box
     def closeEvent(self,_):
         self.close()
-        
+
     #cancel button
     @pyqtSlot()
     def close(self):
@@ -104,12 +103,12 @@ class SamplingDlg(ArtisanDialog):
         self.aw.qmc.flagOpenCompleted = self.org_flagOpenCompleted
         self.storeSettings()
         self.reject()
-    
+
     def storeSettings(self):
         #save window position (only; not size!)
         settings = QSettings()
-        settings.setValue("SamplingPosition",self.frameGeometry().topLeft())
-    
+        settings.setValue('SamplingPosition',self.frameGeometry().topLeft())
+
     #ok button
     @pyqtSlot()
     def ok(self):
@@ -117,8 +116,7 @@ class SamplingDlg(ArtisanDialog):
         self.aw.qmc.flagOpenCompleted = bool(self.openCompletedFlag.isChecked())
         self.aw.qmc.delay = int(self.interval.value()*1000.)
 #        if self.aw.qmc.delay < self.aw.qmc.default_delay:
-#            QMessageBox.warning(self.aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.")) 
-        self.storeSettings() 
+#            QMessageBox.warning(self.aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s."))
+        self.storeSettings()
 #        self.aw.closeEventSettings()
         self.accept()
-

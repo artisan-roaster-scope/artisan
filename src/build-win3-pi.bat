@@ -3,7 +3,7 @@
 
 ::
 :: comandline option LEGACY used to flag a legacy build
-:: when running locally these paths need to be set here 
+:: when running locally these paths need to be set here
 ::   normally they are set in appveyor.yml
 ::
 setlocal enabledelayedexpansion
@@ -82,7 +82,7 @@ echo NSIS makensis.exe file date %NSIS_DATE%
 %NSIS_EXE% /DPRODUCT_VERSION=%ARTISAN_VERSION%.%ARTISAN_BUILD% /DLEGACY=%ARTISAN_LEGACY% setup-install3-pi.nsi
 
 ::
-:: package the zip file 
+:: package the zip file
 ::
 if /i "%APPVEYOR%" == "True" (
     copy ..\LICENSE LICENSE.txt

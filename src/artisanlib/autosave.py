@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # Artisan Autosave Dialog
@@ -33,72 +32,72 @@ class autosaveDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Autosave"))
+        self.setWindowTitle(QApplication.translate('Form Caption','Autosave'))
 
         settings = QSettings()
-        if settings.contains("autosaveGeometry"):
-            self.restoreGeometry(settings.value("autosaveGeometry"))
-        
+        if settings.contains('autosaveGeometry'):
+            self.restoreGeometry(settings.value('autosaveGeometry'))
+
         self.helpdialog = None
 
         self.prefixEdit = QLineEdit(self.aw.qmc.autosaveprefix)
-        self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name"))
+        self.prefixEdit.setToolTip(QApplication.translate('Tooltip', 'Automatic generated name'))
         self.prefixEdit.textChanged.connect(self.prefixChanged)
         prefixpreviewLabel = QLabel()
         prefixpreviewLabel.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignRight)
-        prefixpreviewLabel.setText(QApplication.translate("Label", "Preview:"))
+        prefixpreviewLabel.setText(QApplication.translate('Label', 'Preview:'))
         self.prefixPreview = QLabel()
         self.prefixpreviewrecordingLabel = QLabel()
         self.prefixpreviewrecordingLabel.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignRight)
         self.prefixPreviewrecording = QLabel()
         self.prefixChanged()
- 
-        autochecklabel = QLabel(QApplication.translate("CheckBox","Autosave [a]"))
+
+        autochecklabel = QLabel(QApplication.translate('CheckBox','Autosave [a]'))
         self.autocheckbox = QCheckBox()
-        self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [a]"))
+        self.autocheckbox.setToolTip(QApplication.translate('Tooltip', 'ON/OFF of automatic saving when pressing keyboard letter [a]'))
         self.autocheckbox.setChecked(self.aw.qmc.autosaveflag)
 
-        addtorecentfileslabel = QLabel(QApplication.translate("CheckBox","Add to recent file list"))
+        addtorecentfileslabel = QLabel(QApplication.translate('CheckBox','Add to recent file list'))
         self.addtorecentfiles = QCheckBox()
-        self.addtorecentfiles.setToolTip(QApplication.translate("Tooltip", "Add auto saved file names to the recent files list"))
+        self.addtorecentfiles.setToolTip(QApplication.translate('Tooltip', 'Add auto saved file names to the recent files list'))
         self.addtorecentfiles.setChecked(self.aw.qmc.autosaveaddtorecentfilesflag)
 
-        autopdflabel = QLabel(QApplication.translate("CheckBox","Save also"))
+        autopdflabel = QLabel(QApplication.translate('CheckBox','Save also'))
         self.autopdfcheckbox = QCheckBox()
-        self.autopdfcheckbox.setToolTip(QApplication.translate("Tooltip", "Save image alongside .alog profiles"))
+        self.autopdfcheckbox.setToolTip(QApplication.translate('Tooltip', 'Save image alongside .alog profiles'))
         self.autopdfcheckbox.setChecked(self.aw.qmc.autosaveimage)
         self.imageTypesComboBox = QComboBox()
         self.imageTypesComboBox.addItems(self.aw.qmc.autoasaveimageformat_types)
         try:
             if not self.aw.QtWebEngineSupport:
                 # disable "PDF Report" item if QtWebEngine Support is not available
-                self.imageTypesComboBox.model().item(self.aw.qmc.autoasaveimageformat_types.index("PDF Report")).setEnabled(False)
+                self.imageTypesComboBox.model().item(self.aw.qmc.autoasaveimageformat_types.index('PDF Report')).setEnabled(False)
         except Exception: # pylint: disable=broad-except
             pass
         self.imageTypesComboBox.setCurrentIndex(self.aw.qmc.autoasaveimageformat_types.index(self.aw.qmc.autosaveimageformat))
         prefixlabel = QLabel()
         prefixlabel.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        prefixlabel.setText(QApplication.translate("Label", "File Name Prefix"))
+        prefixlabel.setText(QApplication.translate('Label', 'File Name Prefix'))
 
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.autoChanged)
         self.dialogbuttons.rejected.connect(self.close)
         self.helpButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Help)
-        self.setButtonTranslations(self.helpButton,"Help",QApplication.translate("Button","Help"))
+        self.setButtonTranslations(self.helpButton,'Help',QApplication.translate('Button','Help'))
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Help).clicked.connect(self.showautosavehelp)
-        
-        pathButton = QPushButton(QApplication.translate("Button","Path"))
+
+        pathButton = QPushButton(QApplication.translate('Button','Path'))
         pathButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pathEdit = QLineEdit(self.aw.qmc.autosavepath)
-        self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [a]"))
+        self.pathEdit.setToolTip(QApplication.translate('Tooltip', 'Sets the directory to store batch profiles when using the letter [a]'))
         pathButton.clicked.connect(self.getpath)
-        
-        pathAlsoButton = QPushButton(QApplication.translate("Button","Path"))
+
+        pathAlsoButton = QPushButton(QApplication.translate('Button','Path'))
         pathAlsoButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pathAlsoEdit = QLineEdit(self.aw.qmc.autosavealsopath)
-        self.pathAlsoEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store the save also files"))
+        self.pathAlsoEdit.setToolTip(QApplication.translate('Tooltip', 'Sets the directory to store the save also files'))
         pathAlsoButton.clicked.connect(self.getalsopath)
-        
+
         # this intermediate layout is needed to add the 'addtorecentfiles' checkbox into the existing grid layout.
         autochecklabelplus = QHBoxLayout()
         autochecklabelplus.addWidget(autochecklabel)
@@ -142,7 +141,7 @@ class autosaveDlg(ArtisanDialog):
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
-                QApplication.translate("Form Caption","Autosave Fields Help"),
+                QApplication.translate('Form Caption','Autosave Fields Help'),
                 autosave_help.content())
 
     def closeHelp(self):
@@ -154,20 +153,20 @@ class autosaveDlg(ArtisanDialog):
         self.prefixPreview.setText(preview)
         previewrecording = self.aw.generateFilename(self.prefixEdit.text(),previewmode=1)
         if previewrecording == preview:
-            self.prefixpreviewrecordingLabel.setText("")
-            self.prefixPreviewrecording.setText("")
+            self.prefixpreviewrecordingLabel.setText('')
+            self.prefixPreviewrecording.setText('')
         else:
-            self.prefixpreviewrecordingLabel.setText(QApplication.translate("Label", "While recording:"))
+            self.prefixpreviewrecordingLabel.setText(QApplication.translate('Label', 'While recording:'))
             self.prefixPreviewrecording.setText(previewrecording)
 
     @pyqtSlot(bool)
     def getpath(self,_):
-        filename = self.aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate("Form Caption","AutoSave Path"))
+        filename = self.aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate('Form Caption','AutoSave Path'))
         self.pathEdit.setText(filename)
 
     @pyqtSlot(bool)
     def getalsopath(self,_):
-        filename = self.aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate("Form Caption","AutoSave Save Also Path"))
+        filename = self.aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate('Form Caption','AutoSave Save Also Path'))
         self.pathAlsoEdit.setText(filename)
 
     @pyqtSlot()
@@ -177,12 +176,12 @@ class autosaveDlg(ArtisanDialog):
         if self.autocheckbox.isChecked():
             self.aw.qmc.autosaveflag = 1
             self.aw.qmc.autosaveprefix = self.prefixEdit.text()
-            message = QApplication.translate("Message","Autosave ON. Prefix: {0}").format(self.prefixEdit.text())
+            message = QApplication.translate('Message','Autosave ON. Prefix: {0}').format(self.prefixEdit.text())
             self.aw.sendmessage(message)
         else:
             self.aw.qmc.autosaveflag = 0
             self.aw.qmc.autosaveprefix = self.prefixEdit.text()
-            message = QApplication.translate("Message","Autosave OFF. Prefix: {0}").format(self.prefixEdit.text())
+            message = QApplication.translate('Message','Autosave OFF. Prefix: {0}').format(self.prefixEdit.text())
             self.aw.sendmessage(message)
         self.aw.qmc.autosaveimage = self.autopdfcheckbox.isChecked()
         self.aw.qmc.autosaveimageformat = self.imageTypesComboBox.currentText()
@@ -195,6 +194,4 @@ class autosaveDlg(ArtisanDialog):
         self.closeHelp()
         settings = QSettings()
         #save window geometry
-        settings.setValue("autosaveGeometry",self.saveGeometry())
-
-
+        settings.setValue('autosaveGeometry',self.saveGeometry())

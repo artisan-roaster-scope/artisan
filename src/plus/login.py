@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # login.py
 #
@@ -67,8 +66,8 @@ _log: Final = logging.getLogger(__name__)
 class Login(ArtisanDialog):
 
     __slots__ = [ 'login', 'passwd', 'remember', 'linkRegister', 'linkResetPassword', 'textPass', 'textName', 'rememberCheckbox' ]
-        
-    
+
+
     def __init__(
         self,
         parent=None,
@@ -96,13 +95,13 @@ class Login(ArtisanDialog):
         )
         self.setButtonTranslations(
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok),
-            "OK",
-            QApplication.translate("Button", "OK"),
+            'OK',
+            QApplication.translate('Button', 'OK'),
         )
         self.setButtonTranslations(
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel),
-            "Cancel",
-            QApplication.translate("Button", "Cancel"),
+            'Cancel',
+            QApplication.translate('Button', 'Cancel'),
         )
 
         self.dialogbuttons.accepted.connect(self.setCredentials) # type: ignore
@@ -111,7 +110,7 @@ class Login(ArtisanDialog):
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setDefault(True)
         # add additional CMD-. shortcut to close the dialog
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setShortcut(
-            QKeySequence("Ctrl+.")
+            QKeySequence('Ctrl+.')
         )
         # add additional CMD-W shortcut to close this dialog
         cancelAction = QAction(self)
@@ -124,12 +123,12 @@ class Login(ArtisanDialog):
         self.textPass = QLineEdit(self)
         self.textPass.setEchoMode(QLineEdit.EchoMode.Password)
         self.textPass.setPlaceholderText(
-            QApplication.translate("Plus", "Password")
+            QApplication.translate('Plus', 'Password')
         )
 
         self.textName = QLineEdit(self)
         self.textName.setPlaceholderText(
-            QApplication.translate("Plus", "Email")
+            QApplication.translate('Plus', 'Email')
         )
         self.textName.textChanged.connect(self.textChanged)  # type: ignore
         if email is not None:
@@ -138,7 +137,7 @@ class Login(ArtisanDialog):
         self.textPass.textChanged.connect(self.textChanged)  # type: ignore
 
         self.rememberCheckbox = QCheckBox(
-            QApplication.translate("Plus", "Remember")
+            QApplication.translate('Plus', 'Remember')
         )
         self.rememberCheckbox.setChecked(self.remember)
         self.rememberCheckbox.stateChanged.connect(self.rememberCheckChanged)  # type: ignore
@@ -198,8 +197,8 @@ class Login(ArtisanDialog):
         return (
             len(passwd) >= config.min_passwd_len
             and len(login) >= config.min_login_len
-            and "@" in login
-            and "." in login
+            and '@' in login
+            and '.' in login
         )
 
     @pyqtSlot(str)
@@ -228,9 +227,9 @@ def plus_login(
     saved_password: Optional[str] = None,
     remember_credentials: bool = True
 ):
-    _log.debug("plus_login()")
+    _log.debug('plus_login()')
     ld = Login(window, email, saved_password, remember_credentials)
-    ld.setWindowTitle("plus")
+    ld.setWindowTitle('plus')
     ld.setWindowFlags(Qt.WindowType.Sheet)   # type: ignore
     ld.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)   # type: ignore
     res = ld.exec()

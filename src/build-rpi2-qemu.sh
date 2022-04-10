@@ -165,5 +165,3 @@ rmdir $mountpoint
 
 ssh_control &
 qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -drive file=${RASPBIAN_IMAGE},format=raw -redir tcp:2222::22
-
-

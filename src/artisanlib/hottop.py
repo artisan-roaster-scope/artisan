@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # Hottop 2k+ support for Artisan
@@ -63,21 +62,21 @@ def hex2int(h1,h2=None):
     if h2:
         return int(h1*256 + h2)
     return int(h1)
-        
+
 def openport(p):
     try:
         if not p.isOpen():
             p.open()
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
-        
+
 def closeport(p):
     try:
         if p == None and p.isOpen():
             p.close()
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
-        
+
 def gettemperatures(p,retry=True):
     BT = -1
     ET = -1
@@ -104,7 +103,7 @@ def gettemperatures(p,retry=True):
             else:
                 P0 = hex2int(r[0])
                 P1 = hex2int(r[1])
-                chksum = sum([hex2int(c) for c in r[:35]]) & 0xFF 
+                chksum = sum(hex2int(c) for c in r[:35]) & 0xFF
                 P35 = hex2int(r[35])
                 if P0 != 165 or P1 != 150 or P35 != chksum:
                     closeport(p)
@@ -136,7 +135,7 @@ def doWork(interval, comport, baudrate, bytesize, parity, stopbits, timeout,
     SP.bytesize = bytesize
     SP.parity = parity
     SP.stopbits = stopbits
-    SP.timeout = timeout    
+    SP.timeout = timeout
     while True:
         # logging part
         BT, ET, HEATER, FAN, MAIN_FAN, SOLENOID, DRUM_MOTOR, COOLING_MOTOR, CHAFF_TRAY = gettemperatures(SP)
@@ -180,11 +179,11 @@ def doWork(interval, comport, baudrate, bytesize, parity, stopbits, timeout,
                 aSET_COOLING_MOTOR.value = 1
             sendControl(SP,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
                         aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR)
-            
-        time.sleep(interval)
-      
 
-# Control processing 
+        time.sleep(interval)
+
+
+# Control processing
 
 def sendControl(p,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
         aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR):
@@ -198,10 +197,10 @@ def sendControl(p,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOT
             p.reset_input_buffer()
             #p.flushOutput() # deprecated in v3
             p.reset_output_buffer()
-            p.write(cmd) 
+            p.write(cmd)
     except Exception as e: # pylint: disable=broad-except
         _log.exeption(e)
-            
+
 # prefers set_value, and returns get_value if set_value is -1. If both are -1, returns 0
 def newValue(set_value,get_value):
     if set_value != -1:
@@ -233,13 +232,13 @@ def HOTTOPcontrol(aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOT
 
 
 # External Interface
-        
+
 def takeHottopControl():
     if xCONTROL:
         xCONTROL.value = True
         return True
     return False
-    
+
 def releaseHottopControl():
     if xCONTROL and xBT.value < BTleaveControl:
         xCONTROL.value = False
@@ -277,7 +276,7 @@ def setHottop(heater=None,fan=None,main_fan=None,solenoid=None,drum_motor=None,c
 
 
 # interval has to be smaller than 1 (= 1sec)
-def startHottop(interval=1,comport="COM4",baudrate=115200,bytesize=8,parity='N',stopbits=1,timeout=0.5):
+def startHottop(interval=1,comport='COM4',baudrate=115200,bytesize=8,parity='N',stopbits=1,timeout=0.5):
     global process, xCONTROL, xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
         xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR # pylint: disable=global-statement
     try:
@@ -304,7 +303,7 @@ def startHottop(interval=1,comport="COM4",baudrate=115200,bytesize=8,parity='N',
         xSET_DRUM_MOTOR = Value('i', -1, lock=lock)
         xSET_COOLING_MOTOR = Value('i', -1, lock=lock)
         # variables to write to the Hottop
-        
+
         process = mp.Process(target=doWork, args=(interval,comport,baudrate,bytesize,parity,stopbits,timeout,
             xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
             xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xCONTROL))

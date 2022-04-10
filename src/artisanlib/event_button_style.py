@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-
 from artisanlib.util import createGradient
 
 artisan_event_button_style: str = """
-            EventPushButton {{ 
+            EventPushButton {{
                 min-width: {min_width}px;
                 min-height: {min_height}px;
                 font-size: {default_font_size}pt;
@@ -15,7 +13,7 @@ artisan_event_button_style: str = """
                 border-width:0;
                 color: white;
             }}
-            
+
             EventPushButton[Selected=true] {{
                 font-size: {selected_font_size}pt;
                 background-color:""" + createGradient('#d4336a') + """ ;
@@ -40,7 +38,7 @@ artisan_event_button_style: str = """
                 color: white;
                 background-color:""" + createGradient('#cc0f50') + """ ;
             }}
-            
+
             MajorEventPushButton[Selected=false]:flat {{
                 color: darkgrey;
                 background-color: #E0E0E0;
@@ -60,7 +58,7 @@ artisan_event_button_style: str = """
             MajorEventPushButton[Selected=false]:!pressed:hover {{
                 background-color:""" + createGradient('#1985ba') + """ ;
             }}
-            
+
             MinorEventPushButton[Selected=false]:flat {{
                 color: #BDBDBD;
                 background-color: #EEEEEE;
@@ -80,7 +78,7 @@ artisan_event_button_style: str = """
             MinorEventPushButton[Selected=false]:!pressed:hover {{
                 background-color:""" + createGradient('#43a7cf') + """ ;
             }}
-            
+
             AuxEventPushButton[Selected=false]:pressed {{
                 background-color:""" + createGradient('#757575') + """ ;
             }}

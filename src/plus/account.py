@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # account.py
 #
@@ -57,12 +56,12 @@ account_cache_semaphore = QSemaphore(1)
 # by a file lock
 account_cache_path = getDirectory(config.account_cache, share=True)
 account_cache_lock_path = getDirectory(
-    f"{config.account_cache}_lock", share=True
+    f'{config.account_cache}_lock', share=True
 )
 
 
 def setAccountShelve(account_id: str, fh) -> Optional[int]:
-    _log.debug("setAccountShelve(%s,_fh_)", account_id)
+    _log.debug('setAccountShelve(%s,_fh_)', account_id)
     import dbm
     import shelve
     try:
@@ -73,7 +72,7 @@ def setAccountShelve(account_id: str, fh) -> Optional[int]:
             db[account_id] = new_nr
             return new_nr
         _log.debug(
-            "DB type: %s", str(dbm.whichdb(account_cache_path))
+            'DB type: %s', str(dbm.whichdb(account_cache_path))
         )
     except Exception as ex:  # pylint: disable=broad-except
         _log.exception(ex)
@@ -83,13 +82,13 @@ def setAccountShelve(account_id: str, fh) -> Optional[int]:
             # path with any extension as we do not know which extension is
             # chosen by shelve
             _log.info(
-                "clean account cache %s", str(account_cache_path)
+                'clean account cache %s', str(account_cache_path)
             )
             # note that this deletes all "account" files including those for
             # the Viewer and other files of that name prefix like
             # account.db.org!!
             for p in Path(Path(account_cache_path).parent).glob(
-                "{}*".format(config.account_cache)
+                f'{config.account_cache}*'
             ):
                 if str(p) != account_cache_lock_path:
                     # if not the lock file, delete:
@@ -102,7 +101,7 @@ def setAccountShelve(account_id: str, fh) -> Optional[int]:
                 db[account_id] = new_nr
                 return new_nr
             _log.info(
-                "Generated db type: %s",
+                'Generated db type: %s',
                 str(dbm.whichdb(account_cache_path)),
             )
         except Exception as e:  # pylint: disable=broad-except
@@ -119,7 +118,7 @@ def setAccount(account_id: str) -> Optional[int]:
     import portalocker
     try:
         account_cache_semaphore.acquire(1)
-        _log.debug("setAccount(%s)", account_id)
+        _log.debug('setAccount(%s)', account_id)
         with portalocker.Lock(account_cache_lock_path, timeout=0.5) as fh:
             return setAccountShelve(account_id, fh)
     except portalocker.exceptions.LockException as e:
@@ -127,11 +126,11 @@ def setAccount(account_id: str) -> Optional[int]:
         # we couldn't fetch this lock. It seems to be blocked forever
         # we remove the lock file and retry with a shorter timeout
         _log.info(
-            "clean lock %s", str(account_cache_lock_path)
+            'clean lock %s', str(account_cache_lock_path)
         )
         Path(account_cache_lock_path).unlink()
         _log.debug(
-            "retry setAccount(%s)", account_id
+            'retry setAccount(%s)', account_id
         )
         with portalocker.Lock(account_cache_lock_path, timeout=0.3) as fh:
             return setAccountShelve(account_id, fh)

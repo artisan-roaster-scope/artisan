@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # This program realizes a PID controller as part of the open-source roast logging software Artisan.
@@ -39,14 +38,14 @@ _log: Final = logging.getLogger(__name__)
 # expects a function control that takes a value from [<outMin>,<outMax>] to control the heater as called on each update()
 class PID():
 
-    __slots__ = [ 'pidSemaphore', 'outMin', 'outMax', 'dutySteps', 'dutyMin', 'dutyMax', 'control', 'Kp', 
+    __slots__ = [ 'pidSemaphore', 'outMin', 'outMax', 'dutySteps', 'dutyMin', 'dutyMax', 'control', 'Kp',
             'Ki', 'Kd', 'pOnE', 'Pterm', 'errSum', 'Iterm', 'lastError', 'lastInput', 'lastOutput', 'lastTime',
             'lastDerr', 'target', 'active', 'derivative_on_error', 'output_smoothing_factor', 'output_decay_weights',
             'previous_outputs', 'input_smoothing_factor', 'input_decay_weights', 'previous_inputs', 'force_duty', 'iterations_since_duty' ]
 
     def __init__(self, control=lambda _: _, p=2.0, i=0.03, d=0.0):
         self.pidSemaphore = QSemaphore(1)
-        
+
         self.outMin = 0 # minimum output value
         self.outMax = 100 # maximum output value
         self.dutySteps = 1 # change [1-10] between previous and new PID duty to trigger call of control function
@@ -69,7 +68,7 @@ class PID():
         self.target = 0.0
         self.active = False # if active, the control function is called with the PID results
         self.derivative_on_error = False # if False => derivative_on_measurement (avoids the Derivative Kick on changing the target)
-        # PID output smoothing    
+        # PID output smoothing
         self.output_smoothing_factor = 0 # off if 0
         self.output_decay_weights = None
         self.previous_outputs = []
@@ -94,7 +93,7 @@ class PID():
         else:
             res = numpy.average(self.previous_outputs,weights=self.output_decay_weights)
         return res
-       
+
     def _smooth_input(self,inp):
         # create or update smoothing decay weights
         if self.input_smoothing_factor != 0 and (self.input_decay_weights == None or len(self.input_decay_weights) != self.input_smoothing_factor): # recompute only on changes
@@ -109,9 +108,9 @@ class PID():
         else:
             res = numpy.average(self.previous_inputs,weights=self.input_decay_weights)
         return res
-        
+
     ### External API guarded by semaphore
-            
+
     def on(self):
         try:
             self.pidSemaphore.acquire(1)
@@ -121,7 +120,7 @@ class PID():
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
-        
+
     def off(self):
         try:
             self.pidSemaphore.acquire(1)
@@ -129,7 +128,7 @@ class PID():
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
-        
+
     def isActive(self):
         try:
             self.pidSemaphore.acquire(1)
@@ -137,7 +136,7 @@ class PID():
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
-    
+
 
     # update control value (the pid loop is runnning even if PID is inactive, just the control function is only called if active)
     def update(self, i):
@@ -159,45 +158,45 @@ class PID():
                     else:
                         dinput = 0
                         dtinput = 0
-                    
+
 #                    # apply some simple moving average filter to avoid major spikes (used only for D)
 #                    if self.lastDerr:
 #                        derr = (derr + self.lastDerr) / 2.0
 ## This smoothing is dangerous if time between readings is not considered!
 #                    self.lastDerr = derr
-                    
+
                     self.lastTime = now
                     self.lastError = err
                     self.lastInput = i
-                    
+
                     # limit the effect of I
                     self.Iterm += self.Ki * err * dt
-                    
+
                     # clamp Iterm to [outMin,outMax] and avoid integral windup
                     self.Iterm = max(self.outMin,min(self.outMax,self.Iterm))
-                    
+
                     # compute P-Term
                     if self.pOnE:
                         self.Pterm = self.Kp * err
                     else:
                         self.Pterm = self.Pterm -self.Kp * dinput
-                    
+
                     # compute D-Term
                     if self.derivative_on_error:
                         D = self.Kd * derr
                     else:
                         D = - self.Kd * dtinput
-                                                                               
+
                     output = self.Pterm + self.Iterm + D
-                    
+
                     output = self._smooth_output(output)
-                    
+
                     # clamp output to [outMin,outMax] and avoid integral windup
                     if output > self.outMax:
                         output = self.outMax
                     elif output < self.outMin:
                         output = self.outMin
-                    
+
                     int_output = min(self.dutyMax,max(self.dutyMin,int(round(output))))
                     if self.lastOutput == None or self.iterations_since_duty >= self.force_duty or int_output >= self.lastOutput + self.dutySteps or int_output <= self.lastOutput - self.dutySteps:
                         if self.active:
@@ -210,7 +209,7 @@ class PID():
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
-            
+
     # bring the PID to its initial state (to be called externally)
     def reset(self):
         try:
@@ -220,7 +219,7 @@ class PID():
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
-        
+
     # re-initalize the PID on restarting it after a temporary off state
     def init(self):
         try:
@@ -233,13 +232,13 @@ class PID():
             self.Pterm = 0.0
             self.input_decay_weights = None
             self.previous_inputs = []
-            
+
             self.Iterm = 0.0 # for now just reset to 0 in all cases
     #        if self.lastOutput != None:
     #            self.Iterm = self.lastOutput
     #        else:
     #            self.Iterm = 0.0
-    
+
             self.lastOutput = None
             # initialize the output smoothing
             self.output_decay_weights = None
@@ -276,7 +275,7 @@ class PID():
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
-        
+
     def setLimits(self,outMin,outMax):
         try:
             self.pidSemaphore.acquire(1)
@@ -285,7 +284,7 @@ class PID():
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
-        
+
     def setDutySteps(self,steps):
         try:
             self.pidSemaphore.acquire(1)
@@ -293,7 +292,7 @@ class PID():
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
-        
+
     def setDutyMin(self,m):
         try:
             self.pidSemaphore.acquire(1)
@@ -301,7 +300,7 @@ class PID():
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
-        
+
     def setDutyMax(self,m):
         try:
             self.pidSemaphore.acquire(1)
@@ -309,7 +308,7 @@ class PID():
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
-        
+
     def setControl(self,f):
         try:
             self.pidSemaphore.acquire(1)
@@ -317,7 +316,7 @@ class PID():
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
-        
+
     def getDuty(self):
         try:
             self.pidSemaphore.acquire(1)

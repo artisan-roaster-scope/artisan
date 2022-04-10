@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # Artisan Notification System
@@ -58,11 +57,11 @@ class NotificationType(Enum):
 # maps an artisan.plus notification ntype type string to the corresponding Artisan NotificationType
 def ntype2NotificationType(ntype:str) -> NotificationType:
     ntype = ntype.upper()
-    if ntype == "ADMIN":
+    if ntype == 'ADMIN':
         return NotificationType.PLUS_ADMIN
-    if ntype == "ADVERT":
+    if ntype == 'ADVERT':
         return NotificationType.PLUS_ADVERT
-    if ntype == "REMINDER":
+    if ntype == 'REMINDER':
         return NotificationType.PLUS_REMINDER
     return NotificationType.PLUS_SYSTEM
 
@@ -78,27 +77,27 @@ class Notification():
         else:
             self._created = created
         self._id = hr_id
-    
+
     @property
     def title(self):
         return self._title
-    
+
     @property
     def message(self):
         return self._message
-    
+
     @property
     def type(self):
         return self._type
-    
+
     @property
     def created(self):
         return self._created
-        
+
     @property
     def id(self):
         return self._id
-    
+
     def formatedTitle(self):
         seconds_to = time.time() - self._created
         if seconds_to < 24*60*60:
@@ -108,55 +107,55 @@ class Notification():
             # created within the past 7 days
             dt = QDateTime.fromSecsSinceEpoch(int(round(self._created)))
             day_name = QLocale().standaloneDayName(dt.date().dayOfWeek(), QLocale.FormatType.LongFormat)
-            return f"{self._title} ({day_name})"
+            return f'{self._title} ({day_name})'
         # created more than 7 days ago
         l = QLocale()
         dt = QDateTime.fromSecsSinceEpoch(int(round(self._created)))
         short_date = l.toString(dt.date(), l.dateFormat(QLocale.FormatType.NarrowFormat))
-        return f"{self._title} ({short_date})"
+        return f'{self._title} ({short_date})'
 
 
 # data a datetime.datetime object representing the timestamp of the acknowledgement by the user
 def sendPlusNotificationSeen(hr_id:str, date):
-    _log.debug("sendPlusNotificationSeen(%s,%s)", hr_id, date.isoformat())
+    _log.debug('sendPlusNotificationSeen(%s,%s)', hr_id, date.isoformat())
     try:
         plus.connection.sendData(
-            f"{plus.config.notifications_url}/seen/{hr_id}",
-            { "date" : date.isoformat()},
-            "PUT")
+            f'{plus.config.notifications_url}/seen/{hr_id}',
+            { 'date' : date.isoformat()},
+            'PUT')
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
 
 
 class NotificationManager(QObject):
-    
-    __slots__ = ( 'notification_timeout', 'notification_queue_max_length', 'notification_queue_max_age', 'tray_menu', 'tray_icon', 
-                'notifications_available', 'notifications_enabled', 'notifications_visible', 'notifications_queue', 
+
+    __slots__ = ( 'notification_timeout', 'notification_queue_max_length', 'notification_queue_max_age', 'tray_menu', 'tray_icon',
+                'notifications_available', 'notifications_enabled', 'notifications_visible', 'notifications_queue',
                 'active_notification', 'notification_menu_actions' )
 
     def __init__(self):
         super().__init__()
-        
+
         # time to display a notification
         self.notification_timeout: Final = 6000 # in ms
         # we keep the last n notifications in the tray icon menu
         self.notification_queue_max_length: Final = 5
         # notifications older then max_age are automatically removed from the try icon menu
         self.notification_queue_max_age: Final = 30*24*60*60 # in seconds (30 days = 30*24*60*60)
-        
+
         self.tray_icon = QSystemTrayIcon(self)
         self.tray_menu = QMenu()
-        
+
         # notfication_available is true if the operating system supports notifications
         self.notifications_available = self.tray_icon.isSystemTrayAvailable() and self.tray_icon.supportsMessages()
         if self.notifications_available:
             # the tray icon is displayed only if notifications are supported by the system
             self.tray_icon.setIcon(self.artisanTrayIcon())
-            self.tray_icon.setToolTip("Artisan Notifications")
+            self.tray_icon.setToolTip('Artisan Notifications')
             self.tray_icon.messageClicked.connect(self.messageClicked)
-            #self.tray_icon.show() # if try_icon is not visible, notifications are not delivered       
+            #self.tray_icon.show() # if try_icon is not visible, notifications are not delivered
             self.tray_icon.setContextMenu(self.tray_menu)
-        
+
         self.notifications_enabled = True # if False, issued notification messages are ignored
         self.notifications_visible = True # if False, the tray_menu icon (and thus notifications) are not shown
         self.notifications_queue = [] # FIFO of Notification objects. Note: notification ids of all queued notifications are unique if given (not None)
@@ -167,11 +166,11 @@ class NotificationManager(QObject):
 
     @staticmethod
     def artisanTrayIcon():
-        basedir = os.path.join(getResourcePath(),"Icons")
-        if sys.platform.startswith("darwin"):
-            p = os.path.join(basedir, "artisan-trayicon.svg")
+        basedir = os.path.join(getResourcePath(),'Icons')
+        if sys.platform.startswith('darwin'):
+            p = os.path.join(basedir, 'artisan-trayicon.svg')
         else:
-            p = os.path.join(basedir, "artisan-trayicon-large.svg")
+            p = os.path.join(basedir, 'artisan-trayicon-large.svg')
         icon = QIcon(p)
         icon.setIsMask(True)
         return icon
@@ -179,23 +178,23 @@ class NotificationManager(QObject):
     # returns the plus icon as QIcon
     @staticmethod
     def notificationPlusIcon():
-        basedir = os.path.join(getResourcePath(),"Icons")
-        if sys.platform.startswith("darwin"):
-            p = os.path.join(basedir, "plus-notification.png")
+        basedir = os.path.join(getResourcePath(),'Icons')
+        if sys.platform.startswith('darwin'):
+            p = os.path.join(basedir, 'plus-notification.png')
         else:
-            p = os.path.join(basedir, "plus-notification.svg")
+            p = os.path.join(basedir, 'plus-notification.svg')
         return QIcon(p)
 
     # returns the Artisan icon as QIcon
     @staticmethod
     def notificationArtisanIcon():
-        basedir = os.path.join(getResourcePath(),"Icons")
-        if sys.platform.startswith("darwin"):
-            p = os.path.join(basedir, "artisan-notification.png")
+        basedir = os.path.join(getResourcePath(),'Icons')
+        if sys.platform.startswith('darwin'):
+            p = os.path.join(basedir, 'artisan-notification.png')
         else:
-            p = os.path.join(basedir, "artisan-notification.svg")
+            p = os.path.join(basedir, 'artisan-notification.svg')
         return QIcon(p)
-    
+
     @pyqtSlot()
     def messageClicked(self):
         try:
@@ -218,7 +217,7 @@ class NotificationManager(QObject):
                 self.active_notification = None
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-    
+
     def showNotifications(self):
         try:
             if self.notifications_available:
@@ -228,7 +227,7 @@ class NotificationManager(QObject):
                     self.updateNotificationMenu()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-            
+
     def hideNotifications(self):
         try:
             if self.notifications_available:
@@ -236,29 +235,29 @@ class NotificationManager(QObject):
                 self.tray_icon.hide()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-    
+
     # if notifications are enabled, incoming notifications are presented to user
     def enableNotifications(self):
         self.notifications_enabled = True
-    
+
     # if notfications are disabled, incoming notifications are just ignore
     def disableNotifications(self):
         self.notifications_enabled = False
-    
+
     def getNotificationItems(self):
         return self.notifications_queue
-    
+
     def addNotificationItem(self, notification: Notification):
         self.notifications_queue.append(notification)
         self.updateNotificationMenu()
-    
+
     def removeNotificationItem(self, notification: Notification):
         self.notifications_queue.remove(notification)
         self.updateNotificationMenu()
-    
+
     def clearNotificationQueue(self):
         self.notifications_queue = []
-    
+
     def isNotificationInQueue(self, hr_id):
         return not id and any(n.id == hr_id for n in self.getNotificationItems())
 
@@ -271,7 +270,7 @@ class NotificationManager(QObject):
             self.notifications_queue = self.notifications_queue[max(0,len(self.notifications_queue)-self.notification_queue_max_length):]
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-    
+
     def updateNotificationMenu(self):
         try:
             self.cleanNotificationQueue()
@@ -284,7 +283,7 @@ class NotificationManager(QObject):
                     menu_title = (title[:25] + '...') if len(title) > 25 else title
                     action = QAction(menu_title, visible=True, triggered=self.notificationItemSelected)
                     action.setData(n)
-                    self.notification_menu_actions.append(action)                                
+                    self.notification_menu_actions.append(action)
                     self.tray_menu.addAction(action)
             else:
                 self.tray_icon.hide()
@@ -296,7 +295,7 @@ class NotificationManager(QObject):
         action = self.sender()
         n = action.data()
         self.setNotification(n, addToQueue=False)
-        
+
     # actually presents the given notification to the user
     def showNotification(self, notification: Notification):
         try:
@@ -304,18 +303,18 @@ class NotificationManager(QObject):
             if notification.type in [NotificationType.ARTISAN_SYSTEM, NotificationType.ARTISAN_USER]:
                 icon = self.notificationArtisanIcon()
             elif notification.type in [
-                    NotificationType.PLUS_SYSTEM, 
-                    NotificationType.PLUS_REMINDER, 
+                    NotificationType.PLUS_SYSTEM,
+                    NotificationType.PLUS_REMINDER,
                     NotificationType.PLUS_ADMIN,
                     NotificationType.PLUS_ADMIN]:
                 icon = self.notificationPlusIcon()
             self.tray_icon.showMessage(notification.formatedTitle(), notification.message, icon, self.notification_timeout)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-    
+
     # set the given notification as the active one and shows it to the user
     def setNotification(self, notification: Notification, addToQueue:bool = True):
-        _log.info("%s %s %s", notification.type.name, notification.formatedTitle(), notification.message)
+        _log.info('%s %s %s', notification.type.name, notification.formatedTitle(), notification.message)
         try:
             self.active_notification = notification
             if addToQueue:
@@ -325,7 +324,7 @@ class NotificationManager(QObject):
             self.showNotification(notification)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-    
+
     # clears the active notification if equal to the given one
     def clearNotification(self, notification: Notification):
         if self.active_notification == notification:
@@ -333,7 +332,7 @@ class NotificationManager(QObject):
 
     # external API to send a notification to the user via the notification manager
     def sendNotificationMessage(self, title: str, message: str, notification_type: NotificationType, created:Optional[float] = None, hr_id: Optional[str] = None):
-        _log.debug("sendNotificationMessage(%s,%s,%s,%s)", title, message, notification_type, hr_id)
+        _log.debug('sendNotificationMessage(%s,%s,%s,%s)', title, message, notification_type, hr_id)
         try:
             if self.notifications_available and self.notifications_enabled:
                 n = Notification(title, message, notification_type, created=created, hr_id=hr_id)

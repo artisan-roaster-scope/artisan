@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # Acaia scale support for Artisan
@@ -31,27 +30,27 @@ _log: Final = logging.getLogger(__name__)
 class AcaiaBLE():
 
     # Acaia Pearl, Lunar:
-    DEVICE_NAME_PEARL = "PROCHBT"
-    DEVICE_NAME_LUNAR = "ACAIA"
-    SERVICE_UUID_LEGACY = "00001820-0000-1000-8000-00805f9b34fb"
-    CHAR_UUID_LEGACY = ("00002a80-0000-1000-8000-00805f9b34fb", BLE_CHAR_TYPE.BLE_CHAR_NOTIFY_WRITE)
-    
+    DEVICE_NAME_PEARL = 'PROCHBT'
+    DEVICE_NAME_LUNAR = 'ACAIA'
+    SERVICE_UUID_LEGACY = '00001820-0000-1000-8000-00805f9b34fb'
+    CHAR_UUID_LEGACY = ('00002a80-0000-1000-8000-00805f9b34fb', BLE_CHAR_TYPE.BLE_CHAR_NOTIFY_WRITE)
+
     # Acaia Pearl (2021):
-    DEVICE_NAME_PEARL2021 = "PEARL-"
-    SERVICE_UUID = "49535343-FE7D-4AE5-8FA9-9FAFD205E455"
-    CHAR_UUID = ("49535343-1E4D-4BD9-BA61-23C647249616", BLE_CHAR_TYPE.BLE_CHAR_NOTIFY)
-    CHAR_UUID_WRITE = ("49535343-8841-43F4-A8D4-ECBE34729BB3", BLE_CHAR_TYPE.BLE_CHAR_WRITE)
+    DEVICE_NAME_PEARL2021 = 'PEARL-'
+    SERVICE_UUID = '49535343-FE7D-4AE5-8FA9-9FAFD205E455'
+    CHAR_UUID = ('49535343-1E4D-4BD9-BA61-23C647249616', BLE_CHAR_TYPE.BLE_CHAR_NOTIFY)
+    CHAR_UUID_WRITE = ('49535343-8841-43F4-A8D4-ECBE34729BB3', BLE_CHAR_TYPE.BLE_CHAR_WRITE)
 
     # Acaia Pearl S:
-    DEVICE_NAME_PEARLS = "PEARLS"
-    
+    DEVICE_NAME_PEARLS = 'PEARLS'
+
     # Acaia Lunar (2021):
-    DEVICE_NAME_LUNAR2021 = "LUNAR-"
-    
+    DEVICE_NAME_LUNAR2021 = 'LUNAR-'
+
     # Acaia Pyxis:
-    DEVICE_NAME_PYXIS = "PYXIS"
-    
-    
+    DEVICE_NAME_PYXIS = 'PYXIS'
+
+
     HEADER1      = 0xef
     HEADER2      = 0xdd
 
@@ -82,7 +81,7 @@ class AcaiaBLE():
     TIMER_STATE_STOPPED = 0
     TIMER_STATE_STARTED = 1
     TIMER_STATE_PAUSED = 2
-    
+
     # Acaia Protocol Parser
     E_PRS_CHECKHEADER1 = 0
     E_PRS_CHECKHEADER2 = 1
@@ -105,9 +104,9 @@ class AcaiaBLE():
 
 
     def __init__(self):
-        
+
         self.timeStart = None
-    
+
         self.notificationConfSentFast = False
         self.notificationConfSentSlow = False
         # holds msgType on messages split in header and payload
@@ -174,7 +173,7 @@ class AcaiaBLE():
 
                 self.resetProtocolParser()
 
-    
+
     def reset(self):
         self.__init__()
 
@@ -221,7 +220,7 @@ class AcaiaBLE():
 
     # configure notifications
     def confNotificationsSlow(self,write):
-        _log.debug("confNotificationsSlow(_)")
+        _log.debug('confNotificationsSlow(_)')
         self.notificationConfSentSlow = True
         self.sendEvent(write,
             bytes([ # pairs of key/setting
@@ -237,7 +236,7 @@ class AcaiaBLE():
                 ])
                 )
     def confNotificationsFast(self,write):
-        _log.debug("confNotificationsFast(_)")
+        _log.debug('confNotificationsFast(_)')
         self.notificationConfSentFast = True
         self.sendEvent(write,
             bytes([ # pairs of key/setting
@@ -251,22 +250,22 @@ class AcaiaBLE():
 #                    3,  # key (not used)
 #                    255, #4   # setting (not used)
                 ])
-                )                
+                )
 
     def parseInfo(self,data):
-        _log.debug("parseInfo(_)")
+        _log.debug('parseInfo(_)')
 #        if len(data)>1:
 #            print(data[1])
         if len(data)>4:
             self.firmware = (data[2],data[3],data[4])
-            _log.debug("firmware: %s", self.firmware)
+            _log.debug('firmware: %s', self.firmware)
             #print("{}.{}.{}".format(self.firmware[0],self.firmware[1],self.firmware[2]))
         # passwd_set
 #        if len(data)>5:
 #            print(data[5])
 #        if len(data)>6:
 #            print(data[6])
-   
+
     # returns length of consumed data or -1 on error
     def parseWeightEvent(self,payload):
         if len(payload) < self.EVENT_WEIGHT_LEN:
@@ -274,7 +273,7 @@ class AcaiaBLE():
         # first 4 bytes encode the weight as unsigned long
         value = ((payload[3] & 0xff) << 24) + \
             ((payload[2] & 0xff) << 16) + ((payload[1] & 0xff) << 8) + (payload[0] & 0xff)
-        
+
         div = payload[4]
 
         if div == 1:
@@ -285,15 +284,15 @@ class AcaiaBLE():
             value /= 1000
         elif div == 4:
             value /= 10000
-        
+
         # convert received weight data to g
         if self.unit == 1: # kg
             value = value * 1000
         elif self.unit == 5: # oz
             value = value * 28.3495
-        
+
         #stable = (payload[5] & 0x01) != 0x01
-        
+
         # if 2nd bit of payload[5] is set, the reading is negative
         if (payload[5] & 0x02) == 0x02:
             value *= -1
@@ -302,9 +301,9 @@ class AcaiaBLE():
         if value != self.weight: # and stable:
             self.weight = value
 #            _log.debug("new weight: %s", self.weight)
-        
+
         return self.EVENT_WEIGHT_LEN
-    
+
     def parseBatteryEvent(self,payload):
 #        _log.debug("parseBatteryEvent(_)")
         if len(payload) < self.EVENT_BATTERY_LEN:
@@ -313,9 +312,9 @@ class AcaiaBLE():
         if 0 <= b <= 100:
             self.battery = int(payload[0])
             #print("bat","{}%".format(self.battery))
-            _log.debug("battery: %s", self.battery)
+            _log.debug('battery: %s', self.battery)
         return self.EVENT_BATTERY_LEN
-    
+
     def parseTimerEvent(self,payload):
         if len(payload) < self.EVENT_TIMER_LEN:
             return -1
@@ -323,16 +322,16 @@ class AcaiaBLE():
 #            print("seconds",payload[1])
 #            print("mseconds",payload[2])
         value = ((payload[0] & 0xff) * 60) + payload[1] + payload[2] / 10.
-        _log.debug("parseTimerEvent(_): %sm%s%sms, %s",payload[0],payload[1],payload[2], value)
+        _log.debug('parseTimerEvent(_): %sm%s%sms, %s',payload[0],payload[1],payload[2], value)
         return self.EVENT_TIMER_LEN
-    
+
     def parseAckEvent(self,payload):
         if len(payload) < self.EVENT_ACK_LEN:
             return -1
         return self.EVENT_ACK_LEN
-    
+
     def parseKeyEvent(self,payload):
-        _log.debug("parseKeyEvent(_)")
+        _log.debug('parseKeyEvent(_)')
         if len(payload) < self.EVENT_KEY_LEN:
             return -1
         return self.EVENT_KEY_LEN
@@ -343,9 +342,9 @@ class AcaiaBLE():
             payload = payload[2:]
             val = -1
             if event == self.EVENT_WEIGHT:
-                val = self.parseWeightEvent(payload)                
+                val = self.parseWeightEvent(payload)
                 if not self.notificationConfSentSlow:
-                    # after receiving the first weight quick, 
+                    # after receiving the first weight quick,
                     # we slow down the weight notificatinos
                     self.confNotificationsSlow(write)
             elif event == self.EVENT_BATTERY:
@@ -356,7 +355,7 @@ class AcaiaBLE():
                 val = self.parseAckEvent(payload)
             elif event == self.EVENT_KEY:
                 val = self.parseKeyEvent(payload)
-            else: 
+            else:
                 return -1
             if val < 0:
                 return -1
@@ -368,20 +367,20 @@ class AcaiaBLE():
             pos = self.parseScaleEvent(payload,write)
             if pos > -1:
                 self.parseScaleEvents(payload[pos+1:],write)
-                
+
     def parseStatus(self,payload):
-        _log.debug("parseStatus(_,_)")
-        
+        _log.debug('parseStatus(_,_)')
+
         # battery level (7 bits of first byte) + TIMER_START (1bit)
         if payload and len(payload) > 0:
             self.battery = int(payload[1] & ~(1 << 7))
-            _log.debug("battery: %s%%", self.battery)
+            _log.debug('battery: %s%%', self.battery)
             #print("bat","{}%".format(self.battery))
         # unit (7 bits of second byte) + CD_START (1bit)
         if payload and len(payload) > 1:
             self.unit = int(payload[2] & 0x7F)
-            _log.debug("unit: %s", self.unit)
-            
+            _log.debug('unit: %s', self.unit)
+
         # mode (7 bits of third byte) + tare (1bit)
         # sleep (4th byte), 0:off, 1:5sec, 2:10sec, 3:20sec, 4:30sec, 5:60sec
         # key disabled (5th byte), touch key setting 0: off , 1:On
@@ -390,7 +389,7 @@ class AcaiaBLE():
         # max weight (8th byte)
         if payload and len(payload) > 7:
             self.max_weight = (payload[7] + 1) * 1000
-            _log.debug("max_weight: %s", self.max_weight)
+            _log.debug('max_weight: %s', self.max_weight)
 
     def parseScaleData(self,write,msgType,data):
         if msgType == self.MSG_INFO:
@@ -409,12 +408,12 @@ class AcaiaBLE():
     # returns None or new weight data as first result and
     # None or new battery level as second result
     def processData(self, write, data):
-        
+
         data = data.data() # convert QByteArray to Python byte array
         old_weight = self.weight
         old_battery = self.battery
         self.acaiaProtocolParser(write, data)
-            
+
         if old_weight == self.weight:
             w = None # weight did not change
         else:
@@ -424,4 +423,3 @@ class AcaiaBLE():
         else:
             b = self.battery
         return w,b
-

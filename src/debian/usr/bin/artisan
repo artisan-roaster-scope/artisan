@@ -4,7 +4,7 @@ __dir="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 
 if [ -f /etc/os-release ]; then
     grep Raspbian /etc/os-release >/dev/null
-    # Workaround for issue #187	
+    # Workaround for issue #187
     if [ $? -eq 0 ]; then
 	unset XDG_CURRENT_DESKTOP
     fi
@@ -19,5 +19,3 @@ fi
 #    fi
 #fi
 exec /usr/bin/env GDK_BACKEND=x11 PATH=${__dir}/../share/artisan:$PATH QT_PLUGIN_PATH=${__dir}/../share/artisan/PyQt6/Qt6/plugins LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/gtk-3.0/modules:${__dir}/../share/artisan:$LD_LIBRARY_PATH LIBOVERLAY_SCROLLBAR=0 GTK2_RC_FILES="$HOME/.gtkrc-2.0" ${__dir}/../share/artisan/artisan "$@" 2>/dev/null
-
-	

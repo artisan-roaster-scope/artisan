@@ -87,7 +87,7 @@ Artisan
 # wget https://github.com/artisan-roaster-scope/artisan/archive/master.zip
 # unzip master
 # cd artisan-master
-# 
+#
 
 
 
@@ -151,4 +151,3 @@ snap7 + python-snap7
 colorspacious
 
 # sudo pip install colorspacious
-

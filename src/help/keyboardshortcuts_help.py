@@ -10,9 +10,9 @@ def content():
     helpstr = ''  #@UnusedVariable
     newline = '\n'  #@UnusedVariable
     strlist.append('<head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body>')
-    strlist.append("<b>")
+    strlist.append('<b>')
     strlist.append(QApplication.translate('HelpDlg','KEYBOARD SHORTCUTS'))
-    strlist.append("</b>")
+    strlist.append('</b>')
     tbl_KeyboardShortcuts = prettytable.PrettyTable()
     tbl_KeyboardShortcuts.field_names = [QApplication.translate('HelpDlg','Keys'),QApplication.translate('HelpDlg','Description')]
     tbl_KeyboardShortcuts.add_row(['ENTER',QApplication.translate('HelpDlg','Turns ON/OFF Keyboard Shortcuts')])
@@ -44,8 +44,8 @@ def content():
     tbl_KeyboardShortcuts.add_row(['q,w,e,r + <value>',QApplication.translate('HelpDlg','Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &#39;q75&#39;, when the correspoding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less that 100 a leading zero is required, e.g. &#39;q075&#39;.  ')])
     tbl_KeyboardShortcuts.add_row(['v +  <value>',QApplication.translate('HelpDlg','Quick PID SV Entry.  Value is a three digit number.  For values less than 100 must be entered with a leading zero, e.g. &#39;v075&#39;.')])
     tbl_KeyboardShortcuts.add_row(['f\u00A0\u00A0\u00A0[Windows:  CTRL+SHIFT+f]',QApplication.translate('HelpDlg','Full Screen Mode')])
-    strlist.append(tbl_KeyboardShortcuts.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
-    strlist.append("</body>")
-    helpstr = "".join(strlist)
-    helpstr = re.sub(r"&amp;", r"&",helpstr)
+    strlist.append(tbl_KeyboardShortcuts.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
+    strlist.append('</body>')
+    helpstr = ''.join(strlist)
+    helpstr = re.sub(r'&amp;', r'&',helpstr)
     return helpstr

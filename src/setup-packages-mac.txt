@@ -11,7 +11,7 @@ o scipy 1.0.0
 o matplotlib 2.1.1
 (o pyaudio 0.2.8)
 (o minimalmodbus 0.6)
-o Phidgets22 1.0.0 20.11.2017 
+o Phidgets22 1.0.0 20.11.2017
 o pyobjc 3.2.1
 o modulegraph 0.15
 o setuptools 36.0.1
@@ -51,7 +51,7 @@ CHECK FOR UPDATES
 # pipdeptree -fl
 
 Note:
-To build Artisan on Mac OS X 10.11 El Capitan and later one needs to 
+To build Artisan on Mac OS X 10.11 El Capitan and later one needs to
 1) disable SIP (check its status via "# csrutil status")
 2) remove restricted file flag on Python.framework
 
@@ -358,12 +358,12 @@ Upgrade History:
  . Mercurial 1.7.3 => 1.9.1
  . modulegraph 0.8.2 => 0.9.2
 - 2011-07-22: Upgraded
- . Numpy 1.6.0 => 1.6.1 
+ . Numpy 1.6.0 => 1.6.1
 - 2011-06-30: Upgraded
  . py2app 0.5.2 => 0.6.3
 - 2011-06-28: Upgraded
  . Python 2.7.1 => 2.7.2
-- 2011-05-12: Upgraded 
+- 2011-05-12: Upgraded
  . Qt 4.7.2 => Qt 4.7.3
  . Numpy 1.5.1 => 1.6.0
  . SIP 4.12.1 => 4.12.3
@@ -392,7 +392,7 @@ NOTE: if XCode is updated after a complete setup for Artisan, the SVG icons migh
 1) Install XCode 4.5.2
 
 not needed anymore:
-# sudo ln -s /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer /Developer 
+# sudo ln -s /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer /Developer
 
 install command line tools via Preferences/Downloads/Components
 
@@ -407,7 +407,7 @@ set default to 64bit:
 # defaults write com.apple.versioner.python Prefer-32-Bit -bool no
 
 
-3) Install pyserial 
+3) Install pyserial
 
 download latest source (pyserial-2.6.tar.gz) from http://pypi.python.org/pypi/pyserial
 
@@ -447,7 +447,7 @@ Note: PyQt needs to be re-installed after a qt update
 make sure that the current Python is in the path (otherwise the following ./configure.py might fail:
 # export PATH=/Library/Frameworks/Python.framework/Versions/3.4/bin:/Library/Frameworks/Python.framework/Versions/3.4/lib:${PATH}
 
-# tar xzf PyQt-mac-gpl-4.10.4.tar.gz 
+# tar xzf PyQt-mac-gpl-4.10.4.tar.gz
 # cd PyQt-mac-gpl-4.10.4
 # python configure.py
 use: "python configure.py -q /Users/<username>/Qt5.5.0/5.5/clang_64/bin/qmake"
@@ -641,7 +641,7 @@ NOTE: to clean build dir use "python setup.py clean --all"
 
 
 check installation:
-	
+
 # python
 >> import matplotlib
 >> matplotlib.__version__
@@ -656,14 +656,14 @@ check installation:
 # curl -O http://www.portaudio.com/archives/pa_stable_v19_20111121.tgz
 # tar -xzf pa_stable_v19_20111121.tgz
 # cd portaudio
-# ./configure 
+# ./configure
 
 # vi Makefile
 all: lib/$(PALIB) all-recursive test examples selftests
 =>
 all: lib/$(PALIB) all-recursive examples selftests
 
-# make 
+# make
 # sudo make install
 
 
@@ -677,7 +677,7 @@ all: lib/$(PALIB) all-recursive examples selftests
 
 Download and extract PortAudio pa_stable_v19_20140130.tgz from http://www.portaudio.com/download.html
 # cp ../portaudio/include/pa_mac_core.h src/
-# cp ../portaudio/include/portaudio.h src/ 
+# cp ../portaudio/include/portaudio.h src/
 
 # vi src/pa_mac_core.h
 -#include <AudioUnit/AudioUnit.h>
@@ -780,8 +780,8 @@ XX) cx_freeze
 export CC=clang
 export CXX=clang
 export FFLAGS=-ff2c
-export LDSHARED='clang -bundle -undefined dynamic_lookup -arch i386 -arch 
-x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk -g' 
+export LDSHARED='clang -bundle -undefined dynamic_lookup -arch i386 -arch
+x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk -g'
 
 # python setup.py build
 # python setup.py install
@@ -840,7 +840,7 @@ except NameError:
 
 22) yoctopuce 1.10.16490
 
-download lastest package from here: 
+download lastest package from here:
 https://pypi.python.org/pypi/yoctopuce/
 
 # cd yoctopuce-1.10.20773

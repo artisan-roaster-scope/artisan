@@ -10,9 +10,9 @@ def content():
     helpstr = ''  #@UnusedVariable
     newline = '\n'  #@UnusedVariable
     strlist.append('<head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body>')
-    strlist.append("<b>")
+    strlist.append('<b>')
     strlist.append(QApplication.translate('HelpDlg','EVENT CUSTOM BUTTONS'))
-    strlist.append("</b>")
+    strlist.append('</b>')
     tbl_Buttons = prettytable.PrettyTable()
     tbl_Buttons.field_names = [QApplication.translate('HelpDlg','Column'),QApplication.translate('HelpDlg','Description')]
     tbl_Buttons.add_row([QApplication.translate('HelpDlg','Button Label'),QApplication.translate('HelpDlg','Enter \\n to create labels with multiple lines. \\t is substituted by the event type.')])
@@ -22,10 +22,10 @@ def content():
     tbl_Buttons.add_row([QApplication.translate('HelpDlg','Action'),QApplication.translate('HelpDlg','Perform an action at the time of the event.')])
     tbl_Buttons.add_row([QApplication.translate('HelpDlg','Documentation'),QApplication.translate('HelpDlg','The action Command.  Depends on the action type, &#39;{}&#39; is replaced by the event value and the offset in case of a \u00B1 event type.')])
     tbl_Buttons.add_row([QApplication.translate('HelpDlg','Button Visibility'),QApplication.translate('HelpDlg','Hides/shows individual button.')])
-    strlist.append(tbl_Buttons.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
-    strlist.append("<br/><br/><b>")
+    strlist.append(tbl_Buttons.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
+    strlist.append('<br/><br/><b>')
     strlist.append(QApplication.translate('HelpDlg','EVENT BUTTONS CONFIGURATION OPTIONS'))
-    strlist.append("</b>")
+    strlist.append('</b>')
     tbl_Options = prettytable.PrettyTable()
     tbl_Options.field_names = [QApplication.translate('HelpDlg','Option'),QApplication.translate('HelpDlg','Description')]
     tbl_Options.add_row([QApplication.translate('HelpDlg','Max buttons per row'),QApplication.translate('HelpDlg','Sets a maximum number of buttons to display on a single row.')])
@@ -36,14 +36,14 @@ def content():
     tbl_Options.add_row([QApplication.translate('HelpDlg','Delete'),QApplication.translate('HelpDlg','Deletes the selected button.')])
     tbl_Options.add_row([QApplication.translate('HelpDlg','Copy Table'),QApplication.translate('HelpDlg','Copy the button table in tab separated format to the clipboard.  Option or ALT click to copy a tabular format to the clipboard.')])
     tbl_Options.add_row([QApplication.translate('HelpDlg','Help'),QApplication.translate('HelpDlg','Opens this window.')])
-    strlist.append(tbl_Options.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
-    strlist.append("<br/><br/><b>")
+    strlist.append(tbl_Options.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
+    strlist.append('<br/><br/><b>')
     strlist.append(QApplication.translate('HelpDlg','COMMANDS'))
-    strlist.append("</b>")
+    strlist.append('</b>')
     tbl_Commandstop = prettytable.PrettyTable()
     tbl_Commandstop.header = False
     tbl_Commandstop.add_row([QApplication.translate('HelpDlg','Note: "{}" can be used as a placeholder, it will be substituted by the current button value plus the offset for \u00B1 event types.  If a placeholder occurs several times in a description/command, all those occurrences are replaced by the value.\n')+newline+QApplication.translate('HelpDlg','Note: The placeholders {ET}, {BT}, {time}, {ETB}, {BTB} will be substituted by the current ET, BT, time, ET background, BT background value in Serial/CallProgram/MODBUS/S7/WebSocket commands\n')+newline+QApplication.translate('HelpDlg','Note: commands can be sequenced, separated by semicolons like in “<cmd1>;<cmd2>;<cmd3>”\n')+newline+QApplication.translate('HelpDlg','Note: in PHIDGET commands, the optional parameter <sn> has the form <hub_serial>[:<hub_port>] allows to refer to a specific Phidget HUB by given its serial number, and optionally specifying the port number the addressed module is connected to.\n')+newline+QApplication.translate('HelpDlg','Note: in YOCTOPUCE commands, the optional parameter <sn> holds either the modules serial number or its name')])
-    strlist.append(tbl_Commandstop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
+    strlist.append(tbl_Commandstop.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
     tbl_Commands = prettytable.PrettyTable()
     tbl_Commands.field_names = [QApplication.translate('HelpDlg','Action'),QApplication.translate('HelpDlg','Command'),QApplication.translate('HelpDlg','Description')]
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Serial Command'),QApplication.translate('HelpDlg','ASCII serial command or binary a2b_uu(serial command)'),'&#160;'])
@@ -160,8 +160,8 @@ def content():
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','sleep(<float>)'),QApplication.translate('HelpDlg','sleep: add a delay of <float> seconds')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','button(<bool>)'),QApplication.translate('HelpDlg','sets calling button to “pressed” if argument evaluates to 1 or True')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','read(<json>)'),QApplication.translate('HelpDlg','if the `<json>` text respects the JSON format it is send to the connected WebSocket server and the response is bound to the variable `_`')])
-    strlist.append(tbl_Commands.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
-    strlist.append("</body>")
-    helpstr = "".join(strlist)
-    helpstr = re.sub(r"&amp;", r"&",helpstr)
+    strlist.append(tbl_Commands.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
+    strlist.append('</body>')
+    helpstr = ''.join(strlist)
+    helpstr = re.sub(r'&amp;', r'&',helpstr)
     return helpstr

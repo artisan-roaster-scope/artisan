@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # Artisan Cup Profile Dialog
@@ -44,48 +43,48 @@ class flavorDlg(ArtisanResizeablDialog):
         helpFlag = Qt.WindowType.WindowContextHelpButtonHint
         flags = flags & (~helpFlag)
         self.setWindowFlags(flags)
-        self.setWindowTitle(QApplication.translate("Form Caption","Cup Profile"))
-        
+        self.setWindowTitle(QApplication.translate('Form Caption','Cup Profile'))
+
         settings = QSettings()
-        if settings.contains("FlavorProperties"):
-            self.restoreGeometry(settings.value("FlavorProperties"))
-            
-        defaultlabel = QLabel(QApplication.translate("Label","Default"))
+        if settings.contains('FlavorProperties'):
+            self.restoreGeometry(settings.value('FlavorProperties'))
+
+        defaultlabel = QLabel(QApplication.translate('Label','Default'))
         self.defaultcombobox = QComboBox()
-        self.defaultcombobox.addItems(["","Artisan","SCA","SCAA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC","WCRC","*CUSTOM*"])
+        self.defaultcombobox.addItems(['','Artisan','SCA','SCAA','CQI','SweetMarias','C','E','CoffeeGeek','Intelligentsia','IIAC','WCRC','*CUSTOM*'])
         self.defaultcombobox.setCurrentIndex(0)
         self.lastcomboboxIndex = 0
         self.defaultcombobox.currentIndexChanged.connect(self.setdefault)
         self.flavortable = QTableWidget()
         self.flavortable.setTabKeyNavigation(True)
         self.createFlavorTable()
-        leftButton = QPushButton("<")
+        leftButton = QPushButton('<')
         leftButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         leftButton.clicked.connect(self.moveLeft)
-        rightButton = QPushButton(">")
+        rightButton = QPushButton('>')
         rightButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         rightButton.clicked.connect(self.moveRight)
-        addButton = QPushButton(QApplication.translate("Button","Add"))
+        addButton = QPushButton(QApplication.translate('Button','Add'))
         addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         addButton.clicked.connect(self.addlabel)
-        delButton = QPushButton(QApplication.translate("Button","Del"))
+        delButton = QPushButton(QApplication.translate('Button','Del'))
         delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         delButton.clicked.connect(self.poplabel)
-        saveImgButton = QPushButton(QApplication.translate("Button","Save Image"))
+        saveImgButton = QPushButton(QApplication.translate('Button','Save Image'))
         saveImgButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         saveImgButton.clicked.connect(self.aw.saveVectorGraph_PDF) # save as PDF (vector)
-        
+
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.close)
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
-        
-        self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Background"))
+
+        self.backgroundCheck = QCheckBox(QApplication.translate('CheckBox','Background'))
         if self.aw.qmc.flavorbackgroundflag:
             self.backgroundCheck.setChecked(True)
         self.backgroundCheck.clicked.connect(self.showbackground)
-        aspectlabel = QLabel(QApplication.translate("Label","Aspect Ratio"))
+        aspectlabel = QLabel(QApplication.translate('Label','Aspect Ratio'))
         self.aspectSpinBox = QDoubleSpinBox()
-        self.aspectSpinBox.setToolTip(QApplication.translate("Tooltip","Aspect Ratio"))
+        self.aspectSpinBox.setToolTip(QApplication.translate('Tooltip','Aspect Ratio'))
         self.aspectSpinBox.setRange(0.,2.)
         self.aspectSpinBox.setSingleStep(.1)
         self.aspectSpinBox.setValue(self.aw.qmc.flavoraspect)
@@ -138,18 +137,18 @@ class flavorDlg(ArtisanResizeablDialog):
 
     def createFlavorTable(self):
         nflavors = len(self.aw.qmc.flavorlabels)
-        
+
         # self.flavortable.clear() # this crashes Ubuntu 16.04
 #        if ndata != 0:
 #            self.flavortable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
         self.flavortable.clearSelection() # this seems to work also for Ubuntu 16.04
-        
+
         if nflavors:
             self.flavortable.setRowCount(nflavors)
             self.flavortable.setColumnCount(3)
-            self.flavortable.setHorizontalHeaderLabels([QApplication.translate("Table", "Label"),
-                                                        QApplication.translate("Table", "Value"),
-                                                        ""])
+            self.flavortable.setHorizontalHeaderLabels([QApplication.translate('Table', 'Label'),
+                                                        QApplication.translate('Table', 'Value'),
+                                                        ''])
             self.flavortable.setAlternatingRowColors(True)
             self.flavortable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
             self.flavortable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
@@ -180,12 +179,12 @@ class flavorDlg(ArtisanResizeablDialog):
     def showbackground(self,_):
         if self.backgroundCheck.isChecked():
             if not self.aw.qmc.background:
-                message = QApplication.translate("Message","Background profile not found")
+                message = QApplication.translate('Message','Background profile not found')
                 self.aw.sendmessage(message)
                 self.backgroundCheck.setChecked(False)
             else:
                 if len(self.aw.qmc.backgroundFlavors) != len(self.aw.qmc.flavors):
-                    message = QApplication.translate("Message","Background does not match number of labels")
+                    message = QApplication.translate('Message','Background does not match number of labels')
                     self.aw.sendmessage(message)
                     self.aw.qmc.flavorbackgroundflag = False
                     self.backgroundCheck.setChecked(False)
@@ -200,7 +199,7 @@ class flavorDlg(ArtisanResizeablDialog):
     def moveLeft(self,_):
         self.aw.qmc.flavorstartangle += 5
         self.aw.qmc.flavorchart()
-    
+
     @pyqtSlot(bool)
     def moveRight(self,_):
         self.aw.qmc.flavorstartangle -= 5
@@ -211,8 +210,8 @@ class flavorDlg(ArtisanResizeablDialog):
             labeledit = self.flavortable.cellWidget(i,0)
             valueSpinBox = self.flavortable.cellWidget(i,1)
             label = labeledit.text()
-            if "\\n" in label:              #make multiple line text if "\n" found in label string
-                parts = label.split("\\n")
+            if '\\n' in label:              #make multiple line text if "\n" found in label string
+                parts = label.split('\\n')
                 label = chr(10).join(parts)
             self.aw.qmc.flavorlabels[i] = label
             self.aw.qmc.flavors[i] = valueSpinBox.value()
@@ -221,7 +220,7 @@ class flavorDlg(ArtisanResizeablDialog):
             self.aw.qmc.customflavorlabels = self.aw.qmc.flavorlabels
 
     @pyqtSlot()
-    @pyqtSlot("QString")
+    @pyqtSlot('QString')
     def setlabel(self,_):
         x = self.aw.findWidgetsRow(self.flavortable,self.sender(),0)
         if x is not None:
@@ -280,7 +279,7 @@ class flavorDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def addlabel(self,_):
-        self.aw.qmc.flavorlabels.append("???")
+        self.aw.qmc.flavorlabels.append('???')
         self.aw.qmc.flavors.append(5.)
         self.createFlavorTable()
         self.aw.qmc.flavorchart()
@@ -300,7 +299,7 @@ class flavorDlg(ArtisanResizeablDialog):
     def close(self):
         settings = QSettings()
         #save window geometry
-        settings.setValue("FlavorProperties",self.saveGeometry())
+        settings.setValue('FlavorProperties',self.saveGeometry())
         self.savetable()
         self.aw.qmc.fileDirty()
         if self.aw.qmc.ax1 is not None:

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # config.py
 #
@@ -23,8 +22,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#import logging
-#from logging.handlers import RotatingFileHandler
 from typing import Optional
 try:
     from typing import Final
@@ -41,28 +38,28 @@ except Exception:
     from PyQt5.QtWidgets import QMainWindow # @UnusedImport @Reimport  @UnresolvedImport
 
 # Constants
-app_name: Final = "artisan.plus"
-profile_ext: Final = "alog"
-uuid_tag: Final = "roastUUID"
+app_name: Final = 'artisan.plus'
+profile_ext: Final = 'alog'
+uuid_tag: Final = 'roastUUID'
 
 # Serivce URLs
 
 # # LOCAL SETUP
-#api_base_url         = "https://localhost:62602/api/v1"
-#web_base_url         = "https://localhost:8088"
+#api_base_url         = 'https://localhost:62602/api/v1'
+#web_base_url         = 'https://localhost:8088'
 
 # # CLOUD SETUP
-api_base_url: Final = "https://artisan.plus/api/v1"
-web_base_url: Final = "https://artisan.plus"
+api_base_url: Final = 'https://artisan.plus/api/v1'
+web_base_url: Final = 'https://artisan.plus'
 
-shop_base_url: Final = "https://shop.artisan.plus"
+shop_base_url: Final = 'https://shop.artisan.plus'
 
-register_url: Final = web_base_url + "/register"
-reset_passwd_url: Final = web_base_url + "/resetPassword"
-auth_url: Final = api_base_url + "/accounts/users/authenticate"
-stock_url: Final = api_base_url + "/acoffees"
-roast_url: Final = api_base_url + "/aroast"
-notifications_url: Final = api_base_url + "/notifications"
+register_url: Final = web_base_url + '/register'
+reset_passwd_url: Final = web_base_url + '/resetPassword'
+auth_url: Final = api_base_url + '/accounts/users/authenticate'
+stock_url: Final = api_base_url + '/acoffees'
+roast_url: Final = api_base_url + '/aroast'
+notifications_url: Final = api_base_url + '/notifications'
 
 # Connection configurations
 
@@ -101,17 +98,17 @@ queue_put_timeout: Final = 0.5
 
 # the stock cache reflects the current coffee stock of the account and
 # gets automatically synced with the cloud
-stock_cache: Final = "cache"
+stock_cache: Final = 'cache'
 
 # the uuid register that associates UUIDs with local filepaths where to
 # locate the corresponding Artisan profiles
-uuid_cache: Final = "uuids"
+uuid_cache: Final = 'uuids'
 
 # the account register that associates account ids with a local running
 # account number
 # Note: the account_cache file is shared between the main Artisan and the
 # ArtisanViewer app, protected by a filelock
-account_cache: Final = "account"
+account_cache: Final = 'account'
 
 # the account nr locally assocated to the current account, or None
 account_nr: Optional[int] = None
@@ -120,12 +117,12 @@ account_nr: Optional[int] = None
 # modified_at for profiles uploaded/synced automatially
 # Note: the sync_cache file is shared between the main Artisan and the
 # ArtisanViewer app, protected by a filelock
-sync_cache: Final = "sync"
+sync_cache: Final = 'sync'
 
 # the outbox queues the outgoing PUSH/PUT data requests
 # Note: the outbox_cache file is shared between the main Artisan and the
 # ArtisanViewer app, NOT protected by ab extra filelock
-outbox_cache: Final = "outbox"
+outbox_cache: Final = 'outbox'
 
 
 # Runtime variables

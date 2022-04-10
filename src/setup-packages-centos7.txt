@@ -39,7 +39,7 @@ o colorspacious 1.1.0
 # ./build-linux.sh
 # sudo ./build-linux-pkg.sh
 # cp *.deb *.rpm /media/sf_host/
-# 
+#
 
 Upgrade History:
 
@@ -91,23 +91,23 @@ allow access to shared folder
 
 Mac Keyboard layout
 
-right alt Q = @ 
-right alt ß = \ 
-right alt ^ = | 
-right alt E = € 
+right alt Q = @
+right alt ß = \
+right alt ^ = |
+right alt E = €
 
-alternatively, you can also use ctrl left alt in stead of right alt, e.g.: 
+alternatively, you can also use ctrl left alt in stead of right alt, e.g.:
 
-ctrl left alt Q = @ 
-ctrl left alt ß = \ 
-ctrl left alt ^ = | 
+ctrl left alt Q = @
+ctrl left alt ß = \
+ctrl left alt ^ = |
 ctrl left alt E = €
 
 
 # sudo yum install zlib-devel bzip2-devel sqlite sqlite-devel openssl-devel ncurses-devel readline-devel tk-devel
 # sudo yum install libXext-devel blas-devel lapack-devel
 # sudo yum install gstreamer*
-# sudo yum install xdg-utils	
+# sudo yum install xdg-utils
 
 
 2) Install Python 3.5.4

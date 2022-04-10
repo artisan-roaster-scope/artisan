@@ -161,7 +161,7 @@ remove all references to twisted (py2exe 0.9.2.2 will struggle with) from setup.
 
 12) yoctopuce 1.10.16490
 
-download lastest package from here: 
+download lastest package from here:
 https://pypi.python.org/pypi/yoctopuce/
 
 # cd yoctopuce-1.10.20773
@@ -196,7 +196,7 @@ https://pypi.python.org/pypi/gevent
 
 download gevent-1.1b3-cp34-none-win32.whl
 
-# py -3 -m pip install gevent-1.1b3-cp34-none-win32.whl 
+# py -3 -m pip install gevent-1.1b3-cp34-none-win32.whl
 
 the file _util_py2.py needs to be deleted from the site-packages/gevent folder
 to make py2exe happy (on Python3)

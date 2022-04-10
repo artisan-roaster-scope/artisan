@@ -10,9 +10,9 @@ def content():
     helpstr = ''  #@UnusedVariable
     newline = '\n'  #@UnusedVariable
     strlist.append('<head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body>')
-    strlist.append("<b>")
+    strlist.append('<b>')
     strlist.append(QApplication.translate('HelpDlg','EVENT CUSTOM SLIDERS'))
-    strlist.append("</b>")
+    strlist.append('</b>')
     tbl_Sliders = prettytable.PrettyTable()
     tbl_Sliders.field_names = [QApplication.translate('HelpDlg','Column'),QApplication.translate('HelpDlg','Description')]
     tbl_Sliders.add_row([QApplication.translate('HelpDlg','Event'),QApplication.translate('HelpDlg','Hide or show the corresponding slider.')])
@@ -25,14 +25,14 @@ def content():
     tbl_Sliders.add_row([QApplication.translate('HelpDlg','Course'),QApplication.translate('HelpDlg','When ticked the slider moves in steps of 10.')])
     tbl_Sliders.add_row([QApplication.translate('HelpDlg','Temp'),QApplication.translate('HelpDlg','Should be ticked when the slider&#39;s value is a temperature to allow Artisan to properly scale the value between Centigrade and Fahrenheit.')])
     tbl_Sliders.add_row([QApplication.translate('HelpDlg','Unit'),QApplication.translate('HelpDlg','Optional text used in annotations to the the units used for the slider value.')])
-    strlist.append(tbl_Sliders.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
-    strlist.append("<br/><br/><b>")
+    strlist.append(tbl_Sliders.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
+    strlist.append('<br/><br/><b>')
     strlist.append(QApplication.translate('HelpDlg','COMMANDS'))
-    strlist.append("</b>")
+    strlist.append('</b>')
     tbl_Commandstop = prettytable.PrettyTable()
     tbl_Commandstop.header = False
     tbl_Commandstop.add_row([QApplication.translate('HelpDlg','Note: "{}" can be used as a placeholder, it will be subsituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.\n')+newline+QApplication.translate('HelpDlg','Note: The placeholders {ET}, {BT}, {time}, {ETB}, {BTB} will be substituted by the current ET, BT, time, ET background, BT background value in Serial/CallProgram/MODBUS/S7/WebSocket commands\n')+newline+QApplication.translate('HelpDlg','Note: commands can be sequenced, separated by semicolons like in “<cmd1>;<cmd2>;<cmd3>”\n')+newline+QApplication.translate('HelpDlg','Note: in PHIDGET commands, the optional parameter <sn> has the form <hub_serial>[:<hub_port>] allows to refer to a specific Phidget HUB by given its serial number, and optionally specifying the port number the addressed module is connected to.\n')+newline+QApplication.translate('HelpDlg','Note: in YOCTOPUCE commands, the optional parameters <sn> holds either the modules serial number or its name')])
-    strlist.append(tbl_Commandstop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
+    strlist.append(tbl_Commandstop.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
     tbl_Commands = prettytable.PrettyTable()
     tbl_Commands.field_names = [QApplication.translate('HelpDlg','Action'),QApplication.translate('HelpDlg','Command'),QApplication.translate('HelpDlg','Description')]
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Serial Command'),QApplication.translate('HelpDlg','ASCII serial command or binary a2b_uu(serial command)'),'&#160;'])
@@ -145,8 +145,8 @@ def content():
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','sleep(<float>)'),QApplication.translate('HelpDlg','sleep: add a delay of <float> seconds')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','button(<bool>)'),QApplication.translate('HelpDlg','sets calling button to “pressed” if argument evaluates to 1 or True')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','read(<json>)'),QApplication.translate('HelpDlg','if the `<json>` text respects the JSON format it is send to the connected WebSocket server and the response is bound to the variable `_`')])
-    strlist.append(tbl_Commands.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
-    strlist.append("</body>")
-    helpstr = "".join(strlist)
-    helpstr = re.sub(r"&amp;", r"&",helpstr)
+    strlist.append(tbl_Commands.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
+    strlist.append('</body>')
+    helpstr = ''.join(strlist)
+    helpstr = re.sub(r'&amp;', r'&',helpstr)
     return helpstr

@@ -58,7 +58,7 @@ do
      if [ -e ${QTBASE_FILE} ]
           then cp ${QTBASE_FILE} dist/translations
      fi
-     if [ -e ${QT_FILE} ] 
+     if [ -e ${QT_FILE} ]
           then cp ${QT_FILE} dist/translations
      fi
 done
@@ -140,6 +140,3 @@ cp ../LICENSE dist/LICENSE.txt
 #rm -f dist/libglib-2.0.so.0 # removed for v1.6 and later
 
 #rm -f dist/libusb-1.0.so.0
-
-
-

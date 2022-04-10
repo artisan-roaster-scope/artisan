@@ -23,14 +23,14 @@ if [ ! -z $APPVEYOR ]; then
 #    export QT_SRC_PATH=${QT_PATH}
 #    export PYUIC=pyuic5
 #    export PYRCC=pyrcc5
-    
+
 # for PyQt6
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt6/Qt6
     export QT_SRC_PATH==${QT_PATH}
     export PYUIC=pyuic6
     export PYRCC=pyrcc6
     export PYLUPDATE=./pylupdate6pro
-    
+
     export MACOSX_DEPLOYMENT_TARGET=10.15
 #    export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
 else
@@ -78,7 +78,7 @@ if [ -z $APPVEYOR ]; then
             $PYUIC -o uic/${fn}.py -x ui/${fn}.ui
         fi
     done
-    
+
 #    # qrc
 #    find qrc -iname "*.qrc" | while read f
 #    do

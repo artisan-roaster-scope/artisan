@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # queue.py
 #
@@ -34,7 +33,7 @@ except Exception:
 
 from artisanlib.util import getDirectory
 from plus import config, util, roast, connection, sync, controller
-from typing import Any, Dict, List
+from typing import Any
 try:
     from typing import Final
 except ImportError:
@@ -66,7 +65,7 @@ class Worker(QObject):
     replySignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int, machines:List[str]
 
     __slots__ = [ '_paused', '_state' ]
-    
+
     def __init__(self):
         super().__init__()
         self._paused = False  # start out non-paused
@@ -75,11 +74,11 @@ class Worker(QObject):
     @staticmethod
     def addSyncItem(item):
         # successfully transmitted, we add/update the roasts UUID sync-cache
-        if "roast_id" in item["data"] and "modified_at" in item["data"]:
+        if 'roast_id' in item['data'] and 'modified_at' in item['data']:
             # we update the plus status icon
             sync.addSync(
-                item["data"]["roast_id"],
-                util.ISO86012epoch(item["data"]["modified_at"]),
+                item['data']['roast_id'],
+                util.ISO86012epoch(item['data']['modified_at']),
             )
             config.app_window.updatePlusStatusSignal.emit()  # @UndefinedVariable
 
@@ -94,34 +93,34 @@ class Worker(QObject):
             with self._state:
                 if self._paused:
                     self._state.wait()  # block until notified
-            _log.debug("-> qsize: %s", queue.qsize())
-            _log.debug("looking for next item to be fetched")
+            _log.debug('-> qsize: %s', queue.qsize())
+            _log.debug('looking for next item to be fetched')
             try:
                 if item is None:
                     item = queue.get()
                 time.sleep(config.queue_task_delay)
                 _log.debug(
-                    "-> worker processing item: %s", item
+                    '-> worker processing item: %s', item
                 )
                 iters = config.queue_retries + 1
                 while iters > 0:
                     _log.debug(
-                        "-> remaining iterations: %s", iters
+                        '-> remaining iterations: %s', iters
                     )
                     r = None
                     try:
                         # we upload only full roast records, or partial updates
                         # in case the are under sync
                         # (registered in the sync cache)
-                        if is_full_roast_record(item["data"]) or (
-                            "roast_id" in item["data"]
-                            and sync.getSync(item["data"]["roast_id"])
+                        if is_full_roast_record(item['data']) or (
+                            'roast_id' in item['data']
+                            and sync.getSync(item['data']['roast_id'])
                         ):
                             controller.connect(
                                 clear_on_failure=False, interactive=False
                             )
                             r = connection.sendData(
-                                item["url"], item["data"], item["verb"]
+                                item['url'], item['data'], item['verb']
                             )
                             r.raise_for_status()
                             # successfully transmitted, we add/update the
@@ -134,7 +133,7 @@ class Worker(QObject):
                             # a fresh (full) SyncRecord here as the uploaded
                             # record might contain only changed attributes
                             sr, h = roast.getSyncRecord()
-                            if item["data"]["roast_id"] == sr["roast_id"]:
+                            if item['data']['roast_id'] == sr['roast_id']:
                                 sync.setSyncRecordHash(sync_record=sr, h=h)
                             try:
                                 response = r.json()
@@ -151,8 +150,8 @@ class Worker(QObject):
                         try:
                             if controller.is_connected():
                                 _log.debug(
-                                    ("-> connection error,"
-                                     " disconnecting: %s"),
+                                    ('-> connection error,'
+                                     ' disconnecting: %s'),
                                     e,
                                 )
                                 # we disconnect
@@ -165,21 +164,21 @@ class Worker(QObject):
                         # a delay in the next iteration
                         time.sleep(config.queue_retry_delay)
                     except Exception as e:  # pylint: disable=broad-except
-                        _log.debug("-> task failed: %s", e)
+                        _log.debug('-> task failed: %s', e)
                         if r is not None:
                             _log.debug(
-                                "-> status code %s", r.status_code
+                                '-> status code %s', r.status_code
                             )
                         else:
-                            _log.debug("-> no status code")
+                            _log.debug('-> no status code')
                         if (
                             r is not None and r.status_code == 401
                         ):  # authentication failed
                             try:
                                 if controller.is_connected():
                                     _log.debug(
-                                        ("-> connection error,"
-                                         " disconnecting: %s"),
+                                        ('-> connection error,'
+                                         ' disconnecting: %s'),
                                         e,
                                     )
                                     # we disconnect, but keep the queue running
@@ -212,27 +211,27 @@ class Worker(QObject):
                 queue.task_done()
                 item = None
                 _log.debug(
-                    "end of run:while paused=%s", self._paused
+                    'end of run:while paused=%s', self._paused
                 )
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
 
     def resume(self):
-        _log.debug("resume()")
+        _log.debug('resume()')
         with self._state:
             self._paused = False
             self._state.notify()  # unblock self if waiting
 
     def pause(self):
-        _log.debug("pause()")
+        _log.debug('pause()')
         with self._state:
             self._paused = True  # make self block and wait
 
 # will be evaluated in GUI thread
-def processReply(rlimit:float, rused:float, pu:str, notifications:int, machines:List[str]):
+def processReply(rlimit:float, rused:float, pu:str, notifications:int, machines:list[str]):
     try:
 #        _log.debug('thread id', threading.get_ident())
-        _log.debug("processReply(%s,%s,%s,%s,%s", rlimit, rused, pu, notifications, machines)
+        _log.debug('processReply(%s,%s,%s,%s,%s', rlimit, rused, pu, notifications, machines)
     except Exception:  # pylint: disable=broad-except
         pass
 
@@ -244,7 +243,7 @@ def start():
 #        return
     global queue  # pylint: disable=global-statement
     global worker, worker_thread  # pylint: disable=global-statement
-    
+
     if queue is None:
         # we initialize the queue
         import persistqueue
@@ -254,9 +253,9 @@ def start():
         # we keep items in the queue if not explicit marked as task_done:
         # auto_commit=False
 
-    
-    _log.info("start()")
-    _log.debug("-> qsize: %s", queue.qsize())
+
+    _log.info('start()')
+    _log.debug('-> qsize: %s', queue.qsize())
     if worker_thread is None:
         worker = Worker()
         worker_thread = QThread()
@@ -287,9 +286,9 @@ def full_roast_in_queue(roast_id: str) -> bool:
     try:
         while True:
             item = q.get(block=False)
-            if "data" in item:
-                r = item["data"]
-                if is_full_roast_record(r) and roast_id == r["roast_id"]:
+            if 'data' in item:
+                r = item['data']
+                if is_full_roast_record(r) and roast_id == r['roast_id']:
                     # there is a full roast record already in queue
                     break
         del q
@@ -304,8 +303,8 @@ def full_roast_in_queue(roast_id: str) -> bool:
 
 # returns true if the given roast_record r is a full record containing all
 # information (incl. the roast date) and not only an update
-def is_full_roast_record(r: Dict[str, Any]) -> bool:
-    return "date" in r and r["date"] and "amount" in r and "roast_id" in r
+def is_full_roast_record(r: dict[str, Any]) -> bool:
+    return 'date' in r and r['date'] and 'amount' in r and 'roast_id' in r
 
 
 # called on completed roasts with roast data
@@ -318,16 +317,16 @@ def is_full_roast_record(r: Dict[str, Any]) -> bool:
 #   an update only the roast_id
 def addRoast(roast_record=None):
     try:
-        _log.info("addRoast()")
+        _log.info('addRoast()')
         if config.app_window.plus_readonly:
             _log.info(
-                ("-> roast not queued as users"
-                 " account access is readonly")
+                '-> roast not queued as users'
+                 ' account access is readonly'
             )
         elif queue is None:
             _log.info(
-                ("-> roast not queued as queue"
-                 " is not running")
+                '-> roast not queued as queue'
+                 ' is not running'
             )
         else:
             if roast_record is None:
@@ -336,24 +335,24 @@ def addRoast(roast_record=None):
                 r = roast_record
             # if modification date is not set yet, we add the current time as
             # modified_at timestamp as float EPOCH with millisecond
-            if "modified_at" not in r:
-                r["modified_at"] = util.epoch2ISO8601(time.time())
-            _log.debug("-> roast: %s", r)
+            if 'modified_at' not in r:
+                r['modified_at'] = util.epoch2ISO8601(time.time())
+            _log.debug('-> roast: %s', r)
             # check if all required data is available before queueing this up
             if (
-                "roast_id" in r
-                and r["roast_id"]
+                'roast_id' in r
+                and r['roast_id']
                 and (
                     roast_record is not None
-                    or ("date" in r and r["date"] and "amount" in r)
+                    or ('date' in r and r['date'] and 'amount' in r)
                 )
             ):  # amount can be 0 but has to be present
                 # put in upload queue
-                _log.debug("-> put in queue")
+                _log.debug('-> put in queue')
                 config.app_window.sendmessage(
                     QApplication.translate(
-                        "Plus",
-                        "Queuing roast for upload to artisan.plus"
+                        'Plus',
+                        'Queuing roast for upload to artisan.plus'
                     )
                 )  # @UndefinedVariable
                 if roast_record is not None:
@@ -361,15 +360,15 @@ def addRoast(roast_record=None):
                     # cached sync record are uploaded
                     r = sync.diffCachedSyncRecord(r)
                 queue.put(
-                    {"url": config.roast_url, "data": r, "verb": "POST"},
+                    {'url': config.roast_url, 'data': r, 'verb': 'POST'},
                     # timeout=config.queue_put_timeout
                     # sql queue does not feature a timeout
                 )
-                _log.debug("-> roast queued up")
-                _log.debug("-> qsize: %s", queue.qsize())
+                _log.debug('-> roast queued up')
+                _log.debug('-> qsize: %s', queue.qsize())
             else:
                 _log.debug(
-                    "-> roast not queued as mandatory info missing"
+                    '-> roast not queued as mandatory info missing'
                 )
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)

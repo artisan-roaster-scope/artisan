@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # Artisan Designer Dialogs
@@ -42,25 +41,25 @@ except Exception:
 class designerconfigDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
-        self.setWindowTitle(QApplication.translate("Form Caption","Designer Config"))
+        self.setWindowTitle(QApplication.translate('Form Caption','Designer Config'))
         self.setModal(True)
         #landmarks
-        charge = QLabel(QApplication.translate("Label", "CHARGE"))
+        charge = QLabel(QApplication.translate('Label', 'CHARGE'))
         charge.setAlignment(Qt.AlignmentFlag.AlignRight)
-        charge.setStyleSheet("background-color: #f07800")
-        self.dryend = QCheckBox(QApplication.translate("CheckBox","DRY END"))
-        self.dryend.setStyleSheet("background-color: orange")
-        self.fcs = QCheckBox(QApplication.translate("CheckBox","FC START"))
-        self.fcs.setStyleSheet("background-color: orange")
-        self.fce = QCheckBox(QApplication.translate("CheckBox","FC END"))
-        self.fce.setStyleSheet("background-color: orange")
-        self.scs = QCheckBox(QApplication.translate("CheckBox","SC START"))
-        self.scs.setStyleSheet("background-color: orange")
-        self.sce = QCheckBox(QApplication.translate("CheckBox","SC END"))
-        self.sce.setStyleSheet("background-color: orange")
-        drop = QLabel(QApplication.translate("Label", "DROP"))
+        charge.setStyleSheet('background-color: #f07800')
+        self.dryend = QCheckBox(QApplication.translate('CheckBox','DRY END'))
+        self.dryend.setStyleSheet('background-color: orange')
+        self.fcs = QCheckBox(QApplication.translate('CheckBox','FC START'))
+        self.fcs.setStyleSheet('background-color: orange')
+        self.fce = QCheckBox(QApplication.translate('CheckBox','FC END'))
+        self.fce.setStyleSheet('background-color: orange')
+        self.scs = QCheckBox(QApplication.translate('CheckBox','SC START'))
+        self.scs.setStyleSheet('background-color: orange')
+        self.sce = QCheckBox(QApplication.translate('CheckBox','SC END'))
+        self.sce.setStyleSheet('background-color: orange')
+        drop = QLabel(QApplication.translate('Label', 'DROP'))
         drop.setAlignment(Qt.AlignmentFlag.AlignRight)
-        drop.setStyleSheet("background-color: #f07800")
+        drop.setStyleSheet('background-color: #f07800')
         self.loadconfigflags()
         self.dryend.clicked.connect(self.changeflags)
         self.fcs.clicked.connect(self.changeflags)
@@ -71,84 +70,84 @@ class designerconfigDlg(ArtisanDialog):
             start = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
         else:
             start = 0
-        markersettinglabel = QLabel(QApplication.translate("Label", "Marker"))
+        markersettinglabel = QLabel(QApplication.translate('Label', 'Marker'))
         markersettinglabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        timesettinglabel = QLabel(QApplication.translate("Label", "Time"))
+        timesettinglabel = QLabel(QApplication.translate('Label', 'Time'))
         timesettinglabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        btsettinglabel = QLabel(QApplication.translate("Label", "BT"))
+        btsettinglabel = QLabel(QApplication.translate('Label', 'BT'))
         btsettinglabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        etsettinglabel = QLabel(QApplication.translate("Label", "ET"))
+        etsettinglabel = QLabel(QApplication.translate('Label', 'ET'))
         etsettinglabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.Edit0 = QLineEdit(stringfromseconds(0))
         self.Edit0.setEnabled(False)
-        self.Edit0bt = QLineEdit("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[0]])
-        self.Edit0et = QLineEdit("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[0]])
+        self.Edit0bt = QLineEdit('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[0]])
+        self.Edit0et = QLineEdit('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[0]])
         self.Edit0.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit0bt.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit0et.setAlignment(Qt.AlignmentFlag.AlignRight)
         if self.aw.qmc.timeindex[1]:
             self.Edit1 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[1]] - start))
-            self.Edit1bt = QLineEdit("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[1]])
-            self.Edit1et = QLineEdit("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[1]])
+            self.Edit1bt = QLineEdit('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[1]])
+            self.Edit1et = QLineEdit('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[1]])
         else:
             self.Edit1 = QLineEdit(stringfromseconds(0))
-            self.Edit1bt = QLineEdit("0.0")
-            self.Edit1et = QLineEdit("0.0")
+            self.Edit1bt = QLineEdit('0.0')
+            self.Edit1et = QLineEdit('0.0')
         self.Edit1.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit1bt.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit1et.setAlignment(Qt.AlignmentFlag.AlignRight)
         if self.aw.qmc.timeindex[2]:
             self.Edit2 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[2]] - start))
-            self.Edit2bt = QLineEdit("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[2]])
-            self.Edit2et = QLineEdit("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[2]])
+            self.Edit2bt = QLineEdit('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[2]])
+            self.Edit2et = QLineEdit('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[2]])
         else:
             self.Edit2 = QLineEdit(stringfromseconds(0))
-            self.Edit2bt = QLineEdit("0.0")
-            self.Edit2et = QLineEdit("0.0")
+            self.Edit2bt = QLineEdit('0.0')
+            self.Edit2et = QLineEdit('0.0')
         self.Edit2.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit2bt.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit2et.setAlignment(Qt.AlignmentFlag.AlignRight)
         if self.aw.qmc.timeindex[3]:
             self.Edit3 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[3]] - start))
-            self.Edit3bt = QLineEdit("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[3]])
-            self.Edit3et = QLineEdit("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[3]])
+            self.Edit3bt = QLineEdit('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[3]])
+            self.Edit3et = QLineEdit('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[3]])
         else:
             self.Edit3 = QLineEdit(stringfromseconds(0))
-            self.Edit3bt = QLineEdit("0.0")
-            self.Edit3et = QLineEdit("0.0")
+            self.Edit3bt = QLineEdit('0.0')
+            self.Edit3et = QLineEdit('0.0')
         self.Edit3.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit3bt.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit3et.setAlignment(Qt.AlignmentFlag.AlignRight)
         if self.aw.qmc.timeindex[4]:
             self.Edit4 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[4]] - start))
-            self.Edit4bt = QLineEdit("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[4]])
-            self.Edit4et = QLineEdit("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[4]])
+            self.Edit4bt = QLineEdit('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[4]])
+            self.Edit4et = QLineEdit('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[4]])
         else:
             self.Edit4 = QLineEdit(stringfromseconds(0))
-            self.Edit4bt = QLineEdit("0.0")
-            self.Edit4et = QLineEdit("0.0")
+            self.Edit4bt = QLineEdit('0.0')
+            self.Edit4et = QLineEdit('0.0')
         self.Edit4.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit4bt.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit4et.setAlignment(Qt.AlignmentFlag.AlignRight)
         if self.aw.qmc.timeindex[5]:
             self.Edit5 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[5]] - start))
-            self.Edit5bt = QLineEdit("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[5]])
-            self.Edit5et = QLineEdit("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[5]])
+            self.Edit5bt = QLineEdit('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[5]])
+            self.Edit5et = QLineEdit('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[5]])
         else:
             self.Edit5 = QLineEdit(stringfromseconds(0))
-            self.Edit5bt = QLineEdit("0.0")
-            self.Edit5et = QLineEdit("0.0")
+            self.Edit5bt = QLineEdit('0.0')
+            self.Edit5et = QLineEdit('0.0')
         self.Edit5.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit5bt.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit5et.setAlignment(Qt.AlignmentFlag.AlignRight)
         if self.aw.qmc.timeindex[6]:
             self.Edit6 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[6]] - start))
-            self.Edit6bt = QLineEdit("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[6]])
-            self.Edit6et = QLineEdit("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[6]])
+            self.Edit6bt = QLineEdit('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[6]])
+            self.Edit6et = QLineEdit('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[6]])
         else:
             self.Edit6 = QLineEdit(stringfromseconds(0))
-            self.Edit6bt = QLineEdit("0.0")
-            self.Edit6et = QLineEdit("0.0")
+            self.Edit6bt = QLineEdit('0.0')
+            self.Edit6et = QLineEdit('0.0')
         self.Edit6.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit6bt.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit6et.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -194,7 +193,7 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit4etcopy = self.Edit4et.text()
         self.Edit5etcopy = self.Edit5et.text()
         self.Edit6etcopy = self.Edit6et.text()
-        regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
+        regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$')
         self.Edit0.setValidator(QRegularExpressionValidator(regextime,self))
         self.Edit1.setValidator(QRegularExpressionValidator(regextime,self))
         self.Edit2.setValidator(QRegularExpressionValidator(regextime,self))
@@ -202,7 +201,7 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit4.setValidator(QRegularExpressionValidator(regextime,self))
         self.Edit5.setValidator(QRegularExpressionValidator(regextime,self))
         self.Edit6.setValidator(QRegularExpressionValidator(regextime,self))
-        regextemp = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]?\.?[0-9]?$")
+        regextemp = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]?\.?[0-9]?$')
         self.Edit0bt.setValidator(QRegularExpressionValidator(regextemp,self))
         self.Edit1bt.setValidator(QRegularExpressionValidator(regextemp,self))
         self.Edit2bt.setValidator(QRegularExpressionValidator(regextemp,self))
@@ -217,35 +216,35 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit4et.setValidator(QRegularExpressionValidator(regextemp,self))
         self.Edit5et.setValidator(QRegularExpressionValidator(regextemp,self))
         self.Edit6et.setValidator(QRegularExpressionValidator(regextemp,self))
-        curvinesslabel = QLabel(QApplication.translate("Label", "Curviness"))
-        etcurviness = QLabel(QApplication.translate("Label", "ET"))
-        btcurviness = QLabel(QApplication.translate("Label", "BT"))
+        curvinesslabel = QLabel(QApplication.translate('Label', 'Curviness'))
+        etcurviness = QLabel(QApplication.translate('Label', 'ET'))
+        btcurviness = QLabel(QApplication.translate('Label', 'BT'))
         etcurviness.setAlignment(Qt.AlignmentFlag.AlignRight)
         btcurviness.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.ETsplineComboBox = QComboBox()
-        self.ETsplineComboBox.addItems(["1","2","3","4","5"])
+        self.ETsplineComboBox.addItems(['1','2','3','4','5'])
         self.ETsplineComboBox.setCurrentIndex(self.aw.qmc.ETsplinedegree - 1)
         self.ETsplineComboBox.currentIndexChanged.connect(self.redrawcurviness)
         self.BTsplineComboBox = QComboBox()
-        self.BTsplineComboBox.addItems(["1","2","3","4","5"])
+        self.BTsplineComboBox.addItems(['1','2','3','4','5'])
         self.BTsplineComboBox.setCurrentIndex(self.aw.qmc.BTsplinedegree - 1)
         self.BTsplineComboBox.currentIndexChanged.connect(self.redrawcurviness)
 
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok))
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
-        
+
         self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Close)
         self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Apply)
         self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Close),"Close",QApplication.translate("Button","Close"))
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Apply),"Apply",QApplication.translate("Button","Apply"))
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults),"Restore Defaults",QApplication.translate("Button","Restore Defaults"))
-        
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Close),'Close',QApplication.translate('Button','Close'))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Apply),'Apply',QApplication.translate('Button','Apply'))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults),'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
+
         self.dialogbuttons.rejected.connect(self.accept)
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults).clicked.connect(self.reset)
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Apply).clicked.connect(self.settimes)
-        
+
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
@@ -292,7 +291,7 @@ class designerconfigDlg(ArtisanDialog):
         curvinessLayout.addWidget(self.BTsplineComboBox)
         modLayout = QVBoxLayout()
         modLayout.addLayout(curvinessLayout)
-        marksGroupLayout = QGroupBox(QApplication.translate("GroupBox","Initial Settings"))
+        marksGroupLayout = QGroupBox(QApplication.translate('GroupBox','Initial Settings'))
         marksGroupLayout.setLayout(settingsLayout)
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(marksGroupLayout)
@@ -302,9 +301,9 @@ class designerconfigDlg(ArtisanDialog):
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Close).setFocus()
 
         settings = QSettings()
-        if settings.contains("DesignerPosition"):
-            self.move(settings.value("DesignerPosition"))
-        
+        if settings.contains('DesignerPosition'):
+            self.move(settings.value('DesignerPosition'))
+
         mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
     @pyqtSlot(int)
@@ -317,36 +316,36 @@ class designerconfigDlg(ArtisanDialog):
         else:
             self.aw.qmc.ETsplinedegree = len(self.aw.qmc.timex)-1
             self.ETsplineComboBox.setCurrentIndex(self.aw.qmc.ETsplinedegree-1)
-            ms = QApplication.translate("Message","Not enough time points for an ET curviness of {0}. Set curviness to {1}").format(ETcurviness,self.aw.qmc.ETsplinedegree)
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config"),ms)
+            ms = QApplication.translate('Message','Not enough time points for an ET curviness of {0}. Set curviness to {1}').format(ETcurviness,self.aw.qmc.ETsplinedegree)
+            QMessageBox.information(self,QApplication.translate('Message','Designer Config'),ms)
         if (timepoints - BTcurviness) >= 1:
             self.aw.qmc.BTsplinedegree = BTcurviness
         else:
             self.aw.qmc.BTsplinedegree = len(self.aw.qmc.timex)-1
             self.BTsplineComboBox.setCurrentIndex(self.aw.qmc.BTsplinedegree-1)
-            ms = QApplication.translate("Message","Not enough time points for an BT curviness of {0}. Set curviness to {1}").format(BTcurviness,self.aw.qmc.BTsplinedegree)
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config"),ms)
+            ms = QApplication.translate('Message','Not enough time points for an BT curviness of {0}. Set curviness to {1}').format(BTcurviness,self.aw.qmc.BTsplinedegree)
+            QMessageBox.information(self,QApplication.translate('Message','Designer Config'),ms)
         self.aw.qmc.redrawdesigner()
 
     @pyqtSlot(bool)
     def settimes(self,_):
         #check input
-        strings = [QApplication.translate("Message","CHARGE"),
-                   QApplication.translate("Message","DRY END"),
-                   QApplication.translate("Message","FC START"),
-                   QApplication.translate("Message","FC END"),
-                   QApplication.translate("Message","SC START"),
-                   QApplication.translate("Message","SC END"),
-                   QApplication.translate("Message","DROP")]
+        strings = [QApplication.translate('Message','CHARGE'),
+                   QApplication.translate('Message','DRY END'),
+                   QApplication.translate('Message','FC START'),
+                   QApplication.translate('Message','FC END'),
+                   QApplication.translate('Message','SC START'),
+                   QApplication.translate('Message','SC END'),
+                   QApplication.translate('Message','DROP')]
         timecheck = self.validatetime()
         if timecheck != 1000:
-            st = QApplication.translate("Message","Incorrect time format. Please recheck {0} time").format(strings[timecheck])
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config"),st)
+            st = QApplication.translate('Message','Incorrect time format. Please recheck {0} time').format(strings[timecheck])
+            QMessageBox.information(self,QApplication.translate('Message','Designer Config'),st)
             return 1
         checkvalue = self.validatetimeorder()
         if checkvalue != 1000:
-            st = QApplication.translate("Message","Times need to be in ascending order. Please recheck {0} time").format(strings[checkvalue+1])
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config"),st)
+            st = QApplication.translate('Message','Times need to be in ascending order. Please recheck {0} time').format(strings[checkvalue+1])
+            QMessageBox.information(self,QApplication.translate('Message','Designer Config'),st)
             return 1
         if self.Edit0bt.text() != self.Edit0btcopy:
             self.aw.qmc.temp2[self.aw.qmc.timeindex[0]] = float(str(self.Edit0bt.text()))
@@ -465,7 +464,7 @@ class designerconfigDlg(ArtisanDialog):
     @pyqtSlot(bool)
     def readchecks(self,_=False):
         checks = [0,0,0,0,0,0,0]
-        if self.dryend.isChecked(): 
+        if self.dryend.isChecked():
             checks[1] = 1
         if self.fcs.isChecked():
             checks[2] = 1
@@ -480,12 +479,12 @@ class designerconfigDlg(ArtisanDialog):
     def create(self):
         self.close()
         self.aw.qmc.convert_designer()
-    
+
     @pyqtSlot()
     def accept(self):
         #save window position (only; not size!)
         settings = QSettings()
-        settings.setValue("DesignerPosition",self.frameGeometry().topLeft())
+        settings.setValue('DesignerPosition',self.frameGeometry().topLeft())
         super().accept()
 
     #reset
@@ -506,21 +505,21 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit4.setText(stringfromseconds(self.aw.qmc.designertimeinit[4]))
         self.Edit5.setText(stringfromseconds(self.aw.qmc.designertimeinit[5]))
         self.Edit6.setText(stringfromseconds(self.aw.qmc.designertimeinit[6]))
-        self.Edit0bt.setText("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[0]])
-        self.Edit1bt.setText("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[1]])
-        self.Edit2bt.setText("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[2]])
-        self.Edit3bt.setText("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[3]])
-        self.Edit4bt.setText("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[4]])
-        self.Edit5bt.setText("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[5]])
-        self.Edit6bt.setText("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[6]])
-        self.Edit0et.setText("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[0]])
-        self.Edit1et.setText("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[1]])
-        self.Edit2et.setText("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[2]])
-        self.Edit3et.setText("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[3]])
-        self.Edit4et.setText("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[4]])
-        self.Edit5et.setText("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[5]])
-        self.Edit6et.setText("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[6]])
-        self.aw.sendmessage(QApplication.translate("Message","Designer has been reset"))
+        self.Edit0bt.setText('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[0]])
+        self.Edit1bt.setText('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[1]])
+        self.Edit2bt.setText('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[2]])
+        self.Edit3bt.setText('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[3]])
+        self.Edit4bt.setText('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[4]])
+        self.Edit5bt.setText('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[5]])
+        self.Edit6bt.setText('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[6]])
+        self.Edit0et.setText('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[0]])
+        self.Edit1et.setText('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[1]])
+        self.Edit2et.setText('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[2]])
+        self.Edit3et.setText('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[3]])
+        self.Edit4et.setText('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[4]])
+        self.Edit5et.setText('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[5]])
+        self.Edit6et.setText('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[6]])
+        self.aw.sendmessage(QApplication.translate('Message','Designer has been reset'))
 
     def loadconfigflags(self):
         self.dryend.setChecked(self.aw.qmc.timeindex[1])
@@ -562,15 +561,15 @@ class designerconfigDlg(ArtisanDialog):
                 if self.sce.isChecked():
                     self.sce.setChecked(False)
             #ERROR time from edit boxes is not in ascending order
-            strings = [QApplication.translate("Message","CHARGE"),
-                       QApplication.translate("Message","DRY END"),
-                       QApplication.translate("Message","FC START"),
-                       QApplication.translate("Message","FC END"),
-                       QApplication.translate("Message","SC START"),
-                       QApplication.translate("Message","SC END"),
-                       QApplication.translate("Message","DROP")]
-            st = QApplication.translate("Message","Times need to be in ascending order. Please recheck {0} time").format(strings[idi])
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config"),st)
+            strings = [QApplication.translate('Message','CHARGE'),
+                       QApplication.translate('Message','DRY END'),
+                       QApplication.translate('Message','FC START'),
+                       QApplication.translate('Message','FC END'),
+                       QApplication.translate('Message','SC START'),
+                       QApplication.translate('Message','SC END'),
+                       QApplication.translate('Message','DROP')]
+            st = QApplication.translate('Message','Times need to be in ascending order. Please recheck {0} time').format(strings[idi])
+            QMessageBox.information(self,QApplication.translate('Message','Designer Config'),st)
             return
         #idi = id index
         if self.aw.qmc.timeindex[idi]:
@@ -600,7 +599,7 @@ class designerconfigDlg(ArtisanDialog):
                 timez = stringtoseconds(str(self.Edit5.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                 bt = float(str(self.Edit5bt.text()))
                 et = float(str(self.Edit5et.text()))
-            self.aw.qmc.currentx = timez 
+            self.aw.qmc.currentx = timez
             self.aw.qmc.currenty = bt
             newindex = self.aw.qmc.addpoint(manual=False)
             self.aw.qmc.timeindex[idi] = newindex
@@ -616,22 +615,22 @@ class pointDlg(ArtisanDialog):
             values = [0,0]
         else:
             self.values = values
-        self.setWindowTitle(QApplication.translate("Form Caption","Add Point"))
+        self.setWindowTitle(QApplication.translate('Form Caption','Add Point'))
         self.tempEdit = QLineEdit(str(int(round(self.values[1]))))
         self.tempEdit.setValidator(QIntValidator(0, 999, self.tempEdit))
         self.tempEdit.setFocus()
         self.tempEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        templabel = QLabel(QApplication.translate("Label", "temp"))
-        regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
+        templabel = QLabel(QApplication.translate('Label', 'temp'))
+        regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$')
         self.timeEdit = QLineEdit(stringfromseconds(self.values[0],leadingzero=False))
         self.timeEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.timeEdit.setValidator(QRegularExpressionValidator(regextime,self))
-        timelabel = QLabel(QApplication.translate("Label", "time"))
+        timelabel = QLabel(QApplication.translate('Label', 'time'))
 
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.return_values)
         self.dialogbuttons.rejected.connect(self.reject)
-        
+
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
@@ -642,11 +641,11 @@ class pointDlg(ArtisanDialog):
         grid.addWidget(self.tempEdit,1,1)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(grid)
-        mainLayout.addStretch()  
+        mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
-    
+
     @pyqtSlot()
     def return_values(self):
         self.values[0] = stringtoseconds(str(self.timeEdit.text()))

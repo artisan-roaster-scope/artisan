@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # Artisan Alarms Dialog
@@ -57,86 +56,86 @@ class AlarmDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None, aw = None, activeTab = 0):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Alarms"))
+        self.setWindowTitle(QApplication.translate('Form Caption','Alarms'))
         self.helpdialog = None
 
         # restore window position
         settings = QSettings()
-        if settings.contains("AlarmsGeometry"):
-            self.restoreGeometry(settings.value("AlarmsGeometry"))
-        
+        if settings.contains('AlarmsGeometry'):
+            self.restoreGeometry(settings.value('AlarmsGeometry'))
+
         #table for alarms
         self.alarmtable = QTableWidget()
         self.createalarmtable()
         self.alarmtable.itemSelectionChanged.connect(self.selectionChanged)
-        allonButton = QPushButton(QApplication.translate("Button","All On"))
+        allonButton = QPushButton(QApplication.translate('Button','All On'))
         allonButton.clicked.connect(self.alarmsAllOn)
         allonButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        alloffButton = QPushButton(QApplication.translate("Button","All Off"))
+        alloffButton = QPushButton(QApplication.translate('Button','All Off'))
         alloffButton.clicked.connect(self.alarmsAllOff)
         alloffButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        addButton = QPushButton(QApplication.translate("Button","Add"))
+        addButton = QPushButton(QApplication.translate('Button','Add'))
         addButton.clicked.connect(self.addalarm)
         addButton.setMinimumWidth(80)
-        addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)   
-        
-        self.insertButton = QPushButton(QApplication.translate("Button","Insert"))
+        addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+        self.insertButton = QPushButton(QApplication.translate('Button','Insert'))
         self.insertButton.clicked.connect(self.insertalarm)
         self.insertButton.setMinimumWidth(80)
         self.insertButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.insertButton.setEnabled(False)
-                     
-        deleteButton = QPushButton(QApplication.translate("Button","Delete"))
+
+        deleteButton = QPushButton(QApplication.translate('Button','Delete'))
         deleteButton.clicked.connect(self.deletealarm)
         deleteButton.setMinimumWidth(80)
         deleteButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
-        self.copyalarmTableButton = QPushButton(QApplication.translate("Button", "Copy Table"))
-        self.copyalarmTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text"))
+        self.copyalarmTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
+        self.copyalarmTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
         self.copyalarmTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.copyalarmTableButton.clicked.connect(self.copyAlarmTabletoClipboard)
 
-        importButton = QPushButton(QApplication.translate("Button","Load"))
+        importButton = QPushButton(QApplication.translate('Button','Load'))
         importButton.clicked.connect(self.importalarms)
         importButton.setMinimumWidth(80)
         importButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        exportButton = QPushButton(QApplication.translate("Button","Save"))
+        exportButton = QPushButton(QApplication.translate('Button','Save'))
         exportButton.clicked.connect(self.exportalarms)
         exportButton.setMinimumWidth(80)
         exportButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        
+
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.closealarms)
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
-        
+
         helpDialogButton = QDialogButtonBox()
         helpButton = helpDialogButton.addButton(QDialogButtonBox.StandardButton.Help)
-        self.setButtonTranslations(helpButton,"Help",QApplication.translate("Button","Help"))
-        helpButton.setToolTip(QApplication.translate("Tooltip","Show help"))
+        self.setButtonTranslations(helpButton,'Help',QApplication.translate('Button','Help'))
+        helpButton.setToolTip(QApplication.translate('Tooltip','Show help'))
         helpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         helpButton.setMinimumWidth(80)
         helpButton.clicked.connect(self.showAlarmbuttonhelp)
-        clearButton = QPushButton(QApplication.translate("Button","Clear"))
-        clearButton.setToolTip(QApplication.translate("Tooltip","Clear alarms table"))
+        clearButton = QPushButton(QApplication.translate('Button','Clear'))
+        clearButton.setToolTip(QApplication.translate('Tooltip','Clear alarms table'))
         clearButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         clearButton.setMinimumWidth(80)
         clearButton.clicked.connect(self.clearalarms)
-        self.loadAlarmsFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load from profile"))
+        self.loadAlarmsFromProfile = QCheckBox(QApplication.translate('CheckBox', 'Load from profile'))
         self.loadAlarmsFromProfile.setChecked(self.aw.qmc.loadalarmsfromprofile)
-        self.loadAlarmsFromBackground = QCheckBox(QApplication.translate("CheckBox", "Load from background"))
+        self.loadAlarmsFromBackground = QCheckBox(QApplication.translate('CheckBox', 'Load from background'))
         self.loadAlarmsFromBackground.setChecked(self.aw.qmc.loadalarmsfrombackground)
-        
+
         self.popupTimoutSpinBox = QSpinBox()
-        self.popupTimoutSpinBox.setSuffix("s")
+        self.popupTimoutSpinBox.setSuffix('s')
         self.popupTimoutSpinBox.setSingleStep(1)
         self.popupTimoutSpinBox.setRange(0,120)
         self.popupTimoutSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.popupTimoutSpinBox.setValue(self.aw.qmc.alarm_popup_timout)
-        popupTimeoutLabel = QLabel(QApplication.translate("Label", "Pop Up Timeout"))
-        
-        alarmLabelLabel = QLabel(QApplication.translate("Label", "Label"))
+        popupTimeoutLabel = QLabel(QApplication.translate('Label', 'Pop Up Timeout'))
+
+        alarmLabelLabel = QLabel(QApplication.translate('Label', 'Label'))
         self.alarmLabelEdit = QLineEdit(self.aw.qmc.alarmsetlabel)
-                
+
         self.alarmsfile = QLabel(self.aw.qmc.alarmsfile)
         self.alarmsfile.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.alarmsfile.setMinimumWidth(300)
@@ -173,30 +172,30 @@ class AlarmDlg(ArtisanResizeablDialog):
         confButtonLayout.addSpacing(25)
         confButtonLayout.addWidget(alarmLabelLabel)
         confButtonLayout.addWidget(self.alarmLabelEdit)
-        
+
         okbuttonlayout.addSpacing(5)
         okbuttonlayout.addWidget(self.alarmsfile)
         okbuttonlayout.addWidget(self.dialogbuttons)
-        
+
         ## alarm sets
-        alarmSetListLabel = QLabel(QApplication.translate("Label","Alarm Sets"))
-        transferalarmsetbutton = QPushButton(QApplication.translate("Button","<< Store Alarm Set"))
+        alarmSetListLabel = QLabel(QApplication.translate('Label','Alarm Sets'))
+        transferalarmsetbutton = QPushButton(QApplication.translate('Button','<< Store Alarm Set'))
         transferalarmsetbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        setalarmsetbutton = QPushButton(QApplication.translate("Button","Activate Alarm Set >>"))
+        setalarmsetbutton = QPushButton(QApplication.translate('Button','Activate Alarm Set >>'))
         setalarmsetbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        transferalarmesetcurrentLabel = QLabel(QApplication.translate("Label","Current Alarm Set"))
+        transferalarmesetcurrentLabel = QLabel(QApplication.translate('Label','Current Alarm Set'))
         self.transferalarmesetcurrentset = QLineEdit(self.aw.qmc.alarmsetlabel)
         self.transferalarmsetcombobox = QComboBox()
         self.transferalarmsetcombobox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         # next line needed to avoid truncation of entries on Mac OS X under Qt 5.12.1-5.12.3
         # https://bugreports.qt.io/browse/QTBUG-73653
         self.transferalarmsetcombobox.setMinimumWidth(120)
-        
+
         self.setAlarmSetLabels()
-        
-        transferalarmsetbutton.clicked.connect(self.setAlarmSet)        
+
+        transferalarmsetbutton.clicked.connect(self.setAlarmSet)
         setalarmsetbutton.clicked.connect(self.setAlarmTable)
-                    
+
         alarmsetGrid = QGridLayout()
         alarmsetGrid.addWidget(alarmSetListLabel,1,0)
         alarmsetGrid.addWidget(transferalarmsetbutton,0,2)
@@ -210,7 +209,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         alarmsetBox.addStretch()
         alarmsetManagementBox = QVBoxLayout()
         alarmsetManagementBox.addLayout(alarmsetBox)
-        alarmsetGroupLayout = QGroupBox(QApplication.translate("GroupBox","Management"))
+        alarmsetGroupLayout = QGroupBox(QApplication.translate('GroupBox','Management'))
         alarmsetGroupLayout.setLayout(alarmsetManagementBox)
         #tab layout
         self.TabWidget = QTabWidget()
@@ -224,17 +223,17 @@ class AlarmDlg(ArtisanResizeablDialog):
 
         C1Widget = QWidget()
         C1Widget.setLayout(tab1layout)
-        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","Alarm Table"))
+        self.TabWidget.addTab(C1Widget,QApplication.translate('Tab','Alarm Table'))
         C1Widget.setContentsMargins(5, 0, 5, 0)
-        
+
         tab2layout = QVBoxLayout()
         tab2layout.addWidget(alarmsetGroupLayout)
-        
+
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
-        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","Alarm Sets"))
+        self.TabWidget.addTab(C2Widget,QApplication.translate('Tab','Alarm Sets'))
         C2Widget.setContentsMargins(5, 0, 5, 0)
-        
+
         self.TabWidget.setCurrentIndex(activeTab)
         self.TabWidget.currentChanged.connect(self.tabSwitched)
 
@@ -251,7 +250,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         for i in range(self.aw.qmc.alarmsets_count):
             alarmset = self.aw.qmc.getAlarmSet(i)
             if alarmset is not None:
-                alarmset_labels.append("{} {}".format(str(i),alarmset[0]))
+                alarmset_labels.append(f'{str(i)} {alarmset[0]}')
         self.transferalarmsetcombobox.clear()
         self.transferalarmsetcombobox.addItems(alarmset_labels)
         self.transferalarmsetcombobox.setCurrentIndex(-1)
@@ -265,7 +264,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.aw.qmc.alarmsetlabel = self.transferalarmesetcurrentset.text()
             self.transferalarmesetcurrentset.setText(self.aw.qmc.alarmsetlabel)
             # we clear the alarmsfile as we overwrite here from an alarmset
-            self.aw.qmc.alarmsfile = ""
+            self.aw.qmc.alarmsfile = ''
             self.alarmsfile.setText(self.aw.qmc.alarmsfile)
             self.aw.qmc.setAlarmSet(i,
                 self.aw.qmc.makeAlarmSet(
@@ -282,7 +281,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                     self.aw.qmc.alarmbeep[:],
                     self.aw.qmc.alarmstrings[:]))
             self.setAlarmSetLabels()
-    
+
     # transfers the selected alarm set to the alarm table
     @pyqtSlot(bool)
     def setAlarmTable(self,_):
@@ -291,7 +290,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.aw.qmc.selectAlarmSet(i)
             self.transferalarmesetcurrentset.setText(self.aw.qmc.alarmsetlabel)
             self.transferalarmsetcombobox.setCurrentIndex(-1)
-    
+
     @pyqtSlot(int)
     def tabSwitched(self,i):
         if i == 0:
@@ -313,10 +312,10 @@ class AlarmDlg(ArtisanResizeablDialog):
     def selectionChanged(self):
         selected = self.alarmtable.selectedRanges()
         if selected and len(selected) > 0:
-            self.insertButton.setEnabled(True)	
-        else:	
+            self.insertButton.setEnabled(True)
+        else:
             self.insertButton.setEnabled(False)
-            
+
     def deselectAll(self):
         selected = self.alarmtable.selectedRanges()
         if selected and len(selected) > 0:
@@ -325,7 +324,7 @@ class AlarmDlg(ArtisanResizeablDialog):
     @pyqtSlot(bool)
     def clearalarms(self):
         self.aw.qmc.alarmtablecolumnwidths = [self.alarmtable.columnWidth(c) for c in range(self.alarmtable.columnCount())]
-        self.aw.qmc.alarmsfile = ""
+        self.aw.qmc.alarmsfile = ''
         self.alarmsfile.setText(self.aw.qmc.alarmsfile)
         self.aw.qmc.alarmflag = []
         self.aw.qmc.alarmguard = []
@@ -342,8 +341,8 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.alarmtable.setSortingEnabled(False)
         self.alarmtable.setRowCount(0)
         self.alarmtable.setSortingEnabled(True)
-        self.aw.qmc.alarmsetlabel = ""
-        self.alarmLabelEdit.setText("")
+        self.aw.qmc.alarmsetlabel = ''
+        self.alarmLabelEdit.setText('')
 
     @pyqtSlot(bool)
     def alarmsAllOn(self,_):
@@ -352,7 +351,7 @@ class AlarmDlg(ArtisanResizeablDialog):
     @pyqtSlot(bool)
     def alarmsAllOff(self,_):
         self.alarmson(0)
-    
+
     def alarmson(self,flag):
         for i in range(len(self.aw.qmc.alarmflag)):
             if flag == 1:
@@ -374,7 +373,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         alarm_temperature = 500.
         alarm_action = 0
         alarm_beep = 0
-        alarm_string = QApplication.translate("Label","Enter description")
+        alarm_string = QApplication.translate('Label','Enter description')
         selected = self.alarmtable.selectedRanges()
         if len(selected) > 0:
             self.savealarms() # we first "save" the alarmtable to be able to pick up the values of the selected row
@@ -411,10 +410,10 @@ class AlarmDlg(ArtisanResizeablDialog):
         nalarms = self.alarmtable.rowCount()
         self.alarmtable.setRowCount(nalarms + 1)
         self.setalarmtablerow(nalarms)
-        
+
         header = self.alarmtable.horizontalHeader()
         header.setStretchLastSection(True)
-        
+
         if len(self.aw.qmc.alarmflag) == 1: # only for the first entry we apply some default column width
             # improve width of Qlineedit columns
             self.alarmtable.resizeColumnsToContents()
@@ -461,7 +460,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             alarm_temperature = 500.
             alarm_action = 0
             alarm_beep = 0
-            alarm_string = QApplication.translate("Label","Enter description")
+            alarm_string = QApplication.translate('Label','Enter description')
             # check for selection
             selected = self.alarmtable.selectedRanges()
             if selected and len(selected) > 0:
@@ -482,7 +481,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                     alarm_beep = self.aw.qmc.alarmbeep[selected_row]
                     alarm_string= self.aw.qmc.alarmstrings[selected_row]
                 except Exception: # pylint: disable=broad-except
-                    pass  
+                    pass
                 self.aw.qmc.alarmflag.insert(selected_row,alarm_flag)
                 self.aw.qmc.alarmguard.insert(selected_row,alarm_guard)
                 self.aw.qmc.alarmnegguard.insert(selected_row,alarm_negguard)
@@ -531,7 +530,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                     if nguard_value >= selected_row:
                         nguard.setText(str(nguard_value+2))
         self.alarmtable.setSortingEnabled(True)
-        
+
     def renumberRows(self):
         for i in range(self.alarmtable.rowCount()):
             self.alarmtable.setItem(i, 0, MyTableWidgetItemNumber(str(i+1),i))
@@ -607,40 +606,39 @@ class AlarmDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def importalarms(self,_):
-        self.aw.fileImport(QApplication.translate("Message", "Load Alarms"),self.importalarmsJSON,ext="*.alrm *.alog")
+        self.aw.fileImport(QApplication.translate('Message', 'Load Alarms'),self.importalarmsJSON,ext='*.alrm *.alog')
 
     def importalarmsJSON(self,filename):
         try:
             _,ext = os.path.splitext(filename)
-            if ext == ".alrm":
-                import io
+            if ext == '.alrm':
                 from json import load as json_load
-                with io.open(filename, 'r', encoding='utf-8') as infile:
+                with open(filename, encoding='utf-8') as infile:
                     alarms = json_load(infile)
                 self.aw.qmc.alarmsfile = filename
                 self.alarmsfile.setText(self.aw.qmc.alarmsfile)
-                self.aw.qmc.alarmflag = alarms["alarmflags"]
-                self.aw.qmc.alarmguard = alarms["alarmguards"]
-                if "alarmnegguards" in alarms:
-                    self.aw.qmc.alarmnegguard = alarms["alarmnegguards"]
+                self.aw.qmc.alarmflag = alarms['alarmflags']
+                self.aw.qmc.alarmguard = alarms['alarmguards']
+                if 'alarmnegguards' in alarms:
+                    self.aw.qmc.alarmnegguard = alarms['alarmnegguards']
                 else:
                     self.aw.qmc.alarmnegguard = [0]*len(self.aw.qmc.alarmflag)
-                self.aw.qmc.alarmtime = alarms["alarmtimes"]
-                self.aw.qmc.alarmoffset = alarms["alarmoffsets"]
-                self.aw.qmc.alarmcond = alarms["alarmconds"]
-                self.aw.qmc.alarmsource = alarms["alarmsources"]
-                self.aw.qmc.alarmtemperature = alarms["alarmtemperatures"]
-                self.aw.qmc.alarmaction = alarms["alarmactions"]
-                if "alarmbeep" in alarms:
-                    self.aw.qmc.alarmbeep = alarms["alarmbeep"]
+                self.aw.qmc.alarmtime = alarms['alarmtimes']
+                self.aw.qmc.alarmoffset = alarms['alarmoffsets']
+                self.aw.qmc.alarmcond = alarms['alarmconds']
+                self.aw.qmc.alarmsource = alarms['alarmsources']
+                self.aw.qmc.alarmtemperature = alarms['alarmtemperatures']
+                self.aw.qmc.alarmaction = alarms['alarmactions']
+                if 'alarmbeep' in alarms:
+                    self.aw.qmc.alarmbeep = alarms['alarmbeep']
                 else:
                     self.aw.qmc.alarmbeep = [0]*len(self.aw.qmc.alarmflag)
-                self.aw.qmc.alarmstrings = alarms["alarmstrings"]
-            elif ext == ".alog":
+                self.aw.qmc.alarmstrings = alarms['alarmstrings']
+            elif ext == '.alog':
                 obj = self.aw.deserialize(filename)
                 self.aw.loadAlarmsFromProfile(filename,obj)
-                self.alarmsfile.setText(self.aw.qmc.alarmsfile) 
-            self.aw.qmc.alarmstate = [-1]*len(self.aw.qmc.alarmflag) 
+                self.alarmsfile.setText(self.aw.qmc.alarmsfile)
+            self.aw.qmc.alarmstate = [-1]*len(self.aw.qmc.alarmflag)
             aitems = self.buildAlarmSourceList()
             for i in range(len(self.aw.qmc.alarmsource)):
                 if self.aw.qmc.alarmsource[i] + 3 >= len(aitems):
@@ -649,28 +647,28 @@ class AlarmDlg(ArtisanResizeablDialog):
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
-            self.aw.sendmessage(QApplication.translate("Message","Error loading alarm file"))
-            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " importalarmsJSON() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.sendmessage(QApplication.translate('Message','Error loading alarm file'))
+            self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' importalarmsJSON() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def exportalarms(self,_):
-        self.aw.fileExport(QApplication.translate("Message", "Save Alarms"),"*.alrm",self.exportalarmsJSON)
+        self.aw.fileExport(QApplication.translate('Message', 'Save Alarms'),'*.alrm',self.exportalarmsJSON)
 
     def exportalarmsJSON(self,filename):
         try:
             self.savealarms()
             alarms = {}
-            alarms["alarmflags"] = self.aw.qmc.alarmflag
-            alarms["alarmguards"] = self.aw.qmc.alarmguard
-            alarms["alarmnegguards"] = self.aw.qmc.alarmnegguard
-            alarms["alarmtimes"] = self.aw.qmc.alarmtime
-            alarms["alarmoffsets"] = self.aw.qmc.alarmoffset
-            alarms["alarmconds"] = self.aw.qmc.alarmcond
-            alarms["alarmsources"] = self.aw.qmc.alarmsource
-            alarms["alarmtemperatures"] = self.aw.qmc.alarmtemperature
-            alarms["alarmactions"] = self.aw.qmc.alarmaction
-            alarms["alarmbeep"] = self.aw.qmc.alarmbeep
-            alarms["alarmstrings"] = list(self.aw.qmc.alarmstrings)
+            alarms['alarmflags'] = self.aw.qmc.alarmflag
+            alarms['alarmguards'] = self.aw.qmc.alarmguard
+            alarms['alarmnegguards'] = self.aw.qmc.alarmnegguard
+            alarms['alarmtimes'] = self.aw.qmc.alarmtime
+            alarms['alarmoffsets'] = self.aw.qmc.alarmoffset
+            alarms['alarmconds'] = self.aw.qmc.alarmcond
+            alarms['alarmsources'] = self.aw.qmc.alarmsource
+            alarms['alarmtemperatures'] = self.aw.qmc.alarmtemperature
+            alarms['alarmactions'] = self.aw.qmc.alarmaction
+            alarms['alarmbeep'] = self.aw.qmc.alarmbeep
+            alarms['alarmstrings'] = list(self.aw.qmc.alarmstrings)
             from json import dump as json_dump
             with open(filename, 'w', encoding='utf-8') as outfile:
                 json_dump(alarms, outfile, ensure_ascii=True)
@@ -679,7 +677,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " exportalarmsJSON(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' exportalarmsJSON(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
 
     @pyqtSlot()
@@ -687,18 +685,18 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.savealarms()
         # save column widths
         self.aw.qmc.alarmtablecolumnwidths = [self.alarmtable.columnWidth(c) for c in range(self.alarmtable.columnCount())]
-        
+
         self.aw.qmc.alarm_popup_timout = int(self.popupTimoutSpinBox.value())
         self.aw.qmc.alarmsetlabel = self.alarmLabelEdit.text()
         self.closeHelp()
         settings = QSettings()
         #save window geometry
-        settings.setValue("AlarmsGeometry",self.saveGeometry())
+        settings.setValue('AlarmsGeometry',self.saveGeometry())
 #        self.aw.closeEventSettings()
-        
+
         self.aw.AlarmDlg_activeTab = self.TabWidget.currentIndex()
         self.accept()
-    
+
     def closeEvent(self, _):
         self.closealarms()
 
@@ -706,11 +704,11 @@ class AlarmDlg(ArtisanResizeablDialog):
     def restorealarmsets(self,_):
         self.aw.restorealarmsets()
         self.setAlarmSetLabels()
-    
+
     @pyqtSlot(bool)
     def backupalarmsets(self,_):
         self.aw.backupalarmsets()
-    
+
     def savealarms(self):
         try:
             self.alarmtable.sortItems(0)
@@ -727,7 +725,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.aw.qmc.alarmtemperature = [500.]*nalarms
             self.aw.qmc.alarmaction = [0]*nalarms
             self.aw.qmc.alarmbeep = [0]*nalarms
-            self.aw.qmc.alarmstrings = [""]*nalarms
+            self.aw.qmc.alarmstrings = ['']*nalarms
             for i in range(nalarms):
                 flag = self.alarmtable.cellWidget(i,1)
                 self.aw.qmc.alarmflag[i] = int(flag.isChecked())
@@ -752,14 +750,14 @@ class AlarmDlg(ArtisanResizeablDialog):
                 timez =  self.alarmtable.cellWidget(i,4)
                 self.aw.qmc.alarmtime[i] = self.aw.qmc.menuidx2alarmtime[timez.currentIndex()]
                 offset =  self.alarmtable.cellWidget(i,5)
-                if offset and offset != "":
+                if offset and offset != '':
 #                    self.aw.qmc.alarmoffset[i] = max(0,stringtoseconds(str(offset.text())))
                     tx = self.aw.QTime2time(offset.time())
                     self.aw.qmc.alarmoffset[i] = max(0,tx)
                 atype = self.alarmtable.cellWidget(i,6)
                 self.aw.qmc.alarmsource[i] = int(str(atype.currentIndex())) - 3
                 cond = self.alarmtable.cellWidget(i,7)
-                self.aw.qmc.alarmcond[i] = int(str(cond.currentIndex())) 
+                self.aw.qmc.alarmcond[i] = int(str(cond.currentIndex()))
                 temp = self.alarmtable.cellWidget(i,8)
                 try:
                     self.aw.qmc.alarmtemperature[i] = float(self.aw.comma2dot(str(temp.text())))
@@ -775,25 +773,25 @@ class AlarmDlg(ArtisanResizeablDialog):
                 self.aw.qmc.alarmstrings[i] = description.text()
         except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:") + " savealarms(): {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-            
+            self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' savealarms(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+
     def buildAlarmSourceList(self):
         extra_names = []
         for i in range(len(self.aw.qmc.extradevices)):
-            extra_names.append(str(i) + "xT1: " + self.aw.qmc.extraname1[i])
-            extra_names.append(str(i) + "xT2: " + self.aw.qmc.extraname2[i])
-        return ["",
-             deltaLabelUTF8 + QApplication.translate("Label","ET"),
-             deltaLabelUTF8 + QApplication.translate("Label","BT"),
-             QApplication.translate("ComboBox","ET"),
-             QApplication.translate("ComboBox","BT")] + extra_names
+            extra_names.append(str(i) + 'xT1: ' + self.aw.qmc.extraname1[i])
+            extra_names.append(str(i) + 'xT2: ' + self.aw.qmc.extraname2[i])
+        return ['',
+             deltaLabelUTF8 + QApplication.translate('Label','ET'),
+             deltaLabelUTF8 + QApplication.translate('Label','BT'),
+             QApplication.translate('ComboBox','ET'),
+             QApplication.translate('ComboBox','BT')] + extra_names
 
     # creates Widget in row i of self.alarmtable and sets them to values from local dialog variables at position i
     def setalarmtablerow(self,i):
         #flag
         flagComboBox = QCheckBox()
         flagComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        flagComboBox.setText(QApplication.translate("ComboBox","ON"))
+        flagComboBox.setText(QApplication.translate('ComboBox','ON'))
         if self.aw.qmc.alarmflag[i]:
             flagComboBox.setCheckState(Qt.CheckState.Checked)
         else:
@@ -802,7 +800,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         if self.aw.qmc.alarmguard[i] > -1:
             guardstr = str(self.aw.qmc.alarmguard[i] + 1)
         else:
-            guardstr = "0"
+            guardstr = '0'
         guardedit = QLineEdit(guardstr)
         guardedit.setValidator(QIntValidator(0, 999,guardedit))
         guardedit.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -810,25 +808,25 @@ class AlarmDlg(ArtisanResizeablDialog):
         if self.aw.qmc.alarmnegguard[i] > -1:
             negguardstr = str(self.aw.qmc.alarmnegguard[i] + 1)
         else:
-            negguardstr = "0"
+            negguardstr = '0'
         negguardedit = QLineEdit(negguardstr)
         negguardedit.setValidator(QIntValidator(0, 999,negguardedit))
         negguardedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         #Effective time from
         timeComboBox = MyQComboBox()
         timeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
-        timeComboBox.addItems([QApplication.translate("ComboBox","ON"), # qmc.alarmtime 9
-                               QApplication.translate("ComboBox","START"), # qmc.alarmtime -1
-                               QApplication.translate("ComboBox","CHARGE"), # qmc.alarmtime 0
-                               QApplication.translate("ComboBox","TP"), # qmc.alarmtime 8
-                               QApplication.translate("ComboBox","DRY END"), # qmc.alarmtime 1
-                               QApplication.translate("ComboBox","FC START"), # qmc.alarmtime 2
-                               QApplication.translate("ComboBox","FC END"), # qmc.alarmtime 3
-                               QApplication.translate("ComboBox","SC START"), # qmc.alarmtime 4
-                               QApplication.translate("ComboBox","SC END"), # qmc.alarmtime 5
-                               QApplication.translate("ComboBox","DROP"), # qmc.alarmtime 6
-                               QApplication.translate("ComboBox","COOL"), # qmc.alarmtime 7
-                               QApplication.translate("ComboBox","If Alarm")]) # qmc.alarmtime 10
+        timeComboBox.addItems([QApplication.translate('ComboBox','ON'), # qmc.alarmtime 9
+                               QApplication.translate('ComboBox','START'), # qmc.alarmtime -1
+                               QApplication.translate('ComboBox','CHARGE'), # qmc.alarmtime 0
+                               QApplication.translate('ComboBox','TP'), # qmc.alarmtime 8
+                               QApplication.translate('ComboBox','DRY END'), # qmc.alarmtime 1
+                               QApplication.translate('ComboBox','FC START'), # qmc.alarmtime 2
+                               QApplication.translate('ComboBox','FC END'), # qmc.alarmtime 3
+                               QApplication.translate('ComboBox','SC START'), # qmc.alarmtime 4
+                               QApplication.translate('ComboBox','SC END'), # qmc.alarmtime 5
+                               QApplication.translate('ComboBox','DROP'), # qmc.alarmtime 6
+                               QApplication.translate('ComboBox','COOL'), # qmc.alarmtime 7
+                               QApplication.translate('ComboBox','If Alarm')]) # qmc.alarmtime 10
         timeComboBox.setCurrentIndex(self.aw.qmc.alarmtime2menuidx[self.aw.qmc.alarmtime[i]])
         #time after selected event
 #        timeoffsetedit = QLineEdit(stringfromseconds(max(0,self.aw.qmc.alarmoffset[i])))
@@ -837,7 +835,7 @@ class AlarmDlg(ArtisanResizeablDialog):
 #        timeoffsetedit.setValidator(QRegularExpressionValidator(regextime,self))
         timeoffsetedit = QTimeEdit()
         timeoffsetedit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        timeoffsetedit.setDisplayFormat("mm:ss")
+        timeoffsetedit.setDisplayFormat('mm:ss')
         timeoffsetedit.setTime(self.aw.time2QTime(max(0,self.aw.qmc.alarmoffset[i])))
         #type/source
         typeComboBox = MyQComboBox()
@@ -851,8 +849,8 @@ class AlarmDlg(ArtisanResizeablDialog):
         #condition
         condComboBox = MyQComboBox()
         condComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
-        condComboBox.addItems([QApplication.translate("ComboBox","below"),
-                               QApplication.translate("ComboBox","above")])
+        condComboBox.addItems([QApplication.translate('ComboBox','below'),
+                               QApplication.translate('ComboBox','above')])
         condComboBox.setCurrentIndex(self.aw.qmc.alarmcond[i])
         #temperature
         tempedit = QLineEdit(str(self.aw.float2float(self.aw.qmc.alarmtemperature[i])))
@@ -863,33 +861,33 @@ class AlarmDlg(ArtisanResizeablDialog):
         #action
         actionComboBox = MyQComboBox()
         actionComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
-        actionComboBox.addItems(["",
-                                 QApplication.translate("ComboBox","Pop Up"),
-                                 QApplication.translate("ComboBox","Call Program"),
-                                 QApplication.translate("ComboBox","Event Button"),
-                                 QApplication.translate("ComboBox","Slider") + " " + self.aw.qmc.etypesf(0),
-                                 QApplication.translate("ComboBox","Slider") + " " + self.aw.qmc.etypesf(1),
-                                 QApplication.translate("ComboBox","Slider") + " " + self.aw.qmc.etypesf(2),
-                                 QApplication.translate("ComboBox","Slider") + " " + self.aw.qmc.etypesf(3),
-                                 QApplication.translate("ComboBox","START"),
-                                 QApplication.translate("ComboBox","DRY"),
-                                 QApplication.translate("ComboBox","FCs"),
-                                 QApplication.translate("ComboBox","FCe"),
-                                 QApplication.translate("ComboBox","SCs"),
-                                 QApplication.translate("ComboBox","SCe"),
-                                 QApplication.translate("ComboBox","DROP"),
-                                 QApplication.translate("ComboBox","COOL END"),
-                                 QApplication.translate("ComboBox","OFF"),
-                                 QApplication.translate("ComboBox","CHARGE"),
-                                 QApplication.translate("ComboBox","RampSoak ON"),
-                                 QApplication.translate("ComboBox","RampSoak OFF"),
-                                 QApplication.translate("ComboBox","PID ON"),
-                                 QApplication.translate("ComboBox","PID OFF"),
-                                 QApplication.translate("ComboBox","SV"),
-                                 QApplication.translate("ComboBox","Playback ON"),
-                                 QApplication.translate("ComboBox","Playback OFF"),
-                                 QApplication.translate("ComboBox","Set Canvas Color"),
-                                 QApplication.translate("ComboBox","Reset Canvas Color")])
+        actionComboBox.addItems(['',
+                                 QApplication.translate('ComboBox','Pop Up'),
+                                 QApplication.translate('ComboBox','Call Program'),
+                                 QApplication.translate('ComboBox','Event Button'),
+                                 QApplication.translate('ComboBox','Slider') + ' ' + self.aw.qmc.etypesf(0),
+                                 QApplication.translate('ComboBox','Slider') + ' ' + self.aw.qmc.etypesf(1),
+                                 QApplication.translate('ComboBox','Slider') + ' ' + self.aw.qmc.etypesf(2),
+                                 QApplication.translate('ComboBox','Slider') + ' ' + self.aw.qmc.etypesf(3),
+                                 QApplication.translate('ComboBox','START'),
+                                 QApplication.translate('ComboBox','DRY'),
+                                 QApplication.translate('ComboBox','FCs'),
+                                 QApplication.translate('ComboBox','FCe'),
+                                 QApplication.translate('ComboBox','SCs'),
+                                 QApplication.translate('ComboBox','SCe'),
+                                 QApplication.translate('ComboBox','DROP'),
+                                 QApplication.translate('ComboBox','COOL END'),
+                                 QApplication.translate('ComboBox','OFF'),
+                                 QApplication.translate('ComboBox','CHARGE'),
+                                 QApplication.translate('ComboBox','RampSoak ON'),
+                                 QApplication.translate('ComboBox','RampSoak OFF'),
+                                 QApplication.translate('ComboBox','PID ON'),
+                                 QApplication.translate('ComboBox','PID OFF'),
+                                 QApplication.translate('ComboBox','SV'),
+                                 QApplication.translate('ComboBox','Playback ON'),
+                                 QApplication.translate('ComboBox','Playback OFF'),
+                                 QApplication.translate('ComboBox','Set Canvas Color'),
+                                 QApplication.translate('ComboBox','Reset Canvas Color')])
         actionComboBox.setCurrentIndex(self.aw.qmc.alarmaction[i] + 1)
         #beep
         beepWidget = QWidget()
@@ -934,7 +932,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.alarmtable.setItem(i, 10, MyTableWidgetItemQCheckBox(beepWidget.layout().itemAt(1).widget()))
         self.alarmtable.setCellWidget(i,11,descriptionedit)
         self.alarmtable.setItem(i, 11, MyTableWidgetItemQLineEdit(descriptionedit))
-        
+
 
     # puts a gray background on alarm rows that have already been fired
     def markNotEnabledAlarmRows(self):
@@ -952,18 +950,18 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.alarmtable.clear()
             self.alarmtable.setTabKeyNavigation(True)
             self.alarmtable.setColumnCount(12)
-            self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","Nr"),
-                                                           QApplication.translate("Table","Status"),
-                                                           QApplication.translate("Table","If Alarm"),
-                                                           QApplication.translate("Table","But Not"),
-                                                           QApplication.translate("Table","From"),
-                                                           QApplication.translate("Table","Time"),
-                                                           QApplication.translate("Table","Source"),
-                                                           QApplication.translate("Table","Condition"),
-                                                           QApplication.translate("Table","Value"),
-                                                           QApplication.translate("Table","Action"),
-                                                           QApplication.translate("Table","Beep"),
-                                                           QApplication.translate("Table","Description")])
+            self.alarmtable.setHorizontalHeaderLabels([QApplication.translate('Table','Nr'),
+                                                           QApplication.translate('Table','Status'),
+                                                           QApplication.translate('Table','If Alarm'),
+                                                           QApplication.translate('Table','But Not'),
+                                                           QApplication.translate('Table','From'),
+                                                           QApplication.translate('Table','Time'),
+                                                           QApplication.translate('Table','Source'),
+                                                           QApplication.translate('Table','Condition'),
+                                                           QApplication.translate('Table','Value'),
+                                                           QApplication.translate('Table','Action'),
+                                                           QApplication.translate('Table','Beep'),
+                                                           QApplication.translate('Table','Description')])
             self.alarmtable.setAlternatingRowColors(True)
             self.alarmtable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
             self.alarmtable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
@@ -992,17 +990,17 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.markNotEnabledAlarmRows()
             self.alarmtable.setSortingEnabled(True)
             self.alarmtable.sortItems(0)
-            
+
         except Exception as ex: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:") + " createalarmtable() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' createalarmtable() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def copyAlarmTabletoClipboard(self,_=False):
         import prettytable
-        nrows = self.alarmtable.rowCount() 
+        nrows = self.alarmtable.rowCount()
         ncols = self.alarmtable.columnCount()
-        clipboard = ""
+        clipboard = ''
         modifiers = QApplication.keyboardModifiers()
         if modifiers == Qt.KeyboardModifier.AltModifier:  #alt click
             tbl = prettytable.PrettyTable()
@@ -1018,7 +1016,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                 rows.append(self.alarmtable.cellWidget(r,3).text())
                 rows.append(self.alarmtable.cellWidget(r,4).currentText())
 #                rows.append(self.alarmtable.cellWidget(r,5).text())
-                rows.append(self.alarmtable.cellWidget(r,5).time().toString("mm:ss"))
+                rows.append(self.alarmtable.cellWidget(r,5).time().toString('mm:ss'))
                 rows.append(self.alarmtable.cellWidget(r,6).currentText())
                 rows.append(self.alarmtable.cellWidget(r,7).currentText())
                 rows.append(self.alarmtable.cellWidget(r,8).text())
@@ -1040,7 +1038,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                 clipboard += self.alarmtable.cellWidget(r,3).text() + '\t'
                 clipboard += self.alarmtable.cellWidget(r,4).currentText() + '\t'
 #                clipboard += self.alarmtable.cellWidget(r,5).text() + '\t'
-                clipboard += self.alarmtable.cellWidget(r,5).time().toString("mm:ss") + '\t'
+                clipboard += self.alarmtable.cellWidget(r,5).time().toString('mm:ss') + '\t'
                 clipboard += self.alarmtable.cellWidget(r,6).currentText() + '\t'
                 clipboard += self.alarmtable.cellWidget(r,7).currentText() + '\t'
                 clipboard += self.alarmtable.cellWidget(r,8).text() + '\t'
@@ -1050,7 +1048,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
         sys_clip.setText(clipboard)
-        self.aw.sendmessage(QApplication.translate("Message","Alarm table copied to clipboard"))
+        self.aw.sendmessage(QApplication.translate('Message','Alarm table copied to clipboard'))
 
     @pyqtSlot(bool)
     def showAlarmbuttonhelp(self,_=False):
@@ -1058,7 +1056,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
-                QApplication.translate("Form Caption","Alarms Help"),
+                QApplication.translate('Form Caption','Alarms Help'),
                 alarms_help.content())
 
     def closeHelp(self):

@@ -6,9 +6,9 @@
 
 ## Steps to Reproduce the Problem
 
-  1. 
-  2. 
-  3. 
+  1.
+  2.
+  3.
 
 ## Specifications
 
@@ -16,7 +16,7 @@
   - Artisan Build (number in brackets shown in the about box):
   - Platform (Mac/Windows/Linux + OS version):
   - Connected devices or roasting machine:
-  
+
 Please attach your current Artisan settings file (as exported via menu Help >> Save Settings as *.aset) file.
 Please attach any relevant Artisan *.alog profiles.
 

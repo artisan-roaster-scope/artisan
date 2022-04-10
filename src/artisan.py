@@ -4,7 +4,7 @@ Start the application.
 """
 
 import warnings
-warnings.simplefilter("ignore", DeprecationWarning)
+warnings.simplefilter('ignore', DeprecationWarning)
 
 import sys
 import os
@@ -13,7 +13,7 @@ from platform import system
 # highDPI support must be set before creating the Application instance
 try:
     if system() == 'Darwin':
-        os.environ["QT_MAC_WANTS_LAYER"] = "1" # some widgets under PyQt  on macOS seem not to update properly without this (see the discussion on the pyqt mailing list from 15.6.2020 "Widgets are not updated - is this a bug?")
+        os.environ['QT_MAC_WANTS_LAYER'] = '1' # some widgets under PyQt  on macOS seem not to update properly without this (see the discussion on the pyqt mailing list from 15.6.2020 "Widgets are not updated - is this a bug?")
     try:
         #pylint: disable = E, W, R, C
         from PyQt6.QtWidgets import QApplication  # @UnusedImport @Reimport  @UnresolvedImport
@@ -27,29 +27,29 @@ try:
 #    os.environ["QT_SCALE_FACTOR"] = "1"
 except Exception: # pylint: disable=broad-except
     pass
-        
+
 # on Qt5, the platform plugin cocoa/windows is not found in the plugin directory (dispite the qt.conf file) if we do not
 # extend the libraryPath accordingly
-if system().startswith("Windows"):
+if system().startswith('Windows'):
     try:
         ib = (
-            hasattr(sys, "frozen") or # new py2exe
-            hasattr(sys, "importers") # old py2exe
+            hasattr(sys, 'frozen') or # new py2exe
+            hasattr(sys, 'importers') # old py2exe
         )
         try:
             from PyQt6.QtWidgets import QApplication  # @UnresolvedImport @Reimport @UnusedImport pylint: disable=import-error
             if ib:
-                QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), "plugins"))            
+                QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), 'plugins'))
             else:
                 import site # @Reimport @UnusedImport
-                QApplication.addLibraryPath(site.getsitepackages()[1] + "\\PyQt6\\plugins")
+                QApplication.addLibraryPath(site.getsitepackages()[1] + '\\PyQt6\\plugins')
         except Exception:  # pylint: disable=broad-except
             from PyQt5.QtWidgets import QApplication  # @UnresolvedImport @Reimport @UnusedImport pylint: disable=import-error
             if ib:
-                QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), "plugins"))            
+                QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), 'plugins'))
             else:
                 import site # @Reimport @UnusedImport
-                QApplication.addLibraryPath(site.getsitepackages()[1] + "\\PyQt5\\plugins")
+                QApplication.addLibraryPath(site.getsitepackages()[1] + '\\PyQt5\\plugins')
 
     except Exception: # pylint: disable=broad-except
         pass
@@ -59,27 +59,27 @@ else: # Linux
         try:
             from PyQt6.QtWidgets import QApplication  # @UnresolvedImport @Reimport @UnusedImport pylint: disable=import-error
             if ib:
-                QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "Resources/qt_plugins"))            
+                QApplication.addLibraryPath(os.path.join(os.path.dirname(__file__), 'Resources/qt_plugins'))
             else:
                 import site # @Reimport
-                QApplication.addLibraryPath(os.path.dirname(site.getsitepackages()[0]) + "/PyQt6/qt_plugins")
+                QApplication.addLibraryPath(os.path.dirname(site.getsitepackages()[0]) + '/PyQt6/qt_plugins')
         except Exception:  # pylint: disable=broad-except
             from PyQt5.QtWidgets import QApplication  # @UnresolvedImport @Reimport @UnusedImport pylint: disable=import-error
             if ib:
-                QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "Resources/qt_plugins"))            
+                QApplication.addLibraryPath(os.path.join(os.path.dirname(__file__), 'Resources/qt_plugins'))
             else:
                 import site # @Reimport
-                QApplication.addLibraryPath(os.path.dirname(site.getsitepackages()[0]) + "/PyQt5/qt_plugins")
+                QApplication.addLibraryPath(os.path.dirname(site.getsitepackages()[0]) + '/PyQt5/qt_plugins')
     except Exception: # pylint: disable=broad-except
         pass
 
 from artisanlib import main, command_utility
 from multiprocessing import freeze_support
 
-if system() == "Windows" and hasattr(sys, "frozen"): # tools/freeze
+if system() == 'Windows' and hasattr(sys, 'frozen'): # tools/freeze
     from multiprocessing import set_executable
     executable = os.path.join(os.path.dirname(sys.executable), 'artisan.exe')
-    set_executable(executable)    
+    set_executable(executable)
     del executable
 
 if __name__ == '__main__':

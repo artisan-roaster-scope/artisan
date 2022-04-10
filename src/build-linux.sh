@@ -52,7 +52,7 @@ for lan in ar, da, de, en, el, es, fa, fi, fr, gd, he, hu, id, it, ja, ko, lv, n
      if [ -e ${QTBASE_FILE} ]
           then cp ${QTBASE_FILE} dist/translations
      fi
-     if [ -e ${QT_FILE} ] 
+     if [ -e ${QT_FILE} ]
           then cp ${QT_FILE} dist/translations
      fi
 done
@@ -149,6 +149,3 @@ rm -f dist/libz.so.1 # removing this lib seems to break the build on some RPi Bu
 rm -f dist/libglib-2.0.so.0 # removed for v1.6 and later
 
 rm -f libusb-1.0.so.0
-
-
-

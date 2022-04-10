@@ -2,7 +2,7 @@
 
 block_cipher = None
 
-additionalLibs = [] 
+additionalLibs = []
 #additionalLibs.append( ("libGL.so.1", "/usr/lib64/libGL.so.1", 'BINARY') )
 
 import os

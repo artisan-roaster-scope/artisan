@@ -57,7 +57,7 @@ sudo -H python3 -m pip install -r src/requirements.txt
 # replaced sudo -H python3 -m pip install -r src/requirements-${TRAVIS_OS_NAME}.txt
 sudo -H python3 -m pip install -r src/requirements-${ARTISAN_OS}.txt
 
-# use a custom py2app v0.23 with apptemplate main-x86_64 build for 
+# use a custom py2app v0.23 with apptemplate main-x86_64 build for
 # target 10.13 using MacOSX10.15.sdk build on macOS 10.15 to add dark-mode support to builds
 #sudo -H python3 -m pip install .ci/py2app-0.23-py2.py3-none-any.whl
 # with PyQt6 we need to use 0.26.1 which duplicates the Qt installation hopefully resolved in the next version

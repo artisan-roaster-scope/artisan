@@ -352,7 +352,7 @@ NOTE: replace site-packages by dist-packages if using the default Ubuntu python 
 12) bbfreeze
 
 # vi bbfrezze/recipes.py
-comment out the line refering to matplotlib.numerix 
+comment out the line refering to matplotlib.numerix
 (as this generates an error on build)
 
 # python2.7 setup.py build
@@ -369,7 +369,7 @@ v1.1.3 of bbfreeze fails with
 ImportError: No module named matplotlib.numerix
 
 To fix this, one has to patch bbfreeze/recipes.py by putting the call to mf.import_hook("matplotlib.numerix.random_array", m)
-into a 
+into a
 try:
   mf.import_hook("matplotlib.numerix.random_array", m)
 except:
@@ -475,4 +475,3 @@ o minimalmodbus (??)
 # pip install -U minimalmodbus
 o bbfreeze (??)
 # sudo easy_install bbfreeze
-

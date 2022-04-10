@@ -1,0 +1,19 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: check-yaml
+    -   id: check-xml
+    -   id: end-of-file-fixer
+        exclude: ^(src/uic/|src/translations/|src/includes/)
+    -   id: trailing-whitespace
+        exclude: ^(src/uic/|src/translations/|src/includes/)
+    -   id: double-quote-string-fixer
+        exclude: ^(src/uic/|src/translations/|src/includes/)
+    -   id: check-ast
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v2.32.0
+    hooks:
+    -   id: pyupgrade
+        args: [--py39-plus]
+        exclude: ^(src/uic/|src/translations/|src/includes/)

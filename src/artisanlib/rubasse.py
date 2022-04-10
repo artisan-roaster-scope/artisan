@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # RUBASSE CSV Roast Profile importer for Artisan
 
 import os
-import io
 import csv
 import logging
 try:
@@ -27,23 +25,23 @@ _log: Final = logging.getLogger(__name__)
 def extractProfileRubasseCSV(file,aw):
     res = {} # the interpreted data set
 
-    res["samplinginterval"] = 1.0
+    res['samplinginterval'] = 1.0
     filename = os.path.basename(file)
-    res["title"] = filename
+    res['title'] = filename
 
-    with io.open(file, 'r', newline="",encoding='utf-8') as csvFile:
+    with open(file, newline='',encoding='utf-8') as csvFile:
         data = csv.reader(csvFile,delimiter=',')
         #read file header
         header_row = next(data)
-        header = ["time","BT","Fan","Heater","RoR","Drum","Humidity","ET","Pressure"]
-        
+        header = ['time','BT','Fan','Heater','RoR','Drum','Humidity','ET','Pressure']
+
         fan = None # holds last processed fan event value
         fan_last = None # holds the fan event value before the last one
         heater = None # holds last processed heater event value
         heater_last = None # holds the heater event value before the last one
         fan_event = False # set to True if a fan event exists
         heater_event = False # set to True if a heater event exists
-        
+
         specialevents = []
         specialeventstype = []
         specialeventsvalue = []
@@ -58,26 +56,26 @@ def extractProfileRubasseCSV(file,aw):
         extra5 = []
         extra6 = []
         timeindex = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
-        
-    
-    
+
+
+
         i = 0
         for row in data:
             items = list(zip(header, row))
             item = {}
             for (name, value) in items:
                 item[name] = value.strip()
-                
+
             # take i as time in seconds
             timex.append(i)
-            
+
             et = -1
             try:
                 et = float(item['ET'])
             except Exception: # pylint: disable=broad-except
                 pass
             temp1.append(et)
-            
+
             bt = -1
             try:
                 bt = float(item['BT'])
@@ -87,47 +85,47 @@ def extractProfileRubasseCSV(file,aw):
             except Exception: # pylint: disable=broad-except
                 pass
             temp2.append(bt)
-            
+
             heater = -1
             try:
                 heater = float(item['Heater'])
             except Exception: # pylint: disable=broad-except
                 pass
             extra1.append(heater)
-    
+
             fan = -1
             try:
                 fan = float(item['Fan'])
             except Exception: # pylint: disable=broad-except
                 pass
             extra2.append(fan)
-    
+
             humidity = -1
             try:
                 humidity = float(item['Humidity'])
             except Exception: # pylint: disable=broad-except
                 pass
             extra3.append(humidity)
-    
+
             pressure = -1
             try:
                 pressure = float(item['Pressure'])
             except Exception: # pylint: disable=broad-except
                 pass
             extra4.append(pressure)
-    
+
             drum = -1
             try:
                 drum = float(item['Drum'])
             except Exception: # pylint: disable=broad-except
                 pass
             extra5.append(drum)
-            
+
             extra6.append(-1)
-            
-            if "Fan" in item:
+
+            if 'Fan' in item:
                 try:
-                    v = float(item["Fan"])
+                    v = float(item['Fan'])
                     if v != fan:
                         # fan value changed
                         if fan_last is not None and v == fan_last:
@@ -147,14 +145,14 @@ def extractProfileRubasseCSV(file,aw):
                             specialeventsvalue.append(v)
                             specialevents.append(i)
                             specialeventstype.append(0)
-                            specialeventsStrings.append("{}".format(float(item["Fan"])) + "%")
+                            specialeventsStrings.append('{}'.format(float(item['Fan'])) + '%')
                     else:
                         fan_last = None
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-            if "Heater" in item:
+            if 'Heater' in item:
                 try:
-                    v = int(round(float(item["Heater"])))
+                    v = int(round(float(item['Heater'])))
                     if heater is None or v != heater:
                         # heater value changed
                         if heater_last is not None and v == heater_last:
@@ -174,13 +172,13 @@ def extractProfileRubasseCSV(file,aw):
                             specialeventsvalue.append(v)
                             specialevents.append(i)
                             specialeventstype.append(3)
-                            specialeventsStrings.append("{}".format(float(item["Heater"])) + "%")
+                            specialeventsStrings.append('{}'.format(float(item['Heater'])) + '%')
                     else:
                         heater_last = None
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
             i = i + 1
-     
+
     # mark CHARGE
 # not sure if index 1 holds the correct data
 #    try:
@@ -211,42 +209,41 @@ def extractProfileRubasseCSV(file,aw):
 #        pass
     if timeindex[6] == 0:
         timeindex[6] = max(0,len(timex)-1)
-    
-    res["mode"] = 'C'
-            
-    res["timex"] = timex
-    res["temp1"] = temp1
-    res["temp2"] = temp2
-    res["timeindex"] = timeindex
-    
-    res["extradevices"] = [25,25,25]
-    res["extratimex"] = [timex[:],timex[:],timex[:]]
-    
-    res["extraname1"] = ["{3}","Humidity","{1}"]
-    res["extratemp1"] = [extra1,extra3,extra5]
-    res["extramathexpression1"] = ["","",""]
-    
-    res["extraname2"] = ["{0}","Pressure",""]
-    res["extratemp2"] = [extra2,extra4,extra6]
-    res["extramathexpression2"] = ["","",""]
-    
+
+    res['mode'] = 'C'
+
+    res['timex'] = timex
+    res['temp1'] = temp1
+    res['temp2'] = temp2
+    res['timeindex'] = timeindex
+
+    res['extradevices'] = [25,25,25]
+    res['extratimex'] = [timex[:],timex[:],timex[:]]
+
+    res['extraname1'] = ['{3}','Humidity','{1}']
+    res['extratemp1'] = [extra1,extra3,extra5]
+    res['extramathexpression1'] = ['','','']
+
+    res['extraname2'] = ['{0}','Pressure','']
+    res['extratemp2'] = [extra2,extra4,extra6]
+    res['extramathexpression2'] = ['','','']
+
     if len(specialevents) > 0:
-        res["specialevents"] = specialevents
-        res["specialeventstype"] = specialeventstype
-        res["specialeventsvalue"] = specialeventsvalue
-        res["specialeventsStrings"] = specialeventsStrings
+        res['specialevents'] = specialevents
+        res['specialeventstype'] = specialeventstype
+        res['specialeventsvalue'] = specialeventsvalue
+        res['specialeventsStrings'] = specialeventsStrings
         if heater_event or fan_event:
             # first set etypes to defaults
-            res["etypes"] = [QApplication.translate("ComboBox", "Air"),
-                             QApplication.translate("ComboBox", "Drum"),
-                             QApplication.translate("ComboBox", "Damper"),
-                             QApplication.translate("ComboBox", "Burner"),
-                             "--"]
+            res['etypes'] = [QApplication.translate('ComboBox', 'Air'),
+                             QApplication.translate('ComboBox', 'Drum'),
+                             QApplication.translate('ComboBox', 'Damper'),
+                             QApplication.translate('ComboBox', 'Burner'),
+                             '--']
             # update
             if fan_event:
-                res["etypes"][0] = "Fan"
+                res['etypes'][0] = 'Fan'
             if heater_event:
-                res["etypes"][3] = "Heater"        
-    
+                res['etypes'][3] = 'Heater'
+
     return res
-                

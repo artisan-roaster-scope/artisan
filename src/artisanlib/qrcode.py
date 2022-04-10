@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 
 import qrcode
@@ -36,7 +35,7 @@ class QRImage(qrcode.image.base.BaseImage):
 
     def save(self, stream, kind=None):
         pass
-    
+
     def process(self):
         pass
 

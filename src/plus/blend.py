@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # blend.py
 #
@@ -75,7 +74,6 @@ import logging
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 from uic import BlendDialog
-from typing import List
 try:
     from typing import Final
 except ImportError:
@@ -94,11 +92,11 @@ class Component():
     def __init__(self, coffee: str, ratio: float):
         self._coffee = coffee
         self._ratio = ratio
-        
+
     @property
     def coffee(self):
         return self._coffee
-        
+
     @coffee.setter
     def coffee(self, value):
         self._coffee = value
@@ -106,7 +104,7 @@ class Component():
     @property
     def ratio(self):
         return self._ratio
-    
+
     @ratio.setter
     def ratio(self, value):
         self._ratio = value
@@ -116,10 +114,10 @@ class Component():
 #######################  Blend  ########################################################
 
 class Blend():
-    def __init__(self, name: str, components: List):
+    def __init__(self, name: str, components: list):
         self._name = name
         self._components = components
-        
+
     @property
     def name(self):
         return self._name
@@ -135,13 +133,13 @@ class Blend():
     @components.setter
     def components(self, value):
         self._components = value
-    
-    # a blend is valid if it 
+
+    # a blend is valid if it
     #  - has at least 2 ingredients,
     #  - the component ratios of all ingredients sum up to 1,
     #  - there are no duplicates in the list of component coffees, and,
     #  - all component coffees are contained in the list of available_coffees (list of hr_ids as strings), if given
-    def isValid(self, available_coffees: List = None):
+    def isValid(self, available_coffees: list = None):
         if self.components is None:
             return False
         component_coffees = [c.coffee for c in self.components]
@@ -166,52 +164,52 @@ class CustomBlendDialog(ArtisanDialog):
         self.blend = Blend( # we create a new copy not to alter the original one
             blend.name.strip(),
             [Component(c.coffee, c.ratio) for c in blend.components])
-        
+
         # configure UI
         self.ui = BlendDialog.Ui_customBlendDialog()
         self.ui.setupUi(self)
-        self.setWindowTitle(QApplication.translate("Form Caption","Custom Blend"))
+        self.setWindowTitle(QApplication.translate('Form Caption','Custom Blend'))
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
         # hack to assign the Apply button the AcceptRole without loosing default system translations
         applyButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply)
         self.ui.buttonBox.removeButton(applyButton)
         self.applyButton = self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
-        
+
         # populate widgets
         self.ui.lineEdit_name.setText(self.blend.name)
-        self.ui.label_weight.setText(QApplication.translate("Label","Weight"))
+        self.ui.label_weight.setText(QApplication.translate('Label','Weight'))
         self.ui.lineEdit_weight.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.ui.lineEdit_weight))  # the max limit has to be high enough otherwise the connected signals are not send!
-        inw = "%g" % self.aw.float2floatWeightVolume(self.inWeight)
+        inw = '%g' % self.aw.float2floatWeightVolume(self.inWeight)
         self.ui.lineEdit_weight.setText(inw)
         self.ui.label_unit.setText(self.weightUnit)
         self.updateComponentTable()
         self.updateAddButton()
-        
+
         # connect widget signals
         self.ui.lineEdit_name.editingFinished.connect(self.nameChanged)
         self.ui.pushButton_add.clicked.connect(self.addComponent)
         self.ui.lineEdit_weight.editingFinished.connect(self.weighteditChanged)
 
         settings = QSettings()
-        if settings.contains("BlendGeometry"):
-            self.restoreGeometry(settings.value("BlendGeometry"))
-        
+        if settings.contains('BlendGeometry'):
+            self.restoreGeometry(settings.value('BlendGeometry'))
+
 
     @pyqtSlot()
     def nameChanged(self):
         self.blend.name = self.ui.lineEdit_name.text().strip()
-    
+
     # as the total weight was excplicitly updated by the user, we set the initialTotalWeight here
     @pyqtSlot()
     def weighteditChanged(self):
         weight = float(self.aw.comma2dot(self.ui.lineEdit_weight.text()))
-        inw = "%g" % self.aw.float2floatWeightVolume(weight)
+        inw = '%g' % self.aw.float2floatWeightVolume(weight)
         self.ui.lineEdit_weight.setText(inw)
         self.ui.lineEdit_weight.repaint()
         self.initialTotalWeight = float(self.ui.lineEdit_weight.text())
         self.inWeight = self.initialTotalWeight
         self.updateComponentTable()
-    
+
     @pyqtSlot()
     def ratioChanged(self):
         i = self.aw.findWidgetsRow(self.ui.tableWidget,self.sender(), 0)
@@ -228,12 +226,12 @@ class CustomBlendDialog(ArtisanDialog):
         i = self.aw.findWidgetsRow(self.ui.tableWidget,self.sender(), 1)
         weightLineEdit = self.ui.tableWidget.cellWidget(i,1)
         weight = float(self.aw.comma2dot(weightLineEdit.text()))
-        inw = "%g" % self.aw.float2floatWeightVolume(weight)
+        inw = '%g' % self.aw.float2floatWeightVolume(weight)
         weightLineEdit.setText(inw)
         if self.initialTotalWeight == 0:
             # we update the total weight
             self.inWeight = sum(float(self.ui.tableWidget.cellWidget(j,1).text()) for j in range(self.ui.tableWidget.rowCount()))
-            inw = "%g" % self.aw.float2floatWeightVolume(self.inWeight)
+            inw = '%g' % self.aw.float2floatWeightVolume(self.inWeight)
             self.ui.lineEdit_weight.setText(inw)
         # we update the ratio
         ratio = weight / self.inWeight
@@ -245,7 +243,7 @@ class CustomBlendDialog(ArtisanDialog):
             # we calculate the ratio of all other components from their individual weight too
             for j in range(self.ui.tableWidget.rowCount()):
                 if j != i: # for component i we already calculated the ratio
-                    weight = float(self.ui.tableWidget.cellWidget(j,1).text()) 
+                    weight = float(self.ui.tableWidget.cellWidget(j,1).text())
                     ratio = weight / self.inWeight
                     self.blend.components[j].ratio = ratio
         self.updateComponentTable()
@@ -256,33 +254,33 @@ class CustomBlendDialog(ArtisanDialog):
         coffeecombobox = self.ui.tableWidget.cellWidget(i,2)
         hr_id = self.coffees[coffeecombobox.currentText()]
         self.blend.components[i].coffee = hr_id
-    
+
     ###
 
     @pyqtSlot(bool)
     def addComponent(self,_):
-        ratio = min(100,max(0,1 - sum([c.ratio for c in self.blend.components])))
+        ratio = min(100,max(0,1 - sum(c.ratio for c in self.blend.components)))
         blend_coffees = [c.coffee for c in self.blend.components]
         coffee = [hr_id for (c,hr_id) in self.sorted_coffees if hr_id not in blend_coffees][0]
         self.blend.components.append(Component(coffee,ratio))
         self.updateAddButton()
         self.updateComponentTable()
-    
+
     @pyqtSlot(bool)
     def deleteComponent(self,_):
         i = self.aw.findWidgetsRow(self.ui.tableWidget,self.sender(), 3)
         self.blend.components = self.blend.components[:i] + self.blend.components[i+1:]
         self.updateAddButton()
         self.updateComponentTable()
-    
+
     def saveSettings(self):
         settings = QSettings()
         #save window geometry
-        settings.setValue("BlendGeometry",self.saveGeometry())
-        
+        settings.setValue('BlendGeometry',self.saveGeometry())
+
     def closeEvent(self,_):
         self.saveSettings()
-        
+
     @pyqtSlot()
     def accept(self):
         self.saveSettings()
@@ -291,67 +289,67 @@ class CustomBlendDialog(ArtisanDialog):
     @pyqtSlot()
     def reject(self):
         self.saveSettings()
-        super().reject()        
-    
+        super().reject()
+
     @pyqtSlot()
     def close(self):
         self.closeEvent(None)
-    
+
     def updateAddButton(self):
         self.ui.pushButton_add.setEnabled(len(self.coffees)>len(self.blend.components))
-    
+
     # returns True if all component rations sum up to 1 and all individual ratios are above 0 and below 100
     def checkRatio(self):
         ratios = [c.ratio for c in self.blend.components]
-        return all((0 < r < 100 for r in ratios)) and ((1 - sum(ratios)) < 0.001)
-    
+        return all(0 < r < 100 for r in ratios) and ((1 - sum(ratios)) < 0.001)
+
     def updateComponentTable(self):
         try:
             self.ui.tableWidget.clear()
             self.ui.tableWidget.setTabKeyNavigation(False)
-            
+
             columns = 4
             rows = len(self.blend.components)
             self.ui.tableWidget.setColumnCount(columns)
             self.ui.tableWidget.setRowCount(rows)
-    
-            self.ui.tableWidget.setHorizontalHeaderLabels(["%",
+
+            self.ui.tableWidget.setHorizontalHeaderLabels(['%',
                                                            self.weightUnit,
-                                                           QApplication.translate("Label","Beans"),
-                                                           ""])
+                                                           QApplication.translate('Label','Beans'),
+                                                           ''])
             self.ui.tableWidget.setAlternatingRowColors(False)
             self.ui.tableWidget.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
             self.ui.tableWidget.setSelectionMode(QTableWidget.SelectionMode.NoSelection) # QTableWidget.SelectionMode.SingleSelection
             self.ui.tableWidget.setShowGrid(True)
-            
+
             blend_coffees = [c.coffee for c in self.blend.components]
-            
+
             ratio_correct = self.checkRatio()
-            
+
             self.applyButton.setEnabled(ratio_correct)
-            
+
             for i, c in enumerate(self.blend.components):
-                #ratio            
-                ratioedit = QLineEdit(f"{c.ratio*100:.1f}".rstrip('0').rstrip('.'))
+                #ratio
+                ratioedit = QLineEdit(f'{c.ratio*100:.1f}'.rstrip('0').rstrip('.'))
                 ratioedit.setAlignment(Qt.AlignmentFlag.AlignRight)
                 ratioedit.setMinimumWidth(40)
-                ratioedit.setMaximumWidth(40) 
+                ratioedit.setMaximumWidth(40)
                 ratioedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 1, ratioedit))  # the max limit has to be high enough otherwise the connected signals are not send!
                 if not ratio_correct:
-                    ratioedit.setStyleSheet("QLineEdit { color: #CC0F50; }")
+                    ratioedit.setStyleSheet('QLineEdit { color: #CC0F50; }')
                 ratioedit.editingFinished.connect(self.ratioChanged)
                 self.ui.tableWidget.setCellWidget(i,0,ratioedit)
-    
+
                 #weight
                 component_weight = c.ratio * self.inWeight
-                weightedit = QLineEdit("%g" % self.aw.float2floatWeightVolume(component_weight))
+                weightedit = QLineEdit('%g' % self.aw.float2floatWeightVolume(component_weight))
                 weightedit.setAlignment(Qt.AlignmentFlag.AlignRight)
                 weightedit.setMinimumWidth(70)
                 weightedit.setMaximumWidth(70)
                 weightedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, weightedit))  # the max limit has to be high enough otherwise the connected signals are not send!
                 weightedit.editingFinished.connect(self.weightChanged)
                 self.ui.tableWidget.setCellWidget(i,1,weightedit)
-                
+
                 #beans
                 beansComboBox = MyQComboBox()
                 beansComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
@@ -361,7 +359,7 @@ class CustomBlendDialog(ArtisanDialog):
                 beansComboBox.setCurrentIndex(coffees.index(self.coffee_ids[c.coffee]))
                 self.ui.tableWidget.setCellWidget(i,2,beansComboBox)
                 beansComboBox.currentIndexChanged.connect(self.componentCoffeeChanged)
-                
+
                 #delete
                 if rows>2:
                     deleteButton = QToolButton()
@@ -370,7 +368,7 @@ class CustomBlendDialog(ArtisanDialog):
                     deleteButton.setFixedSize(QSize(22, 22))
                     deleteButton.clicked.connect(self.deleteComponent)
                     self.ui.tableWidget.setCellWidget(i,3,deleteButton)
-                
+
             header = self.ui.tableWidget.horizontalHeader()
             self.ui.tableWidget.resizeColumnsToContents()
             header.setStretchLastSection(False)
@@ -381,7 +379,7 @@ class CustomBlendDialog(ArtisanDialog):
             self.ui.tableWidget.setColumnWidth(3,22)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-    
+
 
 def openCustomBlendDialog(window, aw, inWeight, weightUnit, coffees, blend):
     dialog = CustomBlendDialog(window, aw, inWeight, weightUnit, coffees, blend)
@@ -392,7 +390,7 @@ def openCustomBlendDialog(window, aw, inWeight, weightUnit, coffees, blend):
     else:
         blend = None
         total_weight = inWeight
-                
+
     #deleteLater() will not work here as the dialog is still bound via the parent
     #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
     # the following will immedately release the memory dispite this parent link

@@ -2,7 +2,7 @@
 #
 # ensure that the selected version is on https://www.piwheels.org/ as binary package
 # for the builds Python version (3.5.3)
-# ensure also that the dependency order is right (eg. gevent-websocket==0.10.1 is not on 
+# ensure also that the dependency order is right (eg. gevent-websocket==0.10.1 is not on
 # pywheel and requires gevent that is then also not taken from pywheel thus gevent-
 # websocket has to be requested after the pywheel version of gevent)
 #

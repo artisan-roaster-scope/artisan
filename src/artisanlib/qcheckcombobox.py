@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 
 """
@@ -44,9 +43,9 @@ class CheckComboBox(QComboBox):
     """
     A QComboBox allowing multiple item selection.
     """
-    
+
     flagChanged=pyqtSignal(int,bool)
-    
+
 
     class ComboItemDelegate(QStyledItemDelegate):
         """
@@ -55,7 +54,7 @@ class CheckComboBox(QComboBox):
         list view (e.g windows style).
         """
         def isSeparator(self, index): # pylint: disable=no-self-use
-            return str(index.data(Qt.ItemDataRole.AccessibleDescriptionRole)) == "separator"
+            return str(index.data(Qt.ItemDataRole.AccessibleDescriptionRole)) == 'separator'
 
         def paint(self, painter, option, index):
 #            if option.widget is not None:
@@ -84,11 +83,11 @@ class CheckComboBox(QComboBox):
         delegate used by the QComboBox). Used to style the popup like a
         menu. (e.g osx aqua style).
         """
-        
+
         __slots__ = [ '__popupIsShown', '__blockMouseReleaseTimer', '__initialMousePos', '__separator', '__placeholderText' ]
-        
+
         def isSeparator(self, index): # pylint: disable=no-self-use
-            return str(index.data(Qt.ItemDataRole.AccessibleDescriptionRole)) == "separator"
+            return str(index.data(Qt.ItemDataRole.AccessibleDescriptionRole)) == 'separator'
 
         def paint(self, painter, option, index):
             menuopt = self._getMenuStyleOption(option, index)
@@ -112,7 +111,7 @@ class CheckComboBox(QComboBox):
 
         def _getMenuStyleOption(self, option, index):
             menuoption = QStyleOptionMenuItem()
-            palette = option.palette.resolve(QApplication.palette("QMenu"))
+            palette = option.palette.resolve(QApplication.palette('QMenu'))
             foreground = index.data(Qt.ItemDataRole.ForegroundRole)
             if isinstance(foreground, (QBrush, QColor, QPixmap)):
                 foreground = QBrush(foreground)
@@ -147,7 +146,7 @@ class CheckComboBox(QComboBox):
             if option.widget is not None:
                 menuoption.font = option.widget.font()
             else:
-                menuoption.font = QApplication.font("QMenu")
+                menuoption.font = QApplication.font('QMenu')
 
             menuoption.maxIconWidth = option.decorationSize.width() + 4
             menuoption.rect = option.rect
@@ -183,7 +182,7 @@ class CheckComboBox(QComboBox):
             menuoption.state = state
             return menuoption
 
-    def __init__(self, parent=None, placeholderText="", separator=", ",
+    def __init__(self, parent=None, placeholderText='', separator=', ',
                  **kwargs):
         super().__init__(parent, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
@@ -388,21 +387,21 @@ class CheckComboBox(QComboBox):
 
 def example():
     app = QApplication(list(sys.argv))
-    cb = CheckComboBox(placeholderText="None")
+    cb = CheckComboBox(placeholderText='None')
     model = cb.model()
-    cb.addItem("First")
+    cb.addItem('First')
     model.item(0).setCheckable(True)
-    cb.addItem("Second")
+    cb.addItem('Second')
     model.item(1).setCheckable(True)
-    cb.addItem("Third")
+    cb.addItem('Third')
     model.item(2).setCheckable(True)
     cb.insertSeparator(3)
-    cb.addItem("Fourth - Disabled")
+    cb.addItem('Fourth - Disabled')
     model.item(4).setEnabled(False)
     cb.show()
     cb.raise_()
 
     return app.exec()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     sys.exit(example())

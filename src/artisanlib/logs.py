@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # Artisan serial, error and message logs
@@ -38,9 +37,9 @@ class serialLogDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Serial Log"))
-        self.serialcheckbox = QCheckBox(QApplication.translate("CheckBox","Serial Log ON/OFF"))
-        self.serialcheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF logs serial communication"))
+        self.setWindowTitle(QApplication.translate('Form Caption','Serial Log'))
+        self.serialcheckbox = QCheckBox(QApplication.translate('CheckBox','Serial Log ON/OFF'))
+        self.serialcheckbox.setToolTip(QApplication.translate('Tooltip', 'ON/OFF logs serial communication'))
         self.serialcheckbox.setChecked(self.aw.seriallogflag)
         self.serialcheckbox.stateChanged.connect(self.serialcheckboxChanged)
         self.serialEdit = QTextEdit()
@@ -53,12 +52,12 @@ class serialLogDlg(ArtisanDialog):
 
     def getstring(self):
         #convert list of serial comm an html string
-        htmlserial = "version = " +__version__ +"<br><br>"
+        htmlserial = 'version = ' +__version__ +'<br><br>'
         lenl = len(self.aw.seriallog)
         for i in range(len(self.aw.seriallog)):
-            htmlserial += "<b>" + str(lenl-i) + "</b> " + self.aw.seriallog[-i-1] + "<br><br>"
+            htmlserial += '<b>' + str(lenl-i) + '</b> ' + self.aw.seriallog[-i-1] + '<br><br>'
         return htmlserial
-            
+
     def update(self):
         if self.aw.seriallogflag:
             self.serialEdit.setText(self.getstring())
@@ -69,7 +68,7 @@ class serialLogDlg(ArtisanDialog):
             self.aw.seriallogflag = True
         else:
             self.aw.seriallogflag = False
-            
+
     def closeEvent(self,_):
         self.close()
         self.aw.serial_dlg = None
@@ -82,7 +81,7 @@ class errorDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Error Log"))
+        self.setWindowTitle(QApplication.translate('Form Caption','Error Log'))
         self.elabel = QLabel()
         self. errorEdit = QTextEdit()
         self.errorEdit.setReadOnly(True)
@@ -91,17 +90,17 @@ class errorDlg(ArtisanDialog):
         layout.addWidget(self.errorEdit,1)
         self.setLayout(layout)
         self.update()
-        
+
     def update(self):
         #convert list of errors to an html string
         lenl = len(self.aw.qmc.errorlog)
-        htmlerr = "".join(["<b>{}</b> {}<br><br>".format(lenl-i,m) for i,m in enumerate(reversed(self.aw.qmc.errorlog))])
-        
+        htmlerr = ''.join([f'<b>{lenl-i}</b> {m}<br><br>' for i,m in enumerate(reversed(self.aw.qmc.errorlog))])
+
         enumber = len(self.aw.qmc.errorlog)
-        labelstr =  "<b>"+ QApplication.translate("Label","Number of errors found {0}").format(str(enumber)) + "</b>"
+        labelstr =  '<b>'+ QApplication.translate('Label','Number of errors found {0}').format(str(enumber)) + '</b>'
         self.elabel.setText(labelstr)
-        self.errorEdit.setHtml("version = " +__version__ +"<br><br>" + htmlerr)
-        
+        self.errorEdit.setHtml('version = ' +__version__ +'<br><br>' + htmlerr)
+
     def closeEvent(self,_):
         self.close()
         self.aw.error_dlg = None
@@ -115,20 +114,20 @@ class messageDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Message History"))
+        self.setWindowTitle(QApplication.translate('Form Caption','Message History'))
         self.messageEdit = QTextEdit()
         self.messageEdit.setReadOnly(True)
         layout = QVBoxLayout()
         layout.addWidget(self.messageEdit,0)
         self.setLayout(layout)
         self.update()
-        
+
     def update(self):
         #convert list of messages to an html string
         lenl = len(self.aw.messagehist)
-        htmlmessage = "".join(["<b>{}</b> {}<br><br>".format(lenl-i,m) for i,m in enumerate(reversed(self.aw.messagehist))])
+        htmlmessage = ''.join([f'<b>{lenl-i}</b> {m}<br><br>' for i,m in enumerate(reversed(self.aw.messagehist))])
         self.messageEdit.setHtml(htmlmessage)
-    
+
     def closeEvent(self,_):
         self.close()
         self.aw.message_dlg = None

@@ -1,6 +1,6 @@
 <img align="right" src="https://raw.githubusercontent.com/artisan-roaster-scope/artisan/master/wiki/screenshots/artisan.png" width="70">
 
-[Artisan](https://artisan-scope.org/) 
+[Artisan](https://artisan-scope.org/)
 ==========
 Visual scope for coffee roasters
 
@@ -10,6 +10,7 @@ Visual scope for coffee roasters
 ![Github All Releases](https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/total.svg)
 ![License](https://img.shields.io/github/license/artisan-roaster-scope/artisan.svg)
 [![pylint](https://github.com/artisan-roaster-scope/artisan/actions/workflows/pylint.yaml/badge.svg?branch=master&event=push)](https://github.com/artisan-roaster-scope/artisan/actions?query=workflow:pylint+event:push+branch:master)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 
 *WARNING: pre-release builds may not work.  Use at your own risk.*
@@ -38,7 +39,7 @@ If you think Artisan is useful to you, contribute financially to its further dev
 [Documentation](https://artisan-scope.org/docs/)
 
 
-PLEASE FOLLOW AND TAG US!  
+PLEASE FOLLOW AND TAG US!
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="https://www.facebook.com/ArtisanScope"><img src="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/screenshots/facebook-square.svg?raw=true" width="30"></a>&nbsp;&nbsp;&nbsp;<a href="https://www.instagram.com/artisanscope/"><img src="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/screenshots/instagram-square.svg?raw=true" width="30"></a>&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/channel/UCEp-DH_Y7sBR3-X3FWomgog"><img src="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/screenshots/youtube-svgrepo-com.svg?raw=true" width="30"></a>&nbsp;&nbsp;&nbsp;<a href="https://twitter.com/artisanscope"><img src="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/screenshots/twitter-svgrepo-com.svg?raw=true" width="30"></a>&nbsp;&nbsp;&nbsp;<a href="https://www.linkedin.com/company/artisan-plus"><img src="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/screenshots/linkedin-svgrepo-com.svg?raw=true" width="30"></a>
 
 

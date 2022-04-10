@@ -2,7 +2,7 @@
 #
 # ensure that the selected version is on https://www.piwheels.org/ as binary package
 # for the builds Python version 3.7.3 / Qt/PyQt 5.11.3
-# ensure also that the dependency order is right (eg. gevent-websocket==0.10.1 is not on 
+# ensure also that the dependency order is right (eg. gevent-websocket==0.10.1 is not on
 # pywheel and requires gevent that is then also not taken from pywheel thus gevent-
 # websocket has to be requested after the pywheel version of gevent)
 #
@@ -24,7 +24,7 @@ colorspacious==1.1.2 # depends on numpy thus needs to be put after
 openpyxl==3.0.9 # 3.0.7
 #PyQt 5.11.3 is preinstalled
 #PyQtWebEngine==5.15.5 # not available for 32bit platforms
-# what about 
+# what about
 pyinstaller==4.9 #4.4
 cffi==1.15.0 # 1.14.4
 cryptography==3.4.8 #3.4.7 #3.3.2

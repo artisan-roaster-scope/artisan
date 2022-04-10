@@ -14,22 +14,22 @@ import time
 
 
 def main():
-    
-    print("use CTRL + C to interrupt program\n")
+
+    print('use CTRL + C to interrupt program\n')
     delay = 3           # set interval of seconds between each reading
     port = '/dev/cu.usbserial-FTFKDA5O'
-    
+
     ser = serial.Serial(port, baudrate=19200, bytesize=8, parity='N', stopbits=1, timeout=1)
-    
-    
+
+
     while True:
         #v = fl.readlines(eol=serial.to_bytes("\r\n"))
         #v = ser.read()
-        ser.write(b"s") # only stable
+        ser.write(b's') # only stable
         #ser.write(b"w") # any weight
         v = ser.readline()
         # b'          194 g  \r\n'
         print(v)
         time.sleep(delay)
-        
+
 main()

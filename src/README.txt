@@ -44,12 +44,12 @@ Artisan is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-   
+
 Artisan is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-   
-Copies of the GNU General Public License has been included with this 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Copies of the GNU General Public License has been included with this
 distribution in the file `LICENSE.txt`. An online version is available at
 <http://www.gnu.org/licenses/>.
 
@@ -74,7 +74,7 @@ Artisan uses the following libraries in unmodified forms:
 - pymodbus under the BSD License by Galen Collins
   https://github.com/bashwork/pymodbus
 - python-snap7 under MIT license
-  https://github.com/gijzelaerr/python-snap7 
+  https://github.com/gijzelaerr/python-snap7
 - arabic_reshaper.py under GPL by Abd Allah Diab (Mpcabd)
 
 

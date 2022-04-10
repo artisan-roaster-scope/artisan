@@ -10,9 +10,9 @@ def content():
     helpstr = ''  #@UnusedVariable
     newline = '\n'  #@UnusedVariable
     strlist.append('<head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body>')
-    strlist.append("<b>")
+    strlist.append('<b>')
     strlist.append(QApplication.translate('HelpDlg','PORTS CONFIGURATION'))
-    strlist.append("</b>")
+    strlist.append('</b>')
     tbl_Modbus = prettytable.PrettyTable()
     tbl_Modbus.field_names = [QApplication.translate('HelpDlg','MODBUS SETTINGS')]
     tbl_Modbus.add_row([QApplication.translate('HelpDlg','The MODBUS serial protocols RTU, ASCII, and Binary is using the specified serial port parameters. The MODBUS IP protocol on TCP and UDP is respecting the host IP and port.')])
@@ -24,8 +24,8 @@ def content():
     tbl_Modbus.add_row([QApplication.translate('HelpDlg','The PID Control dialog can operate a connected PID slave using the given PID registers to set the p-i-d parameters and the set value (SV). MODBUS commands can be specified to turn the PID slave on and off from that PID Control dialog. See the help page in the Events Dialog for documentation of available MODBUS write commands.')])
     tbl_Modbus.add_row([QApplication.translate('HelpDlg','The Scan button opens a simple MODBUS scanner to search for data holding registers in the connected device.')])
     tbl_Modbus.add_row([QApplication.translate('HelpDlg','Refer to the User Manual of your MODBUS device for information specific to the setup required for your device.')])
-    strlist.append(tbl_Modbus.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
-    strlist.append("</body>")
-    helpstr = "".join(strlist)
-    helpstr = re.sub(r"&amp;", r"&",helpstr)
+    strlist.append(tbl_Modbus.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
+    strlist.append('</body>')
+    helpstr = ''.join(strlist)
+    helpstr = re.sub(r'&amp;', r'&',helpstr)
     return helpstr

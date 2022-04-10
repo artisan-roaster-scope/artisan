@@ -224,7 +224,7 @@ download from https://github.com/bashwork/pymodbus
 
 14) yoctopuce 1.10.16490
 
-download lastest package from here: 
+download lastest package from here:
 https://pypi.python.org/pypi/yoctopuce/
 
 # cd yoctopuce-1.10.16490

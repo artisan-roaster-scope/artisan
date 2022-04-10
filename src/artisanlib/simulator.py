@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # A simple device simulator for Artisan
@@ -30,43 +29,43 @@ _log: Final = logging.getLogger(__name__)
 class Simulator():
     __slots__ = [ 'profile', 'temp1', 'temp2', 'timex', 'extratemp1', 'extratemp2', 'extratimex',
         'extraDelta1', 'extraDelta2', 'extraNoneTempHint1', 'extraNoneTempHint2' ]
-    
+
     # mode is the current temperature of Artisan, either "C" or "F"
     def __init__(self, mode, profile = None):
-   
+
         self.profile = profile
-        self.temp1 = profile["temp1"]
-        self.temp2 = profile["temp2"]
-        self.timex = profile["timex"]
-        if "extratemp1" in profile and "extratemp2" in profile and "extratimex" in profile:
-            self.extratemp1 = profile["extratemp1"]
-            self.extratemp2 = profile["extratemp2"]
-            self.extratimex = profile["extratimex"]
+        self.temp1 = profile['temp1']
+        self.temp2 = profile['temp2']
+        self.timex = profile['timex']
+        if 'extratemp1' in profile and 'extratemp2' in profile and 'extratimex' in profile:
+            self.extratemp1 = profile['extratemp1']
+            self.extratemp2 = profile['extratemp2']
+            self.extratimex = profile['extratimex']
         else:
             self.extratemp1 = []
             self.extratemp2 = []
             self.extratimex = []
-        if "extraDelta1" in profile and "extraDelta2" in profile:
-            self.extraDelta1 = profile["extraDelta1"]
-            self.extraDelta2 = profile["extraDelta2"]
+        if 'extraDelta1' in profile and 'extraDelta2' in profile:
+            self.extraDelta1 = profile['extraDelta1']
+            self.extraDelta2 = profile['extraDelta2']
         else:
-            self.extraDelta1 = [False]*len(self.extratimex) 
-            self.extraDelta2 = [False]*len(self.extratimex)    
-        if "extraNoneTempHint1" in profile:
-            self.extraNoneTempHint1 = profile["extraNoneTempHint1"]
+            self.extraDelta1 = [False]*len(self.extratimex)
+            self.extraDelta2 = [False]*len(self.extratimex)
+        if 'extraNoneTempHint1' in profile:
+            self.extraNoneTempHint1 = profile['extraNoneTempHint1']
         else:
             self.extraNoneTempHint1 = []
-        if "extraNoneTempHint2" in profile:
-            self.extraNoneTempHint2 = profile["extraNoneTempHint2"]
+        if 'extraNoneTempHint2' in profile:
+            self.extraNoneTempHint2 = profile['extraNoneTempHint2']
         else:
             self.extraNoneTempHint2 = []
-        
+
         # convert temperature unit if needed
-        if "mode" in profile:
-            m = str(profile["mode"])
+        if 'mode' in profile:
+            m = str(profile['mode'])
         else:
             m = mode
-        if mode == "C" and m == "F":
+        if mode == 'C' and m == 'F':
             self.temp1 = [fromFtoC(t) for t in self.temp1]
             self.temp2 = [fromFtoC(t) for t in self.temp2]
             for e in range(len(self.extratimex)):
@@ -79,8 +78,8 @@ class Simulator():
                     self.extratemp2[e] = [RoRfromFtoC(t) for t in self.extratemp2[e]]
                 else:
                     if not (len(self.extraNoneTempHint2) > e and self.extraNoneTempHint2[e]):
-                        self.extratemp2[e] = [fromFtoC(t) for t in self.extratemp2[e]]            
-        elif mode == "F" and m == "C":
+                        self.extratemp2[e] = [fromFtoC(t) for t in self.extratemp2[e]]
+        elif mode == 'F' and m == 'C':
             self.temp1 = [fromCtoF(t) for t in self.temp1]
             self.temp2 = [fromCtoF(t) for t in self.temp2]
 
@@ -95,13 +94,13 @@ class Simulator():
                 else:
                     if not (len(self.extraNoneTempHint2) > e and self.extraNoneTempHint2[e]):
                         self.extratemp2[e] = [fromCtoF(t) for t in self.extratemp2[e]]
-        
+
         self.removeEmptyPrefix()
-    
+
     def removeEmptyPrefix(self):
         try:
             # select the first BT index not an error value to start with
-            start = list(map(lambda i: i != -1, self.temp2)).index(True) 
+            start = list(map(lambda i: i != -1, self.temp2)).index(True)
             self.temp1 = numpy.array(self.temp1[start:])
             self.temp2 = numpy.array(self.temp2[start:])
             self.timex = numpy.array(self.timex[start:])
@@ -118,7 +117,7 @@ class Simulator():
                     self.extratimex[i] = self.extratimex[i] - self.extratimex[i][0]
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-    
+
     def read(self,tx):
         et = -1
         bt = -1
@@ -132,7 +131,7 @@ class Simulator():
         except Exception: # pylint: disable=broad-except
             pass
         return et,bt
-    
+
     def readextra(self,i,tx):
         t1 = -1
         t2 = -1
@@ -146,4 +145,3 @@ class Simulator():
         except Exception: # pylint: disable=broad-except
             pass
         return t2,t1
-        

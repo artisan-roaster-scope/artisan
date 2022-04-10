@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # controller.py
 #
@@ -82,7 +81,7 @@ def start(app_window):
 # toggles between connected and disconnected modes. If connected and
 # not is_synced() send current data to server
 def toggle(app_window):
-    _log.info("toggle()")
+    _log.info('toggle()')
     config.app_window = app_window
     if config.app_window.plus_account is None:  # @UndefinedVariable
         connect()
@@ -121,20 +120,20 @@ def toggle(app_window):
 def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
     if not is_connected():
         _log.info(
-            "connect(%s,%s)", clear_on_failure, interactive
+            'connect(%s,%s)', clear_on_failure, interactive
         )
         try:
             connect_semaphore.acquire(1)
             if config.app_window is not None:
-            
-                if platform.system().startswith("Windows"):
+
+                if platform.system().startswith('Windows'):
                     import keyring.backends.Windows  # @UnusedImport
-                elif platform.system() == "Darwin":
+                elif platform.system() == 'Darwin':
                     import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
                 else:
                     import keyring.backends.SecretService  # @UnusedImport
                 import keyring  # @Reimport # imported last to make py2app work
-            
+
                 connection.setKeyring()
                 account = config.app_window.plus_account
                 if account is None:
@@ -154,12 +153,12 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                         )  # @UndefinedVariable
                         if config.passwd is None:
                             _log.debug(
-                                ("-> keyring.get_password"
-                                 " returned None")
+                                '-> keyring.get_password'
+                                 ' returned None'
                             )
                         else:
                             _log.debug(
-                                "-> keyring passwd received"
+                                '-> keyring passwd received'
                             )
                     except Exception as e:  # pylint: disable=broad-except
                         _log.exception(e)
@@ -195,21 +194,21 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                                 keyring.set_password(
                                     config.app_name, login, passwd
                                 )
-                                _log.debug("keyring set password (%s)", login)
+                                _log.debug('keyring set password (%s)', login)
                             # pylint: disable=broad-except
                             except Exception as e:
                                 _log.exception(e)
                                 if (
-                                    not platform.system().startswith("Windows")
-                                    and platform.system() != "Darwin"
+                                    not platform.system().startswith('Windows')
+                                    and platform.system() != 'Darwin'
                                 ):
                                     # on Linux remind to install
                                     # the gnome-keyring
                                     config.app_window.sendmessageSignal.emit(
                                         QApplication.translate(
-                                            "Plus",
-                                            ("Keyring error: Ensure that"
-                                             " gnome-keyring is installed.")
+                                            'Plus',
+                                            ('Keyring error: Ensure that'
+                                             ' gnome-keyring is installed.')
                                         ),
                                         True,
                                         None,
@@ -219,7 +218,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
             if config.app_window.plus_account is None:  # @UndefinedVariable
                 if interactive:
                     config.app_window.sendmessageSignal.emit(
-                        QApplication.translate("Plus", "Login aborted"),
+                        QApplication.translate('Plus', 'Login aborted'),
                         True,
                         None,
                     )  # @UndefinedVariable
@@ -234,12 +233,12 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                     )  # @UndefinedVariable
                     config.app_window.sendmessageSignal.emit(
                         QApplication.translate(
-                            "Plus", "Connected to artisan.plus"
+                            'Plus', 'Connected to artisan.plus'
                         ),
                         True,
                         None,
                     )  # @UndefinedVariable
-                    _log.info("artisan.plus connected")
+                    _log.info('artisan.plus connected')
                     try:
                         queue.start()  # start the outbox queue
                     except Exception as e:  # pylint: disable=broad-except
@@ -253,20 +252,20 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                         connection.clearCredentials()
                         config.app_window.sendmessageSignal.emit(
                             QApplication.translate(
-                                "Plus", "artisan.plus turned off"
+                                'Plus', 'artisan.plus turned off'
                             ),
                             True,
                             None,
                         )  # @UndefinedVariable
                     elif interactive:
                         message = QApplication.translate(
-                            "Plus", "Authentication failed"
+                            'Plus', 'Authentication failed'
                         )
                         if (
                             config.app_window.plus_account is not None
                         ):  # @UndefinedVariable
                             message = (
-                                f"{config.app_window.plus_account} {message}"
+                                f'{config.app_window.plus_account} {message}'
                             )  # @UndefinedVariable
                         config.app_window.sendmessageSignal.emit(
                             message, True, None
@@ -279,7 +278,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                 if interactive:
                     config.app_window.sendmessageSignal.emit(
                         QApplication.translate(
-                            "Plus", "artisan.plus turned off"
+                            'Plus', 'artisan.plus turned off'
                         ),
                         True,
                         None,
@@ -288,7 +287,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                 if interactive:
                     config.app_window.sendmessageSignal.emit(
                         QApplication.translate(
-                            "Plus", "Couldn't connect to artisan.plus"
+                            'Plus', "Couldn't connect to artisan.plus"
                         ),
                         True,
                         None,
@@ -304,11 +303,11 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
 
 # show a dialog to have the user confirm the disconnect action
 def disconnect_confirmed() -> bool:
-    string = QApplication.translate("Plus", "Disconnect artisan.plus?")
+    string = QApplication.translate('Plus', 'Disconnect artisan.plus?')
     aw = config.app_window
     reply = QMessageBox.question(
         aw,
-        QApplication.translate("Plus", "Disconnect?"),
+        QApplication.translate('Plus', 'Disconnect?'),
         string,
         QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
     )
@@ -324,7 +323,7 @@ def disconnect(
     keepON: bool = True
 ) -> None:
     _log.info(
-        "disconnect(%s,%s,%s,%s)",
+        'disconnect(%s,%s,%s,%s)',
         remove_credentials,
         stop_queue,
         interactive,
@@ -345,7 +344,7 @@ def disconnect(
             if remove_credentials:
                 config.app_window.sendmessageSignal.emit(
                     QApplication.translate(
-                        "Plus", "artisan.plus turned off"
+                        'Plus', 'artisan.plus turned off'
                     ),
                     True,
                     None,
@@ -353,7 +352,7 @@ def disconnect(
             else:
                 config.app_window.sendmessageSignal.emit(
                     QApplication.translate(
-                        "Plus", "artisan.plus disconnected"
+                        'Plus', 'artisan.plus disconnected'
                     ),
                     True,
                     None,
@@ -368,7 +367,7 @@ def disconnect(
 
 def reconnected() -> None:
     if not is_connected():
-        _log.info("reconnected()")
+        _log.info('reconnected()')
         try:
             connect_semaphore.acquire(1)
             config.connected = True
@@ -387,7 +386,7 @@ def reconnected() -> None:
 # to be added to the saved file
 def updateSyncRecordHashAndSync() -> None:
     try:
-        _log.info("updateSyncRecordHashAndSync()")
+        _log.info('updateSyncRecordHashAndSync()')
         if is_on():
             roast_record = roast.getRoast()
             sync_record, sync_record_hash = roast.getSyncRecord(roast_record)
@@ -397,10 +396,10 @@ def updateSyncRecordHashAndSync() -> None:
                 )
                 if (
                     server_updates_modified_at is not None
-                    and "roast_id" in roast_record
+                    and 'roast_id' in roast_record
                 ):
                     sync.addSync(
-                        roast_record["roast_id"], server_updates_modified_at
+                        roast_record['roast_id'], server_updates_modified_at
                     )
                     sync.setApplidedServerUpdatesModifiedAt(None)
                 # artisan.plus is ON and the profile is under sync
@@ -408,8 +407,8 @@ def updateSyncRecordHashAndSync() -> None:
                     # we push updates on the sync record back to the server
                     # via the queue
                     queue.addRoast(sync_record)
-            elif "roast_id" in roast_record and queue.full_roast_in_queue(
-                roast_record["roast_id"]
+            elif 'roast_id' in roast_record and queue.full_roast_in_queue(
+                roast_record['roast_id']
             ):
                 # in case this roast is not yet in sync cache as it has
                 # not been successfully uploaded, but a corresponding full

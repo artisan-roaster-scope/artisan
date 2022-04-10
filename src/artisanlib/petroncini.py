@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # Petroncini CSV Roast Profile importer for Artisan
 
-import io
 import csv
 import time as libtime
 import logging
@@ -45,15 +43,15 @@ def replace_duplicates(data):
 def extractProfilePetronciniCSV(file,_):
     res = {} # the interpreted data set
 
-    res["samplinginterval"] = 1.0
+    res['samplinginterval'] = 1.0
 
-    with io.open(file, 'r', newline="",encoding='utf-8') as csvFile:
+    with open(file, newline='',encoding='utf-8') as csvFile:
         data = csv.reader(csvFile,delimiter=';')
         #read file header
         next(data) # skip "Export path"
         next(data) # skip path
         header = [i.strip() for i in next(data)]
-        
+
         roast_date = None
         power = None # holds last processed heater event value
         power_last = None # holds the heater event value before the last one
@@ -93,7 +91,7 @@ def extractProfilePetronciniCSV(file,_):
             else:
                 temp1.append(-1)
             if 'Beans Temperature' in item:
-                temp2.append(float(item['Beans Temperature'].replace(",",".")))
+                temp2.append(float(item['Beans Temperature'].replace(',','.')))
             else:
                 temp2.append(-1)
             # mark CHARGE
@@ -111,10 +109,10 @@ def extractProfilePetronciniCSV(file,_):
                 extra2.append(float(item['Burner Percentage']))
             else:
                 extra2.append(-1)
-    
-            if "Burner Percentage" in item:
+
+            if 'Burner Percentage' in item:
                 try:
-                    v = float(item["Burner Percentage"])
+                    v = float(item['Burner Percentage'])
                     if v != power:
                         # power value changed
                         if v == power_last:
@@ -134,50 +132,49 @@ def extractProfilePetronciniCSV(file,_):
                             specialeventsvalue.append(v)
                             specialevents.append(i)
                             specialeventstype.append(3)
-                            specialeventsStrings.append(item["power"] + "%")
+                            specialeventsStrings.append(item['power'] + '%')
                     else:
                         power_last = None
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
-            
-    res["timex"] = timex
-    res["temp1"] = replace_duplicates(temp1)
-    res["temp2"] = replace_duplicates(temp2)
-    res["timeindex"] = timeindex
-    
-    res["extradevices"] = [25]
-    res["extratimex"] = [timex[:]]
-    
-    res["extraname1"] = ["IT"]
-    res["extratemp1"] = [extra1]
-    res["extramathexpression1"] = [""]  
-    
-    res["extraname2"] = ["burner"]
-    res["extratemp2"] = [replace_duplicates(extra2)]
-    res["extramathexpression2"] = [""]
-    
-    
+
+    res['timex'] = timex
+    res['temp1'] = replace_duplicates(temp1)
+    res['temp2'] = replace_duplicates(temp2)
+    res['timeindex'] = timeindex
+
+    res['extradevices'] = [25]
+    res['extratimex'] = [timex[:]]
+
+    res['extraname1'] = ['IT']
+    res['extratemp1'] = [extra1]
+    res['extramathexpression1'] = ['']
+
+    res['extraname2'] = ['burner']
+    res['extratemp2'] = [replace_duplicates(extra2)]
+    res['extramathexpression2'] = ['']
+
+
     # set date
     if roast_date is not None and roast_date.isValid():
-        res["roastdate"] = encodeLocal(roast_date.date().toString())
-        res["roastisodate"] = encodeLocal(roast_date.date().toString(Qt.DateFormat.ISODate))
-        res["roasttime"] = encodeLocal(roast_date.time().toString())
-        res["roastepoch"] = int(roast_date.toSecsSinceEpoch())
-        res["roasttzoffset"] = libtime.timezone    
-    
+        res['roastdate'] = encodeLocal(roast_date.date().toString())
+        res['roastisodate'] = encodeLocal(roast_date.date().toString(Qt.DateFormat.ISODate))
+        res['roasttime'] = encodeLocal(roast_date.time().toString())
+        res['roastepoch'] = int(roast_date.toSecsSinceEpoch())
+        res['roasttzoffset'] = libtime.timezone
+
     if len(specialevents) > 0:
-        res["specialevents"] = specialevents
-        res["specialeventstype"] = specialeventstype
-        res["specialeventsvalue"] = specialeventsvalue
-        res["specialeventsStrings"] = specialeventsStrings
+        res['specialevents'] = specialevents
+        res['specialeventstype'] = specialeventstype
+        res['specialeventsvalue'] = specialeventsvalue
+        res['specialeventsStrings'] = specialeventsStrings
         if power_event:
             # first set etypes to defaults
-            res["etypes"] = [QApplication.translate("ComboBox", "Air"),
-                             QApplication.translate("ComboBox", "Drum"),
-                             QApplication.translate("ComboBox", "Damper"),
-                             QApplication.translate("ComboBox", "Burner"),
-                             "--"]
+            res['etypes'] = [QApplication.translate('ComboBox', 'Air'),
+                             QApplication.translate('ComboBox', 'Drum'),
+                             QApplication.translate('ComboBox', 'Damper'),
+                             QApplication.translate('ComboBox', 'Burner'),
+                             '--']
     return res
 
 # roast date raus lesen
-                

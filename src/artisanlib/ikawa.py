@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # IKAWA CSV Roast Profile importer for Artisan
 
 import time as libtime
 import os
-import io
 import csv
 import re
 import logging
@@ -33,25 +31,25 @@ _log: Final = logging.getLogger(__name__)
 def extractProfileIkawaCSV(file,_):
     res = {} # the interpreted data set
 
-    res["samplinginterval"] = 1.0
+    res['samplinginterval'] = 1.0
 
     # set profile date from the file name if it has the format "IKAWA yyyy-mm-dd hhmmss.csv"
     filename = os.path.basename(file)
     p = re.compile(r'IKAWA \d{4,4}-\d{2,2}-\d{2,2} \d{6,6}.csv')
     if p.match(filename):
         s = filename[6:-4] # the extracted date time string
-        date = QDateTime.fromString(s,"yyyy-MM-dd HHmmss")
-        res["roastdate"] = encodeLocal(date.date().toString())
-        res["roastisodate"] = encodeLocal(date.date().toString(Qt.DateFormat.ISODate))
-        res["roasttime"] = encodeLocal(date.time().toString())
-        res["roastepoch"] = int(date.toSecsSinceEpoch())
-        res["roasttzoffset"] = libtime.timezone
+        date = QDateTime.fromString(s,'yyyy-MM-dd HHmmss')
+        res['roastdate'] = encodeLocal(date.date().toString())
+        res['roastisodate'] = encodeLocal(date.date().toString(Qt.DateFormat.ISODate))
+        res['roasttime'] = encodeLocal(date.time().toString())
+        res['roastepoch'] = int(date.toSecsSinceEpoch())
+        res['roasttzoffset'] = libtime.timezone
 
-    with io.open(file, 'r', newline="",encoding='utf-8') as csvFile:
+    with open(file, newline='',encoding='utf-8') as csvFile:
         data = csv.reader(csvFile,delimiter=',')
         #read file header
         header = next(data)
-        
+
         fan = None # holds last processed fan event value
         fan_last = None # holds the fan event value before the last one
         heater = None # holds last processed heater event value
@@ -111,13 +109,13 @@ def extractProfileIkawaCSV(file,_):
                 extra2.append(rpm/100)
             else:
                 extra2.append(-1)
-            
-            if "fan set (%)" in item or "fan set" in item:
+
+            if 'fan set (%)' in item or 'fan set' in item:
                 try:
-                    if "fan set (%)" in item:
-                        v = float(item["fan set (%)"])
-                    elif "fan set" in item:
-                        v = float(item["fan set"])
+                    if 'fan set (%)' in item:
+                        v = float(item['fan set (%)'])
+                    elif 'fan set' in item:
+                        v = float(item['fan set'])
                     if v != fan:
                         # fan value changed
                         if v == fan_last:
@@ -137,17 +135,17 @@ def extractProfileIkawaCSV(file,_):
                             specialeventsvalue.append(v)
                             specialevents.append(i-1)
                             specialeventstype.append(0)
-                            specialeventsStrings.append("{}".format(fan) + "%")
+                            specialeventsStrings.append(f'{fan}' + '%')
                     else:
                         fan_last = None
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-            if "heater power (%)" in item or "heater" in item:
+            if 'heater power (%)' in item or 'heater' in item:
                 try:
-                    if "heater power (%)" in item:
-                        v = float(item["heater power (%)"])
-                    elif "heater" in item:
-                        v = float(item["heater"])
+                    if 'heater power (%)' in item:
+                        v = float(item['heater power (%)'])
+                    elif 'heater' in item:
+                        v = float(item['heater'])
                     if v != heater:
                         # heater value changed
                         if v == heater_last:
@@ -167,46 +165,45 @@ def extractProfileIkawaCSV(file,_):
                             specialeventsvalue.append(v)
                             specialevents.append(i-1)
                             specialeventstype.append(3)
-                            specialeventsStrings.append("{}".format(heater) + "%")
+                            specialeventsStrings.append(f'{heater}' + '%')
                     else:
                         heater_last = None
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-    
-    res["mode"] = 'C'
-            
-    res["timex"] = timex
-    res["temp1"] = temp1
-    res["temp2"] = temp2
-    res["timeindex"] = timeindex
-    
-    res["extradevices"] = [25]
-    res["extratimex"] = [timex[:]]
-    
-    res["extraname1"] = ["SET"]
-    res["extratemp1"] = [extra1]
-    res["extramathexpression1"] = [""]
-    
-    res["extraname2"] = ["RPM"]
-    res["extratemp2"] = [extra2]
-    res["extramathexpression2"] = ["x/100"]
-    
+
+    res['mode'] = 'C'
+
+    res['timex'] = timex
+    res['temp1'] = temp1
+    res['temp2'] = temp2
+    res['timeindex'] = timeindex
+
+    res['extradevices'] = [25]
+    res['extratimex'] = [timex[:]]
+
+    res['extraname1'] = ['SET']
+    res['extratemp1'] = [extra1]
+    res['extramathexpression1'] = ['']
+
+    res['extraname2'] = ['RPM']
+    res['extratemp2'] = [extra2]
+    res['extramathexpression2'] = ['x/100']
+
     if len(specialevents) > 0:
-        res["specialevents"] = specialevents
-        res["specialeventstype"] = specialeventstype
-        res["specialeventsvalue"] = specialeventsvalue
-        res["specialeventsStrings"] = specialeventsStrings
+        res['specialevents'] = specialevents
+        res['specialeventstype'] = specialeventstype
+        res['specialeventsvalue'] = specialeventsvalue
+        res['specialeventsStrings'] = specialeventsStrings
         if heater_event or fan_event:
             # first set etypes to defaults
-            res["etypes"] = [QApplication.translate("ComboBox", "Air"),
-                             QApplication.translate("ComboBox", "Drum"),
-                             QApplication.translate("ComboBox", "Damper"),
-                             QApplication.translate("ComboBox", "Burner"),
-                             "--"]
+            res['etypes'] = [QApplication.translate('ComboBox', 'Air'),
+                             QApplication.translate('ComboBox', 'Drum'),
+                             QApplication.translate('ComboBox', 'Damper'),
+                             QApplication.translate('ComboBox', 'Burner'),
+                             '--']
             # update
             if fan_event:
-                res["etypes"][0] = "Fan"
+                res['etypes'][0] = 'Fan'
             if heater_event:
-                res["etypes"][3] = "Heater"
+                res['etypes'][3] = 'Heater'
     return res
-                

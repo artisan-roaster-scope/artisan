@@ -41,7 +41,7 @@ brew cask install artisan
 
 ### Linux
 
-Install the downloaded installer file by a double-click or run the installer via the following console command on 
+Install the downloaded installer file by a double-click or run the installer via the following console command on
 
 __Redhat/CentOS__
 
@@ -100,7 +100,7 @@ The serial settings for meters are already configured by Artisan automatically w
 
 ## Consistent USB names on Debian (by Rob Gardner)
 
-On some Debian-based systems the USB device names are different, once /dev/tty/USB0 another time /dev/tty/USB1, on each connect of the same device. The solution is to add a udev rule that creates a symbolic link with a constant name to point to the actual device. In my situation, I added a file called 
+On some Debian-based systems the USB device names are different, once /dev/tty/USB0 another time /dev/tty/USB1, on each connect of the same device. The solution is to add a udev rule that creates a symbolic link with a constant name to point to the actual device. In my situation, I added a file called
 
 ```
   /etc/udev/rules.d/datalogger.rules

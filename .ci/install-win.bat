@@ -3,7 +3,7 @@
 
 ::
 :: script comandline option LEGACY used to flag a legacy build
-:: when running locally these paths need to be set here 
+:: when running locally these paths need to be set here
 ::   normally they are set in appveyor.yml
 ::
 setlocal enabledelayedexpansion
@@ -92,4 +92,3 @@ echo curl libusb-win32
 curl -k -L -O https://netcologne.dl.sourceforge.net/project/libusb-win32/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip
 7z x libusb-win32-bin-1.2.6.0.zip
 copy libusb-win32-bin-1.2.6.0\bin\amd64\libusb0.dll C:\Windows\SysWOW64
-

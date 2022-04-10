@@ -10,13 +10,13 @@ def content():
     helpstr = ''  #@UnusedVariable
     newline = '\n'  #@UnusedVariable
     strlist.append('<head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body>')
-    strlist.append("<b>")
+    strlist.append('<b>')
     strlist.append(QApplication.translate('HelpDlg','ALARMS'))
-    strlist.append("</b>")
+    strlist.append('</b>')
     tbl_Alarmstop = prettytable.PrettyTable()
     tbl_Alarmstop.header = False
     tbl_Alarmstop.add_row([QApplication.translate('HelpDlg','Each alarm is only triggered once.\nAlarms are scanned in order from the top of the table to the bottom.')])
-    strlist.append(tbl_Alarmstop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
+    strlist.append(tbl_Alarmstop.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
     tbl_Alarms = prettytable.PrettyTable()
     tbl_Alarms.field_names = [QApplication.translate('HelpDlg','Field'),QApplication.translate('HelpDlg','Description')]
     tbl_Alarms.add_row([QApplication.translate('HelpDlg','Nr'),QApplication.translate('HelpDlg','Alarm number for reference.')])
@@ -30,10 +30,10 @@ def content():
     tbl_Alarms.add_row([QApplication.translate('HelpDlg','Temp'),QApplication.translate('HelpDlg','The specified temperature limit.')])
     tbl_Alarms.add_row([QApplication.translate('HelpDlg','Action'),QApplication.translate('HelpDlg','The action to be triggered if all conditions are fulfilled.')])
     tbl_Alarms.add_row([QApplication.translate('HelpDlg','Description'),QApplication.translate('HelpDlg','Commands for alarms with an action go here.  Anything after a &#39;#&#39; character is considered a comment and is ignored when processing the alarm.  ')])
-    strlist.append(tbl_Alarms.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
-    strlist.append("<br/><br/><b>")
+    strlist.append(tbl_Alarms.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
+    strlist.append('<br/><br/><b>')
     strlist.append(QApplication.translate('HelpDlg','ALARM CONFIGURATION OPTIONS'))
-    strlist.append("</b>")
+    strlist.append('</b>')
     tbl_Options = prettytable.PrettyTable()
     tbl_Options.field_names = [QApplication.translate('HelpDlg','Option'),QApplication.translate('HelpDlg','Description')]
     tbl_Options.add_row([QApplication.translate('HelpDlg','Add'),QApplication.translate('HelpDlg','Adds a new alarm to the bottom of the table.')])
@@ -49,14 +49,14 @@ def content():
     tbl_Options.add_row([QApplication.translate('HelpDlg','Load from Profile'),QApplication.translate('HelpDlg','when ticked will replace the alarm table when loading a profile with the alarms stored in the profile.  If there are no alarms in the profile the alarm table will be cleared.')])
     tbl_Options.add_row([QApplication.translate('HelpDlg','Load from Background'),QApplication.translate('HelpDlg','when ticked will replace the alarm table when loading a background profile with the alarms stored in the profile.  If there are no alarms in the profile the alarm table will be cleared.')])
     tbl_Options.add_row([QApplication.translate('HelpDlg','PopUp TimeOut'),QApplication.translate('HelpDlg','A PopUp will automatically close after this time if the OK button has not been clicked.')])
-    strlist.append(tbl_Options.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
-    strlist.append("<br/><br/><b>")
+    strlist.append(tbl_Options.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
+    strlist.append('<br/><br/><b>')
     strlist.append(QApplication.translate('HelpDlg','Alarm Actions'))
-    strlist.append("</b>")
+    strlist.append('</b>')
     tbl_Actionstop = prettytable.PrettyTable()
     tbl_Actionstop.header = False
     tbl_Actionstop.add_row([QApplication.translate('HelpDlg','Enter the Command into the Description field of the Alarm.')])
-    strlist.append(tbl_Actionstop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
+    strlist.append(tbl_Actionstop.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
     tbl_Actions = prettytable.PrettyTable()
     tbl_Actions.field_names = [QApplication.translate('HelpDlg','Action'),QApplication.translate('HelpDlg','Command'),QApplication.translate('HelpDlg','Meaning')]
     tbl_Actions.add_row([QApplication.translate('HelpDlg','Pop Up'),QApplication.translate('HelpDlg','<text>'),QApplication.translate('HelpDlg','the text to  be displayed in the pop up')])
@@ -80,8 +80,8 @@ def content():
     tbl_Actions.add_row([QApplication.translate('HelpDlg','RampSoak OFF'),'&#160;',QApplication.translate('HelpDlg','turns PID off and switches to manual mode')])
     tbl_Actions.add_row([QApplication.translate('HelpDlg','Set Canvas Color'),QApplication.translate('HelpDlg','<color>'),QApplication.translate('HelpDlg','sets the canvas to <color>, can be in hex format, e.g. "#ffaa55" or a color name, e.g. "blue"')])
     tbl_Actions.add_row([QApplication.translate('HelpDlg','Reset Canvas Color'),'&#160;',QApplication.translate('HelpDlg','reset the canvas color to the color specified in Config>>Colors\ncanvas color resets automatically at OFF')])
-    strlist.append(tbl_Actions.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
-    strlist.append("</body>")
-    helpstr = "".join(strlist)
-    helpstr = re.sub(r"&amp;", r"&",helpstr)
+    strlist.append(tbl_Actions.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
+    strlist.append('</body>')
+    helpstr = ''.join(strlist)
+    helpstr = re.sub(r'&amp;', r'&',helpstr)
     return helpstr

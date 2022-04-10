@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # connection.py
 #
@@ -29,7 +28,6 @@ except Exception:
     #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
 
-from typing import List
 try:
     from typing import Final
 except ImportError:
@@ -51,8 +49,8 @@ get_notifications_semaphore = QSemaphore(
 
 # if notifications > 0 the new notifications are retrieved and forwarded to the user
 # should only be called from the GUI thread
-def updateNotifications(notifications: int, machines: List[str]):
-    _log.debug("updateNotifications(%s,%s)",notifications,machines)
+def updateNotifications(notifications: int, machines: list[str]):
+    _log.debug('updateNotifications(%s,%s)',notifications,machines)
     try:
         if config.app_window:
             aw = config.app_window
@@ -67,31 +65,31 @@ def updateNotifications(notifications: int, machines: List[str]):
 # fetches new notifications and forward them to the Artisan notification system
 # sidecondition: at this point all pending notifications are delivered and the "notification" count on the server can be assumed to be 0
 def retrieveNotifications():
-    gotlock = get_notifications_semaphore.tryAcquire(1,0) 
+    gotlock = get_notifications_semaphore.tryAcquire(1,0)
     # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
     if gotlock:
         try:
-            _log.info("retrieveNotifications()")
+            _log.info('retrieveNotifications()')
             if controller.is_connected():
                 aw = config.app_window
-                if aw.qmc.roastertype_setup != "":
-                    params = {"machine": aw.qmc.roastertype_setup}
+                if aw.qmc.roastertype_setup != '':
+                    params = {'machine': aw.qmc.roastertype_setup}
                 else:
                     params = None
                 # fetch from server
                 d = connection.getData(config.notifications_url, params=params)
-                _log.debug("-> %s", d.status_code)
+                _log.debug('-> %s', d.status_code)
                 res = d.json()
-                _log.debug("-> retrieved")
-                _log.debug("notifications = %s", res)
-                if ("success" in res
-                        and res["success"]
-                        and "result" in res
-                        and res["result"]
-                        and isinstance(res["result"],list)):
-                    for n in res["result"]: 
+                _log.debug('-> retrieved')
+                _log.debug('notifications = %s', res)
+                if ('success' in res
+                        and res['success']
+                        and 'result' in res
+                        and res['result']
+                        and isinstance(res['result'],list)):
+                    for n in res['result']:
                         processNotification(n)
-                
+
                 # NOTE: we do not updateLimitsFromResponse(res) here to avoid an infinit loop if
                 # the server does not reset the notifications counter. Further notifications will be retrieved on next request
         except Exception as e:  # pylint: disable=broad-except
@@ -109,14 +107,14 @@ def processNotification(plus_notification):
             if aw.notificationManager:
                 created = None
                 try:
-                    created = util.ISO86012epoch(plus_notification["added_on"])
+                    created = util.ISO86012epoch(plus_notification['added_on'])
                 except Exception:  # pylint: disable=broad-except
                     pass
                 aw.notificationManager.sendNotificationMessage(
-                    util.extractInfo(plus_notification, "title", ""),
-                    util.extractInfo(plus_notification, "text", ""),
-                    ntype2NotificationType(util.extractInfo(plus_notification, "ntype", "")),
+                    util.extractInfo(plus_notification, 'title', ''),
+                    util.extractInfo(plus_notification, 'text', ''),
+                    ntype2NotificationType(util.extractInfo(plus_notification, 'ntype', '')),
                     created = created,
-                    hr_id = util.extractInfo(plus_notification, "hr_id", None))
+                    hr_id = util.extractInfo(plus_notification, 'hr_id', None))
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)

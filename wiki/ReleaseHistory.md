@@ -273,7 +273,7 @@ v2.4.2 (October 2, 2020)
 * CHANGES
   - new RoR computation method based on linear polyfits ([PR #503](../../../pull/503) by [PDWest](https://github.com/PDWest)) and "optimized" variant based on the [Savitzky-Golay filter](https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter) for display after recording
   - do not propagate error values -1 to the full formula if the full formula is enclosed in parentheses
-  - allows three digits following [q,w,e,r] special event shortcut when the corresponding slider max value is greater than 100.  Be aware that when this is true three digits must be entered so a leading zero is required for values less than 100. 
+  - allows three digits following [q,w,e,r] special event shortcut when the corresponding slider max value is greater than 100.  Be aware that when this is true three digits must be entered so a leading zero is required for values less than 100.
   - changes Windows keyboard shortcut to remove background curve to CTRL+SHIFT+h
   - updates GUI libs (Qt/PyQt/Matplotlib)
   - updates Brazilian and Greek translations
@@ -315,7 +315,7 @@ v2.4.0 (June 3, 2020)
   - adds [Roast Comparator](https://artisan-roasterscope.blogspot.com/2020/05/roast-comparator.html), [Roast Simulator](https://artisan-roasterscope.blogspot.com/2020/05/roast-simulator.html), and [Profile Transposer](https://artisan-roasterscope.blogspot.com/2020/05/profile-transposer.html)
   - adds Cropster XLS, IKAWA CSV, Giesen Software CSV and RostPATH URL profile import
   - adds flexible [automatic file name generator](https://artisan-roasterscope.blogspot.com/2020/05/autosave-file-naming.html) ([Issue #430](../../../issues/430), see also [Saving Artisan Profiles - Naming, Saving, File Location etc](https://www.home-barista.com/home-roasting/saving-artisan-profiles-naming-saving-file-location-etc-t61713.html))
-  - adds custom [special event annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html) in step and step+ modes that will show roast data including time, temperature DTR, etc. 
+  - adds custom [special event annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html) in step and step+ modes that will show roast data including time, temperature DTR, etc.
   - adds support for the [Giesen IR sensor](https://artisan-scope.org/machines/giesen/)
   - adds support for [Twino/Ozstar roasting machines](https://artisan-scope.org/machines/twino-ozstar/)
   - adds S7 and MODBUS communication optimizer
@@ -434,7 +434,7 @@ v2.1.1 (November 29, 2019)
   - fixes DROP action, broken in v2.1.0
   - fixes S7 communication, broken in v2.1.0
   - fixes rare issue with the exit handler
- 
+
 ----
 v2.1.0 (November 26, 2019)
 ------------------
@@ -508,7 +508,7 @@ function 16
   - UI: don't move sliders on RESET
 * FIXES
   - ACTIONS: fixes broken Artisan Command "tare" ([Issue #376](../../../issues/376))
-  - BATCH COUNTER: improves overwrite handling of counter on loading settings from .aset files ([Issue #372](../../../issues/372)) 
+  - BATCH COUNTER: improves overwrite handling of counter on loading settings from .aset files ([Issue #372](../../../issues/372))
   - DEVICE SUPPORT: fixes Acaia lunar random disconnect failures
   - EVENTS: fixes random duplicate event entry on slider moves
   - EXPORT: enhancements and fixes to Web and Excel reports ([Issue #401](../../../issues/401))
@@ -530,7 +530,7 @@ function 16
   - UI: Roast Properties "Title" Font Color problem ([Issue #371](../../../issues/371))
   - UI: toggling the mouse coordinates via key d updates the message line immediately ([Issue #422](../../../issues/422))
 
-  
+
 ----
 v2.0.0 (June 4, 2019)
 ------------------
@@ -591,7 +591,7 @@ v1.6.1 (March 10, 2019)
 
 * NEW FEATURES
   - adds focus indicator to event sliders
-  - extends the import alarms action to load alarms also from .alog profiles besides 
+  - extends the import alarms action to load alarms also from .alog profiles besides
  dedicated Artisan alarm files (.alrm)
   - hide/show curves via click to corresponding entry in the legend
   - adds IO Command state feedback by mfurlotti ([PR #284](../../../pull/284))
@@ -673,10 +673,10 @@ v1.5.0 (October 17, 2018)
   - extends LCD rendering from [-999,9999] to render [-9999,99999] if "Decimal Places" are turned on
   - adds "Program 78" and "Program 910" device types
   - adds support for manual [Besca roasting machines](https://www.bescaroasters.com/)
-* CHANGES 
+* CHANGES
   - order of columns in roast/background properties events table, CSV import/export and Excel export swapped (ET always before BT)
   -  event values on the graph are not abbreviated anymore if "Decimal Places" is not ticked
-* FIXES 
+* FIXES
   - fixes udev rule installation on Redhat/CentOS rpm builds
   - fixes broken Linux builds crashing on opening the file selector ([Issue #259](../../../issues/259))
   - fixes Windows gevent build error by upgrading to PyInstaller 3.4
@@ -699,10 +699,10 @@ v1.4.0 (October 3, 2018)
 ------------------
 
 * NEW FEATURES
-  - adds time guide option (most useful when following a background profile)  
+  - adds time guide option (most useful when following a background profile)
   - adds export and convert to Excel
   - adds PhasesLCD mode-by-phase selection
-  - adds PhasesLCD mode that shows all of time/temp/percentage in finish phase accros the 3 Phases LCDs ([Issue #235](../../../issues/235))   
+  - adds PhasesLCD mode that shows all of time/temp/percentage in finish phase accros the 3 Phases LCDs ([Issue #235](../../../issues/235))
   - adds flag to allow phases to be adjusted based on DRY and FCs of the background profile
   - adds [PID P-on-Measurement/Input mode](http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/) for internal Software PID and [TC4 aArtisanQ v6.6 PID](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan_PID/tags/REL_aArtisanQ_PID_6_6) (complementing the standard P-on-Error mode)
   - adds KeepON flag
@@ -713,7 +713,7 @@ v1.4.0 (October 3, 2018)
   - add machine setup for Hottop TC4 configurations, [Atilla GOLD plus 7"](http://www.atilla.com.br/p/atilla-5kg-gold-plus/), [Besca roasting machines](https://www.bescaroasters.com/), [Coffee-Tech Engineering Ghibli](https://www.coffee-tech.com/products/commercial-roasters/ghibli-r15/) and [Diedrich Roasters](https://www.diedrichroasters.com/)
   - adds fan RPM to R1 Aillio setup
   - adds option to load alarms from background profiles
-* CHANGES 
+* CHANGES
   - ensures that background curves are always render using the same smoothing algorithm as the foreground
   - adds re-sampling and back-sampling to improve all smoothing algorithms
   - adds "Insert" button to trigger the extra event table insert action instead of abusing the "Add" button
@@ -739,7 +739,7 @@ v1.4.0 (October 3, 2018)
   - reset window geometries and dpi settings on factory-reset
   - removes Py2.7 support and updates build environment
   - improved autoCHARGE/autoDROP in Fahrenheit mode
-* FIXES 
+* FIXES
   - fixes missing translations on Linux/RPi ([Issue #211](../../../issues/211))
   - fixes hanging message line in FullScreen mode
   - close the device assignment dialog before opening the serial dialog to ensure that it cannot hide the serial dialog if app is put in background and back in foreground again
@@ -777,7 +777,7 @@ v1.4.0 (October 3, 2018)
 v1.3.1 (May 20, 2018)
 ------------------
 
-* NEW FEATURES 
+* NEW FEATURES
   - adds Cmd-Shift-S as shortcut for "Save As" ([Issue #194](../../../issues/194))
   - remembers fullscreen mode over restarts ([Issue #199](../../../issues/199))
   - allows to insert a custom event button line before the selected one by clicking Add
@@ -816,19 +816,19 @@ v1.3.1 (May 20, 2018)
   - v1.3.1(0): build 0 (initial release)
   - v1.3.1(1): build 1 uploaded on 22.05.2018
     - fixes BC Roaster machine setup
-   
+
 ----
 v1.3.0 (April 15, 2018)
 ------------------
 
-* NEW FEATURES 
+* NEW FEATURES
   - adds extraction yield calculator by Rui Paulo
   - adds configurable alarm popup timeout
   - adds MODBUS BCD decoding
   - adds support for the Siemens S7 protocol
   - adds support for custom event values larger than 100 up to 999
   - adds new custom event rendering options and the option  to render event descriptions instead of values
-  - adds the new custom event button type "--" that adds an event (compared to the pure action button of type "  ") 
+  - adds the new custom event button type "--" that adds an event (compared to the pure action button of type "  ")
  and can be used to add labels to the graph rendering its button description
   - adds color themes
   - adds color check messages to warn when foreground and background colors are too similar
@@ -1000,7 +1000,7 @@ v1.1.0 (June 10, 2017)
 
 **NOTE**
 _This is the last version supporting supporting Mac OS X 10.9, Windows XP/7 and 32bit OS versions_
-        
+
 ----
 v1.0.0 (February 24, 2017)
 ------------------
@@ -1008,7 +1008,7 @@ v1.0.0 (February 24, 2017)
 * NEW FEATURES
    * adds [internal PID](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html) and support to control external MODBUS PIDs
    * adds two more MODBUS input channels (now 6 in total)
-   * adds alarms triggerd at a specified time after another alarm specified as "If Alarm" was triggered, if "from" rules is set to "If Alarm"    
+   * adds alarms triggerd at a specified time after another alarm specified as "If Alarm" was triggered, if "from" rules is set to "If Alarm"
    * adds improved Windows installer (option to uninstall previous versions during installation and silent option)
    * adds support for loading Artisan profiles from zip files for reporting (as kindly contributed by David Baxter)
    * adds experimental support for the [Apollo DT301](http://www.ueitest.com/products/temperature-humidity/dt301) (by Rob Gardner)
@@ -1028,7 +1028,7 @@ v1.0.0 (February 24, 2017)
    * adds automatic unit conversion for Yoctopuce devices
    * adds profile C<->F batch conversion
    * adds a field for green bean temperature
-   * adds p-i-d button action    
+   * adds p-i-d button action
    * adds auto axis limits calculation via manual trigger or automatic on load
    * adds [AUC statistics, LCD and guide](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html)
    * adds possibility to "clamp" by-value custom events to the x-axis in the range of 0-100
@@ -1060,7 +1060,7 @@ v1.0.0 (February 24, 2017)
    * fixes image paths in HTML reports
    * fixes hangs and accent character support on "Playback Aid"
    * improved autoDROP
-   * fixes WebLCDs on Mac OS X   
+   * fixes WebLCDs on Mac OS X
    * fixes Fuji PXG duty overflow for values from -3% to 0%
    * fixes handling of external program paths containing accent characters on Windows
    * fixes handling of accent characters in autosave path
@@ -1089,7 +1089,7 @@ v0.9.9 (March 14, 2016)
    * adds background moving by using the cursor keys
    * adds PID keyboard shortcuts to toggle mode and (p key) and to incr/decr lookahead (+/- key)
    * designer: adds save/load of points
-   * designer: adds keyboard entry on adding points    
+   * designer: adds keyboard entry on adding points
    * availability on Arch Linux
    * adds batch conversion to various formats (CSV, JSON, PDF, PNG,..)
    * adds switch ET<->BT action

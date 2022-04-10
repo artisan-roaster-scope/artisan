@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # GIESEN CSV Roast Profile importer for Artisan
 
-import io
 import csv
 import logging
 try:
@@ -41,13 +39,13 @@ def replace_duplicates(data):
 def extractProfileGiesenCSV(file,_):
     res = {} # the interpreted data set
 
-    res["samplinginterval"] = 1.0
+    res['samplinginterval'] = 1.0
 
-    with io.open(file, 'r', newline="",encoding='utf-8') as csvFile:
+    with open(file, newline='',encoding='utf-8') as csvFile:
         data = csv.reader(csvFile,delimiter=',')
         #read file header
         header = next(data)
-        
+
         speed = None # holds last processed drum event value
         speed_last = None # holds the drum event value before the last one
         power = None # holds last processed heater event value
@@ -103,10 +101,10 @@ def extractProfileGiesenCSV(file,_):
                 extra4.append(float(item['pressure']))
             else:
                 extra4.append(-1)
-            
-            if "speed" in item:
+
+            if 'speed' in item:
                 try:
-                    v = float(item["speed"])
+                    v = float(item['speed'])
                     if v != speed:
                         # speed value changed
                         if v == speed_last:
@@ -126,14 +124,14 @@ def extractProfileGiesenCSV(file,_):
                             specialeventsvalue.append(v)
                             specialevents.append(i)
                             specialeventstype.append(1)
-                            specialeventsStrings.append(item["speed"] + "%")
+                            specialeventsStrings.append(item['speed'] + '%')
                     else:
                         speed_last = None
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-            if "power" in item:
+            if 'power' in item:
                 try:
-                    v = float(item["power"])
+                    v = float(item['power'])
                     if v != power:
                         # power value changed
                         if v == power_last:
@@ -153,44 +151,43 @@ def extractProfileGiesenCSV(file,_):
                             specialeventsvalue.append(v)
                             specialevents.append(i)
                             specialeventstype.append(3)
-                            specialeventsStrings.append(item["power"] + "%")
+                            specialeventsStrings.append(item['power'] + '%')
                     else:
                         power_last = None
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-            
-    res["timex"] = timex
-    res["temp1"] = replace_duplicates(temp1)
-    res["temp2"] = replace_duplicates(temp2)
-    res["timeindex"] = timeindex
-    
-    res["extradevices"] = [25,25]
-    res["extratimex"] = [timex[:],timex[:]]
-    
-    res["extraname1"] = ["ror","speed"]
-    res["extratemp1"] = [extra1,extra3]
-    res["extramathexpression1"] = ["",""]
-    
-    res["extraname2"] = ["power","pressure"]
-    res["extratemp2"] = [extra2,extra4]
-    res["extramathexpression2"] = ["",""]
-    
+
+    res['timex'] = timex
+    res['temp1'] = replace_duplicates(temp1)
+    res['temp2'] = replace_duplicates(temp2)
+    res['timeindex'] = timeindex
+
+    res['extradevices'] = [25,25]
+    res['extratimex'] = [timex[:],timex[:]]
+
+    res['extraname1'] = ['ror','speed']
+    res['extratemp1'] = [extra1,extra3]
+    res['extramathexpression1'] = ['','']
+
+    res['extraname2'] = ['power','pressure']
+    res['extratemp2'] = [extra2,extra4]
+    res['extramathexpression2'] = ['','']
+
     if len(specialevents) > 0:
-        res["specialevents"] = specialevents
-        res["specialeventstype"] = specialeventstype
-        res["specialeventsvalue"] = specialeventsvalue
-        res["specialeventsStrings"] = specialeventsStrings
+        res['specialevents'] = specialevents
+        res['specialeventstype'] = specialeventstype
+        res['specialeventsvalue'] = specialeventsvalue
+        res['specialeventsStrings'] = specialeventsStrings
         if power_event or speed_event:
             # first set etypes to defaults
-            res["etypes"] = [QApplication.translate("ComboBox", "Air"),
-                             QApplication.translate("ComboBox", "Drum"),
-                             QApplication.translate("ComboBox", "Damper"),
-                             QApplication.translate("ComboBox", "Burner"),
-                             "--"]
+            res['etypes'] = [QApplication.translate('ComboBox', 'Air'),
+                             QApplication.translate('ComboBox', 'Drum'),
+                             QApplication.translate('ComboBox', 'Damper'),
+                             QApplication.translate('ComboBox', 'Burner'),
+                             '--']
             # update
             if speed_event:
-                res["etypes"][0] = "Speed"
+                res['etypes'][0] = 'Speed'
             if power_event:
-                res["etypes"][3] = "Power"
+                res['etypes'][3] = 'Power'
     return res
-                

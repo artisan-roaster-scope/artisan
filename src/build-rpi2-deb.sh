@@ -42,6 +42,3 @@ sudo chmod 755 debian/DEBIAN/postinst
 sudo chmod 755 debian/DEBIAN/prerm
 (while :; do ps ax | grep dpkg; sleep 300;done)&
 dpkg-deb --build debian ${NAME}_raspbian-stretch.deb
-
-
-

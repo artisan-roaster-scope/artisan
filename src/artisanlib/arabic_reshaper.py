@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This work is licensed under the GNU Public License (GPL).
 # To view a copy of this license, visit http://www.gnu.org/copyleft/gpl.html
@@ -143,12 +142,12 @@ def get_reshaped_glyph(target, location):
     if target in ARABIC_GLYPHS:
         return ARABIC_GLYPHS[target][location]
     return target
-        
+
 def get_glyph_type(target):
     if target in ARABIC_GLYPHS:
         return ARABIC_GLYPHS[target][5]
     return 2
-        
+
 def is_haraka(target):
     return target in HARAKAT
 
@@ -166,10 +165,10 @@ def replace_lam_alef(unshaped_word):
             candidate_lam = unshaped_word[i]
             lam_position = i
             haraka_position = i + 1
-            
+
             while haraka_position < len(unshaped_word) and is_haraka(unshaped_word[haraka_position]):
                 haraka_position += 1
-                
+
             if haraka_position < len(unshaped_word):
                 if lam_position > 0 and get_glyph_type(letter_before) > 2:
                     lam_alef = get_lam_alef(list_word[haraka_position], candidate_lam, False)
@@ -178,28 +177,28 @@ def replace_lam_alef(unshaped_word):
                 if lam_alef != '':
                     list_word[lam_position] = lam_alef
                     list_word[haraka_position] = ' '
-            
+
     return ''.join(list_word).replace(' ', '')
-        
+
 def get_lam_alef(candidate_alef, candidate_lam, is_end_of_word):
     shift_rate = 1
     reshaped_lam_alef = ''
     if is_end_of_word:
         shift_rate += 1
-    
+
     if DEFINED_CHARACTERS_ORGINAL_LAM == candidate_lam:
         if DEFINED_CHARACTERS_ORGINAL_ALF_UPPER_MDD == candidate_alef:
             reshaped_lam_alef = LAM_ALEF_GLYPHS[0][shift_rate]
-        
+
         if DEFINED_CHARACTERS_ORGINAL_ALF_UPPER_HAMAZA == candidate_alef:
             reshaped_lam_alef = LAM_ALEF_GLYPHS[1][shift_rate]
-        
+
         if DEFINED_CHARACTERS_ORGINAL_ALF == candidate_alef:
             reshaped_lam_alef = LAM_ALEF_GLYPHS[2][shift_rate]
-        
+
         if DEFINED_CHARACTERS_ORGINAL_ALF_LOWER_HAMAZA == candidate_alef:
             reshaped_lam_alef = LAM_ALEF_GLYPHS[3][shift_rate]
-    
+
     return reshaped_lam_alef
 
 class DecomposedWord(): # pylint: disable=too-few-public-methods
@@ -265,12 +264,12 @@ def reshape_it(unshaped_word):
 
 def is_arabic_character(target):
     return target in ARABIC_GLYPHS or target in HARAKAT
-    
+
 def get_words(sentence):
     if sentence:
         return re.split('\\s', sentence)
     return []
-    
+
 def has_arabic_letters(word):
     for c in word:
         if is_arabic_character(c):
@@ -282,7 +281,7 @@ def is_arabic_word(word):
         if not is_arabic_character(c):
             return False
     return True
-    
+
 def get_words_from_mixed_word(word):
     temp_word = ''
     words = []
@@ -302,7 +301,7 @@ def get_words_from_mixed_word(word):
     if temp_word:
         words.append(temp_word)
     return words
-    
+
 def reshape(text):
     if text:
         lines = re.split('\\r?\\n', text)
@@ -310,7 +309,7 @@ def reshape(text):
             lines[i] = reshape_sentence(lines[i])
         return '\n'.join(lines)
     return ''
-    
+
 def reshape_sentence(sentence):
     words = get_words(sentence)
     for i in range(len(words)):

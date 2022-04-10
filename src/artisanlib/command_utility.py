@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # Handling of Commandline Utility Functions
@@ -29,7 +28,7 @@ def handleCommands():
     for arg in sys.argv:
 
         if arg in ('-v', '--Version'):
-            print ('Artisan  Verison {}'.format(__version__))
+            print (f'Artisan  Verison {__version__}')
 
             return False
 

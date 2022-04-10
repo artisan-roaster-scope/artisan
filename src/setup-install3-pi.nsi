@@ -19,14 +19,14 @@ RequestExecutionLevel admin
   WriteRegStr HKCR "${FILECLASS}\shell\open" "" `${COMMANDTEXT}`
   WriteRegStr HKCR "${FILECLASS}\shell\open\command" "" `${COMMAND}`
 !macroend
- 
+
 !macro APP_UNASSOCIATE EXT FILECLASS
   ; Backup the previously associated file class
   ReadRegStr $R0 HKCR ".${EXT}" `${FILECLASS}_backup`
   WriteRegStr HKCR ".${EXT}" "" "$R0"
   DeleteRegKey HKCR `${FILECLASS}`
 !macroend
- 
+
 !macro Rmdir_Wildcard dir uid
   ; RMDIR with wildcard, dir in the form $INSTDIR\dir_with_wildcard, uid should be ${__LINE__}
   FindFirst $0 $1 ${dir}
@@ -39,7 +39,7 @@ RequestExecutionLevel admin
   FindClose $0
 !macroend
 
-!macro IsRunning 
+!macro IsRunning
   Delete "$TEMP\25b241e1.tmp"
   nsExec::Exec "cmd /c for /f $\"tokens=1,2$\" %i in ('tasklist') do (if /i %i EQU artisan.exe fsutil file createnew $TEMP\25b241e1.tmp 0)"
   IfFileExists $TEMP\25b241e1.tmp 0 notRunning
@@ -65,12 +65,12 @@ RequestExecutionLevel admin
   WriteRegStr HKCR "${FILECLASS}\shell\${VERB}" "" `${COMMANDTEXT}`
   WriteRegStr HKCR "${FILECLASS}\shell\${VERB}\command" "" `${COMMAND}`
 !macroend
- 
+
 !macro APP_ASSOCIATE_ADDVERB FILECLASS VERB COMMANDTEXT COMMAND
   WriteRegStr HKCR "${FILECLASS}\shell\${VERB}" "" `${COMMANDTEXT}`
   WriteRegStr HKCR "${FILECLASS}\shell\${VERB}\command" "" `${COMMAND}`
 !macroend
- 
+
 !macro APP_ASSOCIATE_REMOVEVERB FILECLASS VERB
   DeleteRegKey HKCR `${FILECLASS}\shell\${VERB}`
 !macroend
@@ -88,7 +88,7 @@ RequestExecutionLevel admin
 !undef SHCNF_FLUSH
 !endif
 !define SHCNF_FLUSH        0x1000
- 
+
 !macro UPDATEFILEASSOC
 ; Using the system.dll plugin to call the SHChangeNotify Win32 API function so we
 ; can update the shell.
@@ -107,9 +107,9 @@ RequestExecutionLevel admin
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
 ;Special commandline options
-;Product version can be defined on the command line '/DPRODUCT_VERSION=ww.xx.yy.zz' 
+;Product version can be defined on the command line '/DPRODUCT_VERSION=ww.xx.yy.zz'
 ;  and will override the version explicitly set below.
-!define /ifndef PRODUCT_VERSION "0.0.0.0"  
+!define /ifndef PRODUCT_VERSION "0.0.0.0"
 !define /ifndef SIGN "False"
 !define /ifndef LEGACY "False"
 
@@ -167,19 +167,19 @@ ShowUnInstDetails show
 Function .onInit
   ${If} ${LEGACY} == "False"
   ${AndIfNot} ${AtLeastWin10}
-    MessageBox mb_iconStop "Artisan requires Windows 10 or later to install and run." 
+    MessageBox mb_iconStop "Artisan requires Windows 10 or later to install and run."
     Abort
   ${EndIf}
-    
+
   ${If} ${LEGACY} == "True"
   ${AndIf} ${AtLeastWin10}
-    MessageBox mb_iconStop "Artisan Legacy builds require 64 bit Windows 7 or Windows 8 to install and run." 
+    MessageBox mb_iconStop "Artisan Legacy builds require 64 bit Windows 7 or Windows 8 to install and run."
     Abort
   ${EndIf}
-    
+
   ${If} ${LEGACY} == "True"
   ${AndIfNot} ${AtLeastWin7}
-    MessageBox mb_iconStop "Artisan Legacy builds require 64 bit Windows 7 or Windows 8 to install and run." 
+    MessageBox mb_iconStop "Artisan Legacy builds require 64 bit Windows 7 or Windows 8 to install and run."
     Abort
   ${EndIf}
   !insertmacro IsRunning
@@ -187,8 +187,8 @@ Function .onInit
   ${If} ${RunningX64}
     ReadRegStr $R0 ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
     "UninstallString"
-    StrCmp $R0 "" done  
- 
+    StrCmp $R0 "" done
+
     MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
     "${PRODUCT_NAME} is already installed. $\n$\nClick `OK` to remove the \
     previous version or `Cancel` to cancel this upgrade." /SD IDOK \
@@ -198,26 +198,26 @@ Function .onInit
     MessageBox MB_OK "You are not using a 64bit system.\nSorry, we can not install Artisan on your system."
     Abort
   ${EndIf}
- 
+
   ;Run the uninstaller
   uninst:
     ClearErrors
     IfSilent mysilent nosilent
-      
+
   mysilent:
     ExecWait '$R0 /S _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
     IfErrors no_remove_uninstaller done
-    
+
   nosilent:
-    ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file 
+    ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
     IfErrors no_remove_uninstaller done
-      
+
   no_remove_uninstaller:
       ;You can either use Delete /REBOOTOK in the uninstaller or add some code
       ;here to remove the uninstaller. Use a registry key to check
       ;whether the user has chosen to uninstall. If you are using an uninstaller
       ;components page, make sure all sections are uninstalled.
-    
+
   done:
 FunctionEnd
 
@@ -264,25 +264,25 @@ Section -Post
   ; file associations
   !insertmacro APP_ASSOCIATE "alog" "Artisan.Profile" "Artisan Roast Profile" \
      "$INSTDIR\artisanProfile.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
-     
+
   !insertmacro APP_ASSOCIATE "alrm" "Artisan.Alarms" "Artisan Alarms" \
      "$INSTDIR\artisanAlarms.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
-     
+
   !insertmacro APP_ASSOCIATE "apal" "Artisan.Palettes" "Artisan Palettes" \
      "$INSTDIR\artisanPalettes.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
-     
+
   !insertmacro APP_ASSOCIATE "athm" "Artisan.Theme" "Artisan Theme" \
      "$INSTDIR\artisanTheme.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
-     
+
   !insertmacro APP_ASSOCIATE "aset" "Artisan.Settings" "Artisan Settings" \
      "$INSTDIR\artisanSettings.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
-     
+
   !insertmacro APP_ASSOCIATE "wg" "Artisan.Wheel" "Artisan Wheel" \
      "$INSTDIR\artisanWheel.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
-     
+
   !insertmacro APP_ASSOCIATE_URL "artisan" "URL:artisan Protocol" \
      "Open with URL" "$INSTDIR\artisan.exe $\"%1$\""
-     
+
 SectionEnd
 
 
@@ -295,10 +295,10 @@ FunctionEnd
 Function un.onInit
     !insertmacro IsRunning
 
-    IfSilent +3 
-        MessageBox MB_ICONQUESTION|MB_YESNO|MB_TOPMOST "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +2 
-        Abort 
-    HideWindow   
+    IfSilent +3
+        MessageBox MB_ICONQUESTION|MB_YESNO|MB_TOPMOST "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +2
+        Abort
+    HideWindow
 
 FunctionEnd
 
@@ -395,16 +395,16 @@ Section Uninstall
   Delete "$INSTDIR\qt.conf"
   Delete "$INSTDIR\vc_redist.x64.exe"
   Delete "$INSTDIR\logging.yaml"
-  
+
   SetShellVarContext all
   Delete "$SMPROGRAMS\Artisan\Uninstall.lnk"
   Delete "$SMPROGRAMS\Artisan\Website.lnk"
   Delete "$DESKTOP\Artisan.lnk"
   Delete "$SMPROGRAMS\Artisan\Artisan.lnk"
-  
+
   RMDir "$SMPROGRAMS\Artisan"
   RMDir "$INSTDIR"
-  
+
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
   DeleteRegKey HKCR ".alog"
@@ -412,7 +412,7 @@ Section Uninstall
   DeleteRegKey HKCR "Artisan.Profile\shell"
   DeleteRegKey HKCR "Artisan.Profile\shell\open\command"
   DeleteRegKey HKCR "Artisan.Profile"
- 
+
   !insertmacro APP_UNASSOCIATE "alog" "Artisan.Profile"
   !insertmacro APP_UNASSOCIATE "alrm" "Artisan.Alarms"
   !insertmacro APP_UNASSOCIATE "apal" "Artisan.Palettes"
@@ -423,6 +423,6 @@ Section Uninstall
   DeleteRegKey HKCR "artisan\shell"
   DeleteRegKey HKCR "artisan\shell\open\command"
   DeleteRegKey HKCR "artisan"
-  
+
   SetAutoClose true
 SectionEnd

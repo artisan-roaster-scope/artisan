@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # Aillio support for Artisan
@@ -44,11 +43,10 @@ except Exception:
     from PyQt5.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
-import io
 
 
 _log: Final = logging.getLogger(__name__)
-        
+
 
 class AillioR1:
     AILLIO_VID = 0x0483
@@ -88,13 +86,13 @@ class AillioR1:
         self.drum = 0
         self.voltage = 0
         self.exitt = 0
-        self.state_str = ""
+        self.state_str = ''
         self.r1state = 0
         self.worker_thread = None
         self.worker_thread_run = True
         self.roast_number = -1
         self.fan_rpm = 0
-        
+
         self.parent_pipe = None
         self.child_pipe = None
         self.irt = 0
@@ -113,7 +111,7 @@ class AillioR1:
         if self.AILLIO_DEBUG and self.simulated != True:
             try:
                 print('AillioR1: ' + msg)
-            except IOError:
+            except OSError:
                 pass
 
     def __open(self):
@@ -127,28 +125,28 @@ class AillioR1:
             self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
                                            idProduct=self.AILLIO_PID_REV3)
         if self.usbhandle is None:
-            raise IOError("not found or no permission")
+            raise OSError('not found or no permission')
         self.__dbg('device found!')
-        if not system().startswith("Windows"):
+        if not system().startswith('Windows'):
             if self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE):
                 try:
                     self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE)
                 except Exception as e:
                     self.usbhandle = None
-                    raise IOError("unable to detach kernel driver") from e
+                    raise OSError('unable to detach kernel driver') from e
         try:
             config = self.usbhandle.get_active_configuration()
             if config.bConfigurationValue != self.AILLIO_CONFIGURATION:
                 self.usbhandle.set_configuration(configuration=self.AILLIO_CONFIGURATION)
         except Exception as e:
             self.usbhandle = None
-            raise IOError("unable to configure") from e
+            raise OSError('unable to configure') from e
 
         try:
             usb.util.claim_interface(self.usbhandle, self.AILLIO_INTERFACE)
         except Exception as e:
             self.usbhandle = None
-            raise IOError("unable to claim interface") from e
+            raise OSError('unable to claim interface') from e
         self.__sendcmd(self.AILLIO_CMD_INFO1)
         reply = self.__readreply(32)
         sn = unpack('h', reply[0:2])[0]
@@ -186,7 +184,7 @@ class AillioR1:
     def get_roast_number(self):
         self.__getstate()
         return self.roast_number
-    
+
     def get_bt(self):
         self.__getstate()
         return self.bt
@@ -253,7 +251,7 @@ class AillioR1:
             for _ in range(d):
                 self.parent_pipe.send(self.AILLIO_CMD_HEATER_INCR)
         self.heater = value
-        
+
     def set_fan(self, value):
         self.__dbg('set_fan ' + str(value))
         value = int(value)
@@ -273,7 +271,7 @@ class AillioR1:
             for _ in range(0, d):
                 self.parent_pipe.send(self.AILLIO_CMD_FAN_INCR)
         self.fan = value
-        
+
     def set_drum(self, value):
         self.__dbg('set_drum ' + str(value))
         value = int(value)
@@ -283,7 +281,7 @@ class AillioR1:
             value = 9
         self.parent_pipe.send([0x32, 0x01, value, 0x00])
         self.drum = value
-        
+
     def prs(self):
         self.__dbg('PRS')
         self.parent_pipe.send(self.AILLIO_CMD_PRS)
@@ -326,7 +324,7 @@ class AillioR1:
             self.coil_fan2 = 0
             self.pht = 0
             self.r1state = self.AILLIO_STATE_ROASTING
-            self.state_str = "roasting"
+            self.state_str = 'roasting'
             return
         self.__open()
         if not self.parent_pipe.poll():
@@ -370,17 +368,17 @@ class AillioR1:
         self.pht = unpack('H', state[40:42])[0]
         self.__dbg('pre-heat temperature: ' + str(self.pht))
         if self.r1state == self.AILLIO_STATE_OFF:
-            self.state_str = "off"
+            self.state_str = 'off'
         elif self.r1state == self.AILLIO_STATE_PH:
-            self.state_str = "pre-heating to " + str(self.pht) + "C"
+            self.state_str = 'pre-heating to ' + str(self.pht) + 'C'
         elif self.r1state == self.AILLIO_STATE_CHARGE:
-            self.state_str = "charge"
+            self.state_str = 'charge'
         elif self.r1state == self.AILLIO_STATE_ROASTING:
-            self.state_str = "roasting"
+            self.state_str = 'roasting'
         elif self.r1state == self.AILLIO_STATE_COOLING:
-            self.state_str = "cooling"
+            self.state_str = 'cooling'
         elif self.r1state == self.AILLIO_STATE_SHUTDOWN:
-            self.state_str = "shutdown"
+            self.state_str = 'shutdown'
         self.__dbg('state: ' + self.state_str)
         self.__dbg('second coil fan: ' + str(self.coil_fan2))
 
@@ -394,121 +392,121 @@ class AillioR1:
 def extractProfileBulletDict(data,aw):
     try:
         res = {} # the interpreted data set
-        
-        if "celsius" in data and not data["celsius"]:
-            res["mode"] = 'F'
+
+        if 'celsius' in data and not data['celsius']:
+            res['mode'] = 'F'
         else:
-            res["mode"] = 'C'
-        if "comments" in data:
-            res["roastingnotes"] = data["comments"]
+            res['mode'] = 'C'
+        if 'comments' in data:
+            res['roastingnotes'] = data['comments']
         try:
-            if "dateTime" in data:
+            if 'dateTime' in data:
                 try:
-                    dateQt = QDateTime.fromString(data["dateTime"],Qt.DateFormat.ISODate) # RFC 3339 date time
+                    dateQt = QDateTime.fromString(data['dateTime'],Qt.DateFormat.ISODate) # RFC 3339 date time
                 except Exception: # pylint: disable=broad-except
-                    dateQt = QDateTime.fromMSecsSinceEpoch (data["dateTime"])
+                    dateQt = QDateTime.fromMSecsSinceEpoch (data['dateTime'])
                 if dateQt.isValid():
-                    res["roastdate"] = encodeLocal(dateQt.date().toString())
-                    res["roastisodate"] = encodeLocal(dateQt.date().toString(Qt.DateFormat.ISODate))
-                    res["roasttime"] = encodeLocal(dateQt.time().toString())
-                    res["roastepoch"] = int(dateQt.toSecsSinceEpoch())
-                    res["roasttzoffset"] = time.timezone
+                    res['roastdate'] = encodeLocal(dateQt.date().toString())
+                    res['roastisodate'] = encodeLocal(dateQt.date().toString(Qt.DateFormat.ISODate))
+                    res['roasttime'] = encodeLocal(dateQt.time().toString())
+                    res['roastepoch'] = int(dateQt.toSecsSinceEpoch())
+                    res['roasttzoffset'] = time.timezone
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         try:
-            res["title"] = data["beanName"]
-        except Exception: # pylint: disable=broad-except
-            pass            
-        if "roastName" in data:
-            res["title"] = data["roastName"]
-        try:
-            if "roastNumber" in data:
-                res["roastbatchnr"] = int(data["roastNumber"])
+            res['title'] = data['beanName']
         except Exception: # pylint: disable=broad-except
             pass
-        if "beanName" in data:
-            res["beans"] = data["beanName"]
-        elif "bean" in data and "beanName" in data["bean"]:
-            res["beans"] = data["bean"]["beanName"]
+        if 'roastName' in data:
+            res['title'] = data['roastName']
         try:
-            if "weightGreen" in data or "weightRoasted" in data:
+            if 'roastNumber' in data:
+                res['roastbatchnr'] = int(data['roastNumber'])
+        except Exception: # pylint: disable=broad-except
+            pass
+        if 'beanName' in data:
+            res['beans'] = data['beanName']
+        elif 'bean' in data and 'beanName' in data['bean']:
+            res['beans'] = data['bean']['beanName']
+        try:
+            if 'weightGreen' in data or 'weightRoasted' in data:
                 wunit = aw.qmc.weight_units.index(aw.qmc.weight[2])
                 if wunit in [1,3]: # turn Kg into g, and lb into oz
                     wunit = wunit -1
                 wgreen = 0
-                if "weightGreen" in data:
-                    wgreen = float(data["weightGreen"])
+                if 'weightGreen' in data:
+                    wgreen = float(data['weightGreen'])
                 wroasted = 0
-                if "weightRoasted" in data:
-                    wroasted = float(data["weightRoasted"])
-                res["weight"] = [wgreen,wroasted,aw.qmc.weight_units[wunit]]
+                if 'weightRoasted' in data:
+                    wroasted = float(data['weightRoasted'])
+                res['weight'] = [wgreen,wroasted,aw.qmc.weight_units[wunit]]
         except Exception: # pylint: disable=broad-except
             pass
         try:
-            if "agtron" in data:
-                res["ground_color"] = int(round(data["agtron"]))
-                res["color_system"] = "Agtron"
+            if 'agtron' in data:
+                res['ground_color'] = int(round(data['agtron']))
+                res['color_system'] = 'Agtron'
         except Exception: # pylint: disable=broad-except
             pass
         try:
-            if "roastMasterName" in data:
-                res["operator"] = data["roastMasterName"]
+            if 'roastMasterName' in data:
+                res['operator'] = data['roastMasterName']
         except Exception: # pylint: disable=broad-except
             pass
-        res["roastertype"] = "Aillio Bullet R1"
-            
-        if "ambient" in data:
-            res['ambientTemp'] = data["ambient"]
-        if "humidity" in data:
-            res["ambient_humidity"] = data["humidity"]
+        res['roastertype'] = 'Aillio Bullet R1'
 
-        if "beanTemperature" in data:
-            bt = data["beanTemperature"]
+        if 'ambient' in data:
+            res['ambientTemp'] = data['ambient']
+        if 'humidity' in data:
+            res['ambient_humidity'] = data['humidity']
+
+        if 'beanTemperature' in data:
+            bt = data['beanTemperature']
         else:
             bt = []
-        if "drumTemperature" in data:
-            dt = data["drumTemperature"]
+        if 'drumTemperature' in data:
+            dt = data['drumTemperature']
         else:
             dt = []
         # make dt the same length as bt
         dt = dt[:len(bt)]
         dt.extend(-1 for _ in range(len(bt) - len(dt)))
-        
-        if "exitTemperature" in data:
-            et = data["exitTemperature"]
+
+        if 'exitTemperature' in data:
+            et = data['exitTemperature']
         else:
             et = None
         if et is not None:
             # make et the same length as bt
             et = et[:len(bt)]
             et.extend(-1 for _ in range(len(bt) - len(et)))
-        
-        if "beanDerivative" in data:
-            ror = data["beanDerivative"]
+
+        if 'beanDerivative' in data:
+            ror = data['beanDerivative']
         else:
             ror = None
         if ror is not None:
             # make et the same length as bt
             ror = ror[:len(bt)]
             ror.extend(-1 for _ in range(len(bt) - len(ror)))
-        
-        if "sampleRate" in data:
-            sr = data["sampleRate"]
+
+        if 'sampleRate' in data:
+            sr = data['sampleRate']
         else:
             sr = 2.
-        res["samplinginterval"] = 1.0/sr
+        res['samplinginterval'] = 1.0/sr
         tx = [x/sr for x in range(len(bt))]
-        res["timex"] = tx
-        res["temp1"] = dt
-        res["temp2"] = bt
-        
+        res['timex'] = tx
+        res['temp1'] = dt
+        res['temp2'] = bt
+
         timeindex = [-1,0,0,0,0,0,0,0]
-        if "roastStartIndex" in data:
-            timeindex[0] = min(max(data["roastStartIndex"],0),len(tx)-1)
+        if 'roastStartIndex' in data:
+            timeindex[0] = min(max(data['roastStartIndex'],0),len(tx)-1)
         else:
             timeindex[0] = 0
-        
-        labels = ["indexYellowingStart","indexFirstCrackStart","indexFirstCrackEnd","indexSecondCrackStart","indexSecondCrackEnd"]
+
+        labels = ['indexYellowingStart','indexFirstCrackStart','indexFirstCrackEnd','indexSecondCrackStart','indexSecondCrackEnd']
         for i in range(1,6):
             try:
                 idx = data[labels[i-1]]
@@ -518,24 +516,24 @@ def extractProfileBulletDict(data,aw):
             except Exception: # pylint: disable=broad-except
                 pass
 
-        if "roastEndIndex" in data:
-            timeindex[6] = max(0,min(data["roastEndIndex"],len(tx)-1))
+        if 'roastEndIndex' in data:
+            timeindex[6] = max(0,min(data['roastEndIndex'],len(tx)-1))
         else:
             timeindex[6] = max(0,len(tx)-1)
-        res["timeindex"] = timeindex
-        
+        res['timeindex'] = timeindex
+
         # extract events from newer JSON format
         specialevents = []
         specialeventstype = []
         specialeventsvalue = []
         specialeventsStrings = []
-        
+
         # extract events from older JSON format
         try:
-            eventtypes = ["blowerSetting","drumSpeedSetting","--","inductionPowerSetting"]
+            eventtypes = ['blowerSetting','drumSpeedSetting','--','inductionPowerSetting']
             for j in range(len(eventtypes)):
                 eventname = eventtypes[j]
-                if eventname != "--":
+                if eventname != '--':
                     last = None
                     ip = data[eventname]
                     for i in range(len(ip)):
@@ -544,21 +542,21 @@ def extractProfileBulletDict(data,aw):
                             specialevents.append(i)
                             specialeventstype.append(j)
                             specialeventsvalue.append(v)
-                            specialeventsStrings.append("")
+                            specialeventsStrings.append('')
                             last = v
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
         # extract events from newer JSON format
         try:
-            for action in data["actions"]["actionTimeList"]:
-                time_idx = action["index"] - 1
-                value = action["value"] + 1
-                if action["ctrlType"] == 0:
+            for action in data['actions']['actionTimeList']:
+                time_idx = action['index'] - 1
+                value = action['value'] + 1
+                if action['ctrlType'] == 0:
                     event_type = 3
-                elif action["ctrlType"] == 1:
+                elif action['ctrlType'] == 1:
                     event_type = 0
-                elif action["ctrlType"] == 2:
+                elif action['ctrlType'] == 2:
                     event_type = 1
                 specialevents.append(time_idx)
                 specialeventstype.append(event_type)
@@ -567,82 +565,82 @@ def extractProfileBulletDict(data,aw):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         if len(specialevents) > 0:
-            res["specialevents"] = specialevents
-            res["specialeventstype"] = specialeventstype
-            res["specialeventsvalue"] = specialeventsvalue
-            res["specialeventsStrings"] = specialeventsStrings
-        
+            res['specialevents'] = specialevents
+            res['specialeventstype'] = specialeventstype
+            res['specialeventsvalue'] = specialeventsvalue
+            res['specialeventsStrings'] = specialeventsStrings
+
         if (ror is not None and len(ror) == len(tx)) or (et is not None and len(et) == len(tx)):
             # add one (virtual) extra device
-            res["extradevices"] = [25]
-            res["extratimex"] = [tx]
-        
+            res['extradevices'] = [25]
+            res['extratimex'] = [tx]
+
             temp3_visibility = True
             temp4_visibility = False
             if et is not None and len(et) == len(tx):
-                res["extratemp1"] = [et]
+                res['extratemp1'] = [et]
             else:
-                res["extratemp1"] = [[-1]*len(tx)]
+                res['extratemp1'] = [[-1]*len(tx)]
                 temp3_visibility = False
             if ror is not None and len(ror) == len(tx):
-                res["extratemp2"] = [ror]
+                res['extratemp2'] = [ror]
             else:
-                res["extratemp2"] = [[-1]*len(tx)]
+                res['extratemp2'] = [[-1]*len(tx)]
                 temp4_visibility = False
-            res["extraname1"] = ["Exhaust"]
-            res["extraname2"] = ["RoR"]
-            res["extramathexpression1"] = [""]
-            res["extramathexpression2"] = [""]
-            res["extraLCDvisibility1"] = [temp3_visibility]
-            res["extraLCDvisibility2"] = [temp4_visibility]
-            res["extraCurveVisibility1"] = [temp3_visibility]
-            res["extraCurveVisibility2"] = [temp4_visibility]
-            res["extraDelta1"] = [False]
-            res["extraDelta2"] = [True]
-            res["extraFill1"] = [False]
-            res["extraFill2"] = [False]
-            res["extradevicecolor1"] = ['black']
-            res["extradevicecolor2"] = ['black']
-            res["extramarkersizes1"] = [6.0]
-            res["extramarkersizes2"] = [6.0]
-            res["extramarkers1"] = [None]
-            res["extramarkers2"] = [None]
-            res["extralinewidths1"] = [1.0]
-            res["extralinewidths2"] = [1.0]
-            res["extralinestyles1"] = ['-']
-            res["extralinestyles2"] = ['-']
-            res["extradrawstyles1"] = ['default']
-            res["extradrawstyles2"] = ['default']
+            res['extraname1'] = ['Exhaust']
+            res['extraname2'] = ['RoR']
+            res['extramathexpression1'] = ['']
+            res['extramathexpression2'] = ['']
+            res['extraLCDvisibility1'] = [temp3_visibility]
+            res['extraLCDvisibility2'] = [temp4_visibility]
+            res['extraCurveVisibility1'] = [temp3_visibility]
+            res['extraCurveVisibility2'] = [temp4_visibility]
+            res['extraDelta1'] = [False]
+            res['extraDelta2'] = [True]
+            res['extraFill1'] = [False]
+            res['extraFill2'] = [False]
+            res['extradevicecolor1'] = ['black']
+            res['extradevicecolor2'] = ['black']
+            res['extramarkersizes1'] = [6.0]
+            res['extramarkersizes2'] = [6.0]
+            res['extramarkers1'] = [None]
+            res['extramarkers2'] = [None]
+            res['extralinewidths1'] = [1.0]
+            res['extralinewidths2'] = [1.0]
+            res['extralinestyles1'] = ['-']
+            res['extralinestyles2'] = ['-']
+            res['extradrawstyles1'] = ['default']
+            res['extradrawstyles2'] = ['default']
 
         return res
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
         return {}
-        
+
 def extractProfileRoastWorld(url,aw):
     s = requests.Session()
     s.mount('file://', FileAdapter())
-    page = s.get(url.toString(), timeout=(4, 15), headers={"Accept-Encoding" : "gzip"})
+    page = s.get(url.toString(), timeout=(4, 15), headers={'Accept-Encoding' : 'gzip'})
     tree = html.fromstring(page.content)
     data = tree.xpath('//body/script[1]/text()')
-    data = data[0].split("gon.profile=")
-    data = data[1].split(";")
+    data = data[0].split('gon.profile=')
+    data = data[1].split(';')
     res = extractProfileBulletDict(json.loads(data[0]),aw)
-    if not "beans" in res:
+    if not 'beans' in res:
         try:
             b = tree.xpath("//div[*='Bean']/*/a/text()")
             if b:
-                res["beans"] = b[0]
+                res['beans'] = b[0]
         except Exception: # pylint: disable=broad-except
             pass
     return res
 
 def extractProfileRoasTime(file,aw):
-    with io.open(file, 'r', encoding='utf-8') as infile:
+    with open(file, encoding='utf-8') as infile:
         data = json.load(infile)
     return extractProfileBulletDict(data,aw)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     R1 = AillioR1(debug=True)
     while True:
         R1.get_heater()

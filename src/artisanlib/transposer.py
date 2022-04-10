@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # ABOUT
 # Artisan Profile Transposer
@@ -43,14 +42,14 @@ class profileTransformatorDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Profile Transposer"))
-        
+        self.setWindowTitle(QApplication.translate('Form Caption','Profile Transposer'))
+
         self.helpdialog = None
-        
-        self.regexpercent = QRegularExpression(r"^$|[0-9]?[0-9]?(\.[0-9])?")
-        self.regextime = QRegularExpression(r"^$|[0-9]?[0-9]:[0-5][0-9]")
-        self.regextemp = QRegularExpression(r"^$|[0-9]?[0-9]?[0-9]?(\.[0-9])?")
-        
+
+        self.regexpercent = QRegularExpression(r'^$|[0-9]?[0-9]?(\.[0-9])?')
+        self.regextime = QRegularExpression(r'^$|[0-9]?[0-9]:[0-5][0-9]')
+        self.regextemp = QRegularExpression(r'^$|[0-9]?[0-9]?[0-9]?(\.[0-9])?')
+
         # original data
         self.org_transMappingMode = self.aw.qmc.transMappingMode
         self.org_timex = self.aw.qmc.timex[:]
@@ -65,11 +64,11 @@ class profileTransformatorDlg(ArtisanDialog):
         self.org_safesaveflag = self.aw.qmc.safesaveflag
         self.org_l_event_flags_dict = self.aw.qmc.l_event_flags_dict
         self.org_l_annotations_dict = self.aw.qmc.l_annotations_dict
-        
+
         self.phasestable = QTableWidget()
         self.timetable = QTableWidget()
         self.temptable = QTableWidget()
-        
+
         # time table widgets initialized by createTimeTable() to a list (target/result) with 4 widgets each
         #   DRY, FCs, SCs, DROP
         # if an event is not set in the profile, None is set instead of a widget
@@ -80,27 +79,27 @@ class profileTransformatorDlg(ArtisanDialog):
         #
         self.time_target_widgets = None
         self.time_result_widgets = None
-        
+
         # profileTimes: list of DRY, FCs, SCs and DROP times in seconds if event is set, otherwise None
         self.profileTimes = self.getProfileTimes()
         # list of DRY, FCs, SCs, and DROP target times in seconds as specified by the user, or None if not set
         self.targetTimes = self.getTargetTimes()
-        
+
         # temp table widgets initialized by createTempTable() to a list (target/result) with 5 widgets each
         #   CHARGE, DRY, FCs, SCs, DROP
         # if an event is not set in the profile, None is set instead of a widget
         self.temp_target_widgets = None
         self.temp_result_widgets = None
-        
+
         # list of CHARGE, DRY, FCs, SCs and DROP BT temperatures
         self.profileTemps = self.getProfileTemps()
         # list of DRY, FCs, SCs, and DROP target temperatures as specified by the user, or None if not set
         self.targetTemps = self.getTargetTemps()
-        
+
         self.createPhasesTable()
         self.createTimeTable()
         self.createTempTable()
-        
+
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.applyTransformations)
         self.dialogbuttons.rejected.connect(self.restoreState)
@@ -110,39 +109,39 @@ class profileTransformatorDlg(ArtisanDialog):
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Apply).clicked.connect(self.apply)
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Reset).clicked.connect(self.restore)
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Help).clicked.connect(self.openHelp)
-        
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Apply),"Apply",QApplication.translate("Button","Apply"))
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Reset),"Reset",QApplication.translate("Button","Reset"))
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Help),"Help",QApplication.translate("Button","Help"))
-        
+
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Apply),'Apply',QApplication.translate('Button','Apply'))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Reset),'Reset',QApplication.translate('Button','Reset'))
+        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Help),'Help',QApplication.translate('Button','Help'))
+
         #buttons
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addWidget(self.dialogbuttons)
-        
-        mappingLabel = QLabel(QApplication.translate("Label","Mapping"))
+
+        mappingLabel = QLabel(QApplication.translate('Label','Mapping'))
         self.mappingModeComboBox = QComboBox()
-        self.mappingModeComboBox.addItems([QApplication.translate("ComboBox","discrete"),
-                                              QApplication.translate("ComboBox","linear"),
-                                              QApplication.translate("ComboBox","quadratic")])
+        self.mappingModeComboBox.addItems([QApplication.translate('ComboBox','discrete'),
+                                              QApplication.translate('ComboBox','linear'),
+                                              QApplication.translate('ComboBox','quadratic')])
         self.mappingModeComboBox.setCurrentIndex(self.aw.qmc.transMappingMode)
         self.mappingModeComboBox.currentIndexChanged.connect(self.changeMappingMode)
-        
+
         self.temp_formula = QLabel()
         self.temp_formula.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        
+
         settingsHLayout = QHBoxLayout()
         settingsHLayout.addStretch()
         settingsHLayout.addWidget(mappingLabel)
         settingsHLayout.addWidget(self.mappingModeComboBox)
         settingsHLayout.addStretch()
-        
+
         phasesHLayout = QHBoxLayout()
         phasesHLayout.addStretch()
         phasesHLayout.addWidget(self.phasestable)
         phasesHLayout.addStretch()
         phasesLayout = QVBoxLayout()
         phasesLayout.addLayout(phasesHLayout)
-        
+
         timeHLayout = QHBoxLayout()
         timeHLayout.addStretch()
         timeHLayout.addWidget(self.timetable)
@@ -162,14 +161,14 @@ class profileTransformatorDlg(ArtisanDialog):
         tempLayout.addLayout(tempHLayout)
         tempLayout.addLayout(formulaHLayout)
         tempLayout.addStretch()
-        
-        phasesGroupLayout = QGroupBox(QApplication.translate("Table","Phases"))
+
+        phasesGroupLayout = QGroupBox(QApplication.translate('Table','Phases'))
         phasesGroupLayout.setLayout(phasesLayout)
-        timeGroupLayout = QGroupBox(QApplication.translate("Table","Time"))
+        timeGroupLayout = QGroupBox(QApplication.translate('Table','Time'))
         timeGroupLayout.setLayout(timeLayout)
-        tempGroupLayout = QGroupBox(QApplication.translate("Table","BT"))
+        tempGroupLayout = QGroupBox(QApplication.translate('Table','BT'))
         tempGroupLayout.setLayout(tempLayout)
-        
+
         #main
         mainlayout = QVBoxLayout()
         mainlayout.addLayout(settingsHLayout)
@@ -178,63 +177,63 @@ class profileTransformatorDlg(ArtisanDialog):
         mainlayout.addWidget(tempGroupLayout)
         mainlayout.addStretch()
         mainlayout.addLayout(buttonsLayout)
-        
+
         self.setLayout(mainlayout)
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
 
         settings = QSettings()
-        if settings.contains("TransformatorPosition"):
-            self.move(settings.value("TransformatorPosition"))
-        
+        if settings.contains('TransformatorPosition'):
+            self.move(settings.value('TransformatorPosition'))
+
         mainlayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
 
     # utility functions
-    
+
     def forgroundOffset(self):
         if self.aw.qmc.timeindex[0] == -1:
             return 0
         return self.org_timex[self.aw.qmc.timeindex[0]]
-    
+
     def backgroundOffset(self):
         if self.aw.qmc.timeindexB[0] != -1 and len(self.aw.qmc.timeB) > self.aw.qmc.timeindexB[0]:
             return self.aw.qmc.timeB[self.aw.qmc.timeindexB[0]]
         return 0
-    
+
     def clearPhasesTargetTimes(self):
         for i in range(3):
             if self.phases_target_widgets_time[i] is not None:
-                self.phases_target_widgets_time[i].setText("")
-    
+                self.phases_target_widgets_time[i].setText('')
+
     def clearPhasesTargetPercent(self):
         for i in range(3):
             if self.phases_target_widgets_percent[i] is not None:
-                self.phases_target_widgets_percent[i].setText("")
-    
+                self.phases_target_widgets_percent[i].setText('')
+
     def clearPhasesResults(self):
         for i in range(3):
             if self.phases_result_widgets[i] is not None:
-                self.phases_result_widgets[i].setText("")
-    
+                self.phases_result_widgets[i].setText('')
+
     def clearTimeTargets(self):
         for i in range(4):
             if self.time_target_widgets[i] is not None:
-                self.time_target_widgets[i].setText("")
-    
+                self.time_target_widgets[i].setText('')
+
     def clearTimeResults(self):
         for i in range(4):
             if self.time_result_widgets[i] is not None:
-                self.time_result_widgets[i].setText("")
-    
+                self.time_result_widgets[i].setText('')
+
     def clearTempTargets(self):
         for i in range(5):
             if self.temp_target_widgets[i] is not None:
-                self.temp_target_widgets[i].setText("")
-    
+                self.temp_target_widgets[i].setText('')
+
     def clearTempResults(self):
         for i in range(5):
             if self.temp_result_widgets[i] is not None:
-                self.temp_result_widgets[i].setText("")
+                self.temp_result_widgets[i].setText('')
 
     # returns list of DRY, FCs, SCs and DROP profile times in seconds if event is set, otherwise None
     def getProfileTimes(self):
@@ -247,7 +246,7 @@ class profileTransformatorDlg(ArtisanDialog):
             else:
                 res.append(self.aw.qmc.timex[idx] - offset)
         return res
-        
+
     # returns list of CHARGE, DRY, FCs, SCs and DROP BT temperatures if event is set, otherwise None
     def getProfileTemps(self):
         res = []
@@ -260,7 +259,7 @@ class profileTransformatorDlg(ArtisanDialog):
             else:
                 res.append(None)
         return res
-    
+
     # returns list of DRYING, MAILARD, FINISHING target phases times in seconds as first result and phases percentages (float) as second result
     # if a phase is set not set None is returned instead of a value
     def getTargetPhases(self):
@@ -271,7 +270,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 r = None
                 if w is not None:
                     txt = w.text()
-                    if txt is not None and txt != "":
+                    if txt is not None and txt != '':
                         r = stringtoseconds(txt)
                 res_times.append(r)
         if self.phases_target_widgets_percent is not None:
@@ -279,7 +278,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 r = None
                 if w is not None:
                     txt = w.text()
-                    if txt is not None and txt != "":
+                    if txt is not None and txt != '':
                         r = float(txt)
                 res_phases.append(r)
         return res_times, res_phases
@@ -292,7 +291,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 r = None
                 if w is not None:
                     txt = w.text()
-                    if txt is not None and txt != "":
+                    if txt is not None and txt != '':
                         r = stringtoseconds(txt)
                 res.append(r)
         return res
@@ -305,14 +304,14 @@ class profileTransformatorDlg(ArtisanDialog):
                 r = None
                 if w is not None:
                     txt = w.text()
-                    if txt is not None and txt != "":
+                    if txt is not None and txt != '':
                         r = float(txt)
                 res.append(r)
         return res
 
 
     # message slots
-    
+
     @pyqtSlot(int)
     def changeMappingMode(self,i):
         self.aw.qmc.transMappingMode = i
@@ -323,9 +322,9 @@ class profileTransformatorDlg(ArtisanDialog):
     def phasesTableColumnHeaderClicked(self,i):
         if self.phases_target_widgets_time[i] is not None and self.phases_target_widgets_percent[i] is not None:
             # clear target value i
-            if self.phases_target_widgets_time[i].text() != "" or self.phases_target_widgets_percent[i].text() != "":
-                self.phases_target_widgets_time[i].setText("")
-                self.phases_target_widgets_percent[i].setText("")
+            if self.phases_target_widgets_time[i].text() != '' or self.phases_target_widgets_percent[i].text() != '':
+                self.phases_target_widgets_time[i].setText('')
+                self.phases_target_widgets_percent[i].setText('')
             elif self.aw.qmc.backgroundprofile is not None and self.aw.qmc.timeindexB[1]>0 and self.aw.qmc.timeindexB[2]>0 and self.aw.qmc.timeindexB[6]>0 and \
                     self.aw.qmc.timeindex[1]>0 and self.aw.qmc.timeindex[2]>0 and self.aw.qmc.timeindex[6]>0:
                 back_offset = self.backgroundOffset()
@@ -343,7 +342,7 @@ class profileTransformatorDlg(ArtisanDialog):
                     s = stringfromseconds(back_drop - back_fcs)
                 self.phases_target_widgets_time[i].setText(s)
             self.updateTimeResults()
-    
+
     @pyqtSlot(int)
     def phasesTableRowHeaderClicked(self,i):
         if i == 1: # row targets
@@ -357,8 +356,8 @@ class profileTransformatorDlg(ArtisanDialog):
     def timeTableColumnHeaderClicked(self,i):
         if self.time_target_widgets[i] is not None:
             # clear target value i
-            if self.time_target_widgets[i].text() != "":
-                self.time_target_widgets[i].setText("")
+            if self.time_target_widgets[i].text() != '':
+                self.time_target_widgets[i].setText('')
                 self.updateTimeResults()
             elif self.aw.qmc.backgroundprofile is not None:
                 timeidx = [1,2,4,6][i]
@@ -377,39 +376,39 @@ class profileTransformatorDlg(ArtisanDialog):
     def tempTableColumnHeaderClicked(self,i):
         if self.temp_target_widgets[i] is not None:
             # clear target value i
-            if self.temp_target_widgets[i].text() != "":
-                self.temp_target_widgets[i].setText("")
+            if self.temp_target_widgets[i].text() != '':
+                self.temp_target_widgets[i].setText('')
                 self.updateTempResults()
             elif self.aw.qmc.backgroundprofile is not None:
                 timeidx = [0,1,2,4,6][i]
                 if self.aw.qmc.timeindexB[timeidx] > 0:
                     self.temp_target_widgets[i].setText(str(self.aw.float2float(self.aw.qmc.temp2B[self.aw.qmc.timeindexB[timeidx]])))
                     self.updateTempResults()
-    
+
     @pyqtSlot(int)
     def tempTableRowHeaderClicked(self,i):
         if i == 1: # row targets
             self.clearTempTargets()
             self.clearTempResults()
-    
+
     @pyqtSlot()
     def updatePhasesWidget(self):
         self.clearTimeTargets()
         sender = self.sender()
         # clear corresponding time target if percentage target is set, or the otherway around
-        if sender.text() != "":
+        if sender.text() != '':
             try:
                 time_idx = self.phases_target_widgets_time.index(sender)
-                self.phases_target_widgets_percent[time_idx].setText("")
+                self.phases_target_widgets_percent[time_idx].setText('')
             except Exception: # pylint: disable=broad-except
                 pass
             try:
                 percent_idx = self.phases_target_widgets_percent.index(sender)
-                self.phases_target_widgets_time[percent_idx].setText("")
+                self.phases_target_widgets_time[percent_idx].setText('')
             except Exception: # pylint: disable=broad-except
                 pass
         self.updateTimeResults()
-    
+
     @pyqtSlot()
     def updateTimesWidget(self):
         self.clearPhasesTargetTimes()
@@ -436,7 +435,7 @@ class profileTransformatorDlg(ArtisanDialog):
             for i in range(4):
                 if self.time_result_widgets[i] is not None:
                     if result_times[i] is None:
-                        s = ""
+                        s = ''
                     else:
                         s = stringfromseconds(result_times[i],leadingzero=False)
                     self.time_result_widgets[i].setText(s)
@@ -447,24 +446,24 @@ class profileTransformatorDlg(ArtisanDialog):
                 drying_period = result_times[0]
                 drying_percentage = 100 * drying_period / result_times[3]
                 drying_str = \
-                        "{}    {}%".format(stringfromseconds(drying_period,leadingzero=False),self.aw.float2float(drying_percentage))
+                        f'{stringfromseconds(drying_period,leadingzero=False)}    {self.aw.float2float(drying_percentage)}%'
                 self.phases_result_widgets[0].setText(drying_str)
                 # MAILARD
                 mailard_period = result_times[1] - result_times[0]
                 mailard_percentage = 100 * mailard_period / result_times[3]
                 mailard_str = \
-                        "{}    {}%".format(stringfromseconds(mailard_period,leadingzero=False),self.aw.float2float(mailard_percentage))
+                        f'{stringfromseconds(mailard_period,leadingzero=False)}    {self.aw.float2float(mailard_percentage)}%'
                 self.phases_result_widgets[1].setText(mailard_str)
                 # FINISHING
                 finishing_period = result_times[3] - result_times[1]
                 finishing_percentage = 100 * finishing_period / result_times[3]
                 finishing_str = \
-                        "{}    {}%".format(stringfromseconds(finishing_period,leadingzero=False),self.aw.float2float(finishing_percentage))
+                        f'{stringfromseconds(finishing_period,leadingzero=False)}    {self.aw.float2float(finishing_percentage)}%'
                 self.phases_result_widgets[2].setText(finishing_str)
             else:
                 for w in self.phases_result_widgets:
                     if w is not None:
-                        w.setText("")
+                        w.setText('')
 
     @pyqtSlot()
     def updateTempResults(self):
@@ -479,7 +478,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 if self.temp_result_widgets[i] is not None and result_temps[i] is not None:
                     self.temp_result_widgets[i].setText(str(self.aw.float2float(result_temps[i])) + self.aw.qmc.mode)
             if fit is None:
-                s = ""
+                s = ''
             elif isinstance(fit,str):
                 s = fit
             else:
@@ -507,7 +506,7 @@ class profileTransformatorDlg(ArtisanDialog):
             self.aw.qmc.redraw()
         else:
             self.restore()
-    
+
     #called from Restore button
     @pyqtSlot(bool)
     def restore(self,_=False):
@@ -528,14 +527,14 @@ class profileTransformatorDlg(ArtisanDialog):
         self.aw.qmc.temp2 = self.org_temp2[:]
         self.aw.autoAdjustAxis()
         self.aw.qmc.redraw()
-    
+
     #called from OK button
     @pyqtSlot()
     def applyTransformations(self):
         self.apply()
         #save window position (only; not size!)
         settings = QSettings()
-        settings.setValue("TransformatorPosition",self.frameGeometry().topLeft())
+        settings.setValue('TransformatorPosition',self.frameGeometry().topLeft())
         self.accept()
 
     #called from Cancel button
@@ -545,7 +544,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.aw.qmc.transMappingMode = self.org_transMappingMode
         #save window position (only; not size!)
         settings = QSettings()
-        settings.setValue("TransformatorPosition",self.geometry().topLeft())
+        settings.setValue('TransformatorPosition',self.geometry().topLeft())
         self.closeHelp()
         self.reject()
 
@@ -555,7 +554,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
-                QApplication.translate("Form Caption","Profile Transposer Help"),
+                QApplication.translate('Form Caption','Profile Transposer Help'),
                 transposer_help.content())
 
     def closeHelp(self):
@@ -611,13 +610,13 @@ class profileTransformatorDlg(ArtisanDialog):
             if len(active_fits) > 0 and len(active_fits) < 3:
                 fit = self.aw.fit2str(fits[0])
             else:
-                formula = ""
+                formula = ''
                 last_target = None
                 for f,tpl in reversed(active_fits[:-1]):
                     if last_target is None:
                         formula = self.aw.fit2str(f)
                     else:
-                        formula = "({} if x<{} else {})".format(self.aw.fit2str(f), last_target, formula)
+                        formula = f'({self.aw.fit2str(f)} if x<{last_target} else {formula})'
                     last_target = tpl[1]
                 fit = formula
         else:
@@ -636,7 +635,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 except Exception: # pylint: disable=broad-except
                     pass
         return res,fit
-    
+
     # returns target times based on the phases target
     def getTargetPhasesTimes(self):
         # get the offset
@@ -649,31 +648,31 @@ class profileTransformatorDlg(ArtisanDialog):
         dry_set = False
         drop_set = False
         fcs_set = False
-        
+
         # first determine the target DROP time (relative to the profile drop) if any
-        if self.phases_target_widgets_time[2] is not None and self.phases_target_widgets_time[2].text() != "":
+        if self.phases_target_widgets_time[2] is not None and self.phases_target_widgets_time[2].text() != '':
             drop = fcs + stringtoseconds(self.phases_target_widgets_time[2].text())
             drop_set = True
-        elif self.phases_target_widgets_percent[2] is not None and self.phases_target_widgets_percent[2].text() != "":
+        elif self.phases_target_widgets_percent[2] is not None and self.phases_target_widgets_percent[2].text() != '':
             drop = fcs + (float(self.phases_target_widgets_percent[2].text()) * drop / 100)
             drop_set = True
-        
+
         # determine the target DRY time (relative to the target drop of above) if any
-        if self.phases_target_widgets_time[0] is not None and self.phases_target_widgets_time[0].text() != "":
+        if self.phases_target_widgets_time[0] is not None and self.phases_target_widgets_time[0].text() != '':
             dry = stringtoseconds(self.phases_target_widgets_time[0].text())
             dry_set = True
-        elif self.phases_target_widgets_percent[0] is not None and self.phases_target_widgets_percent[0].text() != "":
+        elif self.phases_target_widgets_percent[0] is not None and self.phases_target_widgets_percent[0].text() != '':
             dry = float(self.phases_target_widgets_percent[0].text()) * drop / 100
             dry_set = True
-        
+
         # determine the target FCs time (relative to the target drop of above) if any
-        if self.phases_target_widgets_time[1] is not None and self.phases_target_widgets_time[1].text() != "":
+        if self.phases_target_widgets_time[1] is not None and self.phases_target_widgets_time[1].text() != '':
             fcs = dry + stringtoseconds(self.phases_target_widgets_time[1].text())
             fcs_set = True
-        elif self.phases_target_widgets_percent[1] is not None and self.phases_target_widgets_percent[1].text() != "":
+        elif self.phases_target_widgets_percent[1] is not None and self.phases_target_widgets_percent[1].text() != '':
             fcs = dry + (float(self.phases_target_widgets_percent[1].text()) * drop / 100)
             fcs_set = True
-            
+
 #        return [(dry if dry_set else None),(fcs if fcs_set else None), None, (drop if drop_set else None)]
         # set all unset target times to the profile times
         return [
@@ -725,7 +724,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 return None
         else:
             return None
-    
+
     # returns a list of segment-wise fits between sources and targets
     # each fit is a numpy.array as returned by numpy.polyfit
     # a source element of None generates None as fit
@@ -792,7 +791,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 fit = numpy.poly1d(fits[j]) # fit to be applied
                 res_timex.append(fit(timex[i] - offset)+new_offset)
         return res_timex
-    
+
     # returns False if no transformation was applied
     def applyTimeTransformation(self):
         # first update the targets
@@ -844,7 +843,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 except numpy.RankWarning:
                     pass
         return True
-    
+
     # returns False if no transformation was applied
     def applyTempTransformation(self):
         # first update the targets
@@ -869,7 +868,7 @@ class profileTransformatorDlg(ArtisanDialog):
                     j = 2 # after FCs
                 elif self.aw.qmc.timeindex[1] > 0 and i >= self.aw.qmc.timeindex[1]:
                     j = 1 # after DRY
-                
+
                 tp = self.org_temp2[i]
                 if tp is None or tp == -1 or fits[j] is None:
                     self.aw.qmc.temp2.append(tp)
@@ -887,12 +886,12 @@ class profileTransformatorDlg(ArtisanDialog):
             except numpy.RankWarning:
                 pass
         return True
-    
+
     # tables
-    
+
     def createPhasesTable(self):
-    
-        self.phasestable.setStyleSheet("QTableView { background-color: red); }")
+
+        self.phasestable.setStyleSheet('QTableView { background-color: red); }')
 
         self.phasestable.setRowCount(3)
         self.phasestable.setColumnCount(3)
@@ -900,22 +899,22 @@ class profileTransformatorDlg(ArtisanDialog):
         self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         self.timetable.horizontalHeader().setHighlightSections(False)
-        self.phasestable.setHorizontalHeaderLabels([QApplication.translate("Label","Drying"),
-                                                         QApplication.translate("Label","Maillard"),
-                                                         QApplication.translate("Label","Finishing")])
-        self.phasestable.setVerticalHeaderLabels([QApplication.translate("Table","Profile"),
-                                                         QApplication.translate("Table","Target"),
-                                                         QApplication.translate("Table","Result")])
+        self.phasestable.setHorizontalHeaderLabels([QApplication.translate('Label','Drying'),
+                                                         QApplication.translate('Label','Maillard'),
+                                                         QApplication.translate('Label','Finishing')])
+        self.phasestable.setVerticalHeaderLabels([QApplication.translate('Table','Profile'),
+                                                         QApplication.translate('Table','Target'),
+                                                         QApplication.translate('Table','Result')])
         self.phasestable.setShowGrid(True)
         self.phasestable.setAlternatingRowColors(True)
         self.phasestable.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.phasestable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 #        self.phasestable.setFrameStyle(QTableWidget.NoFrame)
         self.phasestable.setFixedSize(
-            self.phasestable.horizontalHeader().length() + 
+            self.phasestable.horizontalHeader().length() +
 #                self.phasestable.verticalHeader().width(), # only the width of the default labels (numbers)
                 self.phasestable.verticalHeader().sizeHint().width(),
-            self.phasestable.verticalHeader().length() + 
+            self.phasestable.verticalHeader().length() +
                 self.phasestable.horizontalHeader().height())
         self.phasestable.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.phasestable.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -927,7 +926,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.phases_target_widgets_time = []
         self.phases_target_widgets_percent = []
         self.phases_result_widgets = []
-        
+
         profilePhasesTimes = [None]*3 # DRYING, MAILARD, FINISHING
         profilePhasesPercentages = [None] * 3
         #
@@ -946,19 +945,19 @@ class profileTransformatorDlg(ArtisanDialog):
         for i in range(3):
             if len(profilePhasesTimes) > i and profilePhasesTimes[i] is not None:
                 profile_phases_time_str = \
-                    "{}    {}%".format(stringfromseconds(profilePhasesTimes[i],leadingzero=False),self.aw.float2float(profilePhasesPercentages[i]))
+                    f'{stringfromseconds(profilePhasesTimes[i],leadingzero=False)}    {self.aw.float2float(profilePhasesPercentages[i])}%'
                 profile_phases_widget = QTableWidgetItem(profile_phases_time_str)
                 profile_phases_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.phasestable.setItem(0,i,profile_phases_widget)
                 #
-                target_widget_time = QLineEdit("")
+                target_widget_time = QLineEdit('')
                 target_widget_time.setValidator(QRegularExpressionValidator(self.regextime))
                 target_widget_time.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 if phases_enabled:
                     target_widget_time.editingFinished.connect(self.updatePhasesWidget)
                 else:
                     target_widget_time.setEnabled(False)
-                target_widget_percent = QLineEdit("")
+                target_widget_percent = QLineEdit('')
                 target_widget_percent.setValidator(QRegularExpressionValidator(self.regexpercent))
                 target_widget_percent.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 if phases_enabled:
@@ -974,7 +973,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 target_cell_widget.setLayout(target_cell_layout)
                 self.phasestable.setCellWidget(1,i,target_cell_widget)
                 #
-                result_widget = QTableWidgetItem("")
+                result_widget = QTableWidgetItem('')
                 result_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.phasestable.setItem(2,i,result_widget)
             else:
@@ -993,23 +992,23 @@ class profileTransformatorDlg(ArtisanDialog):
         self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         self.timetable.horizontalHeader().setHighlightSections(False)
-        self.timetable.setHorizontalHeaderLabels([QApplication.translate("Label","DRY END"),
-                                                         QApplication.translate("Label","FC START"),
-                                                         QApplication.translate("Label","SC START"),
-                                                         QApplication.translate("Label","DROP")])
-        self.timetable.setVerticalHeaderLabels([QApplication.translate("Table","Profile"),
-                                                         QApplication.translate("Table","Target"),
-                                                         QApplication.translate("Table","Result")])
+        self.timetable.setHorizontalHeaderLabels([QApplication.translate('Label','DRY END'),
+                                                         QApplication.translate('Label','FC START'),
+                                                         QApplication.translate('Label','SC START'),
+                                                         QApplication.translate('Label','DROP')])
+        self.timetable.setVerticalHeaderLabels([QApplication.translate('Table','Profile'),
+                                                         QApplication.translate('Table','Target'),
+                                                         QApplication.translate('Table','Result')])
         self.timetable.setShowGrid(True)
         self.timetable.setAlternatingRowColors(False)
         self.timetable.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.timetable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.timetable.setFrameStyle(QFrame.Shape.NoFrame)
         self.timetable.setFixedSize(
-            self.timetable.horizontalHeader().length() + 
+            self.timetable.horizontalHeader().length() +
 #                self.timetable.verticalHeader().width(), # only the width of the default labels (numbers)
                 self.timetable.verticalHeader().sizeHint().width(),
-            self.timetable.verticalHeader().length() + 
+            self.timetable.verticalHeader().length() +
                 self.timetable.horizontalHeader().height())
         self.timetable.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.timetable.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -1018,10 +1017,10 @@ class profileTransformatorDlg(ArtisanDialog):
 #        self.timetable.setStyleSheet("QTableWidget { background-color: #fafafa; }")
         self.timetable.verticalHeader().sectionClicked.connect(self.timeTableRowHeaderClicked)
         self.timetable.horizontalHeader().sectionClicked.connect(self.timeTableColumnHeaderClicked)
-        
+
         self.time_target_widgets = []
         self.time_result_widgets = []
-        
+
         for i in range(4):
             if len(self.profileTimes) > i and not self.profileTimes[i] is None:
                 profile_time_str = stringfromseconds(self.profileTimes[i],leadingzero=False)
@@ -1029,7 +1028,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 profile_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.timetable.setItem(0,i,profile_widget)
                 #
-                target_widget = QLineEdit("")
+                target_widget = QLineEdit('')
                 target_widget.setValidator(QRegularExpressionValidator(self.regextime))
                 target_widget.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 target_widget.editingFinished.connect(self.updateTimesWidget)
@@ -1041,7 +1040,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 target_cell_widget.setLayout(target_cell_layout)
                 self.timetable.setCellWidget(1,i,target_cell_widget)
                 #
-                result_widget = QTableWidgetItem("") #profile_time_str)
+                result_widget = QTableWidgetItem('') #profile_time_str)
                 result_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.timetable.setItem(2,i,result_widget)
             else:
@@ -1057,24 +1056,24 @@ class profileTransformatorDlg(ArtisanDialog):
         self.temptable.horizontalHeader().setStretchLastSection(False)
         self.temptable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         self.temptable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
-        self.temptable.setHorizontalHeaderLabels([QApplication.translate("Label","CHARGE"),
-                                                         QApplication.translate("Label","DRY END"),
-                                                         QApplication.translate("Label","FC START"),
-                                                         QApplication.translate("Label","SC START"),
-                                                         QApplication.translate("Label","DROP")])
-        self.temptable.setVerticalHeaderLabels([QApplication.translate("Table","Profile"),
-                                                         QApplication.translate("Table","Target"),
-                                                         QApplication.translate("Table","Result")])
+        self.temptable.setHorizontalHeaderLabels([QApplication.translate('Label','CHARGE'),
+                                                         QApplication.translate('Label','DRY END'),
+                                                         QApplication.translate('Label','FC START'),
+                                                         QApplication.translate('Label','SC START'),
+                                                         QApplication.translate('Label','DROP')])
+        self.temptable.setVerticalHeaderLabels([QApplication.translate('Table','Profile'),
+                                                         QApplication.translate('Table','Target'),
+                                                         QApplication.translate('Table','Result')])
         self.temptable.setShowGrid(True)
         self.temptable.setAlternatingRowColors(False)
         self.temptable.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.temptable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 #        self.temptable.setFrameStyle(QTableWidget.NoFrame)
         self.temptable.setFixedSize(
-            self.temptable.horizontalHeader().length() + 
+            self.temptable.horizontalHeader().length() +
 #                self.temptable.verticalHeader().width(), # only the width of the default labels (numbers)
                 self.temptable.verticalHeader().sizeHint().width(),
-            self.temptable.verticalHeader().length() + 
+            self.temptable.verticalHeader().length() +
                 self.temptable.horizontalHeader().height())
         self.temptable.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.temptable.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -1082,10 +1081,10 @@ class profileTransformatorDlg(ArtisanDialog):
         self.temptable.setAutoScroll(False)
         self.temptable.verticalHeader().sectionClicked.connect(self.tempTableRowHeaderClicked)
         self.temptable.horizontalHeader().sectionClicked.connect(self.tempTableColumnHeaderClicked)
-        
+
         self.temp_target_widgets = []
         self.temp_result_widgets = []
-        
+
         for i in range(5):
             if len(self.profileTemps) > i and self.profileTemps[i] is not None:
                 profile_temp_str = str(self.aw.float2float(self.profileTemps[i])) + self.aw.qmc.mode
@@ -1093,11 +1092,11 @@ class profileTransformatorDlg(ArtisanDialog):
                 profile_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.temptable.setItem(0,i,profile_widget)
                 #
-                target_widget = QLineEdit("")
+                target_widget = QLineEdit('')
                 target_widget.setValidator(QRegularExpressionValidator(self.regextemp))
                 target_widget.editingFinished.connect(self.updateTempResults)
                 target_widget.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
-                
+
                 target_cell_widget = QWidget()
                 target_cell_layout = QHBoxLayout(target_cell_widget)
                 target_cell_layout.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
@@ -1107,7 +1106,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 target_cell_widget.setLayout(target_cell_layout)
                 self.temptable.setCellWidget(1,i,target_cell_widget)
                 #
-                result_widget = QTableWidgetItem("")
+                result_widget = QTableWidgetItem('')
                 result_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.temptable.setItem(2,i,result_widget)
             else:
