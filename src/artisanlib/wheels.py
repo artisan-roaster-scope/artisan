@@ -79,7 +79,7 @@ class WheelDlg(ArtisanDialog):
         txtButtonminus.clicked.connect(self.changetext0)
         edgelabel = QLabel(QApplication.translate('Label','Edge'))
         self.edgeSpinBox = QSpinBox()
-        self.edgeSpinBox.setToolTip(QApplication.translate('Tooltip','Decorative edge beween wheels'))
+        self.edgeSpinBox.setToolTip(QApplication.translate('Tooltip','Decorative edge between wheels'))
         self.edgeSpinBox.setRange(0,5)
         self.edgeSpinBox.setValue(int(self.aw.qmc.wheeledge*100))
         self.edgeSpinBox.valueChanged.connect(self.setedge)
@@ -332,7 +332,7 @@ class WheelDlg(ArtisanDialog):
             self.aw.qmc.segmentlengths[x][u] = newwidth
             self.aw.qmc.drawWheel()
 
-    #input: z = index of parent in previus wheel; x = wheel number; i = index of element in wheel
+    #input: z = index of parent in previous wheel; x = wheel number; i = index of element in wheel
     @pyqtSlot(int)
     def setwheelchild(self,z):
         i = self.aw.findWidgetsRow(self.labeltable,self.sender(),1)
@@ -542,7 +542,7 @@ class WheelDlg(ArtisanDialog):
             self.aw.qmc.projection[x] = projectionComboBox.currentIndex()
             self.aw.qmc.drawWheel()
 
-    #chages text size in wheel with index x
+    #changes text size in wheel with index x
     @pyqtSlot(int)
     def setTextsizeX(self,_):
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),7)

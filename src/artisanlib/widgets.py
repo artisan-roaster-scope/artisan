@@ -314,7 +314,7 @@ class AnimatedMajorEventPushButton(MajorEventPushButton):
 
         # we make the dark animation color slightly darker than the background:
         anim_dark_color = QColor(background_color).lighter(80)
-        # and the ligher
+        # and the lighter
         anim_light_color = QColor(anim_dark_color).lighter(180)
         # we reduce the staturation slightly:
         anim_light_color = QColor.fromHsv(

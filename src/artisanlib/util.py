@@ -107,7 +107,7 @@ def stringfromseconds(seconds_raw, leadingzero=True):
         if leadingzero:
             return '%02d:%02d'% divmod(seconds, 60)
         return ('%d:%02d'% divmod(seconds, 60))
-    #usually the timex[timeindex[0]] is alreday taken away in seconds before calling stringfromseconds()
+    #usually the timex[timeindex[0]] is already taken away in seconds before calling stringfromseconds()
     negtime = abs(seconds)
     if leadingzero:
         return f'-{("%02d:%02d"% divmod(negtime, 60))}'
@@ -215,7 +215,7 @@ def removeAll(l,s):
 # [1, 2, 3, -1, -1, -1, 10, 11] => [1, 2, 3, 4.75, 6.5, 8.25, 11]
 # [1,2,3,-1,-1,-1,-1] => [1,2,3,-1,-1,-1,-1] # no final value to interpolate too, so trailing -1 are kept!
 # [-1,-1,2] => [2, 2, 2] # a prefix of -1 of max length 'interpolate_max' will be replaced by the first value in l that is not -1
-# INVARIANT: the resulting list has always the same lenght as l
+# INVARIANT: the resulting list has always the same length as l
 # only gaps of length interpolate_max (should be set to the global aw.qmc.interpolatemax), if not None, are interpolated
 def fill_gaps(l, interpolate_max=3):
     res = []

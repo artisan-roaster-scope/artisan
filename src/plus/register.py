@@ -67,7 +67,7 @@ def addPathShelve(uuid: str, path: str, fh) -> None:
             # in case we couldn't open the shelve file as  "shelve.open
             # db type could not be determined" remove all files name
             # uuid_cache_path with any extension as we do not know which
-            # extension is choosen by shelve
+            # extension is chosen by shelve
             _log.info(
                 'clean uuid cache %s', str(uuid_cache_path)
             )
@@ -79,7 +79,7 @@ def addPathShelve(uuid: str, path: str, fh) -> None:
                 if str(p) != uuid_cache_path_lock:
                     # if not the lock file, delete:
                     p.unlink()
-            # try again to acccess/create the shelve file
+            # try again to access/create the shelve file
             with shelve.open(uuid_cache_path) as db:
                 db[uuid] = str(path)
             _log.info(

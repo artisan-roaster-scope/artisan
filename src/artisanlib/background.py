@@ -764,7 +764,7 @@ class backgroundDlg(ArtisanResizeablDialog):
                 self.datatable.setItem(i,3,deltaET)
                 self.datatable.setItem(i,4,deltaBT)
 
-                if xtcurve and len(self.aw.qmc.temp1BX[n3]) > i: # an XT column is availble, fill it with data
+                if xtcurve and len(self.aw.qmc.temp1BX[n3]) > i: # an XT column is available, fill it with data
                     if self.aw.qmc.xtcurveidx % 2:
                         XT = QTableWidgetItem('%.0f'%self.aw.qmc.temp1BX[n3][i])
                     else:
@@ -772,7 +772,7 @@ class backgroundDlg(ArtisanResizeablDialog):
                     XT.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
                     self.datatable.setItem(i,5,XT)
 
-                if ytcurve and len(self.aw.qmc.temp1BX[n4]) > i: # an YT column is availble, fill it with data
+                if ytcurve and len(self.aw.qmc.temp1BX[n4]) > i: # an YT column is available, fill it with data
                     if self.aw.qmc.ytcurveidx % 2:
                         YT = QTableWidgetItem('%.0f'%self.aw.qmc.temp1BX[n4][i])
                     else:

@@ -120,7 +120,8 @@ def generateRows(ws):
         all_rows.append(this_row)
     return all_rows
 
-def getTitle(all_rows,ws,nsheet):
+def getTitle(all_rows,_,nsheet):
+    del _
     if nsheet == 0:
         title = nlind + 'strlist.append("<b>")'
     else:
@@ -156,7 +157,6 @@ def getFieldnames(rows,tbl_name):
 
 def getAddrows(all_rows,tbl_name):
     addrows = ''
-    tbl = ''
     for idx in range(len(all_rows)):
         this_row = ','.join(all_rows[idx])
         if idx > 0:
@@ -270,7 +270,8 @@ def writepyFile(fname_in, fname_out):
     outfile.close()
 
 
-def writehtmlFile(fname_in, fname_out, fname_htm):
+def writehtmlFile(_fname_in, fname_out, fname_htm):
+    del _fname_in
     importfile = splitext(split(fname_out)[1])[0]
     importpath = abspath(split(fname_out)[0])
     sys.path.append(importpath)

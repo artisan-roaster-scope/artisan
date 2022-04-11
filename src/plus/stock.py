@@ -680,7 +680,7 @@ def getCoffeeStore(coffeeId, storeId, acquire_lock=True):
 #   coffeeLabelDict: { <CoffeeId>:<CoffeeLabel> } # with <CoffeeLabel>
 #        a longer description like "Brazil Santos, 11.5%"
 #   replacementBlends: [(maxAmount, replacementBlendDict), ...,
-#        (maxAmount, replacementBlendDict)]  # list orderd by maxAmount
+#        (maxAmount, replacementBlendDict)]  # list ordered by maxAmount
 #   replacementBlendDict: same format as blendDict, but without any
 #        "replace_coffee" entries in ingredients element
 
@@ -940,7 +940,7 @@ def blend2beans(blend, weight_unit_idx, weightIn=0):
 #        or <blendLabel,[blendDict,stockDict,maxAmount,coffeeLabelDict,
 #            replaceMaxAmount,replacementBlends]>
 #       for blends with replacement coffees defined
-# customBlend is an extra locally defined blend that get's added to the result if it has a non-empty ingredients list
+# customBlend is an extra locally defined blend that gets added to the result if it has a non-empty ingredients list
 #    it is a dict of the form { 'hr_id': '', 'label': <some string>, 'ingredients': [ {'ratio':<num>, 'coffee':<hr_id_str>},...] }
 def getBlends(weight_unit_idx, store=None, customBlend=None):
     _log.debug('getBlends(%s,%s)', weight_unit_idx, store)

@@ -701,7 +701,7 @@ class FujiPID():
             return self.aw.fujipid.PXF['runstandby'][0]
         return None
 
-    #sets a new sv value (if slient=False, no output nor event recording is done, if move is True the SV slider is moved)
+    #sets a new sv value (if silent=False, no output nor event recording is done, if move is True the SV slider is moved)
     def setsv(self,value,silent=False,move=True):
         command = ''
         #Fuji PXG / PXF
@@ -873,7 +873,7 @@ class FujiPID():
             for i in range(4-n):
                 #last temperature
                 lasttemp = segments[-1].split('::')[1]
-                #create a string with 4 segments ("SETRS" alredy removed)
+                #create a string with 4 segments ("SETRS" already removed)
                 string = '::' + lasttemp + '::0::0'   #add zero ramp time and zero soak time
                 segments.append(string)
         rs = []
@@ -1012,7 +1012,7 @@ class FujiPID():
 
     @staticmethod
     def dec2HexRaw(decimal):
-        # This method converts a decimal to a raw string appropiate for Fuji serial TX
+        # This method converts a decimal to a raw string appropriate for Fuji serial TX
         # Used to compose serial messages
         Nbytes = []
         while decimal:
@@ -1041,7 +1041,7 @@ class FujiPID():
         crc16int = self.fujiCrc16(datastring)
         #convert crc16 to hex string to change the order of the 2 bytes from AB.CD to CD.AB to match Fuji requirements
         crc16hex= hex(crc16int)[2:]
-        #we need 4 chars but sometimes we get only three or two because of abreviations by hex(). Therefore, add "0" if needed.
+        #we need 4 chars but sometimes we get only three or two because of abbreviations by hex(). Therefore, add "0" if needed.
         ll = 4 - len(crc16hex)
         pad =['','0','00','000']
         crc16hex = pad[ll] + crc16hex
@@ -1054,7 +1054,7 @@ class FujiPID():
 
     #input string command. Output integer (not binary string); used for example to read temperature or to obtain the value of a variable
     def readoneword(self,command):
-        #takes an already formated command to read 1 word data and returns the response from the pid
+        #takes an already formatted command to read 1 word data and returns the response from the pid
         #SEND command and RECEIVE 7 bytes back
         r = self.aw.ser.sendFUJIcommand(command,7)
         if len(r) == 7:
@@ -1463,7 +1463,7 @@ class PIDcontrol():
                 self.sv_decay_weights = numpy.arange(1,self.sv_smoothing_factor+1)
             # add new value
             self.previous_svs.append(sv)
-            # throw away superflous values
+            # throw away superfluous values
             self.previous_svs = self.previous_svs[-self.sv_smoothing_factor:]
             # compute smoothed output
             if len(self.previous_svs) < self.sv_smoothing_factor:

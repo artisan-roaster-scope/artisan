@@ -34,7 +34,7 @@ import logging
 _log: Final = logging.getLogger(__name__)
 
 # given a profile dictionary extract key parameters to populate a Roast element
-# backgrund=True if the bp is holding a background profile (ambientTemp, AUCbase not converted to current temp mode)
+# background=True if the bp is holding a background profile (ambientTemp, AUCbase not converted to current temp mode)
 def getTemplate(bp: dict[str, Any],background=False) -> dict[str, Any]:
     _log.debug('getTemplate()')
     d: dict[str, Any] = {}
@@ -337,7 +337,7 @@ def getRoast() -> dict[str, Any]:
             d[
                 'coffee'
             ] = None
-            # we neeed to explicitly add empty selections otherwise
+            # we need to explicitly add empty selections otherwise
             # the coffee cannot be deleted from the online record
         if aw.qmc.plus_blend_spec and aw.qmc.plus_coffee is None:
             d['blend'] = trimBlendSpec(aw.qmc.plus_blend_spec)
@@ -345,7 +345,7 @@ def getRoast() -> dict[str, Any]:
             d[
                 'blend'
             ] = None
-            # we neeed to explicitly add empty selections otherwise
+            # we need to explicitly add empty selections otherwise
             # the coffee cannot be deleted from the online record
 
         # ensure that location is None if neither coffee nor blend is set

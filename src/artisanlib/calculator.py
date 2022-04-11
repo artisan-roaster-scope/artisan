@@ -135,7 +135,7 @@ class calculatorDlg(ArtisanDialog):
         for e in [self.groundsEdit, self.coffeeEdit, self.tdsEdit]:
             e.editingFinished.connect(self.calculateYield)
         #LAYOUTS
-        #Rate of chage
+        #Rate of change
         calrcLayout = QGridLayout()
         calrcLayout.addWidget(startlabel,0,0)
         calrcLayout.addWidget(endlabel,0,1)

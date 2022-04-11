@@ -240,7 +240,7 @@ class NotificationManager(QObject):
     def enableNotifications(self):
         self.notifications_enabled = True
 
-    # if notfications are disabled, incoming notifications are just ignore
+    # if notifications are disabled, incoming notifications are just ignore
     def disableNotifications(self):
         self.notifications_enabled = False
 

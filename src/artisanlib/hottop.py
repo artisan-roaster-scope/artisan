@@ -199,7 +199,7 @@ def sendControl(p,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOT
             p.reset_output_buffer()
             p.write(cmd)
     except Exception as e: # pylint: disable=broad-except
-        _log.exeption(e)
+        _log.exception(e)
 
 # prefers set_value, and returns get_value if set_value is -1. If both are -1, returns 0
 def newValue(set_value,get_value):

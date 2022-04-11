@@ -118,7 +118,7 @@ class modbusport():
 
         # retries
         self.readRetries = 0
-        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
+        #default initial settings. They are changed by settingsload() at initiation of program according to the device chosen
         self.comport = 'COM5'      #NOTE: this string should not be translated.
         self.baudrate = 115200
         self.bytesize = 8
@@ -179,7 +179,7 @@ class modbusport():
 
         self.commError = False # True after a communication error was detected and not yet cleared by receiving proper data
 
-    # this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec) on serial connections
+    # this guarantees a minimum of 30 milliseconds between readings and 80ms between writes (according to the Modbus spec) on serial connections
     # this sleep delays between requests seems to be beneficial on slow RTU serial connections like those of the FZ-94
     def sleepBetween(self,write=False):
         if write:
@@ -212,7 +212,7 @@ class modbusport():
             _log.exception(e)
         self.master = None
 
-    # t a duration between start and end time in seconds to be formated in a string as ms
+    # t a duration between start and end time in seconds to be formatted in a string as ms
     @staticmethod
     def formatMS(start, end):
         return f'{(end-start)*1000:.1f}'
@@ -382,7 +382,7 @@ class modbusport():
                         count = seq[1]-seq[0] + 1
                         res = None
                         if just_send:
-                            self.sleepBetween() # we start with a sleep, as it could be that just a send command happend before the semaphore was catched
+                            self.sleepBetween() # we start with a sleep, as it could be that just a send command happened before the semaphore was caught
                         just_send = True
                         tx = time.time()
                         while True:

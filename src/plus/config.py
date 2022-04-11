@@ -42,7 +42,7 @@ app_name: Final = 'artisan.plus'
 profile_ext: Final = 'alog'
 uuid_tag: Final = 'roastUUID'
 
-# Serivce URLs
+# Service URLs
 
 # # LOCAL SETUP
 #api_base_url         = 'https://localhost:62602/api/v1'
@@ -110,11 +110,11 @@ uuid_cache: Final = 'uuids'
 # ArtisanViewer app, protected by a filelock
 account_cache: Final = 'account'
 
-# the account nr locally assocated to the current account, or None
+# the account nr locally associated to the current account, or None
 account_nr: Optional[int] = None
 
 # the sync register that associates UUIDs with last known modification dates
-# modified_at for profiles uploaded/synced automatially
+# modified_at for profiles uploaded/synced automatically
 # Note: the sync_cache file is shared between the main Artisan and the
 # ArtisanViewer app, protected by a filelock
 sync_cache: Final = 'sync'

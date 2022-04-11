@@ -163,7 +163,7 @@ class PID_DlgControl(ArtisanDialog):
         pidVBox.addLayout(pidSetBox)
         pidVBox.setAlignment(pidSetBox,Qt.AlignmentFlag.AlignRight)
 
-        #PID target (only shown if interal PID for hottop/modbus/TC4 is active
+        #PID target (only shown if internal PID for hottop/modbus/TC4 is active
         controlItems = ['None',self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3)]
         #positiveControl
         positiveControlLabel = QLabel(QApplication.translate('Label','Positive'))
@@ -1150,7 +1150,7 @@ class PXRpidDlgControl(PXpidDlgControl):
         self.setModal(True)
         #self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose) # default is True and this is set already in ArtisanDialog by default
         self.setWindowTitle(QApplication.translate('Form Caption','Fuji PXR PID Control'))
-        #create Ramp Soak control button colums
+        #create Ramp Soak control button columns
         self.labelrs1 = QLabel()
         self.labelrs1.setContentsMargins(5,5,5,5)
         self.labelrs1.setStyleSheet("background-color:'#CCCCCC';")
@@ -1327,7 +1327,7 @@ class PXRpidDlgControl(PXpidDlgControl):
         buttonRampSoakLayout2 = QVBoxLayout()
         tab3layout = QGridLayout()
         svlayout = QGridLayout()
-        #place rs buttoms in RampSoakLayout1
+        #place rs buttons in RampSoakLayout1
         buttonRampSoakLayout1.addWidget(self.labelrs1,0)
         buttonRampSoakLayout1.addWidget(self.label_rs1,1)
         buttonRampSoakLayout1.addWidget(self.label_rs2,2)
@@ -3079,7 +3079,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             reg_dict = self.aw.fujipid.PXG4
         else:
             reg_dict = self.aw.fujipid.PXF
-        #first get the new sv value from the correspondig edit line
+        #first get the new sv value from the corresponding edit line
         if i == 1:
             self.sv1edit.setText(self.aw.comma2dot(str(self.sv1edit.text())))
             if self.sv1edit.text() != '':
@@ -3200,7 +3200,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             reg_dict = self.aw.fujipid.PXG4
         else:
             reg_dict = self.aw.fujipid.PXF
-        #first get the new sv value from the correspondig edit ine
+        #first get the new sv value from the corresponding edit ine
         if k == 1:
             if self.p1edit.text() != '' and self.i1edit.text() != '' and self.d1edit.text() != '':
                 newPvalue = int(float(str(self.p1edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
@@ -3615,7 +3615,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         string += '\n-----------------------------------------------------------------------'
         string += '\nStart to run from PV value: ' + mode[1]
         string += '\nEnd output status at the end of ramp/soak: ' + mode[2]
-        string += '\nOutput status while ramp/soak opearion set to OFF: ' + mode[3]
+        string += '\nOutput status while ramp/soak operation set to OFF: ' + mode[3]
         string += '\nRepeat Operation at the end: ' + mode[4]
         string += '\n-----------------------------------------------------------------------'
         string += '\n\nRecomended Mode = 0\n'

@@ -1196,7 +1196,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.ambientedit.setText('%g' % self.aw.float2float(self.aw.qmc.ambientTemp))
         self.ambientedit.setMinimumWidth(50)
         self.ambientedit.setMaximumWidth(50)
-        self.ambientedit.setValidator(self.aw.createCLocaleDoubleValidator(-9999., 9999999., 1, self.ambientedit))  # larger range needed to triger editing_finished
+        self.ambientedit.setValidator(self.aw.createCLocaleDoubleValidator(-9999., 9999999., 1, self.ambientedit))  # larger range needed to trigger editing_finished
         self.ambientedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.ambientedit.editingFinished.connect(self.ambientedit_editing_finished)
         pressureunitslabel = QLabel('hPa')
@@ -2015,7 +2015,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.plus_stores_combo.blockSignals(True)
                     self.plus_stores_combo.clear()
                     store_items = plus.stock.getStoreLabels(self.plus_stores)
-    #                # HACK to prevent those cutted menu items on macOS and Qt 5.15.1:
+    #                # HACK to prevent those cut menu items on macOS and Qt 5.15.1:
     #                if sys.platform.startswith("darwin"):
     #                    store_items = [l + "  " for l in store_items]
                     self.plus_stores_combo.addItems([''] + store_items)
@@ -2057,7 +2057,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.plus_coffees_combo.blockSignals(True)
                 self.plus_coffees_combo.clear()
                 coffee_items = plus.stock.getCoffeesLabels(self.plus_coffees)
-    #            # HACK to prevent those cutted menu items on macOS and Qt 5.15.1:
+    #            # HACK to prevent those cut menu items on macOS and Qt 5.15.1:
     #            if sys.platform.startswith("darwin"):
     #                coffee_items = [l + "  " for l in coffee_items]
                 self.plus_coffees_combo.addItems([''] + coffee_items)
@@ -2098,7 +2098,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.plus_blends_combo.clear()
                 blend_items = plus.stock.getBlendLabels(self.plus_blends)
 
-    #            # HACK to prevent those cutted menu items on macOS and Qt 5.15.1:
+    #            # HACK to prevent those cut menu items on macOS and Qt 5.15.1:
     #            if sys.platform.startswith("darwin"):
     #                blend_items = [l + "  " for l in blend_items]
                 self.plus_blends_combo.addItems([''] + blend_items)
@@ -2787,9 +2787,9 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def tabSwitched(self,i):
-        if i == 0: # Roast (always initialzed in __init__())
+        if i == 0: # Roast (always initialized in __init__())
             self.saveEventTable()
-        elif i == 1: # Notes (always initialzed in __init__())
+        elif i == 1: # Notes (always initialized in __init__())
             self.saveEventTable()
         elif i == 2: # Events (only initialized on first opening that tab)
             self.createEventTable()
@@ -2834,7 +2834,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.org_betweenbatch_after_preheat = self.aw.qmc.betweenbatch_after_preheat
             self.org_electricEnergyMix = self.aw.qmc.electricEnergyMix
 
-            ### reset UI text lables and tooltips for propper translation
+            ### reset UI text labels and tooltips for proper translation
             # hack to access the Qt automatic translation of the RestoreDefaults button
             db_help = QDialogButtonBox(QDialogButtonBox.StandardButton.Help)
             help_text_translated = db_help.button(QDialogButtonBox.StandardButton.Help).text()
@@ -3831,7 +3831,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.setup_ui.labelDrumSpeed.setText(QApplication.translate('Label', 'Drum Speed'))
             # populate defaults
             self.populateSetupDefaults()
-            # popuplate comboBox
+            # populate comboBox
             self.setup_ui.comboBoxHeating.addItems(self.aw.qmc.heating_types)
             self.setup_ui.SetDefaults.setText(QApplication.translate('Button', 'Save Defaults'))
             # hack to access the Qt automatic translation of the RestoreDefaults button
@@ -5186,13 +5186,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         dialog.ui.loadCunit.setText(loadUnits[2])
         dialog.ui.loadDunit.setText(loadUnits[3])
         dialog.ui.duration.setText(protocolDuration)
-        # fixed hight
+        # fixed height
         layout.setSpacing(5)
         dialog.setFixedHeight(dialog.sizeHint().height())
         res = dialog.exec()
         #deleteLater() will not work here as the dialog is still bound via the parent
         #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
-        # the following will immedately release the memory dispite this parent link
+        # the following will immediately release the memory despite this parent link
         QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
         try: # sip not supported on older PyQt versions (RPi!)
             sip.delete(dialog)
@@ -5212,7 +5212,7 @@ class EnergyMeasuringDialog(ArtisanDialog):
         self.ui.setupUi(self)
         self.setWindowTitle(QApplication.translate('Form Caption','Set Measure from Profile'))
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
-        # hack to assign the Apply button the AcceptRole without loosing default system translations
+        # hack to assign the Apply button the AcceptRole without losing default system translations
         applyButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply)
         self.ui.buttonBox.removeButton(applyButton)
         self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)

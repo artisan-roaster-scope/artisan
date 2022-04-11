@@ -2,7 +2,7 @@
 
 import time
 
-# higher resultion time signal (at least on Mac OS X)
+# higher resolution time signal (at least on macOS)
 # base can change (eg. depending on the simulator mode)
 class ArtisanTime():
 

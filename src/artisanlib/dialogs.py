@@ -82,7 +82,7 @@ class ArtisanDialog(QDialog):
     def setButtonTranslations(btn, txt, trans):
         current_trans = btn.text()
         if txt == current_trans:
-            # if standard qtbase tanslations fail, revert to artisan translations
+            # if standard qtbase translations fail, revert to artisan translations
             current_trans = trans
         if txt != current_trans:
             btn.setText(current_trans)

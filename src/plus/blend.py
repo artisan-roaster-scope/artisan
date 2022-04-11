@@ -170,7 +170,7 @@ class CustomBlendDialog(ArtisanDialog):
         self.ui.setupUi(self)
         self.setWindowTitle(QApplication.translate('Form Caption','Custom Blend'))
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
-        # hack to assign the Apply button the AcceptRole without loosing default system translations
+        # hack to assign the Apply button the AcceptRole without losing default system translations
         applyButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply)
         self.ui.buttonBox.removeButton(applyButton)
         self.applyButton = self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
@@ -199,7 +199,7 @@ class CustomBlendDialog(ArtisanDialog):
     def nameChanged(self):
         self.blend.name = self.ui.lineEdit_name.text().strip()
 
-    # as the total weight was excplicitly updated by the user, we set the initialTotalWeight here
+    # as the total weight was explicitly updated by the user, we set the initialTotalWeight here
     @pyqtSlot()
     def weighteditChanged(self):
         weight = float(self.aw.comma2dot(self.ui.lineEdit_weight.text()))
@@ -393,7 +393,7 @@ def openCustomBlendDialog(window, aw, inWeight, weightUnit, coffees, blend):
 
     #deleteLater() will not work here as the dialog is still bound via the parent
     #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
-    # the following will immedately release the memory dispite this parent link
+    # the following will immediately release the memory despite this parent link
     QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
     try: # sip not supported on older PyQt versions (RPi!)
         sip.delete(dialog)

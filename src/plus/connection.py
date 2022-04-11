@@ -159,7 +159,7 @@ def setKeyring() -> None:
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
 
-# returns True on successful authentification
+# returns True on successful authentication
 # NOTE: authentify might be called from outside the GUI thread
 def authentify() -> bool:
     _log.info('authentify()')

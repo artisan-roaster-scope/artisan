@@ -728,7 +728,7 @@ class profileTransformatorDlg(ArtisanDialog):
     # returns a list of segment-wise fits between sources and targets
     # each fit is a numpy.array as returned by numpy.polyfit
     # a source element of None generates None as fit
-    # a target element of None is skipped and pervious and next segements are joined
+    # a target element of None is skipped and previous and next segments are joined
     # the lists of sources and targets are expected to be of the same length
     # the length of the result list is the same as that of the sources and targets
     @staticmethod

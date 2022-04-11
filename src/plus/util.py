@@ -349,7 +349,7 @@ def updateLimits(rlimit:float, rused:float, pu:str, notifications:int, machines:
     if config.app_window:
         config.app_window.updateLimits(rlimit, rused, pu, notifications, machines)
 
-# takes the JSON response dict and returns the accont state as tuple
+# takes the JSON response dict and returns the account state as tuple
 # rlimit:float, rused:float, pu:str, notifications:int
 def extractAccountState(response: dict):
     rlimit = -1

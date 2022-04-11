@@ -108,9 +108,9 @@ class RoastProfile():
         self.E3 = []
         self.E4 = []
         # (re-)computed data:
-        self.stemp1 = None # smoothed from temp1 and cutted to visible data only on recompute
+        self.stemp1 = None # smoothed from temp1 and cut to visible data only on recompute
         self.stemp2 = None
-        self.delta1 = None # based on smoothed stemp1, but not yet cutted data as computed in recompute, and RoR smoothing applied, then cutted to visible data
+        self.delta1 = None # based on smoothed stemp1, but not yet cut data as computed in recompute, and RoR smoothing applied, then cut to visible data
         self.delta2 = None
         self.events1 = None # ET temperatures of main events [CHARGE, DRY, FCs, FCe, SCs, SCe, DROP], None if not set
         self.events2 = None # BT temperatures of main events [CHARGE, DRY, FCs, FCe, SCs, SCe, DROP], None if not set
@@ -546,7 +546,7 @@ class RoastProfile():
     def getTempTrans(self,offset=None):
         if offset is None:
             offset = self.timeoffset
-        # transformation pipelines are processed from left to right so in "A + B" first transformation A then tranformation B is applied (on the result of A)
+        # transformation pipelines are processed from left to right so in "A + B" first transformation A then transformation B is applied (on the result of A)
         # an artist transformation is supplied with data in data coordinates and should return data in display coordinates
         # ax.transData : transforms from data to display coordinates
         # transforms.Affine2D().translate() : applies its transformation
@@ -735,7 +735,7 @@ class roastCompareDlg(ArtisanDialog):
         self.foreground = foreground
         self.background = background
         self.setWindowTitle(QApplication.translate('Form Caption','Comparator'))
-        self.maxentries = 10 # maxium number of profiles to be compared
+        self.maxentries = 10 # maximum number of profiles to be compared
         self.basecolors = list(cm.tab10(numpy.linspace(0,1,10)))  # @UndefinedVariable # pylint: disable=maybe-no-member
         self.profiles = []
         self.label_number = 0

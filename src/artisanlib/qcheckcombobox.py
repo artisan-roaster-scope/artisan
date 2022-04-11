@@ -260,7 +260,7 @@ class CheckComboBox(QComboBox):
 
         if self.__popupIsShown and event.type() == QEvent.Type.KeyPress:
             if event.key() == Qt.Key.Key_Space:
-                # toogle the current items check state
+                # toggle the current items check state
                 model = self.model()
                 index = self.view().currentIndex()
                 flags = model.flags(index)

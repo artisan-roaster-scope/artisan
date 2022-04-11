@@ -199,7 +199,7 @@ class PhidgetManager():
             if self.managersemaphore.available() < 1:
                 self.managersemaphore.release(1)
 
-    # should be called from the detach handler that releases this hardware channel fron a software channel
+    # should be called from the detach handler that releases this hardware channel from a software channel
     def releaseChannel(self,channel):
         _log.debug('releaseChannel: %s', channel)
         try:

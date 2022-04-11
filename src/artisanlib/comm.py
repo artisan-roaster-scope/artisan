@@ -240,7 +240,7 @@ class serialport():
 
         self.platf = platform.system()
 
-        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
+        #default initial settings. They are changed by settingsload() at initiation of program according to the device chosen
         self.comport = 'COM4'      #NOTE: this string should not be translated. It is an argument for lib Pyserial
         self.baudrate = 9600
         self.bytesize = 8
@@ -250,7 +250,7 @@ class serialport():
         #serial port for ET/BT
         import serial  # @UnusedImport
         self.SP = serial.Serial()
-        #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()).
+        #used only in devices that also control the roaster like PIDs or Arduino (possible to receive asynchrous comands from GUI commands and thread sample()).
         self.COMsemaphore = QSemaphore(1)
         #list of comm ports available after Scan
         self.commavailable = []
@@ -280,10 +280,10 @@ class serialport():
         self.PhidgetIOsemaphores = [QSemaphore(1),QSemaphore(1),QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to self.Phidget1048values per channel
         #stores the Phidget Digital Output PMW objects (None if not initialized)
         self.PhidgetDigitalOut = {} # a dict associating out serials with lists of channels
-        self.PhidgetDigitalOutLastPWM = {} # a dict assocating out serials with the list of last PWMs per channel
+        self.PhidgetDigitalOutLastPWM = {} # a dict associating out serials with the list of last PWMs per channel
         self.PhidgetDigitalOutLastToggle = {} # a dict associating out serials with the list of last toggles per channel; if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
         self.PhidgetDigitalOutHub = {} # a dict associating hub serials with lists of channels
-        self.PhidgetDigitalOutLastPWMhub = {} # a dict assocating hub serials with the list of last PWMs per port of the hub
+        self.PhidgetDigitalOutLastPWMhub = {} # a dict associating hub serials with the list of last PWMs per port of the hub
         self.PhidgetDigitalOutLastToggleHub = {} # a dict associating hub serials with the list of last toggles per port of the hub; if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
         #store the Phidget Analog Output objects
         self.PhidgetAnalogOut = {} # a dict associating serials with lists of channels
@@ -344,9 +344,9 @@ class serialport():
         self.HH806Winitflag = 0
         self.R1 = None
         #list of functions calls to read temperature for devices.
-        # device 0 (with index 0 bellow) is Fuji Pid
-        # device 1 (with index 1 bellow) is Omega HH806
-        # device 2 (with index 2 bellow) is omega HH506
+        # device 0 (with index 0 below) is Fuji Pid
+        # device 1 (with index 1 below) is Omega HH806
+        # device 2 (with index 2 below) is omega HH506
         # etc
         # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
         # - add to self.devicefunctionlist
@@ -501,7 +501,7 @@ class serialport():
                 self.SP.write(binstring)
                 r = self.SP.read(nbytes)
                 #serTX.close()
-                libtime.sleep(0.035)                     #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
+                libtime.sleep(0.035)                     #this guarantees a minimum of 35 milliseconds between readings (for all Fujis)
                 lenstring = len(r)
                 if lenstring:
                     # CHECK FOR RECEIVED ERROR CODES
@@ -530,7 +530,7 @@ class serialport():
                 return '0'
             return '0'
         except Exception: # pylint: disable=broad-except
-            timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = miliseconds
+            timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
             error = QApplication.translate('Error Message','Serial Exception:') + ' ser.sendFUJIcommand()'
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror(timez + ' ' + error,getattr(exc_tb, 'tb_lineno', '?'))
@@ -548,7 +548,7 @@ class serialport():
     def fujitemperature(self):
         #update ET SV LCD 6
         self.aw.qmc.currentpidsv = self.aw.fujipid.readcurrentsv()
-        #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
+        #get time of temperature reading in seconds from start; .elapsed() returns milliseconds
         tx = self.aw.qmc.timeclock.elapsedMilli()
         # get the temperature for ET. self.aw.fujipid.gettemperature(unitID)
         t1 = self.aw.fujipid.gettemperature(self.controlETpid[0],self.controlETpid[1])/10.  #Need to divide by 10 because using 1 decimal point in Fuji (ie. received 843 = 84.3)
@@ -694,7 +694,7 @@ class serialport():
             return -1
         except Exception: # pylint: disable=broad-except
             error = QApplication.translate('Error Message','Serial Exception:') + ' ser.sendDTAcommand()'
-            timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = miliseconds
+            timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror(timez + ' ' + error,getattr(exc_tb, 'tb_lineno', '?'))
             return -1
@@ -1327,7 +1327,7 @@ class serialport():
 
     def WSextractData(self,channel,data):
         if self.aw.ws.channel_nodes[channel] != '' and self.aw.ws.channel_nodes[channel] in data:
-            # channel active and data availabel
+            # channel active and data available
             res = data[self.aw.ws.channel_nodes[channel]]
             # convert temperature scale
             m = self.aw.ws.channel_modes[channel]
@@ -1758,13 +1758,13 @@ class serialport():
                 self.SP.open()
                 if self.aw.seriallogflag:
                     settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
-                    self.aw.addserial('serial port openend: ' + settings)
+                    self.aw.addserial('serial port opened: ' + settings)
                 libtime.sleep(.2) # avoid possible hickups on startup
         except Exception: # pylint: disable=broad-except
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             self.SP.close()
-            libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
+            libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port gets disabled
             error = QApplication.translate('Error Message','Serial Exception:') + ' ' + QApplication.translate('Error Message','Unable to open serial port')
             self.aw.qmc.adderror(error)
 
@@ -1781,7 +1781,7 @@ class serialport():
         try:
             if self.SP and self.SP.isOpen():
                 self.SP.close()
-                libtime.sleep(0.1) # on OS X opening a serial port too fast after closing the port get's disabled
+                libtime.sleep(0.1) # on OS X opening a serial port too fast after closing the port gets disabled
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -2183,7 +2183,7 @@ class serialport():
         for i in range(self.aw.modbus.channels):
             if self.aw.modbus.inputSlaves[i] and not force: # in force mode (second request in oversampling mode) read only first two channels (ET/BT)
                 if not self.aw.modbus.optimizer or force:
-                    self.aw.modbus.sleepBetween() # we start with a sleep, as it could be that just a send command happend before the semaphore was catched
+                    self.aw.modbus.sleepBetween() # we start with a sleep, as it could be that just a send command happened before the semaphore was caught
                 if self.aw.modbus.inputFloats[i]:
                     res[i] = self.aw.modbus.readFloat(
                                 self.aw.modbus.inputSlaves[i],
@@ -2390,7 +2390,7 @@ class serialport():
                     return self.CENTER302temperature(retry=retry-1)
                 nbytes = len(r)
                 error = QApplication.translate('Error Message','CENTER302temperature(): {0} bytes received but 7 needed').format(nbytes)
-                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = miliseconds
+                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
                 self.aw.qmc.adderror(timez + ' ' + error)
                 return -1,-1
             return -1,-1
@@ -2455,7 +2455,7 @@ class serialport():
                     return self.CENTER303temperature(retry=retry-1)
                 nbytes = len(r)
                 error = QApplication.translate('Error Message','CENTER303temperature(): {0} bytes received but 8 needed').format(nbytes)
-                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = miliseconds
+                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
                 self.aw.qmc.adderror(timez + ' ' + error)
                 return -1,-1
             return -1,-1
@@ -2498,7 +2498,7 @@ class serialport():
                     return self.VOLTCRAFTPL125T2temperature(retry=retry-1)
                 nbytes = len(r)
                 error = QApplication.translate('Error Message','VOLTCRAFTPL125T2temperature(): {0} bytes received but 26 needed').format(nbytes)
-                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = miliseconds
+                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
                 _,_, exc_tb = sys.exc_info()
                 self.aw.qmc.adderror(timez + ' ' + error)
                 return -1,-1
@@ -2546,7 +2546,7 @@ class serialport():
                     return self.VOLTCRAFTPL125T4temperature(retry=retry-1)
                 nbytes = len(r)
                 error = QApplication.translate('Error Message','VOLTCRAFTPL125T4temperature(): {0} bytes received but 26 needed').format(nbytes)
-                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = miliseconds
+                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
                 _,_, exc_tb = sys.exc_info()
                 self.aw.qmc.adderror(timez + ' ' + error)
                 return -1,-1
@@ -2614,7 +2614,7 @@ class serialport():
                     return self.CENTER306temperature(retry=retry-1)
                 nbytes = len(r)
                 error = QApplication.translate('Error Message','CENTER306temperature(): {0} bytes received but 10 needed').format(nbytes)
-                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = miliseconds
+                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
                 _,_, exc_tb = sys.exc_info()
                 self.aw.qmc.adderror(timez + ' ' + error,getattr(exc_tb, 'tb_lineno', '?'))
                 return -1,-1
@@ -2637,7 +2637,7 @@ class serialport():
         ##    command = "\x4E" simulates EXIT MAX/MIN button
         ##    command = "\x52" simulates TIME button
         ##    command = "\x43" simulates C/F button
-        ##    command = "\x55" dump all memmory
+        ##    command = "\x55" dump all memory
         ##    command = "\x50" Load recorded data
         ##    command = "\x41" returns 45 bytes (8x5 + 5 = 45) as follows:
         ##
@@ -2887,7 +2887,7 @@ class serialport():
                             if deviceType != DeviceID.PHIDID_TMP1200:
                                 self.PhidgetIRSensorIC.setHubPort(port)
                         self.PhidgetIRSensor.setDeviceSerialNumber(ser)
-                        self.PhidgetIRSensor.setChannel(0) # attache to the IR channel
+                        self.PhidgetIRSensor.setChannel(0) # attached to the IR channel
                         try:
                             if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
                                 self.PhidgetIRSensor.setIsRemote(True)
@@ -2897,7 +2897,7 @@ class serialport():
                             pass
                         if deviceType != DeviceID.PHIDID_TMP1200:
                             self.PhidgetIRSensorIC.setDeviceSerialNumber(ser)
-                            self.PhidgetIRSensorIC.setChannel(1) # attache to the IC channel
+                            self.PhidgetIRSensorIC.setChannel(1) # attached to the IC channel
                             if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
                                 self.PhidgetIRSensorIC.setIsRemote(True)
                                 self.PhidgetIRSensorIC.setIsLocal(False)
@@ -2940,7 +2940,7 @@ class serialport():
                             now = self.aw.qmc.timeclock.elapsedMilli()
                             start_of_interval = now-self.aw.qmc.delay/1000
                             # 1. just consider async readings taken within the previous sampling interval
-                            # and associate them with the (arrivial) time since the begin of that interval
+                            # and associate them with the (arrival) time since the begin of that interval
                             valid_readings = [(r,t) for (r,t) in self.Phidget1045values if t > start_of_interval]
                             if len(valid_readings) > 0:
 
@@ -3059,7 +3059,7 @@ class serialport():
                 now = libtime.time()
                 start_of_interval = now-self.aw.qmc.delay/1000
                 # 1. just consider async readings taken within the previous sampling interval
-                # and associate them with the (arrivial) time since the begin of that interval
+                # and associate them with the (arrival) time since the begin of that interval
                 valid_readings = [(r,t - start_of_interval) for (r,t) in self.Phidget1048values[channel] if t > start_of_interval]
                 if len(valid_readings) > 0:
                     # 2. calculate the value
@@ -3376,7 +3376,7 @@ class serialport():
                 now = libtime.time()
                 start_of_interval = now-self.aw.qmc.delay/1000
                 # 1. just consider async readings taken within the previous sampling interval
-                # and associate them with the (arrivial) time since the begin of that interval
+                # and associate them with the (arrival) time since the begin of that interval
                 valid_readings = [(r,t - start_of_interval) for (r,t) in self.Phidget1046values[channel] if t > start_of_interval]
                 if len(valid_readings) > 0:
                     # 2. calculate the value
@@ -3605,7 +3605,7 @@ class serialport():
             remote=self.aw.qmc.phidgetRemoteFlag,
             remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
 
-#--- Phidget IO Binay Output
+#--- Phidget IO Binary Output
 #  only supporting (trying to attach in this order)
 #      4 channel Phidget 1014, OUT1100, REL1000, REL1100, REL1101
 #      8 channel Phidget 1017
@@ -4837,7 +4837,7 @@ class serialport():
                     now = libtime.time()
                     start_of_interval = now-self.aw.qmc.delay/1000
                     # 1. just consider async readings taken within the previous sampling interval
-                    # and associate them with the (arrivial) time since the begin of that interval
+                    # and associate them with the (arrival) time since the begin of that interval
                     valid_readings = [(r,t - start_of_interval) for (r,t) in self.PhidgetIOvalues[i] if t > start_of_interval]
                     if len(valid_readings) > 0:
                         # 2. calculate the value
@@ -5400,7 +5400,7 @@ class serialport():
                             now = libtime.time()
                             start_of_interval = now-self.aw.qmc.delay/1000
                             # 1. just consider async readings taken within the previous sampling interval
-                            # and associate them with the (arrivial) time since the begin of that interval
+                            # and associate them with the (arrival) time since the begin of that interval
                             valid_readings = [(r,t - start_of_interval) for (r,t) in self.YOCTOvalues[0] if t > start_of_interval]
                             if len(valid_readings) > 0:
                                 # 2. calculate the value
@@ -5450,7 +5450,7 @@ class serialport():
                             now = libtime.time()
                             start_of_interval = now-self.aw.qmc.delay/1000
                             # 1. just consider async readings taken within the previous sampling interval
-                            # and associate them with the (arrivial) time since the begin of that interval
+                            # and associate them with the (arrival) time since the begin of that interval
                             valid_readings = [(r,t - start_of_interval) for (r,t) in self.YOCTOvalues[1] if t > start_of_interval]
                             if len(valid_readings) > 0:
                                 # 2. calculate the value
@@ -5564,7 +5564,7 @@ class serialport():
             if not self.SP.isOpen():
                 self.openport()
                 #libtime.sleep(1)
-                #Reinitialize Arduino in case communication was interupted
+                #Reinitialize Arduino in case communication was interrupted
                 self.ArduinoIsInitialized = 0
             if self.SP.isOpen():
                 #INITIALIZE (ONLY ONCE)
@@ -5798,7 +5798,7 @@ class serialport():
 
                 #MaWa
                 #really interesting:
-                #need this sleep. without artisan hungs after 20 to 40 seconds.
+                #need this sleep. without artisan hangs after 20 to 40 seconds.
                 #seems like iam running the loop forever, forever .... with sleep it is ok
                 #seen this sometimes in communication between threads in C or C++. --> volatile problem?
                 if counter > 0:
@@ -5926,7 +5926,7 @@ class serialport():
         except ValueError:
             #self.closeport()
             error = QApplication.translate('Error Message','Value Error:') + ' ser.TEVA18Btemperature()'
-            timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = miliseconds
+            timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror(timez + ' ' + error,getattr(exc_tb, 'tb_lineno', '?'))
             return -1,-1
@@ -5942,8 +5942,8 @@ class serialport():
                 self.aw.addserial('TEVA18B: ' + settings + ' || Tx = ' + 'No command' + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
     def HHM28multimeter(self):
-        # This meter sends a continuos frame byte by byte. It only transmits data. It does not receive commands.
-        # A frame is composed of 14 ordered bytes. A byte is represented bellow enclosed in "XX"
+        # This meter sends a continuous frame byte by byte. It only transmits data. It does not receive commands.
+        # A frame is composed of 14 ordered bytes. A byte is represented below enclosed in "XX"
         # FRAME  = ["1A","2B","3C","4D","5E","6F","7G","8H","9I","10J","11K","12L","13M","14N"]
         # The first 4 bits of each byte are dedicated to identify the byte in the frame by using a number.
         # The last 4 bits of each byte are dedicated to carry Data. Depending on the byte number, the meaning of data changes.
@@ -5999,7 +5999,7 @@ class serialport():
                 table = {'00':' ','68':'L','7d':'0','05':'1','5b':'2','1f':'3',
                          '27':'4','3e':'5','7e':'6','15':'7','7f':'8','3f':'9'}
                 val = ''
-                #some erros found in values: "38","5d",0A,etc
+                #some errors found in values: "38","5d",0A,etc
                 for i in range(4):
                     if digits[i] in table:
                         val += table[digits[i]]
@@ -6026,7 +6026,7 @@ class serialport():
         except ValueError:
             #self.closeport()
             error  = QApplication.translate('Error Message','Value Error:') + ' ser.HHM28multimeter()'
-            timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = miliseconds
+            timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror(timez + ' ' + error,getattr(exc_tb, 'tb_lineno', '?'))
             #find device index
@@ -6092,7 +6092,7 @@ class extraserialport():
     def __init__(self, aw):
         self.aw = aw
 
-        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
+        #default initial settings. They are changed by settingsload() at initiation of program according to the device chosen
         self.comport = '/dev/cu.usbserial-FTFKDA5O'      #NOTE: this string should not be translated.
         self.baudrate = 19200
         self.bytesize = 8
@@ -6119,7 +6119,7 @@ class extraserialport():
                 self.SP.open()
         except Exception:  # pylint: disable=broad-except
             self.SP.close()
-#            libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
+#            libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port gets disabled
             error = QApplication.translate('Error Message','Serial Exception:')
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror(error + ' Unable to open serial port',getattr(exc_tb, 'tb_lineno', '?'))
@@ -6127,7 +6127,7 @@ class extraserialport():
     def closeport(self):
         if self.SP is not None:
             self.SP.close()
-            libtime.sleep(0.3) # on OS X opening a serial port too fast after closing the port get's disabled
+            libtime.sleep(0.3) # on OS X opening a serial port too fast after closing the port gets disabled
 
     # this one is called from scale and color meter code
     def connect(self,error=True):
@@ -6159,7 +6159,7 @@ class scaleport(extraserialport):
     def __init__(self,aw):
         super().__init__(aw)
 
-        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
+        #default initial settings. They are changed by settingsload() at initiation of program according to the device chosen
         self.comport = '/dev/cu.usbserial-FTFKDA5O'      #NOTE: this string should not be translated.
         self.baudrate = 19200
         self.bytesize = 8
@@ -6275,7 +6275,7 @@ class colorport(extraserialport):
     def __init__(self,aw):
         super().__init__(aw)
 
-        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
+        #default initial settings. They are changed by settingsload() at initiation of program according to the device chosen
         self.comport = '/dev/cu.usbserial-FTFKDA5O'      #NOTE: this string should not be translated.
         self.baudrate = 115200
         self.bytesize = 8

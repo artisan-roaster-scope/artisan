@@ -658,7 +658,7 @@ class LargePhasesLCDs(LargeLCDs):
     __slots__ = ['labels', 'values1', 'values2']
 
     def __init__(self, parent = None, aw = None):
-        self.labels = [' ', ' ', ' ', self.formatLabel('AUC')] # formated labels
+        self.labels = [' ', ' ', ' ', self.formatLabel('AUC')] # formatted labels
         self.values1 = [' ']*2
         self.values2 = [' ']*2
         super().__init__(parent, aw)

@@ -15,7 +15,6 @@
 # version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
 # the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -55,7 +54,7 @@ def updateNotifications(notifications: int, machines: list[str]):
         if config.app_window:
             aw = config.app_window
             # we fetch notifications if notifications are enabled within the Artisan settings, there are some unqualified notifications, or
-            # our machine name is in the list of machines indiciating that there is a qualified notification for us
+            # our machine name is in the list of machines indicating that there is a qualified notification for us
             if aw.notificationsflag and (notifications>0 or aw.qmc.roastertype_setup in machines):
                 # should happen with less delay (0.7s) then the stock.update() (2.5s) triggered controller.connect() to avoid duplicate fetching on startup
                 QTimer.singleShot(700, retrieveNotifications)
@@ -90,7 +89,7 @@ def retrieveNotifications():
                     for n in res['result']:
                         processNotification(n)
 
-                # NOTE: we do not updateLimitsFromResponse(res) here to avoid an infinit loop if
+                # NOTE: we do not updateLimitsFromResponse(res) here to avoid an infinite loop if
                 # the server does not reset the notifications counter. Further notifications will be retrieved on next request
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)

@@ -83,7 +83,7 @@ def addSyncShelve(uuid: str, modified_at, fh):
             # in case we couldn't open the shelve file as  "shelve.open db type
             # could not be determined"
             # remove all files name getSyncPath() with any extension as we
-            # do not know which extension is choosen by shelve
+            # do not know which extension is chosen by shelve
             _log.info(
                 'register: clean uuid cache %s', str(getSyncPath())
             )
@@ -96,7 +96,7 @@ def addSyncShelve(uuid: str, modified_at, fh):
                 if str(p) != sync_lock_file:
                     # if not the lock file, delete:
                     p.unlink()
-            # try again to acccess/create the shelve file
+            # try again to access/create the shelve file
             with shelve.open(getSyncPath()) as db:
                 db[uuid] = modified_at
             _log.debug(

@@ -59,7 +59,7 @@ class QtSingleApplication(QApplication):
                 # Yes, there is.
                 self._outStream = QTextStream(self._outSocket)
                 try:
-                    self._outStream.setCodec('UTF-8') # setCodec not avaiable in PyQt6, but UTF-8 the default encoding
+                    self._outStream.setCodec('UTF-8') # setCodec not available in PyQt6, but UTF-8 the default encoding
                 except Exception: # pylint: disable=broad-except
                     pass
                 # Is there another viewer running?
@@ -69,7 +69,7 @@ class QtSingleApplication(QApplication):
                 if self._isRunningViewer:
                     self._outStreamViewer = QTextStream(self._outSocketViewer)
                     try:
-                        self._outStreamViewer.setCodec('UTF-8') # setCodec not avaiable in PyQt6, but UTF-8 the default encoding
+                        self._outStreamViewer.setCodec('UTF-8') # setCodec not available in PyQt6, but UTF-8 the default encoding
                     except Exception: # pylint: disable=broad-except
                         pass
                 else:
@@ -138,7 +138,7 @@ class QtSingleApplication(QApplication):
             return
         self._inStream = QTextStream(self._inSocket)
         try:
-            self._inStream.setCodec('UTF-8') # setCodec not avaiable in PyQt6, but UTF-8 the default encoding
+            self._inStream.setCodec('UTF-8') # setCodec not available in PyQt6, but UTF-8 the default encoding
         except Exception: # pylint: disable=broad-except
             pass
         self._inSocket.readyRead.connect(self._onReadyRead)

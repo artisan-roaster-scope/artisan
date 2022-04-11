@@ -1616,7 +1616,7 @@ class CurvesDlg(ArtisanDialog):
             self.equvdevicebutton.setToolTip(QApplication.translate('Tooltip','Add P1 and P2 as ET and BT'))
         else:
             self.equvdevicebutton.setText(QApplication.translate('Button','Create Virtual\nExtra Device'))
-            if len(self.aw.qmc.extradevices) < self.aw.nLCDS:  #not at maximimum of virtual devices
+            if len(self.aw.qmc.extradevices) < self.aw.nLCDS:  #not at maximum of virtual devices
                 self.equvdevicebutton.setEnabled(True)
                 self.equvdevicebutton.setToolTip(QApplication.translate('Tooltip','Add P1 and P2 as:\n\n1 an Extra virtual device if a profile is loaded\n2 or ET and BT if profile is not loaded\n'))
             else:

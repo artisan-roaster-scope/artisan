@@ -2061,7 +2061,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.transferpalettecombobox.addItems(palettelist)
         self.transferpalettecombobox.setCurrentIndex(-1)
 
-    #applys a pattern of colors
+    #applies a pattern of colors
     @pyqtSlot(int)
     def colorizebuttons(self,pattern=0):
         if self.changingcolorflag:
@@ -2211,7 +2211,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.eventbuttontable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
 
         #Enable Drag Sorting
-        self.eventbuttontable.setDragEnabled(False) # content not dragable, only vertical header!
+        self.eventbuttontable.setDragEnabled(False) # content not draggable, only vertical header!
         self.eventbuttontable.verticalHeader().setSectionsMovable(True)
         self.eventbuttontable.verticalHeader().setDragDropMode(QTableWidget.DragDropMode.InternalMove)
 
@@ -3207,14 +3207,14 @@ class EventsDlg(ArtisanResizeablDialog):
         # connect signals
         dialog.ui.lineEdit_TargetValue_min.editingFinished.connect(self.calcSliderFactorOffset)
         dialog.ui.lineEdit_TargetValue_max.editingFinished.connect(self.calcSliderFactorOffset)
-        # fixed hight
+        # fixed height
         layout.setSpacing(7)
         dialog.setFixedHeight(dialog.sizeHint().height())
         dialog.setFixedWidth(dialog.sizeHint().width())
         res = dialog.exec()
         #deleteLater() will not work here as the dialog is still bound via the parent
         #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
-        # the following will immedately release the memory dispite this parent link
+        # the following will immediately release the memory despite this parent link
         QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
         try: # sip not supported on older PyQt versions (RPi!)
             sip.delete(dialog)
@@ -3237,7 +3237,7 @@ class SliderCalculator(ArtisanDialog):
         self.ui.setupUi(self)
         self.setWindowTitle(QApplication.translate('Form Caption','Slider Calculator'))
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
-        # hack to assign the Apply button the AcceptRole without loosing default system translations
+        # hack to assign the Apply button the AcceptRole without losing default system translations
         applyButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply)
         self.ui.buttonBox.removeButton(applyButton)
         self.applyButton = self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)

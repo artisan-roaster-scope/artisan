@@ -122,7 +122,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
 ##        self.devicetypeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
 ##        self.devicetypeComboBox.view().setTextElideMode(Qt.TextElideMode.ElideNone)
-#        # HACK: only needed for the macintosh UI on Qt 5.12 onwords; without long items get cutted in the popup
+#        # HACK: only needed for the macintosh UI on Qt 5.12 onwords; without long items get cut in the popup
 #        #  note the -7 as the width of the popup is too large if given the correct maximum characters
 ##        self.devicetypeComboBox.setMinimumContentsLength(max(22,len(max(dev, key=len)) - 7)) # expects # characters, but is to wide
 # the following "hack" helped on PyQt5, but seems not to be needed on PyQt6 any longer
@@ -1048,7 +1048,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.temperatureDeviceCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.temperatureDeviceCombo.addItems(self.aw.qmc.temperaturedevicefunctionlist)
 
-        # HACK: only needed for the macintosh UI on Qt 5.12 onwords; withou long items get cutted in the popup
+        # HACK: only needed for the macOS UI on Qt 5.12 onwords; without long items get cut in the popup
         #  note the -7 as the width of the popup is too large if given the correct maximum characters
 #        self.temperatureDeviceCombo.setMinimumContentsLength(max(22,len(max(self.aw.qmc.temperaturedevicefunctionlist, key=len)) - 7)) # expects # characters, but is to wide
 
@@ -1729,7 +1729,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if len(self.aw.extraser) > x:
                 if self.aw.extraser[x].SP.isOpen():
                     self.aw.extraser[x].SP.close()
-                    libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
+                    libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port gets disabled
                 self.aw.extraser.pop(x)
             self.createDeviceTable()
             self.aw.qmc.resetlinecountcaches()

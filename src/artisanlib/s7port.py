@@ -256,7 +256,7 @@ class s7port():
         self.COMsemaphore = QSemaphore(1)
 
         # we do not use the snap7 enums here to avoid the import for non S7 users
-        self.areas = None # lazy initalized in initArray() on connect
+        self.areas = None # lazy initialized in initArray() on connect
         self.last_request_timestamp = time.time()
         self.min_time_between_requests = 0.04
 
