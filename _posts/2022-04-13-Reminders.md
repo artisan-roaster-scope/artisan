@@ -14,6 +14,6 @@ tags:
 link: https://doc.artisan.plus/docs/reminders/
 ---
 
-We have just added a [flexible reminder system](https://doc.artisan.plus/docs/reminders/){:target="_blank"} to [artisan.plus](https://artisan.plus){:target="_blank"}. Manage preventative maintenance for your roastery with ease! 
+We just added a [flexible reminder system](https://doc.artisan.plus/docs/reminders/){:target="_blank"} to [artisan.plus](https://artisan.plus){:target="_blank"}. Manage preventative maintenance for your roastery with ease! 
 
 ---
