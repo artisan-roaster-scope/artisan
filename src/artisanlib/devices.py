@@ -2984,11 +2984,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.redraw(recomputeAllDeltas=False)
             self.aw.sendmessage(message)
             #open serial conf Dialog
-            self.accept()
             #if device is not None or not external-program (don't need serial settings config)
             if not(self.aw.qmc.device in self.aw.qmc.nonSerialDevices):
                 self.aw.setcommport()
             self.close()
+            self.accept()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()

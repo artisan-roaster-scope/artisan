@@ -14288,7 +14288,7 @@ class tgraphcanvas(FigureCanvas):
 ##                delta = numpy.array([numpy.nan if x == -1 else x for x in self.delta2[-k:]], dtype='float64')
 #                delta = numpy.array([numpy.nan if x == -1 else x for x in self.unfiltereddelta2[-k:]], dtype='float64')
 #                idx = numpy.isfinite(ET_BT) & numpy.isfinite(delta)
-#                z, residuals, _, _, _ = numpy.polyfit(ET_BT[idx],delta[idx], 1, full=True)
+#                z, residuals, _, _, _ = numpy.polyfit(ET_BT[idx],delta[idx], 2, full=True)
 #                print("z",z)
 #                f = numpy.poly1d(z)
 #                v = f(ET_BT[-1])
@@ -16722,12 +16722,16 @@ class EventActionThread(QThread): # pylint: disable=too-few-public-methods
 class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-methods
 
     def fixup(self, input_value): # pylint: disable=no-self-use # used by class
-        if input_value is None or input_value == '':
-            return '0'
         try:
-            return aw.comma2dot(input_value)
-        except Exception: # pylint: disable=broad-except
-            return input
+            if input_value is None or input_value == '':
+                return '0'
+            try:
+                return aw.comma2dot(input_value)
+            except Exception: # pylint: disable=broad-except
+                return input_value
+        except Exeption as e:
+            _log.exception(e)
+            return input_value
 
 ########################################################################################
 #################### MAIN APPLICATION WINDOW ###########################################
