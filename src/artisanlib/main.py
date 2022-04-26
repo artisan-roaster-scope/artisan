@@ -16729,7 +16729,7 @@ class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-met
                 return aw.comma2dot(input_value)
             except Exception: # pylint: disable=broad-except
                 return input_value
-        except Exeption as e:
+        except Exception as e:
             _log.exception(e)
             return input_value
 
