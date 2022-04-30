@@ -31,7 +31,7 @@ except ImportError:
     # for Python 3.7:
     from typing_extensions import Final
 
-from artisanlib.util import cmd2str, RoRfromCtoF, appFrozen, fromCtoF, fromFtoC, hex2int, str2cmd, toFloat
+from artisanlib.util import cmd2str, RoRfromCtoF, fromCtoF, fromFtoC, hex2int, str2cmd, toFloat
 
 try:
     #pylint: disable = E, W, R, C
@@ -5228,30 +5228,30 @@ class serialport():
             # import Yoctopuce Python library (installed form PyPI)
             #self.aw.sendmessage(str(errmsg))
             YAPI.DisableExceptions()
-            ## WINDOWS/Linux DLL HACK BEGIN
-            arch = platform.architecture()[0]
-            machine = platform.machine()
-            libpath = os.path.dirname(sys.executable)
-            if self.platf == 'Windows' and appFrozen():
-                if arch == '32bit':
-                    YAPI._yApiCLibFile = libpath + '\\lib\\yapi.dll' # pylint: disable=protected-access
-                else:
-                    YAPI._yApiCLibFile = libpath + '\\lib\\yapi64.dll' # pylint: disable=protected-access
-                YAPI._yApiCLibFileFallback = libpath + '\\lib\\yapi.dll' # pylint: disable=protected-access
-            elif self.platf == 'Linux' and appFrozen():
-                if machine.find('arm') >= 0: # Raspberry
-                    YAPI._yApiCLibFile = libpath + '/libyapi-armhf.so' # pylint: disable=protected-access
-                    YAPI._yApiCLibFileFallback = libpath + '/libyapi-armel.so' # pylint: disable=protected-access
-                elif machine.find('mips') >= 0:
-                    YAPI._yApiCLibFile = libpath + '/libyapi-mips.so' # pylint: disable=protected-access
-                    YAPI._yApiCLibFileFallback = '' # pylint: disable=protected-access
-                elif machine == 'x86_32' or (machine[0] == 'i' and machine[-2:] == '86'):
-                    YAPI._yApiCLibFile = libpath + '/libyapi-i386.so' # pylint: disable=protected-access
-                    YAPI._yApiCLibFileFallback = libpath + '/libyapi-amd64.so'  # just in case # pylint: disable=protected-access
-                elif machine == 'x86_64':
-                    YAPI._yApiCLibFile = libpath + '/libyapi-amd64.so' # pylint: disable=protected-access
-                    YAPI._yApiCLibFileFallback = libpath + '/libyapi-i386.so'  # just in case # pylint: disable=protected-access
-            ## WINDOWS/Linux DLL HACK END
+#            ## WINDOWS/Linux DLL HACK BEGIN
+#            arch = platform.architecture()[0]
+#            machine = platform.machine()
+#            libpath = os.path.dirname(sys.executable)
+#            if self.platf == 'Windows' and appFrozen():
+#                if arch == '32bit':
+#                    YAPI._yApiCLibFile = libpath + '\\lib\\yapi.dll' # pylint: disable=protected-access
+#                else:
+#                    YAPI._yApiCLibFile = libpath + '\\lib\\yapi64.dll' # pylint: disable=protected-access
+#                YAPI._yApiCLibFileFallback = libpath + '\\lib\\yapi.dll' # pylint: disable=protected-access
+#            elif self.platf == 'Linux' and appFrozen():
+#                if machine.find('arm') >= 0: # Raspberry
+#                    YAPI._yApiCLibFile = libpath + '/libyapi-armhf.so' # pylint: disable=protected-access
+#                    YAPI._yApiCLibFileFallback = libpath + '/libyapi-armel.so' # pylint: disable=protected-access
+#                elif machine.find('mips') >= 0:
+#                    YAPI._yApiCLibFile = libpath + '/libyapi-mips.so' # pylint: disable=protected-access
+#                    YAPI._yApiCLibFileFallback = '' # pylint: disable=protected-access
+#                elif machine == 'x86_32' or (machine[0] == 'i' and machine[-2:] == '86'):
+#                    YAPI._yApiCLibFile = libpath + '/libyapi-i386.so' # pylint: disable=protected-access
+#                    YAPI._yApiCLibFileFallback = libpath + '/libyapi-amd64.so'  # just in case # pylint: disable=protected-access
+#                elif machine == 'x86_64':
+#                    YAPI._yApiCLibFile = libpath + '/libyapi-amd64.so' # pylint: disable=protected-access
+#                    YAPI._yApiCLibFileFallback = libpath + '/libyapi-i386.so'  # just in case # pylint: disable=protected-access
+#            ## WINDOWS/Linux DLL HACK END
         try:
             if self.aw.qmc.yoctoRemoteFlag:
                 YAPI.RegisterHub(self.aw.qmc.yoctoServerID,errmsg)

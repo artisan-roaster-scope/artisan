@@ -25890,13 +25890,13 @@ class ApplicationWindow(QMainWindow):
         if self.soundflag:
             QApplication.beep()
 
-    @staticmethod
-    def removeDisallowedFilenameChars(filename):
-        import string as libstring
-        import unicodedata # @UnresolvedImport
-        validFilenameChars = f'-_.() {libstring.ascii_letters}{libstring.digits}'
-        cleanedFilename = s2a(unicodedata.normalize('NFKD', filename))
-        return ''.join(c for c in decodeLocal(cleanedFilename) if c in validFilenameChars)
+#    @staticmethod
+#    def removeDisallowedFilenameChars(filename):
+#        import unicodedata # @UnresolvedImport
+#        cleanedFilename = s2a(unicodedata.normalize('NFKD', filename))
+#        import string as libstring
+#        validFilenameChars = f'-_.() {libstring.ascii_letters}{libstring.digits}'
+#        return ''.join(c for c in decodeLocal(cleanedFilename) if c in validFilenameChars)
 
 
     def generateFilename(self,prefix='',previewmode=0):
@@ -25917,8 +25917,8 @@ class ApplicationWindow(QMainWindow):
             else:
                 filename = self.parseAutosaveprefix(prefix,previewmode=previewmode)
             filename += '.alog'
-            #clean name
-            filename = self.removeDisallowedFilenameChars(filename)
+#            #clean name (disabled now since Artisan >2.6.0)
+#            filename = self.removeDisallowedFilenameChars(filename)
             filename = filename.strip()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -25930,17 +25930,18 @@ class ApplicationWindow(QMainWindow):
         try:
             currtime = QDateTime.currentDateTime().toString('hhmmss')
 
-            #it is text only when there are no disallowed characters, so add the date for backward compatibility and return.
-            if fn == self.removeDisallowedFilenameChars(str(fn)):
-                fn += '_' + self.qmc.roastdate.toString('yy-MM-dd_hhmm')
-                return fn
-
             #single, leading delimiter for the fields
             fieldDelim = '~'  #note this value is hard coded in autosavefields
             #delimiter for ON only
             onDelim = "'"
             #delimiter for OFF only
             offDelim = '"'
+
+            #it is text only when there are no disallowed characters, so add the date for backward compatibility and return.
+#            if fn == self.removeDisallowedFilenameChars(str(fn)):
+            if fieldDelim not in fn:
+                fn += '_' + self.qmc.roastdate.toString('yy-MM-dd_hhmm')
+                return fn
 
             #newlines can sneak in from cut and paste from help page
             fn = fn.replace('\n', '')
