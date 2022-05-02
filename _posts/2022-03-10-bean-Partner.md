@@ -15,6 +15,6 @@ tags:
 link: https://doc.artisan.plus/partners/
 ---
 
-We welcome the innovative coffee bean supplier [Bean Importer (Thailand)](https://bean.co.th/) to our [artisan.plus bean supplier partner program](https://doc.artisan.plus/partners/). All there bean data is directly available now from within [artisan.plus](https://artisan.plus). Additionally, hacea provides exclusive coupon codes to [artisan.plus](https://artisan.plus) members.
+We welcome the innovative coffee bean supplier [Bean Importer (Thailand)](https://bean.co.th/) to our [artisan.plus bean supplier partner program](https://doc.artisan.plus/partners/). All there bean data is directly available now from within [artisan.plus](https://artisan.plus). Additionally, [Bean Importer (Thailand)](https://bean.co.th/) provides exclusive coupon codes to [artisan.plus](https://artisan.plus) members.
 
 ---
