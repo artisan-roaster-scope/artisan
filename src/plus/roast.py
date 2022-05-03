@@ -22,7 +22,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from plus import config, util
-from typing import Any, Optional
+from typing import Any, Optional, Dict, List, Tuple  #for Python >= 3.9: can remove 'List', 'Dict' and 'Tuple' since type hints can use the generic 'list', 'dict' and 'tuple'
 try:
     from typing import Final
 except ImportError:
@@ -35,7 +35,7 @@ _log: Final = logging.getLogger(__name__)
 
 # given a profile dictionary extract key parameters to populate a Roast element
 # background=True if the bp is holding a background profile (ambientTemp, AUCbase not converted to current temp mode)
-def getTemplate(bp: dict[str, Any],background=False) -> dict[str, Any]:
+def getTemplate(bp: Dict[str, Any],background=False) -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with the generic type hint 'dict'
     _log.debug('getTemplate()')
     d: dict[str, Any] = {}
     try:
@@ -252,7 +252,7 @@ def trimBlendSpec(blend_spec):
         return None
 
 
-def getRoast() -> dict[str, Any]:
+def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with the generic type hint 'dict'
     d = {}
     try:
         _log.debug('getRoast()')
@@ -386,7 +386,7 @@ def getRoast() -> dict[str, Any]:
 
 # the following data items are suppressed from the roast record if they have 0
 # values to avoid sending just tags with zeros:
-sync_record_zero_supressed_attributes: list[str] = [
+sync_record_zero_supressed_attributes: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
     'density_roasted',
     'batch_number',
     'batch_pos',
@@ -419,7 +419,7 @@ sync_record_zero_supressed_attributes: list[str] = [
     'CO2_batch',
 ]
 
-sync_record_empty_string_supressed_attributes: list[str] = [
+sync_record_empty_string_supressed_attributes: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
     'label',
     'batch_prefix',
     'color_system',
@@ -427,7 +427,7 @@ sync_record_empty_string_supressed_attributes: list[str] = [
     'notes',
 ]
 
-sync_record_non_supressed_attributes: list[str] = [
+sync_record_non_supressed_attributes: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
     'roast_id',
     'location',
     'coffee',
@@ -437,7 +437,7 @@ sync_record_non_supressed_attributes: list[str] = [
 ]
 
 # all roast record attributes that participate in the sync process
-sync_record_attributes: list[str] = (
+sync_record_attributes: List[str] = (  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
     sync_record_non_supressed_attributes
     + sync_record_zero_supressed_attributes
     + sync_record_empty_string_supressed_attributes
@@ -447,7 +447,7 @@ sync_record_attributes: list[str] = (
 # returns the current plus record and a hash over the plus record
 # if applied, r is assumed to contain the complete roast data as returned
 # by roast.getRoast()
-def getSyncRecord(r: Optional[dict[str, Any]] = None) -> tuple[dict[str, Any], str]:
+def getSyncRecord(r: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], str]:  #for Python >= 3.9 can replace 'Dict' and 'Tuple' with the generic type hints 'dict' and 'tuple'
     _log.info('getSyncRecord()')
     m = hashlib.sha256()
     d: dict[str, Any] = {}

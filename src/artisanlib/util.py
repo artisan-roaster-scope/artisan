@@ -281,7 +281,7 @@ def getDataDirectory():
     return None
 
 # internal function to return
-@functools.cache
+@functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
 def _getAppDataDirectory(app):
     # temporarily switch app name to Artisan (as it might be ArtisanViewer)
     appName = app.applicationName()
@@ -297,7 +297,7 @@ def _getAppDataDirectory(app):
     except Exception:  # pylint: disable=broad-except
         return None
 
-@functools.cache
+@functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
 def getAppPath():
     res = ''
     platf = platform.system()
@@ -315,7 +315,7 @@ def getAppPath():
         res = QCoreApplication.applicationDirPath() + '/'
     return res
 
-@functools.cache
+@functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
 def getResourcePath():
     res = ''
     platf = platform.system()
@@ -363,7 +363,7 @@ def getDirectory(
 
 
 # creates QLinearGradient style from light to dark by default, or from dark to light if reverse is True
-@functools.cache
+@functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
 def createGradient(rgb, tint_factor=0.1, shade_factor=0.1, reverse=False):
     light_grad,dark_grad = createRGBGradient(rgb,tint_factor,shade_factor)
     if reverse:
@@ -394,7 +394,7 @@ def createRGBGradient(rgb, tint_factor=0.3, shade_factor=0.3):
 
 # Logging
 
-@functools.cache
+@functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
 def getLoggers():
     return [logging.getLogger(name) for name in logging.root.manager.loggerDict if ('.' not in name)]  # @UndefinedVariable pylint: disable=no-member
 

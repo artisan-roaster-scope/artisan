@@ -29,7 +29,7 @@ except Exception:
     from PyQt5.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib import __version__
-from typing import Any, Optional
+from typing import Any, Optional, Dict  #for Python >= 3.9: can remove 'Dict' since type hints can now use the generic 'dict'
 try:
     from typing import Final
 except ImportError:
@@ -320,7 +320,7 @@ def authentify() -> bool:
 
 
 def getHeaders(
-    authorized: bool = True, decompress: bool = True) -> dict[str, str]:
+    authorized: bool = True, decompress: bool = True) -> Dict[str, str]:  #for Python >= 3.9 can replace 'Dict' with the generic type hint 'dict'
     os, os_version, os_arch = config.app_window.get_os()  # @UndefinedVariable
     headers = {
         'user-agent': f'Artisan/{__version__} ({os}; {os_version}; {os_arch})'
@@ -358,7 +358,7 @@ def getHeadersAndData(authorized: bool, compress: bool, jsondata: JSON):
 
 def sendData(
     url: str,
-    data: dict[Any, Any],
+    data: Dict[Any, Any],  #for Python >= 3.9 can replace 'Dict' with the generic type hint 'dict'
     verb: str, # POST or PUT
     authorized: bool = True,
     compress: bool = config.compress_posts,

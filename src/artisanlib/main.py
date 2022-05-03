@@ -69,7 +69,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 import logging.config
 from yaml import safe_load as yaml_load
-from typing import Optional
+from typing import Optional, List  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 try:
     from typing import Final
 except ImportError:
@@ -19295,7 +19295,7 @@ class ApplicationWindow(QMainWindow):
 
     # if rlimit = -1 or rused = -1 or pu = "", no update information is available and the state is not updated
     @pyqtSlot(float,float,str,int,list)
-    def updateLimits(self, rlimit:float, rused:float, pu:str, notifications:int, machines: list[str]):
+    def updateLimits(self, rlimit:float, rused:float, pu:str, notifications:int, machines: List[str]):  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
         _log.debug('updateLimits(%s,%s,%s,%s,%s)', rlimit, rused, pu, notifications, machines)
         self.updatePlusLimits(rlimit, rused)
         self.updatePlusPaidUntil(pu)
@@ -24532,7 +24532,7 @@ class ApplicationWindow(QMainWindow):
                 _log.exception(e)
 
     @staticmethod
-    @functools.cache # we cache the result to avoid re-compuation
+    @functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
     def calc_env():
         # we try to set the users standard environment, replacing the one pointing to the restrictive python build in Artisan
         my_env = os.environ.copy()
@@ -32178,7 +32178,7 @@ class ApplicationWindow(QMainWindow):
     # returns OS name, version and architecture as strings
     # ex: "macOS", "11.6",
     @staticmethod
-    @functools.cache # we cache the result to avoid re-compuation
+    @functools.lru_cache(maxsize=None) #we cache the result to avoid re-compuation #for Python >=3.9 can use @functools.cache
     def get_os():
         def get_macOS_version():
             # platform.mac_ver() returns 10.16-style version info on BigSur

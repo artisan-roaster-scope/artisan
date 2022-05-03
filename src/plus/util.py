@@ -35,7 +35,7 @@ except Exception:
 from artisanlib.util import decodeLocal
 from pathlib import Path
 from plus import config
-from typing import Optional
+from typing import Optional, List  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 try:
     from typing import Final
 except ImportError:
@@ -345,7 +345,7 @@ def getLanguage() -> str:
 
 # if rlimit = -1 or rused = -1 or pu = "", no update information is available and the state is not updated
 @pyqtSlot(float,float,str,int,list)
-def updateLimits(rlimit:float, rused:float, pu:str, notifications:int, machines: list[str]):
+def updateLimits(rlimit:float, rused:float, pu:str, notifications:int, machines: List[str]):  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
     if config.app_window:
         config.app_window.updateLimits(rlimit, rused, pu, notifications, machines)
 

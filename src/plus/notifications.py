@@ -28,7 +28,7 @@ except Exception:
     from PyQt5.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
 
 try:
-    from typing import Final
+    from typing import Final, List  #for Python >= 3.9: can remove 'List' since type hints can use the generic 'list'
 except ImportError:
     # for Python 3.7:
     from typing_extensions import Final
@@ -48,7 +48,7 @@ get_notifications_semaphore = QSemaphore(
 
 # if notifications > 0 the new notifications are retrieved and forwarded to the user
 # should only be called from the GUI thread
-def updateNotifications(notifications: int, machines: list[str]):
+def updateNotifications(notifications: int, machines: List[str]):  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
     _log.debug('updateNotifications(%s,%s)',notifications,machines)
     try:
         if config.app_window:
