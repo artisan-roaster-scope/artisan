@@ -15,5 +15,5 @@ repos:
     rev: v2.32.0
     hooks:
     -   id: pyupgrade
-        args: [--py39-plus]
+        args: [--py38-plus]
         exclude: ^(src/uic/|src/translations/|src/includes/)
