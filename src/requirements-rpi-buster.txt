@@ -18,7 +18,7 @@ gevent==21.12.0 #21.8.0
 gevent-websocket==0.10.1
 numpy==1.21.4 #1.22.1 # 1.21.4 is last for Buster on pywheels
 scipy==1.7.3 # 1.7.2 # depends on numpy thus needs to be put after # 1.7.3 is last for Buster on pywheels
-matplotlib==3.5.1 # 3.5.0 # 3.4.1 requires pyinstaller > 4.2 # 3.1.x requires Python 3.7, stretch comes with Python 3.5.3 only
+matplotlib==3.5.2 # 3.5.1 # 3.4.1 requires pyinstaller > 4.2 # 3.1.x requires Python 3.7, stretch comes with Python 3.5.3 only
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus needs to be put after
 openpyxl==3.0.9 # 3.0.7

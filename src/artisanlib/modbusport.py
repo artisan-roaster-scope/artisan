@@ -104,7 +104,7 @@ def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,wordorde
 class modbusport():
     """ this class handles the communications with all the modbus devices"""
 
-    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_write_delay', 'readRetries', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
+    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
         'timeout', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
         'channels', 'inputSlaves', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
         'inputModes', 'optimizer', 'fetch_max_blocks', 'reset_socket', 'activeRegisters', 'readingsCache', 'SVmultiplier', 'PIDmultiplier',
@@ -116,8 +116,8 @@ class modbusport():
         self.modbus_serial_read_delay = 0.035 # in seconds
         self.modbus_serial_write_delay = 0.080 # in seconds
 
-        # retries
-        self.readRetries = 0
+        self.maxCount = 125 # the maximum number of registers that can be fetched in one request according to the MODBUS spec
+        self.readRetries = 0  # retries
         #default initial settings. They are changed by settingsload() at initiation of program according to the device chosen
         self.comport = 'COM5'      #NOTE: this string should not be translated.
         self.baudrate = 115200
@@ -356,6 +356,10 @@ class modbusport():
                     v)
                 self.aw.addserial(ser_str)
 
+    @staticmethod
+    def invalidResult(res,count):
+        return res is None or res.isError() or res.registers is None or len(res.registers) != count
+
     def readActiveRegisters(self):
         if not self.optimizer:
             return
@@ -380,62 +384,64 @@ class modbusport():
                         retry = self.readRetries
                         register = seq[0]
                         count = seq[1]-seq[0] + 1
-                        res = None
-                        if just_send:
-                            self.sleepBetween() # we start with a sleep, as it could be that just a send command happened before the semaphore was caught
-                        just_send = True
-                        tx = time.time()
-                        while True:
-                            try:
-                                # we cache only MODBUS function 3 and 4 (not 1 and 2!)
-                                if code == 3:
-                                    res = self.master.read_holding_registers(register,count,unit=slave)
-                                elif code == 4:
-                                    res = self.master.read_input_registers(register,count,unit=slave)
-                            except Exception as e: # pylint: disable=broad-except
-                                _log.exception(e)
-                                res = None
-                            if res is None or res.isError(): # requires pymodbus v1.5.1
-                                if retry > 0:
-                                    retry = retry - 1
-                                    #time.sleep(0.020) # no retry delay as timeout time should already be larger enough
+                        if 0 < count <= self.maxCount:
+                            res = None
+                            if just_send:
+                                self.sleepBetween() # we start with a sleep, as it could be that just a send command happened before the semaphore was caught
+                            just_send = True
+                            tx = time.time()
+                            while True:
+                                try:
+                                    # we cache only MODBUS function 3 and 4 (not 1 and 2!)
+                                    if code == 3:
+                                        res = self.master.read_holding_registers(register,count,unit=slave)
+                                    elif code == 4:
+                                        res = self.master.read_input_registers(register,count,unit=slave)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                                    res = None
+                                if self.invalidResult(res,count):
+                                    if retry > 0:
+                                        retry = retry - 1
+                                        time.sleep(0.020)
+                                    else:
+                                        _log.info('PRINT except')
+                                        raise Exception('Exception response')
                                 else:
-                                    raise Exception('Exception response')
-                            else:
-                                break
+                                    break
 
-                        #note: logged chars should be unicode not binary
-                        if self.aw.seriallogflag:
-                            if self.type < 3: # serial MODBUS
-                                ser_str = 'MODBUS readActiveRegisters : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx# = {}'.format(
-                                    self.formatMS(tx,time.time()),
-                                    self.comport,
-                                    self.baudrate,
-                                    self.bytesize,
-                                    self.parity,
-                                    self.stopbits,
-                                    self.timeout,
-                                    slave,
-                                    register,
-                                    code,
-                                    len(res.registers))
-                            else: # IP MODBUS
-                                ser_str = 'MODBUS readActiveRegisters : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx# = {}'.format(
-                                    self.formatMS(tx,time.time()),
-                                    self.host,
-                                    self.port,
-                                    slave,
-                                    register,
-                                    code,
-                                    len(res.registers))
-                            _log.debug(ser_str)
-                            self.aw.addserial(ser_str)
+                            #note: logged chars should be unicode not binary
+                            if self.aw.seriallogflag:
+                                if self.type < 3: # serial MODBUS
+                                    ser_str = 'MODBUS readActiveRegisters : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx# = {}'.format(
+                                        self.formatMS(tx,time.time()),
+                                        self.comport,
+                                        self.baudrate,
+                                        self.bytesize,
+                                        self.parity,
+                                        self.stopbits,
+                                        self.timeout,
+                                        slave,
+                                        register,
+                                        code,
+                                        len(res.registers))
+                                else: # IP MODBUS
+                                    ser_str = 'MODBUS readActiveRegisters : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx# = {}'.format(
+                                        self.formatMS(tx,time.time()),
+                                        self.host,
+                                        self.port,
+                                        slave,
+                                        register,
+                                        code,
+                                        len(res.registers))
+                                _log.debug(ser_str)
+                                self.aw.addserial(ser_str)
 
-                        if res is not None:
-                            if self.commError: # we clear the previous error and send a message
-                                self.commError = False
-                                self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-                            self.cacheReadings(code,slave,register,res.registers)
+                            if res is not None:
+                                if self.commError: # we clear the previous error and send a message
+                                    self.commError = False
+                                    self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                                self.cacheReadings(code,slave,register,res.registers)
 
         except Exception as ex: # pylint: disable=broad-except
             _log.debug(ex)
@@ -652,7 +658,7 @@ class modbusport():
                     res = self.master.read_holding_registers(int(register),2,unit=int(slave))
                 else:
                     res = self.master.read_input_registers(int(register),2,unit=int(slave))
-                if res is None or res.isError(): # requires pymodbus v1.5.1
+                if self.invalidResult(res,2):
                     if retry > 0:
                         retry = retry - 1
                         #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
@@ -735,7 +741,7 @@ class modbusport():
                     res = self.master.read_holding_registers(int(register),2,unit=int(slave))
                 else:
                     res = self.master.read_input_registers(int(register),2,unit=int(slave))
-                if res is None or res.isError(): # requires pymodbus v1.5.1
+                if self.invalidResult(res,2):
                     if retry > 0:
                         retry = retry - 1
                         #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
@@ -810,7 +816,7 @@ class modbusport():
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             res = None
-        if res is not None and not res.isError(): # requires pymodbus v1.5.1
+        if self.invalidResult(res,1):
             if code in [1,2]:
                 if res is not None and res.bits[0]:
                     return 1
@@ -863,7 +869,7 @@ class modbusport():
                 except Exception as ex: # pylint: disable=broad-except
                     _log.exception(ex)
                     res = None
-                if res is None or res.isError(): # requires pymodbus v1.5.1
+                if self.invalidResult(res,1):
                     if retry > 0:
                         retry = retry - 1
                         #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
@@ -961,7 +967,7 @@ class modbusport():
                     res = self.master.read_holding_registers(int(register),2,unit=int(slave))
                 else:
                     res = self.master.read_input_registers(int(register),2,unit=int(slave))
-                if res is None or res.isError(): # requires pymodbus v1.5.1
+                if self.invalidResult(res,2):
                     if retry > 0:
                         retry = retry - 1
                         #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
@@ -1054,7 +1060,7 @@ class modbusport():
                         res = self.master.read_input_registers(int(register),1,unit=int(slave))
                 except Exception: # pylint: disable=broad-except
                     res = None
-                if res is None or res.isError(): # requires pymodbus v1.5.1
+                if self.invalidResult(res,1):
                     if retry > 0:
                         retry = retry - 1
                         # time.sleep(0.020)  # no retry delay as timeout time should already be larger enough

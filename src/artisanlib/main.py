@@ -15940,14 +15940,8 @@ def my_get_icon(name):
         return QIcon(p)
     return None
 
-def my_fedit(data, _title='', comment='', icon=None, parent=None, _apply=None):
-    del _title, _apply
-    # Sorting for default labels (_lineXXX, _imageXXX).
-    def cmp_key(label):
-        match = re.match(r'(_line|_image)(\d+)', label)
-        if match:
-            return match.group(1), int(match.group(2))
-        return label, 0
+def my_fedit(data, comment='', icon=None, parent=None, **kargs):
+    del kargs
 
     axes = aw.qmc.ax
     figure = aw.qmc.fig
@@ -15959,7 +15953,6 @@ def my_fedit(data, _title='', comment='', icon=None, parent=None, _apply=None):
         if label == '_nolegend_':
             continue
         linedict[label] = line
-    curvelabels = sorted(linedict, key=cmp_key)
 
     if len(data) > 1:
         # just take the Curve Styles and drop the Axis settings
@@ -16004,9 +15997,9 @@ def my_fedit(data, _title='', comment='', icon=None, parent=None, _apply=None):
         def my_apply(data):
             try:
                 # Set / Curves
-                for index, curve in enumerate(data):
-                    if len(curvelabels) > index:
-                        line = linedict[curvelabels[index]]
+                for curve in data:
+                    if curve[0] in linedict:
+                        line = linedict[curve[0]]
                         (label, linestyle, drawstyle, linewidth, color, marker, markersize,
                          markerfacecolor, markeredgecolor) = curve
                         line.set_label(label)
@@ -16027,7 +16020,9 @@ def my_fedit(data, _title='', comment='', icon=None, parent=None, _apply=None):
                     figure.canvas.toolbar.push_current()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
-    return formlayout.fedit_org(data,QApplication.translate('Toolbar', 'Lines'),comment,icon,parent,my_apply) #@UndefinedVariable
+    dialog = formlayout.FormDialog(data, QApplication.translate('Toolbar', 'Lines'), comment, icon, parent, my_apply)
+    dialog.exec()
+    return dialog.get()
 
 #####
 
@@ -19295,7 +19290,7 @@ class ApplicationWindow(QMainWindow):
 
     # if rlimit = -1 or rused = -1 or pu = "", no update information is available and the state is not updated
     @pyqtSlot(float,float,str,int,list)
-    def updateLimits(self, rlimit:float, rused:float, pu:str, notifications:int, machines: List[str]):  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
+    def updateLimits(self, rlimit:float, rused:float, pu:str, notifications:int, machines: list[str]):  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
         _log.debug('updateLimits(%s,%s,%s,%s,%s)', rlimit, rused, pu, notifications, machines)
         self.updatePlusLimits(rlimit, rused)
         self.updatePlusPaidUntil(pu)
@@ -24532,7 +24527,7 @@ class ApplicationWindow(QMainWindow):
                 _log.exception(e)
 
     @staticmethod
-    @functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
+    @functools.cache  #for Python >= 3.9 can use @functools.cache
     def calc_env():
         # we try to set the users standard environment, replacing the one pointing to the restrictive python build in Artisan
         my_env = os.environ.copy()
@@ -32178,7 +32173,7 @@ class ApplicationWindow(QMainWindow):
     # returns OS name, version and architecture as strings
     # ex: "macOS", "11.6",
     @staticmethod
-    @functools.lru_cache(maxsize=None) #we cache the result to avoid re-compuation #for Python >=3.9 can use @functools.cache
+    @functools.cache #we cache the result to avoid re-compuation #for Python >=3.9 can use @functools.cache
     def get_os():
         def get_macOS_version():
             # platform.mac_ver() returns 10.16-style version info on BigSur
