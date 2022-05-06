@@ -316,6 +316,7 @@ Section Uninstall
   RMDir /r "$INSTDIR\greenlet"
   RMDir /r "$INSTDIR\Icons"
   RMDir /r "$INSTDIR\Include"
+  RMDir /r "$INSTDIR\kiwisolver"
   RMDir /r "$INSTDIR\lib"
   RMDir /r "$INSTDIR\lib2to3"
   RMDir /r "$INSTDIR\lxml"
