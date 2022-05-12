@@ -29,14 +29,11 @@ sidebar:
 > * Download and run [zadig](https://zadig.akeo.ie/) (no installation required).
 > * Select Options>> List All Devices.
 ![alt text](../../assets/images/zadig_options_list_all.png)
-
 > * Select `Aillio LTD - Bullet R1 ROASTER FS (Interface 1)` from the pull down.
 ![alt text](../../assets/images/zadig_pulldown.png)
-
 > * Select `libusb-win32 (v1.2.6.0)` on the right side of the driver line.
 > * Click `Replace Driver`.  The button may show `Reinstall Driver`.  The driver installation may take several minutes.  Once complete you may closed Zadig.  A Windows reboot is recommended.
 ![alt text](../../assets/images/zadig_replace_driver.png)
-
 RoasTime will run with libusb installed.  There is no need to switch between USB drivers.  RoasTime may complain about the drivers when it is first started.  Look for the green light in the lower left corner as the indication that all is well.
 ![alt text](../../assets/images/rt_startup_with_libusb.png)
 {: .notice--primary}
