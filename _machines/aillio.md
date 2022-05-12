@@ -20,15 +20,25 @@ sidebar:
   - support for the new [IBTS IR sensor](https://medium.com/@aillio/the-start-of-something-39aa01d08fa9){:target="_blank"} and newer models version 1.5 and 2, and firmware versions, has been added in Artisan v1.6.1
 
 > **Watch out!** 
-> To connect successfully, Artisan running on Windows requires the **[Aillio USB Drivers For Legacy Version Only](https://s3.amazonaws.com/aillio/bulletr1interface/installation/LibUSB/libusb-win32-bin-1.2.6.0.exe){:target="_blank"}** `libusb-win32-bin-1.2.6.0.exe`, to be installed.  Link is from [Sweet Maria's legacy support page](https://legacy.sweetmarias.com/library/aillio-bullet-r1-support/){:target="_blank"}. For those with V2 there is a workaround for [using Artisan on Windows only](https://www.home-barista.com/home-roasting/artisan-2-0-and-aillio-bullet-r1-v2-t64271.html#p708297){:target="_blank"}
->
-> Alternatively you can install the legacy serial driver as follows with the Bullet R1 V2 plugged into the USB port of your computer:
+> To connect successfully, Artisan running on Windows
+> requires libusb-win32-bin-1.2.6.0 driver to be installed. 
+>  
+> To install the libusb driver:
+> * Connect the Bullet R1 to your computer.  Close RoasTime if it is running.
 > 
-> * Download and run [zadig](https://zadig.akeo.ie/)
-> * You should see the `Aillio LTD - Bullet R 1 ROASTER FS` selected
-> * On the left side you will see your current driver
-> * On the right side pick `libusb-win32 (v1.2.6.0)`
-> * Install the driver
+> * Download and run [zadig](https://zadig.akeo.ie/) (no installation required).
+> * Select Options>> List All Devices.
+![alt text](../../assets/images/zadig_options_list_all.png)
+
+> * Select `Aillio LTD - Bullet R1 ROASTER FS (Interface 1)` from the pull down.
+![alt text](../../assets/images/zadig_pulldown.png)
+
+> * Select `libusb-win32 (v1.2.6.0)` on the right side of the driver line.
+> * Click `Replace Driver`.  The button may show `Reinstall Driver`.  The driver installation may take several minutes.  Once complete you may closed Zadig.  A Windows reboot is recommended.
+![alt text](../../assets/images/zadig_replace_driver.png)
+
+RoasTime will run with libusb installed.  There is no need to switch between USB drivers.  RoasTime may complain about the drivers when it is first started.  Look for the green light in the lower left corner as the indication that all is well.
+![alt text](../../assets/images/rt_startup_with_libusb.png)
 {: .notice--primary}
 
 **Watch out!** For best performance, please start monitoring the
