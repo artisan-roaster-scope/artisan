@@ -250,6 +250,12 @@ class BleInterface(QtCore.QObject):
     @QtCore.pyqtSlot('QLowEnergyService::ServiceError')
     def serviceError(self):
         _log.debug('onSeviceErrorOccurred: %s', self.m_service.error())
+        self.m_service.stateChanged.disconnect(self.onServiceStateChanged)
+        self.m_service.characteristicChanged.disconnect(self.onCharacteristicChanged)
+        self.m_service.characteristicRead.disconnect(self.onCharacteristicRead)
+        self.m_service.errorOccurred.disconnect(self.serviceError)
+        self.m_service = None
+        self.update_connected(False)
 
     @QtCore.pyqtSlot()
     def onServiceScanDone(self):
