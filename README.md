@@ -7,7 +7,7 @@ Visual scope for coffee roasters
 [![Windows/Mac/Linux build](https://img.shields.io/appveyor/ci/roasterdave/artisan.svg?label=Windows/Mac/Linux%20builds)](https://ci.appveyor.com/project/roasterdave/artisan)
 [![Latest release](https://img.shields.io/github/release/artisan-roaster-scope/artisan.svg)](https://github.com/artisan-roaster-scope/artisan/releases/latest)
 [![Pre-release](https://img.shields.io/github/release-pre/artisan-roaster-scope/artisan.svg)](https://github.com/artisan-roaster-scope/artisan/releases/continuous)
-![Github All Releases](https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/total.svg)
+![Github Latest Releases](https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total)
 ![License](https://img.shields.io/github/license/artisan-roaster-scope/artisan.svg)
 [![pylint](https://github.com/artisan-roaster-scope/artisan/actions/workflows/pylint.yaml/badge.svg?branch=master&event=push)](https://github.com/artisan-roaster-scope/artisan/actions?query=workflow:pylint+event:push+branch:master)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
