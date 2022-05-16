@@ -16716,17 +16716,20 @@ class EventActionThread(QThread): # pylint: disable=too-few-public-methods
 # applies comma2dot as fixup to automatically turn numbers like "1,2" into valid numbers like "1.0" and the empty entry into "0.0"
 class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-methods
 
-    def fixup(self, input_value): # pylint: disable=no-self-use # used by class
+    def __init__(self, bottom, top, decimals, lineedit):
+        super().__init__(bottom, top, decimals, lineedit)
+        self.lineedit = lineedit
+
+    def fixup(self, input_value):
         try:
             if input_value is None or input_value == '':
-                return '0'
-            try:
-                return aw.comma2dot(input_value)
-            except Exception: # pylint: disable=broad-except
-                return input_value
-        except Exception as e:
-            _log.exception(e)
-            return input_value
+                input_value = '0'
+            else:
+                input_value = aw.comma2dot(input_value)
+            self.lineedit.setText(input_value)
+#            super().fixup(input_value)
+        except Exception: # pylint: disable=broad-except
+            pass
 
 ########################################################################################
 #################### MAIN APPLICATION WINDOW ###########################################
@@ -18076,7 +18079,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background-color: '#147bb3';
+                    background-color: #147bb3;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
@@ -18178,7 +18181,7 @@ class ApplicationWindow(QMainWindow):
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background-color: #7FC8FF;
+                    background-color: #cc0f50;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -18186,11 +18189,11 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
-                    background-color: #1985ba;
+                    background-color: #c70d49;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background-color: #77cafd;
+                    background-color: #d4336a;
                 }
             """,
             'SV +':     """
@@ -19675,6 +19678,7 @@ class ApplicationWindow(QMainWindow):
     def createCLocaleDoubleValidator(bot,top,dec,w):
         validator = MyQDoubleValidator(bot,top,dec,w)
         validator.setLocale(QLocale.c())
+        validator.setNotation(QDoubleValidator.Notation.StandardNotation);
         return validator
 
 #    @pyqtSlot()

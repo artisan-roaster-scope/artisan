@@ -33,7 +33,7 @@ def extractProfileRubasseCSV(file,aw):
         data = csv.reader(csvFile,delimiter=',')
         #read file header
         header_row = next(data)
-        header = ['time','BT','Fan','Heater','RoR','Drum','Humidity','ET','Pressure']
+        header = ['time','BT','Fan','Heater','RoR','Drum','Humidity','ET','Pressure'] + ['DT', 'timeB', 'BTB', 'FanB', 'HeaterB', 'RoRB', 'DrumB', 'HumidityB', 'ETB', 'PressureB', 'DTB']
 
         fan = None # holds last processed fan event value
         fan_last = None # holds the fan event value before the last one
@@ -86,19 +86,19 @@ def extractProfileRubasseCSV(file,aw):
                 pass
             temp2.append(bt)
 
-            heater = -1
+            heaterV = -1
             try:
-                heater = float(item['Heater'])
+                heaterV = float(item['Heater'])
             except Exception: # pylint: disable=broad-except
                 pass
-            extra1.append(heater)
+            extra1.append(heaterV)
 
-            fan = -1
+            fanV = -1
             try:
-                fan = float(item['Fan'])
+                fanV = float(item['Fan'])
             except Exception: # pylint: disable=broad-except
                 pass
-            extra2.append(fan)
+            extra2.append(fanV)
 
             humidity = -1
             try:
@@ -121,12 +121,18 @@ def extractProfileRubasseCSV(file,aw):
                 pass
             extra5.append(drum)
 
-            extra6.append(-1)
+            DT = -1
+            try:
+                DT = float(item['DT'])
+            except Exception: # pylint: disable=broad-except
+                pass
+            extra6.append(DT)
+#            extra6.append(-1)
 
             if 'Fan' in item:
                 try:
                     v = float(item['Fan'])
-                    if v != fan:
+                    if fan is None or v != fan:
                         # fan value changed
                         if fan_last is not None and v == fan_last:
                             # just a fluctuation, we remove the last added fan value again
@@ -220,11 +226,11 @@ def extractProfileRubasseCSV(file,aw):
     res['extradevices'] = [25,25,25]
     res['extratimex'] = [timex[:],timex[:],timex[:]]
 
-    res['extraname1'] = ['{3}','Humidity','{1}']
+    res['extraname1'] = ['{3}','Moisture','{1}']
     res['extratemp1'] = [extra1,extra3,extra5]
     res['extramathexpression1'] = ['','','']
 
-    res['extraname2'] = ['{0}','Pressure','']
+    res['extraname2'] = ['{0}','Pressure','DT']
     res['extratemp2'] = [extra2,extra4,extra6]
     res['extramathexpression2'] = ['','','']
 
