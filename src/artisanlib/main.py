@@ -5345,9 +5345,11 @@ class tgraphcanvas(FigureCanvas):
                 #find time or temp distances
                 slider_events = {} # keep event type value pairs to move sliders (but only once per slider and per interval!)
                 next_byTemp_checked = False # we take care to reply events by temperature in order!
+                now = self.timeclock.elapsedMilli()
                 for i in range(len(self.backgroundEvents)):
-                    if i not in aw.qmc.replayedBackgroundEvents: # never replay one event twice
-                        timed = self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.
+                    if (i not in aw.qmc.replayedBackgroundEvents and # never replay one event twice
+                        (self.timeindexB[6]==0 or self.backgroundEvents[i] < self.timeindexB[6])): # don't replay events that happend after DROP in the backgroundprofile
+                        timed = self.timeB[self.backgroundEvents[i]] - now
                         delta = 1 # by default don't trigger this one
                         if aw.qmc.replayType == 0: # replay by time
                             delta = timed
@@ -19678,7 +19680,7 @@ class ApplicationWindow(QMainWindow):
     def createCLocaleDoubleValidator(bot,top,dec,w):
         validator = MyQDoubleValidator(bot,top,dec,w)
         validator.setLocale(QLocale.c())
-        validator.setNotation(QDoubleValidator.Notation.StandardNotation);
+        validator.setNotation(QDoubleValidator.Notation.StandardNotation)
         return validator
 
 #    @pyqtSlot()
