@@ -6674,7 +6674,8 @@ class tgraphcanvas(FigureCanvas):
                 self.restoreEnergyLoadDefaults()
                 self.restoreEnergyProtocolDefaults()
                 #
-                self.weight = [0,0,self.weight[2]]
+                nominal_batch_size = aw.convertWeight(self.roastersize_setup,1,self.weight_units.index(self.weight[2]))
+                self.weight = [nominal_batch_size,0,self.weight[2]]
                 self.volume = [0,0,self.volume[2]]
                 self.density = [0,self.density[1],1,self.density[3]]
                 # we reset ambient values to the last sampled readings in this session
@@ -31319,6 +31320,9 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.roastertype_setup = toString(settings.value('roastertype_setup',self.qmc.roastertype_setup))
             if settings.contains('roastersize_setup'):
                 self.qmc.roastersize_setup = toFloat(settings.value('roastersize_setup',self.qmc.roastersize_setup))
+            # we set the default in-weight from the given nominal batchsize
+            nominal_batch_size = self.convertWeight(self.qmc.roastersize_setup,1,self.qmc.weight_units.index(self.qmc.weight[2]))
+            self.qmc.weight = [nominal_batch_size,self.qmc.weight[1],self.qmc.weight[2]]
             if settings.contains('roasterheating_setup'):
                 self.qmc.roasterheating_setup = toInt(settings.value('roasterheating_setup',self.qmc.roasterheating_setup))
             if settings.contains('drumspeed_setup'):
