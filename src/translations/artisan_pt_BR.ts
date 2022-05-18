@@ -854,7 +854,7 @@ FINAL</translation>
     <message>
       <location filename="../artisanlib/main.py" line="18309" />
       <source>CHARGE</source>
-      <translation>CARGA</translation>
+      <translation>CARREGAR</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18314" />
@@ -1278,7 +1278,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="358" />
       <source>Start PID on CHARGE</source>
-      <translation>Inicie o PID na CARGA</translation>
+      <translation>Inicie o PID na CARREGAR</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="125" />
@@ -1336,7 +1336,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/events.py" line="451" />
       <source>CHARGE timer</source>
-      <translation>CARGA temporizador</translation>
+      <translation>CARREGAR temporizador</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="463" />
@@ -1366,13 +1366,13 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/events.py" line="1039" />
       <source>CHARGE</source>
-      <translation>CARGA</translation>
+      <translation>CARREGAR</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="50" />
       <location filename="../artisanlib/events.py" line="1048" />
       <source>DRY END</source>
-      <translation>FINAL SECAGEM</translation>
+      <translation>FIM DA SECA</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="52" />
@@ -1431,7 +1431,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/ports.py" line="1450" />
       <source>START on CHARGE</source>
-      <translation>COMEÇAR em CHARGE</translation>
+      <translation>COMEÇAR em CARREGAR</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1452" />
@@ -1493,7 +1493,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="873" />
       <source>Open on CHARGE</source>
-      <translation>Abrir na CARGA</translation>
+      <translation>Abrir na CARREGAR</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="876" />
@@ -1613,7 +1613,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/curves.py" line="368" />
       <source>Smooth Spikes</source>
-      <translation>Picos Suavizados</translation>
+      <translation>Suavizar Picos</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="373" />
@@ -1623,7 +1623,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/curves.py" line="396" />
       <source>Drop Spikes</source>
-      <translation>Picos Removidos</translation>
+      <translation>Remover Picos</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="591" />
@@ -2088,7 +2088,7 @@ RESFRIADO</translation>
       <location filename="../artisanlib/alarms.py" line="820" />
       <location filename="../artisanlib/pid_dialogs.py" line="412" />
       <source>CHARGE</source>
-      <translation>CARGA</translation>
+      <translation>CARREGAR</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="882" />
@@ -2461,7 +2461,7 @@ RESFRIADO</translation>
       <location filename="../artisanlib/curves.py" line="936" />
       <location filename="../artisanlib/curves.py" line="904" />
       <source>DRY END</source>
-      <translation>FINAL SECAGEM</translation>
+      <translation>FIM DA SECA</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="937" />
@@ -2523,7 +2523,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/main.py" line="1697" />
       <source>Propane Gas (LPG)</source>
-      <translation>Gás Propano (GLP)</translation>
+      <translation>Gás Propano</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="1698" />
@@ -4539,7 +4539,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4835" />
       <source>Unable to move CHARGE to a value that does not exist</source>
-      <translation>Impossível mover CARGA para um valor que não existe</translation>
+      <translation>Impossível mover CARREGAR para um valor que não existe</translation>
     </message>
     <message>
       <location filename="../artisanlib/modbusport.py" line="654" />
@@ -4688,7 +4688,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/main.py" line="38514" />
       <source>Analyze: CHARGE event required, none found</source>
-      <translation>Analisar: evento CHARGE necessário, nenhum encontrado</translation>
+      <translation>Analisar: evento CARREGAR necessário, nenhum encontrado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="38518" />
@@ -4703,7 +4703,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/main.py" line="38608" />
       <source>Analyze: background profile requires CHARGE and DROP events</source>
-      <translation>Análise: o perfil modelo precisa ter eventos de CARGA e DESCARGA</translation>
+      <translation>Análise: o perfil modelo precisa ter eventos de CARREGAR e DESCARGA</translation>
     </message>
     <message>
       <source>HH806AUtemperature(): {0} bytes received but 14 needed</source>
@@ -4956,7 +4956,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/logs.py" line="40" />
       <source>Serial Log</source>
-      <translation>Registro de Série</translation>
+      <translation>Registro Serial</translation>
     </message>
     <message>
       <location filename="../artisanlib/logs.py" line="84" />
@@ -5599,7 +5599,7 @@ RESFRIADO</translation>
       <location filename="../artisanlib/main.py" line="33996" />
       <location filename="../artisanlib/main.py" line="33972" />
       <source>CHARGE BT</source>
-      <translation>CARGA BT</translation>
+      <translation>CARREGAR BT</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34003" />
@@ -5721,7 +5721,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/main.py" line="33995" />
       <source>CHARGE ET</source>
-      <translation>CARGA ET</translation>
+      <translation>CARREGAR ET</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="33997" />
@@ -6213,7 +6213,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/main.py" line="35489" />
       <source>CHARGE:</source>
-      <translation>CARGA:</translation>
+      <translation>CARREGAR:</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35491" />
@@ -6927,12 +6927,12 @@ Os alarmes são verificados em ordem, do topo à base da tabela.</translation>
     <message>
       <location filename="../help/alarms_help.py" line="78" />
       <source>CHARGE</source>
-      <translation>CARGA</translation>
+      <translation>CARREGAR</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="78" />
       <source>trigger the CHARGE event</source>
-      <translation>acionar o evento CHARGE</translation>
+      <translation>acionar o evento CARREGAR</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="79" />
@@ -8963,7 +8963,7 @@ Carregue o perfil gravado na máquina menor e abra o Transposer. Selecione o map
       <location filename="../help/eventbuttons_help.py" line="114" />
       <location filename="../help/eventsliders_help.py" line="99" />
       <source>enables/disables autoCHARGE</source>
-      <translation>ativa / desativa o autoCHARGE</translation>
+      <translation>ativa / desativa o auto CARREGAR</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="115" />
@@ -11883,7 +11883,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
       <location filename="../artisanlib/ports.py" line="1440" />
       <location filename="../artisanlib/comparator.py" line="760" />
       <source>CHARGE</source>
-      <translation>CARGA</translation>
+      <translation>CARREGAR</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22373" />
@@ -12770,7 +12770,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
       <location filename="../artisanlib/statistics.py" line="90" />
       <location filename="../artisanlib/roast_properties.py" line="764" />
       <source>DRY END</source>
-      <translation>FINAL SECAGEM</translation>
+      <translation>FIM DA SECA</translation>
     </message>
     <message>
       <location filename="../artisanlib/transposer.py" line="1061" />
@@ -13281,7 +13281,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/curves.py" line="898" />
       <source>Offset seconds from CHARGE</source>
-      <translation>Segundos após a CARGA</translation>
+      <translation>Segundos após a CARREGAR</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="903" />
@@ -13292,7 +13292,7 @@ Fases LCDs</translation>
       <location filename="../artisanlib/curves.py" line="945" />
       <location filename="../artisanlib/curves.py" line="913" />
       <source>Custom offset seconds from CHARGE</source>
-      <translation>Personalizar segundos após a CARGA</translation>
+      <translation>Personalizar segundos após a CARREGAR</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="922" />
@@ -14982,7 +14982,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/main.py" line="17876" />
       <source>Serial</source>
-      <translation>Série</translation>
+      <translation>Communicação Serial</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17881" />
@@ -15688,13 +15688,13 @@ Repita a operação no final: {0}</translation>
       <location filename="../artisanlib/designer.py" line="564" />
       <location filename="../artisanlib/designer.py" line="333" />
       <source>CHARGE</source>
-      <translation>CARGA</translation>
+      <translation>CARREGAR</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="565" />
       <location filename="../artisanlib/designer.py" line="334" />
       <source>DRY END</source>
-      <translation>FINAL SECAGEM</translation>
+      <translation>FIM DA SECA</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="566" />
@@ -16102,7 +16102,7 @@ Repita a operação no final: {0}</translation>
     <message>
       <location filename="../artisanlib/main.py" line="12024" />
       <source>CHARGE: Scope is not recording</source>
-      <translation>CHARGE: Scope não está gravando</translation>
+      <translation>CARREGAR: Scope não está gravando</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12052" />
@@ -16122,7 +16122,7 @@ Repita a operação no final: {0}</translation>
     <message>
       <location filename="../artisanlib/main.py" line="12193" />
       <source>[DRY END] recorded at {0} BT = {1}</source>
-      <translation>[FINAL SECAGEM] gravado em {0} BT = {1}</translation>
+      <translation>[FIM DA SECA] gravado em {0} BT = {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12271" />
@@ -16275,17 +16275,17 @@ Prosseguir?</translation>
       <location filename="../artisanlib/main.py" line="14767" />
       <source>Unable to start designer.
 Profile missing [CHARGE] or [DROP]</source>
-      <translation>Impossível iniciar desenhista. Perfil não tem [CARGA] ou [DESCARGA]</translation>
+      <translation>Impossível iniciar desenhista. Perfil não tem [CARREGAR] ou [DESCARGA]</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15066" />
       <source>[ CHARGE ]</source>
-      <translation>[ CARGA ]</translation>
+      <translation>[ CARREGAR ]</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15069" />
       <source>[ DRY END ]</source>
-      <translation>[ FINAL SECAGEM ]</translation>
+      <translation>[ FIM DA SECA ]</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15072" />
@@ -16551,12 +16551,12 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="23831" />
       <source>autoCHARGE on</source>
-      <translation>autoCHARGE ligado</translation>
+      <translation>autoCARREGAR ligado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="23834" />
       <source>autoCHARGE off</source>
-      <translation>autoCHARGE desligado</translation>
+      <translation>autoCARREGAR desligado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="23843" />
@@ -16757,7 +16757,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="26463" />
       <source>NEW ROAST canceled: incomplete profile lacking CHARGE and DROP found</source>
-      <translation>NEW ROAST cancelado: perfil incompleto sem CHARGE e DROP encontrado</translation>
+      <translation>NEW ROAST cancelado: perfil incompleto sem CARREGAR e DESCARGA encontrado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="26468" />
@@ -18216,7 +18216,7 @@ Continuar?</translation>
       <location filename="../artisanlib/main.py" line="7297" />
       <location filename="../artisanlib/main.py" line="7293" />
       <source>CHARGE</source>
-      <translation>CARGA</translation>
+      <translation>CARREGAR</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12070" />
@@ -19182,14 +19182,14 @@ Continuar?</translation>
       <location filename="../artisanlib/roast_properties.py" line="4144" />
       <location filename="../artisanlib/background.py" line="733" />
       <source>CHARGE</source>
-      <translation>CARGA</translation>
+      <translation>CARREGAR</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="2020" />
       <location filename="../artisanlib/roast_properties.py" line="4147" />
       <location filename="../artisanlib/background.py" line="736" />
       <source>DRY END</source>
-      <translation>FINAL SECAGEM</translation>
+      <translation>FIM DA SECA</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="2021" />
@@ -19858,7 +19858,7 @@ Aromática</translation>
     <message>
       <location filename="../artisanlib/axis.py" line="143" />
       <source>Automatically set time axis min and max from profile CHARGE/DROP events</source>
-      <translation>Definir automaticamente o mínimo e máximo do eixo de tempo a partir dos eventos CHARGE / DROP do perfil</translation>
+      <translation>Definir automaticamente o mínimo e máximo do eixo de tempo a partir dos eventos CARREGAR / DESCARGA do perfil</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="177" />

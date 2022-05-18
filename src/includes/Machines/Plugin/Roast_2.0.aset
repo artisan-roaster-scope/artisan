@@ -1,11 +1,11 @@
 [General]
-Delay=2000
+Delay=1000
 Oversampling=false
 roastertype_setup=Plugin Roast
 
 [Device]
 id=29
-Controlbuttonflag=true
+Controlbuttonflag=false
 
 [Modbus]
 PID_OFF_action=
@@ -17,7 +17,7 @@ PID_p_register=12
 PID_slave_ID=1
 PIDmultiplier=2
 SVmultiplier=2
-baudrate=19200
+baudrate=115200
 bytesize=8
 comport=COM5
 host=127.0.0.1
