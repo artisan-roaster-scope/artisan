@@ -32,11 +32,11 @@ You need to (temporarily during installation) tick "Allow applications downloade
 #### Alternative: Homebrew
 Artisan is available on [Homebrew](https://brew.sh/). To install Homebrew:
 ```
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 To install Artisan via Homebrew:
 ```
-brew cask install artisan
+brew install --cask artisan
 ```
 
 ### Linux
