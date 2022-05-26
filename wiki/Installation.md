@@ -89,7 +89,7 @@ sudo apt-get install gnome-keyring
 
 ---
 
-[A bug in Ubuntu 22.04] has been reported](https://bugs.launchpad.net/ubuntu/+source/brltty/+bug/1958224) that deactivates certain `/dev/ttyUSB` device ports, eg. the one used by the Mastech 6514. The culprit is a package called BRLTTY, which is installed automatically in 22.04. This package is for blind folks who use a TTY. A work around is to use synaptic or the following terminal commands to remove this package.
+[A bug in Ubuntu 22.04 has been reported](https://bugs.launchpad.net/ubuntu/+source/brltty/+bug/1958224) that deactivates certain `/dev/ttyUSB` device ports, eg. the one used by the Mastech 6514. The culprit is a package called BRLTTY, which is installed automatically in 22.04. This package is for blind folks who use a TTY. A work around is to use synaptic or the following terminal commands to remove this package.
 
 ```
 # sudo apt-get remove brltty
