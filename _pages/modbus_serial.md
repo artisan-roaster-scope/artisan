@@ -52,6 +52,7 @@ Machine                         | Driver | Remarks
 [KapoK](/machines/kapok/) | CH34x
 [NOR](/machines/nor/) | FTDI | CH34x (on N Series V.4 old machines)
 [Nordic](/machines/nordic/) | PL2303
+[Plugin Roast](/machines/pluginroast/) | CH34x
 [Phoenix](/machines/phoenix/) | CH34x
 [Proaster](/machines/proaster/) | FTDI
 [Roastmax](/machines/roastmax/) | FTDI
