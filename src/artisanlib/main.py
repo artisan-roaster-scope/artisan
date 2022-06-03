@@ -748,7 +748,7 @@ class tgraphcanvas(FigureCanvas):
         'specialeventsStrings', 'specialeventsvalue', 'eventsGraphflag', 'clampEvents', 'renderEventsDescr', 'eventslabelschars', 'eventsshowflag',
         'annotationsflag', 'showeventsonbt', 'showEtypes', 'E1timex', 'E2timex', 'E3timex', 'E4timex', 'E1values', 'E2values', 'E3values', 'E4values',
         'EvalueColor', 'EvalueTextColor', 'EvalueMarker', 'EvalueMarkerSize', 'Evaluelinethickness', 'Evaluealpha', 'eventpositionbars', 'specialeventannotations',
-        'specialeventannovisibilities', 'overlappct', 'linestyle_default', 'drawstyle_default', 'linewidth_default', 'back_linewidth_default', 'delta_linewidth_default',
+        'specialeventannovisibilities', 'specialeventplaybackaid', 'specialeventplayback', 'overlappct', 'linestyle_default', 'drawstyle_default', 'linewidth_default', 'back_linewidth_default', 'delta_linewidth_default',
         'back_delta_linewidth_default', 'extra_linewidth_default', 'marker_default', 'markersize_default', 'BTlinestyle', 'BTdrawstyle', 'BTlinewidth', 'BTmarker',
         'BTmarkersize', 'ETlinestyle', 'ETdrawstyle', 'ETlinewidth', 'ETmarker', 'ETmarkersize', 'BTdeltalinestyle', 'BTdeltadrawstyle', 'BTdeltalinewidth',
         'BTdeltamarker', 'BTdeltamarkersize', 'ETdeltalinestyle', 'ETdeltadrawstyle', 'ETdeltalinewidth', 'ETdeltamarker', 'ETdeltamarkersize', 'BTbacklinestyle',
@@ -1925,6 +1925,8 @@ class tgraphcanvas(FigureCanvas):
         self.eventpositionbars = [0.]*120
         self.specialeventannotations = ['','','','']
         self.specialeventannovisibilities = [0,0,0,0]
+        self.specialeventplaybackaid = [True, True, True, True] # per event type decides if playback aid is active
+        self.specialeventplayback = [True, True, True, True] # per event type decides if background events are playbacked or not
         self.overlappct = 100
 
         #curve styles
@@ -5371,7 +5373,9 @@ class tgraphcanvas(FigureCanvas):
                                 next_byTemp_checked = True
                         else:
                             delta = 1 # don't trigger this one
-                        if reproducing is None and aw.qmc.backgroundReproduce and 0 < timed < self.detectBackgroundEventTime:
+                        if (reproducing is None and
+                                self.backgroundEtypes[i] < 4 and self.specialeventplaybackaid[self.backgroundEtypes[i]] and  # only show playback aid for event types with activated playback aid
+                                aw.qmc.backgroundReproduce and 0 < timed < self.detectBackgroundEventTime):
                             if i not in aw.qmc.beepedBackgroundEvents and aw.qmc.backgroundReproduceBeep:
                                 aw.qmc.beepedBackgroundEvents.append(i)
                                 QApplication.beep()
@@ -5427,9 +5431,10 @@ class tgraphcanvas(FigureCanvas):
                             # if playbackevents is active, we fire the event by moving the slider, but only if
                             # a event type is given (type!=4), the background event type is named exactly as the one of the foreground
                             # the event slider is active/visible and has an action defined
-                            if aw.qmc.backgroundPlaybackEvents and self.backgroundEtypes[i] < 4 and \
-                                (str(self.etypesf(self.backgroundEtypes[i]) == str(self.Betypesf(self.backgroundEtypes[i])))) and \
-                                aw.eventslidervisibilities[self.backgroundEtypes[i]]: #  and aw.eventslideractions[self.backgroundEtypes[i]]
+                            if (aw.qmc.backgroundPlaybackEvents and self.backgroundEtypes[i] < 4 and
+                                    self.specialeventplayback[self.backgroundEtypes[i]] and # only replay event types activated for replay
+                                    (str(self.etypesf(self.backgroundEtypes[i]) == str(self.Betypesf(self.backgroundEtypes[i])))) and
+                                    aw.eventslidervisibilities[self.backgroundEtypes[i]]): #  and aw.eventslideractions[self.backgroundEtypes[i]]
                                 slider_events[self.backgroundEtypes[i]] = self.eventsInternal2ExternalValue(self.backgroundEvalues[i]) # add to dict (later overwrite earlier slider moves!)
                                 # we move sliders only after processing all pending events (from the collected dict)
                                 #aw.moveslider(self.backgroundEtypes[i],self.eventsInternal2ExternalValue(self.backgroundEvalues[i])) # move slider and update slider LCD
@@ -30449,6 +30454,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundPlaybackDROP = bool(toBool(settings.value('backgroundPlaybackDROP',self.qmc.backgroundPlaybackDROP)))
             if settings.contains('replayType'):
                 aw.qmc.replayType = toInt(settings.value('replayType',aw.qmc.replayType))
+            if settings.contains('specialeventplaybackaid'):
+                self.qmc.specialeventplaybackaid = [toBool(x) for x in toList(settings.value('specialeventplaybackaid'))]
+            if settings.contains('specialeventplayback'):
+                self.qmc.specialeventplayback = [toBool(x) for x in toList(settings.value('specialeventplayback'))]
             #restore phases
             if settings.contains('Phases'):
                 self.qmc.phases = [toInt(x) for x in toList(settings.value('Phases',self.qmc.phases))]
@@ -32339,6 +32348,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue('backgroundPlaybackEvents',self.qmc.backgroundPlaybackEvents)
             settings.setValue('backgroundPlaybackDROP',self.qmc.backgroundPlaybackDROP)
             settings.setValue('replayType',self.qmc.replayType)
+            settings.setValue('specialeventplaybackaid',self.qmc.specialeventplaybackaid)
+            settings.setValue('specialeventplayback',self.qmc.specialeventplayback)
             settings.setValue('Phases',self.qmc.phases)
             #save phasesbuttonflag
             settings.setValue('phasesbuttonflag',self.qmc.phasesbuttonflag)
