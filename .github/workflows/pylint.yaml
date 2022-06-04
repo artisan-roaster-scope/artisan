@@ -37,5 +37,5 @@ jobs:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         set -o pipefail
-        pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt6 src/plus | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
-        pylint --disable=C --disable=R --extension-pkg-whitelist=PyQt6 src/artisanlib | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
+        pylint --disable=C --disable=R --extension-pkg-allow-list=PyQt6 --load-plugins=pylint.extensions.no_self_use src/plus | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
+        pylint --disable=C --disable=R --extension-pkg-allow-list=PyQt6 --load-plugins=pylint.extensions.no_self_use src/artisanlib | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
