@@ -86,7 +86,8 @@ def set_bool(bytearray_: bytearray, byte_index: int, bool_index: int, value: boo
         >>> buffer
             bytearray(b"\\x01")
     """
-    if value not in {0, 1, True, False}:
+
+    if value not in {0, 1, True, False}: # pylint: disable=duplicate-value
         raise TypeError(f'Value value:{value} is not a boolean expression.')
 
     current_value = get_bool(bytearray_, byte_index, bool_index)
