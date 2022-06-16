@@ -29829,7 +29829,7 @@ class ApplicationWindow(QMainWindow):
                     if self.qmc.autosaveimage:
                         #
                         if QFileInfo(filename).suffix() == 'alog':
-                            name_also = QFileInfo(filename).baseName()
+                            name_also = QFileInfo(filename).completeBaseName()
                         else:
                             name_also = QFileInfo(filename).fileName()
                         path_also = QDir()
