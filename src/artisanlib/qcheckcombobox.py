@@ -17,7 +17,7 @@ import sys
 
 try:
     #ylint: disable = E, W, R, C
-    from PyQt6.QtCore import Qt, QEvent, QRect, QTimer, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import Qt, QEvent, QTimer, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import (
         QPalette, QFontMetrics, QBrush, QColor, QPixmap, QIcon # @UnusedImport @Reimport  @UnresolvedImport
     )
@@ -28,7 +28,7 @@ try:
     )
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import Qt, QEvent, QRect, QTimer, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, QEvent, QTimer, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (
         QPalette, QFontMetrics, QBrush, QColor, QPixmap, QIcon # @UnusedImport @Reimport  @UnresolvedImport
     )
