@@ -23,14 +23,10 @@
 
 try:
     #ylint: disable = E, W, R, C
-    from PyQt6.QtCore import QStandardPaths, QCoreApplication, QDir, QUrl, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QDesktopServices # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QStandardPaths, QCoreApplication, QDir, QUrl, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QDesktopServices # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import decodeLocal
 from pathlib import Path

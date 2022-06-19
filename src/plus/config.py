@@ -29,14 +29,6 @@ except ImportError:
     # for Python 3.7:
     from typing_extensions import Final
 
-
-try:
-    #ylint: disable = E, W, R, C
-    from PyQt6.QtWidgets import QMainWindow # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
-    from PyQt5.QtWidgets import QMainWindow # @UnusedImport @Reimport  @UnresolvedImport
-
 # Constants
 app_name: Final = 'artisan.plus'
 profile_ext: Final = 'alog'

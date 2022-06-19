@@ -23,10 +23,10 @@
 
 try:
     #ylint: disable = E, W, R, C
-    from PyQt6.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib import __version__
 from typing import Any, Optional, Dict  #for Python >= 3.9: can remove 'Dict' since type hints can now use the generic 'dict'

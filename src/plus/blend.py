@@ -34,7 +34,7 @@ try:
         QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
     )
     from PyQt6.QtCore import Qt, pyqtSlot, QSize, QSettings # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QKeySequence, QAction, QIcon # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QIcon # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
@@ -43,14 +43,13 @@ except Exception: # pylint: disable=broad-except
         QComboBox, # @UnusedImport @Reimport  @UnresolvedImport
         QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
         QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QAction, # @UnusedImport @Reimport  @UnresolvedImport
         QToolButton, # @UnusedImport @Reimport  @UnresolvedImport
         QTableWidget, # @UnusedImport @Reimport  @UnresolvedImport
         QStyle, # @UnusedImport @Reimport  @UnresolvedImport
         QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
     )
     from PyQt5.QtCore import Qt, pyqtSlot, QSize, QSettings # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QKeySequence, QIcon # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QIcon # @UnusedImport @Reimport  @UnresolvedImport
     try:
         from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
     except Exception: # pylint: disable=broad-except
