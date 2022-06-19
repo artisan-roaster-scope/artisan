@@ -23,7 +23,7 @@ import matplotlib.patheffects as PathEffects
 from matplotlib import rcParams
 if sys.platform.startswith('darwin'):
     # import module to detect if OS X dark mode is active or not
-    import darkdetect # @UnresolvedImport # pylint: disable=import-error
+    import darkdetect # @UnresolvedImport # plint: disable=import-error
 import logging
 try:
     from typing import Final
@@ -41,14 +41,14 @@ with suppress_stdout_stderr():
     from matplotlib import cm
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl,  # @UnusedImport @Reimport  @UnresolvedImport
         QCoreApplication, QFileInfo, QDate, QTime, QDateTime) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import (QColor, QDesktopServices) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton,  # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox) # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl,  # @UnusedImport @Reimport  @UnresolvedImport
         QCoreApplication, QFileInfo, QDate, QTime, QDateTime) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QColor, QDesktopServices) # @UnusedImport @Reimport  @UnresolvedImport
@@ -736,7 +736,7 @@ class roastCompareDlg(ArtisanDialog):
         self.background = background
         self.setWindowTitle(QApplication.translate('Form Caption','Comparator'))
         self.maxentries = 10 # maximum number of profiles to be compared
-        self.basecolors = list(cm.tab10(numpy.linspace(0,1,10)))  # @UndefinedVariable # pylint: disable=maybe-no-member
+        self.basecolors = list(cm.tab10(numpy.linspace(0,1,10)))  # @UndefinedVariable # ylint: disable=maybe-no-member
         self.profiles = []
         self.label_number = 0
         # align line

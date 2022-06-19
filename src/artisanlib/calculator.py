@@ -19,13 +19,13 @@ from artisanlib.util import fromCtoF, fromFtoC, stringfromseconds, stringtosecon
 from artisanlib.dialogs import ArtisanDialog
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import pyqtSlot, QSettings, QRegularExpression # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QLabel, QGridLayout, QGroupBox, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QHBoxLayout, QVBoxLayout) # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import pyqtSlot, QSettings, QRegularExpression # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QLabel, QGridLayout, QGroupBox, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport

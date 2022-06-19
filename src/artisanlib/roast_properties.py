@@ -46,7 +46,7 @@ from uic import MeasureDialog
 _log: Final = logging.getLogger(__name__)
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
@@ -54,8 +54,8 @@ try:
                                  QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
@@ -68,7 +68,7 @@ except Exception:
         import sip  # @Reimport @UnresolvedImport @UnusedImport
 
 if sys.platform.startswith('darwin'):
-    import darkdetect # @UnresolvedImport # pylint: disable=import-error
+    import darkdetect # @UnresolvedImport # ylint: disable=import-error
 
 
 ########################################################################################

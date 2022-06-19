@@ -16,10 +16,10 @@ except ImportError:
     from typing_extensions import Final
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
 
 

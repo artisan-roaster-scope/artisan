@@ -19,14 +19,14 @@ from artisanlib.util import stringtoseconds, createGradient
 from typing import Optional
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # @UnusedImport @Reimport  @UnresolvedImport
         QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
         QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QFontMetrics, QColor, QCursor # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # @UnusedImport @Reimport  @UnresolvedImport
         QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
@@ -228,7 +228,7 @@ class ClickableLCDFrame(QFrame): # pylint: disable=too-few-public-methods
 
 
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
-class ClickableTextEdit(QTextEdit): # pylint: disable=too-few-public-methods
+class ClickableTextEdit(QTextEdit): # ylint: disable=too-few-public-methods
     clicked = pyqtSignal()
     editingFinished = pyqtSignal()
     receivedFocus = pyqtSignal()

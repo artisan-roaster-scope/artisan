@@ -34,14 +34,14 @@ except ImportError:
 from artisanlib.util import cmd2str, RoRfromCtoF, fromCtoF, fromFtoC, hex2int, str2cmd, toFloat
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import Qt, QDateTime, QSemaphore, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QIntValidator # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QCheckBox, QDialog, QGridLayout, QHBoxLayout, QVBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QLabel, QLineEdit,QPushButton) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6 import sip  # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import Qt, QDateTime, QSemaphore, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIntValidator # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QCheckBox, QDialog, QGridLayout, QHBoxLayout, QVBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
@@ -724,7 +724,7 @@ class serialport():
 
             if self.platf == 'Windows':
                 cmd_str = os.path.expanduser(self.aw.ser.externalprogram)
-                p = subprocess.Popen(cmd_str,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo,shell=True) # pylint: disable=consider-using-with
+                p = subprocess.Popen(cmd_str,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo,shell=True) # ylint: disable=consider-using-with
             else:
                 p = subprocess.Popen([os.path.expanduser(c) for c in shlex.split(self.aw.ser.externalprogram)],env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo) # pylint: disable=consider-using-with
             output = p.communicate()[0].decode('UTF-8')
@@ -5228,30 +5228,6 @@ class serialport():
             # import Yoctopuce Python library (installed form PyPI)
             #self.aw.sendmessage(str(errmsg))
             YAPI.DisableExceptions()
-#            ## WINDOWS/Linux DLL HACK BEGIN
-#            arch = platform.architecture()[0]
-#            machine = platform.machine()
-#            libpath = os.path.dirname(sys.executable)
-#            if self.platf == 'Windows' and appFrozen():
-#                if arch == '32bit':
-#                    YAPI._yApiCLibFile = libpath + '\\lib\\yapi.dll' # pylint: disable=protected-access
-#                else:
-#                    YAPI._yApiCLibFile = libpath + '\\lib\\yapi64.dll' # pylint: disable=protected-access
-#                YAPI._yApiCLibFileFallback = libpath + '\\lib\\yapi.dll' # pylint: disable=protected-access
-#            elif self.platf == 'Linux' and appFrozen():
-#                if machine.find('arm') >= 0: # Raspberry
-#                    YAPI._yApiCLibFile = libpath + '/libyapi-armhf.so' # pylint: disable=protected-access
-#                    YAPI._yApiCLibFileFallback = libpath + '/libyapi-armel.so' # pylint: disable=protected-access
-#                elif machine.find('mips') >= 0:
-#                    YAPI._yApiCLibFile = libpath + '/libyapi-mips.so' # pylint: disable=protected-access
-#                    YAPI._yApiCLibFileFallback = '' # pylint: disable=protected-access
-#                elif machine == 'x86_32' or (machine[0] == 'i' and machine[-2:] == '86'):
-#                    YAPI._yApiCLibFile = libpath + '/libyapi-i386.so' # pylint: disable=protected-access
-#                    YAPI._yApiCLibFileFallback = libpath + '/libyapi-amd64.so'  # just in case # pylint: disable=protected-access
-#                elif machine == 'x86_64':
-#                    YAPI._yApiCLibFile = libpath + '/libyapi-amd64.so' # pylint: disable=protected-access
-#                    YAPI._yApiCLibFileFallback = libpath + '/libyapi-i386.so'  # just in case # pylint: disable=protected-access
-#            ## WINDOWS/Linux DLL HACK END
         try:
             if self.aw.qmc.yoctoRemoteFlag:
                 YAPI.RegisterHub(self.aw.qmc.yoctoServerID,errmsg)

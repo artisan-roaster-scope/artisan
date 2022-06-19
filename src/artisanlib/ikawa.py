@@ -2,6 +2,7 @@
 # ABOUT
 # IKAWA CSV Roast Profile importer for Artisan
 
+from pathlib import Path
 import time as libtime
 import os
 import csv
@@ -14,11 +15,11 @@ except ImportError:
     from typing_extensions import Final
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import QDateTime,Qt # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import QDateTime,Qt # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
@@ -34,16 +35,19 @@ def extractProfileIkawaCSV(file,_):
     res['samplinginterval'] = 1.0
 
     # set profile date from the file name if it has the format "IKAWA yyyy-mm-dd hhmmss.csv"
-    filename = os.path.basename(file)
-    p = re.compile(r'IKAWA \d{4,4}-\d{2,2}-\d{2,2} \d{6,6}.csv')
-    if p.match(filename):
-        s = filename[6:-4] # the extracted date time string
-        date = QDateTime.fromString(s,'yyyy-MM-dd HHmmss')
-        res['roastdate'] = encodeLocal(date.date().toString())
-        res['roastisodate'] = encodeLocal(date.date().toString(Qt.DateFormat.ISODate))
-        res['roasttime'] = encodeLocal(date.time().toString())
-        res['roastepoch'] = int(date.toSecsSinceEpoch())
-        res['roasttzoffset'] = libtime.timezone
+    try:
+        filename = os.path.basename(file)
+        p = re.compile(r'IKAWA \d{4,4}-\d{2,2}-\d{2,2} \d{6,6}.csv')
+        if p.match(filename):
+            s = filename[6:-4] # the extracted date time string
+            date = QDateTime.fromString(s,'yyyy-MM-dd HHmmss')
+            res['roastdate'] = encodeLocal(date.date().toString())
+            res['roastisodate'] = encodeLocal(date.date().toString(Qt.DateFormat.ISODate))
+            res['roasttime'] = encodeLocal(date.time().toString())
+            res['roastepoch'] = int(date.toSecsSinceEpoch())
+            res['roasttzoffset'] = libtime.timezone
+    except Exception as e: # pylint: disable=broad-except
+        _log.exception(e)
 
     with open(file, newline='',encoding='utf-8') as csvFile:
         data = csv.reader(csvFile,delimiter=',')
@@ -206,4 +210,5 @@ def extractProfileIkawaCSV(file,_):
                 res['etypes'][0] = 'Fan'
             if heater_event:
                 res['etypes'][3] = 'Heater'
+    res['title'] = Path(file).stem
     return res

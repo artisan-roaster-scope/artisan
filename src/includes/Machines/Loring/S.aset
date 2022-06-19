@@ -31,13 +31,15 @@ extraCurveVisibility1=false, true, true, true, true, true, true, true, true, tru
 extraCurveVisibility2=true, false, true, true, true, true, true, true, true, true
 extraLCDvisibility1=true, true, false, false, false, false, false, false, false, false
 extraLCDvisibility2=true, false, false, false, false, false, false, false, false, false
+extraDelta1=false, false, false, false, false, false, false, false, false, false
+extraDelta2=false, true, false, false, false, false, false, false, false, false
 extradevicecolor1=#820011, black
 extradevicecolor2=black, black
 extradevices=33, 55
 extramathexpression1=, 
 extramathexpression2=, 
 extraname1={3}, Stack
-extraname2=Inlet, 
+extraname2=Inlet, RoR
 
 [Modbus]
 PID_OFF_action=

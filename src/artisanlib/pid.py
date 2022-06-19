@@ -27,10 +27,10 @@ except ImportError:
     from typing_extensions import Final
 
 try:
-    #pylint: disable-next = E, W, R, C
+    #ylint: disable-next = E, W, R, C
     from PyQt6.QtCore import QSemaphore # @Reimport @UnresolvedImport @UnusedImport
 except Exception:  # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore # @Reimport @UnresolvedImport @UnusedImport
 
 _log: Final = logging.getLogger(__name__)

@@ -34,11 +34,11 @@ except ImportError:
 import artisanlib.util
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
@@ -386,7 +386,7 @@ class s7port():
             _log.debug('connect(): connecting')
             try:
                 if self.plc is None:
-                    from artisanlib.s7client import S7Client # pylint: disable=reimported
+                    from artisanlib.s7client import S7Client # ylint: disable=reimported
                     self.plc = S7Client()
                     self.initArrays() # initialize S7 arrays
                 else:
@@ -410,7 +410,7 @@ class s7port():
                 _log.debug('connect(): connecting failed')
                 self.disconnect()
                 time.sleep(0.3)
-                from artisanlib.s7client import S7Client # pylint: disable=reimported
+                from artisanlib.s7client import S7Client # ylint: disable=reimported
                 self.plc = S7Client()
                 self.initArrays() # initialize S7 arrays
                 # we try a second time
@@ -487,7 +487,7 @@ class s7port():
                             sequences = [[registers[0],registers[-1]]]
                         else:
                             # split in successive sequences
-                            gaps = [[s, e] for s, e in zip(registers, registers[1:]) if s+1 < e] # pylint: disable=used-before-assignment
+                            gaps = [[s, e] for s, e in zip(registers, registers[1:]) if s+1 < e] # ylint: disable=used-before-assignment
                             edges = iter(registers[:1] + sum(gaps, []) + registers[-1:])
                             sequences = list(zip(edges, edges)) # list of pairs of the form (start-register,end-register)
                         for seq in sequences:

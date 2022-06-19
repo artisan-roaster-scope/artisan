@@ -22,46 +22,32 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtWidgets import (
         QApplication, # @UnusedImport @Reimport  @UnresolvedImport
-        QCheckBox, # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QGroupBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QHBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
-        QVBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
-        QLabel, # @UnusedImport @Reimport  @UnresolvedImport
         QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
         QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
         QToolButton, # @UnusedImport @Reimport  @UnresolvedImport
         QTableWidget, # @UnusedImport @Reimport  @UnresolvedImport
         QStyle, # @UnusedImport @Reimport  @UnresolvedImport
         QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
-        QSizePolicy # @UnusedImport @Reimport  @UnresolvedImport
     )
     from PyQt6.QtCore import Qt, pyqtSlot, QSize, QSettings # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QKeySequence, QAction, QIcon # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtWidgets import (
         QApplication, # @UnusedImport @Reimport  @UnresolvedImport
-        QCheckBox, # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QGroupBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QHBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
-        QVBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
-        QLabel, # @UnusedImport @Reimport  @UnresolvedImport
         QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
         QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
         QAction, # @UnusedImport @Reimport  @UnresolvedImport
-        QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
         QToolButton, # @UnusedImport @Reimport  @UnresolvedImport
         QTableWidget, # @UnusedImport @Reimport  @UnresolvedImport
         QStyle, # @UnusedImport @Reimport  @UnresolvedImport
         QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
-        QSizePolicy # @UnusedImport @Reimport  @UnresolvedImport
     )
     from PyQt5.QtCore import Qt, pyqtSlot, QSize, QSettings # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QKeySequence, QIcon # @UnusedImport @Reimport  @UnresolvedImport

@@ -22,11 +22,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
@@ -391,7 +391,7 @@ def setApplidedServerUpdatesModifiedAt(modified_at):
 
 
 def getApplidedServerUpdatesModifiedAt():
-    # pylint: disable=global-statement
+    # ylint: disable=global-statement
     try:
         _log.debug('getApplidedServerUpdatesModifiedAt()')
         applied_server_updates_modified_at_semaphore.acquire(1)

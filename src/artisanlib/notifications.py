@@ -16,12 +16,12 @@
 # Marko Luther, 2021
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtWidgets import QSystemTrayIcon, QApplication, QMenu # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QIcon, QDesktopServices, QAction # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtCore import QTimer, pyqtSlot, QUrl, QObject, QDateTime, QLocale # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtWidgets import QSystemTrayIcon, QApplication, QMenu, QAction # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIcon, QDesktopServices # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtCore import QTimer, pyqtSlot, QUrl, QObject, QDateTime, QLocale # @UnusedImport @Reimport  @UnresolvedImport

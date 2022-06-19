@@ -19,8 +19,8 @@ scipy==1.8.0 #1.7.3  # depends on numpy thus we have to put it after numpy
 matplotlib==3.5.2 #3.5.1
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
-PyQt5==5.15.6
-PyQtWebEngine==5.15.5
+PyQt5==5.15.7 #5.15.6
+PyQtWebEngine==5.15.6 #5.15.5
 #PyQt6==6.2.3 # Qt6 not supported on macOS 10.13
 #PyQt6-WebEngine==6.2.1 # Qt6 not supported on macOS 10.13
 openpyxl==3.0.9 # 3.0.7

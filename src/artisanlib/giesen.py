@@ -2,6 +2,7 @@
 # ABOUT
 # GIESEN CSV Roast Profile importer for Artisan
 
+from pathlib import Path
 import csv
 import logging
 try:
@@ -11,10 +12,10 @@ except ImportError:
     from typing_extensions import Final
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import fill_gaps
@@ -33,10 +34,10 @@ def replace_duplicates(data):
     # reconstruct first and last reading
     if len(data)>0:
         data_core[-1] = data[-1]
-    return fill_gaps(data_core)
+    return fill_gaps(data_core, interpolate_max=100)
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
-def extractProfileGiesenCSV(file,_):
+def extractProfileGiesenCSV(file,aw):
     res = {} # the interpreted data set
 
     res['samplinginterval'] = 1.0
@@ -124,7 +125,7 @@ def extractProfileGiesenCSV(file,_):
                             specialeventsvalue.append(v)
                             specialevents.append(i)
                             specialeventstype.append(1)
-                            specialeventsStrings.append(item['speed'] + '%')
+                            specialeventsStrings.append(f'{speed:.1f}%')
                     else:
                         speed_last = None
                 except Exception as e: # pylint: disable=broad-except
@@ -151,15 +152,19 @@ def extractProfileGiesenCSV(file,_):
                             specialeventsvalue.append(v)
                             specialevents.append(i)
                             specialeventstype.append(3)
-                            specialeventsStrings.append(item['power'] + '%')
+                            specialeventsStrings.append(f'{power:.0f}%')
                     else:
                         power_last = None
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
     res['timex'] = timex
-    res['temp1'] = replace_duplicates(temp1)
-    res['temp2'] = replace_duplicates(temp2)
+    if aw.qmc.dropDuplicates:
+        res['temp1'] = replace_duplicates(temp1)
+        res['temp2'] = replace_duplicates(temp2)
+    else:
+        res['temp1'] = temp1
+        res['temp2'] = temp2
     res['timeindex'] = timeindex
 
     res['extradevices'] = [25,25]
@@ -190,4 +195,5 @@ def extractProfileGiesenCSV(file,_):
                 res['etypes'][0] = 'Speed'
             if power_event:
                 res['etypes'][3] = 'Power'
+    res['title'] = Path(file).stem
     return res

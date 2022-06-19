@@ -31,15 +31,15 @@ from artisanlib.comm import serialport
 
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import (Qt, pyqtSlot, QEvent, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QIntValidator # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
                                  QHeaderView)  # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import (Qt, pyqtSlot, QEvent, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIntValidator # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
@@ -449,29 +449,29 @@ class comportDlg(ArtisanResizeablDialog):
         comportlabel =QLabel(QApplication.translate('Label', 'Comm Port'))
         self.comportEdit = PortComboBox(selection = self.aw.ser.comport)
         self.comportEdit.activated.connect(self.portComboBoxIndexChanged)
-        comportlabel.setBuddy(self.comportEdit)
+#        comportlabel.setBuddy(self.comportEdit)
         baudratelabel = QLabel(QApplication.translate('Label', 'Baud Rate'))
         self.baudrateComboBox = QComboBox()
-        baudratelabel.setBuddy(self.baudrateComboBox)
+#        baudratelabel.setBuddy(self.baudrateComboBox)
         self.bauds = ['1200', '2400','4800','9600','19200','38400','57600','57800','115200']
         self.baudrateComboBox.addItems(self.bauds)
         self.baudrateComboBox.setCurrentIndex(self.bauds.index(str(self.aw.ser.baudrate)))
         bytesizelabel = QLabel(QApplication.translate('Label', 'Byte Size'))
         self.bytesizeComboBox = QComboBox()
-        bytesizelabel.setBuddy(self.bytesizeComboBox)
+#        bytesizelabel.setBuddy(self.bytesizeComboBox)
         self.bytesizes = ['7','8']
         self.bytesizeComboBox.addItems(self.bytesizes)
         self.bytesizeComboBox.setCurrentIndex(self.bytesizes.index(str(self.aw.ser.bytesize)))
         paritylabel = QLabel(QApplication.translate('Label', 'Parity'))
         self.parityComboBox = QComboBox()
-        paritylabel.setBuddy(self.parityComboBox)
+#        paritylabel.setBuddy(self.parityComboBox)
         #0 = Odd, E = Even, N = None. NOTE: These strings cannot be translated as they are arguments to the lib pyserial.
         self.parity = ['O','E','N']
         self.parityComboBox.addItems(self.parity)
         self.parityComboBox.setCurrentIndex(self.parity.index(self.aw.ser.parity))
         stopbitslabel = QLabel(QApplication.translate('Label', 'Stopbits'))
         self.stopbitsComboBox = QComboBox()
-        stopbitslabel.setBuddy(self.stopbitsComboBox)
+#        stopbitslabel.setBuddy(self.stopbitsComboBox)
         self.stopbits = ['1','2']
         self.stopbitsComboBox.addItems(self.stopbits)
         self.stopbitsComboBox.setCurrentIndex(self.aw.ser.stopbits-1)
@@ -491,10 +491,10 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_comportEdit = PortComboBox(selection = self.aw.modbus.comport)
 #        self.modbus_comportEdit.setFixedWidth(120)
         self.modbus_comportEdit.activated.connect(self.portComboBoxIndexChanged)
-        modbus_comportlabel.setBuddy(self.modbus_comportEdit)
+#        modbus_comportlabel.setBuddy(self.modbus_comportEdit)
         modbus_baudratelabel = QLabel(QApplication.translate('Label', 'Baud Rate'))
         self.modbus_baudrateComboBox = QComboBox()
-        modbus_baudratelabel.setBuddy(self.modbus_baudrateComboBox)
+#        modbus_baudratelabel.setBuddy(self.modbus_baudrateComboBox)
         self.modbus_bauds = ['1200','2400','4800','9600','19200','38400','57600','57800','115200']
         self.modbus_baudrateComboBox.addItems(self.modbus_bauds)
         try:
@@ -503,20 +503,20 @@ class comportDlg(ArtisanResizeablDialog):
             _log.exception(e)
         modbus_bytesizelabel = QLabel(QApplication.translate('Label', 'Byte Size'))
         self.modbus_bytesizeComboBox = QComboBox()
-        modbus_bytesizelabel.setBuddy(self.modbus_bytesizeComboBox)
+#        modbus_bytesizelabel.setBuddy(self.modbus_bytesizeComboBox)
         self.modbus_bytesizes = ['7','8']
         self.modbus_bytesizeComboBox.addItems(self.modbus_bytesizes)
         self.modbus_bytesizeComboBox.setCurrentIndex(self.modbus_bytesizes.index(str(self.aw.modbus.bytesize)))
         modbus_paritylabel = QLabel(QApplication.translate('Label', 'Parity'))
         self.modbus_parityComboBox = QComboBox()
-        modbus_paritylabel.setBuddy(self.modbus_parityComboBox)
+#        modbus_paritylabel.setBuddy(self.modbus_parityComboBox)
         #0 = Odd, E = Even, N = None. NOTE: These strings cannot be translated as they are arguments to the lib pyserial.
         self.modbus_parity = ['O','E','N']
         self.modbus_parityComboBox.addItems(self.modbus_parity)
         self.modbus_parityComboBox.setCurrentIndex(self.modbus_parity.index(self.aw.modbus.parity))
         modbus_stopbitslabel = QLabel(QApplication.translate('Label', 'Stopbits'))
         self.modbus_stopbitsComboBox = QComboBox()
-        modbus_stopbitslabel.setBuddy(self.modbus_stopbitsComboBox)
+#        modbus_stopbitslabel.setBuddy(self.modbus_stopbitsComboBox)
         self.modbus_stopbits = ['1','2']
         self.modbus_stopbitsComboBox.addItems(self.stopbits)
         self.modbus_stopbitsComboBox.setCurrentIndex(self.aw.modbus.stopbits - 1)
@@ -606,7 +606,7 @@ class comportDlg(ArtisanResizeablDialog):
         # type
         self.modbus_type = QComboBox()
         modbus_typelabel = QLabel(QApplication.translate('Label', 'Type'))
-        modbus_typelabel.setBuddy(self.modbus_type)
+#        modbus_typelabel.setBuddy(self.modbus_type)
         self.modbus_type.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.modbus_type.addItems(['Serial RTU', 'Serial ASCII', 'Serial Binary', 'TCP', 'UDP'])
         self.modbus_type.setCurrentIndex(self.aw.modbus.type)
@@ -730,6 +730,35 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_pid.setContentsMargins(0,10,0,0)
         modbus_pidgroup.setContentsMargins(0,20,0,3)
 
+        modbus_IP_timeoutlabel = QLabel(QApplication.translate('Label', 'Timeout'))
+        modbus_IP_timeoutlabel.setToolTip(QApplication.translate('Tooltip', 'IP timeout in seconds, not larger than half of the sampling interval'))
+        self.modbus_IP_timeoutEdit = QLineEdit(str(self.aw.modbus.IP_timeout))
+        self.modbus_IP_timeoutEdit.setValidator(self.aw.createCLocaleDoubleValidator(0,5,1,self.modbus_IP_timeoutEdit))
+        self.modbus_IP_timeoutEdit.setFixedWidth(50)
+        self.modbus_IP_timeoutEdit.setToolTip(QApplication.translate('Tooltip', 'IP timeout in seconds, not larger than half of the sampling interval'))
+        modbus_IP_retries = QLabel(QApplication.translate('Label', 'Retries'))
+        self.modbus_IP_retriesComboBox = QComboBox()
+#        modbus_IP_retries.setBuddy(self.modbus_IP_retriesComboBox)
+        self.modbus_IP_retriesComboBox.addItems([str(n) for n in range(3)])
+        self.modbus_IP_retriesComboBox.setCurrentIndex(self.aw.modbus.IP_retries)
+
+        modbus_IP_grid = QGridLayout()
+        modbus_IP_grid.addWidget(modbus_IP_timeoutlabel,0,0,Qt.AlignmentFlag.AlignRight)
+        modbus_IP_grid.addWidget(self.modbus_IP_timeoutEdit,0,1,Qt.AlignmentFlag.AlignRight)
+        modbus_IP_grid.addWidget(modbus_IP_retries,1,0,Qt.AlignmentFlag.AlignRight)
+        modbus_IP_grid.addWidget(self.modbus_IP_retriesComboBox,1,1,Qt.AlignmentFlag.AlignRight)
+
+        modbus_IP_layout = QVBoxLayout()
+        modbus_IP_layout.addLayout(modbus_IP_grid)
+        modbus_IP_layout.addStretch()
+
+        modbus_IPgroup = QGroupBox(QApplication.translate('GroupBox', 'UDP/TCP'))
+        modbus_IPgroup.setLayout(modbus_IP_layout)
+
+        modbus_PID_IP = QHBoxLayout()
+        modbus_PID_IP.addWidget(modbus_pidgroup)
+        modbus_PID_IP.addWidget(modbus_IPgroup)
+
         scanButton = QPushButton(QApplication.translate('Button','Scan'))
         scanButton.setToolTip(QApplication.translate('Tooltip','Scan MODBUS'))
         scanButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -760,14 +789,14 @@ class comportDlg(ArtisanResizeablDialog):
         except Exception: # pylint: disable=broad-except
             self.scale_deviceEdit.setCurrentIndex(0)
         self.scale_deviceEdit.setEditable(False)
-        scale_devicelabel.setBuddy(self.scale_deviceEdit)
+#        scale_devicelabel.setBuddy(self.scale_deviceEdit)
         scale_comportlabel = QLabel(QApplication.translate('Label', 'Comm Port'))
         self.scale_comportEdit = PortComboBox(selection = self.aw.scale.comport)
         self.scale_comportEdit.activated.connect(self.portComboBoxIndexChanged)
-        scale_comportlabel.setBuddy(self.scale_comportEdit)
+#        scale_comportlabel.setBuddy(self.scale_comportEdit)
         scale_baudratelabel = QLabel(QApplication.translate('Label', 'Baud Rate'))
         self.scale_baudrateComboBox = QComboBox()
-        scale_baudratelabel.setBuddy(self.scale_baudrateComboBox)
+#        scale_baudratelabel.setBuddy(self.scale_baudrateComboBox)
         self.scale_bauds = ['1200','2400','4800','9600','19200','38400','57600','115200']
         self.scale_baudrateComboBox.addItems(self.scale_bauds)
         try:
@@ -776,20 +805,20 @@ class comportDlg(ArtisanResizeablDialog):
             _log.exception(e)
         scale_bytesizelabel = QLabel(QApplication.translate('Label', 'Byte Size'))
         self.scale_bytesizeComboBox = QComboBox()
-        scale_bytesizelabel.setBuddy(self.scale_bytesizeComboBox)
+#        scale_bytesizelabel.setBuddy(self.scale_bytesizeComboBox)
         self.scale_bytesizes = ['7','8']
         self.scale_bytesizeComboBox.addItems(self.scale_bytesizes)
         self.scale_bytesizeComboBox.setCurrentIndex(self.scale_bytesizes.index(str(self.aw.scale.bytesize)))
         scale_paritylabel = QLabel(QApplication.translate('Label', 'Parity'))
         self.scale_parityComboBox = QComboBox()
-        scale_paritylabel.setBuddy(self.scale_parityComboBox)
+#        scale_paritylabel.setBuddy(self.scale_parityComboBox)
         #0 = Odd, E = Even, N = None. NOTE: These strings cannot be translated as they are arguments to the lib pyserial.
         self.scale_parity = ['O','E','N']
         self.scale_parityComboBox.addItems(self.scale_parity)
         self.scale_parityComboBox.setCurrentIndex(self.scale_parity.index(self.aw.scale.parity))
         scale_stopbitslabel = QLabel(QApplication.translate('Label', 'Stopbits'))
         self.scale_stopbitsComboBox = QComboBox()
-        scale_stopbitslabel.setBuddy(self.scale_stopbitsComboBox)
+#        scale_stopbitslabel.setBuddy(self.scale_stopbitsComboBox)
         self.scale_stopbits = ['1','2']
         self.scale_stopbitsComboBox.addItems(self.stopbits)
         self.scale_stopbitsComboBox.setCurrentIndex(self.aw.scale.stopbits - 1)
@@ -807,33 +836,33 @@ class comportDlg(ArtisanResizeablDialog):
             self.color_deviceEdit.setCurrentIndex(0)
         self.color_deviceEdit.setEditable(False)
         self.color_deviceEdit.activated.connect(self.colorDeviceIndexChanged)
-        color_devicelabel.setBuddy(self.color_deviceEdit)
+#        color_devicelabel.setBuddy(self.color_deviceEdit)
         color_comportlabel = QLabel(QApplication.translate('Label', 'Comm Port'))
         self.color_comportEdit = PortComboBox(selection = self.aw.color.comport)
         self.color_comportEdit.activated.connect(self.portComboBoxIndexChanged)
-        color_comportlabel.setBuddy(self.color_comportEdit)
+#        color_comportlabel.setBuddy(self.color_comportEdit)
         color_baudratelabel = QLabel(QApplication.translate('Label', 'Baud Rate'))
         self.color_baudrateComboBox = QComboBox()
-        color_baudratelabel.setBuddy(self.color_baudrateComboBox)
+#        color_baudratelabel.setBuddy(self.color_baudrateComboBox)
         self.color_bauds = ['1200','2400','4800','9600','19200','38400','57600','115200']
         self.color_baudrateComboBox.addItems(self.color_bauds)
         self.color_baudrateComboBox.setCurrentIndex(self.color_bauds.index(str(self.aw.color.baudrate)))
         color_bytesizelabel = QLabel(QApplication.translate('Label', 'Byte Size'))
         self.color_bytesizeComboBox = QComboBox()
-        color_bytesizelabel.setBuddy(self.color_bytesizeComboBox)
+#        color_bytesizelabel.setBuddy(self.color_bytesizeComboBox)
         self.color_bytesizes = ['7','8']
         self.color_bytesizeComboBox.addItems(self.color_bytesizes)
         self.color_bytesizeComboBox.setCurrentIndex(self.color_bytesizes.index(str(self.aw.color.bytesize)))
         color_paritylabel = QLabel(QApplication.translate('Label', 'Parity'))
         self.color_parityComboBox = QComboBox()
-        color_paritylabel.setBuddy(self.color_parityComboBox)
+#        color_paritylabel.setBuddy(self.color_parityComboBox)
         #0 = Odd, E = Even, N = None. NOTE: These strings cannot be translated as they are arguments to the lib pyserial.
         self.color_parity = ['O','E','N']
         self.color_parityComboBox.addItems(self.color_parity)
         self.color_parityComboBox.setCurrentIndex(self.color_parity.index(self.aw.color.parity))
         color_stopbitslabel = QLabel(QApplication.translate('Label', 'Stopbits'))
         self.color_stopbitsComboBox = QComboBox()
-        color_stopbitslabel.setBuddy(self.color_stopbitsComboBox)
+#        color_stopbitslabel.setBuddy(self.color_stopbitsComboBox)
         self.color_stopbits = ['1','2']
         self.color_stopbitsComboBox.addItems(self.stopbits)
         self.color_stopbitsComboBox.setCurrentIndex(self.aw.color.stopbits - 1)
@@ -901,6 +930,9 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_gridV.addLayout(modbus_grid)
         modbus_gridV.addStretch()
 
+        modbus_serial_group = QGroupBox(QApplication.translate('GroupBox','Serial'))
+        modbus_serial_group.setLayout(modbus_gridV)
+
         modbus_input_grid = QGridLayout()
 
         modbus_input_grid.addWidget(modbus_input1slavelabel,1,0,Qt.AlignmentFlag.AlignRight)
@@ -923,7 +955,7 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_input_grid.setSpacing(2)
 
         modbus_gridVLayout = QHBoxLayout()
-        modbus_gridVLayout.addLayout(modbus_gridV)
+        modbus_gridVLayout.addWidget(modbus_serial_group)
         modbus_gridVLayout.addStretch()
         modbus_gridVLayout.addLayout(modbus_input_grid)
         modbus_gridVLayout.addStretch()
@@ -955,7 +987,7 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_setup.addWidget(self.modbus_portEdit)
         tab3Layout = QVBoxLayout()
         tab3Layout.addLayout(modbus_gridVLayout)
-        tab3Layout.addWidget(modbus_pidgroup)
+        tab3Layout.addLayout(modbus_PID_IP)
         tab3Layout.addStretch()
         tab3Layout.addLayout(modbus_setup)
         tab3Layout.addStretch()

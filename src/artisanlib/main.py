@@ -765,7 +765,7 @@ class tgraphcanvas(FigureCanvas):
         'ylimit_min_F_default', 'ygrid_F_default', 'zlimit_F_default', 'zlimit_min_F_default', 'zgrid_F_default', 'ylimit_C_default', 'ylimit_min_C_default',
         'ygrid_C_default', 'zlimit_C_default', 'zlimit_min_C_default', 'zgrid_C_default', 'temp_grid', 'time_grid', 'zlimit_max', 'zlimit_min_max',
         'ylimit_max', 'ylimit_min_max', 'ylimit', 'ylimit_min', 'zlimit', 'zlimit_min', 'RoRlimitFlag', 'RoRlimit', 'RoRlimitm', 'maxRoRlimit',
-        'endofx', 'startofx', 'resetmaxtime', 'chargemintime', 'fixmaxtime', 'locktimex', 'autotimex', 'autodeltaxET', 'autodeltaxBT', 'locktimex_start',
+        'endofx', 'startofx', 'resetmaxtime', 'chargemintime', 'fixmaxtime', 'locktimex', 'autotimex', 'autotimexMode', 'autodeltaxET', 'autodeltaxBT', 'locktimex_start',
         'locktimex_end', 'xgrid', 'ygrid', 'zgrid', 'gridstyles', 'gridlinestyle', 'gridthickness', 'gridalpha', 'xrotation',
         'statisticsheight', 'statisticsupper', 'statisticslower', 'autosaveflag', 'autosaveprefix', 'autosavepath', 'autosavealsopath',
         'autosaveaddtorecentfilesflag', 'autosaveimage', 'autosaveimageformat', 'autoasaveimageformat_types', 'ystep_down', 'ystep_up', 'backgroundETcurve', 'backgroundBTcurve',
@@ -2122,6 +2122,7 @@ class tgraphcanvas(FigureCanvas):
         self.fixmaxtime = False # if true, do not automatically extend the endofx by 3min if needed because the measurements get out of the x-axis
         self.locktimex = False # if true, do not set time axis min and max from profile on load
         self.autotimex = True # automatically set time axis min and max from profile CHARGE/DROP on load
+        self.autotimexMode = 0 # mode for autotimex with 0: profile (CHARGE/DROP(, 1: BBP+profile (START/DROP), 2: BBP (START/CHARGE)
         self.autodeltaxET = False # automatically set the delta axis max to the max(DeltaET)
         self.autodeltaxBT = False # automatically set the delta axis max to the max(DeltaBT)
         self.locktimex_start = self.startofx_default # seconds of x-axis min as locked by locktimex (needs to be interpreted wrt. CHARGE index)
@@ -6982,7 +6983,7 @@ class tgraphcanvas(FigureCanvas):
 #                b = scipy_medfilt(b,3)
                 res = b
             except Exception as e: # pylint: disable=broad-except
-                _log.error(e)
+                _log.exception(e)
                 res = b
         # 3. smooth data
         if window_len>2:
@@ -17240,6 +17241,10 @@ class ApplicationWindow(QMainWindow):
         importK204Action.triggered.connect(self.importK204)
         self.importMenu.addAction(importK204Action)
 
+        importLoringAction = QAction('Loring CSV...', self)
+        importLoringAction.triggered.connect(self.importLoring)
+        self.importMenu.addAction(importLoringAction)
+
         importRubasseAction = QAction('Rubasse CSV...', self)
         importRubasseAction.triggered.connect(self.importRubasse)
         self.importMenu.addAction(importRubasseAction)
@@ -20941,7 +20946,7 @@ class ApplicationWindow(QMainWindow):
                     else:
                         t_min = aw.qmc.chargemintime
                         t_max = aw.qmc.resetmaxtime
-                if aw.qmc.background:
+                if aw.qmc.background and aw.qmc.autotimexMode != 2:
                     if background:
                         t_max_b = t_max
                     else:
@@ -21014,22 +21019,28 @@ class ApplicationWindow(QMainWindow):
     # min to be 1min before CHARGE or first recording if no CHARGE
     # max to be 1min after COOL or DROP or last recording if no DROP nor COOL
     def calcAutoAxis(self):
-        if len(aw.qmc.timex) > 3:
+        if len(self.qmc.timex) > 3:
             # profile loaded?
-            t_start = aw.qmc.startofx
-            t_end = aw.qmc.endofx
-            if self.qmc.timeindex[0] > -1: # CHARGE set
-                t_start = aw.qmc.timex[aw.qmc.timeindex[0]] - 60
-            elif self.qmc.timeindex[0] == -1:
-                t_start = aw.qmc.timex[0] - 60
-            if self.qmc.timeindex[7] > 0 and (self.qmc.foregroundShowFullflag or self.qmc.flagstart): # COOL set and the curves are drawn beyond DROP
-                t_end = aw.qmc.timex[aw.qmc.timeindex[7]] + 60
-            elif self.qmc.timeindex[6] > 0: # DROP set
-                t_end = aw.qmc.timex[aw.qmc.timeindex[6]] + 90
+            t_start = self.qmc.startofx
+            t_end = self.qmc.endofx
+            if self.qmc.autotimexMode == 0 and self.qmc.timeindex[0] > -1: # CHARGE set
+                t_start = self.qmc.timex[self.qmc.timeindex[0]] - 60
             else:
-                t_end = aw.qmc.timex[-1] + 90
+                if self.qmc.autotimexMode == 0:
+                    t_start = self.qmc.timex[0] - 60
+                else:
+                    t_start = self.qmc.timex[0] - 30
+            if self.qmc.autotimexMode == 2 and self.qmc.timeindex[0] > -1:
+                t_end = self.qmc.timex[self.qmc.timeindex[0]] + 30
+            else:
+                if self.qmc.timeindex[7] > 0 and (self.qmc.foregroundShowFullflag or self.qmc.flagstart): # COOL set and the curves are drawn beyond DROP
+                    t_end = self.qmc.timex[self.qmc.timeindex[7]] + 60
+                elif self.qmc.timeindex[6] > 0: # DROP set
+                    t_end = self.qmc.timex[self.qmc.timeindex[6]] + 90
+                else:
+                    t_end = self.qmc.timex[-1] + 90
             return t_start, t_end
-        return aw.qmc.startofx, aw.qmc.endofx
+        return self.qmc.startofx, self.qmc.endofx
 
     def calcAutoDelta(self,d1,d2,timeindex,d1flag,d2flag):
         # returns the max ET/BT RoR between CHARGE and DROP
@@ -25452,6 +25463,10 @@ class ApplicationWindow(QMainWindow):
 
                 if k == 70:                         #F SELECTS FULL SCREEN MODE
                     self.toggleFullscreen()
+                elif k == 71:                       #G (toggle time auto axis mode)
+                    self.qmc.autotimexMode = (self.qmc.autotimexMode+1) % 3
+                    self.autoAdjustAxis(deltas=False)
+                    self.qmc.redraw()
                 elif self.buttonpalette_shortcuts and control_modifier and k in numberkeys: # palette switch via SHIFT-NUM-Keys
                     self.setbuttonsfrom(numberkeys.index(k))
                 elif k == 74:                       #J (toggle Playback Events)
@@ -30801,6 +30816,10 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.parity = s2a(toString(settings.value('parity',self.modbus.parity)))
             if settings.contains('timeout'):
                 self.modbus.timeout = aw.float2float(toFloat(settings.value('timeout',self.modbus.timeout)))
+            if settings.contains('IP_timeout'):
+                self.modbus.IP_timeout = aw.float2float(toFloat(settings.value('IP_timeout',self.modbus.IP_timeout)))
+            if settings.contains('IP_retries'):
+                self.modbus.IP_retries = toInt(settings.value('IP_retries',self.modbus.IP_retries))
             if settings.contains('input1slave'):
                 self.modbus.inputSlaves[0] = toInt(settings.value('input1slave',self.modbus.inputSlaves[0]))
             if settings.contains('input1register'):
@@ -32533,6 +32552,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue('stopbits',self.modbus.stopbits)
             settings.setValue('parity',self.modbus.parity)
             settings.setValue('timeout',self.modbus.timeout)
+            settings.setValue('IP_timeout',self.modbus.IP_timeout)
+            settings.setValue('IP_retries',self.modbus.IP_retries)
             settings.setValue('PID_slave_ID',self.modbus.PID_slave_ID)
             settings.setValue('PID_SV_register',self.modbus.PID_SV_register)
             settings.setValue('PID_p_register',self.modbus.PID_p_register)
@@ -35862,9 +35883,9 @@ class ApplicationWindow(QMainWindow):
         res = 0
         if len(self.qmc.timex)>5 and i < len(self.qmc.timex):
             if self.checkTop(offset,self.qmc.temp2[i-5],self.qmc.temp2[i-4],self.qmc.temp2[i-3],self.qmc.temp2[i-2],self.qmc.temp2[i-1],self.qmc.temp2[i]):
-                res = 2
+                res = 3
             elif len(self.qmc.timex)>10 and self.checkTop(offset,self.qmc.temp2[i-10],self.qmc.temp2[i-8],self.qmc.temp2[i-6],self.qmc.temp2[i-4],self.qmc.temp2[i-2],self.qmc.temp2[i]):
-                res = 5
+                res = 6
         return res
 
     # this can be used to find the CHARGE index as well as the DROP index by using
@@ -36324,6 +36345,8 @@ class ApplicationWindow(QMainWindow):
             self.modbus.stopbits = int(str(dialog.modbus_stopbitsComboBox.currentText()))
             self.modbus.parity = str(dialog.modbus_parityComboBox.currentText())
             self.modbus.timeout = aw.float2float(toFloat(str(dialog.modbus_timeoutEdit.text())))
+            self.modbus.IP_timeout = aw.float2float(toFloat(str(dialog.modbus_IP_timeoutEdit.text())))
+            self.modbus.IP_retries = dialog.modbus_IP_retriesComboBox.currentIndex()
             self.modbus.PID_slave_ID = int(str(dialog.modbus_PIDslave_Edit.text()))
             self.modbus.PID_SV_register = int(str(dialog.modbus_SVregister_Edit.text()))
             self.modbus.PID_p_register = int(str(dialog.modbus_Pregister_Edit.text()))
@@ -37694,6 +37717,12 @@ class ApplicationWindow(QMainWindow):
     def importIkawa(self,_=False):
         from artisanlib.ikawa import extractProfileIkawaCSV
         self.importExternal(extractProfileIkawaCSV,QApplication.translate('Message','Import IKAWA CSV'),'*.csv')
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importLoring(self,_=False):
+        from artisanlib.loring import extractProfileLoringCSV
+        self.importExternal(extractProfileLoringCSV,QApplication.translate('Message','Import Loring CSV'),'*.csv')
 
     @pyqtSlot()
     @pyqtSlot(bool)

@@ -25,13 +25,13 @@ from artisanlib.util import stringfromseconds, stringtoseconds
 
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QRegularExpression, QDateTime # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QHeaderView, QAbstractItemView, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
                 QTableWidget, QTableWidgetItem, QGroupBox, QLayout, QHBoxLayout, QVBoxLayout, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import Qt, pyqtSlot, QSettings, QRegularExpression, QDateTime # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QHeaderView, QAbstractItemView, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport

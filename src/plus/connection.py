@@ -22,10 +22,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib import __version__
@@ -313,7 +313,7 @@ def authentify() -> bool:
     except requests.exceptions.RequestException as e:
         _log.exception(e)
         raise (e)
-    except Exception as e:  # pylint: disable=broad-except
+    except Exception as e:  # ylint: disable=broad-except
         _log.exception(e)
         clearCredentials()
         raise (e)

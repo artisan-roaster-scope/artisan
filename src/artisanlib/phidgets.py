@@ -27,10 +27,10 @@ from Phidget22.DeviceID import DeviceID
 from Phidget22.DeviceClass import DeviceClass
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
 
 

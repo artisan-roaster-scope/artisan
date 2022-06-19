@@ -2,7 +2,10 @@
 # ABOUT
 # Petroncini CSV Roast Profile importer for Artisan
 
+from pathlib import Path
+import os
 import csv
+import re
 import time as libtime
 import logging
 try:
@@ -14,11 +17,11 @@ except ImportError:
 from artisanlib.util import fill_gaps, encodeLocal
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import QDateTime, QDate, QTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import QDateTime, QDate, QTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
@@ -37,13 +40,28 @@ def replace_duplicates(data):
     # reconstruct first and last reading
     if len(data)>0:
         data_core[-1] = data[-1]
-    return fill_gaps(data_core)
+    return fill_gaps(data_core, interpolate_max=100)
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
-def extractProfilePetronciniCSV(file,_):
+def extractProfilePetronciniCSV(file,aw):
     res = {} # the interpreted data set
 
     res['samplinginterval'] = 1.0
+
+    # set profile date from the file name if it has the format "yyyy_mm_dd_hh_mm_ss.csv"
+    try:
+        filename = os.path.basename(file)
+        p = re.compile(r'\d{4,4}_\d{1,2}_\d{1,2}_\d{1,2}_\d{1,2}_\d{1,2}.csv')
+        if p.match(filename):
+            s = filename[:-4] # the extracted date time string
+            date = QDateTime.fromString(s,'yyyy_MM_dd_HH_mm_ss')
+            res['roastdate'] = encodeLocal(date.date().toString())
+            res['roastisodate'] = encodeLocal(date.date().toString(Qt.DateFormat.ISODate))
+            res['roasttime'] = encodeLocal(date.time().toString())
+            res['roastepoch'] = int(date.toSecsSinceEpoch())
+            res['roasttzoffset'] = libtime.timezone
+    except Exception as e: # pylint: disable=broad-except
+        _log.exception(e)
 
     with open(file, newline='',encoding='utf-8') as csvFile:
         data = csv.reader(csvFile,delimiter=';')
@@ -132,26 +150,33 @@ def extractProfilePetronciniCSV(file,_):
                             specialeventsvalue.append(v)
                             specialevents.append(i)
                             specialeventstype.append(3)
-                            specialeventsStrings.append(item['power'] + '%')
+                            specialeventsStrings.append(f'{power:.0f}%')
                     else:
                         power_last = None
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
 
     res['timex'] = timex
-    res['temp1'] = replace_duplicates(temp1)
-    res['temp2'] = replace_duplicates(temp2)
+    if aw.qmc.dropDuplicates:
+        res['temp1'] = replace_duplicates(temp1)
+        res['temp2'] = replace_duplicates(temp2)
+    else:
+        res['temp1'] = temp1
+        res['temp2'] = temp2
     res['timeindex'] = timeindex
 
-    res['extradevices'] = [25]
+    res['extradevices'] = [33]
     res['extratimex'] = [timex[:]]
 
-    res['extraname1'] = ['IT']
-    res['extratemp1'] = [extra1]
+    res['extraname1'] = ['Burner']
+    res['extratemp1'] = [extra2]
     res['extramathexpression1'] = ['']
 
-    res['extraname2'] = ['burner']
-    res['extratemp2'] = [replace_duplicates(extra2)]
+    res['extraname2'] = ['']
+    if aw.qmc.dropDuplicates:
+        res['extratemp2'] = [replace_duplicates(extra1)]
+    else:
+        res['extratemp2'] = [extra1]
     res['extramathexpression2'] = ['']
 
 
@@ -175,6 +200,5 @@ def extractProfilePetronciniCSV(file,_):
                              QApplication.translate('ComboBox', 'Damper'),
                              QApplication.translate('ComboBox', 'Burner'),
                              '--']
+    res['title'] = Path(file).stem
     return res
-
-# roast date raus lesen

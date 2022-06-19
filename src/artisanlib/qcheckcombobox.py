@@ -16,25 +16,25 @@ once.
 import sys
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import Qt, QEvent, QRect, QTimer, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import (
         QPalette, QFontMetrics, QBrush, QColor, QPixmap, QIcon # @UnusedImport @Reimport  @UnresolvedImport
     )
     from PyQt6.QtWidgets import (
-        QComboBox, QAbstractItemView, QAbstractItemDelegate, QStyledItemDelegate, # @UnusedImport @Reimport  @UnresolvedImport
-        QApplication, QStyle, QStyleOption, QStyleOptionComboBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QAbstractItemDelegate, QStyledItemDelegate, # @UnusedImport @Reimport  @UnresolvedImport
+        QApplication, QStyle, QStyleOptionComboBox, # @UnusedImport @Reimport  @UnresolvedImport
         QStyleOptionMenuItem, QStyleOptionViewItem, QStylePainter # @UnusedImport @Reimport  @UnresolvedImport
     )
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import Qt, QEvent, QRect, QTimer, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (
         QPalette, QFontMetrics, QBrush, QColor, QPixmap, QIcon # @UnusedImport @Reimport  @UnresolvedImport
     )
     from PyQt5.QtWidgets import (
-        QComboBox, QAbstractItemView, QAbstractItemDelegate, QStyledItemDelegate, # @UnusedImport @Reimport  @UnresolvedImport
-        QApplication, QStyle, QStyleOption, QStyleOptionComboBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QAbstractItemDelegate, QStyledItemDelegate, # @UnusedImport @Reimport  @UnresolvedImport
+        QApplication, QStyle, QStyleOptionComboBox, # @UnusedImport @Reimport  @UnresolvedImport
         QStyleOptionMenuItem, QStyleOptionViewItem, QStylePainter # @UnusedImport @Reimport  @UnresolvedImport
     )
 

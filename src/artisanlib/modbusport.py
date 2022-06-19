@@ -25,11 +25,11 @@ except ImportError:
     from typing_extensions import Final
 
 try:
-    #pylint: disable = E, W, R, C
+    #ylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:
-    #pylint: disable = E, W, R, C
+except Exception: # pylint: disable=broad-except
+    #ylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
@@ -105,7 +105,7 @@ class modbusport():
     """ this class handles the communications with all the modbus devices"""
 
     __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
-        'timeout', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
+        'timeout', 'IP_timeout', 'IP_retries', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
         'channels', 'inputSlaves', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
         'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'reset_socket', 'activeRegisters', 'readingsCache', 'SVmultiplier', 'PIDmultiplier',
         'byteorderLittle', 'wordorderLittle', 'master', 'COMsemaphore', 'host', 'port', 'type', 'lastReadResult', 'commError' ]
@@ -124,7 +124,9 @@ class modbusport():
         self.bytesize = 8
         self.parity= 'N'
         self.stopbits = 1
-        self.timeout = 0.4
+        self.timeout = 0.4 # serial MODBUS timeout
+        self.IP_timeout = 0.4 # UDP/TCP MODBUS timeout in seconds
+        self.IP_retries = 1 # UDP/TCP MODBUS retries (max 2)
         self.PID_slave_ID = 0
         self.PID_SV_register = 0
         self.PID_p_register = 0
@@ -265,8 +267,8 @@ class modbusport():
                                 retry_on_empty=False,   # only supported for serial clients in v2.5.2
                                 retry_on_invalid=False, # only supported for serial clients in v2.5.2
                                 reset_socket=self.reset_socket,
-                                retries=1,
-                                timeout=min((self.aw.qmc.delay/2000), 0.2) # the timeout should not be larger than half of the sampling interval
+                                retries=self.IP_retries,
+                                timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
                                 )
                         self.readRetries = 1
                     except Exception: # pylint: disable=broad-except
@@ -283,8 +285,8 @@ class modbusport():
                             retry_on_empty=False,   # only supported for serial clients in v2.5.2
                             retry_on_invalid=False, # only supported for serial clients in v2.5.2
                             reset_socket=self.reset_socket,
-                            retries=1,
-                            timeout=min((self.aw.qmc.delay/2000), 0.2) # the timeout should not be larger than half of the sampling interval
+                            retries=self.IP_retries,
+                            timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
                             )
                         self.readRetries = 1
                     except Exception: # pylint: disable=broad-except # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
