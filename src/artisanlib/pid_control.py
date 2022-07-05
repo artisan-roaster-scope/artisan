@@ -1348,7 +1348,7 @@ class PIDcontrol():
                 self.pidActive = True
                 self.aw.qmc.pid.on()
                 self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
-            if self.sv is None:
+            if self.sv is None and self.svMode == 0: # only in manual SV mode we initialize the SV on PID ON
                 self.setSV(self.svValue)
 
     def pidOff(self):
@@ -1407,6 +1407,7 @@ class PIDcontrol():
     # returns SV (or None) wrt. to the ramp-soak table and the given time t
     # (used only internally)
     def svRampSoak(self,t):
+        _log.info('PRINT svRampSoak %s',t)
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             if self.ramp_soak_engaged == 0:
@@ -1418,11 +1419,16 @@ class PIDcontrol():
             segment_start_sv = 0 # the (target) sv of the segment
             prev_segment_start_sv = 0 # the (target) sv of the previous segment
             for i in range(len(self.svValues)):
+                _log.info('PRINT i %s',i)
                 # Ramp
                 if self.svRamps[i] != 0:
                     segment_end_time = segment_end_time + self.svRamps[i]
                     segment_start_sv = self.svValues[i]
+                    _log.info('PRINT segment_end_time %s', segment_end_time)
+                    _log.info('PRINT prev_segment_start_sv %s', prev_segment_start_sv)
+                    _log.info('PRINT segment_start_sv %s', segment_start_sv)
                     if segment_end_time > t:
+                        _log.info('PRINT in')
                         # t is within the current segment
                         k = float(segment_start_sv - prev_segment_start_sv) / float(segment_end_time - prev_segment_end_time)
                         if self.current_ramp_segment != i+1:

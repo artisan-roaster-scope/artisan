@@ -11402,10 +11402,11 @@ class tgraphcanvas(FigureCanvas):
             self.StopAsyncSamplingAction()
             aw.enableEditMenus()
 
+            aw.autoAdjustAxis()
             aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
             # HACK:
             # with visible (draggable) legend a click (or several) on the canvas makes the extra lines disappear
-            # this happens after real recordings or simlatro runs and also if signals onclick/onpick/ondraw are disconnected
+            # this happens after real recordings or simlator runs and also if signals onclick/onpick/ondraw are disconnected
             # solutions are to run an updateBackground() or another redraw() about in 100s using a QTimer
             # also a call  to self.fig.canvas.flush_events() or QApplication.processEvents() here resolves it. A libtime.sleep(1) does not solve the issue
 #            QTimer.singleShot(100,self.updateBackground) # solves the issue
