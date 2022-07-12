@@ -37,6 +37,7 @@ Machine                         | Driver | Remarks
 [Arc](/machines/arc/) | CP210x | CH34x on newer Models
 [Besca](/machines/besca/) | FTDI | CH34x on some older machines
 [BellaTW](/machines/bellatw/) | PL2303 | CH34x on some machines
+[Bideli](/machines/bideli/) | CH34x | 
 [BlueKing](/machines/blueking/) | CP210x | on some older machines FTDI, on others CH34x
 [BC Roasters](/machines/bc/) | CP210x | on some older machines FTDI, on others CH34x
 [Coffeed](/machines/coffed/) | CH34x

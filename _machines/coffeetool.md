@@ -29,3 +29,6 @@ sidebar:
 ### Setup
 
 The computer running Artisan must be on the same IP network as the Coffeetool roaster. Configure your computer to use a static IP address in the range of the roaster (192.168.1.x) but with x different from that of the roaster (which by default is 192.168.1.42). Choose for example 192.168.1.55. Set the subnet mask of your computers network setup to 255.255.255.0.
+
+
+{% include video id="49WfKxhHs4U" provider="youtube" %}
