@@ -3327,7 +3327,17 @@ class tgraphcanvas(FigureCanvas):
             # clear custom label positions cache entry
             if action.key[0] in aw.qmc.l_annotations_dict:
                 del aw.qmc.l_annotations_dict[action.key[0]]
+            try:
+                # clear the event mark position cache
+                self.l_annotations_dict.pop(action.key[0])
+            except Exception: # pylint: disable=broad-except
+                pass
             if action.key[0] == 0: # CHARGE
+                try:
+                    # clear the TP mark position cache (TP depends on CHARGE!)
+                    self.l_annotations_dict.pop(-1)
+                except Exception: # pylint: disable=broad-except
+                    pass
                 # realign to background
                 if self.flagon:
                     try:
@@ -3346,6 +3356,11 @@ class tgraphcanvas(FigureCanvas):
                     aw.autoAdjustAxis(deltas=False)
                 aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             elif action.key[0] == 6: # DROP
+                try:
+                    # clear the TP mark position cache (TP depends on DROP!)
+                    self.l_annotations_dict.pop(-1)
+                except Exception: # pylint: disable=broad-except
+                    pass
                 try:
                     # update ambient temperature if a ambient temperature source is configured and no value yet established
                     aw.qmc.updateAmbientTempFromPhidgetModulesOrCurve()
@@ -7903,18 +7918,17 @@ class tgraphcanvas(FigureCanvas):
 
             #populate delta ET (self.delta1) and delta BT (self.delta2)
             # calculated here to be available for parsepecialeventannotations(). the curve are plotted later.
-            if self.DeltaETflag or self.DeltaBTflag:
-                if (recomputeAllDeltas or (self.DeltaETflag and self.delta1 == []) or (self.DeltaBTflag and self.delta2 == [])) and not self.flagstart: # during recording we don't recompute the deltas
-                    cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-                    decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
-                    t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-                    t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-                    # we start RoR computation 10 readings after CHARGE to avoid this initial peak
-                    if aw.qmc.timeindex[0]>-1:
-                        RoR_start = min(aw.qmc.timeindex[0]+10, len(self.timex)-1)
-                    else:
-                        RoR_start = -1
-                    self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
+            if (recomputeAllDeltas or (self.DeltaETflag and self.delta1 == []) or (self.DeltaBTflag and self.delta2 == [])) and not self.flagstart: # during recording we don't recompute the deltas
+                cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
+                t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+                t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+                # we start RoR computation 10 readings after CHARGE to avoid this initial peak
+                if aw.qmc.timeindex[0]>-1:
+                    RoR_start = min(aw.qmc.timeindex[0]+10, len(self.timex)-1)
+                else:
+                    RoR_start = -1
+                self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -21500,6 +21514,8 @@ class ApplicationWindow(QMainWindow):
                 np_dbt = replNone(np_dbt,nv)
                 np_dbtb = replNone(np_dbtb,nvb)
 
+                if len(np_dbt) == 0:
+                    raise ValueError('Length of np_dbt is zero')
                 if len(np_dbtb) == 0:
                     raise ValueError('Length of np_dbtb is zero')
 
