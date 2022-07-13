@@ -9,7 +9,6 @@ pyinstaller-versionfile==2.0.0
 # NOTE: pyinstaller 3.5 is NOT compatible with Python3.8
 # pyinstaller 3.6 issue: https://github.com/pyinstaller/pyinstaller/issues/4213
 #
-pyinstaller==5.2
 ######
 # packages that differ per platform:
 #

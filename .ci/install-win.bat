@@ -19,8 +19,8 @@ if /i "%APPVEYOR%" NEQ "True" (
         set PYTHON_PATH=c:\Python310-64
         set QT_PATH=c:\qt\6.2\msvc2019_64
         set ARTISAN_SPEC=win
-        set PYINSTALLER_VER=4.8
-        set BUILD_PYINSTALLER=False
+        set PYINSTALLER_VER=5.2
+        set BUILD_PYINSTALLER=True
         set VC_REDIST=https://aka.ms/vs/17/release/vc_redist.x64.exe
     )
     set PATH=!PYTHON_PATH!;!PYTHON_PATH!\Scripts;!PATH!
