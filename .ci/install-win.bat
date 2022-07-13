@@ -12,7 +12,7 @@ if /i "%APPVEYOR%" NEQ "True" (
         set PYTHON_PATH=c:\Python38-64
         set QT_PATH=c:\qt\5.15\msvc2019_64
         set ARTISAN_SPEC=win-legacy
-        set PYINSTALLER_VER=4.3
+        set PYINSTALLER_VER=5.2
         set BUILD_PYINSTALLER=False
         set VC_REDIST=https://aka.ms/vs/16/release/vc_redist.x64.exe
     ) else (
