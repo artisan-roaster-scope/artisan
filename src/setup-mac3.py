@@ -133,7 +133,10 @@ with open('Info.plist', 'r+b') as fp:
     plist['CFBundleIdentifier'] = 'org.artisan-scope.artisan'
     plist['CFBundleShortVersionString'] = VERSION
     plist['CFBundleVersion'] = 'Artisan ' + VERSION
-    plist['LSMinimumSystemVersion'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
+    try:
+        plist['LSMinimumSystemVersion'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
+    except Exception:
+        plist['LSMinimumSystemVersion'] = '10.15'
     plist['LSMultipleInstancesProhibited'] = 'false'
 #    plist['LSPrefersPPC'] = False # not in use longer
     plist['LSArchitecturePriority'] = ['x86_64']
@@ -158,7 +161,9 @@ OPTIONS = {
     'arch': 'x86_64',
     'matplotlib_backends': '-', # '-' for imported or explicit "Qt5Agg, PDF, PS, SVG"
     'includes': ['serial'],
-    'excludes' :  ['tkinter','curses', # 'sqlite3',
+    'excludes' :  ['tkinter','curses',
+                'PyQt5', # standard builds are now running on PyQt6. If PyQt5 is not excluded here it will be included in Resources/lib/python310.zip
+                # 'sqlite3',
                 ],
     'plist'    : plist}
 

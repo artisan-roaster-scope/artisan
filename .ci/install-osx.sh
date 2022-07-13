@@ -52,7 +52,7 @@ python3 -m pip install --upgrade pip
 # (an alternative could be to use pip install --user ..)
 # the lxml binaries are compiled with an SDK older than the 10.9 SDK which breaks the notarization
 # thus we force the compilation from source
-sudo -H python3 -m pip install --no-binary lxml lxml==4.7.1 #4.6.5 # 4.6.4
+sudo -H python3 -m pip install --no-binary lxml lxml==4.9.1 #4.7.1
 sudo -H python3 -m pip install -r src/requirements.txt
 # replaced sudo -H python3 -m pip install -r src/requirements-${TRAVIS_OS_NAME}.txt
 sudo -H python3 -m pip install -r src/requirements-${ARTISAN_OS}.txt
@@ -61,11 +61,16 @@ sudo -H python3 -m pip install -r src/requirements-${ARTISAN_OS}.txt
 # target 10.13 using MacOSX10.15.sdk build on macOS 10.15 to add dark-mode support to builds
 #sudo -H python3 -m pip install .ci/py2app-0.23-py2.py3-none-any.whl
 # with PyQt6 we need to use 0.26.1 which duplicates the Qt installation hopefully resolved in the next version
-sudo -H python3 -m pip install .ci/py2app-0.27-py2.py3-none-any.whl
+
+# not needed any longer with py2app 0.28.2:
+#sudo -H python3 -m pip install .ci/py2app-0.27-py2.py3-none-any.whl
 
 
 sudo rm -rf /usr/local/opt/python@3.9/lib/python3.9/site-packages/matplotlib/mpl-data/sample_data
 sudo rm -rf /usr/local/opt/python@3.9/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/matplotlib/mpl-data/sample_data
+
+sudo rm -rf /usr/local/opt/python@3.10/lib/python3.9/site-packages/matplotlib/mpl-data/sample_data
+sudo rm -rf /usr/local/opt/python@3.10/Frameworks/Python.framework/Versions/3.10/lib/python3.9/site-packages/matplotlib/mpl-data/sample_data
 
 #.ci/install-phidgets.sh # now installed via pip
 .ci/install-snap7.sh
