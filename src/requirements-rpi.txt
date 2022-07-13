@@ -28,7 +28,7 @@ cffi==1.12.3 # 1.13.2 fails, 1.12.3 is needed by crypto v2.5
 cryptography==3.2.2 # 3.2.1 is the last version supporting Python 3.5 # 2.5 worked but has a security issue # 2.8 fails with libcrypto.so.1.1: version `OPENSSL_1_1_0j' not found, required by cryptography.hazmat.bindings._openssl.so
 keyring==19.2.0  # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller; Python 3.5 support was dropped
 SecretStorage==3.2.0 # 3.3.0 not available on piwheels for Stretch
-lxml==4.7.1 #4.6.5 #4.6.4
+lxml==4.9.1 #4.7.1
 prettytable==0.7.2 # >1.0.0 fail to be packed and the monkey patch in main.py does not help here due the old python version
 #
 # NOTES:
