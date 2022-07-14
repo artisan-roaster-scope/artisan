@@ -11,7 +11,7 @@
     <message>
       <location filename="../artisanlib/main.py" line="19512" />
       <source>Release Sponsor</source>
-      <translation>發布贊助商</translation>
+      <translation>發行版贊助商</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="36246" />
@@ -41,7 +41,7 @@
     <message>
       <location filename="../artisanlib/main.py" line="36298" />
       <source>Show Change list</source>
-      <translation>顯示改變列表</translation>
+      <translation>顯示更新列表</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="36300" />
@@ -51,22 +51,22 @@
     <message>
       <location filename="../artisanlib/main.py" line="36302" />
       <source>You are using the latest release.</source>
-      <translation>你正在使用持續改進中的Beta版本。</translation>
+      <translation>你正在使用最新版本。</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="36304" />
       <source>You are using a beta continuous build.</source>
-      <translation>你正在使用一個自動編譯的測試版本.</translation>
+      <translation>你正在使用測試中的自動化構建版.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="36305" />
       <source>You will see a notice here once a new official release is available.</source>
-      <translation>當有一個新官方版本可用時，這裡會顯示通知。</translation>
+      <translation type="unfinished">新官方版本發布時這裡會顯示通知。</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="36310" />
       <source>There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.</source>
-      <translation>檢索最新版本時出現問題。請檢查你的網絡連接，稍後再試，或者手動檢查更新。</translation>
+      <translation type="unfinished">檢索最新版本時出現問題。請檢查你的網絡連線，稍後再試，或者手動檢查更新。</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="36314" />
@@ -84,7 +84,7 @@
     <message>
       <location filename="../artisanlib/main.py" line="10283" />
       <source>Screen Size</source>
-      <translation>屏幕尺寸</translation>
+      <translation type="unfinished">生豆尺寸</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10292" />
@@ -99,7 +99,7 @@
     <message>
       <location filename="../artisanlib/main.py" line="10301" />
       <source>Batch Size</source>
-      <translation>批次大小</translation>
+      <translation type="unfinished">烘焙量</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10308" />
@@ -114,17 +114,17 @@
     <message>
       <location filename="../artisanlib/main.py" line="10313" />
       <source>Whole Color</source>
-      <translation>整豆色值</translation>
+      <translation type="unfinished">豆色</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10316" />
       <source>Ground Color</source>
-      <translation>咖啡粉色值</translation>
+      <translation type="unfinished">粉色</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10319" />
       <source>Energy</source>
-      <translation>活力</translation>
+      <translation type="unfinished">能量</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10324" />
@@ -134,7 +134,7 @@
     <message>
       <location filename="../artisanlib/main.py" line="10328" />
       <source>AUC</source>
-      <translation />
+      <translation type="unfinished">面積值</translation>
     </message>
     <message>
       <source>Bean Temp</source>
@@ -229,7 +229,7 @@
     <message>
       <location filename="../artisanlib/wheels.py" line="117" />
       <source>Save File</source>
-      <translation>儲存文件</translation>
+      <translation type="unfinished">儲存檔案</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="122" />
@@ -338,13 +338,13 @@
       <location filename="../artisanlib/pid_dialogs.py" line="2042" />
       <location filename="../artisanlib/pid_dialogs.py" line="1181" />
       <source>RampSoak ON</source>
-      <translation>緩升浸泡 開啟</translation>
+      <translation type="unfinished">RampSoak 開啟</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2044" />
       <location filename="../artisanlib/pid_dialogs.py" line="1183" />
       <source>RampSoak OFF</source>
-      <translation>緩升浸泡 關閉</translation>
+      <translation type="unfinished">RampSoak 關閉</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2047" />
@@ -413,13 +413,13 @@
       <location filename="../artisanlib/pid_dialogs.py" line="2402" />
       <location filename="../artisanlib/pid_dialogs.py" line="1291" />
       <source>Set ET PID to 1 decimal point</source>
-      <translation>設定 ET PID保留1位小數</translation>
+      <translation type="unfinished">設定 出風溫 PID至小數點一位數</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2404" />
       <location filename="../artisanlib/pid_dialogs.py" line="1293" />
       <source>Set BT PID to 1 decimal point</source>
-      <translation>設定 BT PID保留1位小數</translation>
+      <translation type="unfinished">設定 豆溫 PID至小數點一位數</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2034" />
@@ -538,7 +538,7 @@
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2406" />
       <source>Set ET PID to MM:SS time units</source>
-      <translation>設定ET PID時間格式為MM:SS</translation>
+      <translation type="unfinished">設定出風溫 PID時間格式為MM:SS</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3953" />
@@ -578,7 +578,7 @@
       <location filename="../artisanlib/background.py" line="164" />
       <location filename="../artisanlib/events.py" line="509" />
       <source>Copy Table</source>
-      <translation>複製表</translation>
+      <translation type="unfinished">複製表格</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="82" />
@@ -589,25 +589,25 @@
     <message>
       <location filename="../artisanlib/events.py" line="545" />
       <source>&lt;&lt; Store Palette</source>
-      <translation>&amp;lt;&amp;lt; 存儲調色</translation>
+      <translation type="unfinished">&lt;&lt; 儲存調色</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="547" />
       <source>Activate Palette &gt;&gt;</source>
-      <translation>啟用調色板 &amp;gt;&amp;gt;</translation>
+      <translation type="unfinished">啟用調色板 &gt;&gt;</translation>
     </message>
     <message>
       <location filename="../artisanlib/transposer.py" line="113" />
       <location filename="../artisanlib/designer.py" line="241" />
       <location filename="../artisanlib/events.py" line="946" />
       <source>Apply</source>
-      <translation>應用</translation>
+      <translation type="unfinished">套用</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="278" />
       <location filename="../artisanlib/ports.py" line="107" />
       <source>Start</source>
-      <translation />
+      <translation type="unfinished">開始</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1022" />
@@ -736,7 +736,7 @@
       <location filename="../artisanlib/colors.py" line="127" />
       <location filename="../artisanlib/curves.py" line="784" />
       <source>Background</source>
-      <translation>背景曲線</translation>
+      <translation type="unfinished">背景顏色</translation>
     </message>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="73" />
@@ -757,13 +757,13 @@
     <message>
       <location filename="../artisanlib/curves.py" line="1615" />
       <source>ET/BT</source>
-      <translation>ET/BT</translation>
+      <translation type="unfinished">出風溫/豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1618" />
       <source>Create Virtual
 Extra Device</source>
-      <translation>新增虛擬
+      <translation type="unfinished">新增虛擬
 額外設備</translation>
     </message>
     <message>
@@ -779,19 +779,19 @@ Extra Device</source>
     <message>
       <location filename="../artisanlib/alarms.py" line="182" />
       <source>&lt;&lt; Store Alarm Set</source>
-      <translation>&amp;lt;&amp;lt; 儲存報警表</translation>
+      <translation type="unfinished">&lt;&lt;  儲存警報表</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="184" />
       <source>Activate Alarm Set &gt;&gt;</source>
-      <translation>啟用警報設定 &amp;gt;&amp;gt;</translation>
+      <translation type="unfinished">啟用警報設定 &gt;&gt;</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18277" />
       <location filename="../artisanlib/main.py" line="11400" />
       <location filename="../artisanlib/main.py" line="6658" />
       <source>ON</source>
-      <translation>開始監控</translation>
+      <translation type="unfinished">開始監看</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18291" />
@@ -847,7 +847,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="18340" />
       <source>DROP</source>
-      <translation>下豆</translation>
+      <translation type="unfinished">下豆</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18345" />
@@ -919,7 +919,7 @@ END</source>
       <location filename="../artisanlib/colors.py" line="70" />
       <location filename="../artisanlib/colors.py" line="60" />
       <source>ET</source>
-      <translation>ET</translation>
+      <translation type="unfinished">出風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="96" />
@@ -927,7 +927,7 @@ END</source>
       <location filename="../artisanlib/colors.py" line="75" />
       <location filename="../artisanlib/colors.py" line="65" />
       <source>BT</source>
-      <translation>BT</translation>
+      <translation type="unfinished">豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="102" />
@@ -942,7 +942,7 @@ END</source>
     <message>
       <location filename="../artisanlib/colors.py" line="133" />
       <source>Grid</source>
-      <translation>坐標格</translation>
+      <translation type="unfinished">座標格線</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="139" />
@@ -992,27 +992,27 @@ END</source>
     <message>
       <location filename="../artisanlib/colors.py" line="192" />
       <source>Text</source>
-      <translation>文本</translation>
+      <translation type="unfinished">文字</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="198" />
       <source>Watermarks</source>
-      <translation>水印</translation>
+      <translation type="unfinished">浮水印</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="204" />
       <source>Time Guide</source>
-      <translation>時間指引</translation>
+      <translation type="unfinished">時間指示</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="210" />
       <source>AUC Guide</source>
-      <translation>AUC指引</translation>
+      <translation type="unfinished">AUC指示</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="216" />
       <source>AUC Area</source>
-      <translation>AUC面積</translation>
+      <translation type="unfinished">曲線下面積</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="222" />
@@ -1022,7 +1022,7 @@ END</source>
     <message>
       <location filename="../artisanlib/colors.py" line="239" />
       <source>Legend border</source>
-      <translation>圖例邊界</translation>
+      <translation type="unfinished">邊界圖例</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="246" />
@@ -1052,22 +1052,22 @@ END</source>
     <message>
       <location filename="../artisanlib/colors.py" line="281" />
       <source>MET Text</source>
-      <translation>最大環境溫度文字</translation>
+      <translation type="unfinished">最高出風溫度 文字</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="287" />
       <source>MET Box</source>
-      <translation>最大環境溫度標記</translation>
+      <translation type="unfinished">最高出風溫度標記</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="293" />
       <source>Analysis Mask</source>
-      <translation>分析區域</translation>
+      <translation type="unfinished">分析遮罩</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="309" />
       <source>Stats&amp;Analysis Bkgnd</source>
-      <translation>狀態&amp;分析背景色</translation>
+      <translation type="unfinished">統計與分析背景色</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="342" />
@@ -1079,12 +1079,12 @@ END</source>
       <location filename="../artisanlib/colors.py" line="330" />
       <location filename="../artisanlib/colors.py" line="328" />
       <source>Digits</source>
-      <translation>數字</translation>
+      <translation type="unfinished">數字顏色</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="370" />
       <source>B/W</source>
-      <translation />
+      <translation type="unfinished">黑白</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="573" />
@@ -1190,7 +1190,7 @@ END</source>
     <message>
       <location filename="../artisanlib/axis.py" line="131" />
       <source>Expand</source>
-      <translation>擴展</translation>
+      <translation type="unfinished">自動延伸</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="135" />
@@ -1221,7 +1221,7 @@ END</source>
       <location filename="../artisanlib/comm.py" line="178" />
       <location filename="../artisanlib/axis.py" line="201" />
       <source>ET</source>
-      <translation />
+      <translation type="unfinished">出風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="73" />
@@ -1229,19 +1229,19 @@ END</source>
       <location filename="../artisanlib/background.py" line="71" />
       <location filename="../artisanlib/axis.py" line="203" />
       <source>BT</source>
-      <translation />
+      <translation type="unfinished">豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="123" />
       <location filename="../artisanlib/pid_dialogs.py" line="478" />
       <location filename="../artisanlib/axis.py" line="244" />
       <source>Load from profile</source>
-      <translation>從曲線設定文件中讀取</translation>
+      <translation type="unfinished">從曲線檔案中載入</translation>
     </message>
     <message>
       <location filename="../artisanlib/comparator.py" line="775" />
       <source>BBP</source>
-      <translation>BBP</translation>
+      <translation type="unfinished">鍋間操作程序</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="65" />
@@ -1258,7 +1258,7 @@ END</source>
       <location filename="../artisanlib/alarms.py" line="125" />
       <location filename="../artisanlib/pid_dialogs.py" line="481" />
       <source>Load from background</source>
-      <translation>從背景曲線載入</translation>
+      <translation type="unfinished">從背景曲線載入</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2089" />
@@ -1274,7 +1274,7 @@ END</source>
     <message>
       <location filename="../artisanlib/autosave.py" line="60" />
       <source>Add to recent file list</source>
-      <translation>加入到最近的文件列表</translation>
+      <translation type="unfinished">加入到最近的檔案列表</translation>
     </message>
     <message>
       <location filename="../artisanlib/autosave.py" line="65" />
@@ -1290,7 +1290,7 @@ END</source>
     <message>
       <location filename="../artisanlib/events.py" line="203" />
       <source>Show on BT</source>
-      <translation>顯示BT</translation>
+      <translation type="unfinished">顯示在豆溫曲線上</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="207" />
@@ -1300,7 +1300,7 @@ END</source>
     <message>
       <location filename="../artisanlib/events.py" line="210" />
       <source>Descr.</source>
-      <translation>說明.</translation>
+      <translation type="unfinished">說明顯示字元數</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="446" />
@@ -1325,17 +1325,17 @@ END</source>
     <message>
       <location filename="../artisanlib/events.py" line="472" />
       <source>Mark MET</source>
-      <translation>標記最大環境溫度</translation>
+      <translation type="unfinished">標記最高排風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="476" />
       <source>Show Time Guide</source>
-      <translation>顯示時間指引</translation>
+      <translation type="unfinished">顯示時間指引線</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="561" />
       <source>Switch Using Number Keys + Cmd</source>
-      <translation>使用數字鍵+命令切換</translation>
+      <translation type="unfinished">使用"數字鍵+cmd鍵"切換</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="1039" />
@@ -1400,7 +1400,7 @@ END</source>
     <message>
       <location filename="../artisanlib/ports.py" line="273" />
       <source>Float</source>
-      <translation>漂浮</translation>
+      <translation type="unfinished">浮點數</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1482" />
@@ -1426,12 +1426,12 @@ END</source>
       <location filename="../artisanlib/curves.py" line="390" />
       <location filename="../artisanlib/background.py" line="72" />
       <source>Show Full</source>
-      <translation>顯示完全</translation>
+      <translation type="unfinished">顯示全域</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="193" />
       <source>Playback Aid</source>
-      <translation>回放輔助設備</translation>
+      <translation type="unfinished">重撥輔助</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1155" />
@@ -1442,22 +1442,22 @@ END</source>
     <message>
       <location filename="../artisanlib/background.py" line="202" />
       <source>Playback Events</source>
-      <translation>回放事件</translation>
+      <translation type="unfinished">重撥事件</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="206" />
       <source>Playback DROP</source>
-      <translation>回放 下豆</translation>
+      <translation type="unfinished">重播 下豆</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="219" />
       <source>Clear the background before loading a new profile</source>
-      <translation>載入新個人資料之前先清除背景</translation>
+      <translation type="unfinished">載入新曲線時清除背景</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="223" />
       <source>Always hide background when loading a profile</source>
-      <translation>加載個人資料時始終隱藏背景</translation>
+      <translation type="unfinished">載入曲線時始終隱藏背景</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="870" />
@@ -1483,37 +1483,37 @@ END</source>
       <location filename="../artisanlib/main.py" line="35640" />
       <location filename="../artisanlib/roast_properties.py" line="1239" />
       <source>Heavy FC</source>
-      <translation>較強一爆</translation>
+      <translation type="unfinished">較強一爆音</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35642" />
       <location filename="../artisanlib/roast_properties.py" line="1242" />
       <source>Low FC</source>
-      <translation>較弱一爆</translation>
+      <translation type="unfinished">較弱一爆音</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35644" />
       <location filename="../artisanlib/roast_properties.py" line="1245" />
       <source>Light Cut</source>
-      <translation>浅色中线</translation>
+      <translation type="unfinished">中間線色淺</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35646" />
       <location filename="../artisanlib/roast_properties.py" line="1248" />
       <source>Dark Cut</source>
-      <translation>深色中线</translation>
+      <translation type="unfinished">中間線色深</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35648" />
       <location filename="../artisanlib/roast_properties.py" line="1251" />
       <source>Drops</source>
-      <translation>滴油</translation>
+      <translation type="unfinished">有油滴</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35650" />
       <location filename="../artisanlib/roast_properties.py" line="1254" />
       <source>Oily</source>
-      <translation>豆表有油</translation>
+      <translation type="unfinished">油亮</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35652" />
@@ -1525,19 +1525,19 @@ END</source>
       <location filename="../artisanlib/main.py" line="35654" />
       <location filename="../artisanlib/roast_properties.py" line="1259" />
       <source>Tipping</source>
-      <translation>不規則</translation>
+      <translation type="unfinished">尖端焦黑</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35656" />
       <location filename="../artisanlib/roast_properties.py" line="1261" />
       <source>Scorching</source>
-      <translation>焦燒</translation>
+      <translation type="unfinished">表面燙傷</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35658" />
       <location filename="../artisanlib/roast_properties.py" line="1263" />
       <source>Divots</source>
-      <translation>裂缝</translation>
+      <translation type="unfinished">隕石坑狀</translation>
     </message>
     <message>
       <location filename="../artisanlib/phases.py" line="94" />
@@ -1547,17 +1547,17 @@ END</source>
     <message>
       <location filename="../artisanlib/phases.py" line="97" />
       <source>From Background</source>
-      <translation>來自背景曲線</translation>
+      <translation type="unfinished">套用背景曲線設定</translation>
     </message>
     <message>
       <location filename="../artisanlib/phases.py" line="100" />
       <source>Watermarks</source>
-      <translation>水印</translation>
+      <translation type="unfinished">浮水印</translation>
     </message>
     <message>
       <location filename="../artisanlib/phases.py" line="102" />
       <source>Phases LCDs</source>
-      <translation>階段LCD</translation>
+      <translation type="unfinished">烘焙階段LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/phases.py" line="104" />
@@ -1572,55 +1572,55 @@ END</source>
     <message>
       <location filename="../artisanlib/logs.py" line="41" />
       <source>Serial Log ON/OFF</source>
-      <translation>串行日誌 開/關</translation>
+      <translation type="unfinished">結構化日誌 開/關</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="348" />
       <source>Optimal Smoothing Post Roast</source>
-      <translation>烘焙時優化為最佳平滑度</translation>
+      <translation type="unfinished">烘焙後曲線最佳平滑化顯示</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="354" />
       <source>Polyfit computation</source>
-      <translation>多邊形擬合計算</translation>
+      <translation type="unfinished">多項式擬合計算</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="368" />
       <source>Smooth Spikes</source>
-      <translation>平滑度峰值</translation>
+      <translation type="unfinished">突波平滑</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="373" />
       <source>Interpolate Duplicates</source>
-      <translation>插入重複項</translation>
+      <translation type="unfinished">內差重複值</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="396" />
       <source>Drop Spikes</source>
-      <translation>下豆峰值</translation>
+      <translation type="unfinished">下豆凸波</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="591" />
       <location filename="../artisanlib/curves.py" line="401" />
       <source>Limits</source>
-      <translation>範圍</translation>
+      <translation type="unfinished">限制範圍</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="425" />
       <location filename="../artisanlib/curves.py" line="424" />
       <source>Projection</source>
-      <translation>預測</translation>
+      <translation type="unfinished">預測投射</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="76" />
       <location filename="../artisanlib/curves.py" line="480" />
       <source>Swap</source>
-      <translation>交換</translation>
+      <translation type="unfinished">交換位置</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="483" />
       <source>Decimal Places</source>
-      <translation>十進制標記</translation>
+      <translation type="unfinished">小數位數</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1159" />
@@ -1630,17 +1630,17 @@ END</source>
     <message>
       <location filename="../artisanlib/curves.py" line="1221" />
       <source>Alarm Popups</source>
-      <translation>警報彈出框</translation>
+      <translation type="unfinished">警報彈出通知</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1281" />
       <source>Hide Image During Roast</source>
-      <translation>烘培時隱藏圖片</translation>
+      <translation type="unfinished">烘焙時隱藏圖片</translation>
     </message>
     <message>
       <location filename="../artisanlib/statistics.py" line="41" />
       <source>Bar</source>
-      <translation>長塊</translation>
+      <translation type="unfinished">長條</translation>
     </message>
     <message>
       <location filename="../artisanlib/statistics.py" line="43" />
@@ -1650,28 +1650,28 @@ END</source>
     <message>
       <location filename="../artisanlib/statistics.py" line="44" />
       <source>Characteristics</source>
-      <translation>特徵</translation>
+      <translation type="unfinished">特徵值</translation>
     </message>
     <message>
       <location filename="../artisanlib/statistics.py" line="45" />
       <source>Summary</source>
-      <translation>統計</translation>
+      <translation type="unfinished">摘要</translation>
     </message>
     <message>
       <location filename="../artisanlib/statistics.py" line="106" />
       <source>From Event</source>
-      <translation>來自事件</translation>
+      <translation type="unfinished">從事件點開始</translation>
     </message>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="81" />
       <location filename="../artisanlib/statistics.py" line="115" />
       <source>Background</source>
-      <translation>背景曲線</translation>
+      <translation type="unfinished">採用背景檔值</translation>
     </message>
     <message>
       <location filename="../artisanlib/statistics.py" line="119" />
       <source>Guide</source>
-      <translation>指引</translation>
+      <translation type="unfinished">指引線</translation>
     </message>
     <message>
       <location filename="../artisanlib/statistics.py" line="121" />
@@ -1691,7 +1691,7 @@ END</source>
     <message>
       <location filename="../artisanlib/batches.py" line="57" />
       <source>Never overwrite counter</source>
-      <translation>從不覆蓋計數器</translation>
+      <translation type="unfinished">從不覆寫計數器</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="134" />
@@ -1706,12 +1706,12 @@ END</source>
     <message>
       <location filename="../artisanlib/devices.py" line="180" />
       <source>Modbus Port</source>
-      <translation>通信協議端口</translation>
+      <translation type="unfinished">Modbus埠</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="220" />
       <source>PID Firmware</source>
-      <translation>PID 固件</translation>
+      <translation type="unfinished">PID 硬體</translation>
     </message>
     <message>
       <source>Button</source>
@@ -1789,7 +1789,7 @@ END</source>
       <location filename="../artisanlib/loring.py" line="281" />
       <location filename="../artisanlib/petroncini.py" line="198" />
       <source>Air</source>
-      <translation>氣流</translation>
+      <translation type="unfinished">風量</translation>
     </message>
     <message>
       <location filename="../artisanlib/ikawa.py" line="204" />
@@ -1979,7 +1979,7 @@ END</source>
       <location filename="../artisanlib/events.py" line="621" />
       <location filename="../artisanlib/pid_dialogs.py" line="397" />
       <source>Call Program</source>
-      <translation>執行程序</translation>
+      <translation type="unfinished">呼叫程式</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="867" />
@@ -2068,13 +2068,13 @@ END</source>
       <location filename="../artisanlib/alarms.py" line="882" />
       <location filename="../artisanlib/pid_dialogs.py" line="413" />
       <source>RampSoak ON</source>
-      <translation>緩升浸泡 開啟</translation>
+      <translation type="unfinished">RampSoak 開啟</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="883" />
       <location filename="../artisanlib/pid_dialogs.py" line="414" />
       <source>RampSoak OFF</source>
-      <translation>緩升浸泡 關閉</translation>
+      <translation type="unfinished">RampSoak 關閉</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="884" />
@@ -2099,14 +2099,14 @@ END</source>
       <location filename="../artisanlib/alarms.py" line="887" />
       <location filename="../artisanlib/pid_dialogs.py" line="418" />
       <source>Playback ON</source>
-      <translation>開啟回放</translation>
+      <translation type="unfinished">開啟重播</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="25458" />
       <location filename="../artisanlib/alarms.py" line="888" />
       <location filename="../artisanlib/pid_dialogs.py" line="419" />
       <source>Playback OFF</source>
-      <translation>關閉回放</translation>
+      <translation type="unfinished">關閉重播</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="889" />
@@ -2123,56 +2123,56 @@ END</source>
     <message>
       <location filename="../artisanlib/events.py" line="224" />
       <source>Flag</source>
-      <translation>標記</translation>
+      <translation type="unfinished">旗標</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="225" />
       <source>Bar</source>
-      <translation>長塊</translation>
+      <translation type="unfinished">長條</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="226" />
       <source>Step</source>
-      <translation>階段</translation>
+      <translation type="unfinished">階梯狀</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="227" />
       <source>Step+</source>
-      <translation>階段+</translation>
+      <translation type="unfinished">階梯附旗標</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="228" />
       <source>Combo</source>
-      <translation>組合</translation>
+      <translation type="unfinished">階梯附長條</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="498" />
       <source>tiny</source>
-      <translation>小</translation>
+      <translation type="unfinished">微型</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="499" />
       <source>small</source>
-      <translation>中</translation>
+      <translation type="unfinished">小型</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="500" />
       <source>large</source>
-      <translation>大</translation>
+      <translation type="unfinished">大型</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="2226" />
       <location filename="../artisanlib/events.py" line="1017" />
       <location filename="../artisanlib/events.py" line="618" />
       <source>Serial Command</source>
-      <translation>串行指令</translation>
+      <translation type="unfinished">序列指令</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="2229" />
       <location filename="../artisanlib/events.py" line="1019" />
       <location filename="../artisanlib/events.py" line="619" />
       <source>Modbus Command</source>
-      <translation>通信協議指令</translation>
+      <translation type="unfinished">Modbus指令</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="2230" />
@@ -2285,7 +2285,7 @@ END</source>
       <location filename="../artisanlib/roast_properties.py" line="3916" />
       <location filename="../artisanlib/events.py" line="891" />
       <source>ET</source>
-      <translation />
+      <translation type="unfinished">排風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="787" />
@@ -2293,7 +2293,7 @@ END</source>
       <location filename="../artisanlib/roast_properties.py" line="3917" />
       <location filename="../artisanlib/events.py" line="892" />
       <source>BT</source>
-      <translation />
+      <translation type="unfinished">豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="2235" />
@@ -2311,7 +2311,7 @@ END</source>
       <location filename="../artisanlib/events.py" line="2228" />
       <location filename="../artisanlib/events.py" line="1036" />
       <source>Multiple Event</source>
-      <translation>多個事件</translation>
+      <translation type="unfinished">多重事件</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="818" />
@@ -2323,12 +2323,12 @@ END</source>
     <message>
       <location filename="../artisanlib/ports.py" line="598" />
       <source>bytes</source>
-      <translation>字節</translation>
+      <translation type="unfinished">位元組</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="602" />
       <source>words</source>
-      <translation />
+      <translation type="unfinished">字組</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1027" />
@@ -2340,7 +2340,7 @@ END</source>
       <location filename="../artisanlib/ports.py" line="1032" />
       <location filename="../artisanlib/ports.py" line="772" />
       <source>fetch full blocks</source>
-      <translation>獲取完整塊</translation>
+      <translation type="unfinished">獲取全部block</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="777" />
@@ -2390,20 +2390,20 @@ END</source>
     <message>
       <location filename="../artisanlib/calculator.py" line="103" />
       <source>cm^3</source>
-      <translation>立方厘米</translation>
+      <translation type="unfinished">立方公分</translation>
     </message>
     <message>
       <location filename="../artisanlib/transposer.py" line="124" />
       <location filename="../artisanlib/curves.py" line="863" />
       <location filename="../artisanlib/curves.py" line="427" />
       <source>linear</source>
-      <translation>線性</translation>
+      <translation type="unfinished">線性</translation>
     </message>
     <message>
       <location filename="../artisanlib/transposer.py" line="125" />
       <location filename="../artisanlib/curves.py" line="428" />
       <source>quadratic</source>
-      <translation>平方</translation>
+      <translation type="unfinished">二次</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="656" />
@@ -2418,7 +2418,7 @@ END</source>
     <message>
       <location filename="../artisanlib/curves.py" line="664" />
       <source>Default</source>
-      <translation>默認</translation>
+      <translation type="unfinished">預設</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="864" />
@@ -2487,17 +2487,17 @@ END</source>
     <message>
       <location filename="../artisanlib/alarms.py" line="852" />
       <source>below</source>
-      <translation>下面</translation>
+      <translation type="unfinished">下方</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="853" />
       <source>above</source>
-      <translation>上面</translation>
+      <translation type="unfinished">上方</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="1697" />
       <source>Propane Gas (LPG)</source>
-      <translation>丙烷 (LPG)</translation>
+      <translation type="unfinished">液化石油氣 (LPG)</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="1698" />
@@ -3826,7 +3826,7 @@ END</source>
     <message>
       <location filename="../plus/countries.py" line="264" />
       <source>Taiwan (Province of China)</source>
-      <translation>台灣（中國省）</translation>
+      <translation type="unfinished">台灣(就是台灣)</translation>
     </message>
     <message>
       <location filename="../plus/countries.py" line="265" />
@@ -4063,8 +4063,8 @@ END</source>
       <location filename="../artisanlib/devices.py" line="1641" />
       <location filename="../artisanlib/devices.py" line="1624" />
       <location filename="../artisanlib/devices.py" line="1516" />
-      <location filename="../artisanlib/main.py" line="39002" />
-      <location filename="../artisanlib/main.py" line="38899" />
+      <location filename="../artisanlib/main.py" line="39010" />
+      <location filename="../artisanlib/main.py" line="38907" />
       <location filename="../artisanlib/main.py" line="38770" />
       <location filename="../artisanlib/main.py" line="38756" />
       <location filename="../artisanlib/main.py" line="38541" />
@@ -4288,7 +4288,7 @@ END</source>
       <location filename="../artisanlib/comparator.py" line="1251" />
       <location filename="../artisanlib/wsport.py" line="327" />
       <source>Exception:</source>
-      <translation>錯誤:</translation>
+      <translation type="unfinished">異常:</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1011" />
@@ -4322,7 +4322,7 @@ END</source>
       <location filename="../artisanlib/comm.py" line="696" />
       <location filename="../artisanlib/comm.py" line="534" />
       <source>Serial Exception:</source>
-      <translation>串行通信錯誤:</translation>
+      <translation type="unfinished">序列通訊異常:</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="690" />
@@ -4332,7 +4332,7 @@ END</source>
     <message>
       <location filename="../artisanlib/comm.py" line="758" />
       <source>callprogram() received:</source>
-      <translation>運行程序() 已接收:</translation>
+      <translation type="unfinished">運行程式() 已接收:</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="1455" />
@@ -4347,7 +4347,7 @@ END</source>
     <message>
       <location filename="../artisanlib/comm.py" line="1768" />
       <source>Unable to open serial port</source>
-      <translation>無法開啟串行端口</translation>
+      <translation type="unfinished">無法開啟序列埠</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="1887" />
@@ -4451,12 +4451,12 @@ END</source>
     <message>
       <location filename="../artisanlib/ports.py" line="1874" />
       <source>Serial Exception: invalid comm port</source>
-      <translation>串行異常:無效端口</translation>
+      <translation type="unfinished">序列異常:無效埠號</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1879" />
       <source>Serial Exception: timeout</source>
-      <translation>串行異常: 超時</translation>
+      <translation type="unfinished">序列異常: 超時</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4835" />
@@ -4473,7 +4473,7 @@ END</source>
       <location filename="../artisanlib/modbusport.py" line="498" />
       <location filename="../artisanlib/modbusport.py" line="323" />
       <source>Modbus Error:</source>
-      <translation>通信協議錯誤:</translation>
+      <translation type="unfinished">Modbus錯誤:</translation>
     </message>
     <message>
       <location filename="../artisanlib/modbusport.py" line="1127" />
@@ -4484,7 +4484,7 @@ END</source>
       <location filename="../artisanlib/modbusport.py" line="704" />
       <location filename="../artisanlib/modbusport.py" line="463" />
       <source>Modbus Communication Resumed</source>
-      <translation>通信協議通信恢復</translation>
+      <translation type="unfinished">Modbus通訊恢復</translation>
     </message>
     <message>
       <location filename="../artisanlib/modbusport.py" line="1137" />
@@ -4494,12 +4494,12 @@ END</source>
       <location filename="../artisanlib/modbusport.py" line="715" />
       <location filename="../artisanlib/modbusport.py" line="473" />
       <source>Modbus Communication Error</source>
-      <translation>通信協議通信錯誤</translation>
+      <translation type="unfinished">Modbus通訊錯誤</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="660" />
       <source>RampSoak could not be changed</source>
-      <translation>緩升浸泡 無法被改變</translation>
+      <translation type="unfinished">RampSoak 無法更改</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1066" />
@@ -4509,22 +4509,22 @@ END</source>
     <message>
       <location filename="../artisanlib/curves.py" line="1907" />
       <source>ln(): no profile data available</source>
-      <translation>ln(): 無有效曲線設定文件數據</translation>
+      <translation type="unfinished">ln(): 無有效曲線數據</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1928" />
       <source>expvar(): no profile data available</source>
-      <translation>expvar(): 無有效設定數據</translation>
+      <translation type="unfinished">expvar(): 無有效曲線數據</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1945" />
       <source>Univariate: no profile data available</source>
-      <translation>單因素:無有效曲線設定文件數據</translation>
+      <translation type="unfinished">Univariate:無有效曲線數據</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="2174" />
       <source>Polyfit: no profile data available</source>
-      <translation>擬合: 無有效曲線設定文件數據</translation>
+      <translation type="unfinished">Polyfit:無有效曲線數據</translation>
     </message>
     <message>
       <location filename="../artisanlib/s7port.py" line="885" />
@@ -4532,12 +4532,12 @@ END</source>
       <location filename="../artisanlib/s7port.py" line="707" />
       <location filename="../artisanlib/s7port.py" line="517" />
       <source>S7 Communication Resumed</source>
-      <translation>S7 通信恢復</translation>
+      <translation type="unfinished">S7 通訊恢復</translation>
     </message>
     <message>
       <location filename="../artisanlib/s7port.py" line="530" />
       <source>readActiveRegisters() S7 Communication Error</source>
-      <translation>readActiveRegisters() S7通信錯誤</translation>
+      <translation type="unfinished">readActiveRegisters() S7通訊錯誤</translation>
     </message>
     <message>
       <location filename="../artisanlib/s7port.py" line="891" />
@@ -4559,23 +4559,23 @@ END</source>
       <location filename="../artisanlib/s7port.py" line="592" />
       <location filename="../artisanlib/s7port.py" line="563" />
       <source>S7 Communication Error</source>
-      <translation>S7 通信錯誤</translation>
+      <translation type="unfinished">S7 通訊錯誤</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="11231" />
       <location filename="../artisanlib/main.py" line="11224" />
       <source>Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!</source>
-      <translation>錯誤: Phidget管理器不能被啟動. 校驗Phidget驅動是否正常安裝!</translation>
+      <translation type="unfinished">異常: Phidget管理器無法啟動. 確認Phidget驅動程式是否正常安裝!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="14447" />
       <source>Error in lnRegression:</source>
-      <translation>回歸錯誤:</translation>
+      <translation type="unfinished">InRegression錯誤</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="14903" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
-      <translation>錯誤: redrawdesigner() 烘培事件可能不在序列中. 重新設定設計器.</translation>
+      <translation type="unfinished">異常: redrawdesigner() 烘焙事件可能不在序列中. 重新設定設計器.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="26231" />
@@ -4586,7 +4586,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="30269" />
       <source>Exception: {} not a valid settings file</source>
-      <translation>例外：{}不是有效的設定文件</translation>
+      <translation type="unfinished">異常：{}不是有效的設定文件</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="33177" />
@@ -4599,33 +4599,33 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="31983" />
       <source>Exception: WebLCDs not supported by this build</source>
-      <translation>例外：此版本不支持 WebLCD</translation>
+      <translation type="unfinished">異常：此版本不支持 WebLCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34821" />
       <location filename="../artisanlib/main.py" line="34448" />
       <source>Exception (probably due to an empty profile):</source>
-      <translation>錯誤 (可能是因為一個空的設定文件):</translation>
+      <translation type="unfinished">異常 (可能是因為一個空的設定文件):</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="38575" />
       <source>Analyze: CHARGE event required, none found</source>
-      <translation>分析：需要入豆事件，並沒有找到</translation>
+      <translation type="unfinished">分析：需要入豆事件，沒有找到</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="38579" />
       <source>Analyze: DROP event required, none found</source>
-      <translation>分析：需要下豆事件，並沒有找到</translation>
+      <translation type="unfinished">分析：需要下豆事件，沒有找到</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="38666" />
       <source>Analyze: no background profile data available</source>
-      <translation>分析: 無有效背景曲線設定數據</translation>
+      <translation type="unfinished">分析: 無有效背景曲線數據</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="38669" />
       <source>Analyze: background profile requires CHARGE and DROP events</source>
-      <translation>分析: 背景曲線設定需要入豆和下豆事件</translation>
+      <translation type="unfinished">分析: 背景曲線需要有入豆和下豆事件</translation>
     </message>
     <message>
       <source>xxvar(): no profile data available</source>
@@ -4748,7 +4748,7 @@ END</source>
     <message>
       <location filename="../artisanlib/comm.py" line="162" />
       <source>Manual Temperature Logger</source>
-      <translation>手動操作溫度記錄器</translation>
+      <translation type="unfinished">手動溫度記錄器</translation>
     </message>
     <message>
       <location filename="../artisanlib/autosave.py" line="35" />
@@ -4763,12 +4763,12 @@ END</source>
     <message>
       <location filename="../artisanlib/autosave.py" line="164" />
       <source>AutoSave Path</source>
-      <translation>自動儲存文件路徑</translation>
+      <translation type="unfinished">自動儲存路徑</translation>
     </message>
     <message>
       <location filename="../artisanlib/autosave.py" line="169" />
       <source>AutoSave Save Also Path</source>
-      <translation>自動儲存另存路徑</translation>
+      <translation type="unfinished">自動另存路徑</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="66" />
@@ -4782,22 +4782,22 @@ END</source>
       <location filename="../artisanlib/events.py" line="744" />
       <location filename="../artisanlib/events.py" line="739" />
       <source>Slider Calculator</source>
-      <translation>滑塊計算器</translation>
+      <translation type="unfinished">滑動條計算器</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="3115" />
       <source>Event Custom Buttons Help</source>
-      <translation>事件自定義按鈕幫助</translation>
+      <translation type="unfinished">事件自定按鈕說明</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="3124" />
       <source>Event Custom Sliders Help</source>
-      <translation>事件自定義滑動條幫助</translation>
+      <translation type="unfinished">事件自定滑動條說明</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="3133" />
       <source>Event Annotations Help</source>
-      <translation>事件說明幫助</translation>
+      <translation type="unfinished">事件說明說明</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="26262" />
@@ -4811,7 +4811,7 @@ END</source>
     <message>
       <location filename="../artisanlib/ports.py" line="78" />
       <source>Scan Modbus</source>
-      <translation>掃描通信協議</translation>
+      <translation type="unfinished">掃描Modbus</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="239" />
@@ -4821,12 +4821,12 @@ END</source>
     <message>
       <location filename="../artisanlib/ports.py" line="445" />
       <source>Ports Configuration</source>
-      <translation>端口設定</translation>
+      <translation type="unfinished">通訊埠設定</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1828" />
       <source>MODBUS Help</source>
-      <translation>通信協議幫助</translation>
+      <translation type="unfinished">Modbus幫助</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1835" />
@@ -4846,7 +4846,7 @@ END</source>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="474" />
       <source>Tare Setup</source>
-      <translation>皮重設定</translation>
+      <translation type="unfinished">扣重設定</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="667" />
@@ -4857,17 +4857,17 @@ END</source>
       <location filename="../plus/blend.py" line="156" />
       <location filename="../artisanlib/roast_properties.py" line="1743" />
       <source>Custom Blend</source>
-      <translation>自定義混合</translation>
+      <translation type="unfinished">自定配方</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="3875" />
       <source>Energy Help</source>
-      <translation>能源幫助</translation>
+      <translation type="unfinished">能量說明</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="5213" />
       <source>Set Measure from Profile</source>
-      <translation>從設定文件設定度量</translation>
+      <translation type="unfinished">從曲線檔設定量測</translation>
     </message>
     <message>
       <location filename="../artisanlib/phases.py" line="34" />
@@ -4882,7 +4882,7 @@ END</source>
     <message>
       <location filename="../artisanlib/logs.py" line="40" />
       <source>Serial Log</source>
-      <translation>串行日誌</translation>
+      <translation type="unfinished">通訊紀錄</translation>
     </message>
     <message>
       <location filename="../artisanlib/logs.py" line="84" />
@@ -4924,7 +4924,7 @@ END</source>
       <location filename="../artisanlib/devices.py" line="3003" />
       <location filename="../artisanlib/curves.py" line="2401" />
       <source>Symbolic Formulas Help</source>
-      <translation>符號公式幫助</translation>
+      <translation type="unfinished">符號方程說明</translation>
     </message>
     <message>
       <location filename="../artisanlib/statistics.py" line="38" />
@@ -4959,17 +4959,17 @@ END</source>
     <message>
       <location filename="../artisanlib/devices.py" line="3021" />
       <source>External Programs Help</source>
-      <translation>外部程序幫助</translation>
+      <translation type="unfinished">外部程式幫助</translation>
     </message>
     <message>
       <location filename="../artisanlib/transposer.py" line="45" />
       <source>Profile Transposer</source>
-      <translation>設定轉換器</translation>
+      <translation type="unfinished">曲線轉換器</translation>
     </message>
     <message>
       <location filename="../artisanlib/transposer.py" line="557" />
       <source>Profile Transposer Help</source>
-      <translation>設定轉換器幫助</translation>
+      <translation type="unfinished">曲線轉換器幫助</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="44" />
@@ -4979,7 +4979,7 @@ END</source>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="46" />
       <source>Cup Profile</source>
-      <translation>杯測設定</translation>
+      <translation type="unfinished">杯測蜘蛛圖</translation>
     </message>
     <message>
       <source>Extras</source>
@@ -5045,7 +5045,7 @@ END</source>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="200" />
       <source>Target</source>
-      <translation>對象</translation>
+      <translation type="unfinished">目標</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="330" />
@@ -5065,7 +5065,7 @@ END</source>
     <message>
       <location filename="../artisanlib/events.py" line="1204" />
       <source>Default Buttons</source>
-      <translation>默認按鈕</translation>
+      <translation type="unfinished">預設按鈕</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="1215" />
@@ -5082,7 +5082,7 @@ END</source>
       <location filename="../artisanlib/ports.py" line="1206" />
       <location filename="../artisanlib/ports.py" line="699" />
       <source>Registers</source>
-      <translation />
+      <translation type="unfinished">暫存器</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1461" />
@@ -5106,7 +5106,7 @@ END</source>
     <message>
       <location filename="../artisanlib/ports.py" line="933" />
       <source>Serial</source>
-      <translation type="unfinished">串行</translation>
+      <translation type="unfinished">通訊紀錄</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="946" />
@@ -5151,7 +5151,7 @@ END</source>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2847" />
       <source>Energy</source>
-      <translation>活力</translation>
+      <translation type="unfinished">能量</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2848" />
@@ -5206,32 +5206,32 @@ END</source>
     <message>
       <location filename="../artisanlib/curves.py" line="565" />
       <source>Input Filter</source>
-      <translation>輸入篩選器</translation>
+      <translation type="unfinished">輸入濾波器</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="577" />
       <source>Curve Filter</source>
-      <translation>曲線篩選器</translation>
+      <translation type="unfinished">曲線濾波器</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="585" />
       <source>Display Filter</source>
-      <translation>顯示篩選器</translation>
+      <translation type="unfinished">顯示濾波器</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="634" />
       <source>Rate of Rise Filter</source>
-      <translation>ROR篩選器</translation>
+      <translation type="unfinished">ROR濾波器</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1016" />
       <source>Interpolate</source>
-      <translation>插值</translation>
+      <translation type="unfinished">內差</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1022" />
       <source>Univariate</source>
-      <translation>單因素</translation>
+      <translation type="unfinished">單變量</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1030" />
@@ -5246,7 +5246,7 @@ END</source>
     <message>
       <location filename="../artisanlib/curves.py" line="1077" />
       <source>Polyfit</source>
-      <translation>擬合</translation>
+      <translation type="unfinished">多項式擬合</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1101" />
@@ -5256,7 +5256,7 @@ END</source>
     <message>
       <location filename="../artisanlib/curves.py" line="1114" />
       <source>Interval of Interest Options</source>
-      <translation>目的範圍選項</translation>
+      <translation type="unfinished">目標範圍選項</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1128" />
@@ -5271,7 +5271,7 @@ END</source>
     <message>
       <location filename="../artisanlib/curves.py" line="1192" />
       <source>Resolution</source>
-      <translation>分辨率</translation>
+      <translation type="unfinished">解析度(文字顯示尺寸)</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1249" />
@@ -5281,12 +5281,12 @@ END</source>
     <message>
       <location filename="../artisanlib/curves.py" line="1264" />
       <source>Rename ET and BT</source>
-      <translation>重命名ET和BT</translation>
+      <translation type="unfinished">重新命名出風溫(ET)和豆溫(BT)</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1303" />
       <source>Logo Image File</source>
-      <translation>Logo圖片文件</translation>
+      <translation type="unfinished">Logo圖片檔</translation>
     </message>
     <message>
       <location filename="../artisanlib/statistics.py" line="138" />
@@ -5296,7 +5296,7 @@ END</source>
     <message>
       <location filename="../artisanlib/statistics.py" line="165" />
       <source>AUC</source>
-      <translation />
+      <translation type="unfinished">曲線下面積</translation>
     </message>
     <message>
       <location filename="../artisanlib/statistics.py" line="167" />
@@ -5322,7 +5322,7 @@ END</source>
     <message>
       <location filename="../artisanlib/devices.py" line="1035" />
       <source>Async</source>
-      <translation>異步</translation>
+      <translation type="unfinished">非同步</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1037" />
@@ -5337,7 +5337,7 @@ END</source>
     <message>
       <location filename="../artisanlib/devices.py" line="1156" />
       <source>External Program</source>
-      <translation>外部程序</translation>
+      <translation type="unfinished">外部程式</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1170" />
@@ -5353,13 +5353,13 @@ END</source>
       <location filename="../artisanlib/colors.py" line="513" />
       <location filename="../artisanlib/colors.py" line="507" />
       <source>ET LCD</source>
-      <translation>ET LCD</translation>
+      <translation type="unfinished">出風溫 LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="516" />
       <location filename="../artisanlib/colors.py" line="510" />
       <source>BT LCD</source>
-      <translation>BT LCD</translation>
+      <translation type="unfinished">豆溫 LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="519" />
@@ -5369,12 +5369,12 @@ END</source>
     <message>
       <location filename="../artisanlib/colors.py" line="522" />
       <source>Ramp/Soak Timer LCD</source>
-      <translation>緩升/浸泡 計時器 顯示器</translation>
+      <translation type="unfinished">Ramp/Soak 計時顯示器</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="525" />
       <source>Slow Cooling Timer LCD</source>
-      <translation>慢冷定時器液晶屏</translation>
+      <translation type="unfinished">緩冷卻定時器LCD</translation>
     </message>
     <message>
       <source>DeltaET LCD</source>
@@ -5458,7 +5458,7 @@ END</source>
       <location filename="../artisanlib/main.py" line="33798" />
       <location filename="../artisanlib/main.py" line="28010" />
       <source>Profile</source>
-      <translation>設定</translation>
+      <translation type="unfinished">曲線</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="33624" />
@@ -5483,27 +5483,27 @@ END</source>
       <location filename="../artisanlib/main.py" line="33801" />
       <location filename="../artisanlib/main.py" line="33633" />
       <source>Beans</source>
-      <translation>咖啡豆</translation>
+      <translation type="unfinished">生豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34908" />
       <location filename="../artisanlib/main.py" line="33804" />
       <location filename="../artisanlib/main.py" line="33634" />
       <source>In</source>
-      <translation>開始</translation>
+      <translation type="unfinished">生豆量</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="33806" />
       <location filename="../artisanlib/main.py" line="33635" />
       <source>Out</source>
-      <translation>結束</translation>
+      <translation type="unfinished">熟豆量</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34909" />
       <location filename="../artisanlib/main.py" line="33808" />
       <location filename="../artisanlib/main.py" line="33636" />
       <source>Loss</source>
-      <translation>損失</translation>
+      <translation type="unfinished">失重量</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="33844" />
@@ -5532,7 +5532,7 @@ END</source>
       <location filename="../artisanlib/main.py" line="34049" />
       <location filename="../artisanlib/main.py" line="34025" />
       <source>CHARGE BT</source>
-      <translation>入豆 BT</translation>
+      <translation type="unfinished">入豆豆溫數值</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34056" />
@@ -5544,7 +5544,7 @@ END</source>
       <location filename="../artisanlib/main.py" line="34058" />
       <location filename="../artisanlib/main.py" line="34027" />
       <source>FCs BT</source>
-      <translation>一爆溫度</translation>
+      <translation type="unfinished">一爆開始豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34068" />
@@ -5556,28 +5556,28 @@ END</source>
       <location filename="../artisanlib/main.py" line="34070" />
       <location filename="../artisanlib/main.py" line="34029" />
       <source>DROP BT</source>
-      <translation>下豆溫度</translation>
+      <translation type="unfinished">下豆時豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34030" />
       <source>Dry Percent</source>
-      <translation>脫水佔比</translation>
+      <translation type="unfinished">脫水期佔比</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34031" />
       <source>MAI Percent</source>
-      <translation>梅納佔比</translation>
+      <translation type="unfinished">梅納期佔比</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34032" />
       <source>Dev Percent</source>
-      <translation>發展佔比</translation>
+      <translation type="unfinished">發展期佔比</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34088" />
       <location filename="../artisanlib/main.py" line="34033" />
       <source>AUC</source>
-      <translation />
+      <translation type="unfinished">曲線下面積AUC</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34096" />
@@ -5599,7 +5599,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="34037" />
       <source>Roaster</source>
-      <translation>烘培機</translation>
+      <translation type="unfinished">烘焙機</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34038" />
@@ -5609,7 +5609,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="34039" />
       <source>Operator</source>
-      <translation>烘培師</translation>
+      <translation type="unfinished">烘豆師</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34040" />
@@ -5624,12 +5624,12 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="34042" />
       <source>Whole Color</source>
-      <translation>整豆色值</translation>
+      <translation type="unfinished">豆色</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34043" />
       <source>Ground Color</source>
-      <translation>咖啡粉色值</translation>
+      <translation type="unfinished">粉色</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34044" />
@@ -5639,12 +5639,12 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="34045" />
       <source>Screen Min</source>
-      <translation>豆目最小</translation>
+      <translation type="unfinished">最小目數</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34046" />
       <source>Screen Max</source>
-      <translation>豆目最大</translation>
+      <translation type="unfinished">最大目數</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34047" />
@@ -5654,7 +5654,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="34048" />
       <source>CHARGE ET</source>
-      <translation>入豆 ET</translation>
+      <translation type="unfinished">入豆出風溫數值</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34050" />
@@ -5664,12 +5664,12 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="34051" />
       <source>TP ET</source>
-      <translation>回溫點ET</translation>
+      <translation type="unfinished">回溫點出風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34052" />
       <source>TP BT</source>
-      <translation>回溫點BT</translation>
+      <translation type="unfinished">回溫點豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34053" />
@@ -5679,17 +5679,17 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="34054" />
       <source>DRY ET</source>
-      <translation>轉黃點ET</translation>
+      <translation type="unfinished">轉黃點出風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34055" />
       <source>DRY BT</source>
-      <translation>轉黃點BT</translation>
+      <translation type="unfinished">轉黃點豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34057" />
       <source>FCs ET</source>
-      <translation>一爆開始ET</translation>
+      <translation type="unfinished">一爆開始出風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34059" />
@@ -5699,12 +5699,12 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="34060" />
       <source>FCe ET</source>
-      <translation>一爆結束ET</translation>
+      <translation type="unfinished">一爆結束出風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34061" />
       <source>FCe BT</source>
-      <translation>一爆結束BT</translation>
+      <translation type="unfinished">一爆結束豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34062" />
@@ -5714,12 +5714,12 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="34063" />
       <source>SCs ET</source>
-      <translation>二爆結束ET</translation>
+      <translation type="unfinished">二爆結束出風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34064" />
       <source>SCs BT</source>
-      <translation>二爆開始BT</translation>
+      <translation type="unfinished">二爆開始豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34065" />
@@ -5729,17 +5729,17 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="34066" />
       <source>SCe ET</source>
-      <translation>二爆結束ET</translation>
+      <translation type="unfinished">二爆結束出風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34067" />
       <source>SCe BT</source>
-      <translation>二爆結束 BT</translation>
+      <translation type="unfinished">二爆結束豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34069" />
       <source>DROP ET</source>
-      <translation>下豆 ET</translation>
+      <translation type="unfinished">下豆出風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34071" />
@@ -5749,32 +5749,32 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="34072" />
       <source>COOL ET</source>
-      <translation>冷卻ET</translation>
+      <translation type="unfinished">冷卻出風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34073" />
       <source>COOL BT</source>
-      <translation>冷卻BT</translation>
+      <translation type="unfinished">冷卻豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34074" />
       <source>Total Time</source>
-      <translation>總時長</translation>
+      <translation type="unfinished">總時間</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34075" />
       <source>Dry Phase Time</source>
-      <translation>脫水階段時間</translation>
+      <translation type="unfinished">脫水階段時間長度</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34076" />
       <source>Mid Phase Time</source>
-      <translation>梅納階段時間</translation>
+      <translation type="unfinished">梅納階段時間長度</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34077" />
       <source>Finish Phase Time</source>
-      <translation>結束階段時間</translation>
+      <translation type="unfinished">結束階段時間長度</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34078" />
@@ -5794,22 +5794,22 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="34081" />
       <source>Dry Phase Delta BT</source>
-      <translation>脫水階段達美BT</translation>
+      <translation type="unfinished">脫水階段豆溫差</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34082" />
       <source>Mid Phase Delta BT</source>
-      <translation>梅納階段達美BT</translation>
+      <translation type="unfinished">梅納階段豆溫差</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34083" />
       <source>Finish Phase Delta BT</source>
-      <translation>結束階段達美BT</translation>
+      <translation type="unfinished">結束階段豆溫差值</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34084" />
       <source>Finish Phase Rise</source>
-      <translation>完成相位上升</translation>
+      <translation type="unfinished">結束階段升溫量</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34085" />
@@ -5986,12 +5986,12 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="34123" />
       <source>BTU Batch</source>
-      <translation>BTU 批量</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34124" />
       <source>BTU Batch per green kg</source>
-      <translation>BTU批量每公斤生豆</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34125" />
@@ -6076,7 +6076,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="34905" />
       <source>Roast Ranking</source>
-      <translation>烘培排名</translation>
+      <translation type="unfinished">烘焙排序</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35020" />
@@ -6121,7 +6121,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="35530" />
       <source>Operator:</source>
-      <translation>烘培師:</translation>
+      <translation type="unfinished">烘焙師:</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35532" />
@@ -6216,7 +6216,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="35571" />
       <source>CM:</source>
-      <translation />
+      <translation type="unfinished">曲線差異量CM</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35573" />
@@ -6256,7 +6256,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="35587" />
       <source>AUC:</source>
-      <translation />
+      <translation type="unfinished">曲線下面積:</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35595" />
@@ -6320,7 +6320,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
       <location filename="../help/energy_help.py" line="32" />
       <location filename="../help/alarms_help.py" line="21" />
       <source>Field</source>
-      <translation>失敗</translation>
+      <translation type="unfinished">項目</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="174" />
@@ -6357,7 +6357,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="22" />
       <source>Alarm number for reference.</source>
-      <translation>供參考警報編號</translation>
+      <translation type="unfinished">警報編號參考</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="23" />
@@ -6367,7 +6367,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="23" />
       <source>Activate or Deactivate the alarm.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">啟動或取消警報</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="24" />
@@ -6377,7 +6377,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="24" />
       <source>Alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.</source>
-      <translation>唯有在指定編號的報警之前被觸發時才會觸發報警。使用編號0表示無保護。</translation>
+      <translation type="unfinished">唯有在指定編號的警報之前被觸發時才會觸發報警。使用編號0表示無保護。</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="25" />
@@ -6387,7 +6387,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="25" />
       <source>Alarm triggered only if the alarm with the given number was not triggered before. Use 0 for no guard.</source>
-      <translation>唯有在指定編號的報警之前被觸發時才會觸發報警。使用編號0表示無保護。</translation>
+      <translation type="unfinished">唯有在指定編號的警報之前被觸發時才會觸發報警。使用編號0表示無保護。</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="26" />
@@ -6419,7 +6419,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="28" />
       <source>The observed temperature source.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">偵測到的溫度訊號源</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="29" />
@@ -6429,7 +6429,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="29" />
       <source>Alarm is triggered if source rises above or below the specified temperature.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">如訊號高於或低於特定溫度時觸發警報</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="26" />
@@ -6440,7 +6440,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="30" />
       <source>The specified temperature limit.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">特定溫度限制</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="48" />
@@ -6457,7 +6457,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="31" />
       <source>The action to be triggered if all conditions are fulfilled.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">如滿足所有條件即觸發動作</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="32" />
@@ -6473,7 +6473,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
       <location filename="../help/eventbuttons_help.py" line="30" />
       <location filename="../help/alarms_help.py" line="38" />
       <source>Option</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">選項</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="34" />
@@ -6575,13 +6575,13 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
       <location filename="../help/keyboardshortcuts_help.py" line="106" />
       <location filename="../help/alarms_help.py" line="48" />
       <source>Help</source>
-      <translation>幫助</translation>
+      <translation type="unfinished">說明</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="38" />
       <location filename="../help/alarms_help.py" line="48" />
       <source>Opens this window.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">開啟本視窗</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="49" />
@@ -6664,13 +6664,13 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
       <location filename="../help/eventsliders_help.py" line="52" />
       <location filename="../help/alarms_help.py" line="63" />
       <source>A program/script path (absolute or relative)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">程式或腳本路徑(絕對或是相對)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="50" />
       <location filename="../help/alarms_help.py" line="63" />
       <source>start an external program</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">開啟外部程式</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="64" />
@@ -6838,17 +6838,17 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="79" />
       <source>RampSoak ON</source>
-      <translation>緩升浸泡 開啟</translation>
+      <translation type="unfinished">RampSoak 開啟</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="79" />
       <source>turns PID on and switches to RampSoak mode</source>
-      <translation>開啟PID並切換至緩升浸泡模式</translation>
+      <translation type="unfinished">開啟PID並切換至RampSoak模式</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="80" />
       <source>RampSoak OFF</source>
-      <translation>緩升浸泡 關閉</translation>
+      <translation type="unfinished">RampSoak 關閉</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="80" />
@@ -7759,7 +7759,7 @@ CTRL+T [Win]</source>
       <location filename="../help/keyboardshortcuts_help.py" line="95" />
       <location filename="../help/keyboardshortcuts_help.py" line="94" />
       <source>Roast</source>
-      <translation type="unfinished">烘培</translation>
+      <translation type="unfinished">烘焙</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="94" />
@@ -7884,7 +7884,7 @@ CTRL+OPTION+A [Win]</source>
       <location filename="../help/keyboardshortcuts_help.py" line="105" />
       <location filename="../help/keyboardshortcuts_help.py" line="104" />
       <source>View</source>
-      <translation type="unfinished">查看</translation>
+      <translation type="unfinished">檢視</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="104" />
@@ -7959,7 +7959,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="17" />
       <location filename="../help/eventsliders_help.py" line="17" />
       <source>Column</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">欄位</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="48" />
@@ -7995,7 +7995,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Factor</source>
-      <translation type="unfinished">因子</translation>
+      <translation type="unfinished">因素</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
@@ -8052,7 +8052,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="41" />
       <location filename="../help/eventsliders_help.py" line="30" />
       <source>COMMANDS</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">動作指令</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="34" />
@@ -8065,21 +8065,26 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: The placeholders {ET}, {BT}, {time}, {ETB}, {BTB} will be substituted by the current ET, BT, time, ET background, BT background value in Serial/CallProgram/MODBUS/S7/WebSocket commands
 </source>
-      <translation type="unfinished" />
+      <translation type="unfinished">註:  在序列指令/呼叫程式/MODBUS/S7/WebSokect 運用指令中,  {ET}, {BT}, {time}, {ETB}, {BTB} 會分別替代成當下出風溫, 豆溫, 時間, 背景出風溫, 背景豆溫 的值
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="45" />
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: commands can be sequenced, separated by semicolons like in “&lt;cmd1&gt;;&lt;cmd2&gt;;&lt;cmd3&gt;”
 </source>
-      <translation type="unfinished" />
+      <translation type="unfinished">註:  指令可以分號串接, 如: “&lt;cmd1&gt;;&lt;cmd2&gt;;&lt;cmd3&gt;”
+
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="45" />
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: in PHIDGET commands, the optional parameter &lt;sn&gt; has the form &lt;hub_serial&gt;[:&lt;hub_port&gt;] allows to refer to a specific Phidget HUB by given its serial number, and optionally specifying the port number the addressed module is connected to.
 </source>
-      <translation type="unfinished" />
+      <translation type="unfinished">註:  PHIDGET指令中,  序號參數 &lt;sn&gt; 可以 &lt;hub_serial&gt;[:&lt;hub_port&gt;] 格式對應至 Phidget HUB, 以代表序號以及連接埠號
+
+</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="34" />
@@ -8090,13 +8095,13 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="49" />
       <location filename="../help/eventsliders_help.py" line="38" />
       <source>Serial Command</source>
-      <translation>串行指令</translation>
+      <translation type="unfinished">序列指令</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="49" />
       <location filename="../help/eventsliders_help.py" line="38" />
       <source>ASCII serial command or binary a2b_uu(serial command)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">ASCII 序列指令或二進位轉換 a2b_uu (序列指令)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="52" />
@@ -8116,7 +8121,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="52" />
       <location filename="../help/eventsliders_help.py" line="39" />
       <source>variable holding the last value read via MODBUS</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">透過MODBUS取得變數的數值</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="160" />
@@ -8148,7 +8153,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventsliders_help.py" line="71" />
       <location filename="../help/eventsliders_help.py" line="40" />
       <source>sleep: add a delay of &lt;float&gt; seconds</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">睡眠: 加入延遲秒數(浮點數)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="161" />
@@ -8165,7 +8170,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="54" />
       <location filename="../help/eventsliders_help.py" line="41" />
       <source>sets calling button to “pressed” if argument is 1 or True</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">如引數為1或True, 設定觸發按鈕按下動作</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="55" />
@@ -8177,7 +8182,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="55" />
       <location filename="../help/eventsliders_help.py" line="42" />
       <source>reads register from slave slaveID using function 3 (Read Multiple Holding Registers). The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">以 function 3從slave的 slave ID 讀取暫存器 (請查詢 Multiple Holding Registers ). 結果會指向placeholder `_` 可供之後指令取用</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="56" />
@@ -8189,7 +8194,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="56" />
       <location filename="../help/eventsliders_help.py" line="43" />
       <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">寫入register: function 6 使用整數(int) , 而function 16使用浮點數(float)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="57" />
@@ -8201,7 +8206,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="57" />
       <location filename="../help/eventsliders_help.py" line="44" />
       <source>write coil: MODBUS function 5</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">寫入coil: MODBUS function 5</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="58" />
@@ -8213,7 +8218,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="58" />
       <location filename="../help/eventsliders_help.py" line="45" />
       <source>write coils: MODBUS function 15</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">寫入 coils: MODBUS function 15</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="46" />
@@ -8230,7 +8235,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="59" />
       <location filename="../help/eventsliders_help.py" line="46" />
       <source>mask write register: MODBUS function 22 or simulates function 22 with function 6 and the given value v</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">遮罩寫入 register: MODBUS function 22 或 以 function 6 給定值 v 模擬的 function 22 </translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="60" />
@@ -8242,7 +8247,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="60" />
       <location filename="../help/eventsliders_help.py" line="47" />
       <source>write registers: MODBUS function 16</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">寫入registers: MODBUS function 16</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="61" />
@@ -8254,7 +8259,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="61" />
       <location filename="../help/eventsliders_help.py" line="48" />
       <source>write 16bit BCD encoded value v to register r of slave s </source>
-      <translation type="unfinished" />
+      <translation type="unfinished">將已編碼的值v, slave s, register r 寫入 16bit BCD</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="62" />
@@ -8266,7 +8271,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="62" />
       <location filename="../help/eventsliders_help.py" line="49" />
       <source>write 32bit float to two 16bit int registers: MODBUS function 16</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">將32bit float浮點資料 以兩個16bit int register寫入: MODBUS function 16</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
@@ -8278,7 +8283,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="63" />
       <location filename="../help/eventsliders_help.py" line="50" />
       <source>write 16bit integer to a single 16bit register: MODBUS function 6 (int)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">將16bit 整數資料寫入單 16bit register : MODBUS function 6 (int)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -8305,7 +8310,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="79" />
       <location filename="../help/eventsliders_help.py" line="53" />
       <source>Hottop Heater</source>
-      <translation>Hottop加熱器</translation>
+      <translation type="unfinished">Hottop 加熱器</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="109" />
@@ -8313,7 +8318,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventsliders_help.py" line="95" />
       <location filename="../help/eventsliders_help.py" line="53" />
       <source>sets heater to value</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">設定加熱器數值</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="80" />
@@ -8327,7 +8332,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventsliders_help.py" line="96" />
       <location filename="../help/eventsliders_help.py" line="54" />
       <source>sets fan to value</source>
-      <translation>設定風扇到值</translation>
+      <translation type="unfinished">設定風扇數值</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="81" />
@@ -8345,13 +8350,13 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="81" />
       <location filename="../help/eventsliders_help.py" line="55" />
       <source>with n={0 ,1},h={0,..100},f={0,..10}</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">電控元件參數及數值範圍: 作動 n={0 ,1}, 加熱器 h={0,..100}, 風扇f={0,..10}</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="83" />
       <location filename="../help/eventsliders_help.py" line="56" />
       <source>Fuji Command</source>
-      <translation>Fuji指令</translation>
+      <translation type="unfinished">Fuji 指令</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="83" />
@@ -8363,7 +8368,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="84" />
       <location filename="../help/eventsliders_help.py" line="57" />
       <source>PWM Command</source>
-      <translation>PWM指令</translation>
+      <translation type="unfinished">PWM 指令</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="84" />
@@ -8375,7 +8380,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="84" />
       <location filename="../help/eventsliders_help.py" line="57" />
       <source>PHIDGET PWM Output: &lt;value&gt; in [0-100]</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET PWM 輸出: 以[0-100]為設定值範圍</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="85" />
@@ -8387,7 +8392,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="85" />
       <location filename="../help/eventsliders_help.py" line="58" />
       <source>PHIDGET PWM Output: toggles &lt;channel&gt;</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET PWM 輸出:  切換至&lt;頻道&gt;</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="86" />
@@ -8399,7 +8404,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="86" />
       <location filename="../help/eventsliders_help.py" line="59" />
       <source>PHIDGET PWM Output: turn &lt;channel&gt; on for &lt;millis&gt; milliseconds</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET PWM 輸出:  轉至&lt;頻道&gt;並持續&lt;時間&gt;(毫秒)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="87" />
@@ -8411,7 +8416,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="87" />
       <location filename="../help/eventsliders_help.py" line="60" />
       <source>PHIDGET HUB PWM Output: &lt;value&gt; in [0-100]</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET HUB PWM 輸出: 以[0-100]為設定值範圍</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -8423,7 +8428,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="88" />
       <location filename="../help/eventsliders_help.py" line="61" />
       <source>PHIDGET HUB PWM Output: toggles &lt;channel&gt;</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET HUB PWM 輸出:切換至&lt;頻道&gt;</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="89" />
@@ -8435,7 +8440,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="89" />
       <location filename="../help/eventsliders_help.py" line="62" />
       <source>PHIDGET HUB PWM Output:  turn &lt;channel&gt; on for &lt;millis&gt; milliseconds</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET HUB PWM 輸出:切換至&lt;頻道&gt;並持續&lt;時間&gt;(毫秒)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="155" />
@@ -8449,7 +8454,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="90" />
       <location filename="../help/eventsliders_help.py" line="63" />
       <source>YOCTOPUCE PWM Output: PWM running state</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">YOCTOPUCE PWM 輸出: PWN執行狀態</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="91" />
@@ -8461,7 +8466,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="91" />
       <location filename="../help/eventsliders_help.py" line="64" />
       <source>YOCTOPUCE PWM Output: set PWM frequency to f (Hz)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">YOCTOPUCE PWM 輸出: 設定PWN頻率f (赫茲)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="92" />
@@ -8473,7 +8478,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="92" />
       <location filename="../help/eventsliders_help.py" line="65" />
       <source>YOCTOPUCE PWM Output: set PWM period with the duty cycle in % as a float [0.0-100.0]</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">YOCTOPUCE PWM 輸出: 以浮點數[0.0-100.0] 設定PWN 工作週期%</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="93" />
@@ -8485,13 +8490,13 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="93" />
       <location filename="../help/eventsliders_help.py" line="66" />
       <source>YOCTOPUCE PWM Output: changes progressively the PWM to the specified value over the given time interval</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">YOCTOPUCE PWM 輸出:  以間隔時間t  將PWM值逐步調至設定值d </translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <location filename="../help/eventsliders_help.py" line="67" />
       <source>VOUT Command</source>
-      <translation>VOUT指令</translation>
+      <translation type="unfinished">輸出電壓指令</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="158" />
@@ -8515,7 +8520,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="95" />
       <location filename="../help/eventsliders_help.py" line="68" />
       <source>for PHIDGET OUTPUT modules: set analog output channel n to output voltage value v in V (eg. 5.5 for 5.5V)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET OUTPUT 模組: 設定頻道 n 以類比輸出電壓值 v (伏特) , 譬如: 5.5 即為 5.5V</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="96" />
@@ -8527,7 +8532,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="96" />
       <location filename="../help/eventsliders_help.py" line="69" />
       <source>for YOCTOPUCE VOLTAGE OUT modules with c the channel (1 or 2),v the voltage as float [0.0-10.0]</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">YOCTOPUCE VOLTAGE OUT模組:  設定在頻道c (1或2) 以浮點數值 [ [0.0-10.0]] 輸出電壓 v</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="97" />
@@ -8539,7 +8544,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="97" />
       <location filename="../help/eventsliders_help.py" line="70" />
       <source>for YOCTOPUCE CURRENT OUT modules with c the current as float [3.0-21.0]</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">YOCTOPUCE CURRENT OUT 模組: 以浮點數 [3.0-21.0] 設定電流值c</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="65" />
@@ -8557,7 +8562,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="65" />
       <location filename="../help/eventsliders_help.py" line="72" />
       <source>PHIDGET Binary Output: switches channel c off (b=0) and on (b=1)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET 二進位輸出:  開關 頻道c 關閉(b=0) 與開啟(b=1)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="66" />
@@ -8569,7 +8574,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="66" />
       <location filename="../help/eventsliders_help.py" line="73" />
       <source>PHIDGET Binary Output: toggles channel c</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET 二進位輸出: 切換 頻道c</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="67" />
@@ -8581,7 +8586,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="67" />
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>PHIDGET Binary Output: sets the output of channel c to on for time t in milliseconds</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET 二進位輸出: 設定輸出頻道 c 開啟時間長度 t ,以毫秒計(milliseconds)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="68" />
@@ -8593,7 +8598,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="68" />
       <location filename="../help/eventsliders_help.py" line="75" />
       <source>PHIDGET Voltage Output: sets voltage output of channel c to v (float)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET 電壓輸出: 設定頻道c的輸出電壓為 v (浮點數值)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="69" />
@@ -8605,7 +8610,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="69" />
       <location filename="../help/eventsliders_help.py" line="76" />
       <source>PHIDGET DCMotor: sets acceleration of channel c to v (float)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET DC直流馬達: 設定頻道c 加速度值 v (浮點數)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="70" />
@@ -8617,7 +8622,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="70" />
       <location filename="../help/eventsliders_help.py" line="77" />
       <source>PHIDGET DCMotor: sets target velocity of channel c to v (float)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET DC直流馬達: 設定頻道c 速度值 v (浮點數)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="71" />
@@ -8629,7 +8634,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="71" />
       <location filename="../help/eventsliders_help.py" line="78" />
       <source>PHIDGET DCMotor: sets current limit of channel c to v (float)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET DC直流馬達: 設定頻道c 電流限制 v (浮點數)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="72" />
@@ -8641,7 +8646,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="72" />
       <location filename="../help/eventsliders_help.py" line="79" />
       <source>YOCTOPUCE Relay Output: turn channel c of the relay module on</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">YOCTOPUCE繼電器輸出: 將頻道c 的繼電器模組開啟</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="73" />
@@ -8653,7 +8658,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="73" />
       <location filename="../help/eventsliders_help.py" line="80" />
       <source>YOCTOPUCE Relay Output: turn channel c of the relay module off</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">YOCTOPUCE繼電器輸出: 將頻道c 的繼電器模組關閉</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="74" />
@@ -8665,7 +8670,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="74" />
       <location filename="../help/eventsliders_help.py" line="81" />
       <source>YOCTOPUCE Relay Output: toggle the state of channel c</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">YOCTOPUCE繼電器輸出: 將頻道c 切換狀態</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="75" />
@@ -8677,7 +8682,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="75" />
       <location filename="../help/eventsliders_help.py" line="82" />
       <source>YOCTOPUCE Relay Output: pulse the channel c on after a delay of delay milliseconds for the duration of duration milliseconds</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">YOCTOPUCE繼電器輸出: 使頻道c 以延遲秒數(毫秒)及持續時間(毫秒)輸出脈衝</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="76" />
@@ -8689,7 +8694,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="76" />
       <location filename="../help/eventsliders_help.py" line="83" />
       <source>move slider c to value v</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">拉滑動條c 至 v值</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="77" />
@@ -8701,26 +8706,26 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="77" />
       <location filename="../help/eventsliders_help.py" line="84" />
       <source>switches channel c off (b=0) and on (b=1) and sets button i to pressed or normal depending on the value b</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">按鈕以 i 設定按下或從頻道c開關切換至 關閉 (b=0) 決定</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="99" />
       <location filename="../help/eventsliders_help.py" line="86" />
       <source>S7 Command</source>
-      <translation>S7指令</translation>
+      <translation type="unfinished">S7 指令</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="99" />
       <location filename="../help/eventsliders_help.py" line="86" />
       <source>variable holding the last value read via S7</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">透過S7 取得變數的數值</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="161" />
       <location filename="../help/eventsliders_help.py" line="146" />
       <location filename="../help/eventsliders_help.py" line="88" />
       <source>sets calling button to “pressed” if argument evaluates to 1 or True</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">如引數為1或True, 設定觸發按鈕按下動作</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="102" />
@@ -8732,7 +8737,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="102" />
       <location filename="../help/eventsliders_help.py" line="89" />
       <source>read bool from S7 DB</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">從S7 DB 讀取布林值</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="103" />
@@ -8744,7 +8749,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="103" />
       <location filename="../help/eventsliders_help.py" line="90" />
       <source>read int from S7 DB</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">從S7 DB 讀取整數值</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="104" />
@@ -8756,7 +8761,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="104" />
       <location filename="../help/eventsliders_help.py" line="91" />
       <source>read float from S7 DB</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">從S7 DB 讀取浮點數值</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="105" />
@@ -8768,7 +8773,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="105" />
       <location filename="../help/eventsliders_help.py" line="92" />
       <source>write bool to S7 DB</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">寫入布林值進 S7 DB</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="106" />
@@ -8780,7 +8785,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="106" />
       <location filename="../help/eventsliders_help.py" line="93" />
       <source>write int to S7 DB</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">寫入整數值進 S7 DB</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="108" />
@@ -8792,31 +8797,31 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="108" />
       <location filename="../help/eventsliders_help.py" line="94" />
       <source>write float to S7 DB</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">寫入浮點數值進 S7 DB</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="109" />
       <location filename="../help/eventsliders_help.py" line="95" />
       <source>Aillio R1 Heater</source>
-      <translation>Aillio R1加熱器</translation>
+      <translation type="unfinished">Aillio R1 加熱器</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="110" />
       <location filename="../help/eventsliders_help.py" line="96" />
       <source>Aillio R1 Fan</source>
-      <translation>Aillio R1風扇</translation>
+      <translation type="unfinished">Aillio R1 風扇</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="111" />
       <location filename="../help/eventsliders_help.py" line="97" />
       <source>Aillio R1 Drum</source>
-      <translation>Aillio R1滾筒</translation>
+      <translation type="unfinished">Aillio R1 滾筒</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="111" />
       <location filename="../help/eventsliders_help.py" line="97" />
       <source>sets drum speed to value</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">設定鍋爐轉速數值</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="113" />
@@ -8834,7 +8839,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="113" />
       <location filename="../help/eventsliders_help.py" line="98" />
       <source>enables/disables alarms</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">啟用/取消 警報</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="114" />
@@ -8846,7 +8851,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="114" />
       <location filename="../help/eventsliders_help.py" line="99" />
       <source>enables/disables autoCHARGE</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">啟用/取消 autoCHARGE</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="115" />
@@ -8858,7 +8863,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="115" />
       <location filename="../help/eventsliders_help.py" line="100" />
       <source>enables/disables autoDROP</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">啟用/取消 autoDROP</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="117" />
@@ -8870,7 +8875,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="117" />
       <location filename="../help/eventsliders_help.py" line="102" />
       <source>tare channel &lt;int&gt; with 1 =&gt; ET, 2 =&gt; BT, 3 =&gt; E1c1, 4: E1c2,..</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">tare 頻道號碼 (整數值) ,  1 =&gt; 出風溫(ET) , 2 =&gt; 豆溫(BT),  3 =&gt; 外部裝置頻道1 (E1c1), 4 =&gt; 外部裝置頻道2 (E1c2) , ..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="118" />
@@ -8882,7 +8887,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="118" />
       <location filename="../help/eventsliders_help.py" line="103" />
       <source>turns PID on</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">開啟 PID</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="119" />
@@ -8894,7 +8899,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="119" />
       <location filename="../help/eventsliders_help.py" line="104" />
       <source>turns PID off</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">關閉 PID</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="120" />
@@ -8906,7 +8911,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="120" />
       <location filename="../help/eventsliders_help.py" line="105" />
       <source>toggles the PID state</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">切換 PID 狀態</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="121" />
@@ -8918,7 +8923,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="121" />
       <location filename="../help/eventsliders_help.py" line="106" />
       <source>sets PID mode to 0: manual, 1: RS, 2: background follow</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">設定 PID 模式 為 0:手動 , 1:RS , 2:跟隨背景</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="122" />
@@ -8930,19 +8935,19 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="122" />
       <location filename="../help/eventsliders_help.py" line="107" />
       <source>sets the p-i-d parameters of the PID</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">設定 PID的 p , i , d 個別參數</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="123" />
       <location filename="../help/eventsliders_help.py" line="108" />
       <source>adjustSV(&lt;int&gt;)</source>
-      <translation>調整SV(&amp;lt;int&amp;gt;)</translation>
+      <translation type="unfinished">adjustSV(&lt;int&gt;)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="123" />
       <location filename="../help/eventsliders_help.py" line="108" />
       <source>increases or decreases the current target SV value by &lt;int&gt;</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">對現有 SV 目標值增減 (整數)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="124" />
@@ -8954,7 +8959,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="124" />
       <location filename="../help/eventsliders_help.py" line="109" />
       <source>sets the PID target set value SV</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">設定PID的SV目標值</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="125" />
@@ -8966,7 +8971,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="125" />
       <location filename="../help/eventsliders_help.py" line="110" />
       <source>activates the PID Ramp-Soak pattern number &lt;rs&gt; (1-based!) or the one labeled &lt;rs&gt;</source>
-      <translation>啟用PID 緩升-浸泡 程式編碼&amp;lt;rs&amp;gt; (1-based!) or the one labeled &amp;lt;rs&amp;gt;</translation>
+      <translation type="unfinished">以 樣式編號 &lt;rs&gt; (1-based!) 或 標記為 &lt;rs&gt; 啟用 PID的 Ramp Soak </translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="126" />
@@ -8978,7 +8983,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="126" />
       <location filename="../help/eventsliders_help.py" line="111" />
       <source>selects the PID input source with &lt;n&gt; 0: BT, 1: ET (Software PID); &lt;n&gt; in {0,..,3} (Arduino PID)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">選擇PID訊號源 &lt;n&gt; , 軟體PID表示 :  0:豆溫BT, 1:出風溫ET ; Arduino PID 表示 &lt;n&gt; : {0,….,3} </translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="127" />
@@ -8990,7 +8995,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="127" />
       <location filename="../help/eventsliders_help.py" line="112" />
       <source>sets the PID lookahead</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">設定 PID 的 lookahead 參數</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="128" />
@@ -9266,7 +9271,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="150" />
       <location filename="../help/eventsliders_help.py" line="135" />
       <source>ramp(ch,b[,sn])</source>
-      <translation>緩升(ch,b[,sn])</translation>
+      <translation type="unfinished">ramp(ch,b[,sn])</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="150" />
@@ -9436,7 +9441,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/modbus_help.py" line="24" />
       <source>The PID Control dialog can operate a connected PID slave using the given PID registers to set the p-i-d parameters and the set value (SV). MODBUS commands can be specified to turn the PID slave on and off from that PID Control dialog. See the help page in the Events Dialog for documentation of available MODBUS write commands.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">Modbus指令</translation>
     </message>
     <message>
       <location filename="../help/s7_help.py" line="24" />
@@ -9453,77 +9458,77 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="14" />
       <source>EVENT CUSTOM BUTTONS</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">自定事件按鈕</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="18" />
       <source>Button Label</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">標籤</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="18" />
       <source>Enter \n to create labels with multiple lines. \t is substituted by the event type.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">輸入” \n “可使標籤文字換行, 輸入” \t ” 可引入事件類型文字.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="19" />
       <source>Event Description</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">說明</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="19" />
       <source>Description of the Event to be recorded.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">事件紀錄的說明.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="20" />
       <source>Event Type</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">類型</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="20" />
       <source>Event type to be recorded or leave blank for no event. '±' types add a chosen offset (positive or negative) to the present value of the chosen event.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">事件類型,或留白作無事件, 使用 ‘±’ 以紀錄對事件現值的增減 (為正或負)量.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="21" />
       <source>Event Value</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">數值</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="21" />
       <source>Value of event (1-100) to be recorded.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">事件紀錄值(1-100).</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="22" />
       <source>Perform an action at the time of the event.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">在事件當下執行的動作</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="23" />
       <source>Documentation</source>
-      <translation>文檔</translation>
+      <translation type="unfinished">動作指令</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="23" />
       <source>The action Command.  Depends on the action type, &amp;#39;{}&amp;#39; is replaced by the event value and the offset in case of a ± event type.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">動作指令. 依據事件類型,  '{}' 會替代成事件值或增減量數值.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="24" />
       <source>Button Visibility</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">顯示按鈕</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="24" />
       <source>Hides/shows individual button.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">顯示或隱藏單顆按鈕</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="27" />
       <source>EVENT BUTTONS CONFIGURATION OPTIONS</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">事件按鈕設定項目</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="31" />
@@ -9533,7 +9538,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="31" />
       <source>Sets a maximum number of buttons to display on a single row.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">設定每行最多按鈕數.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="32" />
@@ -9543,58 +9548,61 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="32" />
       <source>Sets a size for the buttons.  Choices are tiny, small and large.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">設定按鈕大小. 有 迷你, 小, 大 可選擇.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="33" />
       <source>Color Pattern</source>
-      <translation>色彩圖案</translation>
+      <translation type="unfinished">按鈕顏色</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="33" />
       <source>Applies one of 99 autogenerated color patterns to the buttons.  Set to "0" to manually choose the button colors.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">有99種自動生成的配色可用於按鈕 , 設為 "0" 可手動自選按鈕顏色.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="34" />
       <source>Adds a new button to the bottom of the table.</source>
-      <translation>新增新按鈕至表格底部</translation>
+      <translation type="unfinished">新增新按鈕至表格底部.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="35" />
       <source>Inserts a new button above the selected button.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">插入新按鈕至目前表格中按鈕上方.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="36" />
       <source>Deletes the selected button.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">刪除選擇的按鈕.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="37" />
       <source>Copy the button table in tab separated format to the clipboard.  Option or ALT click to copy a tabular format to the clipboard.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">以逗點分隔格式複製按鈕表格至剪貼簿. 可按住OPTION或ALT 點選要複製的表格文字內容.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="45" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by the current button value plus the offset for ± event types.  If a placeholder occurs several times in a description/command, all those occurrences are replaced by the value.
 </source>
-      <translation type="unfinished" />
+      <translation type="unfinished">註:  "{}" 可用作為佔位符, 可被替代成目前按鈕值加上的增減值. 如佔位符在指令中重複使用, 都將替代成同事件數值.
+
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="45" />
       <source>Note: in YOCTOPUCE commands, the optional parameter &lt;sn&gt; holds either the modules serial number or its name</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">註:  YOCTOPUCE指令中,  序號參數  &lt;sn&gt; 可當作模組序號或是名稱
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="51" />
       <source>Multiple Event</source>
-      <translation>多個事件</translation>
+      <translation type="unfinished">多重事件</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="51" />
       <source>button numbers separated by a comma: 1,2,..</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">以逗點 ’,’ 分隔按鈕編號: 1,2...</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="51" />
@@ -9620,7 +9628,7 @@ Always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating</source>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for 5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">PHIDGET OUTPUT 模組: 設定電壓範圍(r=5 即 5V 而 r=10 則是 10V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="95" />
@@ -9635,12 +9643,12 @@ Always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating</source>
     <message>
       <location filename="../help/eventbuttons_help.py" line="107" />
       <source>write value where bits are replaced by those from orMask at positions where andMask bits are not set</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">在由orMask 值取代的位元處寫入值 (andMask未被設定)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="112" />
       <source>Aillio R1 Command</source>
-      <translation>Aillio R1指令</translation>
+      <translation type="unfinished">Aillio R1 指令</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="112" />
@@ -9650,7 +9658,7 @@ Always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating</source>
     <message>
       <location filename="../help/eventbuttons_help.py" line="112" />
       <source>Sends PRS command</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">送出 PRS 指令</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="156" />
@@ -9697,53 +9705,56 @@ Inputs with the area set to the empty input are turned off.</source>
       <location filename="../help/autosave_help.py" line="30" />
       <location filename="../help/eventannotations_help.py" line="17" />
       <source>Prefix Field</source>
-      <translation>加入前綴失敗</translation>
+      <translation type="unfinished">前綴參數</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="58" />
       <location filename="../help/autosave_help.py" line="30" />
       <location filename="../help/eventannotations_help.py" line="17" />
       <source>Example</source>
-      <translation>實例</translation>
+      <translation type="unfinished">範例</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="18" />
       <source>The value of Event</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">事件值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="21" />
       <location filename="../help/eventannotations_help.py" line="19" />
       <source>ET value</source>
-      <translation>ET值</translation>
+      <translation type="unfinished">出風溫值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="22" />
       <location filename="../help/eventannotations_help.py" line="20" />
       <source>BT value</source>
-      <translation>BT值</translation>
+      <translation type="unfinished">豆溫值</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="21" />
       <source>The Description field of the Event</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">事件描述顯示字串</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="22" />
       <source>The Type field of the Event</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">事件類型</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="23" />
       <source>The value of the Slider Unit for this Event</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">滑動條數值單位</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="24" />
       <source>Number of seconds before or after CHARGE 
 Before CHARGE shows negative 
 Displays &amp;#39;*&amp;#39; when no CHARGE event exists</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">入豆之前或之後 的秒數
+如入豆前 顯示為負值
+尚未入豆時顯示為 '*' 
+</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="25" />
@@ -9758,7 +9769,11 @@ Displays &amp;#39;*&amp;#39; when no CHARGE event exists</source>
 Best used inside double quotes (see notes below) 
 Negative value before FCs 
 Displays &amp;#39;*&amp;#39; when no FCs event exists</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">一爆之前或之後秒數
+建議使用雙引號'標示
+一爆之前為負值
+尚未一爆前顯示為 '*' 
+</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="27" />
@@ -9774,7 +9789,9 @@ Displays &amp;#39;*&amp;#39; when no FCs event exists</source>
 Best used inside single quotes or back ticks (see notes below) 
 Positive value only 
 Displays &amp;#39;*&amp;#39; after FCs or when no FCs event exists</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">一爆前秒數
+建議使用單引號'標示並只能為正數
+顯示為 一爆前'*' </translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="29" />
@@ -9788,84 +9805,93 @@ Displays &amp;#39;*&amp;#39; after FCs or when no FCs event exists</source>
       <location filename="../help/eventannotations_help.py" line="30" />
       <source>Development time ratio (percent). Note: DTR=0 before FCs 
 100*(t{Event}-t{FCs})/(t{FCs}-t{CHARGE})</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">發展期比例(百分比)
+一爆前值為0
+計算式為 100*(t{Event}-t{FCs})/(t{FCs}-t{CHARGE})</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="31" />
       <source>The degree symbol</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">溫度單位符號: °</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="32" />
       <source>Temperature mode (&amp;#39;C&amp;#39; or &amp;#39;F&amp;#39;)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">溫度格式 (C或F)</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="33" />
       <source>Degree symbol with Temperature mode</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">溫度格式 含溫度單位符號</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="34" />
       <source>ET RoR value
 Displays &amp;#39;--&amp;#39; when the RoR value is not available.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">出風溫升溫率值
+顯示為 '--' 時表示升溫率值無法計算</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="35" />
       <source>BT RoR value
 Shows &amp;#39;--&amp;#39; when the RoR value Is not available.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">豆溫升溫率值
+顯示為 '--' 時表示升溫率值無法計算
+</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="36" />
       <source>RoR units
 Shorthand for &amp;#39;~deg~mode/min&amp;#39;</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">升溫率單位
+由 '~deg~mode/min' 寫法簡化</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="37" />
       <source>ET RoR with units
 Field is hidden when the RoR value is not available.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">出風溫升溫率值 含單位標示
+如無法計算則不會顯示</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="38" />
       <source>BT RoR with units
 Field is hidden when the RoR value is not available.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">豆溫升溫率值 含單位標示
+如無法計算則不會顯示</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="39" />
       <source>Quote symbol</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">雙引號</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="40" />
       <source>Single quote symbol</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">單引號</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="113" />
       <location filename="../help/eventannotations_help.py" line="43" />
       <source>EXAMPLES</source>
-      <translation>BEISPIELE</translation>
+      <translation type="unfinished">範例</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="47" />
       <source>Assumptions:  The event value is 50.  In the case of Gas the value 50 corresponds to either 5.0kPh or 50%.  
 For a sensory milestone (see notes above) the value 50 corresponds to the "Hay" aroma. </source>
-      <translation type="unfinished" />
+      <translation type="unfinished">假設: 事件數值為50. 瓦斯(能量類型)事件的50可用在 5.0kph或是 50%. 
+另外還有別的用法,例如數值為50時對應為"乾稻草"味</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="50" />
       <source>Annotation Field</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">備註寫法範例</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="50" />
       <source>Displays</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">將顯示成</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="51" />
@@ -9951,17 +9977,17 @@ Gas 50% @12% DTR</source>
     <message>
       <location filename="../help/eventannotations_help.py" line="60" />
       <source>NOTES:</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">註:</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="64" />
       <source>Event annotations apply only for &amp;#39;Step&amp;#39; and &amp;#39;Step+&amp;#39; Events settings</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">事件備註只適用於"階梯狀"或“階梯狀附旗標"類型事件標記方式</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="65" />
       <source>Anything between double quotes " will show only after FCs. Example: "~E1 @~DTR%"</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">任何雙引號內的內容只在一爆開始後顯示 如"~E1 @~DTR%"</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="66" />
@@ -10008,7 +10034,7 @@ Note that if the event value  does not match any value in the Annotation definit
     <message>
       <location filename="../help/energy_help.py" line="14" />
       <source>Energy and CO2 Calculator</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">能量與二氧化碳計算機</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="18" />
@@ -10017,27 +10043,32 @@ Note that if the event value  does not match any value in the Annotation definit
 Note that pre-heating and roaster cooling energy values are applied to the first roast of a roasting session.  Between batch energies are applied to every roast except the first.  Tick the "Between batches after Pre-Heating box to apply the between batch value to the first roast.
 
 Follow the steps below to set the energy inputs for the roast machine and afterburner.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">此能量頁為烘焙的使用能量計算, 也同時監看烘焙操作中二氧化碳排放量的影響. 每批次烘焙所需耗用能量都會被計入評估. 使用到的燃燒器,馬達以及風扇為主要的耗能. 預熱與鍋間操作和冷卻程序所需要使用的能量也會被設定列入計算.
+
+請注意預熱以及冷卻所需能量,是在整批烘焙作業的第一鍋烘焙操作時計算. 點選”預熱值套用至鍋間”選項可將鍋間操作的能量值設定為預熱過程估算值當作每次耗能.
+
+依照以下步驟設定烘焙機以及後燃器能量計算</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="18" />
       <source>Blank entries  are the same as a zero entry.  Negative values are not allowed.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">如無寫入則計算時視此值為零. 不能設定為負值</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="22" />
       <source>Once you set up the Loads sub-tab and the Protocols sub-tab, it is a good idea to click "Save Defaults" on both  sub-tabs (they are saved separately).  When loading a profile with existing energy values, the profile settings will be read and will overwrite the values on the Loads and Profiles sub-tabs.  Having them saved as defaults allow for them to be quickly restored by clicking "Restore Defaults" on each sub-tab.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">“計入設備”與”設定”完成後, 分別可點擊”存為預設值”個別儲存. 只要載入有此項計算過的曲線,會讀入檔案設定並覆蓋當下原設定. 如有將預設值儲存即可個別點擊”還原預設值“快速還原.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="25" />
       <source>1. Details Sub-Tab</source>
-      <translation type="unfinished" />
+      <translatorcomment>1. 細節</translatorcomment>
+      <translation type="unfinished">1. 細節</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="29" />
       <source>This sub-tab shows a detailed table of the energy consumption and CO2 production data for the roast.  The values in this table are based on current Profile and the settings made on the Loads and Protocols sub-tabs.  Columns may be sorted by clicking on the column title.  To return to original sort click on the &amp;#39;Kind&amp;#39; column title.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">此標籤頁顯示烘焙耗用能量與二氧化碳排放的設備的細節. 表中數值皆基於目前曲線以及”計入設備”與”設定”標籤頁資料的計算. 可透過點擊欄位名稱排序列表, 點擊”類型”欄位即回到原始排序. </translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="33" />
@@ -10047,32 +10078,32 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
     <message>
       <location filename="../help/energy_help.py" line="33" />
       <source>Choose the energy units for the summary displays and the Details sub-tab.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">選擇各標籤頁設定與能量計算和結果顯示所使用的能量單位.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="36" />
       <source>2. Loads Sub-Tab</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">2. 計入設備</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="40" />
       <source>Begin by making entries on the Loads sub-tab  to define the sources of energy used by this roast. It might be a good idea to save those settings as defaults to be used to calculate the energy consumption of future roasts</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">從”計入設備”標籤頁輸入資料開始定義烘焙中耗能設備. 可先將設定儲存成預設值為將來烘焙準備.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="40" />
       <source>Power ratings for up to four energy loads may be entered.  Loads will be the main burners or heaters, motors and blowers, and the afterburner if one is used.  Enter one load per line.  Motors and blowers that run continuously may be aggregated and entered as one load.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">能量耗用設備可列入四種, ,每列設定一種元件, 這些可是主要燃燒器或加熱器,馬達與風扇,如有後燃機也可列入. 持續運轉的馬達與風扇可合併為一項.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="40" />
       <source>Loads are assumed to run continuously. Variable loads, such as the main burner setting, can be recorded in Artisan using one of the four special events.  The settings can be captured from a button, slider or in some cases read directly from the roaster.  The load setup allows linking a load to one of these events.  The energy calculator will then determine the setting percentage and the duration of the setting to calculate the energy consumed.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">設備皆預設為持續運轉. 如為能量為可變值類型的項目,如燃燒器,可在”事件”選單中選擇對應的項目,其值可直接獲取事件按鈕或滑動條的數值. 能量計算器會透過其比率值與耗時計算能量消耗.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="40" />
       <source>Burner entries require knowing the power rating of the burner.  Roasting machine manufacturer&amp;#39;s typically provide this information.  If this information can not be found for your machine this table provides approximate values based on roaster capacities.  https://artisan-scope.org/ratings/</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">燃燒器的設定需要知道額定輸出功率(Power Rate). 燃燒器廠商應該提供此資訊. 如機器上無此資訊, 可依據相近載量參考此表資料: https://artisan-scope.org/ratings/</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="44" />
@@ -10082,128 +10113,131 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
     <message>
       <location filename="../help/energy_help.py" line="44" />
       <source>Enter your personal description for this burner.  Examples are &amp;#39;Main&amp;#39; and &amp;#39;Afterburner&amp;#39;.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">對燃燒器輸入自定標示, 如 “主要”或”後燃器”</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="45" />
       <source>Rating</source>
-      <translation type="unfinished">比率</translation>
+      <translation type="unfinished">額定功率</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="45" />
       <source>This is the power rating of the load  Choose the units in the next column.  </source>
-      <translation type="unfinished" />
+      <translation type="unfinished">指燃燒器額定功率, 其單位在下個欄位設定.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="46" />
       <source>Select the appropriate power unit. Some manufacturers incorrectly use BTU.  In that case use BTU/h for the unit.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">選擇適當的單位. 某些廠商可能誤植為BTU. 應為BTU/h</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="47" />
       <source>Fuel</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">來源</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="47" />
       <source>Select the type of fuel used by this load  &amp;#39;Elec&amp;#39; is assumed to be electricity generated from dirty coal.  There is a setting below to adjust for renewable clean energy sources.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">選擇燃料類型. “電能”意指由燃煤(髒煤)供給的電力能源. 下方另有可再生潔凈能源選項可設定.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="48" />
       <source>Special Events are often used to record load settings, such as a burner setting, in the roast profile.  Select the Event that corresponds to the load setting here.  
 
 When blank the load is assumed to be at a constant setting, which is the percent &amp;#39;Value 100%&amp;#39; multiplied by the rating.  A 10 kW load at &amp;#39;100% Value&amp;#39;= 60 would thus be 10 kW * 60% = 6 kW. Continuous loads are typically motors and blowers and the afterburner.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">特定事件可載入設定紀錄,如燃燒器設定. 在”事件”清單中選擇對應項目.
+
+如未設定則預設為固定負載值,以100%時對應數值與額定功率值相乘. 設定10kＷ在”100%時值應為60”的設定下等同10 kW * 60% = 6 kW. 馬達與風扇和後燃器即是典型的固定負載類型設備.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="49" />
       <source>Pressure %</source>
-      <translation type="unfinished">氣壓 %</translation>
+      <translation type="unfinished">以壓力計算</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="49" />
       <source>For gas loads tick this box when  the readings are made in units of pressure.  Some roasters and some controllers provide readings in heat energy.  When the readings are made in heat energy leave this box unticked.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">瓦斯量讀值單位為壓力時勾選此項, 如烘焙機的讀值為能量單位則不需勾選.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="50" />
       <source>Value 0%</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">0% 數值</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="50" />
       <source>When an Event is selected in the previous column this value can be set to match the 0% burner setting to the event setting.  In most cases a 0 Event value will correspond to the 0% load setting.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">勾選前項(以壓力計算)時, 0%等同數值可在此設定. 多數狀況視0%等同數值為0.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="51" />
       <source>Value 100%</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">100% 數值</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="51" />
       <source>When an Event is selected this value can be set to match the 100% load setting to the event setting.  This is useful when the 100% load setting is recorded as a different number in the Event.  For instance, maybe the burner event is recorded as 10x the kPa reading on the gas manometer.  An event value of 35 is recoded to signify 3.5 kPa, which is 50% pressure.  If the 100% burner setting corresponds to 7 kPa then the &amp;#39;Value 100%&amp;#39; should be set to 70, which is 7 * 10  = 70.  Thus 3.5 kPa will be seen by he energy calculator as 50%.  For pressure readings be sure to tick the Pressure box.  Heat energy readings are normally 0%-100% and do not require any adjustment to this  setting.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">勾選前項(以壓力計算)時, 100%等同的數值可在此設定. 可利用於設備在100%全載輸出時其值非100的情況. 例如: 瓦斯壓力錶的讀值基本單位數為實際值的10倍(10x kPa), 且定義100%輸出時錶壓為7kPa, 紀錄事件數值即為70 (因事件記錄值設定為實際值的10倍,故 7*10 = 70). 所以3.5kPa將被視為50%輸出. 如錶頭單位並非瓦斯壓力值而是額定功率時,則不須設定100%代表的實際值.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="52" />
       <source>Electric Energy Mix</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">混合電能</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="52" />
       <source>This setting allows to set a mix of renewable energy that sources the electric loads.  0% assumes all the energy comes from burning dirty coal and maximizes the CO2 in the calculations.  100% assumes the energy comes only from renewable sources with no CO2 produced.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">此項可設定電力供應混合可再生能源比率, 0%代表全部能量來自於燃煤(髒煤)電力並具最大的二氧化碳排放量. 設為100%時代表能量全部皆來自於再生能源且無二氧化碳排放. </translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="72" />
       <location filename="../help/energy_help.py" line="53" />
       <source>Save Defaults</source>
-      <translation type="unfinished">儲存默認</translation>
+      <translation type="unfinished">存為預設值</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="72" />
       <location filename="../help/energy_help.py" line="53" />
       <source>Stores the current settings on this sub-tab as defaults to be recalled later.  The default values will be stored when saving settings (Help&gt;Save Settings) to a file.  </source>
-      <translation type="unfinished" />
+      <translation type="unfinished">可儲存本頁設定為預設值, 此預設值將會在儲存設定檔 (幫助&gt;儲存設定) 時一同寫入存檔.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="73" />
       <location filename="../help/energy_help.py" line="54" />
       <source>Restore Defaults</source>
-      <translation type="unfinished">修復默認</translation>
+      <translation type="unfinished">還原預設值</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="73" />
       <location filename="../help/energy_help.py" line="54" />
       <source>Overwrites the values on this sub-tab with those stored as the defaults.  When a profile with energy settings is opened, the values on this tab will be read from the profile.   They will be overwritten when clicking Restore Defaults.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">將設定值覆蓋為預設值, 如烘焙曲線檔案中有本頁資訊時會在載入檔案時讀取使用. 故如欲恢復預設值即可從載入預設值恢復.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="57" />
       <source>3. Protocol Sub-Tab</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">3.設定</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="61" />
       <source>The Protocol settings allow including Pre-Heating, Between Batch (BBP) and Cooling protocol energy consumption.  There are two ways to specify these values.  The first assumes a constant load setting for a defined period of time.  An example for pre-heating is to set a Duration of 45:00 (45 minutes) at 30% Burner setting.  Percentages must be entered with the percent sign (30%).  When a percentage is entered  a corresponding Duration must be entered.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">協定中可為預熱,批次間條溫作業(BBP) 還有冷卻的能量消耗做設定. 有兩種格式可用, 一為使用時間內皆持續為固定負載量的類型, 例如預熱階段由燃燒器以30%輸出45分鐘.則比率值30以及符號%必須輸入,如30%.  比率值與耗時必須同時紀錄.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="61" />
       <source>The second type of entry is a "measured" energy value.  This can be any value greater than 1.0.  Artisan can inspect the open profile to determine energy values for each Load that is associated with an Event on the Loads sub-tab.  Click the [...] button for each Protocol to auto fill the Measured Energy fields.   The Artisan measurements for Pre-Heating and Between Batches are made from the start of the profile until CHARGE.  If there is no CHARGE event the measurement is from the start to the end of profile.  The values measured for Pre-Heating and Between Batches are the same.  Be sure you do not use the same profile to enter both values.  The Cooling energy is measured from DROP to the end of the profile.  If there is no DROP event the measurement begins at CHARGE.  If there is no CHARGE event the measurement is from the start to the end of the profile.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">第二種格式為量測而得的能量數值. 故此值即可大於1. Artisan會檢查曲線檔於”計入設備”標籤頁所使用事件類型決定能量值格式. 點擊每列最後[...]按鈕則可自動填入個別數值. Artisan 會對於預熱及批次間量測相關數據,計算方式相同. 如果入豆事件沒有標定,計算會持續到曲線最後.  請確定預熱及批次間兩者數據是否要以同曲線套入數值. 冷卻耗能的量測由下豆之後起計至曲線最後. 如無標定下豆事件則會造成計算由入豆開始算起. 如入豆事件也無標定則會計算整個曲線全程.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="61" />
       <source>To use the Artisan energy measurement feature you will need to record one or more profiles that include the protocol of interest.  For example, to measure the Pre-Heating energy, START recording when the roaster is turned on.  Let Artisan record the entire pre-heating procedure.  At the end of the pre-heating you can either STOP recording the profile or go forward with the roast.  The CHARGE event will mark the end of pre-heating when Artisan measures the pre-heat energy.  Similarly a Between Batches protocol can be recorded with START followed by a normal roast.  A Cooling protocol would be captured by not turning the Artisan recording OFF until the roaster is fully cooled.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">Artisan能耗計算功能需要一筆或更多曲線紀錄引入能耗計算協定. 例如為了量測預熱能量使用,於點火後就需執行開始記錄, 由Artisan紀錄整個預熱流程. 在預熱完成後可停止紀錄. 如繼續烘焙操作, 則入豆事件標定會標記成預熱階段計算的結束點. 相同的, 批次間協定也會起始於開始記錄之後啟動計算. 冷卻協定則會在完成冷卻執行停止紀錄之後計算.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="61" />
       <source>The Artisan measurements for Pre-Heating and Between Batches are made from the start of the profile until CHARGE.  If there is no CHARGE event the measurement is from the start to the end of profile.  The values measured for Pre-Heating and Between Batches are the same.  Be sure you do not use the same profile to enter both values.  The Cooling energy is measured from DROP to the end of the profile.  If there is no DROP event the measurement begins at CHARGE.  If there is no CHARGE event the measurement is from the start to the end of the profile.</source>
-      <translation type="unfinished" />
+      <translatorcomment>原文內容與上段重複</translatorcomment>
+      <translation type="unfinished">  </translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="65" />
@@ -10215,7 +10249,8 @@ When blank the load is assumed to be at a constant setting, which is the percent
       <source>This row sets the values for pre-heating energy.  Percentage or measured values may be entered for each burner.  When a percentage is used the Duration field must be set.
 
 Pre-Heating energy is applied only to the first batch of a roasting session.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">此列設定預熱耗能. 可記為比率值或量測值. 如設定為比率值則耗時欄位也必須設定.
+預熱耗能應用在烘焙作業的第一個烘焙批次時的計算.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="66" />
@@ -10227,7 +10262,8 @@ Pre-Heating energy is applied only to the first batch of a roasting session.</so
       <source>This row sets the values for between batches protocol for the roasting session.  Percentage or measured values may be entered for each burner.  When a percentage is used the Duration field must be set.
 
 Between Batches energy is applied to each batch of the roasting session, except the first batch.  Tick the &amp;#39;Between Batches after Pre-Heating&amp;#39; box to apply Between Batches energies to the first batch of the session too.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">此列設定烘焙作業的批次間的耗能. 可記為比率值或量測值. 如設定為比率值則耗時欄位也必須設定.
+批次間能耗應為第一批次之外的每個批次.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="67" />
@@ -10239,17 +10275,17 @@ Between Batches energy is applied to each batch of the roasting session, except 
       <source>This row sets the values for the energy used for cooling.  Most common loads are motors and blowers that consume energy during the roaster cool down period.  Percentage or measured values may be entered for each burner.  When a percentage is used the Duration field must be set.
 
 Pre-Heating energy is applied only to the first batch of a roasting session.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">此列設定冷卻時耗能. 多數負載裝置由馬達及風扇耗能運轉以在這階段進行降溫. 可記為比率值或量測值.如設定為比率值則耗時欄位也必須設定.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="68" />
       <source>Duration</source>
-      <translation>持續時間</translation>
+      <translation type="unfinished">耗時</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="68" />
       <source>The length (mm:ss) of protocol.  It is used with a burner&amp;#39;s percentage setting to calculate the energy consumed  by that burner.  When a percentage entry is made for the burner, the Duration field must be set.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">以 分鐘數:秒數 (mm:ss)表示. 以比率值設定計算時必須同時設定所需耗時.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="69" />
@@ -10259,27 +10295,30 @@ Pre-Heating energy is applied only to the first batch of a roasting session.</so
     <message>
       <location filename="../help/energy_help.py" line="69" />
       <source>The value is either the measured energy for the protocol or the burner constant percentage setting for the length of the Duration field.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">數值為測量值或是由燃燒器固定比率值與耗時計算</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="70" />
       <source>Measure Profile [...]</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">量測值 [...]按鈕</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="70" />
       <source>Energy is measured from the open profile for each load where an event is specified on the Loads tab.  Click OK to auto fill in the associated Measured Energy field.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">能量由已開啟的曲線檔計算. 曲線檔內包含對應計入設備與計算協定數據. 點擊”套用”將自動填入數值於相關欄位</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="71" />
       <source>Between Batches after Pre-Heating</source>
-      <translation type="unfinished">預熱後 批次間</translation>
+      <translation type="unfinished">預熱與入豆前調溫操作分開紀錄</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="71" />
       <source>This box should be ticked when a Between Batches protocol run is done after the Pre-heating and before the roast.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">曲線紀錄中如果存在預熱階段後及入豆前有段(似批次間調溫作業)的調溫階段. 只有在當天烘焙作業的一剛開始(第一批)可能會將預熱以及調溫合併操作紀錄於同一筆曲線資料.為了不與列表中的批次間耗能計算重複,應將選項取消勾選.  
+ 
+勾選此項,則為預熱過程獨立儲存成一筆曲線紀錄不包含批次間作業(入豆前調溫). 第一筆正式烘焙紀錄的入豆前調溫階段將自動視為批次間作業列入批次間計算式中.
+可參考此頁說明:https://artisan-roasterscope.blogspot.com/2021/07/tracking-energy-consumption-co2.html</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="14" />
@@ -10382,7 +10421,7 @@ A &amp;#39;While Recording:&amp;#39; example will also be shown if the file name
     <message>
       <location filename="../help/autosave_help.py" line="34" />
       <source>The current batch position, or "Roast of the Day"</source>
-      <translation>目前批次位置,或&amp;quot;烘培日期&amp;quot;</translation>
+      <translation type="unfinished">目前批次位置,或&amp;quot;烘焙日期&amp;quot;</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="35" />
@@ -10393,7 +10432,7 @@ A &amp;#39;While Recording:&amp;#39; example will also be shown if the file name
     <message>
       <location filename="../help/autosave_help.py" line="36" />
       <source>From Roast&gt;Properties&gt;Title</source>
-      <translation>來自 烘焙&amp;gt;屬性&amp;gt;標題</translation>
+      <translation type="unfinished">來自 烘焙&gt;屬性&gt;標題</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="37" />
@@ -10409,27 +10448,27 @@ From Roast&gt;Properties&gt;Beans</source>
     <message>
       <location filename="../help/autosave_help.py" line="39" />
       <source>Roast date in format yy-MM-dd</source>
-      <translation>烘培日期格式為 yy-MM-dd</translation>
+      <translation type="unfinished">烘焙日期格式為 yy-MM-dd</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="40" />
       <source>Roast date in format yyyy-MM-dd</source>
-      <translation>烘培日期格式為 yyyy-MM-dd</translation>
+      <translation type="unfinished">烘焙日期格式為 yyyy-MM-dd</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="41" />
       <source>Roast time in format hhmm</source>
-      <translation>烘培時間格式為 hhmm</translation>
+      <translation type="unfinished">烘焙時間格式為 hhmm</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="42" />
       <source>Roast date and time in format yy-MM-dd_hhmm</source>
-      <translation>烘培日期和時間格式為 yy-MM-dd_hhmm</translation>
+      <translation type="unfinished">烘焙日期和時間格式為 yy-MM-dd_hhmm</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="43" />
       <source>Roast date and time in format yyyy-MM-dd_hhmm</source>
-      <translation>烘培日期和時間格式為 yyyy-MM-dd_hhmm</translation>
+      <translation type="unfinished">烘焙日期和時間格式為 yyyy-MM-dd_hhmm</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="44" />
@@ -10479,7 +10518,7 @@ From Roast&gt;Properties&gt;Beans</source>
     <message>
       <location filename="../help/autosave_help.py" line="53" />
       <source>From Roast&gt;Properties&gt;Operator</source>
-      <translation>來自 烘培&amp;gt;屬性&amp;gt;烘培師</translation>
+      <translation type="unfinished">來自 烘焙&amp;gt;屬性&amp;gt;烘焙師</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="54" />
@@ -10574,7 +10613,7 @@ From Roast&gt;Properties&gt;Beans</source>
     <message>
       <location filename="../help/autosave_help.py" line="72" />
       <source>From Roast&gt;Properties&gt;Color Whole</source>
-      <translation>來自 烘焙&amp;gt;屬性&amp;gt;整豆色值</translation>
+      <translation type="unfinished">來自 烘焙&amp;gt;屬性&amp;gt;豆表色值</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="73" />
@@ -10589,12 +10628,12 @@ From Roast&gt;Properties&gt;Beans</source>
     <message>
       <location filename="../help/autosave_help.py" line="75" />
       <source>From Roast&gt;Properties&gt;Screen Min</source>
-      <translation>來自 烘焙&amp;gt;屬性&amp;gt;豆目 最小</translation>
+      <translation type="unfinished">來自 烘焙&gt;屬性&gt;豆目 最小</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="76" />
       <source>From Roast&gt;Properties&gt;Screen Max</source>
-      <translation>來自 烘焙&amp;gt;屬性&amp;gt;豆目 最大</translation>
+      <translation type="unfinished">來自 烘焙&gt;屬性&gt;豆目 最大</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="77" />
@@ -10842,12 +10881,13 @@ Recording 1380  Burundi KigandaMurambi 2020-04-25_113809.alog</source>
       <location filename="../help/symbolic_help.py" line="17" />
       <source>Can  shift?
 (see below)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">是否可移位
+(見下方)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="18" />
       <source>Absolute time (seconds) from begin of recording (not only the time after CHARGE!)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">從記錄開始算起的的絕對時間(秒),不是入豆後的烘焙時間</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="48" />
@@ -10870,7 +10910,7 @@ Recording 1380  Burundi KigandaMurambi 2020-04-25_113809.alog</source>
       <location filename="../help/symbolic_help.py" line="19" />
       <location filename="../help/symbolic_help.py" line="18" />
       <source>Yes</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">可</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="19" />
@@ -10880,180 +10920,180 @@ Recording 1380  Burundi KigandaMurambi 2020-04-25_113809.alog</source>
     <message>
       <location filename="../help/symbolic_help.py" line="20" />
       <source>Current channel reading (not available in the Plotter)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">目前頻道讀數(繪圖儀無法使用)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="23" />
       <source>Extra #1 T1 value</source>
-      <translation>額外 #T1 值</translation>
+      <translation type="unfinished">額外設備 #1 T1 值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="24" />
       <source>Extra #1 T2 value</source>
-      <translation>額外 #1 T2 值</translation>
+      <translation type="unfinished">額外設備 #1 T2 值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="25" />
       <source>Extra #2 T1 value</source>
-      <translation>額外 #2 T1 值</translation>
+      <translation type="unfinished">額外設備 #2 T1 值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="26" />
       <source>Extra #2 T2 value</source>
-      <translation>額外 #2 T2 值</translation>
+      <translation type="unfinished">額外設備 #2 T2 值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="39" />
       <location filename="../help/symbolic_help.py" line="33" />
       <location filename="../help/symbolic_help.py" line="27" />
       <source>...and so forth</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">.. 依此類推</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="28" />
       <source>ET background</source>
-      <translation>ET背景曲線</translation>
+      <translation type="unfinished">背景曲線出風溫</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="29" />
       <source>BT background</source>
-      <translation>BT背景曲線</translation>
+      <translation type="unfinished">背景曲線豆溫</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="30" />
       <source>ExtraBackground #1-A</source>
-      <translation>額外背景 #1-A</translation>
+      <translation type="unfinished">背景曲線 額外設備 #1-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="31" />
       <source>ExtraBackground #1-B</source>
-      <translation>額外背景 #1-B</translation>
+      <translation type="unfinished">背景曲線 額外設備 #1-B</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="32" />
       <source>ExtraBackground #2-A</source>
-      <translation type="unfinished">額外背景 #1-A {2-?}</translation>
+      <translation type="unfinished">背景曲線 額外設備 #2-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="34" />
       <source>ET tare value</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">校正後出風溫</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="35" />
       <source>BT tare value</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">校正後豆溫</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="36" />
       <source>Extra Device #1 channel 1 tare value</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">額外設備#1 頻道1校正後值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="37" />
       <source>Extra Device #1 channel 2 tare value</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">額外設備#1 頻道2校正後值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="38" />
       <source>Extra Device #2 channel 1 tare value</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">額外設備#2 頻道1校正後值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="40" />
       <source>Last event value of the first event type</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">第1個事件類型的最後值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="41" />
       <source>Last event value of the second event type</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">第2個事件類型的最後值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="42" />
       <source>Last event value of the third event type</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">第3個事件類型的最後值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="43" />
       <source>Last event value of the fourth event type</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">第4個事件類型的最後值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="45" />
       <source>ET rate of rise</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">出風溫升溫率</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="46" />
       <source>BT rate of rise</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">豆溫升溫率</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="47" />
       <source>Background ET rate of rise</source>
-      <translation>背景ET升溫速率</translation>
+      <translation type="unfinished">背景出風溫升溫速率</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="48" />
       <source>Background BT rate of rise</source>
-      <translation>背景BT升溫速率</translation>
+      <translation type="unfinished">背景豆溫升溫率</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="51" />
       <source>SHIFTED SYMBOLIC VARIABLES</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">位移運算符號變量</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="55" />
       <source>The symbolic variables t, b, Y&lt;n&gt;, B&lt;n&gt; and R&lt;n&gt; evaluate to the current value of a sequence of values that define a roast profile. To access earlier or later values one can apply a shift value.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">t, b, Y&lt;n&gt;, B&lt;n&gt;, 以及R&lt;n&gt;這些運算符號變量皆代表曲線紀錄序列中的目標時間現值. 計算時如欲引入此時間點前後一筆或數筆的值,則可以使用移位數.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="55" />
       <source>
 For example, while "Y2" returns the current bean temperature (BT), "Y2[-1]" returns the previous BT temperature and "Y2[-2]" the one before that. Formulas used in the Plotter are applied in sequence to all values, thus there "Y2" points to the current BT temperature processed, "Y2[-1]" the previous BT temperature processed and "Y2[+1]" the next BT temperature to be processed. A positive shift is only available in the Plotter, obviously not during recording.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">例如Y2代表目前豆溫值, ” Y2[-1] ”就代表前一筆豆溫紀錄, 而” Y2[-1] ”則代表再往前數的前一筆豆溫紀錄. 繪圖儀所使用的計算式即可以取用一序列的數值,其中Y2代表著目前正在運算的當筆豆溫資料,Y2[-1]代表前一筆資料, Y2[+1]代表下一筆紀錄中的資料. 正數的位移量值僅可用於繪圖儀, 不能用於記錄當下.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="59" />
       <source>Time one index ahead (plotter only)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">下一筆記錄的時間(僅供繪圖儀用)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="60" />
       <source>Time three indexes delayed</source>
-      <translation>三個指示器的延遲時間</translation>
+      <translation type="unfinished">往前第三筆記錄的時間</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="61" />
       <source>ET value delayed by 2 indexes</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">出風溫的前第二筆資料</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="62" />
       <source>BT value index advanced by one index (plotter only)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">豆溫的下一筆資料(僅供繪圖儀用)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="63" />
       <source>ExtraBackground #1-B delayed 6 indexes</source>
-      <translation>額外背景 #1-B 延遲6個指標</translation>
+      <translation type="unfinished">背景曲線中 額外裝置#1 B探針值 的前第六筆資料</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="64" />
       <source>ExtraBackground #2-A advanced 2 indexes (plotter only)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">背景曲線中 額外裝置#2 A探針值 的後第二筆資料(僅供繪圖儀用)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="65" />
       <source>ET rate of rise delayed two indexes</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">前第二筆出風溫資料</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="68" />
       <source>INDEXED SYMBOLIC VARIABLES</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">索引運算符號變量</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="72" />
@@ -11063,141 +11103,141 @@ For example, while "Y2" returns the current bean temperature (BT), "Y2[-1]" retu
     <message>
       <location filename="../help/symbolic_help.py" line="72" />
       <source>Previously recorded data assigned to the symbolic variables t, b, Y&lt;n&gt;, B&lt;n&gt; and R&lt;n&gt; can also directly accessed by index. "Y2{0}" evaluates to the first recorded bean temperature (BT) and "Y2{CHARGE}" to the bean temperature at CHARGE. Additionally, the symbolic variable b can be used to access the recording time at a certain index of the background profile. Thus "b{CHARGE}" returns the recording time at CHARGE of the background profile.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">已紀錄的資料值指定至特定運算符號變量也可透過索引數值做到. 如 “Y2{0}”為第一筆豆溫資料,而 "Y2{CHARGE}" 代表著入豆時的豆溫.  另外,運算符號變量”b” 可用於取得背景曲線中特定索引事件的記錄時間. 所以 "b{CHARGE}" 代表著會取得背景曲線中入豆的時間值.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="75" />
       <source>AXIS MAPPING</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">軸映射</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="79" />
       <source>Scaling factor from time to RoR axis. The range of the temperature scale divided by the range of the delta scale. </source>
-      <translation type="unfinished" />
+      <translation type="unfinished">為一個對升溫率右縱軸運算倍數的比例因數. 定義為左軸溫度的範圍尺度除以右軸升溫率的範圍尺度的數值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="80" />
       <source>Offset from time to RoR axis. </source>
-      <translation type="unfinished" />
+      <translation type="unfinished">配合升溫率軸縮放倍數計算的補償值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="84" />
       <source>Note: RoR values r can be scaled to the temperature axis using a linear approximation of the form "r*k + o". As the variables k and o depend on the actual axis settings which can be changed by the user without triggering a recomputation, those variable are less useful for use in a recording, but useful in the Plotter to plot w.r.t. the RoR y-axis instead of the temperature y-axis.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">註: 升溫率值 “r” 可配合溫度軸縮放倍數 “k”進行一個線性近似運算 “r*k + o”. 變數k與o依據真實的軸尺度設定數據修改而變動故不需重新計算, 這對於曲線紀錄時不大有具有用途, 但是可用於使用繪圖儀功能繪製升溫率右軸的時候.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="87" />
       <source>EVENT INDEX and TIME DELTA</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">事件索引以及時間差</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="91" />
       <source>Index of the corresponding event of the profile to retrieve time and values from the corresponding data structures. Evaluates to -1 if not set.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">索引曲線資料中對應事件的時間與數值, 如未標定事件則其值為-1</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="92" />
       <source>Index of the corresponding event of the background profile to retrieve time and values from the corresponding data structures. Evaluates to -1 if not set.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">索引背景曲線資料中對應事件的時間與數值, 如未標定事件則其值為-1</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="94" />
       <source>Time distance in seconds after the corresponding event. Thus dCHARGE is bound to the current roast time (after CHARGE) in seconds while t is bound to the time in seconds from the start of the recording.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">事件發生後經過的時間長度,以秒為單位. 故”dCHARGE” 對應著入豆後至目前為止所經過的時間,以秒計算, 而”t” 則是從曲線紀錄開始到目前的總時間.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="97" />
       <source>AREA UNDER THE CURVE (AUC)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">曲線下面積 (AUC)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="101" />
       <source>AUC base temperature (could be from the selected event, if set)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">曲線下面積計算溫度基線 (可選擇套用指定事件標定當下的溫度值)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="102" />
       <source>AUC target value (could be from the background profile, if set)</source>
-      <translation>AUC目標值(如設定，可源自背景曲線)</translation>
+      <translation type="unfinished">曲線下面積目標值 (可引用有此資料的背景曲線)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="103" />
       <source>the current AUC value. -1 if none available.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">當前曲線下面積值, 如無則為-1</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="106" />
       <source>PREDICITONS</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">預測</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="110" />
       <source>Prediction of the time distance to the DRY event based on the current RoR. Evaluates to -1 on negative RoR and to 0 if the DRY event is already set.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">以目前升溫率估算預測至脫水完成需時. 在升溫率仍為負時標為-1,脫水結束被標記後則為0</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="111" />
       <source>Same as pDRY, just for the FCs event.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">如同pDRY, 計算目標為一爆開始</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="115" />
       <source>Note: The same rules as for the corresponding PhasesLCDs apply to pDRY and pFCs:</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">註: 各 階段LCD 顯示數值計算式與pDRY 和 pFCs算式相同</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="115" />
       <source>
 If there is no background profile the DRY or FCs bean temperature used for the prediction is taken from the Config&gt;Phases setup.</source>
-      <translation>如果無背景曲線，用於預測轉黃或一爆開始的豆溫將源自 設定&amp;gt;階段設定</translation>
+      <translation type="unfinished">如果無背景曲線，用於預測轉黃或一爆開始的豆溫將引用自 "設定&gt;階段" </translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="115" />
       <source>
 If there is a background profile and there is DRY or FCs event in the background profile, the DRY or FCs bean temperature used for the prediction is taken from the background profile.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">如有載入背景曲線且資料中有脫水結束與一爆開始的紀錄, 則其乾燥完成與一爆開始的溫度值會引用做當前預測的目標溫度.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="115" />
       <source>
 Exception to the above for DRY only: if AutoDRY is checked the DRY temperature used for the prediction is taken from the Config&gt;Phases setup.  This does not apply to FCs and AutoFCS.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">上述功能有一例外: 於 設定&gt;階段 中 ”自動標計脫水” 功能有被勾選, 且有對脫水結束溫度完成設定. 則預測脫水完成的計算不會引用自背景曲線的脫水結束時的溫度值計算預測. 此例外不會套用至一爆開始以及自動標定一爆開始</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="115" />
       <source>
 The prediction value is the calculated time in seconds to reach the DRY or FCs temperature.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">此預測數值為以秒為單位的數值,用於評估到達脫水結束以及一爆開始的溫度所需時間.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="118" />
       <source>AMBIENT</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">環境資料</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="122" />
       <source>ambient temperature (default 0)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">環境溫度(預設為0)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="123" />
       <source>ambient humidity (default 0)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">環境溼度(預設為0)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="124" />
       <source>ambient pressure (default 0)</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">環境壓力(預設為0)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="128" />
       <source>Note: The data is (re-)sampled some seconds after the start of recording</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">註: 開始紀錄後會在幾秒後 (重)取樣</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="131" />
       <source>EXPRESSIONS</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">表達式</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="134" />
@@ -11207,12 +11247,14 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
     <message>
       <location filename="../help/symbolic_help.py" line="135" />
       <source>Conditional. Evaluates to the value of the expression &lt;true-expr&gt; if the condition &lt;cond&gt; holds, otherwise to the value of the expression &lt;false-expr&gt;. The rules of Python are applied to decide if a value holds or not. Thus the boolean values "True" and "False" have the obvious semantic. Any number unequal to 0 evaluates to True and 0 evaluates to False. The value "None" is also evaluated to False.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">此為以Python的規則構成的條件句,利用以布林值”True”與”False”決定該數值可執行與否.  當符合條件 &lt;cond&gt; 時, 則執行&lt;true-expr&gt;式, 否則將執行&lt;false-expr&gt;式. 
+例如任何數值不等於0 將為”True”, 如等於0則為”False”. 無數值“None”也相當於”False”.
+</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="138" />
       <source>MATHEMATICAL FORMULAS</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">數學公式</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="141" />
@@ -11222,82 +11264,82 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
     <message>
       <location filename="../help/symbolic_help.py" line="142" />
       <source>Return the absolute value of x.</source>
-      <translation />
+      <translation type="unfinished">傳回x的絕對值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="143" />
       <source>Return the arc cosine (measured in radians) of x.</source>
-      <translation />
+      <translation type="unfinished">傳回x的反餘弦值,以弧度為單位.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="144" />
       <source>Return the arc sine (measured in radians) of x.</source>
-      <translation />
+      <translation type="unfinished">傳回x的反正弦值,以弧度為單位.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="145" />
       <source>Return the arc tangent (measured in radians) of x.</source>
-      <translation />
+      <translation type="unfinished">傳回x的反正切值,以弧度為單位.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="146" />
       <source>Return the cosine of x (measured in radians).</source>
-      <translation />
+      <translation type="unfinished">傳回x的餘弦值,以弧度為單位.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="147" />
       <source>Convert angle x from radians to degrees.</source>
-      <translation />
+      <translation type="unfinished">將角度x從弧度轉換為度.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="148" />
       <source>Return e raised to the power of x.</source>
-      <translation />
+      <translation type="unfinished">傳回 e 的指定次數乘冪</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="149" />
       <source>Return the logarithm of x to the given base.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">傳回x的指定底數(base)對數值.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="150" />
       <source>Return the minimum of the given values.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">傳回引數清單中的最小值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="151" />
       <source>Return the maximum of the given values.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">傳回引數清單中的最大值</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="152" />
       <source>Return x**y (x to the power of y).</source>
-      <translation />
+      <translation type="unfinished">傳回x的y乘冪的結果</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="153" />
       <source>Convert angle x from degrees to radians.</source>
-      <translation />
+      <translation type="unfinished">將角度x從度轉換為弧度.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="154" />
       <source>Return the sine of x (measured in radians).</source>
-      <translation />
+      <translation type="unfinished">傳回x的正弦值,以弧度為單位.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="155" />
       <source>Return the square root of x.</source>
-      <translation />
+      <translation type="unfinished">傳回x的平方根</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="156" />
       <source>Return the tangent of x (measured in radians).</source>
-      <translation />
+      <translation type="unfinished">傳回x的正切值,以弧度為單位.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="159" />
       <source>MATHEMATICAL CONSTANTS</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">數學常數</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="162" />
@@ -11307,23 +11349,29 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
     <message>
       <location filename="../help/symbolic_help.py" line="167" />
       <source>PLOTTER EXTENSIONS</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">繪圖儀延伸變量</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="171" />
       <source>Note:  This section applies only to the Plotter
 Using math formulas in the plotter also allows to use the symbolic variables P and F (see Signals, Symbolic Assignments and the Plotter).</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">註: 使用數學函式時也可運用變量P以及F,這部分只適用於繪圖儀 
+
+參考: 
+https://artisan-roasterscope.blogspot.com/2016/03/roast-calculus.html
+https://artisan-roasterscope.blogspot.com/2015/10/signals-symbolic-assignments-and-plotter.html
+</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="175" />
       <source>The variables P1,..,P9 represent the results from plot #1,..,#9. You can perform calculations in a later plot on variables of an earlier plot. That way, the plot variables P1,..,P9 allow the cascading or intermediate results. For example, plot #3 can refer to the results of plot 1 using the variable P1.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">P1,..,P9 代表各繪圖計算方程結果, 可被其他變量引用串接. 譬如 polt #3 可引用變量P1(即計算的polt #1 的結果) </translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="176" />
       <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">F1...F9作用為將前計算結果當成當下方程回饋迴圈,這在設計濾波時相當有用.  同樣的, F2 也是作為之前第P2變量的結果的回饋變數, 以此類推.
+</translation>
     </message>
     <message>
       <source>Serial</source>
@@ -11367,7 +11415,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/axis.py" line="45" />
       <location filename="../artisanlib/axis.py" line="43" />
       <source>Max</source>
-      <translation>最大</translation>
+      <translation type="unfinished">最大值</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="3198" />
@@ -11380,12 +11428,12 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/axis.py" line="46" />
       <location filename="../artisanlib/axis.py" line="44" />
       <source>Min</source>
-      <translation>最小</translation>
+      <translation type="unfinished">最小值</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="49" />
       <source>100% Event Step</source>
-      <translation>100% 事件階段</translation>
+      <translation type="unfinished">階梯型事件100%值位置</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="1147" />
@@ -11398,13 +11446,13 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/axis.py" line="183" />
       <location filename="../artisanlib/axis.py" line="148" />
       <source>Step</source>
-      <translation>階段</translation>
+      <translation type="unfinished">標示區間</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="654" />
       <location filename="../artisanlib/axis.py" line="211" />
       <source>Style</source>
-      <translation>風格</translation>
+      <translation type="unfinished">格線型式</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15990" />
@@ -11484,7 +11532,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/comparator.py" line="619" />
       <location filename="../artisanlib/comparator.py" line="598" />
       <source>BT</source>
-      <translation />
+      <translation type="unfinished">豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="31268" />
@@ -11517,7 +11565,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/comparator.py" line="631" />
       <location filename="../artisanlib/comparator.py" line="607" />
       <source>ET</source>
-      <translation />
+      <translation type="unfinished">出風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/comparator.py" line="661" />
@@ -11657,17 +11705,17 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="169" />
       <source>Positive</source>
-      <translation>積極</translation>
+      <translation type="unfinished">正</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="175" />
       <source>Negative</source>
-      <translation>消極</translation>
+      <translation type="unfinished">負</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="187" />
       <source>Invert Control</source>
-      <translation>變頻調節</translation>
+      <translation type="unfinished">反轉控制</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1127" />
@@ -11688,7 +11736,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="237" />
       <source>Steps</source>
-      <translation>步驟</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="775" />
@@ -11707,7 +11755,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="246" />
       <source>Ramp/Soak</source>
-      <translation>緩升/浸泡</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1942" />
@@ -11760,17 +11808,17 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1157" />
       <source>Ramp Soak HH:MM&lt;BR&gt;(1-4)</source>
-      <translation>緩升 浸泡 HH:MM&amp;lt;BR&amp;gt;(1-4)</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1161" />
       <source>Ramp Soak HH:MM&lt;BR&gt;(5-8)</source>
-      <translation>緩升 浸泡 HH:MM&amp;lt;BR&amp;gt;(5-8)</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1162" />
       <source>Ramp/Soak Pattern</source>
-      <translation>緩升/浸泡 程式</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2181" />
@@ -11793,7 +11841,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1218" />
       <source>Writing eeprom memory</source>
-      <translation>寫入EEPROM內存</translation>
+      <translation type="unfinished">寫入EEPROM記憶體</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1219" />
@@ -11831,23 +11879,23 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/pid_dialogs.py" line="2524" />
       <location filename="../artisanlib/pid_dialogs.py" line="1394" />
       <source>ET Thermocouple type</source>
-      <translation>ET熱電偶類型</translation>
+      <translation type="unfinished">出風溫熱電偶類型</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2531" />
       <location filename="../artisanlib/pid_dialogs.py" line="1401" />
       <source>BT Thermocouple type</source>
-      <translation>BT熱電偶類型</translation>
+      <translation type="unfinished">豆溫 熱電偶類型</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1980" />
       <source>Ramp Soak (MM:SS)&lt;br&gt;(1-7)</source>
-      <translation>緩升 浸泡 (MM:SS)&amp;lt;br&amp;gt;(1-7)</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1986" />
       <source>Ramp Soak (MM:SS)&lt;br&gt;(8-16)</source>
-      <translation>緩升 浸泡 (MM:SS)&amp;lt;br&amp;gt;(8-16)</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2036" />
@@ -11899,12 +11947,12 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2410" />
       <source>Artisan Fuji PXG uses MINUTES:SECONDS units in Ramp/Soaks</source>
-      <translation>Artisan Fuji PXG在使用緩升/浸泡上使用分鐘:秒鐘單位</translation>
+      <translation type="unfinished">Artisan Fuji PXG在使用Ramp/Soak上使用分鐘:秒鐘單位</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2412" />
       <source>Artisan Fuji PXF uses MINUTES:SECONDS units in Ramp/Soaks</source>
-      <translation>Artisan Fuji PXF 在緩升/浸泡中使用分鐘:秒鐘單位</translation>
+      <translation type="unfinished">Artisan Fuji PXF 在Ramp/Soak中使用分鐘:秒鐘單位</translation>
     </message>
     <message>
       <location filename="../artisanlib/autosave.py" line="48" />
@@ -11929,17 +11977,17 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/events.py" line="82" />
       <source>Annotation</source>
-      <translation>說明</translation>
+      <translation type="unfinished">註解</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="87" />
       <source>Example before FCs</source>
-      <translation>一爆開始之前 示例</translation>
+      <translation type="unfinished">一爆開始之前 範例</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="91" />
       <source>Example after FCs</source>
-      <translation>一爆開始之後 示例</translation>
+      <translation type="unfinished">一爆開始之後 範例</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="165" />
@@ -12046,13 +12094,13 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/events.py" line="591" />
       <source>Bernoulli</source>
-      <translation>伯努利數</translation>
+      <translation type="unfinished">白努力值</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="835" />
       <location filename="../artisanlib/events.py" line="593" />
       <source>Coarse</source>
-      <translation>取整</translation>
+      <translation type="unfinished">取整數</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="601" />
@@ -12095,17 +12143,17 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/events.py" line="2574" />
       <location filename="../artisanlib/events.py" line="2559" />
       <source>its text</source>
-      <translation>其文本</translation>
+      <translation type="unfinished">其文字</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="3200" />
       <source>Slider Value</source>
-      <translation>滑塊值</translation>
+      <translation type="unfinished">滑動條數值</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="3201" />
       <source>Target Value</source>
-      <translation>目標價值</translation>
+      <translation type="unfinished">目標值</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="627" />
@@ -12118,14 +12166,14 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/ports.py" line="533" />
       <location filename="../artisanlib/ports.py" line="86" />
       <source>Register</source>
-      <translation>註冊</translation>
+      <translation type="unfinished">暫存器</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1116" />
       <location filename="../artisanlib/ports.py" line="1037" />
       <location filename="../artisanlib/ports.py" line="243" />
       <source>Area</source>
-      <translation>區域</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1122" />
@@ -12140,7 +12188,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/ports.py" line="1039" />
       <location filename="../artisanlib/ports.py" line="257" />
       <source>Start</source>
-      <translation>開始</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="840" />
@@ -12148,7 +12196,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/ports.py" line="490" />
       <location filename="../artisanlib/ports.py" line="449" />
       <source>Comm Port</source>
-      <translation>通信端口</translation>
+      <translation type="unfinished">通信埠</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="844" />
@@ -12164,7 +12212,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/ports.py" line="504" />
       <location filename="../artisanlib/ports.py" line="459" />
       <source>Byte Size</source>
-      <translation>字節大小</translation>
+      <translation type="unfinished">資料位元</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="856" />
@@ -12172,7 +12220,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/ports.py" line="510" />
       <location filename="../artisanlib/ports.py" line="465" />
       <source>Parity</source>
-      <translation>校驗</translation>
+      <translation type="unfinished">同位檢查</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="863" />
@@ -12180,7 +12228,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/ports.py" line="517" />
       <location filename="../artisanlib/ports.py" line="472" />
       <source>Stopbits</source>
-      <translation>停止位</translation>
+      <translation type="unfinished">停止位</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="869" />
@@ -12189,12 +12237,12 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/ports.py" line="523" />
       <location filename="../artisanlib/ports.py" line="478" />
       <source>Timeout</source>
-      <translation>超時</translation>
+      <translation type="unfinished">逾時</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="481" />
       <source>Settings for non-Modbus devices</source>
-      <translation>無協議設備設定</translation>
+      <translation type="unfinished">非Modbus設備設定</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="534" />
@@ -12204,12 +12252,12 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/ports.py" line="535" />
       <source>Function</source>
-      <translation />
+      <translation type="unfinished">功能碼</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="536" />
       <source>Divider</source>
-      <translation />
+      <translation type="unfinished">除頻器</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="596" />
@@ -12242,7 +12290,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/ports.py" line="1004" />
       <location filename="../artisanlib/ports.py" line="620" />
       <source>Port</source>
-      <translation>端口</translation>
+      <translation type="unfinished">埠號</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1144" />
@@ -12506,12 +12554,12 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1128" />
       <source>Whole</source>
-      <translation>整豆</translation>
+      <translation type="unfinished">豆色</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1134" />
       <source>Ground</source>
-      <translation>咖啡粉</translation>
+      <translation type="unfinished">粉色</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1157" />
@@ -12528,7 +12576,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1185" />
       <source>Ambient Conditions</source>
-      <translation>環境條件</translation>
+      <translation type="unfinished">環境狀態</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1228" />
@@ -12543,7 +12591,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1321" />
       <source>Ambient Source</source>
-      <translation>環境源</translation>
+      <translation type="unfinished">環境狀態訊號源</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1401" />
@@ -12568,22 +12616,22 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2846" />
       <source>Results in</source>
-      <translation>結果為</translation>
+      <translation type="unfinished">能量單位</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2868" />
       <source>Rating</source>
-      <translation>比率</translation>
+      <translation type="unfinished">額定功率</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2872" />
       <source>Pressure %</source>
-      <translation>氣壓 %</translation>
+      <translation type="unfinished">以壓力計算</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2873" />
       <source>Electric Energy Mix:</source>
-      <translation>電力 火力 混合：</translation>
+      <translation type="unfinished">混合電能：</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2874" />
@@ -12611,7 +12659,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2883" />
       <source>Between Batches after Pre-Heating</source>
-      <translation>預熱後 批次間</translation>
+      <translation type="unfinished">預熱 與 入豆前調溫操作 分開紀錄</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2888" />
@@ -12622,7 +12670,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/main.py" line="21691" />
       <location filename="../artisanlib/roast_properties.py" line="2893" />
       <source>Duration</source>
-      <translation>持續時間</translation>
+      <translation type="unfinished">耗時</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2894" />
@@ -12647,7 +12695,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/roast_properties.py" line="3337" />
       <location filename="../artisanlib/roast_properties.py" line="3332" />
       <source>Roast</source>
-      <translation>烘培</translation>
+      <translation type="unfinished">烘焙</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="3375" />
@@ -12658,7 +12706,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/roast_properties.py" line="3406" />
       <source>Load</source>
-      <translation>載入</translation>
+      <translation type="unfinished">計入設備</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="3826" />
@@ -12668,7 +12716,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/roast_properties.py" line="3827" />
       <source>Operator</source>
-      <translation>烘培師</translation>
+      <translation type="unfinished">烘焙師</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="3828" />
@@ -12712,7 +12760,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/transposer.py" line="904" />
       <location filename="../artisanlib/phases.py" line="49" />
       <source>Finishing</source>
-      <translation>完成</translation>
+      <translation type="unfinished">發展</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="594" />
@@ -12797,7 +12845,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/calculator.py" line="123" />
       <source>Yield (%)</source>
-      <translation>產出 (%)</translation>
+      <translation type="unfinished">萃取率 (%)</translation>
     </message>
     <message>
       <location filename="../artisanlib/calculator.py" line="124" />
@@ -12842,12 +12890,12 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/sampling.py" line="42" />
       <source>Keep ON</source>
-      <translation>儲存開啟</translation>
+      <translation type="unfinished">存檔後繼續維持監看模式</translation>
     </message>
     <message>
       <location filename="../artisanlib/sampling.py" line="46" />
       <source>Open Completed Roast in Viewer</source>
-      <translation>在查看器中開啟完成的烘焙</translation>
+      <translation type="unfinished">在檢視器中開啟完成的烘焙</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="70" />
@@ -12878,13 +12926,13 @@ LCDs All</source>
       <location filename="../artisanlib/devices.py" line="239" />
       <location filename="../artisanlib/curves.py" line="524" />
       <source>ET Y(x)</source>
-      <translation />
+      <translation type="unfinished">出風溫 Y(x)</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="240" />
       <location filename="../artisanlib/curves.py" line="525" />
       <source>BT Y(x)</source>
-      <translation />
+      <translation type="unfinished">豆溫 Y(x)</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="642" />
@@ -12970,7 +13018,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/curves.py" line="935" />
       <source>Start of Curve Fit window</source>
-      <translation>屏幕上曲線的擬合起點</translation>
+      <translation type="unfinished">畫面上曲線的擬合起點</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="961" />
@@ -12996,17 +13044,17 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/statistics.py" line="86" />
       <source>From</source>
-      <translation>來自</translation>
+      <translation type="unfinished">計算起點</translation>
     </message>
     <message>
       <location filename="../artisanlib/statistics.py" line="97" />
       <source>Base</source>
-      <translation>基礎</translation>
+      <translation type="unfinished">計算底線</translation>
     </message>
     <message>
       <location filename="../artisanlib/statistics.py" line="110" />
       <source>Target</source>
-      <translation>目標</translation>
+      <translation type="unfinished">面積值目標</translation>
     </message>
     <message>
       <location filename="../artisanlib/statistics.py" line="128" />
@@ -13016,7 +13064,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/dialogs.py" line="157" />
       <source>For more details visit</source>
-      <translation>訪問更多細節</translation>
+      <translation type="unfinished">更多細節</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="134" />
@@ -13117,7 +13165,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="8381" />
       <source>BackgroundXT</source>
-      <translation>背景曲線XT</translation>
+      <translation type="unfinished">背景XT</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8426" />
@@ -13128,33 +13176,33 @@ LCDs All</source>
       <location filename="../artisanlib/main.py" line="14862" />
       <location filename="../artisanlib/main.py" line="8451" />
       <source>BackgroundET</source>
-      <translation>背景曲線ET</translation>
+      <translation type="unfinished">背景出風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="14866" />
       <location filename="../artisanlib/main.py" line="8473" />
       <source>BackgroundBT</source>
-      <translation>背景曲線BT</translation>
+      <translation type="unfinished">背景豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8500" />
       <source>BackgroundDeltaET</source>
-      <translation>背景曲線DeltaET</translation>
+      <translation type="unfinished">背景出風溫差</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8519" />
       <source>BackgroundDeltaBT</source>
-      <translation>背景曲線DeltaBT</translation>
+      <translation type="unfinished">背景豆溫溫差</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="9792" />
       <source>BTprojection</source>
-      <translation>BT推測</translation>
+      <translation type="unfinished">豆溫預測</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="9797" />
       <source>ETprojection</source>
-      <translation>ET推測</translation>
+      <translation type="unfinished">ET預測</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="9806" />
@@ -13179,7 +13227,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="13286" />
       <source>Event #&lt;b&gt;{0} &lt;/b&gt;</source>
-      <translation>事件 #&amp;lt;b&amp;gt;{0} &amp;lt;/b&amp;gt;</translation>
+      <translation type="unfinished">事件 #&lt;b&gt;{0} &lt;/b&gt;</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22101" />
@@ -13189,30 +13237,30 @@ LCDs All</source>
       <location filename="../artisanlib/main.py" line="13523" />
       <location filename="../artisanlib/main.py" line="13508" />
       <source>AUC</source>
-      <translation />
+      <translation type="unfinished">曲線下面積AUC</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="13527" />
       <location filename="../artisanlib/main.py" line="13514" />
       <source>CM</source>
-      <translation />
+      <translation type="unfinished">曲線差異量CM</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="13529" />
       <location filename="../artisanlib/main.py" line="13516" />
       <source>FC</source>
-      <translation>一爆</translation>
+      <translation type="unfinished">發展時間</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="13520" />
       <source>MET</source>
-      <translation>最大環境溫度</translation>
+      <translation type="unfinished">最高出風溫MET</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="38737" />
       <location filename="../artisanlib/main.py" line="13521" />
       <source>RoR</source>
-      <translation />
+      <translation type="unfinished">升溫率RoR</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="38747" />
@@ -13229,7 +13277,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="15465" />
       <source>BT {0} {1}/min for {2}</source>
-      <translation>{2}BT {0} {1}/分鐘</translation>
+      <translation type="unfinished">{2}豆溫 {0} {1}/分鐘</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15481" />
@@ -13259,7 +13307,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="15995" />
       <source>Face color (RGBA)</source>
-      <translation>面部顏色 (RGBA)</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15996" />
@@ -13285,7 +13333,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="20531" />
       <source>Background BT</source>
-      <translation>背景曲線BT</translation>
+      <translation type="unfinished">背景曲線豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="20540" />
@@ -13367,35 +13415,35 @@ LCDs All</source>
       <location filename="../artisanlib/main.py" line="20586" />
       <location filename="../artisanlib/main.py" line="20580" />
       <source>ET LCD Digits</source>
-      <translation>ET數顯LCD</translation>
+      <translation type="unfinished">出風溫LCD 數字</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="20587" />
       <location filename="../artisanlib/main.py" line="20581" />
       <source>ET LCD Background</source>
-      <translation>ET背景曲線LCD</translation>
+      <translation type="unfinished">出風溫LCD背景</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="20589" />
       <location filename="../artisanlib/main.py" line="20583" />
       <source>BT LCD Digits</source>
-      <translation>BT數顯LCD</translation>
+      <translation type="unfinished">豆溫LCD數字</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="20590" />
       <location filename="../artisanlib/main.py" line="20584" />
       <source>BT LCD Background</source>
-      <translation>BT背景曲線LCD</translation>
+      <translation type="unfinished">豆溫LCD背景</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="20592" />
       <source>Extra/PID LCD Digits</source>
-      <translation>額外/PID 數顯LCD</translation>
+      <translation type="unfinished">額外設備/PID LCD數字</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="20593" />
       <source>Extra/PID LCD Background</source>
-      <translation>背景曲線額外/PID 數顯LCD</translation>
+      <translation type="unfinished">額外設備/PID LCD背景</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="21334" />
@@ -13449,7 +13497,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="21708" />
       <source>Segment Analysis (rise, crash and flick)</source>
-      <translation>片段分析 (暴增, 失溫, 和波動)</translation>
+      <translation type="unfinished">段落分析 暴衝Rise 驟降Crash 反彈Flick</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="21718" />
@@ -13479,7 +13527,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="21721" />
       <source>Delta Span/Smoothing</source>
-      <translation>範圍差值/平滑</translation>
+      <translation type="unfinished">範圍差值/平滑</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="21721" />
@@ -13489,7 +13537,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="21722" />
       <source>Fit RoRoR (C/min/min)</source>
-      <translation>優化RoRoR (C/min/min)</translation>
+      <translation type="unfinished">擬合 RoRoR (C/min/min)</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="21722" />
@@ -13534,7 +13582,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="22271" />
       <source>RAMP%</source>
-      <translation>緩升%</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22371" />
@@ -13628,7 +13676,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/devices.py" line="188" />
       <source>BT Channel</source>
-      <translation>BT頻道</translation>
+      <translation type="unfinished">豆溫頻道</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="214" />
@@ -13638,7 +13686,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/devices.py" line="223" />
       <source>Filter</source>
-      <translation>篩選器</translation>
+      <translation type="unfinished">篩選器</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="911" />
@@ -13667,7 +13715,7 @@ LCDs All</source>
       <location filename="../artisanlib/devices.py" line="418" />
       <location filename="../artisanlib/devices.py" line="370" />
       <source>Rate</source>
-      <translation>比率</translation>
+      <translation type="unfinished">額定功率</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="987" />
@@ -13678,7 +13726,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/devices.py" line="539" />
       <source>Gain</source>
-      <translation>增加</translation>
+      <translation type="unfinished">增益</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="706" />
@@ -13705,12 +13753,12 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/devices.py" line="939" />
       <source>Remote Only</source>
-      <translation>僅遠程</translation>
+      <translation type="unfinished">僅遠端</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="985" />
       <source>VirtualHub</source>
-      <translation>虛擬交換機</translation>
+      <translation type="unfinished">虛擬中心</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1078" />
@@ -13755,12 +13803,12 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="52" />
       <source>Default</source>
-      <translation>默認</translation>
+      <translation type="unfinished">預設</translation>
     </message>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="85" />
       <source>Aspect Ratio</source>
-      <translation>縱橫比</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Event #&lt;b&gt;0 &lt;/b&gt;</source>
@@ -14078,7 +14126,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/events.py" line="299" />
       <source>Square</source>
-      <translation>方格</translation>
+      <translation type="unfinished">方塊形</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="300" />
@@ -14113,7 +14161,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/events.py" line="306" />
       <source>x</source>
-      <translation />
+      <translation type="unfinished">x</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="307" />
@@ -14127,25 +14175,25 @@ LCDs All</source>
       <location filename="../artisanlib/main.py" line="17814" />
       <location filename="../artisanlib/large_lcds.py" line="342" />
       <source>Main LCDs</source>
-      <translation>主要資訊LCD</translation>
+      <translation type="unfinished">主要資訊LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17821" />
       <location filename="../artisanlib/large_lcds.py" line="490" />
       <source>Delta LCDs</source>
-      <translation>Delta LCDs</translation>
+      <translation type="unfinished">升溫速率 LCDs</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17827" />
       <location filename="../artisanlib/large_lcds.py" line="537" />
       <source>PID LCDs</source>
-      <translation />
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17833" />
       <location filename="../artisanlib/large_lcds.py" line="584" />
       <source>Extra LCDs</source>
-      <translation>額外LCD</translation>
+      <translation type="unfinished">額外設備LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17839" />
@@ -14157,7 +14205,7 @@ LCDs All</source>
       <location filename="../artisanlib/main.py" line="17845" />
       <location filename="../artisanlib/large_lcds.py" line="767" />
       <source>Scale LCDs</source>
-      <translation>規模LCD</translation>
+      <translation type="unfinished">重量秤LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17190" />
@@ -14173,7 +14221,7 @@ LCDs All</source>
       <location filename="../artisanlib/main.py" line="17456" />
       <location filename="../artisanlib/main.py" line="17192" />
       <source>Roast</source>
-      <translation>烘培</translation>
+      <translation type="unfinished">烘焙</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17193" />
@@ -14188,12 +14236,12 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="17195" />
       <source>View</source>
-      <translation>查看</translation>
+      <translation type="unfinished">檢視</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17196" />
       <source>Help</source>
-      <translation>幫助</translation>
+      <translation type="unfinished">說明</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="20188" />
@@ -14229,7 +14277,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="17301" />
       <source>Save a Copy As...</source>
-      <translation>另存為複本...</translation>
+      <translation type="unfinished">另存複本為...</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17307" />
@@ -14240,7 +14288,7 @@ LCDs All</source>
       <location filename="../artisanlib/main.py" line="17351" />
       <location filename="../artisanlib/main.py" line="17309" />
       <source>Artisan CSV...</source>
-      <translation />
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17355" />
@@ -14266,7 +14314,7 @@ LCDs All</source>
       <location filename="../artisanlib/main.py" line="17365" />
       <location filename="../artisanlib/main.py" line="17329" />
       <source>RoastLogger...</source>
-      <translation>烘培記錄...</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17333" />
@@ -14332,7 +14380,7 @@ LCDs All</source>
       <location filename="../artisanlib/main.py" line="17478" />
       <location filename="../artisanlib/main.py" line="17464" />
       <source>Web...</source>
-      <translation />
+      <translation type="unfinished">網頁...</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17470" />
@@ -14348,12 +14396,12 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="17490" />
       <source>Ranking</source>
-      <translation>排名</translation>
+      <translation type="unfinished">排序比對</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17510" />
       <source>Save Statistics...</source>
-      <translation>儲存統計...</translation>
+      <translation type="unfinished">儲存統計資料...</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17516" />
@@ -14378,7 +14426,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="17545" />
       <source>Properties...</source>
-      <translation>烘培屬性...</translation>
+      <translation type="unfinished">烘焙屬性...</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17551" />
@@ -14393,17 +14441,17 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="17562" />
       <source>Switch Profiles</source>
-      <translation>切換曲線</translation>
+      <translation type="unfinished">背景前景曲線互換</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17567" />
       <source>Switch ET&lt;-&gt;BT</source>
-      <translation>切換ET&lt;-&gt;BT</translation>
+      <translation type="unfinished">出風溫豆溫曲線互換</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17572" />
       <source>Machine</source>
-      <translation>機器</translation>
+      <translation type="unfinished">烘焙機</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17576" />
@@ -14413,12 +14461,12 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="17581" />
       <source>Port...</source>
-      <translation>端口...</translation>
+      <translation type="unfinished">連接埠...</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17587" />
       <source>Sampling...</source>
-      <translation>採樣...</translation>
+      <translation type="unfinished">取樣...</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17593" />
@@ -14545,7 +14593,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="17756" />
       <source>Convert Profile Temperature</source>
-      <translation>轉換設定溫度</translation>
+      <translation type="unfinished">曲線溫度單位轉換</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17758" />
@@ -14560,7 +14608,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="17775" />
       <source>Calculator</source>
-      <translation>計算器</translation>
+      <translation type="unfinished">計算器</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17782" />
@@ -14575,7 +14623,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="17794" />
       <source>Events Editor</source>
-      <translation>活動編輯器</translation>
+      <translation type="unfinished">事件編輯器</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17800" />
@@ -14590,7 +14638,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="17854" />
       <source>Full Screen</source>
-      <translation>全屏</translation>
+      <translation type="unfinished">全螢幕</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17871" />
@@ -14600,7 +14648,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="17876" />
       <source>Documentation</source>
-      <translation>文檔</translation>
+      <translation type="unfinished">說明文件</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17881" />
@@ -14625,12 +14673,12 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="17902" />
       <source>Serial</source>
-      <translation>串行</translation>
+      <translation type="unfinished">通訊紀錄</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17907" />
       <source>Platform</source>
-      <translation>平台</translation>
+      <translation type="unfinished">平台資訊</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="17915" />
@@ -14721,7 +14769,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/wheels.py" line="630" />
       <source>Save Wheel graph</source>
-      <translation>儲存風味輪 Speichern</translation>
+      <translation type="unfinished">儲存風味輪</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="634" />
@@ -14737,7 +14785,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/wsport.py" line="187" />
       <source>WebSocket disconnected</source>
-      <translation>WebSocket斷開連接</translation>
+      <translation type="unfinished">WebSocket斷開連線</translation>
     </message>
     <message>
       <location filename="../artisanlib/wsport.py" line="194" />
@@ -14747,12 +14795,12 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="720" />
       <source>Load Ramp/Soak Table</source>
-      <translation>讀取 緩升/浸泡 表</translation>
+      <translation type="unfinished">讀取 Ramp/Soak 表</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="808" />
       <source>Save Ramp/Soak Table</source>
-      <translation>儲存 緩升/浸泡 表</translation>
+      <translation type="unfinished">儲存 Ramp/Soak 表</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3603" />
@@ -14901,12 +14949,12 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1726" />
       <source>The rampsoak-mode tells how to start and end the ramp/soak</source>
-      <translation>緩升浸泡-模式告知如何開始和結束 緩升浸泡</translation>
+      <translation type="unfinished">Ramp/Soak模式告知如何開始和結束</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1727" />
       <source>Your rampsoak mode in this pid is:</source>
-      <translation>你的緩升浸泡模式在這個pid裡是:</translation>
+      <translation type="unfinished">你的Ramp/Soak模式在這個pid裡是:</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1728" />
@@ -14921,12 +14969,12 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1731" />
       <source>End output status at the end of ramp/soak: {0}</source>
-      <translation>緩升/浸泡 結束時的最終輸出狀態: {0}</translation>
+      <translation type="unfinished">ramp/soak 結束時的最終輸出狀態: {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1732" />
       <source>Output status while ramp/soak operation set to OFF: {0}</source>
-      <translation>當 緩升/浸泡 操作設定為關閉時的輸出狀態: {0}</translation>
+      <translation type="unfinished">當 Ramp/Soak 操作設定為關閉時的輸出狀態: {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1733" />
@@ -14950,7 +14998,7 @@ Repeat Operation at the end: {0}</source>
       <source>Use the Parameter Loader Software by Fuji if you need to
 
 </source>
-      <translation>如果需要，請使用Fuji的參數加載軟件
+      <translation type="unfinished">如果需要，請使用Fuji的參數載入軟體
 
 </translation>
     </message>
@@ -14964,7 +15012,7 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/pid_dialogs.py" line="3625" />
       <location filename="../artisanlib/pid_dialogs.py" line="1739" />
       <source>Ramp Soak start-end mode</source>
-      <translation>緩升浸泡 開始-結束模式</translation>
+      <translation type="unfinished">Ramp Soak 開始-結束模式</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2621" />
@@ -15005,92 +15053,92 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3715" />
       <source>Ramp/Soak was found ON! Turn it off before changing the pattern</source>
-      <translation>發現緩升/浸泡 已開啟!更改圖案前先關閉</translation>
+      <translation type="unfinished">發現Ramp/Soak 已開啟!更改圖案前先關閉</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3717" />
       <source>Ramp/Soak was found in Hold! Turn it off before changing the pattern</source>
-      <translation>發現緩升/浸泡 已鎖定! 更改圖案前先關閉</translation>
+      <translation type="unfinished">發現Ramp/Soak 已鎖定! 更改圖案前先關閉</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2834" />
       <source>Phidget Temperature Sensor IR attached</source>
-      <translation />
+      <translation type="unfinished">Phidget 紅外線溫度感應器 已連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2837" />
       <source>Phidget Temperature Sensor 1-input attached</source>
-      <translation />
+      <translation type="unfinished">Phidget 單通道溫度感應器 已連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2840" />
       <source>Phidget Isolated Thermocouple 1-input attached</source>
-      <translation />
+      <translation type="unfinished">Phidget 單通道隔離型熱電偶溫度感應器 已連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2846" />
       <source>Phidget VINT RTD 1-input attached</source>
-      <translation />
+      <translation type="unfinished">Phidget VINT 單通道RTD  已連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2857" />
       <source>Phidget Temperature Sensor IR detached</source>
-      <translation />
+      <translation type="unfinished">Phidget 紅外線溫度感應器 已斷開連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2859" />
       <source>Phidget Temperature Sensor 1-input detached</source>
-      <translation />
+      <translation type="unfinished">Phidget 單通道溫度感應器 已斷開連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2861" />
       <source>Phidget Isolated Thermocouple 1-input detached</source>
-      <translation />
+      <translation type="unfinished">Phidget 單通道隔離型熱電偶溫度感應器 已連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2863" />
       <source>Phidget VINT RTD 1-input detached</source>
-      <translation />
+      <translation type="unfinished">Phidget VINT 單通道RTD 已連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="3142" />
       <source>Phidget Temperature Sensor 4-input attached</source>
-      <translation />
+      <translation type="unfinished">Phidget 4通道溫度感測器 已連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="3153" />
       <source>Phidget Temperature Sensor 4-input detached</source>
-      <translation />
+      <translation type="unfinished">Phidget 4通道溫度感測器 已斷開連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="3451" />
       <source>Phidget Bridge 4-input attached</source>
-      <translation />
+      <translation type="unfinished">Phidget 四通道Bridge 已連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="3462" />
       <source>Phidget Bridge 4-input detached</source>
-      <translation />
+      <translation type="unfinished">Phidget 四通道Bridge 已斷開連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="4995" />
       <source>Phidget IO 2/2/2 attached</source>
-      <translation />
+      <translation type="unfinished">Phidget IO 2/2/2 已連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="4997" />
       <source>Phidget IO 6/6/6 attached</source>
-      <translation />
+      <translation type="unfinished">Phidget IO 6/6/6 已連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="4999" />
       <source>Phidget IO 8/8/8 attached</source>
-      <translation />
+      <translation type="unfinished">Phidget IO 8/8/8 已連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5001" />
       <source>Phidget DAQ1400 attached</source>
-      <translation />
+      <translation type="unfinished">Phidget DAQ1400 已連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5003" />
@@ -15110,72 +15158,72 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/comm.py" line="5009" />
       <source>Phidget IO attached</source>
-      <translation />
+      <translation type="unfinished">Phidget IO 已連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5021" />
       <source>Phidget IO 2/2/2 detached</source>
-      <translation />
+      <translation type="unfinished">Phidget IO 2/2/2 已斷開連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5023" />
       <source>Phidget IO 6/6/6 detached</source>
-      <translation />
+      <translation type="unfinished">Phidget IO 6/6/6 已斷開連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5025" />
       <source>Phidget IO 8/8/8 detached</source>
-      <translation />
+      <translation type="unfinished">Phidget IO 8/8/8 已斷開連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5027" />
       <source>Phidget DAQ1400 detached</source>
-      <translation />
+      <translation type="unfinished">Phidget DAQ1400 已斷開連接</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5029" />
       <source>Phidget VCP1000 detached</source>
-      <translation>Phidget VCP1000 分離的</translation>
+      <translation type="unfinished">Phidget VCP1000 以斷開連結</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5031" />
       <source>Phidget VCP1001 detached</source>
-      <translation>Phidget VCP1001 分離的</translation>
+      <translation type="unfinished">Phidget VCP1001 已斷開連結</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5033" />
       <source>Phidget VCP1002 detached</source>
-      <translation>Phidget VCP1002 分離的</translation>
+      <translation type="unfinished">Phidget VCP1002 已斷開連結</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5035" />
       <source>Phidget IO detached</source>
-      <translation />
+      <translation type="unfinished">Phidget IO 已斷開連結</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5285" />
       <source>Yocto Thermocouple attached</source>
-      <translation />
+      <translation type="unfinished">Yocto Thermocouple 已連結</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5287" />
       <source>Yocto IR attached</source>
-      <translation />
+      <translation type="unfinished">Yocto IR 已連結</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5330" />
       <source>Yocto PT100 attached</source>
-      <translation />
+      <translation type="unfinished">Yocto PT100 已連結</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5362" />
       <source>Yocto 4-20mA-Rx attached</source>
-      <translation />
+      <translation type="unfinished">Yocto 4-20mA-Rx 已連結</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5609" />
       <source>TC4 initialized</source>
-      <translation />
+      <translation type="unfinished">TC4 已初始化</translation>
     </message>
     <message>
       <location filename="../artisanlib/autosave.py" line="179" />
@@ -15196,7 +15244,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/events.py" line="2402" />
       <source>Event Button table copied to clipboard</source>
-      <translation>事件按鈕表已復製到剪貼板</translation>
+      <translation type="unfinished">事件按鈕表已復製到剪貼簿</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="3082" />
@@ -15211,7 +15259,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/ports.py" line="1872" />
       <source>Serial Port Settings: {0}, {1}, {2}, {3}, {4}, {5}</source>
-      <translation>串行端口設定: {0}, {1}, {2}, {3}, {4}, {5}</translation>
+      <translation type="unfinished">序列埠設定: {0}, {1}, {2}, {3}, {4}, {5}</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="278" />
@@ -15221,22 +15269,22 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/background.py" line="969" />
       <location filename="../artisanlib/background.py" line="457" />
       <source>Data table copied to clipboard</source>
-      <translation>數據表已復製到剪貼板</translation>
+      <translation type="unfinished">數據表已複製到剪貼簿</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="487" />
       <source>Playback Events set ON</source>
-      <translation>回放事件設定為開啟</translation>
+      <translation type="unfinished">重播事件 設定為開啟</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="529" />
       <source>Playback DROP set ON</source>
-      <translation>回放下豆 設定為開</translation>
+      <translation type="unfinished">重播下豆 設定為開啟</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="549" />
       <source>Playback Aid set ON at {0} secs</source>
-      <translation>在{0}秒後設定開啟回放輔助設備</translation>
+      <translation type="unfinished">設定在{0}秒後開啟重播輔助</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="25504" />
@@ -15254,7 +15302,7 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/roast_properties.py" line="4372" />
       <location filename="../artisanlib/background.py" line="974" />
       <source>Event table copied to clipboard</source>
-      <translation>事件表已復製到剪貼板</translation>
+      <translation type="unfinished">事件表已復製到剪貼簿</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="3607" />
@@ -15281,7 +15329,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4474" />
       <source>No profile found</source>
-      <translation>沒有找到曲線設定</translation>
+      <translation type="unfinished">沒有找到曲線檔</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4506" />
@@ -15296,22 +15344,22 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="5103" />
       <source>Roast properties updated but profile not saved to disk</source>
-      <translation>烘焙屬性已更新但曲線設定並未儲存到硬碟</translation>
+      <translation type="unfinished">烘焙屬性已更新但曲線並未儲存到硬碟</translation>
     </message>
     <message>
       <location filename="../artisanlib/phases.py" line="358" />
       <source>Phases changed to {0} default: {1}</source>
-      <translation>階段更改為 {0} 默認: {1}</translation>
+      <translation type="unfinished">烘焙階段更改為 {0} 預設為: {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/modbusport.py" line="319" />
       <source>Connected via MODBUS</source>
-      <translation>已連接到通信協議</translation>
+      <translation type="unfinished">已連接到MODBUS</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="319" />
       <source>Not enough time points for an ET curviness of {0}. Set curviness to {1}</source>
-      <translation>ET曲線{0}沒有足夠的時間點.設定曲線為{1}</translation>
+      <translation type="unfinished">ET曲線{0}沒有足夠的時間控制點.設定曲線為{1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="572" />
@@ -15325,7 +15373,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/designer.py" line="326" />
       <source>Not enough time points for an BT curviness of {0}. Set curviness to {1}</source>
-      <translation>BT曲線{0}沒有足夠的時間點.設定曲線為{1}</translation>
+      <translation type="unfinished">豆溫曲線{0}沒有足夠的時間控制點.設定曲線為{1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="564" />
@@ -15406,7 +15454,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/pid_control.py" line="741" />
       <source>PXG/PXF sv#{0} set to {1}</source>
-      <translation>PXG/PXF sv#{0} 設定 {1}</translation>
+      <translation type="unfinished">PXG/PXF sv#{0} 設定為 {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="769" />
@@ -15441,7 +15489,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1334" />
       <source>PID turned on</source>
-      <translation>開啟PID</translation>
+      <translation type="unfinished">PID開啟</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1356" />
@@ -15456,7 +15504,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1451" />
       <source>Ramp/Soak pattern finished</source>
-      <translation>緩升/浸泡 程式結束</translation>
+      <translation type="unfinished">Ramp/Soak 模式結束</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1705" />
@@ -15472,7 +15520,7 @@ Repeat Operation at the end: {0}</source>
       <translation>採樣</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="38929" />
+      <location filename="../artisanlib/main.py" line="38937" />
       <location filename="../artisanlib/curves.py" line="1661" />
       <source>Assignment problem</source>
       <translation>任務分配問題</translation>
@@ -15480,7 +15528,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/curves.py" line="2194" />
       <source>Interpolation failed: no profile available</source>
-      <translation>插值失敗: 沒有發現有效的曲線設定</translation>
+      <translation type="unfinished">內插失敗: 沒有發現有效的曲線</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="2204" />
@@ -15511,7 +15559,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/alarms.py" line="650" />
       <source>Error loading alarm file</source>
-      <translation>載入警報文件錯誤</translation>
+      <translation type="unfinished">載入警報檔錯誤</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="655" />
@@ -15521,7 +15569,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/alarms.py" line="1051" />
       <source>Alarm table copied to clipboard</source>
-      <translation>警報表已復製到剪貼板</translation>
+      <translation type="unfinished">警報表已複製到剪貼簿</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="324" />
@@ -15532,17 +15580,17 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="2613" />
       <source>set y-coordinate to {}</source>
-      <translation>將 y 坐標設置為 {}</translation>
+      <translation type="unfinished">將 y 座標設置為 {}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3040" />
       <source>seconds before FCs</source>
-      <translation>秒在一爆開始前</translation>
+      <translation type="unfinished">在一爆開始前秒數</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3043" />
       <source>seconds after FCs</source>
-      <translation>秒在一爆開始後</translation>
+      <translation type="unfinished">一爆開始後秒數</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3470" />
@@ -15582,17 +15630,17 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="6484" />
       <source>Save the profile, Discard the profile (Reset), or Cancel?</source>
-      <translation>儲存設定, 丟棄設定文件（重置）, 或取消?</translation>
+      <translation type="unfinished">儲存曲線, 忽略曲線（重置）, 或取消?</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6487" />
       <source>Save the profile or Cancel?</source>
-      <translation>儲存設定或取消?</translation>
+      <translation type="unfinished">儲存曲線或取消?</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6489" />
       <source>Profile unsaved</source>
-      <translation>設定未儲存</translation>
+      <translation type="unfinished">曲線未儲存</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="20463" />
@@ -15609,22 +15657,22 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="10198" />
       <source>Load Image File</source>
-      <translation>載入圖片文件</translation>
+      <translation type="unfinished">載入圖片檔</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10205" />
       <source>Loaded watermark image {0}</source>
-      <translation>載入水印圖片{0}</translation>
+      <translation type="unfinished">已載入浮水印圖片{0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10208" />
       <source>Unable to load watermark image {0}</source>
-      <translation>無法加載水印圖像 {0}</translation>
+      <translation type="unfinished">無法加載浮水印圖片{0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10603" />
       <source>Convert profile data to Fahrenheit?</source>
-      <translation>轉換設定數據為華氏度?</translation>
+      <translation type="unfinished">轉換曲線數據為華氏度?</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10716" />
@@ -15632,12 +15680,12 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/main.py" line="10654" />
       <location filename="../artisanlib/main.py" line="10604" />
       <source>Convert Profile Temperature</source>
-      <translation>轉換設定溫度單位</translation>
+      <translation type="unfinished">轉換曲線溫度單位</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10651" />
       <source>Profile changed to Fahrenheit</source>
-      <translation>設定轉換為華氏度</translation>
+      <translation type="unfinished">曲線已轉換為華氏度</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10655" />
@@ -15648,17 +15696,17 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/main.py" line="10718" />
       <location filename="../artisanlib/main.py" line="10656" />
       <source>Profile not changed</source>
-      <translation>設定沒有被改變</translation>
+      <translation type="unfinished">曲線沒有被改變</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10663" />
       <source>Convert profile data to Celsius?</source>
-      <translation>轉換設定數據為攝氏度?</translation>
+      <translation type="unfinished">轉換曲線數據為攝氏度?</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10713" />
       <source>Profile changed to Celsius</source>
-      <translation>設定轉換為攝氏度</translation>
+      <translation type="unfinished">曲線轉換為攝氏度</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10717" />
@@ -15668,23 +15716,23 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="10725" />
       <source>Convert Profile Scale</source>
-      <translation>轉換設定範圍</translation>
+      <translation type="unfinished">轉換曲線範圍</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10726" />
       <source>No profile data found</source>
-      <translation>沒有找到設定數據</translation>
+      <translation type="unfinished">沒有找到曲線資料</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10753" />
       <location filename="../artisanlib/main.py" line="10737" />
       <source>Colors set to defaults</source>
-      <translation>恢復默認顏色</translation>
+      <translation type="unfinished">顏色設定為預設值</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10741" />
       <source>Colors set to Default Theme</source>
-      <translation>顏色設定為主題默認</translation>
+      <translation type="unfinished">顏色設定為預設主題</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10757" />
@@ -15700,12 +15748,12 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="11125" />
       <source>Phidget service discovery started...</source>
-      <translation />
+      <translation type="unfinished">發現Phidget服務已啟動</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="11305" />
       <source>Scope monitoring...</source>
-      <translation>記錄監測中...</translation>
+      <translation type="unfinished">記錄儀監看中...</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="11399" />
@@ -15750,12 +15798,12 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="12074" />
       <source>Roast time starts now 00:00 BT = {0}</source>
-      <translation>烘培計時現在開始 00:00 BT = {0}</translation>
+      <translation type="unfinished">烘焙計時現在開始 00:00 豆溫 = {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12100" />
       <source>[TP] recorded at {0} BT = {1}</source>
-      <translation>[TP] 記錄於 {0} BT = {1}</translation>
+      <translation type="unfinished">[TP] 記錄於 {0} 豆溫 = {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12179" />
@@ -15765,7 +15813,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="12215" />
       <source>[DRY END] recorded at {0} BT = {1}</source>
-      <translation>[脫水結束] 記錄於 {0} BT = {1}</translation>
+      <translation type="unfinished">[脫水結束] 記錄於 {0} 豆溫 = {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12293" />
@@ -15775,7 +15823,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="12331" />
       <source>[FC START] recorded at {0} BT = {1}</source>
-      <translation>[一爆開始] 記錄於 {0} BT = {1}</translation>
+      <translation type="unfinished">[一爆開始] 記錄於 {0} 豆溫 = {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12396" />
@@ -15785,7 +15833,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="12437" />
       <source>[FC END] recorded at {0} BT = {1}</source>
-      <translation>[一爆結束] 記錄於 {0} BT = {1}</translation>
+      <translation type="unfinished">[一爆結束] 記錄於 {0} 豆溫 = {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12503" />
@@ -15795,7 +15843,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="12551" />
       <source>[SC START] recorded at {0} BT = {1}</source>
-      <translation>[二爆開始] 記錄於 {0} BT = {1}</translation>
+      <translation type="unfinished">[二爆開始] 記錄於 {0} 豆溫 = {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12615" />
@@ -15805,7 +15853,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="12662" />
       <source>[SC END] recorded at {0} BT = {1}</source>
-      <translation>[二爆結束] 記錄於 {0} BT = {1}</translation>
+      <translation type="unfinished">[二爆結束] 記錄於 {0} 豆溫 = {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12765" />
@@ -15815,7 +15863,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="12818" />
       <source>Roast ended at {0} BT = {1}</source>
-      <translation>烘培結束於 {0} BT = {1}</translation>
+      <translation type="unfinished">烘焙結束於 {0} 豆溫 = {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12900" />
@@ -15825,12 +15873,12 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="12949" />
       <source>[COOL END] recorded at {0} BT = {1}</source>
-      <translation>[冷卻結束] 記錄於 {0} BT = {1}</translation>
+      <translation type="unfinished">[冷卻結束] 記錄於 {0} 豆溫 = {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="13283" />
       <source>Event # {0} recorded at BT = {1} Time = {2}</source>
-      <translation>事件 # {0} 記錄於 BT = {1} 時間 = {2}</translation>
+      <translation type="unfinished">事件 # {0} 記錄於 豆溫 = {1} 時間 = {2}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="13303" />
@@ -15840,7 +15888,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="13336" />
       <source>Computer Event # {0} recorded at BT = {1} Time = {2}</source>
-      <translation>電腦事件 # {0} 記錄於 BT = {1} 時間 = {2}</translation>
+      <translation type="unfinished">電腦事件 # {0} 記錄於 BT = {1} 時間 = {2}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="14205" />
@@ -15850,12 +15898,12 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="14263" />
       <source>No finished profile found</source>
-      <translation>沒有發現已完成的曲線設定</translation>
+      <translation type="unfinished">沒有發現已完成的曲線</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="14280" />
       <source>Polynomial coefficients (Horner form):</source>
-      <translation>多項式係數 (來自Horner):</translation>
+      <translation type="unfinished">多項式係數 (來自於):</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="14282" />
@@ -15875,7 +15923,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="14289" />
       <source>Profile information</source>
-      <translation>設定資訊</translation>
+      <translation type="unfinished">曲線資訊</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="14688" />
@@ -15886,27 +15934,27 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/main.py" line="14689" />
       <source>Importing a profile in to Designer will decimate all data except the main [points].
 Continue?</source>
-      <translation>匯入一個設定到曲線設計器將會刪除除主要[點]外的所有數據. 繼續?</translation>
+      <translation type="unfinished">匯入一個曲線到曲線設計器將會刪除主要[事件點]外的所有數據. 是否繼續?</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="14719" />
       <source>Save Points</source>
-      <translation>儲存點</translation>
+      <translation type="unfinished">儲存設定點</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="14729" />
       <source>Points saved</source>
-      <translation>點已儲存</translation>
+      <translation type="unfinished">設定點已儲存</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="14739" />
       <source>Load Points</source>
-      <translation>載入點</translation>
+      <translation type="unfinished">載入設定點</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="14752" />
       <source>Points loaded</source>
-      <translation>點已載入</translation>
+      <translation type="unfinished">設定點已載入</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="14788" />
@@ -15917,7 +15965,7 @@ Continue?</source>
       <location filename="../artisanlib/main.py" line="14789" />
       <source>Unable to start designer.
 Profile missing [CHARGE] or [DROP]</source>
-      <translation>無法開始曲線設計.曲線設定缺少[入豆]或[下豆]</translation>
+      <translation type="unfinished">無法開始曲線設計.曲線缺少[入豆]或[下豆]事件</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15088" />
@@ -15957,7 +16005,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="15401" />
       <source>New profile created</source>
-      <translation>新的曲線設定已新增</translation>
+      <translation type="unfinished">已新增新的曲線</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15597" />
@@ -15967,27 +16015,27 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="15608" />
       <source> added to roasting notes</source>
-      <translation>已加入到烘培記錄</translation>
+      <translation type="unfinished">已加入到烘焙筆記</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15864" />
       <source>Mouse Cross ON: move mouse around</source>
-      <translation />
+      <translation type="unfinished">十字游標 開啟: 移動滑鼠</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15892" />
       <source>Mouse cross OFF</source>
-      <translation />
+      <translation type="unfinished">十字游標 關閉</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="16262" />
       <source>follow on</source>
-      <translation />
+      <translation type="unfinished">啟動 跟隨</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="16264" />
       <source>follow off</source>
-      <translation />
+      <translation type="unfinished">關閉 跟隨</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="16488" />
@@ -16002,12 +16050,12 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="19220" />
       <source>This is a one time message to inform you about a change in Artisan.</source>
-      <translation>這是一條一次性消息，通知您有關Artisan的更改.</translation>
+      <translation type="unfinished">這是一個一次性消息，通知您有關Artisan的更動.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19221" />
       <source>If you never run older versions of Artisan you can skip this message, the change does not affect you.</source>
-      <translation>如果未使用過舊版本的Artisan，則可以跳過此消息，這些更改不會影響你</translation>
+      <translation type="unfinished">如果未使用過舊版本的Artisan，則可以跳過此消息，這些更動不會影響你</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19222" />
@@ -16022,7 +16070,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="19224" />
       <source>Do not worry. Since this is the first time you opened this new version Artisan has already loaded your last used settings.</source>
-      <translation>別擔心。由於這是第一次開啟此新版本，Artisan已加載上次使用的設定。</translation>
+      <translation type="unfinished">別擔心。由於這是第一次開啟此新版本，Artisan已載入上次使用的設定。</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19225" />
@@ -16047,12 +16095,12 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="19232" />
       <source>This is a one time message to introduce you to the ArtisanViewer.</source>
-      <translation>這是一次向您介紹ArtisanViewer的消息。</translation>
+      <translation type="unfinished">這是向您介紹ArtisanViewer的消息。</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19233" />
       <source>The ArtisanViewer opens whenever a copy of Artisan is already running.</source>
-      <translation>只要已有Artisan副本運行，ArtisanViewer便會開啟。</translation>
+      <translation type="unfinished">只要已有Artisan在運行，ArtisanViewer便會開啟。</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19234" />
@@ -16067,7 +16115,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="19236" />
       <source>Enjoy using ArtisanViewer,</source>
-      <translation>享受使用ArtisanViewer的樂趣，</translation>
+      <translation type="unfinished">請享受使用ArtisanViewer，</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19237" />
@@ -16077,12 +16125,12 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="19238" />
       <source>One time message about ArtisanViewer</source>
-      <translation>關於ArtisanViewer的一次消息</translation>
+      <translation type="unfinished">關於ArtisanViewer的一次性消息</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19542" />
       <source>Artisan is free to use!&lt;br&gt;&lt;br&gt;To keep it free and current please support us&lt;br&gt;&lt;br&gt;&lt;a href="{0}"&gt;{0}&lt;/a&gt;&lt;br&gt;&lt;br&gt;and book&lt;br&gt;&lt;br&gt;&lt;a href="{1}"&gt;{1}&lt;/a&gt;&lt;br&gt;&lt;br&gt;to suppress this dialog</source>
-      <translation>Artisan 可免費使用！&lt;br&gt;&lt;br&gt;要使其保持免費和最新，請支持我們&lt;br&gt;&lt;br&gt;&lt;a href='{0}'&gt;{0}&lt;/a&gt;&lt;br&gt;&lt;br&gt; 並預定&lt;br&gt;&lt;br&gt;&lt;a href='{1}'&gt;{1}&lt;/a&gt;&lt;br&gt;&lt;br&gt;取消此對話框</translation>
+      <translation type="unfinished">Artisan 可免費使用！&lt;br&gt;&lt;br&gt;要使其保持免費和最新，請支持我們&lt;br&gt;&lt;br&gt;&lt;a href='{0}'&gt;{0}&lt;/a&gt;&lt;br&gt;&lt;br&gt; 並訂閱&lt;br&gt;&lt;br&gt;&lt;a href='{1}'&gt;{1}&lt;/a&gt;&lt;br&gt;&lt;br&gt;以消除此對話框</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="20298" />
@@ -16113,17 +16161,17 @@ Profile missing [CHARGE] or [DROP]</source>
       <location filename="../artisanlib/main.py" line="20347" />
       <location filename="../artisanlib/main.py" line="20341" />
       <source>Network name or IP address</source>
-      <translation>網絡名稱或IP地址</translation>
+      <translation type="unfinished">網絡名稱或IP位址</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="20380" />
       <source>Port Configuration</source>
-      <translation>端口設定</translation>
+      <translation type="unfinished">通訊埠設定</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="20381" />
       <source>Comm Port</source>
-      <translation>通信端口</translation>
+      <translation type="unfinished">通信埠</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="20398" />
@@ -16164,8 +16212,8 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>監測到顏色組合難以區分:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="39098" />
-      <location filename="../artisanlib/main.py" line="39057" />
+      <location filename="../artisanlib/main.py" line="39106" />
+      <location filename="../artisanlib/main.py" line="39065" />
       <location filename="../artisanlib/main.py" line="21306" />
       <source>Simulator started @{}x</source>
       <translation>模擬器已開始 @{}x</translation>
@@ -16234,7 +16282,7 @@ Profile missing [CHARGE] or [DROP]</source>
       <location filename="../artisanlib/main.py" line="23952" />
       <location filename="../artisanlib/main.py" line="23941" />
       <source>PID mode Ramp/Soak</source>
-      <translation>PID模式 緩升/浸泡</translation>
+      <translation type="unfinished">PID模式 Ramp/Soak</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="23955" />
@@ -16245,32 +16293,32 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="23965" />
       <source>playback off</source>
-      <translation>回放關閉</translation>
+      <translation type="unfinished">重播關閉</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="23969" />
       <source>playback by time</source>
-      <translation>按時間回放</translation>
+      <translation type="unfinished">按時間重播</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="23973" />
       <source>playback by BT</source>
-      <translation>按BT回放</translation>
+      <translation type="unfinished">按豆溫重播</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="23977" />
       <source>playback by ET</source>
-      <translation>按ET回放</translation>
+      <translation type="unfinished">按ET重播</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="24040" />
       <source>Notifications on</source>
-      <translation>通知於</translation>
+      <translation type="unfinished">通知 開啟</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="24043" />
       <source>Notifications off</source>
-      <translation>關閉通知</translation>
+      <translation type="unfinished">通知 關閉</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="25564" />
@@ -16285,12 +16333,14 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="24831" />
       <source>Do you want to reset all settings?&lt;br&gt; ArtisanViewer has to be restarted!</source>
-      <translation>你想要重置所有設定嗎?&amp;lt;br&amp;gt; ArtisanViewer將被重啟!</translation>
+      <translation type="unfinished">你想要重置所有設定嗎?
+ArtisanViewer將被重啟!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="24833" />
       <source>Do you want to reset all settings?&lt;br&gt; Artisan has to be restarted!</source>
-      <translation>你確認想要重置所有設定嗎?&amp;lt;br&amp;gt; Artisan將會重啟!</translation>
+      <translation type="unfinished">你確認想要重置所有設定嗎?
+Artisan將會重啟!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="24834" />
@@ -16301,7 +16351,7 @@ Profile missing [CHARGE] or [DROP]</source>
       <location filename="../artisanlib/main.py" line="25548" />
       <location filename="../artisanlib/main.py" line="25532" />
       <source>PID Mode: Ramp/Soak</source>
-      <translation>PID模式: 緩升/浸泡</translation>
+      <translation type="unfinished">PID模式: Ramp/Soak</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="25550" />
@@ -16328,32 +16378,32 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="25661" />
       <source>LCD cursor on profile data</source>
-      <translation>配置文件數據上的 LCD 光標</translation>
+      <translation type="unfinished">曲線數據上的 LCD 指示</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="25664" />
       <source>LCD cursor on template data</source>
-      <translation>模板數據上的 LCD 光標</translation>
+      <translation type="unfinished">範本數據上的 LCD 指示</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="25667" />
       <source>LCD cursor OFF</source>
-      <translation>LCD 光標關閉</translation>
+      <translation type="unfinished">LCD 指示關閉</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="25893" />
       <source>Keyboard moves turned ON</source>
-      <translation>已開啟鍵盤移動</translation>
+      <translation type="unfinished">已開啟鍵盤操控動作</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="25901" />
       <source>Keyboard moves turned OFF</source>
-      <translation>已關閉鍵盤移動</translation>
+      <translation type="unfinished">已關閉鍵盤操控動作</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="26188" />
       <source>Profile {0} saved in: {1}</source>
-      <translation>設定 {0} 已儲存到: {1}</translation>
+      <translation type="unfinished">曲線 {0} 已儲存到: {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="26222" />
@@ -16363,7 +16413,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="26225" />
       <source>Empty path or box unchecked in Autosave</source>
-      <translation>自動儲存時是空路徑或未選中復選框</translation>
+      <translation type="unfinished">自動儲存時發現是空白路徑或未選取</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="26338" />
@@ -16384,7 +16434,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="26434" />
       <source>URL</source>
-      <translation />
+      <translation type="unfinished">網址</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="26451" />
@@ -16399,20 +16449,20 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="26501" />
       <source>NEW ROAST canceled: incomplete profile lacking CHARGE and DROP found</source>
-      <translation>新烘焙已取消: 發現不完整的曲線設定缺少入豆和下豆</translation>
+      <translation type="unfinished">新烘焙紀錄已取消: 曲線資料不完整，缺少入豆和下豆事件</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="26506" />
       <source>NEW ROAST canceled: incomplete profile lacking DROP found</source>
-      <translation>新烘焙已取消: 發現不完整的曲線設定缺少下豆</translation>
+      <translation type="unfinished">新烘焙紀錄已取消: 曲線資料不完整，缺少下豆事件</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="26516" />
       <source>{0} has been saved. New roast has started</source>
-      <translation>{0}已被儲存.新的烘培已經開始</translation>
+      <translation type="unfinished">{0}已被儲存.新的烘焙已經開始</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="39101" />
+      <location filename="../artisanlib/main.py" line="39109" />
       <location filename="../artisanlib/main.py" line="27071" />
       <location filename="../artisanlib/main.py" line="26566" />
       <source>Invalid artisan format</source>
@@ -16426,12 +16476,12 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="26736" />
       <source>No profile data.  ET/BT not recalculated</source>
-      <translation>沒有設定數據.ET/BT未重新計算</translation>
+      <translation type="unfinished">沒有烘焙曲線數據.風豆溫未重新計算</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="26739" />
       <source>Problem with the profile data.  ET/BT not recalculated</source>
-      <translation>設定數據中發現問題.ET/BT未重新計算</translation>
+      <translation type="unfinished">曲線數據中發現問題.風豆溫未重新計算</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="27062" />
@@ -16452,17 +16502,17 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="27329" />
       <source>The Probat Shop Pilot Software expects files named &lt;Name&gt;_&lt;Index&gt;.xml like in Test_0.xml on import</source>
-      <translation />
+      <translation type="unfinished">The Probat Shop Pilot 軟體曲線載入時需要檔案名稱 named &lt;Name&gt;_&lt;Index&gt;.xml 如 Test_0.xml</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="29834" />
       <source>Save Profile</source>
-      <translation>儲存曲線設定</translation>
+      <translation type="unfinished">儲存曲線</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="29851" />
       <source>Profile saved</source>
-      <translation>設定已儲存</translation>
+      <translation type="unfinished">曲線已儲存</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="36925" />
@@ -16489,17 +16539,17 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="29916" />
       <source>Export CSV</source>
-      <translation>匯出CSV</translation>
+      <translation type="unfinished">匯出 CSV</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="29921" />
       <source>Export JSON</source>
-      <translation>匯出JSON</translation>
+      <translation type="unfinished">匯出 JSON</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="29926" />
       <source>Export RoastLogger</source>
-      <translation>匯出烘培記錄</translation>
+      <translation type="unfinished">匯出 PoastLogger</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="29931" />
@@ -16513,7 +16563,7 @@ Profile missing [CHARGE] or [DROP]</source>
       <location filename="../artisanlib/main.py" line="30026" />
       <location filename="../artisanlib/main.py" line="29941" />
       <source>Converting...</source>
-      <translation>轉換...</translation>
+      <translation type="unfinished">轉換中...</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="30194" />
@@ -16522,7 +16572,7 @@ Profile missing [CHARGE] or [DROP]</source>
       <location filename="../artisanlib/main.py" line="30055" />
       <location filename="../artisanlib/main.py" line="29960" />
       <source>Target file {0} exists. {1} not converted.</source>
-      <translation>目標文件 {0} 存在.{1} 不轉換</translation>
+      <translation type="unfinished">目標文件 {0} 已存在.{1} 未轉換</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="30217" />
@@ -16547,7 +16597,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="30257" />
       <source>Import RoastLogger</source>
-      <translation>匯入烘培記錄</translation>
+      <translation type="unfinished">匯入RoastLogger</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="30287" />
@@ -16562,17 +16612,17 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="33687" />
       <source>No statistics found</source>
-      <translation>沒有找到統計</translation>
+      <translation type="unfinished">沒有找到統計數據</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="33702" />
       <source>Save Statistics</source>
-      <translation>儲存統計</translation>
+      <translation type="unfinished">儲存統計數據</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="33707" />
       <source>Statistics Saved</source>
-      <translation>統計已儲存</translation>
+      <translation type="unfinished">統計數據已儲存</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="33856" />
@@ -16582,32 +16632,32 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="34630" />
       <source>Ranking Report</source>
-      <translation>排名報告</translation>
+      <translation type="unfinished">排序型報告</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34631" />
       <source>Ranking graphs are only generated up to {0} profiles</source>
-      <translation>排名圖最多只能生成{0}個設定文件</translation>
+      <translation type="unfinished">排序圖最多只能使用{0}個曲線</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34848" />
       <source>Profile missing Dry event</source>
-      <translation>設定缺少脫水事件</translation>
+      <translation type="unfinished">曲線缺少脫水事件</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="34863" />
       <source>Profile missing phase events</source>
-      <translation>設定缺少階段事件</translation>
+      <translation type="unfinished">曲線缺少烘焙階段事件</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35000" />
       <source>CSV Ranking Report exported to {0}</source>
-      <translation>CSV排名報告已匯出到{0}</translation>
+      <translation type="unfinished">CSV排序報告已匯出到{0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="35215" />
       <source>Excel Ranking Report exported to {0}</source>
-      <translation>Excel 排名報告{0} 已匯出</translation>
+      <translation type="unfinished">Excel 排序報告{0} 已匯出</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="36533" />
@@ -16622,7 +16672,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="36553" />
       <source>To control a Hottop you need to activate the super user mode via a right click on the timer LCD first!</source>
-      <translation>要控制Hottop先需要右鍵點擊計時器LCD,啟用超級用戶模式!</translation>
+      <translation type="unfinished">要控制Hottop先需要右鍵點擊計時器LCD,以啟用superuser模式!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="36827" />
@@ -16633,7 +16683,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="36766" />
       <source>artisan-settings</source>
-      <translation>artisan設定</translation>
+      <translation type="unfinished">Artisan設定</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="36767" />
@@ -16648,7 +16698,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="36834" />
       <source>artisan-theme</source>
-      <translation>artisan主題</translation>
+      <translation type="unfinished">Artisan主題</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="36835" />
@@ -16678,7 +16728,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="37215" />
       <source>Alarms are not available for device None</source>
-      <translation>警報不適用於未連接設備</translation>
+      <translation type="unfinished">警報不適用於無連接設備</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="37232" />
@@ -16733,7 +16783,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="37619" />
       <source>Import Aillio Roast.World URL</source>
-      <translation>匯入Aillio Roast.World URL</translation>
+      <translation type="unfinished">匯入Aillio Roast.World 網址</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="37690" />
@@ -16744,7 +16794,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="37659" />
       <source>an error occurred on importing {0}</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">匯入 {0}時發生錯誤</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="37706" />
@@ -16865,22 +16915,23 @@ Profile missing [CHARGE] or [DROP]</source>
       <location filename="../artisanlib/main.py" line="38841" />
       <source>Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.
 Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
-      <translation />
+      <translation type="unfinished">警告: 分析目標區間早於曲線起始點.
+請於 設定/曲線/分析 標籤頁中修正</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="38842" />
       <source>Analysis earlier than Curve fit</source>
-      <translation>在曲線擬合前分析</translation>
+      <translation type="unfinished">分析段落早於曲線擬合</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="39067" />
+      <location filename="../artisanlib/main.py" line="39075" />
       <source>Simulator stopped</source>
       <translation>模擬器已停止</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="39326" />
+      <location filename="../artisanlib/main.py" line="39334" />
       <source>debug logging ON</source>
-      <translation>調試登錄</translation>
+      <translation type="unfinished">除錯紀錄 啟動</translation>
     </message>
     <message>
       <location filename="../artisanlib/batches.py" line="55" />
@@ -16890,43 +16941,43 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/devices.py" line="1576" />
       <source>Device table copied to clipboard</source>
-      <translation>設備表已復製到剪貼板</translation>
+      <translation type="unfinished">設備表已複製到剪貼簿</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1816" />
       <source>Clicking YES will overwrite the existing ET and BT values in this profile with the symbolic values defined here.  Click CANCEL to abort.</source>
-      <translation>點擊YES將重寫本曲線中定義了的符號值中已有的ET和BT值。點擊CANCEL以終止。</translation>
+      <translation type="unfinished">點擊YES將以定義的符號值覆蓋本曲線中已存在的ET和BT值。點擊CANCEL以放棄。</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1828" />
       <location filename="../artisanlib/devices.py" line="1817" />
       <source>Caution - About to overwrite profile data</source>
-      <translation>注意-關於將覆蓋設定文件數據的資訊</translation>
+      <translation type="unfinished">注意-關於將覆蓋曲線中數據</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1827" />
       <source>At least one Virtual Extra Device depends on ET or BT.  Do you want to update all the Virtual Extra Devices after ET and BT are updated?</source>
-      <translation>至少一個虛擬額外設備取決於ET或BT。您是否要在ET和BT更新後更新所有Virtual Extra設備？</translation>
+      <translation type="unfinished">至少有一個額外虛擬設備訊號來自於出風溫或豆溫。您是否要在更新後更改所有額外虛擬設備？</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1843" />
       <source>Symbolic values updated.</source>
-      <translation>符號值已更新。</translation>
+      <translation type="unfinished">符碼值已更新。</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1845" />
       <source>Symbolic values were not updated.</source>
-      <translation>符號值未更新。</translation>
+      <translation type="unfinished">符碼值未更新。</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1847" />
       <source>Nothing here to process.</source>
-      <translation>這裡沒有要處理的東西。</translation>
+      <translation type="unfinished">無待執行的項目。</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1971" />
       <source>Device not set</source>
-      <translation>設備沒有設定</translation>
+      <translation type="unfinished">設備未設定</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2253" />
@@ -16934,7 +16985,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <location filename="../artisanlib/devices.py" line="2061" />
       <location filename="../artisanlib/devices.py" line="2056" />
       <source>Device set to {0}. Now, check Serial Port settings</source>
-      <translation>設備設定為{0}.請先檢查串行端口設定</translation>
+      <translation type="unfinished">設備設定為{0}.請檢查序列埠設定</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2695" />
@@ -16955,18 +17006,18 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <location filename="../artisanlib/devices.py" line="2082" />
       <location filename="../artisanlib/devices.py" line="2072" />
       <source>Device set to {0}. Now, choose serial port</source>
-      <translation>設備設定為 {0}.請先選擇串行端口</translation>
+      <translation type="unfinished">設備設定為 {0}.請先選擇序列埠</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2109" />
       <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, choose serial port</source>
-      <translation>設備設定為CENTER 305, 與CENTER 306相同.請先選擇串行端口</translation>
+      <translation type="unfinished">設備設定為CENTER 305, 與CENTER 306相同.請先選擇序列埠</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2163" />
       <location filename="../artisanlib/devices.py" line="2118" />
       <source>Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port</source>
-      <translation>設備設定為{0},與CENTER 309相同.請先選擇串行端口</translation>
+      <translation type="unfinished">設備設定為{0},與CENTER 309相同.請先選擇序列埠</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2190" />
@@ -16975,23 +17026,23 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <location filename="../artisanlib/devices.py" line="2145" />
       <location filename="../artisanlib/devices.py" line="2136" />
       <source>Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port</source>
-      <translation>設備設定為{0},與CENTER 303相同.請先選擇串行端口</translation>
+      <translation type="unfinished">設備設定為{0},與CENTER 303相同.請先選擇連接埠</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2172" />
       <source>Device set to {0}, which is equivalent to CENTER 306. Now, choose serial port</source>
-      <translation>設備設定為{0},與CENTER 306相同.請先選擇串行端口</translation>
+      <translation type="unfinished">設備設定為{0},與CENTER 306相同.請先選擇序列埠</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2199" />
       <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, choose serial port</source>
-      <translation>設備設定為{0},與Omega HH506RA相同.請先選擇串行端口</translation>
+      <translation type="unfinished">設備設定為{0},與Omega HH506RA相同.請先選擇序列埠</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2296" />
       <location filename="../artisanlib/devices.py" line="2208" />
       <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, choose serial port</source>
-      <translation>設備設定為{0},與Omega HH806AU相同.請先選擇串行端口</translation>
+      <translation type="unfinished">設備設定為{0},與Omega HH806AU相同.請先選擇序列埠</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2684" />
@@ -17041,12 +17092,12 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/devices.py" line="2278" />
       <source>Device set to {0}. Now, choose Modbus serial port or IP address</source>
-      <translation>設備設定為 {0}.請選擇通訊協議串行端口或IP地址</translation>
+      <translation type="unfinished">設備設定為 {0}.請選擇序列埠或IP地址</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2287" />
       <source>Device set to {0}, which is equivalent to CENTER 302. Now, choose serial port</source>
-      <translation>設備設定為{0},與CENTER 302相同.請先選擇串行端口</translation>
+      <translation type="unfinished">設備設定為{0},與CENTER 302相同.請先選擇連接埠</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="992" />
@@ -17062,7 +17113,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="182" />
       <source>Background profile not found</source>
-      <translation>沒有發現背景曲線設定</translation>
+      <translation type="unfinished">沒有發現背景曲線</translation>
     </message>
     <message>
       <source>an error occured on importing {0}</source>
@@ -17528,12 +17579,12 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/main.py" line="16437" />
       <source>debug logging ON</source>
-      <translation>調試登錄</translation>
+      <translation type="unfinished">開啟除錯紀錄</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="16438" />
       <source>debug logging OFF</source>
-      <translation>調試日誌關閉</translation>
+      <translation type="unfinished">關閉除錯紀錄</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="16452" />
@@ -17553,17 +17604,17 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/main.py" line="16482" />
       <source>Please visit our {0}shop{1} to extend your subscription</source>
-      <translation>請訪問我們的{0}商店{1}以擴展您的訂閱</translation>
+      <translation type="unfinished">請至我們的{0}商店{1}以延展您的訂閱</translation>
     </message>
     <message>
       <location filename="../plus/queue.py" line="353" />
       <source>Queuing roast for upload to artisan.plus</source>
-      <translation>排隊等待上傳烘焙到artisan.plus</translation>
+      <translation type="unfinished">佇列等待上傳到Artisan.Plus</translation>
     </message>
     <message>
       <location filename="../plus/sync.py" line="635" />
       <source>Updated data received from artisan.plus</source>
-      <translation>來自artisan.plus的更新數據已接收</translation>
+      <translation type="unfinished">已接收來自Artisan.Plus的更新資料</translation>
     </message>
     <message>
       <location filename="../plus/controller.py" line="208" />
@@ -17573,7 +17624,7 @@ Continue?</source>
     <message>
       <location filename="../plus/controller.py" line="221" />
       <source>Login aborted</source>
-      <translation>登入已終止</translation>
+      <translation type="unfinished">已退出登入</translation>
     </message>
     <message>
       <location filename="../plus/controller.py" line="230" />
@@ -17583,14 +17634,14 @@ Continue?</source>
     <message>
       <location filename="../plus/controller.py" line="235" />
       <source>Connected to artisan.plus</source>
-      <translation>已連接到artisan.plus</translation>
+      <translation type="unfinished">已連接到Artisan.Plus</translation>
     </message>
     <message>
       <location filename="../plus/controller.py" line="346" />
       <location filename="../plus/controller.py" line="280" />
       <location filename="../plus/controller.py" line="254" />
       <source>artisan.plus turned off</source>
-      <translation>artisan.plus關閉</translation>
+      <translation type="unfinished">Artisan.Plus關閉</translation>
     </message>
     <message>
       <location filename="../plus/controller.py" line="261" />
@@ -17600,12 +17651,12 @@ Continue?</source>
     <message>
       <location filename="../plus/controller.py" line="289" />
       <source>Couldn't connect to artisan.plus</source>
-      <translation>無法連接到 artisan.plus</translation>
+      <translation type="unfinished">無法連接到 Artisan.Plus</translation>
     </message>
     <message>
       <location filename="../plus/controller.py" line="306" />
       <source>Disconnect artisan.plus?</source>
-      <translation>斷開artisan.plus連接？</translation>
+      <translation type="unfinished">斷開Artisan.Plus連接？</translation>
     </message>
     <message>
       <location filename="../plus/controller.py" line="310" />
@@ -17665,7 +17716,7 @@ Continue?</source>
     <message>
       <location filename="../plus/login.py" line="131" />
       <source>Email</source>
-      <translation>電郵</translation>
+      <translation type="unfinished">電子郵件</translation>
     </message>
     <message>
       <location filename="../plus/login.py" line="140" />
@@ -17724,7 +17775,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/devices.py" line="105" />
       <source>Meter</source>
-      <translation>儀表</translation>
+      <translation type="unfinished">儀錶</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="106" />
@@ -17826,7 +17877,7 @@ Continue?</source>
       <location filename="../artisanlib/roast_properties.py" line="2182" />
       <location filename="../artisanlib/roast_properties.py" line="2169" />
       <source>Roaster Scope</source>
-      <translation>烘焙記錄儀</translation>
+      <translation type="unfinished">烘焙紀錄儀</translation>
     </message>
   </context>
   <context>
@@ -17864,7 +17915,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1065" />
       <source>Thermocouple type successfully set</source>
-      <translation>熱電偶類型設定成功</translation>
+      <translation type="unfinished">熱電偶類型設定成功</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1068" />
@@ -17875,7 +17926,7 @@ Continue?</source>
       <location filename="../artisanlib/pid_dialogs.py" line="1975" />
       <location filename="../artisanlib/pid_dialogs.py" line="1168" />
       <source>Ready</source>
-      <translation>準備</translation>
+      <translation type="unfinished">已準備好</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3776" />
@@ -17932,7 +17983,7 @@ Continue?</source>
       <location filename="../artisanlib/pid_dialogs.py" line="3647" />
       <location filename="../artisanlib/pid_dialogs.py" line="1759" />
       <source>Ramp/Soak operation cancelled</source>
-      <translation>緩升/浸泡 操作已取消</translation>
+      <translation type="unfinished">Ramp/Soak 操作已取消</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3650" />
@@ -17952,25 +18003,25 @@ Continue?</source>
       <location filename="../artisanlib/pid_dialogs.py" line="3656" />
       <location filename="../artisanlib/pid_dialogs.py" line="1773" />
       <source>Need to change pattern mode...</source>
-      <translation>需要改變模式</translation>
+      <translation type="unfinished">需要改變模式</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3659" />
       <location filename="../artisanlib/pid_dialogs.py" line="1776" />
       <source>Pattern has been changed. Wait 5 secs.</source>
-      <translation>模式已改變.等5秒鐘</translation>
+      <translation type="unfinished">模式已改變.等待5秒鐘</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3661" />
       <location filename="../artisanlib/pid_dialogs.py" line="1778" />
       <source>Pattern could not be changed</source>
-      <translation>模式沒有被改變</translation>
+      <translation type="unfinished">模式無法被改變</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3688" />
       <location filename="../artisanlib/pid_dialogs.py" line="1802" />
       <source>RampSoak could not be changed</source>
-      <translation>緩升浸泡 無法改變</translation>
+      <translation type="unfinished">Ramp/Soak 無法改變</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3691" />
@@ -17982,19 +18033,19 @@ Continue?</source>
       <location filename="../artisanlib/pid_dialogs.py" line="3752" />
       <location filename="../artisanlib/pid_dialogs.py" line="1816" />
       <source>Reading Ramp/Soak {0} ...</source>
-      <translation>讀取緩升/浸泡 {0} ...</translation>
+      <translation type="unfinished">讀取Ramp/Soak {0} ...</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3757" />
       <location filename="../artisanlib/pid_dialogs.py" line="1821" />
       <source>problem reading Ramp/Soak</source>
-      <translation>讀取緩升/浸泡 出現問題</translation>
+      <translation type="unfinished">讀取Ramp/Soak 出現問題</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3760" />
       <location filename="../artisanlib/pid_dialogs.py" line="1824" />
       <source>Finished reading Ramp/Soak val.</source>
-      <translation>已完成讀取 緩升/浸泡</translation>
+      <translation type="unfinished">已完成讀取 Ramp/Soak 數值.</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1861" />
@@ -18005,7 +18056,7 @@ Continue?</source>
       <location filename="../artisanlib/pid_dialogs.py" line="3931" />
       <location filename="../artisanlib/pid_dialogs.py" line="1955" />
       <source>Ramp/Soak successfully written</source>
-      <translation>緩升/浸泡 成功寫入</translation>
+      <translation type="unfinished">Ramp/Soak 成功寫入</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2766" />
@@ -18040,7 +18091,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2961" />
       <source>setNsv(): bad response</source>
-      <translation>setNsv():錯誤響應</translation>
+      <translation type="unfinished">setNsv():反應錯誤</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3015" />
@@ -18050,7 +18101,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3018" />
       <source>setNpid(): bad confirmation</source>
-      <translation>setNpid(): 錯誤確認</translation>
+      <translation type="unfinished">setNpid(): 確認錯誤</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3022" />
@@ -18171,12 +18222,12 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3859" />
       <source>Ramp (MM:SS)</source>
-      <translation>緩升 (MM:SS)</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3860" />
       <source>Soak (MM:SS)</source>
-      <translation>浸泡 (MM:SS)</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3948" />
@@ -18186,17 +18237,17 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/background.py" line="490" />
       <source>Playback Events set OFF</source>
-      <translation>回放事件設定為關閉</translation>
+      <translation type="unfinished">重播事件 設定為關閉</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="532" />
       <source>Playback DROP set OFF</source>
-      <translation>回放下豆 設定為關閉</translation>
+      <translation type="unfinished">重播下豆 設定為關閉</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="552" />
       <source>Playback Aid set OFF</source>
-      <translation>回放輔助設備設定為關閉</translation>
+      <translation type="unfinished">重播輔助 設定為關閉</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="452" />
@@ -18241,7 +18292,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="520" />
       <source>Ramp/Soak</source>
-      <translation>緩升/浸泡</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2566" />
@@ -18272,7 +18323,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3965" />
       <source>General</source>
-      <translation>常規</translation>
+      <translation type="unfinished">一般</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="424" />
@@ -18293,7 +18344,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/events.py" line="1459" />
       <source>Quantifiers</source>
-      <translation>範圍</translation>
+      <translation type="unfinished">配量計</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="1462" />
@@ -18314,22 +18365,22 @@ Continue?</source>
       <location filename="../artisanlib/devices.py" line="1251" />
       <location filename="../artisanlib/ports.py" line="1619" />
       <source>ET/BT</source>
-      <translation />
+      <translation type="unfinished">出風溫/豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1625" />
       <source>Modbus</source>
-      <translation>通信協議</translation>
+      <translation type="unfinished">Modbus通信協定</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1628" />
       <source>S7</source>
-      <translation />
+      <translation type="unfinished">Loring S7</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1631" />
       <source>Scale</source>
-      <translation />
+      <translation type="unfinished">電子秤</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1634" />
@@ -18356,7 +18407,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1668" />
       <source>Roast</source>
-      <translation>烘培</translation>
+      <translation type="unfinished">烘焙</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1671" />
@@ -18366,7 +18417,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1679" />
       <source>Energy</source>
-      <translation>能源</translation>
+      <translation type="unfinished">能量</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1681" />
@@ -18376,17 +18427,17 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2843" />
       <source>Details</source>
-      <translation>詳細</translation>
+      <translation type="unfinished">細節</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2844" />
       <source>Loads</source>
-      <translation>載入</translation>
+      <translation type="unfinished">計入設備</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2845" />
       <source>Protocol</source>
-      <translation>規範</translation>
+      <translation type="unfinished">協定</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="561" />
@@ -18397,12 +18448,12 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/curves.py" line="1326" />
       <source>RoR</source>
-      <translation />
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1332" />
       <source>Filters</source>
-      <translation>篩選器</translation>
+      <translation type="unfinished">濾波器</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1338" />
@@ -18442,7 +18493,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/devices.py" line="1257" />
       <source>Symb ET/BT</source>
-      <translation>標記 ET/BT</translation>
+      <translation type="unfinished">出風/豆 溫度值設定</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1260" />
@@ -18457,7 +18508,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/devices.py" line="1266" />
       <source>Ambient</source>
-      <translation>環境</translation>
+      <translation type="unfinished">周邊環境</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="558" />
@@ -18498,7 +18549,7 @@ Continue?</source>
       <location filename="../artisanlib/wheels.py" line="420" />
       <location filename="../artisanlib/wheels.py" line="204" />
       <source>Color</source>
-      <translation>顏色</translation>
+      <translation type="unfinished">按鈕顏色</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="205" />
@@ -18561,13 +18612,13 @@ Continue?</source>
       <location filename="../artisanlib/pid_dialogs.py" line="542" />
       <location filename="../artisanlib/pid_dialogs.py" line="390" />
       <source>Ramp</source>
-      <translation>緩升</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="543" />
       <location filename="../artisanlib/pid_dialogs.py" line="391" />
       <source>Soak</source>
-      <translation>浸泡</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="962" />
@@ -18593,17 +18644,17 @@ Continue?</source>
       <location filename="../artisanlib/pid_dialogs.py" line="546" />
       <location filename="../artisanlib/pid_dialogs.py" line="394" />
       <source>Description</source>
-      <translation>說明</translation>
+      <translation type="unfinished">說明</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1885" />
       <source>Ramp HH:MM</source>
-      <translation>緩升 HH:MM</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1886" />
       <source>Soak HH:MM</source>
-      <translation>浸泡 HH:MM</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4214" />
@@ -18626,12 +18677,12 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/events.py" line="2201" />
       <source>Documentation</source>
-      <translation>文檔</translation>
+      <translation type="unfinished">動作指令</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="2202" />
       <source>Visibility</source>
-      <translation>透明度</translation>
+      <translation type="unfinished">顯示按鈕</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="2204" />
@@ -18647,7 +18698,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/ports.py" line="1720" />
       <source>Comm Port</source>
-      <translation>通信端口</translation>
+      <translation type="unfinished">通信埠</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1721" />
@@ -18692,7 +18743,7 @@ Continue?</source>
       <location filename="../artisanlib/background.py" line="824" />
       <location filename="../artisanlib/background.py" line="752" />
       <source>ET</source>
-      <translation>ET</translation>
+      <translation type="unfinished">排風溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/transposer.py" line="169" />
@@ -18702,7 +18753,7 @@ Continue?</source>
       <location filename="../artisanlib/background.py" line="825" />
       <location filename="../artisanlib/background.py" line="753" />
       <source>BT</source>
-      <translation>BT</translation>
+      <translation type="unfinished">豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="2018" />
@@ -18784,7 +18835,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2853" />
       <source>Duration</source>
-      <translation>時長</translation>
+      <translation type="unfinished">耗時</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2855" />
@@ -18870,22 +18921,22 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/alarms.py" line="955" />
       <source>If Alarm</source>
-      <translation>警報響時</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="956" />
       <source>But Not</source>
-      <translation>但是並不</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="957" />
       <source>From</source>
-      <translation>來自</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="960" />
       <source>Condition</source>
-      <translation>狀態</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1381" />
@@ -18957,21 +19008,21 @@ Continue?</source>
       <location filename="../artisanlib/transposer.py" line="999" />
       <location filename="../artisanlib/transposer.py" line="905" />
       <source>Profile</source>
-      <translation>設定</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/transposer.py" line="1065" />
       <location filename="../artisanlib/transposer.py" line="1000" />
       <location filename="../artisanlib/transposer.py" line="906" />
       <source>Target</source>
-      <translation>目標</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/transposer.py" line="1066" />
       <location filename="../artisanlib/transposer.py" line="1001" />
       <location filename="../artisanlib/transposer.py" line="907" />
       <source>Result</source>
-      <translation>結果</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Beans</source>
@@ -19012,7 +19063,7 @@ Continue?</source>
       <location filename="../artisanlib/main.py" line="872" />
       <location filename="../artisanlib/main.py" line="837" />
       <source>Acidity</source>
-      <translation>酸质</translation>
+      <translation type="unfinished">酸質</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="953" />
@@ -19024,7 +19075,7 @@ Continue?</source>
       <location filename="../artisanlib/main.py" line="871" />
       <location filename="../artisanlib/main.py" line="838" />
       <source>Aftertaste</source>
-      <translation>余韵</translation>
+      <translation type="unfinished">餘韻</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="902" />
@@ -19032,7 +19083,7 @@ Continue?</source>
       <location filename="../artisanlib/main.py" line="876" />
       <location filename="../artisanlib/main.py" line="839" />
       <source>Clean Cup</source>
-      <translation>干净杯</translation>
+      <translation type="unfinished">乾淨度</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="840" />
@@ -19088,7 +19139,7 @@ Continue?</source>
       <location filename="../artisanlib/main.py" line="873" />
       <location filename="../artisanlib/main.py" line="845" />
       <source>Body</source>
-      <translation>醇厚度</translation>
+      <translation type="unfinished">口感</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="918" />
@@ -19119,7 +19170,7 @@ Continue?</source>
       <location filename="../artisanlib/main.py" line="890" />
       <location filename="../artisanlib/main.py" line="878" />
       <source>Overall</source>
-      <translation>結論</translation>
+      <translation type="unfinished">整體</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="884" />
@@ -19165,7 +19216,7 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/main.py" line="913" />
       <source>Nose</source>
-      <translation>嗅覺</translation>
+      <translation type="unfinished">氣味</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="928" />
@@ -19182,17 +19233,17 @@ Continue?</source>
     <message>
       <location filename="../artisanlib/main.py" line="938" />
       <source>Roast Color</source>
-      <translation>烘焙色值</translation>
+      <translation type="unfinished">烘焙顏色</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="939" />
       <source>Crema Texture</source>
-      <translation>油脂質地</translation>
+      <translation type="unfinished">Crema質地</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="940" />
       <source>Crema Volume</source>
-      <translation>油脂量</translation>
+      <translation type="unfinished">Crema量</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="944" />
@@ -19292,12 +19343,12 @@ Pungency</source>
     <message>
       <location filename="../artisanlib/main.py" line="16101" />
       <source>Pan</source>
-      <translation>平底鍋</translation>
+      <translation type="unfinished">畫面平移</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="16102" />
       <source>Zoom</source>
-      <translation>飛漲</translation>
+      <translation type="unfinished">放大</translation>
     </message>
   </context>
   <context>
@@ -19305,17 +19356,17 @@ Pungency</source>
     <message>
       <location filename="../artisanlib/axis.py" line="54" />
       <source>100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty</source>
-      <translation>步驟模式下的100%事件值與給定的y軸值或最低相位限制（如果留空）對齊</translation>
+      <translation type="unfinished">階梯狀事件的100%(最大)值設定位置如果留空，預設以最低烘焙階段(Phase)高度切齊</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="119" />
       <source>Time axis max on RESET</source>
-      <translation>復位時時間軸最大值</translation>
+      <translation type="unfinished">重置時的時間軸最大值</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="128" />
       <source>Time axis min on RESET</source>
-      <translation>復位時時間軸最小值</translation>
+      <translation type="unfinished">重置時的時間軸最小值</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="133" />
@@ -19330,48 +19381,48 @@ Pungency</source>
     <message>
       <location filename="../artisanlib/axis.py" line="143" />
       <source>Automatically set time axis min and max from profile CHARGE/DROP events</source>
-      <translation>根據設定文件的入豆/下豆事件自動設定時間軸的最小值和最大值</translation>
+      <translation type="unfinished">根據檔案的入豆/下豆事件自動設定時間軸的最小值和最大值</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="177" />
       <source>Show time grid</source>
-      <translation>顯示時間坐標方格</translation>
+      <translation type="unfinished">顯示時間隔線</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="180" />
       <source>Show temperature grid</source>
-      <translation>顯示溫度坐標方格</translation>
+      <translation type="unfinished">顯示溫度格線</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="205" />
       <source>Automatically set delta axis max from DeltaET</source>
-      <translation>從DeltaET自動設定軸差最大值</translation>
+      <translation type="unfinished">從DeltaET自動設定溫差軸(右縱軸)最大值</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="206" />
       <source>Automatically set delta axis max from DeltaBT</source>
-      <translation>從DeltaBT自動設定軸差最大值</translation>
+      <translation type="unfinished">從DeltaBT自動設定溫差軸(右縱軸)最大值</translation>
     </message>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="87" />
       <location filename="../artisanlib/wheels.py" line="68" />
       <source>Aspect Ratio</source>
-      <translation>縱橫比</translation>
+      <translation type="unfinished">長寬比</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="75" />
       <source>Increase size of text in all the graph</source>
-      <translation>增加所有圖形的文字尺寸</translation>
+      <translation type="unfinished">增加所有圖形的文字尺寸</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="78" />
       <source>Decrease size of text in all the graph</source>
-      <translation>減少所有圖形的文字尺寸</translation>
+      <translation type="unfinished">減小所有圖形的文字尺寸</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="82" />
       <source>Decorative edge between wheels</source>
-      <translation type="unfinished" />
+      <translation type="unfinished">邊緣裝飾</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="88" />
@@ -19381,7 +19432,7 @@ Pungency</source>
     <message>
       <location filename="../artisanlib/wheels.py" line="93" />
       <source>Line color</source>
-      <translation>線的顏色</translation>
+      <translation type="unfinished">線條顏色</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="96" />
@@ -19391,12 +19442,12 @@ Pungency</source>
     <message>
       <location filename="../artisanlib/wheels.py" line="100" />
       <source>Apply color pattern to whole graph</source>
-      <translation>將顏色模式運用至全圖</translation>
+      <translation type="unfinished">將配色樣板套用至全圖</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="106" />
       <source>Add new wheel</source>
-      <translation>加入新輪圖</translation>
+      <translation type="unfinished">加入新風味輪</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="109" />
@@ -19411,7 +19462,7 @@ Pungency</source>
     <message>
       <location filename="../artisanlib/wheels.py" line="119" />
       <source>Save graph to a text file.wg</source>
-      <translation>儲存圖形為一個文本文件.wg</translation>
+      <translation type="unfinished">儲存圖形為wg檔</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="791" />
@@ -19427,7 +19478,7 @@ Pungency</source>
     <message>
       <location filename="../artisanlib/wheels.py" line="133" />
       <source>Sets Wheel graph to view mode</source>
-      <translation>設定輪圖為查看模式</translation>
+      <translation type="unfinished">設定風味輪為檢視模式</translation>
     </message>
     <message>
       <location filename="../artisanlib/autosave.py" line="44" />
@@ -19437,27 +19488,27 @@ Pungency</source>
     <message>
       <location filename="../artisanlib/autosave.py" line="57" />
       <source>ON/OFF of automatic saving when pressing keyboard letter [a]</source>
-      <translation>開啟/關閉 按下鍵盤字母[a]自動儲存</translation>
+      <translation type="unfinished">開啟/關閉 按下鍵盤字母[a]自動儲存功能</translation>
     </message>
     <message>
       <location filename="../artisanlib/autosave.py" line="62" />
       <source>Add auto saved file names to the recent files list</source>
-      <translation>將自動儲存的文件名加入到最近的文件列表中</translation>
+      <translation type="unfinished">將自動儲存的檔案加入到最近使用的檔案列表中</translation>
     </message>
     <message>
       <location filename="../artisanlib/autosave.py" line="67" />
       <source>Save image alongside .alog profiles</source>
-      <translation>在.alog設定文件旁儲存圖片</translation>
+      <translation type="unfinished">在.alog設定文件同時儲存圖片</translation>
     </message>
     <message>
       <location filename="../artisanlib/autosave.py" line="92" />
       <source>Sets the directory to store batch profiles when using the letter [a]</source>
-      <translation>當使用字母[a]時為存儲批次設定文件設定目錄</translation>
+      <translation type="unfinished">設定自動儲存時使用的目錄</translation>
     </message>
     <message>
       <location filename="../artisanlib/autosave.py" line="98" />
       <source>Sets the directory to store the save also files</source>
-      <translation>設定存儲文件的目錄</translation>
+      <translation type="unfinished">設定同時自動儲存圖檔時使用的目錄</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="131" />
@@ -19465,7 +19516,7 @@ Pungency</source>
       <location filename="../artisanlib/events.py" line="117" />
       <location filename="../artisanlib/events.py" line="110" />
       <source>Definition string for special event annotation</source>
-      <translation>特殊事件的釋義字符串</translation>
+      <translation type="unfinished">事件說明資訊類型套用的定義字串</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="255" />
@@ -19478,7 +19529,7 @@ Pungency</source>
       <location filename="../artisanlib/background.py" line="165" />
       <location filename="../artisanlib/events.py" line="510" />
       <source>Copy table to clipboard, OPTION or ALT click for tabular text</source>
-      <translation>複製表到剪貼板，OPTION或ALT單擊可顯示表文本</translation>
+      <translation type="unfinished">複製表到剪貼簿，OPTION或ALT點選表格文字內容</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="514" />
@@ -19500,22 +19551,22 @@ Pungency</source>
     <message>
       <location filename="../artisanlib/events.py" line="570" />
       <source>Backup all palettes to a text file</source>
-      <translation>將所有調色板儲存為文字檔</translation>
+      <translation type="unfinished">將所有調色盤儲存為文字檔</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="571" />
       <source>Restore all palettes from a text file</source>
-      <translation>從一個文本文檔中恢復所有調色板</translation>
+      <translation type="unfinished">從檔案恢復所有調色盤設定</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="597" />
       <source>Triggered quantifier fires slider action</source>
-      <translation>觸發量詞觸發滑塊動作</translation>
+      <translation type="unfinished">配量計觸發滑動條動作</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="600" />
       <source>No processing delay if source delivers the set value (SV) instead of the process value (PV)</source>
-      <translation>如果源提供了設定值（SV）而不是過程值（PV），則沒有處理延遲</translation>
+      <translation type="unfinished">如訊號源來自設定值（SV）而不是實際值（PV），則不會有處理延遲</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="1157" />
@@ -19545,26 +19596,26 @@ by applying the given factor and offset to the slider value
 assuming that the gas pressureand not the gas flow is controlled.
 To reduce heat (or gas flow) by 50% the gas pressure
 has to be reduced by 4 times.</source>
-      <translation>將伯努利的瓦斯定律應用於計算出的值
-通過將給定因子和偏移量應用於滑塊值
-假設控制氣體壓力而不是氣體流量。
-將熱量（或氣體流量）減少50％的氣壓
-必須減少4倍。</translation>
+      <translation type="unfinished">將白努力定律應用於計算出的值
+以定因數和偏移量應用於滑動條值
+假設控制的是氣體壓力而不是氣體流量。
+降低50％的氣壓相當於是減少4倍熱量（或氣體流量）
+</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="773" />
       <source>Slider steps in multiple of 10 otherwise 1</source>
-      <translation>滑塊階段為10的倍數，否則為1</translation>
+      <translation type="unfinished">滑動條拉動定位級距為10的倍數，而非1</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="790" />
       <source>Slider values interpreted as temperatures</source>
-      <translation>把滑塊值作為溫度</translation>
+      <translation type="unfinished">把滑動條數值當作溫度</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="808" />
       <source>Unit to be added to generated event descriptions</source>
-      <translation>加入到生成的事件說明中的單位</translation>
+      <translation type="unfinished">加入到事件註解中的單位</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="888" />
@@ -19572,7 +19623,7 @@ has to be reduced by 4 times.</source>
       <location filename="../artisanlib/events.py" line="880" />
       <location filename="../artisanlib/events.py" line="876" />
       <source>If source is a Set Value quantification gets never blocked</source>
-      <translation>如果源是設置值量化永遠不會被阻止</translation>
+      <translation type="unfinished">如果訊號源是SV值則永遠不會被阻斷</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="1162" />
@@ -19617,12 +19668,12 @@ has to be reduced by 4 times.</source>
     <message>
       <location filename="../artisanlib/ports.py" line="763" />
       <source>Scan MODBUS</source>
-      <translation>掃描通訊協議</translation>
+      <translation type="unfinished">掃描Modbus</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="780" />
       <source>Reset socket connection on error</source>
-      <translation>重置套接字連接錯誤</translation>
+      <translation type="unfinished">錯誤時重置socket連線</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1023" />
@@ -19633,56 +19684,56 @@ has to be reduced by 4 times.</source>
       <location filename="../artisanlib/background.py" line="131" />
       <location filename="../artisanlib/background.py" line="122" />
       <source>For loaded backgrounds with extra devices only</source>
-      <translation>僅為額外設備載入背景曲線</translation>
+      <translation type="unfinished">僅供背景曲線中額外設備</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="3825" />
       <source>The maximum nominal batch size of the machine in kg</source>
-      <translation>機器的最大標稱批量（千克）</translation>
+      <translation type="unfinished">機器的最大額定烘焙量（公斤）</translation>
     </message>
     <message>
       <location filename="../artisanlib/logs.py" line="42" />
       <source>ON/OFF logs serial communication</source>
-      <translation>開啟/關閉 串行通信記錄</translation>
+      <translation type="unfinished">開啟/關閉 序列通訊記錄</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="349" />
       <source>Use an optimal smoothing algorithm (only applicable offline, after recording)</source>
-      <translation>使用最佳平滑算法（僅適用於記錄後的離線數據）</translation>
+      <translation type="unfinished">使用最佳平滑算法（僅適用於烘焙後的離線數據）</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="355" />
       <source>Compute the rate-of-rise over the delta span interval by a linear polyfit</source>
-      <translation>通過線性polyfit計算增量跨度間隔內的上升率</translation>
+      <translation type="unfinished">通過線性多項式擬和曲線計算差值範圍的ROR</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="782" />
       <source>Shows data table of plots</source>
-      <translation>顯示繪圖數據表</translation>
+      <translation type="unfinished">顯示繪圖數據表</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="866" />
       <source>linear: linear interpolation
 cubic: 3rd order spline interpolation
 nearest: y value of the nearest point</source>
-      <translation>線性:線性插值
-立方:最接近的三次樣條
-插值:最接近點的y值</translation>
+      <translation type="unfinished">線性:線性
+立方:三次多項式參數曲線
+最近點:以最接近的y值計算</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="909" />
       <source>Choose the start point of analysis interval of interest</source>
-      <translation>選擇感興趣的分析間隔的起始點</translation>
+      <translation type="unfinished">選擇欲分析段落的起始點</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="941" />
       <source>Choose the start point of curve fitting</source>
-      <translation>選擇曲線擬合的起始點</translation>
+      <translation type="unfinished">選擇曲線擬合的起始點</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1616" />
       <source>Add P1 and P2 as ET and BT</source>
-      <translation>加入P1和P2作為ET和BT</translation>
+      <translation type="unfinished">加入P1和P2作為出風溫和豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1621" />
@@ -19691,30 +19742,29 @@ nearest: y value of the nearest point</source>
 1 an Extra virtual device if a profile is loaded
 2 or ET and BT if profile is not loaded
 </source>
-      <translation>加入P1和P2作為:
+      <translation type="unfinished">加入P1和P2作為:
 
-1 如果一個設定文件已載入一個額外虛擬設備
-2 或者如果設定文件沒有載入ET或BT
-</translation>
+1 已載入曲線檔的額外虛擬設備
+2 未載入曲線檔時為出風溫和豆溫</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1624" />
       <source>No more Virtual Extra Devices available</source>
-      <translation>無更多有效虛擬額外設備</translation>
+      <translation type="unfinished">無更多虛擬額外設備</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1629" />
       <location filename="../artisanlib/curves.py" line="1627" />
       <source>Not available during recording</source>
-      <translation>記錄期間不可用</translation>
+      <translation type="unfinished">記錄期間無法使用</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1632" />
       <source>Set P1 as ET background B1
 Set P2 as BT background B2
 Note: Erases all existing background curves.</source>
-      <translation>設定P1作為B1的ET背景曲線
-設定P2為B2的BT背景曲線
+      <translation type="unfinished">設定P1作為B1的出風溫背景曲線
+設定P2為B2的豆溫背景曲線
 注意:將會清除所有已存在的背景曲線.</translation>
     </message>
     <message>
@@ -19725,13 +19775,13 @@ Note: Erases all existing background curves.</source>
     <message>
       <location filename="../artisanlib/main.py" line="11324" />
       <source>Stop monitoring</source>
-      <translation>停止監控</translation>
+      <translation type="unfinished">停止監看</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18279" />
       <location filename="../artisanlib/main.py" line="11398" />
       <source>Start monitoring</source>
-      <translation>開啟監控</translation>
+      <translation type="unfinished">開啟監看</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="11801" />
@@ -19741,7 +19791,7 @@ Note: Erases all existing background curves.</source>
     <message>
       <location filename="../artisanlib/main.py" line="16095" />
       <source>Connect to plus service</source>
-      <translation>連接到plus服務</translation>
+      <translation type="unfinished">連接到ArtisanPlus服務</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="16096" />
@@ -19766,12 +19816,12 @@ Note: Erases all existing background curves.</source>
     <message>
       <location filename="../artisanlib/main.py" line="16101" />
       <source>Pan axes with left mouse, zoom with right</source>
-      <translation>鼠標左鍵平移軸，右鍵縮放</translation>
+      <translation type="unfinished">游標左鍵用作平移，右鍵縮放</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="16102" />
       <source>Zoom to rectangle</source>
-      <translation>縮放到矩形</translation>
+      <translation type="unfinished">矩形縮放</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="16135" />
@@ -19876,7 +19926,7 @@ Note: Erases all existing background curves.</source>
     <message>
       <location filename="../artisanlib/main.py" line="18480" />
       <source>BT Temperature</source>
-      <translation>BT溫度</translation>
+      <translation type="unfinished">豆溫溫度</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18481" />
@@ -19886,7 +19936,7 @@ Note: Erases all existing background curves.</source>
     <message>
       <location filename="../artisanlib/main.py" line="18482" />
       <source>BT/time (degrees/min)</source>
-      <translation>BT/時間(度/分鐘)</translation>
+      <translation type="unfinished">豆溫/時間(度/分鐘)</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18483" />
@@ -19901,7 +19951,7 @@ Note: Erases all existing background curves.</source>
     <message>
       <location filename="../artisanlib/main.py" line="18586" />
       <source>Number of events found</source>
-      <translation>發現事件編號</translation>
+      <translation type="unfinished">已發現事件數</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18602" />
@@ -19921,91 +19971,91 @@ Note: Erases all existing background curves.</source>
     <message>
       <location filename="../artisanlib/main.py" line="18964" />
       <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE</source>
-      <translation>階段 LCDs: 右鍵點擊循環切換時間/百分比/溫度模式</translation>
+      <translation type="unfinished">烘焙階段 LCDs: 點擊右鍵可循環切換 時間/百分比/升溫量 模式</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19807" />
       <source>Syncing with artisan.plus</source>
-      <translation>同步artisan.plus</translation>
+      <translation type="unfinished">與Artisan.Plus同步</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19847" />
       <location filename="../artisanlib/main.py" line="19811" />
       <source>Disconnect artisan.plus</source>
-      <translation>斷開artisan.plus</translation>
+      <translation type="unfinished">與Artisan.Plus斷開連線</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19814" />
       <source>Upload to artisan.plus</source>
-      <translation>上傳到artisan.plus</translation>
+      <translation type="unfinished">上傳到Artisan.Plus</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19850" />
       <source>Connect artisan.plus</source>
-      <translation>連接artisan.plus</translation>
+      <translation type="unfinished">連接Artisan.Plus</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22164" />
       <source>Phase LCDs
 Currently in ALL FINISHING MODE</source>
-      <translation>階段 LCDs
+      <translation type="unfinished">烘焙階段 LCDs
 目前處於全部完成模式</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22201" />
       <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in TIME MODE</source>
-      <translation>階段 LCDs: 右鍵點擊循環切換時間/百分比/溫度模式
+      <translation type="unfinished">烘焙階段 LCDs: 點擊右鍵循環切換 時間/百分比/升溫量 模式
 目前為時間模式</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22219" />
       <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in PERCENTAGE MODE</source>
-      <translation>階段 LCDs: 右鍵點擊循環切換時間/百分比/溫度模式
+      <translation type="unfinished">烘焙階段 LCDs: 點擊右鍵循環切換 時間/百分比/升溫量 模式
 目前為百分比模式</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22233" />
       <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in TEMP MODE</source>
-      <translation>階段 LCDs: 右鍵點擊循環切換時間/百分比/溫度模式
-目前為溫度模式</translation>
+      <translation type="unfinished">烘焙階段 LCDs: 點擊右鍵循環切換 時間/百分比/升溫量 模式
+目前為升溫量模式</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="38214" />
       <source>&lt;b&gt;Label&lt;/b&gt;= </source>
-      <translation>&amp;lt;b&amp;gt;標籤&amp;lt;/b&amp;gt;=</translation>
+      <translation type="unfinished">&lt;b&gt;標籤&lt;/b&gt;= </translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="38215" />
       <source>&lt;b&gt;Description &lt;/b&gt;= </source>
-      <translation>&amp;lt;b&amp;gt;說明&amp;lt;/b&amp;gt;=</translation>
+      <translation type="unfinished">&lt;b&gt;描述&lt;/b&gt;= </translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="38216" />
       <source>&lt;b&gt;Type &lt;/b&gt;= </source>
-      <translation>&amp;lt;b&amp;gt;類型&amp;lt;/b&amp;gt;=</translation>
+      <translation type="unfinished">&lt;b&gt;類型&lt;/b&gt;= </translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="38218" />
       <source>&lt;b&gt;Value &lt;/b&gt;= </source>
-      <translation>&amp;lt;b&amp;gt;數值&amp;lt;/b&amp;gt;=</translation>
+      <translation type="unfinished">&lt;b&gt;數值&lt;/b&gt;= </translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="38220" />
       <source>&lt;b&gt;Documentation &lt;/b&gt;= </source>
-      <translation>&amp;lt;b&amp;gt;文檔&amp;lt;/b&amp;gt;=</translation>
+      <translation type="unfinished">&lt;b&gt;動作指令 &lt;/b&gt;= </translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="38221" />
       <source>&lt;b&gt;Button# &lt;/b&gt;= </source>
-      <translation>&amp;lt;b&amp;gt;按鈕# &amp;lt;/b&amp;gt;=</translation>
+      <translation type="unfinished">&lt;b&gt;按鈕#&lt;/b&gt;= </translation>
     </message>
     <message>
       <location filename="../artisanlib/batches.py" line="37" />
       <source>Batch prefix</source>
-      <translation>批次前綴</translation>
+      <translation type="unfinished">批次前綴字</translation>
     </message>
     <message>
       <location filename="../artisanlib/batches.py" line="44" />
@@ -20015,17 +20065,17 @@ Currently in TEMP MODE</source>
     <message>
       <location filename="../artisanlib/batches.py" line="59" />
       <source>If ticked, the batch counter is never modified by loading a settings file</source>
-      <translation>如果勾選，則載入設定時不會更改批次計數器</translation>
+      <translation type="unfinished">如勾選，則載入設定時不會更動批次計數器</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="284" />
       <source>Recaclulates all Virtual Devices and updates their values in the profile</source>
-      <translation>重新計算所有虛擬設備並更新烘焙設定文件</translation>
+      <translation type="unfinished">重新計算設定檔中所有虛擬設備與設定值更新</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1163" />
       <source>Recaclulates ET and BT and updates their values in the profile</source>
-      <translation>在設定中更新重新計算的ET和BT值</translation>
+      <translation type="unfinished">更新並重新計算曲線檔中的出風溫和豆溫值</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1437" />

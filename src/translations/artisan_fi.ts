@@ -3776,8 +3776,8 @@ LOPPU</translation>
       <location filename="../artisanlib/devices.py" line="1641" />
       <location filename="../artisanlib/devices.py" line="1624" />
       <location filename="../artisanlib/devices.py" line="1516" />
-      <location filename="../artisanlib/main.py" line="39002" />
-      <location filename="../artisanlib/main.py" line="38899" />
+      <location filename="../artisanlib/main.py" line="39010" />
+      <location filename="../artisanlib/main.py" line="38907" />
       <location filename="../artisanlib/main.py" line="38770" />
       <location filename="../artisanlib/main.py" line="38756" />
       <location filename="../artisanlib/main.py" line="38541" />
@@ -14754,7 +14754,7 @@ Repeat Operation at the end: {0}</source>
       <translation type="unfinished">Näytteenotto</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="38929" />
+      <location filename="../artisanlib/main.py" line="38937" />
       <location filename="../artisanlib/curves.py" line="1661" />
       <source>Assignment problem</source>
       <translation type="unfinished" />
@@ -15446,8 +15446,8 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="39098" />
-      <location filename="../artisanlib/main.py" line="39057" />
+      <location filename="../artisanlib/main.py" line="39106" />
+      <location filename="../artisanlib/main.py" line="39065" />
       <location filename="../artisanlib/main.py" line="21306" />
       <source>Simulator started @{}x</source>
       <translation type="unfinished" />
@@ -15694,7 +15694,7 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="39101" />
+      <location filename="../artisanlib/main.py" line="39109" />
       <location filename="../artisanlib/main.py" line="27071" />
       <location filename="../artisanlib/main.py" line="26566" />
       <source>Invalid artisan format</source>
@@ -16155,12 +16155,12 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="39067" />
+      <location filename="../artisanlib/main.py" line="39075" />
       <source>Simulator stopped</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="39326" />
+      <location filename="../artisanlib/main.py" line="39334" />
       <source>debug logging ON</source>
       <translation type="unfinished">virheenkorjauksen kirjaus PÄÄLLÄ</translation>
     </message>

@@ -949,13 +949,13 @@ class tgraphcanvas(FigureCanvas):
 
         self.WorldCoffeeRoastingChampionship: Final = [QApplication.translate('Textbox', 'Aroma'),
                                             QApplication.translate('Textbox', 'Flavour'),
-                                            QApplication.translate('Textbox', 'Flavour'),
                                             QApplication.translate('Textbox', 'Aftertaste'),
                                             QApplication.translate('Textbox', 'Acidity'),
                                             QApplication.translate('Textbox', 'Body'),
+                                            QApplication.translate('Textbox', 'Sweetness'),
+                                            QApplication.translate('Textbox', 'Sweetness'),
                                             QApplication.translate('Textbox', 'Balance'),
                                             QApplication.translate('Textbox', 'Balance'),
-                                            QApplication.translate('Textbox', 'Overall'),
                                             QApplication.translate('Textbox', 'Overall')]
 
         self.ax1 = self.ax2 = None

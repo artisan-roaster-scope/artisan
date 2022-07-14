@@ -4052,8 +4052,8 @@ END</source>
       <location filename="../artisanlib/devices.py" line="1641" />
       <location filename="../artisanlib/devices.py" line="1624" />
       <location filename="../artisanlib/devices.py" line="1516" />
-      <location filename="../artisanlib/main.py" line="39002" />
-      <location filename="../artisanlib/main.py" line="38899" />
+      <location filename="../artisanlib/main.py" line="39010" />
+      <location filename="../artisanlib/main.py" line="38907" />
       <location filename="../artisanlib/main.py" line="38770" />
       <location filename="../artisanlib/main.py" line="38756" />
       <location filename="../artisanlib/main.py" line="38541" />
@@ -15497,7 +15497,7 @@ Ripetizione operazione al termine: {0}</translation>
       <translation>Campionamento</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="38929" />
+      <location filename="../artisanlib/main.py" line="38937" />
       <location filename="../artisanlib/curves.py" line="1661" />
       <source>Assignment problem</source>
       <translation>Problema di assegnazione</translation>
@@ -16189,8 +16189,8 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>Rilevata una coppia di colori che potrebbe essere difficile da vedere:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="39098" />
-      <location filename="../artisanlib/main.py" line="39057" />
+      <location filename="../artisanlib/main.py" line="39106" />
+      <location filename="../artisanlib/main.py" line="39065" />
       <location filename="../artisanlib/main.py" line="21306" />
       <source>Simulator started @{}x</source>
       <translation>Avviare il simulatore @{}x</translation>
@@ -16437,7 +16437,7 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>{0} è stato salvato. Ininiziata nuova tostatura</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="39101" />
+      <location filename="../artisanlib/main.py" line="39109" />
       <location filename="../artisanlib/main.py" line="27071" />
       <location filename="../artisanlib/main.py" line="26566" />
       <source>Invalid artisan format</source>
@@ -16899,12 +16899,12 @@ Correggilo nella scheda Configurazione&amp;gt; Curve&amp;gt; Analizza.</translat
       <translation>Analisi prima dell'adattamento della curva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="39067" />
+      <location filename="../artisanlib/main.py" line="39075" />
       <source>Simulator stopped</source>
       <translation>Fermare il Simulatore</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="39326" />
+      <location filename="../artisanlib/main.py" line="39334" />
       <source>debug logging ON</source>
       <translation>debug log ACCESO</translation>
     </message>
