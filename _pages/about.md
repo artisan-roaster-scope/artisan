@@ -94,11 +94,12 @@ gallery:
 
 Artisan is an open-source software that helps coffee roasters record, analyze, and control roast profiles. This software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.
 
-[Donate](/donate/){: .btn .btn--success .btn--large} &emsp;
+[Donate](/donate/){: .btn .btn--success .btn--large} &ensp;
 [Install Now](https://github.com/artisan-roaster-scope/artisan/releases/latest){: .btn .btn--success .btn--large}{:target="_blank"}
-&emsp; [Quick Start Guide](/docs/quick-start-guide/){: .btn .btn--success .btn--large}
-&emsp; [Blog](https://artisan-roasterscope.blogspot.com/){: .btn .btn--success .btn--large}{:target="_blank"}
-&emsp; [Shop](https://shop.artisan.plus/){: .btn .btn--success .btn--large}{:target="_blank"}
+&ensp; [Quick Start Guide](/docs/quick-start-guide/){: .btn .btn--success .btn--large}
+&ensp; [Tutorials](/docs/videos/){: .btn .btn--success .btn--large}{:target="_blank"}
+&ensp; [Blog](https://artisan-roasterscope.blogspot.com/){: .btn .btn--success .btn--large}{:target="_blank"}
+&ensp; [Shop](https://shop.artisan.plus/){: .btn .btn--success .btn--large}{:target="_blank"}
 
 [All Releases](https://github.com/artisan-roaster-scope/artisan/releases){:target="_blank"} &emsp; [Version History](https://github.com/artisan-roaster-scope/artisan#version_history){:target="_blank"}
 
