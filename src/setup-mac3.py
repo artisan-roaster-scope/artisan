@@ -113,6 +113,7 @@ DATA_FILES = [
     ('../Resources', [r'includes/ranking-template.htm']),
     ('../Resources', [r'includes/Humor-Sans.ttf']),
     ('../Resources', [r'includes/WenQuanYiZenHei-01.ttf']),
+    ('../Resources', [r'includes/WenQuanYiZenHeiMonoMedium.ttf']),
     ('../Resources', [r'includes/SourceHanSansCN-Regular.otf']),
     ('../Resources', [r'includes/SourceHanSansHK-Regular.otf']),
     ('../Resources', [r'includes/SourceHanSansJP-Regular.otf']),

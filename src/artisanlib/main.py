@@ -17675,7 +17675,7 @@ class ApplicationWindow(QMainWindow):
                 ('he', '\u05e2\u05d1\u05e8\u05d9\u05ea'),
                 ('id', 'Indonesia'),
                 ('it', 'Italiano'),
-                ('jp', '\u65e5\u672c\u8a9e'),
+                ('ja', '\u65e5\u672c\u8a9e'),
                 ('ko', '\ud55c\uad6d\uc758'),
                 ('lv', 'Latviete'),
                 ('hu', 'Magyar'),
@@ -38851,15 +38851,23 @@ class ApplicationWindow(QMainWindow):
                 if dim >= 1 or dim <=0:
                     self.qmc.segmentresultsloc = self.qmc.segmentresultsloc_default
 
+            if self.qmc.locale_str in ['ja', 'ko', 'zh_CN', 'zh_TW']:
+                # monospace font with Chinese characters
+                aw.set_mpl_fontproperties(getResourcePath() + 'WenQuanYiZenHeiMonoMedium.ttf')
+                fontfamily = 'WenQuanYi Zen Hei Mono'
+            else:
+                fontfamily = 'monospace'
+
             # create the segment results annotation box
             a = aw.qmc.alpha['statsanalysisbkgnd']
             fc = aw.qmc.palette['statsanalysisbkgnd']
             tc = aw.labelBorW(fc)
             if 'segmentresultstr' in cfr:
                 segmentresultstr = cfr['segmentresultstr']
+
                 self.segmentresultsanno = self.qmc.ax.annotate(segmentresultstr, xy=self.qmc.segmentresultsloc, xycoords='axes fraction',
                            ha='left', va='center',
-                           fontfamily='monospace',
+                           fontfamily=fontfamily,
                            fontsize='x-small',
                            color=tc,
                            zorder=30,
@@ -38878,7 +38886,7 @@ class ApplicationWindow(QMainWindow):
             tc = aw.labelBorW(fc)
             self.analysisresultsanno = self.qmc.ax.annotate(resultstr, xy=self.qmc.analysisresultsloc, xycoords='axes fraction',
                        ha='left', va='center',
-                       fontfamily='monospace',
+                       fontfamily=fontfamily,
                        fontsize='x-small',
                        color=tc,
                        zorder=31,

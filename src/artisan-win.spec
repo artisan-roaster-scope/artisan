@@ -123,6 +123,7 @@ for fn in [
     r'includes\Humor-Sans.ttf',
     r'includes\dijkstra.ttf',
     r'includes\WenQuanYiZenHei-01.ttf',
+    r'includes\WenQuanYiZenHeiMonoMedium.ttf',
     r'includes\SourceHanSansCN-Regular.otf',
     r'includes\SourceHanSansHK-Regular.otf',
     r'includes\SourceHanSansJP-Regular.otf',

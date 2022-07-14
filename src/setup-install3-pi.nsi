@@ -377,6 +377,7 @@ Section Uninstall
   Delete "$INSTDIR\Humor-Sans.ttf"
   Delete "$INSTDIR\dijkstra.ttf"
   Delete "$INSTDIR\WenQuanYiZenHei-01.ttf"
+  Delete "$INSTDIR\WenQuanYiZenHeiMonoMedium.ttf"
   Delete "$INSTDIR\SourceHanSansCN-Regular.otf"
   Delete "$INSTDIR\SourceHanSansHK-Regular.otf"
   Delete "$INSTDIR\SourceHanSansJP-Regular.otf"
