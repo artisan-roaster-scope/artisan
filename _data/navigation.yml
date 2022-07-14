@@ -138,8 +138,8 @@ machines:
 #        url: /machines/trobrat/
       - title: "Twino/Ozstar"
         url: /machines/twino-ozstar/
-#      - title: "Typhoon"
-#        url: /machines/typhoon/
+      - title: "Typhoon"
+        url: /machines/typhoon/
       - title: "US Roaster Corp"
         url: /machines/usroaster/
       - title: "VNT"
