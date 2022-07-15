@@ -18917,7 +18917,7 @@ Continuar?</translation>
   <context>
     <name>Textbox</name>
     <message>
-      <location filename="../artisanlib/main.py" line="954" />
+      <location filename="../artisanlib/main.py" line="953" />
       <location filename="../artisanlib/main.py" line="943" />
       <location filename="../artisanlib/main.py" line="934" />
       <location filename="../artisanlib/main.py" line="927" />
@@ -18931,7 +18931,7 @@ Continuar?</translation>
       <translation>Acidez</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="953" />
+      <location filename="../artisanlib/main.py" line="952" />
       <location filename="../artisanlib/main.py" line="930" />
       <location filename="../artisanlib/main.py" line="922" />
       <location filename="../artisanlib/main.py" line="914" />
@@ -18963,6 +18963,8 @@ Continuar?</translation>
       <translation>Fragancia</translation>
     </message>
     <message>
+      <location filename="../artisanlib/main.py" line="956" />
+      <location filename="../artisanlib/main.py" line="955" />
       <location filename="../artisanlib/main.py" line="933" />
       <location filename="../artisanlib/main.py" line="903" />
       <location filename="../artisanlib/main.py" line="889" />
@@ -18981,8 +18983,8 @@ Continuar?</translation>
       <translation>Aroma</translation>
     </message>
     <message>
+      <location filename="../artisanlib/main.py" line="958" />
       <location filename="../artisanlib/main.py" line="957" />
-      <location filename="../artisanlib/main.py" line="956" />
       <location filename="../artisanlib/main.py" line="948" />
       <location filename="../artisanlib/main.py" line="931" />
       <location filename="../artisanlib/main.py" line="923" />
@@ -18993,7 +18995,7 @@ Continuar?</translation>
       <translation>Equilibrio</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="955" />
+      <location filename="../artisanlib/main.py" line="954" />
       <location filename="../artisanlib/main.py" line="942" />
       <location filename="../artisanlib/main.py" line="935" />
       <location filename="../artisanlib/main.py" line="921" />
@@ -19031,7 +19033,6 @@ Continuar?</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="959" />
-      <location filename="../artisanlib/main.py" line="958" />
       <location filename="../artisanlib/main.py" line="890" />
       <location filename="../artisanlib/main.py" line="878" />
       <source>Overall</source>
@@ -19089,7 +19090,6 @@ Continuar?</translation>
       <translation>Sensación en boca</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="952" />
       <location filename="../artisanlib/main.py" line="951" />
       <location filename="../artisanlib/main.py" line="929" />
       <source>Flavour</source>
