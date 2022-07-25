@@ -113,7 +113,7 @@
     <message>
       <location filename="../artisanlib/main.py" line="10311" />
       <source>Moisture Roasted</source>
-      <translation>Υγρασία ψητή</translation>
+      <translation>Υγρασία ψημένου</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10313" />
@@ -858,7 +858,7 @@ END</source>
       <location filename="../artisanlib/main.py" line="18419" />
       <source>DRY
 END</source>
-      <translation>ΛΗΞΗ ΞΥΡΑΝΣΗΣ</translation>
+      <translation>ΛΗΞΗ ΞHΡΑΝΣΗΣ</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18424" />
@@ -2404,7 +2404,7 @@ END</source>
       <location filename="../artisanlib/curves.py" line="936" />
       <location filename="../artisanlib/curves.py" line="904" />
       <source>DRY END</source>
-      <translation type="unfinished">ΤΕΛΟΣ ΞΥΡΑΝΣΗΣ</translation>
+      <translation>ΤΕΛΟΣ ΞHΡΑΝΣΗΣ</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="937" />
@@ -12630,7 +12630,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
       <location filename="../artisanlib/roast_properties.py" line="1011" />
       <location filename="../artisanlib/roast_properties.py" line="288" />
       <source>Roasted</source>
-      <translation>Ψητό</translation>
+      <translation>Ψημένος</translation>
     </message>
     <message>
       <location filename="../artisanlib/transposer.py" line="1060" />
@@ -12639,7 +12639,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
       <location filename="../artisanlib/statistics.py" line="90" />
       <location filename="../artisanlib/roast_properties.py" line="764" />
       <source>DRY END</source>
-      <translation>ΛΗΞΗ ΞΥΡΑΝΣΗΣ</translation>
+      <translation>ΛΗΞΗ ΞHΡΑΝΣΗΣ</translation>
     </message>
     <message>
       <location filename="../artisanlib/transposer.py" line="1061" />
@@ -12717,7 +12717,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1134" />
       <source>Ground</source>
-      <translation>Εδαφος</translation>
+      <translation>Αλεσμένος</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1157" />
@@ -13711,13 +13711,13 @@ LCDs All</source>
       <location filename="../artisanlib/main.py" line="22334" />
       <location filename="../artisanlib/main.py" line="22188" />
       <source>DEV%</source>
-      <translation>% DEV</translation>
+      <translation>%Ανάπτυξη</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22404" />
       <location filename="../artisanlib/main.py" line="22220" />
       <source>DRY%</source>
-      <translation>ΣΤΕΓΝΟΣ%</translation>
+      <translation>ξήρανση%</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22363" />
@@ -13740,7 +13740,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/main.py" line="22271" />
       <source>RAMP%</source>
-      <translation>ΑΝΑΒΑΘΜΙΔΑ%</translation>
+      <translation>Αύξηση%</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22371" />
@@ -15563,7 +15563,7 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/designer.py" line="565" />
       <location filename="../artisanlib/designer.py" line="334" />
       <source>DRY END</source>
-      <translation type="unfinished">ΛΗΞΗ ΞΥΡΑΝΣΗΣ</translation>
+      <translation type="unfinished">ΛΗΞΗ ΞHΡΑΝΣΗΣ</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="566" />
@@ -15991,7 +15991,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/main.py" line="12215" />
       <source>[DRY END] recorded at {0} BT = {1}</source>
-      <translation type="unfinished">[ΛΗΞΗ ΞΥΡΑΝΣΗΣ]Καταγραφηκε στις {0} ΒΤ = {1}</translation>
+      <translation type="unfinished">[ΛΗΞΗ ΞHΡΑΝΣΗΣ]Καταγραφηκε στις {0} ΒΤ = {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12293" />
@@ -16154,7 +16154,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/main.py" line="15091" />
       <source>[ DRY END ]</source>
-      <translation>[ΛΗΞΗ ΞΥΡΑΝΣΗΣ]</translation>
+      <translation>[ΛΗΞΗ ΞHΡΑΝΣΗΣ]</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15094" />
@@ -18956,7 +18956,7 @@ Proceed?</source>
       <location filename="../artisanlib/roast_properties.py" line="4147" />
       <location filename="../artisanlib/background.py" line="894" />
       <source>DRY END</source>
-      <translation type="unfinished">ΛΗΞΗ ΞΥΡΑΝΣΗΣ</translation>
+      <translation>ΛΗΞΗ ΞHΡΑΝΣΗΣ</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="2021" />
