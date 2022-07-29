@@ -335,7 +335,7 @@ for python_version in ['python3.8', 'python3.9', 'python3.10']:
             'PyQt6/lupdate',
             'PyQt6/uic',
             'PyQt6/Qt6/translations',
-            'PyQt6/Qt6/qml'
+            'PyQt6/Qt6/qml',
             'PyQt6/Qt6/qsci',
 #            "PyQt6/Qt6/lib", # comment for the non-Framework variant
         ]:

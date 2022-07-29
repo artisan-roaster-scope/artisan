@@ -21779,8 +21779,12 @@ class ApplicationWindow(QMainWindow):
                 len_bt = len(aw.qmc.stemp2)
                 rev_drop_idx = len_bt - aw.qmc.timeindex[6]
                 BTlimit = aw.qmc.phases[1]
+                if len(rev_np_bt[rev_drop_idx:]) == 0:
+                    return None, None
                 rev_min_idx = numpy.argmin(rev_np_bt[rev_drop_idx:]) + rev_drop_idx
 
+                if len(rev_np_bt[rev_drop_idx:rev_min_idx]) == 0:
+                    return None, None
                 # Find the first sample less than the phases DRY temp (going backwards from DROP)
                 rev_dry_idx = numpy.argmin(numpy.sign(rev_np_bt[rev_drop_idx:rev_min_idx] - BTlimit))
 
