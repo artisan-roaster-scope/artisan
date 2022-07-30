@@ -34,7 +34,7 @@ class QtSingleApplication(QApplication):
     def __init__(self, _id,_viewer_id, *argv):
 
         if sys.platform.startswith('darwin') and mp.current_process().name == 'WebLCDs':
-            import AppKit
+            import AppKit # pylint: disable=import-error
             info = AppKit.NSBundle.mainBundle().infoDictionary()  # @UndefinedVariable # pylint: disable=maybe-no-member
             info['LSBackgroundOnly'] = '1'
 

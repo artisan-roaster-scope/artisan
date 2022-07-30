@@ -535,10 +535,10 @@ try:
                 conf['handlers']['file']['filename'] = os.path.join(getDataDirectory(),'artisanViewer.log')
             else:
                 conf['handlers']['file']['filename'] = os.path.join(getDataDirectory(),'artisan.log')
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
         logging.config.dictConfig(conf)
-except Exception:
+except Exception: # pylint: disable=broad-except
     pass
 
 _log: Final = logging.getLogger(__name__)
@@ -9737,7 +9737,7 @@ class tgraphcanvas(FigureCanvas):
                             loc = self.legend._loc # pylint: disable=protected-access
                         try:
                             leg = self.ax.legend(self.handles,self.labels,loc=loc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
-                        except Exception:
+                        except Exception: # pylint: disable=broad-except
                             pass
                         try:
                             leg.set_in_layout(False) # remove legend from tight_layout calculation
@@ -15871,12 +15871,12 @@ class tgraphcanvas(FigureCanvas):
             if self.crossmouseid is not None:
                 try:
                     self.fig.canvas.mpl_disconnect(self.crossmouseid)
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
             if self.onreleaseid is not None:
                 try:
                     self.fig.canvas.mpl_disconnect(self.onreleaseid)  #mouse cross lines measurement
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
             try:
                 aw.qmc.ax.lines.remove(self.l_horizontalcrossline)
@@ -28390,7 +28390,7 @@ class ApplicationWindow(QMainWindow):
             filename = self.getExtraDeviceSettingsPath()
         try:
             os.unlink(filename)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 
     def getExtraDeviceSettings(self, settings):
@@ -35260,15 +35260,15 @@ class ApplicationWindow(QMainWindow):
             if batch_process and self.html_loader is not None:
                 try:
                     self.html_loader.page().pdfPrintingFinished.disconnect()
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
                 try:
                     self.html_loader.loadFinished.disconnect()
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
                 try:
                     self.html_loader.renderProcessTerminated.disconnect()
-                except Exception:
+                except Exception: # pylint: disable=broad-except
                     pass
             else:
                 self.releaseQWebEngineView()
