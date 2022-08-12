@@ -1,0 +1,20 @@
+[General]
+Delay=2000
+Oversampling=false
+curvefilter=1
+filterDropOuts=true
+optimalSmoothing=false
+roastertype_setup=Titanium TGX
+
+[Device]
+id=34
+phidget1048_async=false, false, false, false
+phidget1048_changeTriggers=0, 0, 0, 0
+phidget1048_dataRate=32
+phidget1048_types=1, 1, 1, 1
+
+[RoC]
+DeltaETspan=15
+DeltaSpan=15
+deltaETfilter=13
+deltafilter=13

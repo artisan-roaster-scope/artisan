@@ -714,7 +714,7 @@ class tgraphcanvas(FigureCanvas):
         'extralinewidths1', 'extralinewidths2', 'extramarkers1', 'extramarkers2', 'extramarkersizes1', 'extramarkersizes2', 'devicetablecolumnwidths', 'extraNoneTempHint1',
         'extraNoneTempHint2', 'plotcurves', 'plotcurvecolor', 'overlapList', 'tight_layout_params', 'fig', 'ax', 'delta_ax', 'legendloc', 'legendloc_pos', 'onclick_cid',
         'oncpick_cid', 'ondraw_cid', 'rateofchange1', 'rateofchange2', 'flagon', 'flagstart', 'flagKeepON', 'flagOpenCompleted', 'flagsampling', 'flagsamplingthreadrunning',
-        'manuallogETflag', 'zoom_follow', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents', 'compareBBP',
+        'manuallogETflag', 'zoom_follow', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents', 'compareBBP', 'compareRoast',
         'replayType', 'replayedBackgroundEvents', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
         'title', 'title_show_always', 'ambientTemp', 'ambientTempSource', 'ambient_temperature_device', 'ambient_pressure', 'ambient_pressure_device', 'ambient_humidity',
         'ambient_humidity_device', 'elevation', 'temperaturedevicefunctionlist', 'humiditydevicefunctionlist', 'pressuredevicefunctionlist', 'moisture_greens', 'moisture_roasted',
@@ -1508,7 +1508,10 @@ class tgraphcanvas(FigureCanvas):
         self.compareDeltaET = False
         self.compareDeltaBT = True
         self.compareMainEvents = True
-        self.compareBBP = False
+        # Comparator: Roast (compareBBP=False & compareRoast=True); BBP+Roast (compareBBP=True & compareRoast=True); BBP (compareBBP=True & compareRoast=False)
+        #   the state compareBBP=False and compareRoast=False should never occur
+        self.compareBBP = False # if True incl. BBP
+        self.compareRoast = True # if False roast should not be compared (self.compareBBP should be True in this case!)
 
         self.replayType = 0 # 0: by time, 1: by BT, 2: by ET
         self.replayedBackgroundEvents = [] # set of BackgroundEvent indices that have already been replayed (cleared in ClearMeasurements)
@@ -3258,7 +3261,7 @@ class tgraphcanvas(FigureCanvas):
                     # Mark starting point of click-and-drag with a marker
                     self.base_horizontalcrossline, = self.ax.plot(self.baseX,self.baseY,'r+', markersize=20)
                     self.base_verticalcrossline, = self.ax.plot(self.baseX,self.baseY,'wo', markersize = 2)
-            elif event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag:# and not self.flagon:
+            elif event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag and not aw.ntb.mode == 'pan/zoom':# and not self.flagon:
                 timex = self.time2index(event.xdata)
                 if timex > 0:
                     menu = QMenu(aw) # if we bind this to self, we inherit the background-color: transparent from self.fig
@@ -6781,13 +6784,13 @@ class tgraphcanvas(FigureCanvas):
             self.currenty = 0               #used to add point when right click
             self.designertemp1init = []
             self.designertemp2init = []
-            if self.mode == 'C':
-                #CH, DE, Fcs,Fce,Scs,Sce,Drop
-                self.designertemp1init = [290,290,290,290,290,290,290]
-                self.designertemp2init = [200,150,200,210,220,225,240]
-            elif self.mode == 'F':
-                self.designertemp1init = [500,500,500,500,500,500,500]
-                self.designertemp2init = [380,300,390,395,410,412,420]
+#            if self.mode == 'C':
+#                #CH, DE, FCs,FCe,SSs,SCe,DROP, COOL
+#                self.designertemp1init = [290.,290.,290.,290.,280.,270.,260.,250]
+#                self.designertemp2init = [230.,150.,190.,212.,218.,225.,230.,230.]
+#            elif self.mode == 'F':
+#                self.designertemp1init = [500,500,500,500,500,500,500]
+#                self.designertemp2init = [380,300,390,395,410,412,420]
             self.disconnect_designer()  #sets designer flag false
             self.setCursor(Qt.CursorShape.ArrowCursor)
 
@@ -6896,10 +6899,9 @@ class tgraphcanvas(FigureCanvas):
         if self.endofx < 1:
             self.endofx = 60
 
-        aw.autoAdjustAxis(background=not keepProperties) # if reset() triggered by ON, we ignore background on adjusting the axis and adjust according to RESET min/max
-
         ### REDRAW  ##
         if redraw:
+            aw.autoAdjustAxis(background=not keepProperties) # if reset() triggered by ON, we ignore background on adjusting the axis and adjust according to RESET min/max
             self.redraw(True,sampling=sampling,smooth=aw.qmc.optimalSmoothing) # we need to re-smooth with standard smoothing if ON and optimal-smoothing is ticked
 
         #QApplication.processEvents() # this one seems to be needed for a proper redraw in fullscreen mode on OS X if a profile was loaded and NEW is pressed
@@ -14758,14 +14760,14 @@ class tgraphcanvas(FigureCanvas):
 
     #used to start designer from scratch (not from a loaded profile)
     def designerinit(self):
-        #init start vars        #CH, DE,      Fcs,      Fce,       Scs,         Sce,         Drop,      COOL
-        self.designertimeinit = [0,(5*60),(8*60),(10*60),(10.5*60),(11.5*60),(12*60),(16*60)]
+        #init start vars        #CH, DE,      FCs,      FCe,       SCs,         SCe,         Drop,      COOL
+        self.designertimeinit = [0,(4*60),(9*60),(11*60),(12*60),(12.5*60),(13*60),(17*60)]
         if self.mode == 'C':
-            self.designertemp1init = [290.,290.,290.,290.,290.,290.,290.,290.]   #CHARGE,DE,FCs,FCe,SCs,SCe,Drop
-            self.designertemp2init = [230.,150.,190.,210.,220.,225.,230.,230.]   #CHARGE,DE,FCs,FCe,SCs,SCe,DROP
+            self.designertemp1init = [290.,290.,290.,290.,280.,270.,260.,150.]   #CHARGE,DE,FCs,FCe,SCs,SCe,DROP,COOL
+            self.designertemp2init = [210.,150.,198.,207.,212.,213.,215.,150.]   #CHARGE,DE,FCs,FCe,SCs,SCe,DROP,COOL
         elif self.mode == 'F':
-            self.designertemp1init = [500.,500.,500.,500.,500.,500.,500.,500.]
-            self.designertemp2init = [440.,300.,385.,410.,430.,445.,460.,460.]
+            self.designertemp1init = [554.,554.,554.,554.,536.,518.,500.,302.]
+            self.designertemp2init = [410.,300.,388.,404.,413.,415.5,419.,302.]
 
         #check x limits
         #if self.endofx < 960:
@@ -14774,12 +14776,32 @@ class tgraphcanvas(FigureCanvas):
 
         self.timex,self.temp1,self.temp2 = [],[],[]
         for i in range(len(self.timeindex)):
-            self.timex.append(self.designertimeinit[i])
-            self.temp1.append(self.designertemp1init[i])
-            self.temp2.append(self.designertemp2init[i])
-            self.timeindex[i] = i
+            # add SCe and COOL END only if corresponding button is enabled
+            if (i != 5 or aw.qmc.buttonvisibility[5]) and (i != 7 or aw.qmc.buttonvisibility[7]):
+                self.timex.append(self.designertimeinit[i])
+                self.temp1.append(self.designertemp1init[i])
+                self.temp2.append(self.designertemp2init[i])
+                self.timeindex[i] = i
+        # add TP
+        if self.mode == 'C':
+            self.timex.insert(1,1.5*60)
+            self.temp1.insert(1,290)
+            self.temp2.insert(1,110)
+            # add one intermediate point between DRY and FCs
+            self.timex.insert(3,6*60)
+            self.temp1.insert(3,290)
+            self.temp2.insert(3,174)
+        elif self.mode == 'F':
+            self.timex.insert(1,1.5*60)
+            self.temp1.insert(1,554)
+            self.temp2.insert(1,230)
+            # add one intermediate point between DRY and FCs
+            self.timex.insert(3,6*60)
+            self.temp1.insert(3,554)
+            self.temp2.insert(3,345)
 
-        self.xaxistosm(redraw=False)
+        if not self.locktimex:
+            self.xaxistosm(redraw=False)
         self.redrawdesigner()
 
     #loads main points from a profile so that they can be edited
@@ -14833,7 +14855,8 @@ class tgraphcanvas(FigureCanvas):
             self.currenty = lptemp2
             self.addpoint(manual=False)
 
-        self.xaxistosm(redraw=False)
+        if not self.locktimex:
+            self.xaxistosm(redraw=False)
         self.redrawdesigner()                                   #redraw the designer screen
         return True
 
@@ -14882,7 +14905,7 @@ class tgraphcanvas(FigureCanvas):
             self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[2]]],ylist,color = self.palette['grid'],alpha=.3,linewidth=3,linestyle='--')
             self.ax.plot([self.timex[self.timeindex[6]],self.timex[self.timeindex[6]]],ylist,color = self.palette['grid'],alpha=.3,linewidth=3,linestyle='--')
 
-            if self.timex[-1] > self.endofx:
+            if not self.locktimex and self.timex[-1] > self.endofx:
                 self.endofx = self.timex[-1] + 120
                 self.xaxistosm()
 
@@ -20957,7 +20980,7 @@ class ApplicationWindow(QMainWindow):
                     t_min,t_max = aw.calcAutoAxisBackground()
                 else:
                     if len(aw.qmc.timex) > 3:
-                        t_min,t_max = aw.calcAutoAxis()
+                        t_min,t_max = aw.calcAutoAxisForeground()
                     else:
                         t_min = aw.qmc.chargemintime
                         t_max = aw.qmc.resetmaxtime
@@ -21030,30 +21053,34 @@ class ApplicationWindow(QMainWindow):
             if not (platf == 'Darwin' and self.qmc.locale_str == 'en'):
                 aw.fullscreenAction.setChecked(True)
 
+    def calcAutoAxisForeground(self):
+        return self.calcAutoAxis(self.qmc.timex,self.qmc.timeindex,self.qmc.foregroundShowFullflag or self.qmc.flagstart)
+
     # returns time axis min and max
-    # min to be 1min before CHARGE or first recording if no CHARGE
-    # max to be 1min after COOL or DROP or last recording if no DROP nor COOL
-    def calcAutoAxis(self):
-        if len(self.qmc.timex) > 3:
+    # min to be about 1min (1/16 of total time) before CHARGE or first recording if no CHARGE
+    # max to be about 1min (1/10 of total time) after COOL or DROP or last recording if no DROP nor COOL
+    def calcAutoAxis(self, timex, timeindex, beyondDROP):
+        if len(timex) > 3:
             # profile loaded?
             t_start = self.qmc.startofx
             t_end = self.qmc.endofx
-            if self.qmc.autotimexMode == 0 and self.qmc.timeindex[0] > -1: # CHARGE set
-                t_start = self.qmc.timex[self.qmc.timeindex[0]] - 60
+            if self.qmc.autotimexMode == 0 and timeindex[0] > -1: # CHARGE set
+                t_start = timex[timeindex[0]]
             else:
-                if self.qmc.autotimexMode == 0:
-                    t_start = self.qmc.timex[0] - 60
-                else:
-                    t_start = self.qmc.timex[0] - 30
-            if self.qmc.autotimexMode == 2 and self.qmc.timeindex[0] > -1:
-                t_end = self.qmc.timex[self.qmc.timeindex[0]] + 30
+                t_start = timex[0]
+            if self.qmc.autotimexMode == 2 and timeindex[0] > -1:
+                t_end = timex[timeindex[0]]
             else:
-                if self.qmc.timeindex[7] > 0 and (self.qmc.foregroundShowFullflag or self.qmc.flagstart): # COOL set and the curves are drawn beyond DROP
-                    t_end = self.qmc.timex[self.qmc.timeindex[7]] + 60
-                elif self.qmc.timeindex[6] > 0: # DROP set
-                    t_end = self.qmc.timex[self.qmc.timeindex[6]] + 90
+                if timeindex[7] > 0 and beyondDROP: # COOL set and the curves are drawn beyond DROP
+                    t_end = timex[timeindex[7]]
+                elif timeindex[6] > 0: # DROP set
+                    t_end = timex[timeindex[6]]
                 else:
-                    t_end = self.qmc.timex[-1] + 90
+                    t_end = timex[-1]
+            # add padding
+            time_period = t_end - t_start
+            t_start -= 1/16*time_period
+            t_end += 1/10*time_period
             return t_start, t_end
         return self.qmc.startofx, self.qmc.endofx
 
@@ -21093,16 +21120,7 @@ class ApplicationWindow(QMainWindow):
         return 0
 
     def calcAutoAxisBackground(self):
-        if len(aw.qmc.timeB) > 3:
-            # profile loaded?
-            t_start = aw.qmc.startofx
-            t_end = aw.qmc.endofx
-            if self.qmc.timeindexB[0] > -1: # CHARGE set
-                t_start = aw.qmc.timeB[aw.qmc.timeindexB[0]] - 60
-            if self.qmc.timeindexB[6] > 0: # DROP set
-                t_end = aw.qmc.timeB[aw.qmc.timeindexB[6]] + 90
-            return t_start, t_end
-        return aw.qmc.startofx, aw.qmc.endofx
+        return self.calcAutoAxis(self.qmc.timeB,self.qmc.timeindexB,self.qmc.backgroundShowFullflag or self.qmc.flagstart)
 
     # returns the last event value of the given type, or None if no event was ever recorded
     @staticmethod
@@ -25485,9 +25503,23 @@ class ApplicationWindow(QMainWindow):
                 if k == 70:                         #F SELECTS FULL SCREEN MODE
                     self.toggleFullscreen()
                 elif k == 71:                       #G (toggle time auto axis mode)
-                    self.qmc.autotimexMode = (self.qmc.autotimexMode+1) % 3
-                    self.autoAdjustAxis(deltas=False)
-                    self.qmc.redraw()
+                    if not self.qmc.designerflag and not self.qmc.wheelflag:
+                        if bool(aw.comparator):
+                            aw.comparator.modeComboBox.setCurrentIndex((aw.comparator.modeComboBox.currentIndex()+1) % 3)
+                        else:
+                            self.qmc.autotimexMode = (self.qmc.autotimexMode+1) % 3
+                            if self.qmc.autotimexMode == 0:
+                                self.sendmessage(QApplication.translate('Message','Auto Axis Graph Mode: Roast'))
+                            elif self.qmc.autotimexMode == 1:
+                                self.sendmessage(QApplication.translate('Message','Auto Axis Graph Mode: BBP+Roast'))
+                            elif self.qmc.autotimexMode == 2:
+                                self.sendmessage(QApplication.translate('Message','Auto Axis Graph Mode: BBP'))
+                            if not self.qmc.flagon:
+                                # adjust foreground or if no foreground but background is loaded the background
+                                self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
+                                if self.qmc.autotimexMode != 0 and not self.qmc.foregroundShowFullflag:
+                                    self.qmc.foregroundShowFullflag = True
+                                self.qmc.redraw()
                 elif self.buttonpalette_shortcuts and control_modifier and k in numberkeys: # palette switch via SHIFT-NUM-Keys
                     self.setbuttonsfrom(numberkeys.index(k))
                 elif k == 74:                       #J (toggle Playback Events)
@@ -31331,6 +31363,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.locktimex = bool(toBool(settings.value('locktimex',self.qmc.locktimex)))
             if settings.contains('autotimex'):
                 self.qmc.autotimex = bool(toBool(settings.value('autotimex',self.qmc.autotimex)))
+            if settings.contains('autotimexMode'):
+                self.qmc.autotimexMode = toInt(settings.value('autotimexMode',self.qmc.autotimexMode))
             if settings.contains('autodeltaxET'):
                 self.qmc.autodeltaxET = bool(toBool(settings.value('autodeltaxET',self.qmc.autodeltaxET)))
             if settings.contains('autodeltaxBT'):
@@ -31723,8 +31757,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.compareDeltaBT = bool(toBool(settings.value('compareDeltaBT',self.qmc.compareDeltaBT)))
             if settings.contains('compareMainEvents'):
                 self.qmc.compareMainEvents = bool(toBool(settings.value('compareMainEvents',self.qmc.compareMainEvents)))
-            if settings.contains('compareMainEvents'):
+            if settings.contains('compareBBP'):
                 self.qmc.compareBBP = bool(toBool(settings.value('compareBBP',self.qmc.compareBBP)))
+            if settings.contains('compareRoast'):
+                self.qmc.compareRoast = bool(toBool(settings.value('compareRoast',self.qmc.compareRoast)))
             if settings.contains('autosaveflag'):
                 self.qmc.autosaveflag = toInt(settings.value('autosaveflag',self.qmc.autosaveflag))
             if settings.contains('autosaveaddtorecentfilesflag'):
@@ -32832,6 +32868,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue('lockmax',self.qmc.fixmaxtime)
             settings.setValue('locktimex',self.qmc.locktimex)
             settings.setValue('autotimex',self.qmc.autotimex)
+            settings.setValue('autotimexMode',self.qmc.autotimexMode)
             settings.setValue('autodeltaxET',self.qmc.autodeltaxET)
             settings.setValue('autodeltaxBT',self.qmc.autodeltaxBT)
             settings.setValue('locktimex_start',self.qmc.locktimex_start)
@@ -33020,6 +33057,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue('compareDeltaBT',self.qmc.compareDeltaBT)
             settings.setValue('compareMainEvents',self.qmc.compareMainEvents)
             settings.setValue('compareBBP',self.qmc.compareBBP)
+            settings.setValue('compareRoast',self.qmc.compareRoast)
             settings.setValue('autosaveflag',self.qmc.autosaveflag)
             settings.setValue('autosaveaddtorecentfilesflag',self.qmc.autosaveaddtorecentfilesflag)
             settings.setValue('autosavepdf',self.qmc.autosaveimage)

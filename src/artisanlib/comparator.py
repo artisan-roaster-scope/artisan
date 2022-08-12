@@ -303,12 +303,16 @@ class RoastProfile():
             RoR_start = min(self.timeindex[0]+10, len(self.timex)-1)
         else:
             RoR_start = -1
-        self.delta1, self.delta2 = self.aw.qmc.recomputeDeltas(self.timex,RoR_start,self.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
+        if self.aw.qmc.compareBBP and not self.aw.qmc.compareRoast:
+            # no delta curve if BBP only
+            self.delta1, self.delta2 = [None]*len(self.timex), [None]*len(self.timex)
+        else:
+            self.delta1, self.delta2 = self.aw.qmc.recomputeDeltas(self.timex,RoR_start,self.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
         # calculate start/end index
         self.startTimeIdx = (self.timeindex[0] if self.timeindex[0] != -1 else 0)
         self.endTimeIdx = (self.timeindex[6] if self.timeindex[6] != 0 else len(self.timex)-1)
-        self.stemp1 = [None if (not self.aw.qmc.compareBBP and i < self.startTimeIdx) or i > self.endTimeIdx else t for i,t in enumerate(self.stemp1)]
-        self.stemp2 = [None if (not self.aw.qmc.compareBBP and i < self.startTimeIdx) or i > self.endTimeIdx else t for i,t in enumerate(self.stemp2)]
+        self.stemp1 = [None if (not self.aw.qmc.compareBBP and i < self.startTimeIdx) or (not self.aw.qmc.compareRoast and i>self.startTimeIdx) or i > self.endTimeIdx else t for i,t in enumerate(self.stemp1)]
+        self.stemp2 = [None if (not self.aw.qmc.compareBBP and i < self.startTimeIdx) or (not self.aw.qmc.compareRoast and i>self.startTimeIdx) or i > self.endTimeIdx else t for i,t in enumerate(self.stemp2)]
         # calculate max deltas
         self.max_DeltaET = 1
         if len(self.delta1) > 0:
@@ -354,60 +358,63 @@ class RoastProfile():
             self.E2 = []
             self.E3 = []
             self.E4 = []
-            last_E1, last_E2, last_E3, last_E4 = None, None, None, None
-            for i,e in enumerate(self.specialevents):
-                try:
-                    etime = self.timex[e]
-                    etype = self.specialeventstype[i]
-                    evalue = self.aw.qmc.eventsInternal2ExternalValue(self.specialeventsvalue[i]) * value_factor + value_offset
-                    # remember last event value per type before CHARGE
-                    if (self.timeindex[0] != -1 and e < self.timeindex[0]):
-                        if etype == 0:
-                            last_E1 = evalue
-                        elif etype == 1:
-                            last_E2 = evalue
-                        elif etype == 2:
-                            last_E3 = evalue
-                        elif etype == 3:
-                            last_E4 = evalue
-                    # only draw events between CHARGE and DRY
-                    if (self.timeindex[0] == -1 or e >= self.timeindex[0]) and (self.timeindex[6] == 0 or e <= self.timeindex[6]):
-                        if etype == 0:
-                            if last_E1 is not None and last_E1 != evalue:
-                                # add event value @CHARGE
-                                self.E1.append((self.timex[self.timeindex[0]],last_E1))
-                                last_E1 = None
-                            self.E1.append((etime,evalue))
-                        elif etype == 1:
-                            if last_E2 is not None and last_E2 != evalue:
-                                # add event value @CHARGE
-                                self.E2.append((self.timex[self.timeindex[0]],last_E2))
-                                last_E2 = None
-                            self.E2.append((etime,evalue))
-                        elif etype == 2:
-                            if last_E3 is not None and last_E3 != evalue:
-                                # add event value @CHARGE
-                                self.E3.append((self.timex[self.timeindex[0]],last_E3))
-                                last_E3 = None
-                            self.E3.append((etime,evalue))
-                        elif etype == 3:
-                            if last_E4 is not None and last_E4 != evalue:
-                                # add event value @CHARGE
-                                self.E4.append((self.timex[self.timeindex[0]],last_E4))
-                                last_E4 = None
-                            self.E4.append((etime,evalue))
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
-            # add a last event at DROP/END to extend the lines to the end of roast
-            end = (self.timex[-1] if self.timeindex[6] == 0 else self.timex[self.timeindex[6]])
-            if self.E1:
-                self.E1.append((end,self.E1[-1][1]))
-            if self.E2:
-                self.E2.append((end,self.E2[-1][1]))
-            if self.E3:
-                self.E3.append((end,self.E3[-1][1]))
-            if self.E4:
-                self.E4.append((end,self.E4[-1][1]))
+
+            if not self.aw.qmc.compareBBP or self.aw.qmc.compareRoast:
+                # no special event curves if BBP only mode
+                last_E1, last_E2, last_E3, last_E4 = None, None, None, None
+                for i,e in enumerate(self.specialevents):
+                    try:
+                        etime = self.timex[e]
+                        etype = self.specialeventstype[i]
+                        evalue = self.aw.qmc.eventsInternal2ExternalValue(self.specialeventsvalue[i]) * value_factor + value_offset
+                        # remember last event value per type before CHARGE
+                        if (self.timeindex[0] != -1 and e < self.timeindex[0]):
+                            if etype == 0:
+                                last_E1 = evalue
+                            elif etype == 1:
+                                last_E2 = evalue
+                            elif etype == 2:
+                                last_E3 = evalue
+                            elif etype == 3:
+                                last_E4 = evalue
+                        # only draw events between CHARGE and DRY
+                        if (self.timeindex[0] == -1 or e >= self.timeindex[0]) and (self.timeindex[6] == 0 or e <= self.timeindex[6]):
+                            if etype == 0:
+                                if last_E1 is not None and last_E1 != evalue:
+                                    # add event value @CHARGE
+                                    self.E1.append((self.timex[self.timeindex[0]],last_E1))
+                                    last_E1 = None
+                                self.E1.append((etime,evalue))
+                            elif etype == 1:
+                                if last_E2 is not None and last_E2 != evalue:
+                                    # add event value @CHARGE
+                                    self.E2.append((self.timex[self.timeindex[0]],last_E2))
+                                    last_E2 = None
+                                self.E2.append((etime,evalue))
+                            elif etype == 2:
+                                if last_E3 is not None and last_E3 != evalue:
+                                    # add event value @CHARGE
+                                    self.E3.append((self.timex[self.timeindex[0]],last_E3))
+                                    last_E3 = None
+                                self.E3.append((etime,evalue))
+                            elif etype == 3:
+                                if last_E4 is not None and last_E4 != evalue:
+                                    # add event value @CHARGE
+                                    self.E4.append((self.timex[self.timeindex[0]],last_E4))
+                                    last_E4 = None
+                                self.E4.append((etime,evalue))
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+                # add a last event at DROP/END to extend the lines to the end of roast
+                end = (self.timex[-1] if self.timeindex[6] == 0 else self.timex[self.timeindex[6]])
+                if self.E1:
+                    self.E1.append((end,self.E1[-1][1]))
+                if self.E2:
+                    self.E2.append((end,self.E2[-1][1]))
+                if self.E3:
+                    self.E3.append((end,self.E3[-1][1]))
+                if self.E4:
+                    self.E4.append((end,self.E4[-1][1]))
 
     def firstTime(self):
         try:
@@ -721,7 +728,7 @@ class roastCompareDlg(ArtisanDialog):
 
     __slots__ = [ 'foreground', 'background', 'maxentries', 'basecolors', 'profiles', 'label_number', 'l_align', 'legend', 'legendloc_pos', 'addButton',
         'deleteButton', 'alignnames', 'alignComboBox', 'etypes', 'eventsComboBox', 'cb', 'model', 'button_7_org_state_hidden', 'button_1_org_state_hidden',
-        'button_2_org_state_hidden', 'button_10_org_state_hidden', 'pick_handler_id', 'BBPCheckBox', 'buttonCONTROL_org_state_hidden', 'buttonONOFF_org_state_hidden',
+        'button_2_org_state_hidden', 'button_10_org_state_hidden', 'pick_handler_id', 'modeComboBox', 'buttonCONTROL_org_state_hidden', 'buttonONOFF_org_state_hidden',
         'buttonRESET_org_state_hidden', 'buttonSTARTSTOP_org_state_hidden', 'profileTable' ]
 
     def __init__(self, parent = None, aw = None, foreground = None, background = None):
@@ -755,6 +762,22 @@ class roastCompareDlg(ArtisanDialog):
         self.deleteButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.deleteButton.clicked.connect(self.delete)
         # configurations
+        modes = [
+            QApplication.translate('ComboBox','Roast'),
+            QApplication.translate('ComboBox','BBP+Roast'),
+            QApplication.translate('ComboBox','BBP'),
+            ]
+        self.modeComboBox = MyQComboBox()
+        self.modeComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.modeComboBox.addItems(modes)
+        if self.aw.qmc.compareRoast and self.aw.qmc.compareBBP:
+            self.modeComboBox.setCurrentIndex(1)
+        elif not self.aw.qmc.compareRoast and self.aw.qmc.compareBBP:
+            self.modeComboBox.setCurrentIndex(2)
+        else:
+            self.modeComboBox.setCurrentIndex(0)
+        self.modeComboBox.currentIndexChanged.connect(self.changeModeidx)
+        #
         alignLabel = QLabel(QApplication.translate('Label','Align'))
         self.alignnames = [
             QApplication.translate('Label','CHARGE'),
@@ -769,12 +792,13 @@ class roastCompareDlg(ArtisanDialog):
         self.alignComboBox = MyQComboBox()
         self.alignComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.alignComboBox.addItems(self.alignnames)
-        self.alignComboBox.setCurrentIndex(self.aw.qmc.compareAlignEvent)
+        if self.aw.qmc.compareRoast == False and self.aw.qmc.compareBBP == True:
+            self.aw.qmc.compareAlignEvent = 0
+            self.alignComboBox.setCurrentIndex(0)
+            self.alignComboBox.setEnabled(False)
+        else:
+            self.alignComboBox.setCurrentIndex(self.aw.qmc.compareAlignEvent)
         self.alignComboBox.currentIndexChanged.connect(self.changeAlignEventidx)
-        #
-        self.BBPCheckBox = QCheckBox(QApplication.translate('CheckBox','BBP'))
-        self.BBPCheckBox.setChecked(bool(self.aw.qmc.compareBBP))
-        self.BBPCheckBox.stateChanged.connect(self.betweenBatchProtocolChanged)
         #
         self.etypes = self.aw.qmc.etypes[:-1]
         self.etypes.insert(0,'')
@@ -809,7 +833,7 @@ class roastCompareDlg(ArtisanDialog):
 
         settings1Layout = QHBoxLayout()
         settings1Layout.addSpacing(10)
-        settings1Layout.addWidget(self.BBPCheckBox)
+        settings1Layout.addWidget(self.modeComboBox)
         settings1Layout.addStretch()
         settings1Layout.addSpacing(10)
         settings1Layout.addStretch()
@@ -860,6 +884,19 @@ class roastCompareDlg(ArtisanDialog):
         settings = QSettings()
         if settings.contains('CompareGeometry'):
             self.restoreGeometry(settings.value('CompareGeometry'))
+
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # make keyPressEvent below work
+        self.setFocus(Qt.FocusReason.MouseFocusReason)
+
+    def keyPressEvent(self,event):
+        try:
+            k = int(event.key())
+            if k == 71:                       #G (toggle time auto axis mode)
+                self.modeComboBox.setCurrentIndex((self.modeComboBox.currentIndex()+1) % 3)
+            else:
+                QWidget.keyPressEvent(self, event)
+        except Exception: # pylint: disable=broad-except
+            pass
 
     @staticmethod
     def dragEnterEvent(event):
@@ -1287,14 +1324,6 @@ class roastCompareDlg(ArtisanDialog):
         self.repaint()
 
     @pyqtSlot(int)
-    def betweenBatchProtocolChanged(self,_=0):
-        if self.BBPCheckBox.isChecked():
-            self.aw.qmc.compareBBP = True
-        else:
-            self.aw.qmc.compareBBP = False
-        self.redraw()
-
-    @pyqtSlot(int)
     def visibilityChanged(self,state):
         i = self.aw.findWidgetsRow(self.profileTable,self.sender(),1)
         self.profiles[i].setVisible(bool(state))
@@ -1317,6 +1346,28 @@ class roastCompareDlg(ArtisanDialog):
         self.updateDeltaLimits()
         self.updateVisibilities()
         self.repaint()
+
+    @pyqtSlot(int)
+    def changeModeidx(self,i):
+        if int(not self.aw.qmc.compareRoast) + int(self.aw.qmc.compareBBP) != i:
+            if i == 1: # BBP+Roast
+                self.aw.qmc.compareRoast = True
+                self.aw.qmc.compareBBP = True
+                self.alignComboBox.setEnabled(True)
+            elif i == 2: # BBP only
+                self.aw.qmc.compareRoast = False
+                self.aw.qmc.compareBBP = True
+                if self.aw.qmc.compareAlignEvent != 0:
+                    self.aw.qmc.compareAlignEvent = 0
+                    self.blockSignals(True)
+                    self.alignComboBox.setCurrentIndex(0)
+                    self.blockSignals(False)
+                self.alignComboBox.setEnabled(False)
+            else: # Roast only
+                self.aw.qmc.compareRoast = True
+                self.aw.qmc.compareBBP = False
+                self.alignComboBox.setEnabled(True)
+            self.redraw()
 
     @pyqtSlot(int)
     def changeAlignEventidx(self,i):
@@ -1449,7 +1500,8 @@ class roastCompareDlg(ArtisanDialog):
             top.aligned = True
             # we calculate the min/max timex to to show all data considering this alignment to automatically set the time axis limits
             top.min_time = (top.firstTime() - delta if self.aw.qmc.compareBBP else 0)
-            top.max_time = top.endTime() - delta
+#            top.max_time = top.endTime() - delta
+            top.max_time = (top.endTime() - delta if self.aw.qmc.compareRoast else 0)
             # align all other profiles to the top profile w.r.t. self.aw.qmc.compareAlignEvent
             if self.aw.qmc.compareAlignEvent == 0:
                 refTime = 0
@@ -1472,7 +1524,8 @@ class roastCompareDlg(ArtisanDialog):
                     p.setTimeoffset(delta)
                     p.aligned = True
                     p.min_time = refTime - eventTime + (p.firstTime() if self.aw.qmc.compareBBP else p.startTime())
-                    p.max_time = p.endTime() - eventTime + refTime
+#                    p.max_time = p.endTime() - eventTime + refTime
+                    p.max_time = (p.endTime() if self.aw.qmc.compareRoast else p.startTime()) - eventTime + refTime
                 elif self.aw.qmc.compareAlignEvent==1 and p.TP > 0:
                     p_offset = 0
                     if p.timeindex[0]>-1:
@@ -1482,14 +1535,16 @@ class roastCompareDlg(ArtisanDialog):
                     p.setTimeoffset(delta)
                     p.aligned = True
                     p.min_time = refTime - eventTime + (p.firstTime() if self.aw.qmc.compareBBP else p.startTime())
-                    p.max_time = p.endTime() - eventTime + refTime
+#                    p.max_time = p.endTime() - eventTime + refTime
+                    p.max_time = (p.endTime() if self.aw.qmc.compareRoast else p.startTime()) - eventTime + refTime
                 elif self.aw.qmc.compareAlignEvent>1 and p.timeindex[self.aw.qmc.compareAlignEvent-1] > 0:
                     eventTime = p.timex[p.timeindex[self.aw.qmc.compareAlignEvent-1]]
                     delta = eventTime - refTime
                     p.setTimeoffset(delta)
                     p.aligned = True
                     p.min_time = refTime - eventTime + (p.firstTime() if self.aw.qmc.compareBBP else p.startTime())
-                    p.max_time = p.endTime() - eventTime + refTime
+#                    p.max_time = p.endTime() - eventTime + refTime
+                    p.max_time = (p.endTime() if self.aw.qmc.compareRoast else p.startTime()) - eventTime + refTime
                 elif (self.aw.qmc.compareAlignEvent == 0 or (self.aw.qmc.compareAlignEvent == 1 and top.TP == 0) or \
                         (self.aw.qmc.compareAlignEvent>1 and top.timeindex[self.aw.qmc.compareAlignEvent-1] == 0)):
                     # align to CHARGE or first reading
@@ -1501,7 +1556,8 @@ class roastCompareDlg(ArtisanDialog):
                     p.setTimeoffset(delta)
                     p.aligned = True
                     p.min_time = refTime - eventTime + (p.firstTime() if self.aw.qmc.compareBBP else p.startTime())
-                    p.max_time = p.endTime() - eventTime + refTime
+#                    p.max_time = p.endTime() - eventTime + refTime
+                    p.max_time = (p.endTime() if self.aw.qmc.compareRoast else p.startTime()) - eventTime + refTime
                 else:
                     p.aligned = False
             self.updateVisibilities()
@@ -1613,8 +1669,9 @@ class roastCompareDlg(ArtisanDialog):
                     else:
                         max_timex = max(max_timex,p.max_time)
             if min_timex is not None and max_timex is not None:
-                min_timex = min_timex - 30
-                max_timex = max_timex + 30
+                time_period = max_timex - min_timex
+                min_timex -= 1/16*time_period
+                max_timex += 1/10*time_period
                 self.aw.qmc.xaxistosm(min_time=min_timex, max_time=max_timex)
 
     def closeEvent(self, _):

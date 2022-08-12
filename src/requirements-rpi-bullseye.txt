@@ -18,7 +18,7 @@ gevent==21.12.0
 gevent-websocket==0.10.1
 numpy==1.23.1 #1.22.3
 scipy==1.8.1 #1.8.0 # depends on numpy thus needs to be put after
-matplotlib==3.5.2 # 3.5.1 requires pyinstaller > 4.2
+matplotlib==3.5.3 # 3.5.2 requires pyinstaller > 4.2
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus needs to be put after
 openpyxl==3.0.10 #3.0.9

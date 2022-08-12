@@ -35,6 +35,7 @@ except Exception: # pylint: disable=broad-except
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, QLayout, # @UnusedImport @Reimport  @UnresolvedImport
         QSpinBox) # @UnusedImport @Reimport  @UnresolvedImport
 
+
 class WindowsDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
@@ -116,16 +117,16 @@ class WindowsDlg(ArtisanDialog):
         regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$')
         self.resetEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.resetEdit.setText(stringfromseconds(self.aw.qmc.resetmaxtime))
-        self.resetEdit.setToolTip(QApplication.translate('Tooltip', 'Time axis max on RESET'))
+        self.resetEdit.setToolTip(QApplication.translate('Tooltip', 'Time axis max on start of a recording'))
         # CHARGE min
-        chargeminlabel = QLabel(QApplication.translate('Label', 'RESET') + ' ' + QApplication.translate('Label', 'Min'))
+        chargeminlabel = QLabel(QApplication.translate('Label', 'RECORD') + '   ' + QApplication.translate('Label', 'Min'))
         self.chargeminEdit = QLineEdit()
         self.chargeminEdit.setMaximumWidth(50)
         self.chargeminEdit.setMinimumWidth(50)
         self.chargeminEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.chargeminEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.chargeminEdit.setText(stringfromseconds(self.aw.qmc.chargemintime))
-        self.chargeminEdit.setToolTip(QApplication.translate('Tooltip', 'Time axis min on RESET'))
+        self.chargeminEdit.setToolTip(QApplication.translate('Tooltip', 'Time axis min on start of a recording'))
 
         # fixmaxtime flag
         self.fixmaxtimeFlag = QCheckBox(QApplication.translate('CheckBox', 'Expand'))
@@ -141,12 +142,33 @@ class WindowsDlg(ArtisanDialog):
         self.autotimexFlag.setChecked(self.aw.qmc.autotimex)
         self.autotimexFlag.stateChanged.connect(self.autoTimexFlagChanged)
         self.autotimexFlag.setToolTip(QApplication.translate('Tooltip', 'Automatically set time axis min and max from profile CHARGE/DROP events'))
-        autoButton = QPushButton(QApplication.translate('Button','Calc'))
-        autoButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        autoButton.clicked.connect(self.autoAxis)
+        self.autoButton = QPushButton(QApplication.translate('Button','Calc'))
+        self.autoButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.autoButton.clicked.connect(self.autoAxis)
+        # autotimexMode
+        self.autotimexModeCombobox = QComboBox()
+        if not self.autotimexFlag.isChecked():
+            self.autotimexModeCombobox.setEnabled(False)
+            self.autoButton.setEnabled(False)
+        if self.aw.qmc.flagon:
+            self.autoButton.setEnabled(False)
+        self.autotimexModeCombobox.setToolTip(QApplication.translate('Tooltip', 'Distance of major tick labels'))
+        autotimeModes =   [
+                      QApplication.translate('ComboBox', 'Roast'),
+                      QApplication.translate('ComboBox', 'BBP+Roast'),
+                      QApplication.translate('ComboBox', 'BBP')]
+        self.autotimexModeCombobox.addItems(autotimeModes)
+        try:
+            self.autotimexModeCombobox.setCurrentIndex(self.aw.qmc.autotimexMode)
+        except Exception: # pylint: disable=broad-except
+            self.autotimexModeCombobox.setCurrentIndex(0)
+        self.autotimexModeCombobox.currentIndexChanged.connect(self.changeAutoTimexMode)
+
         # time axis steps
         timegridlabel = QLabel(QApplication.translate('Label', 'Step'))
+        timegridlabel.setToolTip(QApplication.translate('Tooltip', 'Distance of major tick labels'))
         self.xaxislencombobox = QComboBox()
+        self.xaxislencombobox.setToolTip(QApplication.translate('Tooltip', 'Distance of major tick labels'))
         timelocs =   [
                       '',
                       QApplication.translate('ComboBox', '1 minute'),
@@ -181,7 +203,9 @@ class WindowsDlg(ArtisanDialog):
         self.tempGridCheckBox.setChecked(self.aw.qmc.temp_grid)
         self.tempGridCheckBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         ygridlabel = QLabel(QApplication.translate('Label', 'Step'))
+        ygridlabel.setToolTip(QApplication.translate('Tooltip', 'Distance of major tick labels'))
         self.ygridSpinBox = QSpinBox()
+        self.ygridSpinBox.setToolTip(QApplication.translate('Tooltip', 'Distance of major tick labels'))
         self.ygridSpinBox.setRange(0,500)
         self.ygridSpinBox.setSingleStep(5)
         self.ygridSpinBox.setValue(self.aw.qmc.ygrid)
@@ -189,7 +213,9 @@ class WindowsDlg(ArtisanDialog):
         self.ygridSpinBox.editingFinished.connect(self.changeygrid)
         self.ygridSpinBox.setMaximumWidth(60)
         zgridlabel = QLabel(QApplication.translate('Label', 'Step'))
+        zgridlabel.setToolTip(QApplication.translate('Tooltip', 'Distance of major tick labels'))
         self.zgridSpinBox = QSpinBox()
+        self.zgridSpinBox.setToolTip(QApplication.translate('Tooltip', 'Distance of major tick labels'))
         self.zgridSpinBox.setRange(0,100)
         self.zgridSpinBox.setSingleStep(1)
         self.zgridSpinBox.setValue(self.aw.qmc.zgrid)
@@ -240,9 +266,11 @@ class WindowsDlg(ArtisanDialog):
         resetButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
         resetButton.clicked.connect(self.reset)
         self.setButtonTranslations(resetButton,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
+        resetButton.setToolTip(QApplication.translate('Tooltip', 'Reset axis settings to their defaults'))
 
         self.loadAxisFromProfile = QCheckBox(QApplication.translate('CheckBox', 'Load from profile'))
         self.loadAxisFromProfile.setChecked(self.aw.qmc.loadaxisfromprofile)
+        self.loadAxisFromProfile.setToolTip(QApplication.translate('Tooltip', 'Take axis settings from profile on load'))
 
         hline = QFrame()
         hline.setFrameShape(QFrame.Shape.HLine)
@@ -254,7 +282,8 @@ class WindowsDlg(ArtisanDialog):
 
         xlayout1 = QHBoxLayout()
         xlayout1.addWidget(self.autotimexFlag)
-        xlayout1.addWidget(autoButton)
+        xlayout1.addWidget(self.autotimexModeCombobox)
+        xlayout1.addWidget(self.autoButton)
         xlayout1.addStretch()
         xlayout1.addWidget(self.locktimexFlag)
         xlayout2 = QHBoxLayout()
@@ -264,6 +293,7 @@ class WindowsDlg(ArtisanDialog):
         xlayout2.addWidget(xlimitLabel)
         xlayout2.addWidget(self.xlimitEdit)
         xlayout2.addStretch()
+        xlayout2.addSpacing(10)
         xlayout2.addWidget(timegridlabel)
         xlayout2.addWidget(self.xaxislencombobox)
         xlayout3 = QHBoxLayout()
@@ -401,6 +431,15 @@ class WindowsDlg(ArtisanDialog):
         self.resetEdit.setEnabled(False)
         self.fixmaxtimeFlag.setEnabled(False)
 
+    def enableAutoControls(self):
+        self.autotimexModeCombobox.setEnabled(True)
+        if not self.aw.qmc.flagon:
+            self.autoButton.setEnabled(True)
+
+    def disableAutoControls(self):
+        self.autotimexModeCombobox.setEnabled(False)
+        self.autoButton.setEnabled(False)
+
     @pyqtSlot(int)
     def lockTimexFlagChanged(self,n):
         if n:
@@ -413,20 +452,21 @@ class WindowsDlg(ArtisanDialog):
     def autoTimexFlagChanged(self,n):
         if n:
             self.locktimexFlag.setChecked(False)
+            self.enableAutoControls()
             self.enableXAxisControls()
-            self.autoAxis()
+            if not self.aw.qmc.flagon :
+                self.autoAxis()
+        else:
+            self.disableAutoControls()
 
     @pyqtSlot(bool)
     def autoAxis(self,_=False):
         if self.aw.qmc.backgroundpath and (self.aw.qmc.flagon or len(self.aw.qmc.timex)<2):
             # no foreground profile
             t_min,t_max = self.aw.calcAutoAxisBackground()
-            t_min = min(-60,t_min)
+            t_min = min(-30,t_min)
         else:
-            t_min,t_max = self.aw.calcAutoAxis()
-            if self.aw.qmc.backgroundpath:
-                _,t_max_b = self.aw.calcAutoAxisBackground()
-                t_max = max(t_max,t_max_b - self.aw.qmc.timeB[self.aw.qmc.timeindexB[0]])
+            t_min,t_max = self.aw.calcAutoAxisForeground()
         if self.aw.qmc.timeindex[0] != -1:
             self.xlimitEdit_min.setText(stringfromseconds(t_min - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]))
             self.xlimitEdit.setText(stringfromseconds(t_max - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]))
@@ -501,6 +541,10 @@ class WindowsDlg(ArtisanDialog):
         self.aw.qmc.legendloc = self.legendComboBox.currentIndex()
         self.aw.qmc.legend = None
         self.aw.qmc.redraw(recomputeAllDeltas=False)
+
+    @pyqtSlot(int)
+    def changeAutoTimexMode(self,_):
+        self.aw.qmc.autotimexMode = self.autotimexModeCombobox.currentIndex()
 
     @pyqtSlot(int)
     def xaxislenloc(self,_):
@@ -611,7 +655,10 @@ class WindowsDlg(ArtisanDialog):
         self.aw.qmc.autotimex = self.autotimexFlag.isChecked()
         self.aw.qmc.autodeltaxET = self.autodeltaxETFlag.isChecked()
         self.aw.qmc.autodeltaxBT = self.autodeltaxBTFlag.isChecked()
-        self.aw.autoAdjustAxis(background=(bool(self.aw.qmc.backgroundpath) and len(self.aw.qmc.timex) < 4)) # align background if no foreground
+        if not self.aw.qmc.flagon:
+            self.aw.autoAdjustAxis(background=(bool(self.aw.qmc.backgroundpath) and not len(self.aw.qmc.timex) > 3)) # align background if no foreground
+            if self.aw.qmc.autotimexMode != 0 and not self.aw.qmc.foregroundShowFullflag:
+                self.aw.qmc.foregroundShowFullflag = True
         self.aw.qmc.redraw(recomputeAllDeltas=False)
         string = QApplication.translate('Message','xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})').format(str(self.ylimitEdit_min.text()),str(self.ylimitEdit.text()),str(self.xlimitEdit_min.text()),str(self.xlimitEdit.text()),str(self.zlimitEdit_min.text()),str(self.zlimitEdit.text()))
         self.aw.sendmessage(string)
@@ -627,16 +674,31 @@ class WindowsDlg(ArtisanDialog):
 
     @pyqtSlot(bool)
     def reset(self,_):
+        self.locktimexFlag.setChecked(False)
+        self.autotimexFlag.setChecked(True)
+        self.autotimexModeCombobox.setCurrentIndex(0)
+        self.chargeminEdit.setText('-00:30')
+        self.resetEdit.setText('10:00')
+        self.fixmaxtimeFlag.setChecked(True)
+        self.autodeltaxETFlag.setChecked(False)
+        self.autodeltaxBTFlag.setChecked(False)
+        self.step100Edit.setText('')
+        self.loadAxisFromProfile.setChecked(False)
+        self.gridstylecombobox.setCurrentIndex(0)
+        self.gridwidthSpinBox.setValue(1)
+        self.gridalphaSpinBox.setValue(2)
+        self.timeGridCheckBox.setChecked(False)
+        self.tempGridCheckBox.setChecked(False)
         if len(self.aw.qmc.timex) > 1:
             self.xlimitEdit.setText(stringfromseconds(self.aw.qmc.timex[-1]))
         else:
             self.xlimitEdit.setText(stringfromseconds(self.aw.qmc.endofx_default))
         self.xlimitEdit_min.setText(stringfromseconds(self.aw.qmc.startofx_default))
+
         try:
             self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(self.aw.qmc.xgrid_default))
-            self.aw.qmc.xgrid(self.aw.qmc.xgrid_default)
         except Exception: # pylint: disable=broad-except
-            self.xaxislencombobox.setCurrentIndex(1)
+            self.xaxislencombobox.setCurrentIndex(2)
         if self.aw.qmc.mode == 'F':
             self.ygridSpinBox.setValue(self.aw.qmc.ygrid_F_default)
             self.aw.qmc.ygrid = self.aw.qmc.ygrid_F_default
