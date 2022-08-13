@@ -10392,34 +10392,38 @@ class tgraphcanvas(FigureCanvas):
                     start = 0
 
                 # position the stats summary relative to the right hand edge of the graph
-                drop_label = QApplication.translate('Scope Annotation','DROP {0}').replace(' {0}','')
-                _,_,droptext_end = self.droptextBounds(drop_label,start,statsheight,ls,prop,fc)
+                # when in BBP mode the graph will end at CHARGE, so we must look for the CHARGE annotation instead of DROP.
+                if aw.qmc.autotimexMode != 2: #dave
+                    event_label = QApplication.translate('Scope Annotation','DROP {0}').replace(' {0}','')
+                else:
+                    event_label = QApplication.translate('Scope Annotation','CHARGE')
+                _,_,eventtext_end = self.eventtextBounds(event_label,start,statsheight,ls,prop,fc)
                 stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
                 stats_textbox_width = stats_textbox_bounds[2]
                 stats_textbox_height = stats_textbox_bounds[3]
                 pos_x = self.ax.get_xlim()[1]-stats_textbox_width-border
 
                 if (aw.qmc.autotimex):
-                    aw.qmc.endofx = droptext_end + stats_textbox_width + 2*border # provide room for the stats
+                    aw.qmc.endofx = eventtext_end + stats_textbox_width + 2*border # provide room for the stats
                     self.xaxistosm(redraw=False)  # recalculate the x axis
 
                     prev_stats_textbox_width = 0
                     #set the maximum number of iterations
                     for _ in range(2, 20):
-                        _,_,droptext_end = self.droptextBounds(drop_label,start,statsheight,ls,prop,fc)
+                        _,_,eventtext_end = self.eventtextBounds(event_label,start,statsheight,ls,prop,fc)
                         stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
                         stats_textbox_width = stats_textbox_bounds[2]
                         stats_textbox_height = stats_textbox_bounds[3]
 
                         # position the stats summary relative to the right edge of the drop text
-                        aw.qmc.endofx = droptext_end + stats_textbox_width + 2*border #provide room for the stats
+                        aw.qmc.endofx = eventtext_end + stats_textbox_width + 2*border #provide room for the stats
                         self.xaxistosm(redraw=False)
                         #break the loop if it looks like stats_textbox_width has converged
                         if abs(prev_stats_textbox_width - stats_textbox_width) < .2:
                             break
                         prev_stats_textbox_width = stats_textbox_width
 
-                    pos_x = droptext_end + border + start
+                    pos_x = eventtext_end + border + start
 
                 pos_y = statsheight
 #               self.stats_summary_rect = patches.Rectangle((pos_x-margin,pos_y+margin),stats_textbox_width+2*margin,-stats_textbox_height-2*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=fc,fill=True,alpha=a,zorder=10)
@@ -10458,18 +10462,21 @@ class tgraphcanvas(FigureCanvas):
             return bbox.bounds
 
 
-    def droptextBounds(self,drop_label,x_pos,y_pos,ls,prop,fc):
-        droptext_width = 0
-        droptextstart = 0
-        droptext_end = aw.qmc.timex[-1] - x_pos #default for when Events Annotations is unchecked
-        for child in self.ax.get_children():
-            if isinstance(child, mpl.text.Annotation):
-                droptext = re.search(fr'.*\((.*?),.*({drop_label} [0-9:]*)',str(child))
-                if droptext:
-                    droptextstart = int(float(droptext.group(1))) - x_pos
-                    droptext_width = self.statstextboxBounds(x_pos,y_pos,droptext.group(2),ls,prop,fc)[2]
-                    droptext_end = droptextstart + droptext_width
-        return droptext_width,droptextstart,droptext_end
+    def eventtextBounds(self,event_label,x_pos,y_pos,ls,prop,fc):
+        try:
+            eventtext_width = 0
+            eventtextstart = 0
+            eventtext_end = aw.qmc.timex[-1] - x_pos #default for when Events Annotations is unchecked
+            for child in self.ax.get_children():
+                if isinstance(child, mpl.text.Annotation):
+                    eventtext = re.search(fr'.*\((.*?),.*({event_label}[ 0-9:]*)',str(child))
+                    if eventtext:
+                        eventtextstart = int(float(eventtext.group(1))) - x_pos
+                        eventtext_width = self.statstextboxBounds(x_pos,y_pos,eventtext.group(2),ls,prop,fc)[2]
+                        eventtext_end = eventtextstart + eventtext_width
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+        return eventtext_width,eventtextstart,eventtext_end
 
     # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
