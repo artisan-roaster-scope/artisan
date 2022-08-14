@@ -64,7 +64,6 @@
          <widget class="QLabel" name="labelOperator">
           <property name="font">
            <font>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -83,7 +82,6 @@
          <widget class="QLabel" name="labelOrganization">
           <property name="font">
            <font>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -92,6 +90,9 @@
           </property>
           <property name="text">
            <string notr="true">Organization</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -178,7 +179,6 @@
          <widget class="QLabel" name="labelHeating">
           <property name="font">
            <font>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -197,7 +197,6 @@
          <widget class="QLabel" name="labelDrumSpeed">
           <property name="font">
            <font>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -229,7 +228,6 @@
          <widget class="QLabel" name="labelMachine">
           <property name="font">
            <font>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>

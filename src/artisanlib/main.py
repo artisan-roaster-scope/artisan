@@ -733,7 +733,7 @@ class tgraphcanvas(FigureCanvas):
         'E1backgroundtimex', 'E2backgroundtimex', 'E3backgroundtimex', 'E4backgroundtimex', 'E1backgroundvalues', 'E2backgroundvalues', 'E3backgroundvalues',
         'E4backgroundvalues', 'l_backgroundeventtype1dots', 'l_backgroundeventtype2dots', 'l_backgroundeventtype3dots', 'l_backgroundeventtype4dots',
         'DeltaETBflag', 'DeltaBTBflag', 'clearBgbeforeprofileload', 'hideBgafterprofileload', 'heating_types', 'operator', 'organization', 'roastertype', 'roastersize', 'roasterheating', 'drumspeed',
-        'organization_setup', 'operator_setup', 'roastertype_setup', 'roastersize_setup', 'roasterheating_setup', 'drumspeed_setup', 'machinesetup_energy_ratings',
+        'organization_setup', 'operator_setup', 'roastertype_setup', 'roastersize_setup', 'roasterheating_setup', 'drumspeed_setup', 'last_batchsize', 'machinesetup_energy_ratings',
         'machinesetup', 'roastingnotes', 'cuppingnotes', 'roastdate', 'roastepoch', 'lastroastepoch', 'batchcounter', 'batchsequence', 'batchprefix', 'neverUpdateBatchCounter',
         'roastbatchnr', 'roastbatchprefix', 'roastbatchpos', 'roasttzoffset', 'roastUUID', 'plus_default_store', 'plus_store', 'plus_store_label', 'plus_coffee',
         'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_custom_blend', 'plus_sync_record_hash', 'plus_file_last_modified', 'beans', 'projectFlag', 'curveVisibilityCache', 'ETcurve', 'BTcurve',
@@ -1714,9 +1714,11 @@ class tgraphcanvas(FigureCanvas):
         self.organization_setup = ''
         self.operator_setup = ''
         self.roastertype_setup = ''
-        self.roastersize_setup = 0
+        self.roastersize_setup = 0 # in kg
         self.roasterheating_setup = 0
         self.drumspeed_setup = ''
+        #
+        self.last_batchsize = 0 # in unit of self.weight[2]; remember the last batchsize used to be applied as default for the next batch
         #
         self.machinesetup_energy_ratings = None # read from predefined machine setups and used if available to set energy defaults
         #
@@ -6698,8 +6700,7 @@ class tgraphcanvas(FigureCanvas):
                 self.restoreEnergyLoadDefaults()
                 self.restoreEnergyProtocolDefaults()
                 #
-                nominal_batch_size = aw.convertWeight(self.roastersize_setup,1,self.weight_units.index(self.weight[2]))
-                self.weight = [nominal_batch_size,0,self.weight[2]]
+                self.weight = [self.last_batchsize,0,self.weight[2]]
                 self.volume = [0,0,self.volume[2]]
                 self.density = [0,self.density[1],1,self.density[3]]
                 # we reset ambient values to the last sampled readings in this session
@@ -8950,7 +8951,7 @@ class tgraphcanvas(FigureCanvas):
                         Nevents = len(self.specialevents)
                         #three modes of drawing events.
                         # the first mode just places annotations. They are text annotations.
-                        # The second mode aligns the events types to a bar height so that they can be visually identified by type. They are text annotations
+                        # the second mode aligns the events types to a bar height so that they can be visually identified by type. They are text annotations
                         # the third mode plots the events by value. They are not annotations but actual lines.
 
                         if self.eventsGraphflag == 1 and Nevents:
@@ -8971,7 +8972,7 @@ class tgraphcanvas(FigureCanvas):
                             for i in range(Nevents):
                                 try:
                                     tx = self.timex[self.specialevents[i]]
-                                    if self.foregroundShowFullflag or ((self.timeindex[0] > -1 and tx >= self.timex[self.timeindex[0]]) and (self.timeindex[6] > 0 and tx <= self.timex[self.timeindex[6]])):
+                                    if self.foregroundShowFullflag or ((self.timeindex[0] > -1 and tx >= self.timex[self.timeindex[0]]) and (self.timeindex[6] > 0 and tx <= self.timex[self.timeindex[6]]) or (self.autotimexMode != 0 and (self.timeindex[6] > 0 and tx >= self.timex[self.timeindex[6]]))):
                                         if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
                                             netypes[0].append(tx)
                                         elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
@@ -9000,7 +9001,7 @@ class tgraphcanvas(FigureCanvas):
                                 elif aw.qmc.showEtypes[self.specialeventstype[i]]:
                                     event_idx = int(self.specialevents[i])
                                     try:
-                                        if not self.flagstart and not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
+                                        if not self.flagstart and not self.foregroundShowFullflag and (event_idx < charge_idx or (self.autotimexMode != 0 and event_idx > drop_idx)):
                                             continue
 
                                         firstletter = self.etypes[self.specialeventstype[i]][0]
@@ -9070,7 +9071,8 @@ class tgraphcanvas(FigureCanvas):
                                 try:
                                     tx = self.timex[self.specialevents[i]]
                                     if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
-                                        if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                        if ((not self.foregroundShowFullflag and self.autotimexMode != 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
+                                            (not self.foregroundShowFullflag and self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
                                             if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
                                                 E1_CHARGE = pos # remember event value at CHARGE
                                             # don't draw event lines before CHARGE if foregroundShowFullflag is not set
@@ -9110,7 +9112,8 @@ class tgraphcanvas(FigureCanvas):
                                             aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                     elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
                                         tx = self.timex[self.specialevents[i]]
-                                        if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                        if ((not self.foregroundShowFullflag and self.autotimexMode != 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
+                                            (not self.foregroundShowFullflag and self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
                                             if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
                                                 E2_CHARGE = pos # remember event value at CHARGE
                                             # don't draw event lines before CHARGE if foregroundShowFullflag is not set
@@ -9151,7 +9154,8 @@ class tgraphcanvas(FigureCanvas):
                                             aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                     elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
                                         tx = self.timex[self.specialevents[i]]
-                                        if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                        if ((not self.foregroundShowFullflag and self.autotimexMode != 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
+                                            (not self.foregroundShowFullflag and self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
                                             if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
                                                 E3_CHARGE = pos # remember event value at CHARGE
                                             # don't draw event lines before CHARGE if foregroundShowFullflag is not set
@@ -9191,7 +9195,8 @@ class tgraphcanvas(FigureCanvas):
                                             aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                     elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
                                         tx = self.timex[self.specialevents[i]]
-                                        if not self.foregroundShowFullflag and ((self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or (self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
+                                        if ((not self.foregroundShowFullflag and self.autotimexMode != 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
+                                            (not self.foregroundShowFullflag and self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
                                             if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
                                                 E4_CHARGE = pos # remember event value at CHARGE
                                             # don't draw event lines before CHARGE if foregroundShowFullflag is not set
@@ -9236,7 +9241,8 @@ class tgraphcanvas(FigureCanvas):
                                 pos = max(0,int(round((self.specialeventsvalue[E1_last]-1)*10)))
                                 if not self.clampEvents: # in clamp mode we render also event values higher than 100:
                                     pos = (pos*event_pos_factor)+event_pos_offset
-                                if self.foregroundShowFullflag and (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E1_last]]):   #if cool exists and last event was earlier
+                                if self.foregroundShowFullflag and self.autotimexMode != 0 and (self.timeindex[7] > 0 and
+                                        aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E1_last]]):   #if cool exists and last event was earlier
                                     self.E1timex.append(self.timex[self.timeindex[7]]) #time of cool
                                     self.E1values.append(pos) #repeat last event value
                                 elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E1_last]]):   #if drop exists and last event was earlier
@@ -9260,7 +9266,6 @@ class tgraphcanvas(FigureCanvas):
                             self.l_eventtype1dots, = self.ax.plot(E1x, E1y, color=self.EvalueColor[0],
                                                                 marker = (self.EvalueMarker[0] if self.eventsGraphflag != 4 else None),
                                                                 markersize = self.EvalueMarkerSize[0],
-    #                                                            picker=2, # deprecated in MPL 3.3.x
                                                                 picker=True,
                                                                 pickradius=2,#markevery=every,
                                                                 linestyle='-',drawstyle=ds,linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
@@ -9268,7 +9273,8 @@ class tgraphcanvas(FigureCanvas):
                                 pos = max(0,int(round((self.specialeventsvalue[E2_last]-1)*10)))
                                 if not self.clampEvents: # in clamp mode we render also event values higher than 100:
                                     pos = (pos*event_pos_factor)+event_pos_offset
-                                if self.foregroundShowFullflag and (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E2_last]]):   #if cool exists and last event was earlier
+                                if self.foregroundShowFullflag and self.autotimexMode != 0 and (self.timeindex[7] > 0 and
+                                        aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E2_last]]):   #if cool exists and last event was earlier
                                     self.E2timex.append(self.timex[self.timeindex[7]]) #time of cool
                                     self.E2values.append(pos) #repeat last event value
                                 elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E2_last]]):   #if drop exists and last event was earlier
@@ -9299,7 +9305,8 @@ class tgraphcanvas(FigureCanvas):
                                 pos = max(0,int(round((self.specialeventsvalue[E3_last]-1)*10)))
                                 if not self.clampEvents: # in clamp mode we render also event values higher than 100:
                                     pos = (pos*event_pos_factor)+event_pos_offset
-                                if self.foregroundShowFullflag and (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E3_last]]):   #if cool exists and last event was earlier
+                                if self.foregroundShowFullflag and self.autotimexMode != 0 and (self.timeindex[7] > 0 and
+                                        aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E3_last]]):   #if cool exists and last event was earlier
                                     self.E3timex.append(self.timex[self.timeindex[7]]) #time of cool
                                     self.E3values.append(pos) #repeat last event value
                                 elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E3_last]]):   #if drop exists and last event was earlier
@@ -9330,7 +9337,7 @@ class tgraphcanvas(FigureCanvas):
                                 pos = max(0,int(round((self.specialeventsvalue[E4_last]-1)*10)))
                                 if not self.clampEvents: # in clamp mode we render also event values higher than 100:
                                     pos = (pos*event_pos_factor)+event_pos_offset
-                                if self.foregroundShowFullflag and (self.timeindex[7] > 0 and
+                                if self.foregroundShowFullflag and self.autotimexMode != 0 and (self.timeindex[7] > 0 and
                                         aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E4_last]]):   #if cool exists and last event was earlier
                                     self.E4timex.append(self.timex[self.timeindex[7]]) #time of cool
                                     self.E4values.append(pos) #repeat last event value
@@ -9407,7 +9414,7 @@ class tgraphcanvas(FigureCanvas):
                                             else:
                                                 temp = self.stemp2[event_idx]
 
-                                        if not self.flagstart and not self.foregroundShowFullflag and (event_idx < charge_idx or event_idx > drop_idx):
+                                        if not self.flagstart and not self.foregroundShowFullflag and ((self.autotimexMode == 0 and event_idx < charge_idx) or event_idx > drop_idx):
                                             continue
 
                                         # combo events
@@ -9549,12 +9556,15 @@ class tgraphcanvas(FigureCanvas):
                                     trans = self.delta_ax.transData
                                 else:
                                     trans = self.ax.transData
-                                if not self.flagstart and not self.foregroundShowFullflag and len(self.extrastemp1[i]) > 0:
+                                if not self.flagstart and not self.foregroundShowFullflag and self.autotimexMode == 0 and len(self.extrastemp1[i]) > 0:
                                     visible_extratemp1 = numpy.concatenate((
                                         numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
                                         self.extrastemp1[i][charge_idx:drop_idx+1],
                                         numpy.full(len(self.extratimex[i])-drop_idx-1, numpy.nan, dtype=numpy.double)))
-
+                                elif not self.flagstart and not self.foregroundShowFullflag and self.autotimexMode != 0 and len(self.extrastemp1[i]) > 0:
+                                    visible_extratemp1 = numpy.concatenate((
+                                        self.extrastemp1[i][0:drop_idx+1],
+                                        numpy.full(len(self.extratimex[i])-drop_idx-1, numpy.nan, dtype=numpy.double)))
                                 else:
                                     visible_extratemp1 = numpy.array(self.extrastemp1[i], dtype=numpy.double)
                                 # first draw the fill if any, but not during recording!
@@ -9578,10 +9588,14 @@ class tgraphcanvas(FigureCanvas):
                                     trans = self.delta_ax.transData
                                 else:
                                     trans = self.ax.transData
-                                if not self.flagstart and not self.foregroundShowFullflag and len(self.extrastemp2[i]) > 0:
+                                if not self.flagstart and not self.foregroundShowFullflag and self.autotimexMode == 0 and len(self.extrastemp2[i]) > 0:
                                     visible_extratemp2 = numpy.concatenate((
                                         numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
                                         self.extrastemp2[i][charge_idx:drop_idx+1],
+                                        numpy.full(len(self.extratimex[i])-drop_idx-1, numpy.nan, dtype=numpy.double)))
+                                elif not self.flagstart and not self.foregroundShowFullflag and self.autotimexMode != 0 and len(self.extrastemp2[i]) > 0:
+                                    visible_extratemp2 = numpy.concatenate((
+                                        self.extrastemp2[i][0:drop_idx+1],
                                         numpy.full(len(self.extratimex[i])-drop_idx-1, numpy.nan, dtype=numpy.double)))
                                 else:
                                     visible_extratemp2 = self.extrastemp2[i]
@@ -9597,8 +9611,7 @@ class tgraphcanvas(FigureCanvas):
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                     ##### ET,BT curves
-
-                    if not self.flagstart and not self.foregroundShowFullflag:
+                    if not self.flagstart and not self.foregroundShowFullflag and self.autotimexMode == 0:
                         visible_et = numpy.concatenate((
                                         numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
                                         self.stemp1[charge_idx:drop_idx+1],
@@ -9606,6 +9619,13 @@ class tgraphcanvas(FigureCanvas):
                         visible_bt = numpy.concatenate((
                                         numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
                                         self.stemp2[charge_idx:drop_idx+1],
+                                        numpy.full(len(self.timex)-drop_idx-1, numpy.nan, dtype=numpy.double)))
+                    elif not self.flagstart and not self.foregroundShowFullflag and self.autotimexMode != 0:
+                        visible_et = numpy.concatenate((
+                                        self.stemp1[0:drop_idx+1],
+                                        numpy.full(len(self.timex)-drop_idx-1, numpy.nan, dtype=numpy.double)))
+                        visible_bt = numpy.concatenate((
+                                        self.stemp2[0:drop_idx+1],
                                         numpy.full(len(self.timex)-drop_idx-1, numpy.nan, dtype=numpy.double)))
                     else:
                         visible_et = self.stemp1
@@ -20340,6 +20360,7 @@ class ApplicationWindow(QMainWindow):
                 org_ws_host = self.ws.host
                 org_comport = self.ser.comport
                 org_roastersize_setup = self.qmc.roastersize_setup
+                org_last_batchsize = self.qmc.last_batchsize
                 org_roastersize = self.qmc.roastersize
                 org_roasterheating_setup = self.qmc.roasterheating_setup
                 org_roasterheating = self.qmc.roasterheating
@@ -20435,6 +20456,13 @@ class ApplicationWindow(QMainWindow):
                     else:
                         res = self.qmc.roastersize_setup # roastersize_setup was loaded from machine setup
                 if res:
+                    # first establish roastersize_setup batchsizes as default batchsize (potentially unit converted)
+                    if self.qmc.roastersize_setup > 0:
+                        if self.qmc.roastersize_setup > 1 and self.qmc.weight[2] == 'g':
+                            self.qmc.weight[2] = 'Kg'
+                        nominal_batch_size = aw.convertWeight(self.qmc.roastersize_setup,1,self.qmc.weight_units.index(self.qmc.weight[2]))
+                        self.qmc.last_batchsize = nominal_batch_size
+                        self.qmc.weight = [nominal_batch_size,0,self.qmc.weight[2]]
                     # size set, ask for heating
                     if self.qmc.roasterheating_setup == 0:
                         dlg = ArtisanComboBoxDialog(self,aw,QApplication.translate('Message',
@@ -20486,11 +20514,15 @@ class ApplicationWindow(QMainWindow):
                     self.ws.host = org_ws_host
                     self.ser.comport = org_comport
                     self.qmc.roastersize_setup = org_roastersize_setup
+                    self.qmc.last_batchsize = org_last_batchsize
                     self.qmc.roastersize = org_roastersize
                     self.qmc.roasterheating_setup = org_roasterheating_setup
                     self.qmc.roasterheating = org_roasterheating
                     #
                     self.sendmessage(QApplication.translate('Message','Action canceled'))
+                else:
+                    # setup not canceled, we establish the last_batchsize
+                    self.qmc.weight = [self.qmc.last_batchsize,0,self.qmc.weight[2]]
                 self.establish_etypes()
 
 
@@ -21061,7 +21093,7 @@ class ApplicationWindow(QMainWindow):
                 aw.fullscreenAction.setChecked(True)
 
     def calcAutoAxisForeground(self):
-        return self.calcAutoAxis(self.qmc.timex,self.qmc.timeindex,self.qmc.foregroundShowFullflag or self.qmc.flagstart)
+        return self.calcAutoAxis(self.qmc.timex,self.qmc.timeindex, self.qmc.foregroundShowFullflag or self.qmc.flagstart)
 
     # returns time axis min and max
     # min to be about 1min (1/16 of total time) before CHARGE or first recording if no CHARGE
@@ -21078,7 +21110,7 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.autotimexMode == 2 and timeindex[0] > -1:
                 t_end = timex[timeindex[0]]
             else:
-                if timeindex[7] > 0 and beyondDROP: # COOL set and the curves are drawn beyond DROP
+                if timeindex[7] > 0 and self.qmc.buttonvisibility[7] and beyondDROP: # COOL set, COOL button shown and the curves are drawn beyond DROP or recording
                     t_end = timex[timeindex[7]]
                 elif timeindex[6] > 0: # DROP set
                     t_end = timex[timeindex[6]]
@@ -25462,10 +25494,12 @@ class ApplicationWindow(QMainWindow):
 
     def toggleForegroundShowfullFlag(self):
         self.qmc.foregroundShowFullflag = not self.qmc.foregroundShowFullflag
+        self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
         self.qmc.redraw(recomputeAllDeltas=False)
 
     def toggleBackroundShowfullFlag(self):
         self.qmc.backgroundShowFullflag = not self.qmc.backgroundShowFullflag
+        self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
         self.qmc.redraw(recomputeAllDeltas=False)
 
     def updatePlaybackIndicator(self):
@@ -25504,6 +25538,7 @@ class ApplicationWindow(QMainWindow):
                 #meta_modifier = modifiers == Qt.KeyboardModifier.MetaModifier # Control on macOS, Meta on Windows
                 #uncomment next line to find the integer value of a k
                 #print(k)
+                #_log.info("PRINT key: %s",k)
 
                 numberkeys = [48,49,50,51,52,53,54,55,56,57] # keycodes for number keys 0,1,...,9
 
@@ -25524,8 +25559,6 @@ class ApplicationWindow(QMainWindow):
                             if not self.qmc.flagon:
                                 # adjust foreground or if no foreground but background is loaded the background
                                 self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
-                                if self.qmc.autotimexMode != 0 and not self.qmc.foregroundShowFullflag:
-                                    self.qmc.foregroundShowFullflag = True
                                 self.qmc.redraw()
                 elif self.buttonpalette_shortcuts and control_modifier and k in numberkeys: # palette switch via SHIFT-NUM-Keys
                     self.setbuttonsfrom(numberkeys.index(k))
@@ -25592,19 +25625,25 @@ class ApplicationWindow(QMainWindow):
                         elif  aw.pidcontrol.svMode == 2:
                             aw.sendmessage(QApplication.translate('Message','PID Mode: Background'))
                 elif k == 45:                       #-
-                    if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
-                        aw.fujipid.lookahead = max(0,aw.fujipid.lookahead-1)
-                        aw.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(aw.fujipid.lookahead))
-                    elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # MODBUS hardware PID
-                        aw.pidcontrol.svLookahead = max(0,aw.pidcontrol.svLookahead-1)
-                        aw.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(aw.pidcontrol.svLookahead))
+                    if control_modifier:
+                        aw.setdpi(aw.dpi-10)
+                    else:
+                        if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
+                            aw.fujipid.lookahead = max(0,aw.fujipid.lookahead-1)
+                            aw.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(aw.fujipid.lookahead))
+                        elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # MODBUS hardware PID
+                            aw.pidcontrol.svLookahead = max(0,aw.pidcontrol.svLookahead-1)
+                            aw.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(aw.pidcontrol.svLookahead))
                 elif k == 43:                       #+
-                    if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
-                        aw.fujipid.lookahead = aw.fujipid.lookahead+1
-                        aw.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(aw.fujipid.lookahead))
-                    elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # MODBUS hardware PID
-                        aw.pidcontrol.svLookahead = aw.pidcontrol.svLookahead+1
-                        aw.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(aw.pidcontrol.svLookahead))
+                    if control_modifier:
+                        aw.setdpi(aw.dpi+10)
+                    else:
+                        if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
+                            aw.fujipid.lookahead = aw.fujipid.lookahead+1
+                            aw.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(aw.fujipid.lookahead))
+                        elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # MODBUS hardware PID
+                            aw.pidcontrol.svLookahead = aw.pidcontrol.svLookahead+1
+                            aw.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(aw.pidcontrol.svLookahead))
                 elif k == 32:                       #SELECTS ACTIVE BUTTON
                     if self.qmc.flagstart:
                         if self.keyboardmoveflag:
@@ -31410,9 +31449,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.roastertype_setup = toString(settings.value('roastertype_setup',self.qmc.roastertype_setup))
             if settings.contains('roastersize_setup'):
                 self.qmc.roastersize_setup = toFloat(settings.value('roastersize_setup',self.qmc.roastersize_setup))
-            # we set the default in-weight from the given nominal batchsize
-            nominal_batch_size = self.convertWeight(self.qmc.roastersize_setup,1,self.qmc.weight_units.index(self.qmc.weight[2]))
-            self.qmc.weight = [nominal_batch_size,self.qmc.weight[1],self.qmc.weight[2]]
+            if settings.contains('last_batchsize'):
+                self.qmc.last_batchsize = toFloat(settings.value('last_batchsize',self.qmc.last_batchsize))
+            # we set the default in-weight from the given last_batchsize
+            self.qmc.weight = [self.qmc.last_batchsize,self.qmc.weight[1],self.qmc.weight[2]]
             if settings.contains('roasterheating_setup'):
                 self.qmc.roasterheating_setup = toInt(settings.value('roasterheating_setup',self.qmc.roasterheating_setup))
             if settings.contains('drumspeed_setup'):
@@ -32891,6 +32931,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue('roastersize_setup',self.qmc.roastersize_setup)
             settings.setValue('roasterheating_setup',self.qmc.roasterheating_setup)
             settings.setValue('drumspeed_setup',self.qmc.drumspeed_setup)
+            settings.setValue('last_batchsize',self.qmc.last_batchsize)
 
             settings.beginGroup('EnergyUse')
             settings.setValue('loadlabels_setup',self.qmc.loadlabels_setup)

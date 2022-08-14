@@ -39,6 +39,7 @@ def content():
     tbl_KeyboardShortcuts.add_row([QApplication.translate('HelpDlg','OPTION+H [Mac]\nCTRL+SHIFT+H [Win]'),QApplication.translate('HelpDlg','Toggle background curves “show full”')])
     tbl_KeyboardShortcuts.add_row([QApplication.translate('HelpDlg','L'),QApplication.translate('HelpDlg','Load alarms')])
     tbl_KeyboardShortcuts.add_row([QApplication.translate('HelpDlg','+,-'),QApplication.translate('HelpDlg','Inc/dec PID lookahead')])
+    tbl_KeyboardShortcuts.add_row([QApplication.translate('HelpDlg','⌘ +,- [Mac]\nCRTL +,- [Win]'),QApplication.translate('HelpDlg','Inc/dec graph resolution')])
     tbl_KeyboardShortcuts.add_row([QApplication.translate('HelpDlg','⌘ 0-9 [Mac]\nCRTL 0-9 [Win]'),QApplication.translate('HelpDlg','Changes Event Button Palettes')])
     tbl_KeyboardShortcuts.add_row([QApplication.translate('HelpDlg',';'),QApplication.translate('HelpDlg','Application ScreenShot')])
     tbl_KeyboardShortcuts.add_row([QApplication.translate('HelpDlg',':'),QApplication.translate('HelpDlg','Desktop ScreenShot')])

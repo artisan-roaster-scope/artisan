@@ -657,8 +657,6 @@ class WindowsDlg(ArtisanDialog):
         self.aw.qmc.autodeltaxBT = self.autodeltaxBTFlag.isChecked()
         if not self.aw.qmc.flagon:
             self.aw.autoAdjustAxis(background=(bool(self.aw.qmc.backgroundpath) and not len(self.aw.qmc.timex) > 3)) # align background if no foreground
-            if self.aw.qmc.autotimexMode != 0 and not self.aw.qmc.foregroundShowFullflag:
-                self.aw.qmc.foregroundShowFullflag = True
         self.aw.qmc.redraw(recomputeAllDeltas=False)
         string = QApplication.translate('Message','xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})').format(str(self.ylimitEdit_min.text()),str(self.ylimitEdit.text()),str(self.xlimitEdit_min.text()),str(self.xlimitEdit.text()),str(self.zlimitEdit_min.text()),str(self.zlimitEdit.text()))
         self.aw.sendmessage(string)

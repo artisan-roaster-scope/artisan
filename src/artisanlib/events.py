@@ -3003,7 +3003,11 @@ class EventsDlg(ArtisanResizeablDialog):
             self.aw.buttonSCe.setVisible(bool(self.aw.qmc.buttonvisibility[5]))
             self.aw.qmc.buttonvisibility[6] = self.DROPbutton.isChecked()
             self.aw.buttonDROP.setVisible(bool(self.aw.qmc.buttonvisibility[6]))
+            coolButtonVisibilityOrg = self.aw.qmc.buttonvisibility[7]
             self.aw.qmc.buttonvisibility[7] = self.COOLbutton.isChecked()
+            if coolButtonVisibilityOrg != self.aw.qmc.buttonvisibility[7]:
+                # adjust foreground or if no foreground but background is loaded the background; depending on showFull and COOL button state the max limit might be different
+                self.aw.autoAdjustAxis(background=self.aw.qmc.background and (not len(self.aw.qmc.timex) > 3), deltas=False)
             self.aw.buttonCOOL.setVisible(bool(self.aw.qmc.buttonvisibility[7]))
             #save sliders
             self.saveSliderSettings()
@@ -3077,7 +3081,6 @@ class EventsDlg(ArtisanResizeablDialog):
 # we don't do that anymore!
 #                # we save the current button and slider definitions to palette 0
 #                self.transferbuttonsto(0)
-
                 self.aw.qmc.redraw(recomputeAllDeltas=False)
                 self.aw.sendmessage(QApplication.translate('Message','Event configuration saved'))
                 self.close()

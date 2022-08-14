@@ -20,9 +20,11 @@
       <widget class="QLineEdit" name="lineEdit_name">
        <property name="font">
         <font>
-         <weight>75</weight>
          <bold>true</bold>
         </font>
+       </property>
+       <property name="toolTip">
+        <string notr="true"/>
        </property>
        <property name="accessibleDescription">
         <string notr="true"/>
@@ -35,6 +37,9 @@
        </property>
        <property name="placeholderText">
         <string notr="true"/>
+       </property>
+       <property name="clearButtonEnabled">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -82,6 +87,9 @@
        </property>
        <property name="placeholderText">
         <string notr="true"/>
+       </property>
+       <property name="clearButtonEnabled">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
