@@ -58,6 +58,7 @@ Machine                         | Driver | Remarks
 [Proaster](/machines/proaster/) | FTDI
 [Roastmax](/machines/roastmax/) | FTDI
 [Rolltech](/machines/rolltech/) | CH34x
+[San Franciscan](/machines/sf/) | FTDI
 [Santoker](/machines/santoker/) | CP210x | FTDI on some machines
 [Sedona](/machines/sedona/) | CP210x
 [Toper](/machines/toper/) | CP210x | CH34x on some machines
