@@ -939,7 +939,19 @@ class roastCompareDlg(ArtisanDialog):
 
     def onpick_event(self,event):
         p = next((p for p in self.profiles if event.artist in [p.l_mainEvents1,p.l_mainEvents2]), None)
-        if p is not None:
+        if p is not None and p.visible and p.active:
+            # determine zorder of this profile:
+            p_zorder = 0
+            if p.l_mainEvents1.get_visible():
+                p_zorder = p.l_mainEvents1.get_zorder()
+            elif p.l_mainEvents2.get_visible():
+                p_zorder = p.l_mainEvents2.get_zorder()
+
+            # if there is any profile op != p which is also triggered by this mouse event and has a higher z-order, ignore this pick
+            if any(op != p and any(me.get_visible() and me.get_zorder() > p_zorder and me.contains(event.mouseevent)[0] for me in [op.l_mainEvents1,op.l_mainEvents2])
+                    for op in self.profiles):
+                return
+
             ind = event.ind[0]
             time = p.timex[p.timeindex[ind]]
             if p.timeindex[0] != -1:
