@@ -90,7 +90,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         alignButton = QPushButton(QApplication.translate('Button','Align'))
         alignButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.alignComboBox = QComboBox()
-        alignnames = [
+        self.aw.qmc.alignnames = [
             QApplication.translate('Label','CHARGE'),
             QApplication.translate('Label','DRY'),
             QApplication.translate('Label','FCs'),
@@ -100,7 +100,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             QApplication.translate('Label','DROP'),
             QApplication.translate('Label','ALL'),
             ]
-        self.alignComboBox.addItems(alignnames)
+        self.alignComboBox.addItems(self.aw.qmc.alignnames)
         self.alignComboBox.setCurrentIndex(self.aw.qmc.alignEvent)
         self.alignComboBox.currentIndexChanged.connect(self.changeAlignEventidx)
         loadButton.clicked.connect(self.load)

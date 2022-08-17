@@ -1500,7 +1500,16 @@ class tgraphcanvas(FigureCanvas):
 
         #self.flagalignFCs = False
         self.alignEvent = 0 # 0:CHARGE, 1:DRY, 2:FCs, 3:FCe, 4:SCs, 5:SCe, 6:DROP, 7:ALL
-
+        self.alignnames = [                          
+            QApplication.translate('Label','CHARGE'),
+            QApplication.translate('Label','DRY'),
+            QApplication.translate('Label','FCs'),
+            QApplication.translate('Label','FCe'),
+            QApplication.translate('Label','SCs'),
+            QApplication.translate('Label','SCe'),
+            QApplication.translate('Label','DROP'),
+            QApplication.translate('Label','ALL'),
+            ]
         self.compareAlignEvent = 0 # 0:CHARGE, 1:DRY, 2:FCs, 3:FCe, 4:SCs, 5:SCe, 6:DROP
         self.compareEvents = 0 # 0: no events, 1: event type 1, 2: event type 2, 3: event type 3, 4: event type 4
         self.compareET = False
@@ -10413,7 +10422,7 @@ class tgraphcanvas(FigureCanvas):
 
                 # position the stats summary relative to the right hand edge of the graph
                 # when in BBP mode the graph will end at CHARGE, so we must look for the CHARGE annotation instead of DROP.
-                if aw.qmc.autotimexMode != 2: #dave
+                if aw.qmc.autotimexMode != 2:
                     event_label = QApplication.translate('Scope Annotation','DROP {0}').replace(' {0}','')
                 else:
                     event_label = QApplication.translate('Scope Annotation','CHARGE')
@@ -21765,6 +21774,14 @@ class ApplicationWindow(QMainWindow):
             segmentresultstr = QApplication.translate('Label','Segment Analysis (rise, crash and flick)') + '\n'
             segmentresultstr += tbl.get_string(border=True)
 
+            # set background alignment information for Fit to Bkgnd
+            if exp == 4:   #background fit
+                bgAlignLabel = QApplication.translate('Label','Background Align')
+                bgAlignType = aw.qmc.alignnames[aw.qmc.alignEvent]
+            else:
+                bgAlignLabel = ''
+                bgAlignType = ''
+
             # build table of general information
             tbl2 = prettytable.PrettyTable()
             tbl2.field_names = ['A','A1', 'B', 'B1'  ]
@@ -21772,7 +21789,7 @@ class ApplicationWindow(QMainWindow):
             tbl2.align['A1'] = 'r'
             tbl2.align['B1'] = 'r'
             tbl2.float_format = '5.2'
-            tbl2.add_row([QApplication.translate('Label','Curve Fit'), fitType, '', ''])
+            tbl2.add_row([QApplication.translate('Label','Curve Fit'), fitType, bgAlignLabel, bgAlignType])
             tbl2.add_row([QApplication.translate('Label','Samples Threshold'), aw.qmc.segmentsamplesthreshold, QApplication.translate('Label','Delta Threshold'), aw.qmc.segmentdeltathreshold])
             tbl2.add_row([QApplication.translate('Label','Sample rate (secs)'), self.qmc.profile_sampling_interval, QApplication.translate('Label','Smooth Curves/Spikes'), f'{str(int((aw.qmc.curvefilter-1)/2))}/{str(smoothspikes)}' ])
             tbl2.add_row([QApplication.translate('Label','Delta Span/Smoothing'), f'{str(aw.qmc.deltaBTspan)}/{str(int((aw.qmc.deltaBTfilter-1)/2))}', QApplication.translate('Label','Polyfit/Optimal Smoothing'), f'{str(polyfit)}/{str(optimal)}'  ])
