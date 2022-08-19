@@ -359,62 +359,61 @@ class RoastProfile():
             self.E3 = []
             self.E4 = []
 
-            if not self.aw.qmc.compareBBP or self.aw.qmc.compareRoast:
-                # no special event curves if BBP only mode
-                last_E1, last_E2, last_E3, last_E4 = None, None, None, None
-                for i,e in enumerate(self.specialevents):
-                    try:
-                        etime = self.timex[e]
-                        etype = self.specialeventstype[i]
-                        evalue = self.aw.qmc.eventsInternal2ExternalValue(self.specialeventsvalue[i]) * value_factor + value_offset
-                        # remember last event value per type before CHARGE
-                        if (self.timeindex[0] != -1 and e < self.timeindex[0]):
-                            if etype == 0:
-                                last_E1 = evalue
-                            elif etype == 1:
-                                last_E2 = evalue
-                            elif etype == 2:
-                                last_E3 = evalue
-                            elif etype == 3:
-                                last_E4 = evalue
-                        # only draw events between CHARGE and DRY
-                        if (self.timeindex[0] == -1 or e >= self.timeindex[0]) and (self.timeindex[6] == 0 or e <= self.timeindex[6]):
-                            if etype == 0:
-                                if last_E1 is not None and last_E1 != evalue:
-                                    # add event value @CHARGE
-                                    self.E1.append((self.timex[self.timeindex[0]],last_E1))
-                                    last_E1 = None
-                                self.E1.append((etime,evalue))
-                            elif etype == 1:
-                                if last_E2 is not None and last_E2 != evalue:
-                                    # add event value @CHARGE
-                                    self.E2.append((self.timex[self.timeindex[0]],last_E2))
-                                    last_E2 = None
-                                self.E2.append((etime,evalue))
-                            elif etype == 2:
-                                if last_E3 is not None and last_E3 != evalue:
-                                    # add event value @CHARGE
-                                    self.E3.append((self.timex[self.timeindex[0]],last_E3))
-                                    last_E3 = None
-                                self.E3.append((etime,evalue))
-                            elif etype == 3:
-                                if last_E4 is not None and last_E4 != evalue:
-                                    # add event value @CHARGE
-                                    self.E4.append((self.timex[self.timeindex[0]],last_E4))
-                                    last_E4 = None
-                                self.E4.append((etime,evalue))
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
-                # add a last event at DROP/END to extend the lines to the end of roast
-                end = (self.timex[-1] if self.timeindex[6] == 0 else self.timex[self.timeindex[6]])
-                if self.E1:
-                    self.E1.append((end,self.E1[-1][1]))
-                if self.E2:
-                    self.E2.append((end,self.E2[-1][1]))
-                if self.E3:
-                    self.E3.append((end,self.E3[-1][1]))
-                if self.E4:
-                    self.E4.append((end,self.E4[-1][1]))
+            last_E1, last_E2, last_E3, last_E4 = None, None, None, None
+            for i,e in enumerate(self.specialevents):
+                try:
+                    etime = self.timex[e]
+                    etype = self.specialeventstype[i]
+                    evalue = self.aw.qmc.eventsInternal2ExternalValue(self.specialeventsvalue[i]) * value_factor + value_offset
+                    # remember last event value per type before CHARGE
+                    if (not self.aw.qmc.compareBBP and self.timeindex[0] != -1 and e < self.timeindex[0]):
+                        if etype == 0:
+                            last_E1 = evalue
+                        elif etype == 1:
+                            last_E2 = evalue
+                        elif etype == 2:
+                            last_E3 = evalue
+                        elif etype == 3:
+                            last_E4 = evalue
+                    # only draw events between CHARGE and DRY
+                    if (self.aw.qmc.compareRoast and (self.aw.qmc.compareBBP  or self.timeindex[0] == -1 or e >= self.timeindex[0]) and (self.timeindex[6] == 0 or e <= self.timeindex[6])) or (not self.aw.qmc.compareRoast and self.aw.qmc.compareBBP and (self.timeindex[0] == -1 or e <= self.timeindex[0])):
+#                    if (self.timeindex[0] == -1 or e >= self.timeindex[0]) and (self.timeindex[6] == 0 or e <= self.timeindex[6]):
+                        if etype == 0:
+                            if last_E1 is not None and last_E1 != evalue:
+                                # add event value @CHARGE
+                                self.E1.append((self.timex[self.timeindex[0]],last_E1))
+                                last_E1 = None
+                            self.E1.append((etime,evalue))
+                        elif etype == 1:
+                            if last_E2 is not None and last_E2 != evalue:
+                                # add event value @CHARGE
+                                self.E2.append((self.timex[self.timeindex[0]],last_E2))
+                                last_E2 = None
+                            self.E2.append((etime,evalue))
+                        elif etype == 2:
+                            if last_E3 is not None and last_E3 != evalue:
+                                # add event value @CHARGE
+                                self.E3.append((self.timex[self.timeindex[0]],last_E3))
+                                last_E3 = None
+                            self.E3.append((etime,evalue))
+                        elif etype == 3:
+                            if last_E4 is not None and last_E4 != evalue:
+                                # add event value @CHARGE
+                                self.E4.append((self.timex[self.timeindex[0]],last_E4))
+                                last_E4 = None
+                            self.E4.append((etime,evalue))
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+            # add a last event at DROP/END to extend the lines to the end of roast
+            end = (self.timex[-1] if self.timeindex[6] == 0 else self.timex[self.timeindex[6]])
+            if self.E1:
+                self.E1.append((end,self.E1[-1][1]))
+            if self.E2:
+                self.E2.append((end,self.E2[-1][1]))
+            if self.E3:
+                self.E3.append((end,self.E3[-1][1]))
+            if self.E4:
+                self.E4.append((end,self.E4[-1][1]))
 
     def firstTime(self):
         try:
