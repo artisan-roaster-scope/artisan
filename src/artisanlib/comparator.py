@@ -377,7 +377,6 @@ class RoastProfile():
                             last_E4 = evalue
                     # only draw events between CHARGE and DRY
                     if (self.aw.qmc.compareRoast and (self.aw.qmc.compareBBP  or self.timeindex[0] == -1 or e >= self.timeindex[0]) and (self.timeindex[6] == 0 or e <= self.timeindex[6])) or (not self.aw.qmc.compareRoast and self.aw.qmc.compareBBP and (self.timeindex[0] == -1 or e <= self.timeindex[0])):
-#                    if (self.timeindex[0] == -1 or e >= self.timeindex[0]) and (self.timeindex[6] == 0 or e <= self.timeindex[6]):
                         if etype == 0:
                             if last_E1 is not None and last_E1 != evalue:
                                 # add event value @CHARGE
@@ -405,7 +404,11 @@ class RoastProfile():
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
             # add a last event at DROP/END to extend the lines to the end of roast
-            end = (self.timex[-1] if self.timeindex[6] == 0 else self.timex[self.timeindex[6]])
+            if not self.aw.qmc.compareRoast and self.aw.qmc.compareBBP:
+                # BBP-only mode
+                end = (self.timex[-1] if self.timeindex[0] == -1 else self.timex[self.timeindex[0]])
+            else:
+                end = (self.timex[-1] if self.timeindex[6] == 0 else self.timex[self.timeindex[6]])
             if self.E1:
                 self.E1.append((end,self.E1[-1][1]))
             if self.E2:
