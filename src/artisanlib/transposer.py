@@ -37,6 +37,16 @@ except Exception: # pylint: disable=broad-except
     from PyQt5.QtWidgets import (QApplication, QHeaderView, QAbstractItemView, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
                 QTableWidget, QTableWidgetItem, QGroupBox, QLayout, QHBoxLayout, QVBoxLayout, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
 
+class MyQRegularExpressionValidator(QRegularExpressionValidator):
+    # we fix partial time input like '12' => '12:00', '12:' => '12:00' and '12:0' => '12:00'
+    def fixup(self, value):
+        if ':' not in value:
+            value = value + ':00'
+        elif value.endswith(':'):
+            value = value + '00'
+        elif len(value[value.index(':')+1:]) == 1:
+            value = value + '0'
+        return input
 
 class profileTransformatorDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
@@ -234,6 +244,8 @@ class profileTransformatorDlg(ArtisanDialog):
         for i in range(5):
             if self.temp_result_widgets[i] is not None:
                 self.temp_result_widgets[i].setText('')
+        self.temp_formula.setText('')
+        self.temp_formula.repaint()
 
     # returns list of DRY, FCs, SCs and DROP profile times in seconds if event is set, otherwise None
     def getProfileTimes(self):
@@ -832,7 +844,7 @@ class profileTransformatorDlg(ArtisanDialog):
                         extratimex = []
                         for timex in self.org_extratimex:
                             offset = 0
-                            if self.aw.qmc.timeindex[0] != -1:
+                            if len(timex) > 0 and self.aw.qmc.timeindex[0] != -1:
                                 offset = timex[self.aw.qmc.timeindex[0]]
                             new_timex = [fit(tx-offset) for tx in timex]
                             if len(new_timex) > 0 and self.aw.qmc.timeindex[0] != -1:
@@ -951,7 +963,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.phasestable.setItem(0,i,profile_phases_widget)
                 #
                 target_widget_time = QLineEdit('')
-                target_widget_time.setValidator(QRegularExpressionValidator(self.regextime))
+                target_widget_time.setValidator(MyQRegularExpressionValidator(self.regextime))
                 target_widget_time.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 if phases_enabled:
                     target_widget_time.editingFinished.connect(self.updatePhasesWidget)
@@ -1029,7 +1041,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.timetable.setItem(0,i,profile_widget)
                 #
                 target_widget = QLineEdit('')
-                target_widget.setValidator(QRegularExpressionValidator(self.regextime))
+                target_widget.setValidator(MyQRegularExpressionValidator(self.regextime))
                 target_widget.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 target_widget.editingFinished.connect(self.updateTimesWidget)
                 target_cell_widget = QWidget()
