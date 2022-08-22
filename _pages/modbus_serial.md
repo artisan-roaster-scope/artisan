@@ -15,6 +15,9 @@ The MODBUS RTU/ASCII protocols are communicated over a RS485 connection. This is
 
 You need to install the corresponding serial driver for the chipset of this converter on your PC, otherwise no serial port for the device is created by your operating system on connecting the machine. Most common drivers are
 
+**Watch out!** The FTDI driver is preinstalled on virtually all Linux distributions as well as all OS X versions supported by Artisan. Installing an additional FTDI driver on those operating system might lead to instabilities!
+{: .notice--primary}
+
 + __FTDI VCP__: [FTDI Chip](http://www.ftdichip.com/Drivers/VCP.htm)
 + __CP210x__: [Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
 + __PL2303__: [Prolific](http://www.prolific.com.tw/US/ShowProduct.aspx?p_id=225&pcid=41)
@@ -23,8 +26,7 @@ You need to install the corresponding serial driver for the chipset of this conv
   - macOS: [http://www.wch.cn/downloads/file/178.html](http://www.wch.cn/downloads/file/178.html)
   - Linux: [http://www.wch.cn/download/CH341SER_LINUX_ZIP.html](http://www.wch.cn/download/CH341SER_LINUX_ZIP.html)
 
-**Watch out!** The FTDI driver is preinstalled on virtually all Linux distributions as well as all OS X versions supported by Artisan. Installing an additional FTDI driver on those operating system might lead to instabilities!
-{: .notice--primary}
+
 
 
 ## Serial Driver Cheat Sheet
