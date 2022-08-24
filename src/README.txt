@@ -10,9 +10,9 @@ The home of its development is on GitHub were all source and binary files are av
 
 <https://github.com/artisan-roaster-scope/artisan>
 
-## MAILING LIST
+## DISCUSSION FORUM
 
-<https://lists.einfachkaffee.de/postorius/lists/artisan-user.lists.einfachkaffee.de/>
+<https://github.com/artisan-roaster-scope/artisan/discussions>
 
 ## ARTISAN BLOG
 
@@ -20,7 +20,7 @@ https://artisan-roasterscope.blogspot.de
 
 ## FEATURES
 
-Runs on 64bit Windows 10, macOS 10.15 Catalina (legacy builds support Windows 8 and macOS 10.13 High Sierra), Redhat/Debian Linux (incl. 32bit Raspberry Pi) and supports a large number of devices and roasting machines. See <https://artisan-scope.org/devices/index> for supported devices and <https://artisan-scope.org/machines/index> for supported machines.
+Runs on 64bit x64 Windows 10, macOS 10.15 Catalina (legacy builds support Windows 8 x64 and macOS 10.13 High Sierra), Redhat/Debian Linux (incl. 32bit Raspberry Pi) and supports a large number of devices and roasting machines. See <https://artisan-scope.org/devices/index> for supported devices and <https://artisan-scope.org/machines/index> for supported machines.
 
 **Artisan offers**
 - Unlimited number of curves.
@@ -56,13 +56,13 @@ distribution in the file `LICENSE.txt`. An online version is available at
 ## LIBRARIES
 
 Artisan uses the following libraries in unmodified forms:
-- Python 3.x released under the PSF licence http://www.python.org/psf/
+- Python released under the PSF licence http://www.python.org/psf/
   http://www.python.org/
-- QT 5.x under the Qt GNU Lesser General Public License version 2.1 (LGPL)
+- QT under the Qt GNU Lesser General Public License version 2.1 (LGPL)
   http://qt-project.org/products/licensing
 - Numpy and Scipy, Copyright (c) 2005, NumPy Developers; All Rights Reserved
   http://www.scipy.org/
-- PyQt 5.x and SIP 4.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
+- PyQt under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
   http://www.riverbankcomputing.co.uk/software/pyqt/
 - matplotlib, Copyright (c) 2002-2015 John D. Hunter; All Rights Reserved. Distributed under a licence based on PSF.
   http://matplotlib.sourceforge.net

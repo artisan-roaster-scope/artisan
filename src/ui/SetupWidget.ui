@@ -91,9 +91,6 @@
           <property name="text">
            <string notr="true">Organization</string>
           </property>
-          <property name="textFormat">
-           <enum>Qt::PlainText</enum>
-          </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>

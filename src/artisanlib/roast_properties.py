@@ -3327,7 +3327,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 energy_unit = self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup]
                 #
                 total_energy = self.scalefloat(self.aw.qmc.convertHeat(metrics['BTU_batch'],0,self.aw.qmc.energyresultunit_setup))
-                self.energy_ui.totalEnergyLabel.setText(f'<b>{total_energy} {energy_unit}</b>')
+                self.energy_ui.totalEnergyLabel.setText(f'{total_energy} {energy_unit}')
                 #
                 preheat_energy = self.scalefloat(self.aw.qmc.convertHeat(metrics['BTU_preheat'],0,self.aw.qmc.energyresultunit_setup))
                 self.energy_ui.preheatEnergyLabel.setText('{} {} ({})'.format(preheat_energy,energy_unit,QApplication.translate('Label','Preheat')))
@@ -3356,7 +3356,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 #
                 if metrics['CO2_batch'] >= 0:
                     scaled_co2_batch = str(self.scalefloat(metrics['CO2_batch']))+'g' if metrics['CO2_batch']<1000 else str(self.scalefloat(metrics['CO2_batch']/1000.)) +'kg'
-                    self.energy_ui.totalCO2Label.setText(f'<b>{scaled_co2_batch}</b>')
+                    self.energy_ui.totalCO2Label.setText(f'{scaled_co2_batch}')
                     #
                     scaled_co2_preheat = str(self.scalefloat(metrics['CO2_preheat']))+'g' if metrics['CO2_preheat']<1000 else str(self.scalefloat(metrics['CO2_preheat']/1000.)) +'kg'
                     self.energy_ui.preheatCO2label.setText('{} ({})'.format(scaled_co2_preheat,QApplication.translate('Label','Preheat')))

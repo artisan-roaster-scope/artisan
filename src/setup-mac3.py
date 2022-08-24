@@ -51,7 +51,7 @@ DATA_FILES = [
     ('../translations', [QTDIR + r'/translations/qtbase_ko.qm']),
 #    ("../translations", [QTDIR + r'/translations/qtbase_pt.qm']),    # empty/missing
     ('../translations', [QTDIR + r'/translations/qtbase_pl.qm']),
-#    ("../translations", [QTDIR + r'/translations/qtbase_ru.qm']),
+    ('../translations', [QTDIR + r'/translations/qtbase_ru.qm']),
     ('../translations', [QTDIR + r'/translations/qtbase_uk.qm']),
 #    ("../translations", [QTDIR + r'/translations/qtbase_sv.qm']),    # empty/missing
     ('../translations', [QTDIR + r'/translations/qtbase_tr.qm']),     # new in Qt 5.15.2
@@ -73,7 +73,7 @@ DATA_FILES = [
     ('../translations', [r'translations/artisan_pt.qm']),
     ('../translations', [r'translations/artisan_pt_BR.qm']),
     ('../translations', [r'translations/artisan_pl.qm']),
-#    ("../translations", [r'translations/artisan_ru.qm']),
+    ('../translations', [r'translations/artisan_ru.qm']),
     ('../translations', [r'translations/artisan_uk.qm']),
     ('../translations', [r'translations/artisan_sv.qm']),
     ('../translations', [r'translations/artisan_no.qm']),

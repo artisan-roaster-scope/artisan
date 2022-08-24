@@ -19,9 +19,10 @@ pylupdate6 artisanlib plus help \
       -ts translations/artisan_lv.ts \
       -ts translations/artisan_nl.ts \
       -ts translations/artisan_no.ts \
+      -ts translations/artisan_pl.ts \
       -ts translations/artisan_pt.ts \
       -ts translations/artisan_pt_BR.ts \
-      -ts translations/artisan_pl.ts \
+      -ts translations/artisan_ru.ts \
       -ts translations/artisan_sk.ts \
       -ts translations/artisan_sv.ts \
       -ts translations/artisan_th.ts \

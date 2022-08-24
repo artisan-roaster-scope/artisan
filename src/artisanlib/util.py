@@ -361,6 +361,17 @@ def getDirectory(
     return str(fp)
 
 
+# takes a hex color string and returns the same color as hex string with staturation set to 0 and incr. lightness
+def toGrey(color):
+    hslf = QColor(color).getHslF()
+    gray = QColor.fromHslF(hslf[0],0,(1-hslf[2])/1.7+hslf[2],hslf[3]) # saturation set to 0
+    return gray.name()
+
+# takes a hex color string and returns the same color as hex string with reduced staturation and incr. lightness
+def toDim(color):
+    hslf = QColor(color).getHslF()
+    gray = QColor.fromHslF(hslf[0],hslf[1]/4,(1-hslf[2])/1.7+hslf[2],hslf[3])
+    return gray.name()
 
 # creates QLinearGradient style from light to dark by default, or from dark to light if reverse is True
 @functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache

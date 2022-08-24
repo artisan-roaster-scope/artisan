@@ -62,7 +62,6 @@ class EventsDlg(ArtisanResizeablDialog):
 
         titlefont = QFont()
         titlefont.setBold(True)
-        titlefont.setWeight(75)
         self.setWindowTitle(QApplication.translate('Form Caption','Events'))
         self.setModal(True)
         self.helpdialog = None

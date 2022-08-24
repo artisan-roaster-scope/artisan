@@ -60,7 +60,6 @@ class Ui_SetupWidget(object):
         self.labelOrganization.setFont(font)
         self.labelOrganization.setToolTip("")
         self.labelOrganization.setText("Organization")
-        self.labelOrganization.setTextFormat(QtCore.Qt.TextFormat.PlainText)
         self.labelOrganization.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
         self.labelOrganization.setObjectName("labelOrganization")
         self.gridLayout.addWidget(self.labelOrganization, 0, 0, 1, 1)

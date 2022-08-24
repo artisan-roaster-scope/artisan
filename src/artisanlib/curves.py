@@ -360,7 +360,7 @@ class CurvesDlg(ArtisanDialog):
         #Filter holds the number of pads in filter
         self.Filter = QSpinBox()
         self.Filter.setSingleStep(1)
-        self.Filter.setRange(0,10)
+        self.Filter.setRange(0,5)
         self.Filter.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Filter.setValue(int(round((self.aw.qmc.curvefilter - 1)/2)))
         self.Filter.editingFinished.connect(self.changeFilter)
@@ -1553,7 +1553,6 @@ class CurvesDlg(ArtisanDialog):
         try:
             value = self.resolutionSpinBox.value()
             self.aw.setdpi(value)
-            self.aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' changedpi(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))

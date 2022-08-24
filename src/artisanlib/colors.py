@@ -44,7 +44,7 @@ class graphColorDlg(ArtisanDialog):
         self.setWindowTitle(QApplication.translate('Form Caption','Colors'))
         titlefont = QFont()
         titlefont.setBold(True)
-        titlefont.setWeight(75)
+#        titlefont.setWeight(75)
         self.commonstyle = 'border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;'
 
         #TAB0

@@ -170,7 +170,6 @@
           <property name="font">
            <font>
             <pointsize>20</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -336,7 +335,6 @@
           <property name="font">
            <font>
             <pointsize>20</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -638,7 +636,6 @@
            <widget class="QLabel" name="cLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -687,7 +684,6 @@
            <widget class="QLabel" name="loadlabelsLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -732,7 +728,6 @@
            <widget class="QLabel" name="ratingunitsLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -761,7 +756,6 @@
            <widget class="QLabel" name="zeropctsLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -780,7 +774,6 @@
            <widget class="QLabel" name="aLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -796,7 +789,6 @@
            <widget class="QLabel" name="pressureLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -858,7 +850,6 @@
            <widget class="QLabel" name="dLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -984,7 +975,6 @@
            <widget class="QLabel" name="loadratingsLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -1010,7 +1000,6 @@
            <widget class="QLabel" name="bLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -1039,7 +1028,6 @@
            <widget class="QLabel" name="eventsLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -1058,7 +1046,6 @@
            <widget class="QLabel" name="sourcetypesLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -1077,7 +1064,6 @@
            <widget class="QLabel" name="hundredpctsLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -1484,7 +1470,6 @@
            <widget class="QLabel" name="betweenBatchesLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -1613,7 +1598,6 @@
            <widget class="QLabel" name="coolingLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
               <kerning>false</kerning>
              </font>
@@ -1636,7 +1620,6 @@
            <widget class="QLabel" name="durationLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -1679,7 +1662,6 @@
            <widget class="QLabel" name="preheatingLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -1806,7 +1788,6 @@
            <widget class="QLabel" name="measuredEnergyLabel">
             <property name="font">
              <font>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>

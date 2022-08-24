@@ -116,9 +116,9 @@ try:
                              QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport @UnusedImport
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport @UnusedImport
                              QAbstractSlider, QSlider, # @Reimport @UnresolvedImport @UnusedImport
-                             QColorDialog, QFrame, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
+                             QColorDialog, QFrame, QSplitter, QScrollArea, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
                              QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport @UnusedImport
-    from PyQt6.QtGui import (QAction, QImage, QImageReader, QWindow, # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt6.QtGui import (QPageLayout, QAction, QImage, QImageReader, QWindow, # @Reimport @UnresolvedImport @UnusedImport
                                 QKeySequence, # @Reimport @UnresolvedImport @UnusedImport
                                 QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
                                 QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor, QFont) # @Reimport @UnresolvedImport @UnusedImport
@@ -144,7 +144,7 @@ except Exception:
                              QAbstractSlider, QSlider, QStackedWidget, # @Reimport @UnresolvedImport @UnusedImport
                              QColorDialog, QFrame, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
                              QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport @UnusedImport
-    from PyQt5.QtGui import (QImage, QImageReader, QWindow,  # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt5.QtGui import (QPageLayout, QImage, QImageReader, QWindow,  # @Reimport @UnresolvedImport @UnusedImport
                                 QKeySequence, # @Reimport @UnresolvedImport @UnusedImport
                                 QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
                                 QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor, QFont) # @Reimport @UnresolvedImport @UnusedImport
@@ -226,7 +226,7 @@ from artisanlib.util import (appFrozen, stringp, uchr, decodeLocal, encodeLocal,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toBool, toStringList, toMap, removeAll, application_name, application_viewer_name, application_organization_name,
         application_organization_domain, getDataDirectory, getAppPath, getResourcePath, getDirectory, debugLogLevelToggle,
-        debugLogLevelActive, setDebugLogLevel, abbrevString, createGradient, natsort)
+        debugLogLevelActive, setDebugLogLevel, abbrevString, createGradient, natsort, toGrey, toDim)
 
 from artisanlib.qtsingleapplication import QtSingleApplication
 
@@ -648,6 +648,195 @@ class AmbientWorker(QObject): # pylint: disable=too-few-public-methods
 #######################################################################################
 #################### GRAPH DRAWING WINDOW  ############################################
 #######################################################################################
+
+class tphasescanvas(FigureCanvas):
+
+    __slots__ = [ 'dpi_offset', 'barheight', 'm', 'g', 'data', 'fig', 'ax' ]
+
+    def __init__(self, dpi):
+        self.dpi_offset = -30 # set the dpi to 30% less than the user selected dpi
+        # values that define the bars and spacing
+        self.barheight =  0.88  # height of each bar within the norm row height of 1
+        self.m = 10             # width of batch number field and drop time field
+        self.g = 2              # width of the gap between batch number field and drop time field and the actual phase percentage bars
+        # set data
+        self.data = None  # the phases data per profile
+        # the canvas
+        self.fig = Figure(figsize=(1, 1), frameon=False, dpi=dpi+self.dpi_offset)
+        self.fig.set_constrained_layout(True)
+        super().__init__(self.fig)
+        self.ax = None
+        self.clear_phases()
+
+    def clear_phases(self):
+        if self.ax is None:
+            self.ax = self.fig.add_subplot(111, frameon=False)
+        self.ax.clear()
+        self.ax.axis('off')
+        self.ax.grid(False)
+        self.ax.set_xlim(0,100 + 2*self.m + 2*self.g)
+
+    def setdpi(self,dpi,moveWindow=True):
+        if aw and self.fig:
+            dpi = (dpi + self.dpi_offset) * aw.devicePixelRatio()
+            self.fig.set_dpi(dpi)
+            if moveWindow:
+                with warnings.catch_warnings():
+                    warnings.simplefilter('ignore')
+                    self.fig.canvas.draw()
+                    self.fig.canvas.update()
+                FigureCanvas.updateGeometry(self)  #@UndefinedVariable
+            aw.scroll.setMaximumHeight(self.sizeHint().height())
+
+    # data is expected to be a None or a list of tuples of the form
+    #   (label, total_time, (phase1_time, phase2_time, phase3_time), active, color)
+    # each time value in the tripple is in seconds and can be 0 if corresponding phase is missing
+    # active is of type bool indicating the state of the corresponding profile
+    # color is a regular color string like '#00b950'
+    def set_phases(self, data):
+        self.data = data
+
+    # updates the phases graphs data and redraws its canvas
+    def update_phases(self, data):
+        self.set_phases(data)
+        self.redraw_phases()
+
+    def redraw_phases(self):
+        if aw is None:
+            return
+        # clear canvas
+        self.clear_phases()
+        if self.data and len(self.data):
+            aw.scroll.setVisible(True)
+            # set canvas background color
+            background_color = aw.qmc.palette['background']
+            self.setStyleSheet(f'background-color: {background_color}')
+            # maximum total roast time of all given profiles
+            max_total_time = max(p[1] for p in self.data)
+            # set font
+            if aw:
+                prop = aw.mpl_fontproperties
+            else:
+                prop = mpl.font_manager.FontProperties().copy()
+            prop.set_family(mpl.rcParams['font.family'])
+            prop.set_size('medium')
+
+            digits = (1 if aw.qmc.LCDdecimalplaces else 0)
+            # dimmed phases bar colors
+            rect1dim = toDim(aw.qmc.palette['rect1'])
+            rect2dim = toDim(aw.qmc.palette['rect2'])
+            rect3dim = toDim(aw.qmc.palette['rect3'])
+            # i counts the number of rows drawn to get the geometry right
+            i = 0
+            # add bars
+            for p in self.data:
+                label, total_time, phases_times, active, color = p
+                if not active:
+                    color = toGrey(color)
+                rects = None
+                if all(phases_times):
+                    # all phases defined
+                    if total_time == sum(phases_times):
+                        phases_percentages = [(phase_time/total_time) * 100. for phase_time in phases_times]
+                        extended_phases_percentages = [self.m,self.g] + phases_percentages + [self.g,self.m*total_time/max_total_time]
+                        widths = numpy.array(extended_phases_percentages)
+                        starts = widths.cumsum() - widths
+                        if active:
+                            labels = [f"{str(round(percent,digits)).rstrip('0').rstrip('.')}%  {stringfromseconds(tx,leadingzero=False)}" if percent>20 else (f"{str(round(percent,digits)).rstrip('0').rstrip('.')}%" if percent>10 else '')
+                                    for (percent,tx) in zip(phases_percentages, phases_times)]
+                        else:
+                            labels = ['']*3
+                        labels = [label, ''] + labels + ['', stringfromseconds(total_time,leadingzero=False)]
+                        # draw the bars
+                        if active:
+                            patch_colors = color, background_color, aw.qmc.palette['rect1'], aw.qmc.palette['rect2'], aw.qmc.palette['rect3'], background_color, color
+                        else:
+                            patch_colors = color, background_color, rect1dim, rect2dim, rect3dim, background_color, color
+                        rects = self.ax.barh(i, widths, left=starts, height=self.barheight, color=patch_colors)
+                    else:
+                        _log.error('redraw_phases(): inconsistent phases data')
+                    # else something is inconsistent in this data and we skip this entry
+                elif phases_times[0] and not phases_times[1] and not phases_times[2]:
+                    # only Drying Phase is defined
+                    phase1_percentage = (phases_times[0]/total_time) * 100.
+                    phases_percentages = [phase1_percentage, 100-phase1_percentage]
+                    extended_phases_percentages = [self.m,self.g] + phases_percentages + [self.g,self.m*total_time/max_total_time]
+                    widths = numpy.array(extended_phases_percentages)
+                    starts = widths.cumsum() - widths
+                    if active:
+                        label1 = f"{str(round(phase1_percentage,digits)).rstrip('0').rstrip('.')}%  {stringfromseconds(phases_times[0],leadingzero=False)}" if phase1_percentage>20 else (f"{str(round(phase1_percentage,digits)).rstrip('0').rstrip('.')}%" if phase1_percentage>10 else '')
+                    else:
+                        label1 = ''
+                    labels = [label, '', label1, '', #QApplication.translate('Message', 'Profile missing FCs event'),
+                        '', stringfromseconds(total_time,leadingzero=False)]
+                    # draw the bars
+                    if active:
+                        patch_colors = [color, background_color, aw.qmc.palette['rect1'], background_color, background_color, color]
+                    else:
+                        patch_colors = [color, background_color, rect1dim, background_color, background_color, color]
+                    rects = self.ax.barh(i, widths, left=starts, height=self.barheight, color=patch_colors)
+                elif not phases_times[0] and not phases_times[1] and phases_times[2]:
+                    # only Finishing Phase is defined
+                    phase3_percentage = (phases_times[2]/total_time) * 100.
+                    phases_percentages = [100-phase3_percentage, phase3_percentage]
+                    extended_phases_percentages = [self.m,self.g] + phases_percentages + [self.g,self.m*total_time/max_total_time]
+                    widths = numpy.array(extended_phases_percentages)
+                    starts = widths.cumsum() - widths
+                    if active:
+                        label3 = f"{str(round(phase3_percentage,digits)).rstrip('0').rstrip('.')}%  {stringfromseconds(phases_times[2],leadingzero=False)}" if phase3_percentage>20 else (f"{str(round(phase3_percentage,digits)).rstrip('0').rstrip('.')}%" if phase3_percentage>10 else '')
+                    else:
+                        label3 = ''
+                    labels = [label, '', '', # QApplication.translate('Message', 'Profile missing DRY event'),
+                        label3, '', stringfromseconds(total_time,leadingzero=False)]
+                    # draw the bars
+                    if active:
+                        patch_colors = [color, background_color, background_color, aw.qmc.palette['rect3'], background_color, color]
+                    else:
+                        patch_colors = [color, background_color, background_color, rect3dim, background_color, color]
+                    rects = self.ax.barh(i, widths, left=starts, height=self.barheight, color=patch_colors)
+                # draw the row
+                if rects is not None:
+                    # draw the labels
+                    tboxes = self.ax.bar_label(rects, label_type='center', labels=labels, fontproperties=prop)
+                    # set the colors to ensure good contrast
+                    if active:
+                        text_colors = ['white' if aw.QColorBrightness(QColor(c)) < 128 else 'black' for c in patch_colors]
+                    else:
+                        text_colors = ['gainsboro' if aw.QColorBrightness(QColor(c)) < 128 else 'dimgrey' for c in patch_colors]
+                    for j in range(len(tboxes)):
+                        tboxes[j].set_color(text_colors[j])
+                    # we set the sketch params for elements of the graph
+                    if aw.qmc.graphstyle:
+                        for c in rects.get_children():
+                            c.set_sketch_params(scale=1, length=700, randomness=12)
+                    # we increase the row counter
+                    i += 1
+
+            # set the graph axis limits
+            x,_ = self.fig.get_size_inches()
+            self.fig.set_size_inches(x, (i-1)*0.35 + 0.445, forward=True)
+            self.ax.set_ylim([-0.5, i-0.5]) # 0 to number of entries but shifted by one half to get rid of borders
+
+#            # add legend
+#            phases_names = [QApplication.translate('Button','Drying Phase'), QApplication.translate('Button','Maillard Phase'),
+#                      QApplication.translate('Button','Finishing Phase')]
+#            phases_colors = aw.qmc.palette['rect1'], aw.qmc.palette['rect2'], aw.qmc.palette['rect3']
+#            import matplotlib.patches as mpatches
+#            handles = [mpatches.Patch(color=color, label=name) for (name, color) in zip(phases_names,phases_colors)]
+#            legend_labelcolor = 'white' if aw.QColorBrightness(QColor(background_color)) < 120 else 'black'
+#            self.ax.legend(ncol=len(phases_names),handles=handles, bbox_to_anchor=(0,-0.01,1,0),
+#                  loc='upper center', fontsize='small', shadow=False, frameon=False, fancybox=False, labelcolor=legend_labelcolor)
+
+            self.fig.canvas.draw_idle()
+            aw.scroll.setMaximumHeight(self.sizeHint().height())
+        else:
+            # if no profiles are given we set the canvas height to 0
+            QSettings().setValue('MainSplitter',aw.splitter.saveState())
+            self.ax.set_ylim([0, 0])
+            self.fig.set_size_inches(0,0, forward=True)
+            aw.scroll.setMaximumHeight(0)
+            aw.scroll.setVisible(False)
+
 
 # NOTE: to have pylint to verify proper __slot__ definitions one has to remove the super class FigureCanvas here temporarily
 #   as this does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
@@ -1443,7 +1632,6 @@ class tgraphcanvas(FigureCanvas):
         self.overlapList = []
 
         self.tight_layout_params: Final = {'pad':.3,'h_pad':0.0,'w_pad':0.0} # slightly less space for axis labels
-#        self.tight_layout_params = True
         self.fig = Figure(tight_layout=self.tight_layout_params,frameon=True,dpi=dpi)
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
 
@@ -1500,7 +1688,7 @@ class tgraphcanvas(FigureCanvas):
 
         #self.flagalignFCs = False
         self.alignEvent = 0 # 0:CHARGE, 1:DRY, 2:FCs, 3:FCe, 4:SCs, 5:SCe, 6:DROP, 7:ALL
-        self.alignnames = [                          
+        self.alignnames = [
             QApplication.translate('Label','CHARGE'),
             QApplication.translate('Label','DRY'),
             QApplication.translate('Label','FCs'),
@@ -3768,7 +3956,7 @@ class tgraphcanvas(FigureCanvas):
                     sample_extractimex2 = aw.qmc.extractimex2
                     sample_extractemp2 = aw.qmc.extractemp2
                 else:
-                    m_len = aw.qmc.curvefilter*2
+                    m_len = aw.qmc.curvefilter #*2
                     sample_timex = aw.qmc.on_timex = aw.qmc.on_timex[-m_len:]
                     sample_temp1 = aw.qmc.on_temp1 = aw.qmc.on_temp1[-m_len:]
                     sample_temp2 = aw.qmc.on_temp2 = aw.qmc.on_temp2[-m_len:]
@@ -3985,7 +4173,7 @@ class tgraphcanvas(FigureCanvas):
 
 
                     #we populate the temporary smoothed ET/BT data arrays (with readings cleansed from -1 dropouts)
-                    cf = aw.qmc.curvefilter*2 - 1 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                    cf = aw.qmc.curvefilter #*2 - 1 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                     if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
                         self.temp_decay_weights = numpy.arange(1,cf+1)
                     # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
@@ -4625,6 +4813,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.sliderpos(slidernr) != value or self.temporayslider_force_move:
                         aw.moveslider(slidernr,value) # move slider
                         aw.fireslideraction(slidernr) # fire action
+                        aw.extraeventsactionslastvalue[slidernr] = int(round(value)) # remember last value for relative event buttons
                         self.temporayslider_force_move = False
                 self.temporarymovepositiveslider = None
                 if self.temporarymovenegativeslider is not None:
@@ -4632,6 +4821,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.sliderpos(slidernr) != value or self.temporayslider_force_move:
                         aw.moveslider(slidernr,value) # move slider
                         aw.fireslideraction(slidernr) # fire action
+                        aw.extraeventsactionslastvalue[slidernr] = int(round(value)) # remember last value for relative event buttons
                         self.temporayslider_force_move = False
                 self.temporarymovenegativeslider = None
 
@@ -6377,7 +6567,7 @@ class tgraphcanvas(FigureCanvas):
 
             if self.xgrid != 0:
 
-                mfactor1 =  round(float(2. + abs(int(round(startofx))/int(round(self.xgrid)))))
+                mfactor1 =  round(float(2. + abs(int(round(startofx-starttime))/int(round(self.xgrid)))))
                 mfactor2 =  round(float(2. + abs(int(round(endofx))/int(round(self.xgrid)))))
 
                 majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid)
@@ -7931,7 +8121,7 @@ class tgraphcanvas(FigureCanvas):
             #populate delta ET (self.delta1) and delta BT (self.delta2)
             # calculated here to be available for parsepecialeventannotations(). the curve are plotted later.
             if (recomputeAllDeltas or (self.DeltaETflag and self.delta1 == []) or (self.DeltaBTflag and self.delta2 == [])) and not self.flagstart: # during recording we don't recompute the deltas
-                cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                cf = aw.qmc.curvefilter #*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                 decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
                 t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
                 t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
@@ -7957,7 +8147,7 @@ class tgraphcanvas(FigureCanvas):
                     timeB_lin = None
 
                 # we populate temporary smoothed ET/BT data arrays
-                cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                cf = aw.qmc.curvefilter #*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                 st1 = self.smooth_list(self.timeB,fill_gaps(self.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
                 st2 = self.smooth_list(self.timeB,fill_gaps(self.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
                 # we start RoR computation 10 readings after CHARGE to avoid this initial peak
@@ -7968,11 +8158,11 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.background_profile_sampling_interval is None:
                     dsET = None
                 else:
-                    dsET = max(1,int(aw.qmc.deltaETspan / aw.qmc.background_profile_sampling_interval))
+                    dsET = max(1,int(round(aw.qmc.deltaETspan / aw.qmc.background_profile_sampling_interval)))
                 if aw.qmc.background_profile_sampling_interval is None:
                     dsBT = None
                 else:
-                    dsBT = max(1,int(aw.qmc.deltaBTspan / aw.qmc.background_profile_sampling_interval))
+                    dsBT = max(1,int(round(aw.qmc.deltaBTspan / aw.qmc.background_profile_sampling_interval)))
                 self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin,deltaETsamples=dsET,deltaBTsamples=dsBT)
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -7990,6 +8180,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.redrawdesigner()
         elif bool(aw.comparator):
             aw.comparator.redraw()
+            aw.qpc.redraw_phases()
         else:
             try:
                 #### lock shared resources   ####
@@ -8087,14 +8278,15 @@ class tgraphcanvas(FigureCanvas):
                         except Exception: # pylint: disable=broad-except
                             pass
 
-                    if aw.qmc.flagstart:
+                    if aw.qmc.flagstart or self.ygrid == 0:
                         y_label = self.ax.set_ylabel('')
-                        self.set_xlabel('')
                     else:
                         y_label = self.ax.set_ylabel(self.mode,color=self.palette['ylabel'],rotation=0,labelpad=10,
-                                fontsize='large',
-                            fontfamily=prop.get_family()
-                            )
+                                fontsize='medium',
+                                fontfamily=prop.get_family())
+                    if aw.qmc.flagstart or self.xgrid == 0:
+                        self.set_xlabel('')
+                    else:
                         self.set_xlabel(aw.arabicReshape(QApplication.translate('Label', 'min','abbrev. of minutes')))
 
                     try:
@@ -8156,12 +8348,12 @@ class tgraphcanvas(FigureCanvas):
                             labelbottom=False)   # labels along the bottom edge are on
 
                         self.ax.patch.set_visible(True)
-                        if aw.qmc.flagstart:
+                        if aw.qmc.flagstart or self.zgrid == 0:
                             y_label = self.delta_ax.set_ylabel('')
                         else:
                             y_label = self.delta_ax.set_ylabel(f'{aw.qmc.mode}{aw.arabicReshape("/min")}',
                                 color = self.palette['ylabel'],
-                                fontsize='large',
+                                fontsize='medium',
                                 fontfamily=prop.get_family()
                                 )
                         try:
@@ -8178,6 +8370,8 @@ class tgraphcanvas(FigureCanvas):
                                 i.set_markersize(5)
                             for label in self.delta_ax.get_yticklabels() :
                                 label.set_fontsize('small')
+                            if not self.LCDdecimalplaces:
+                                self.delta_ax.minorticks_off()
 
                         # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
                         self.delta_ax.fmt_ydata = self.fmt_data
@@ -8194,6 +8388,11 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.spines['bottom'].set_color('0.40')
                     self.ax.spines['left'].set_color('0.40')
                     self.ax.spines['right'].set_color('0.40')
+
+                    self.ax.spines.top.set_visible(self.xgrid != 0 and self.ygrid != 0 and self.zgrid != 0)
+                    self.ax.spines.bottom.set_visible(self.xgrid != 0)
+                    self.ax.spines.left.set_visible(self.ygrid != 0)
+                    self.ax.spines.right.set_visible(self.zgrid != 0)
 
                     self.l_eventtype1dots = None
                     self.l_eventtype2dots = None
@@ -8583,7 +8782,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.overlapList = []
                                 for i in range(len(self.backgroundEvents)):
                                     event_idx = self.backgroundEvents[i]
-                                    if not self.backgroundShowFullflag and (event_idx < bcharge_idx or event_idx > bdrop_idx):
+                                    if (not self.backgroundShowFullflag and (event_idx < bcharge_idx or event_idx > bdrop_idx)):
                                         continue
                                     pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
                                     if self.backgroundEtypes[i] == 0 and aw.qmc.showEtypes[0]:
@@ -9080,7 +9279,7 @@ class tgraphcanvas(FigureCanvas):
                                 try:
                                     tx = self.timex[self.specialevents[i]]
                                     if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
-                                        if ((not self.foregroundShowFullflag and self.autotimexMode != 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
+                                        if ((not self.foregroundShowFullflag and self.autotimexMode == 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
                                             (not self.foregroundShowFullflag and self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
                                             if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
                                                 E1_CHARGE = pos # remember event value at CHARGE
@@ -9121,7 +9320,7 @@ class tgraphcanvas(FigureCanvas):
                                             aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                     elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
                                         tx = self.timex[self.specialevents[i]]
-                                        if ((not self.foregroundShowFullflag and self.autotimexMode != 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
+                                        if ((not self.foregroundShowFullflag and self.autotimexMode == 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
                                             (not self.foregroundShowFullflag and self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
                                             if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
                                                 E2_CHARGE = pos # remember event value at CHARGE
@@ -9163,7 +9362,7 @@ class tgraphcanvas(FigureCanvas):
                                             aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                     elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
                                         tx = self.timex[self.specialevents[i]]
-                                        if ((not self.foregroundShowFullflag and self.autotimexMode != 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
+                                        if ((not self.foregroundShowFullflag and self.autotimexMode == 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
                                             (not self.foregroundShowFullflag and self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
                                             if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
                                                 E3_CHARGE = pos # remember event value at CHARGE
@@ -9204,7 +9403,7 @@ class tgraphcanvas(FigureCanvas):
                                             aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                     elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
                                         tx = self.timex[self.specialevents[i]]
-                                        if ((not self.foregroundShowFullflag and self.autotimexMode != 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
+                                        if ((not self.foregroundShowFullflag and self.autotimexMode == 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
                                             (not self.foregroundShowFullflag and self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
                                             if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
                                                 E4_CHARGE = pos # remember event value at CHARGE
@@ -9528,12 +9727,20 @@ class tgraphcanvas(FigureCanvas):
                                 self.drawDeltaET(trans,0,0)
                                 self.drawDeltaBT(trans,0,0)
 
-                    if recomputeAllDeltas and self.delta_ax is not None and two_ax_mode:
+                    if self.delta_ax is not None and two_ax_mode:
                         aw.autoAdjustAxis(timex=False)
                         self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                         if self.zgrid > 0:
                             self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
                             self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                            for i in self.delta_ax.get_yticklines():
+                                i.set_markersize(10)
+                            for i in self.delta_ax.yaxis.get_minorticklines():
+                                i.set_markersize(5)
+                            for label in self.delta_ax.get_yticklabels() :
+                                label.set_fontsize('small')
+                            if not self.LCDdecimalplaces:
+                                self.delta_ax.minorticks_off()
 
                     ##### Extra devices-curves
                     for l in self.extratemp1lines + self.extratemp2lines:
@@ -13589,7 +13796,10 @@ class tgraphcanvas(FigureCanvas):
                         msg += sep + '#' + str(aw.qmc.ground_color)
                     self.set_xlabel(msg)
             else:
-                self.set_xlabel(aw.arabicReshape(QApplication.translate('Label', 'min','abbrev. of minutes')))
+                if aw.qmc.flagstart or self.xgrid == 0:
+                    self.set_xlabel('')
+                else:
+                    self.set_xlabel(aw.arabicReshape(QApplication.translate('Label', 'min','abbrev. of minutes')))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -14810,6 +15020,7 @@ class tgraphcanvas(FigureCanvas):
         #    self.endofx = 960
         #    self.redraw()
 
+        idx = 0
         self.timex,self.temp1,self.temp2 = [],[],[]
         for i in range(len(self.timeindex)):
             # add SCe and COOL END only if corresponding button is enabled
@@ -14817,7 +15028,8 @@ class tgraphcanvas(FigureCanvas):
                 self.timex.append(self.designertimeinit[i])
                 self.temp1.append(self.designertemp1init[i])
                 self.temp2.append(self.designertemp2init[i])
-                self.timeindex[i] = i
+                self.timeindex[i] = idx
+                idx += 1
         # add TP
         if self.mode == 'C':
             self.timex.insert(1,1.5*60)
@@ -14835,6 +15047,11 @@ class tgraphcanvas(FigureCanvas):
             self.timex.insert(3,6*60)
             self.temp1.insert(3,554)
             self.temp2.insert(3,345)
+        for x in range(len(self.timeindex)):
+            if self.timeindex[x] >= 2:
+                self.timeindex[x] += 2
+            elif self.timeindex[x] >= 1:
+                self.timeindex[x] += 1
 
         if not self.locktimex:
             self.xaxistosm(redraw=False)
@@ -15163,6 +15380,9 @@ class tgraphcanvas(FigureCanvas):
                             elif index == 6:
                                 timez = stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
                                 aw.sendmessage(QApplication.translate('Message', '[ DROP ]') + ' ' + timez, style="background-color:'#f07800';",append=False)
+                            elif index == 7:
+                                timez = stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]])
+                                aw.sendmessage(QApplication.translate('Message', '[ COOL ]') + ' ' + timez, style="background-color:'#6FB5D1';",append=False)
                             break
                         if abs(self.temp2[i] - ydata) < 10:
                             self.ax.plot(self.timex[i],self.temp2[i],color = 'blue',marker = 'o',alpha = .3,markersize=30)
@@ -17743,7 +17963,7 @@ class ApplicationWindow(QMainWindow):
                 ('pl', 'Polski'),
                 ('pt', 'Portugu\xeas'),
                 ('pt_BR', 'Portugu\u00EAs do Brasil'),
-#                ("ru", "\u0420\u0443\u0441\u0441\u043a\u0438\u0439"),
+                ('ru', '\u0420\u0443\u0441\u0441\u043a\u0438\u0439'),
                 ('sk', 'Slov\u00e1k'),
                 ('sv', 'Svenska'),
                 ('uk', '\u0443\u043a\u0440\u0430\u0457\u043d\u0435\u0446\u044c'), #"\u0443\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0438\u0439"),
@@ -19041,7 +19261,38 @@ class ApplicationWindow(QMainWindow):
 
         #level 3
         level3layout.addLayout(pidbuttonLayout,0)
-        level3layout.addWidget(self.qmc)
+
+        self.qpc = tphasescanvas(self.dpi)
+        self.qpc.mpl_connect('scroll_event', self.scrollingPhases)
+
+        self.scroll = QScrollArea()
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll.setWidget(self.qpc)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self.scroll.setVisible(False)
+
+        self.splitter = QSplitter(Qt.Orientation.Vertical)
+        self.splitter.addWidget(self.qmc)
+        self.splitter.addWidget(self.scroll)
+        self.splitter.setSizes([100,0])
+        self.splitter.setFrameShape(QFrame.Shape.NoFrame)
+        #self.splitter.handle(0).setVisible(False)
+        settings = QSettings()
+        if settings.contains('MainSplitter'):
+            self.splitter.restoreState(settings.value('MainSplitter'))
+
+        self.splitter.setHandleWidth(7)
+        #self.splitter.setStyleSheet("QSplitter::handle:vertical {background: lightGray; border-bottom: 1px solid grey; border-top: 1px solid grey;}")
+        #self.splitter.setStyleSheet("QSplitter::handle:vertical {background: lightGray; border-bottom: 1px solid lightGray; border-top: 1px solid lightGray;}")
+        #self.splitter.setStyleSheet("QSplitter::handle:vertical {background: lightGray; border-bottom: 0px; border-top: 0px;}")
+        #self.splitter.setStyleSheet("QSplitter::handle:vertical {background: lightGray;}")
+
+        self.splitter.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Expanding)
+        self.qpc.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
+        level3layout.addWidget(self.splitter)
+
         level3layout.setSpacing(0)
         level3layout.setContentsMargins(0,0,0,0)
 
@@ -19334,6 +19585,15 @@ class ApplicationWindow(QMainWindow):
 
         QTimer.singleShot(0,lambda : _log.info('startup time: %.2f', libtime.process_time() - startup_time))
 
+
+    def scrollingPhases(self, event):
+        val = self.scroll.verticalScrollBar().value()
+        if event.button =='down':
+            self.scroll.verticalScrollBar().setValue(val+10)
+        else:
+            self.scroll.verticalScrollBar().setValue(val-10)
+
+
     # timer_color one of "timer" (black), "slowcoolingtimer" (red), "rstimer" (blue)
     def setTimerColor(self, timer_color:str):
         self.lcd1.setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.lcdpaletteF[timer_color],self.lcdpaletteB[timer_color]))
@@ -19466,9 +19726,12 @@ class ApplicationWindow(QMainWindow):
 
     def addLanguage(self, locale, menu_entry):
         languageAction = QAction(menu_entry, self)
-        languageAction.setCheckable(True)
-        languageAction.triggered.connect(self.change_local_action)
-        self.language_menu_actions[locale] = languageAction
+        if locale in ['ru']:
+            languageAction.setEnabled(False)
+        else:
+            languageAction.setCheckable(True)
+            languageAction.triggered.connect(self.change_local_action)
+            self.language_menu_actions[locale] = languageAction
         self.languageMenu.addAction(languageAction)
         if self.locale_str == locale:
             languageAction.setChecked(True)
@@ -22997,6 +23260,10 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.adjustSize()
                 FigureCanvas.updateGeometry(aw.qmc)  #@UndefinedVariable
                 QApplication.processEvents()
+                if aw.qmc.statssummary:
+                    aw.qmc.redraw(recomputeAllDeltas=False)
+            if aw.qpc:
+                aw.qpc.setdpi(dpi,moveWindow)
 
     def enableSaveActions(self):
         if aw:
@@ -25642,7 +25909,7 @@ class ApplicationWindow(QMainWindow):
                         elif  aw.pidcontrol.svMode == 2:
                             aw.sendmessage(QApplication.translate('Message','PID Mode: Background'))
                 elif k == 45:                       #-
-                    if control_modifier:
+                    if control_modifier or control_shift_modifier:
                         aw.setdpi(aw.dpi-10)
                     else:
                         if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
@@ -25652,7 +25919,7 @@ class ApplicationWindow(QMainWindow):
                             aw.pidcontrol.svLookahead = max(0,aw.pidcontrol.svLookahead-1)
                             aw.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(aw.pidcontrol.svLookahead))
                 elif k == 43:                       #+
-                    if control_modifier:
+                    if control_modifier or control_shift_modifier:
                         aw.setdpi(aw.dpi+10)
                     else:
                         if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
@@ -33444,8 +33711,9 @@ class ApplicationWindow(QMainWindow):
         if image.isNull():
             return
         if self.printer is None:
-            self.printer = QPrinter(QPrinter.PrinterMode.HighResolution)
+            self.printer = QPrinter(QPrinter.PrinterMode.HighResolution) # (QPrinter.PrinterMode.PrinterResolution)
             self.printer.setCreator(application_name)
+#            self.printer.setResolution(300)
         form = QPrintDialog(self.printer, self)
         if form.exec():
             # painter coordinates
@@ -33454,6 +33722,7 @@ class ApplicationWindow(QMainWindow):
             # image coordinates
             size = image.size()
             rect_size = rect.size()
+            graph_height = size.height()
             rect_size.setHeight(int(round(rect_size.height()*aw.devicePixelRatio())))
             rect_size.setWidth(int(round(rect_size.width()*aw.devicePixelRatio())))
             size.scale(rect_size, Qt.AspectRatioMode.KeepAspectRatio)
@@ -33466,6 +33735,28 @@ class ApplicationWindow(QMainWindow):
                 painter.drawPixmap(0, 0, image)
             else:
                 painter.drawImage(0, 0, image)
+            if bool(self.comparator) and self.qpc and len(self.splitter.sizes())>1 and self.splitter.sizes()[1]>0:
+                phases_image = aw.qpc.grab().toImage() # a QImage on macOS
+                if not phases_image.isNull():
+                    if self.printer.pageLayout().orientation() == QPageLayout.Orientation.Landscape:
+                        self.printer.newPage()
+                        offset = 0
+                    else:
+                        offset = int(round(graph_height/aw.devicePixelRatio())) # put the phases graph below the profile graph
+                    size = phases_image.size()
+                    rect_size = rect.size()
+                    rect_size.setHeight(int(round(rect_size.height()*aw.devicePixelRatio())))
+                    rect_size.setWidth(int(round(rect_size.width()*aw.devicePixelRatio())))
+                    size.scale(rect_size, Qt.AspectRatioMode.KeepAspectRatio)
+                    painter.setViewport(rect.x(), rect.y(), size.width(), size.height()) # sets device coordinate system
+                    image_rect = phases_image.rect()
+        #            image_rect.setHeight(int(round(image_rect.height()/aw.devicePixelRatio())))
+        #            image_rect.setWidth(int(round(image_rect.width()/aw.devicePixelRatio())))
+                    painter.setWindow(image_rect) #scale to fit page # sets logical coordinate system
+                    if isinstance(phases_image, QPixmap):
+                        painter.drawPixmap(0, 0, phases_image)
+                    else:
+                        painter.drawImage(0, offset, phases_image)
             painter.end()
             del painter
 
@@ -34689,7 +34980,7 @@ class ApplicationWindow(QMainWindow):
 
                                 if self.qmc.DeltaBTflag and self.qmc.delta_ax:
                                     tx = numpy.array(timex)
-                                    cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                                    cf = aw.qmc.curvefilter #*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                                     t1 = self.qmc.smooth_list(timex,fill_gaps(temp),window_len=cf,decay_smoothing=not aw.qmc.optimalSmoothing)
                                     if len(t1)>10 and len(tx) > 10:
                                         # we start RoR computation 10 readings after CHARGE to avoid this initial peak
@@ -34848,7 +35139,6 @@ class ApplicationWindow(QMainWindow):
 
                     try:
                         # Create a roast phase visualization graph
-                        #import matplotlib.pyplot as plt
 
                         fig_height = 3.2       # in inches when there are 10 profiles, will be scaled for number of profiles
                         fig_width = 10         # in inches
@@ -34872,11 +35162,9 @@ class ApplicationWindow(QMainWindow):
                         prop.set_family(mpl.rcParams['font.family'])
 
                         # generate graph  ( not written to support MPL < v2.0 )
-                        #fig = plt.figure(figsize=(fig_width, (fig_height * len(profiles)/10 + 0.2)))
                         fig = Figure(figsize=(fig_width, (fig_height * len(profiles)/10 + 0.2)))
 
                         ax = fig.add_subplot(111, frameon=False)
-    #                    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
                         fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
 
                         # no grid or tick marks
@@ -34952,7 +35240,7 @@ class ApplicationWindow(QMainWindow):
                                 ax.text( n + rd['DRY_percent'] + rd['MAI_percent'] + rd['DEV_percent'] + g + 1, i*(barheight + barspacer) + textoffset, stringfromseconds(rd['DROP_time']), ha='left', color=fontcolor, fontproperties=prop)
                             elif 'DEV_percent' in rd:   # has FCs but no Dry event
                                 cl = cl[0],'white',cl[3]
-                                missingDryevent = QApplication.translate('Message', 'Profile missing Dry event')
+                                missingDryevent = QApplication.translate('Message', 'Profile missing DRY event')
                                 ax.broken_barh( [ (0, m),
                                                   (n, 100 - rd['DEV_percent']),
                                                   (n+ 100 - rd['DEV_percent'], rd['DEV_percent']),
@@ -34990,7 +35278,6 @@ class ApplicationWindow(QMainWindow):
                         graph_image_pct = graph_image_pct + '?dummy=' + str(int(libtime.time()))
                         graph_image_pct = "<img alt='roast graph pct' style=\"width: 95%;\" src='" + graph_image_pct + "'>"
 
-    #                    plt.close() # release memory
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                         _, _, exc_tb = sys.exc_info()
@@ -35002,7 +35289,7 @@ class ApplicationWindow(QMainWindow):
                             aw.loadFile(foreground_profile_path)
                         if aw.qmc.backgroundpath:
                             aw.loadbackground(aw.qmc.backgroundpath)
-                        self.qmc.redraw(recomputeAllDeltas=False)
+                        self.qmc.timealign()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
 
@@ -36388,7 +36675,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def helpHelp(self, _=False):  # pylint: disable=no-self-use # used as slot
-        QDesktopServices.openUrl(QUrl('https://artisan-scope.org/docs/quick-start-guide/', QUrl.ParsingMode.TolerantMode))
+        QDesktopServices.openUrl(QUrl('https://artisan-scope.org/help/', QUrl.ParsingMode.TolerantMode))
 
     @pyqtSlot()
     @pyqtSlot(bool)

@@ -86,7 +86,6 @@
          <widget class="QLabel" name="loadBlabel">
           <property name="font">
            <font>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -124,7 +123,6 @@
          <widget class="QLabel" name="durationlabel">
           <property name="font">
            <font>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -146,7 +144,6 @@
          <widget class="QLabel" name="loadDlabel">
           <property name="font">
            <font>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -242,7 +239,6 @@
          <widget class="QLabel" name="loadAlabel">
           <property name="font">
            <font>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -306,7 +302,6 @@
          <widget class="QLabel" name="loadClabel">
           <property name="font">
            <font>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>

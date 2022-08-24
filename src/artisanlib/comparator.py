@@ -999,6 +999,11 @@ class roastCompareDlg(ArtisanDialog):
         if grid_axis is not None:
             self.aw.qmc.ax.grid(True,axis=grid_axis,color=self.aw.qmc.palette['grid'],linestyle=self.aw.qmc.gridstyles[self.aw.qmc.gridlinestyle],linewidth = self.aw.qmc.gridthickness,alpha = self.aw.qmc.gridalpha,sketch_params=0,path_effects=[])
 
+        self.aw.qmc.ax.spines.top.set_visible(self.aw.qmc.xgrid != 0 and self.aw.qmc.ygrid != 0 and self.aw.qmc.zgrid != 0)
+        self.aw.qmc.ax.spines.bottom.set_visible(self.aw.qmc.xgrid != 0)
+        self.aw.qmc.ax.spines.left.set_visible(self.aw.qmc.ygrid != 0)
+        self.aw.qmc.ax.spines.right.set_visible(self.aw.qmc.zgrid != 0)
+
         prop = self.aw.mpl_fontproperties.copy()
         prop.set_size('small')
         fontprop_medium = self.aw.mpl_fontproperties.copy()
@@ -1006,8 +1011,12 @@ class roastCompareDlg(ArtisanDialog):
         fontprop_large = self.aw.mpl_fontproperties.copy()
         fontprop_large.set_size('large')
 
-        self.aw.qmc.ax.set_ylabel(self.aw.qmc.mode,color=self.aw.qmc.palette['ylabel'],rotation=0,labelpad=10,fontproperties=fontprop_large)
-        self.aw.qmc.ax.set_xlabel(self.aw.arabicReshape(QApplication.translate('Label', 'min')),color = self.aw.qmc.palette['xlabel'],fontproperties=fontprop_medium)
+        temp_axis_label = ('' if self.aw.qmc.ygrid == 0 else self.aw.qmc.mode)
+        self.aw.qmc.ax.set_ylabel(temp_axis_label,color=self.aw.qmc.palette['ylabel'],rotation=0,labelpad=10,fontproperties=fontprop_medium)
+
+        #time_axis_label = ("" if self.aw.qmc.xgrid == 0 else self.aw.arabicReshape(QApplication.translate('Label', 'min')))
+        time_axis_label = '' # always hide as not very productive
+        self.aw.qmc.set_xlabel(time_axis_label)
 
         tick_dir = 'inout'
         self.aw.qmc.ax.tick_params(\
@@ -1049,7 +1058,10 @@ class roastCompareDlg(ArtisanDialog):
             labelbottom=False)   # labels along the bottom edge are on
 
         self.aw.qmc.ax.patch.set_visible(True)
-        self.aw.qmc.delta_ax.set_ylabel(self.aw.qmc.mode + self.aw.arabicReshape(QApplication.translate('Label', '/min')),color = self.aw.qmc.palette['ylabel'],fontproperties=fontprop_large)
+
+        delta_axis_label = ('' if self.aw.qmc.zgrid == 0 else self.aw.qmc.mode + self.aw.arabicReshape(QApplication.translate('Label', '/min')))
+        self.aw.qmc.delta_ax.set_ylabel(delta_axis_label,color = self.aw.qmc.palette['ylabel'],fontproperties=fontprop_medium)
+
         self.aw.qmc.delta_ax.set_ylim(self.aw.qmc.zlimit_min,self.aw.qmc.zlimit)
         if self.aw.qmc.zgrid > 0:
             self.aw.qmc.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.aw.qmc.zgrid))
@@ -1336,6 +1348,7 @@ class roastCompareDlg(ArtisanDialog):
         self.realign()
         self.updateZorders()
         self.repaint()
+        self.aw.qpc.update_phases(self.getPhasesData())
 
     @pyqtSlot(int)
     def visibilityChanged(self,state):
@@ -1344,6 +1357,7 @@ class roastCompareDlg(ArtisanDialog):
         self.updateDeltaLimits()
         self.autoTimeLimits()
         self.repaint()
+        self.aw.qpc.update_phases(self.getPhasesData())
 
     @pyqtSlot(int,bool)
     def flagChanged(self,i,b):
@@ -1501,6 +1515,7 @@ class roastCompareDlg(ArtisanDialog):
                 else:
                     c = QColor.fromRgbF(*p.gray).lighter()
                 w.setBackground(c)
+        self.aw.qpc.update_phases(self.getPhasesData())
 
     # align all profiles to the first one w.r.t. to the event self.aw.qmc.compareAlignEvent
     #   0:CHARGE, 1:TP, 2:DRY, 3:FCs, 4:FCe, 5:SCs, 6:SCe, 7:DROP
@@ -1609,6 +1624,7 @@ class roastCompareDlg(ArtisanDialog):
                 self.realign()
                 self.updateZorders()
                 self.repaint()
+                self.aw.qpc.update_phases(self.getPhasesData())
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
 
@@ -1637,6 +1653,7 @@ class roastCompareDlg(ArtisanDialog):
             self.realign()
             self.updateZorders()
             self.repaint()
+            self.aw.qpc.update_phases(self.getPhasesData())
 
     def deleteProfile(self,i):
         self.profileTable.removeRow(i)
@@ -1653,6 +1670,7 @@ class roastCompareDlg(ArtisanDialog):
             self.realign()
             self.updateZorders()
             self.repaint()
+            self.aw.qpc.update_phases(self.getPhasesData())
 
     ### Utility
 
@@ -1661,6 +1679,22 @@ class roastCompareDlg(ArtisanDialog):
             if self.profileTable.visualRow(i) == 0:
                 return p
         return None
+
+    def getPhasesData(self):
+        data = []
+        profiles = self.getProfilesVisualOrder()
+        for p in reversed(profiles):
+            if p.visible:
+                start = p.timex[p.timeindex[0]] if p.timeindex[0] != -1 else p.timex[0]
+                total = p.timex[p.timeindex[6]] - start if p.timeindex[6] != 0 else p.timex[-1]
+                dry = p.timex[p.timeindex[1]] - start if p.timeindex[1] != 0 else 0
+                fcs = p.timex[p.timeindex[2]] - start if p.timeindex[2] != 0 else 0
+                p1 = dry
+                p3 = total - fcs if fcs != 0 else 0
+                p2 = total - p1 - p3 if p1 != 0 and p3 != 0 else 0
+                c = QColor.fromRgbF(*p.color)
+                data.append((p.label, total, (p1, p2, p3), p.active, c.name()))
+        return data
 
     def getProfilesVisualOrder(self):
         res = self.profiles[:]
@@ -1718,3 +1752,4 @@ class roastCompareDlg(ArtisanDialog):
             self.aw.ntb.enable_edit_curve_parameters()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
+        self.aw.qpc.update_phases(None)
