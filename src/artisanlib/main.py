@@ -142,7 +142,7 @@ except Exception:
                              QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport @UnusedImport
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport @UnusedImport
                              QAbstractSlider, QSlider, QStackedWidget, # @Reimport @UnresolvedImport @UnusedImport
-                             QColorDialog, QFrame, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
+                             QColorDialog, QFrame, QSplitter, QScrollArea, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
                              QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtGui import (QPageLayout, QImage, QImageReader, QWindow,  # @Reimport @UnresolvedImport @UnusedImport
                                 QKeySequence, # @Reimport @UnresolvedImport @UnusedImport
@@ -663,7 +663,11 @@ class tphasescanvas(FigureCanvas):
         self.data = None  # the phases data per profile
         # the canvas
         self.fig = Figure(figsize=(1, 1), frameon=False, dpi=dpi+self.dpi_offset)
-        self.fig.set_constrained_layout(True)
+#        self.fig.set_constrained_layout(True)
+        # as alternative to the experimental constrained_layout we could use tight_layout as for them main canvas:
+        self.tight_layout_params: Final = {'pad':.3,'h_pad':0.0,'w_pad':0.0} # slightly less space for axis labels
+        self.fig.set_tight_layout(self.tight_layout_params)
+        #
         super().__init__(self.fig)
         self.ax = None
         self.clear_phases()
@@ -736,7 +740,7 @@ class tphasescanvas(FigureCanvas):
                 rects = None
                 if all(phases_times):
                     # all phases defined
-                    if total_time == sum(phases_times):
+                    if int(round(total_time)) == int(round(sum(phases_times))):
                         phases_percentages = [(phase_time/total_time) * 100. for phase_time in phases_times]
                         extended_phases_percentages = [self.m,self.g] + phases_percentages + [self.g,self.m*total_time/max_total_time]
                         widths = numpy.array(extended_phases_percentages)
@@ -754,7 +758,7 @@ class tphasescanvas(FigureCanvas):
                             patch_colors = color, background_color, rect1dim, rect2dim, rect3dim, background_color, color
                         rects = self.ax.barh(i, widths, left=starts, height=self.barheight, color=patch_colors)
                     else:
-                        _log.error('redraw_phases(): inconsistent phases data')
+                        _log.error('redraw_phases(): inconsistent phases data in %s (total: %s, sum(phases): %s)', label, total_time, sum(phases_times))
                     # else something is inconsistent in this data and we skip this entry
                 elif phases_times[0] and not phases_times[1] and not phases_times[2]:
                     # only Drying Phase is defined

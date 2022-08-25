@@ -1171,7 +1171,8 @@ class roastCompareDlg(ArtisanDialog):
 
     def redraw(self):
         self.clearCanvas()
-        self.drawAlignmentLine()
+        if self.profiles:
+            self.drawAlignmentLine()
         self.recompute()
         for rp in self.profiles:
             rp.draw()
