@@ -837,7 +837,7 @@ class tphasescanvas(FigureCanvas):
             # if no profiles are given we set the canvas height to 0
             QSettings().setValue('MainSplitter',aw.splitter.saveState())
             self.ax.set_ylim([0, 0])
-            self.fig.set_size_inches(0,0, forward=True)
+            #self.fig.set_size_inches(0,0, forward=True) # this one crashes numpy on Windows and seems not needed
             aw.scroll.setMaximumHeight(0)
             aw.scroll.setVisible(False)
 
@@ -27221,6 +27221,7 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot(str)
     def loadbackgroundRedraw(self,filename):
+        _log.info('loadbackgroundRedraw(%s)',filename)
         if filename is None or len(filename) == 0:
             return
         try:
@@ -27238,6 +27239,8 @@ class ApplicationWindow(QMainWindow):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
                 self.deleteBackground() # delete a loaded background if any
+        else:
+            QTimer.singleShot(500,lambda : self.sendmessage(f'file not found: {filename}'))
 
     # Loads background profile
     # NOTE: this does NOT set the self.qmc.background flag to make the loaded background visible.
