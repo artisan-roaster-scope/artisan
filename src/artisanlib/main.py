@@ -6604,11 +6604,11 @@ class tgraphcanvas(FigureCanvas):
                     for label in self.ax.xaxis.get_ticklabels():
                         label.set_rotation(self.xrotation)
 
-                if not aw.qmc.LCDdecimalplaces:
-                    if self.ax:
-                        self.ax.minorticks_off()
-                    if self.delta_ax:
-                        self.delta_ax.minorticks_off()
+            if not aw.qmc.LCDdecimalplaces:
+                if self.ax:
+                    self.ax.minorticks_off()
+                if self.delta_ax:
+                    self.delta_ax.minorticks_off()
 
             # we have to update the canvas cache
             if redraw:
@@ -30675,11 +30675,11 @@ class ApplicationWindow(QMainWindow):
                     self.resetqsettings = 0
                     if 'canvas' in aw.qmc.palette:
                         aw.updateCanvasColors(checkColors=False)
-                    # remove window geometry settings
+                    # remove window geometry and splitter settings
                     for s in ['BlendGeometry','RoastGeometry','FlavorProperties','CalculatorGeometry','EventsGeometry', 'CompareGeometry',
                         'BackgroundGeometry','LCDGeometry','DeltaLCDGeometry','ExtraLCDGeometry','PhasesLCDGeometry','AlarmsGeometry','DeviceAssignmentGeometry','PortsGeometry',
                         'TransformatorPosition', 'CurvesPosition', 'StatisticsPosition', 'AxisPosition','PhasesPosition', 'BatchPosition',
-                        'SamplingPosition', 'autosaveGeometry', 'PIDPosition', 'DesignerPosition','PIDLCDGeometry','ScaleLCDGeometry']:
+                        'SamplingPosition', 'autosaveGeometry', 'PIDPosition', 'DesignerPosition','PIDLCDGeometry','ScaleLCDGeometry', 'MainSplitter']:
                         settings.remove(s)
                     #
                     aw.setFonts()

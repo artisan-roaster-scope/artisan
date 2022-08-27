@@ -3101,6 +3101,7 @@ class EventsDlg(ArtisanResizeablDialog):
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' updatetypes(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
+    @pyqtSlot('QCloseEvent')
     def closeEvent(self,_):
         self.closeHelp()
         settings = QSettings()

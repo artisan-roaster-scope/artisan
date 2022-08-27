@@ -35,10 +35,34 @@ except Exception: # pylint: disable=broad-except
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, QLayout, # @UnusedImport @Reimport  @UnresolvedImport
         QSpinBox) # @UnusedImport @Reimport  @UnresolvedImport
 
-
 class WindowsDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
+
+        # remember previous original settings
+
+        self.time_grid_org = self.aw.qmc.time_grid
+        self.temp_grid_org = self.aw.qmc.temp_grid
+        self.gridlinestyle_org = self.aw.qmc.gridlinestyle
+        self.gridthickness_org = self.aw.qmc.gridthickness
+        self.gridalpha_org = self.aw.qmc.gridalpha
+        self.step100temp_org = self.aw.qmc.step100temp
+        self.xgrid_org = self.aw.qmc.xgrid
+        self.ygrid_org = self.aw.qmc.ygrid
+        self.grid_org = self.aw.qmc.zgrid
+        self.zlimit_org = self.aw.qmc.zlimit
+        self.zlimit_min_org = self.aw.qmc.zlimit_min
+        self.legendloc_org = self.aw.qmc.legendloc
+        self.resetmaxtime_org = self.aw.qmc.resetmaxtime
+        self.chargemintime_org = self.aw.qmc.chargemintime
+        self.fixmaxtime_org = self.aw.qmc.fixmaxtime
+        self.locktimex_org = self.aw.qmc.locktimex
+        self.autotimex_org = self.aw.qmc.autotimex
+        self.autotimexMode_org = self.aw.qmc.autotimexMode
+        self.autodeltaxET_org = self.aw.qmc.autodeltaxET
+        self.autodeltaxBT_org = self.aw.qmc.autodeltaxBT
+        self.loadaxisfromprofile_org = self.aw.qmc.loadaxisfromprofile
+
         self.setWindowTitle(QApplication.translate('Form Caption','Axes'))
         self.setModal(True)
         xlimitLabel = QLabel(QApplication.translate('Label', 'Max'))
@@ -198,10 +222,12 @@ class WindowsDlg(ArtisanDialog):
         self.timeGridCheckBox.setChecked(self.aw.qmc.time_grid)
         self.timeGridCheckBox.setToolTip(QApplication.translate('Tooltip', 'Show time grid'))
         self.timeGridCheckBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.timeGridCheckBox.stateChanged.connect(self.changetimeGridCheckBox)
         self.tempGridCheckBox = QCheckBox(QApplication.translate('CheckBox','Temp'))
         self.tempGridCheckBox.setToolTip(QApplication.translate('Tooltip', 'Show temperature grid'))
         self.tempGridCheckBox.setChecked(self.aw.qmc.temp_grid)
         self.tempGridCheckBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.tempGridCheckBox.stateChanged.connect(self.changetempGridCheckBox)
         ygridlabel = QLabel(QApplication.translate('Label', 'Step'))
         ygridlabel.setToolTip(QApplication.translate('Tooltip', 'Distance of major tick labels'))
         self.ygridSpinBox = QSpinBox()
@@ -240,8 +266,11 @@ class WindowsDlg(ArtisanDialog):
                       QApplication.translate('ComboBox', 'dashed'),
                       QApplication.translate('ComboBox', 'dashed-dot'),
                       QApplication.translate('ComboBox', 'dotted'),
-                      QApplication.translate('ComboBox', 'None')]
+                      #QApplication.translate('ComboBox', 'None') # not needed any longer as the grids can be individually deactivated
+                      ]
         self.gridstylecombobox.addItems(gridstyles)
+        if self.aw.qmc.gridlinestyle > 3:
+            self.aw.qmc.gridlinestyle = 0 # style 'None' is gone
         self.gridstylecombobox.setCurrentIndex(self.aw.qmc.gridlinestyle)
         self.gridstylecombobox.currentIndexChanged.connect(self.changegridstyle)
         gridthicknesslabel = QLabel(QApplication.translate('Label', 'Width'))
@@ -261,7 +290,7 @@ class WindowsDlg(ArtisanDialog):
 
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.updatewindow)
-        self.dialogbuttons.rejected.connect(self.close)
+        self.dialogbuttons.rejected.connect(self.restoreState)
 
         resetButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
         resetButton.clicked.connect(self.reset)
@@ -403,7 +432,10 @@ class WindowsDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+        if platform.system() == 'Windows':
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        else:
+            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
 
         if self.aw.qmc.locktimex:
             self.disableXAxisControls()
@@ -532,6 +564,16 @@ class WindowsDlg(ArtisanDialog):
         self.gridwidthSpinBox.setFocus()
 
     @pyqtSlot(int)
+    def changetimeGridCheckBox(self,_):
+        self.aw.qmc.time_grid = not self.aw.qmc.time_grid
+        self.aw.qmc.redraw(recomputeAllDeltas=False)
+
+    @pyqtSlot(int)
+    def changetempGridCheckBox(self,_):
+        self.aw.qmc.temp_grid = not self.aw.qmc.temp_grid
+        self.aw.qmc.redraw(recomputeAllDeltas=False)
+
+    @pyqtSlot(int)
     def changegridstyle(self,_):
         self.aw.qmc.gridlinestyle = self.gridstylecombobox.currentIndex()
         self.aw.qmc.redraw(recomputeAllDeltas=False)
@@ -578,8 +620,6 @@ class WindowsDlg(ArtisanDialog):
         if not self.aw.qmc.flagon and (self.autodeltaxETFlag.isChecked() or self.autodeltaxBTFlag.isChecked()):
             self.autoDeltaAxis()
         #
-        self.aw.qmc.time_grid = self.timeGridCheckBox.isChecked()
-        self.aw.qmc.temp_grid = self.tempGridCheckBox.isChecked()
         self.aw.qmc.loadaxisfromprofile = self.loadAxisFromProfile.isChecked()
         try:
             yl = int(str(self.ylimitEdit.text()))
@@ -662,13 +702,38 @@ class WindowsDlg(ArtisanDialog):
         self.aw.sendmessage(string)
         self.close()
 
-    @pyqtSlot()
-    def close(self):
+    # on Cancel
+    def restoreState(self):
+        self.aw.qmc.time_grid = self.time_grid_org
+        self.aw.qmc.temp_grid = self.temp_grid_org
+        self.aw.qmc.gridlinestyle = self.gridlinestyle_org
+        self.aw.qmc.gridthickness = self.gridthickness_org
+        self.aw.qmc.gridalpha = self.gridalpha_org
+        self.aw.qmc.step100temp = self.step100temp_org
+        self.aw.qmc.xgrid = self.xgrid_org
+        self.aw.qmc.ygrid = self.ygrid_org
+        self.aw.qmc.zgrid = self.grid_org
+        self.aw.qmc.zlimit = self.zlimit_org
+        self.aw.qmc.zlimit_min = self.zlimit_min_org
+        self.aw.qmc.legendloc = self.legendloc_org
+        self.aw.qmc.resetmaxtime = self.resetmaxtime_org
+        self.aw.qmc.chargemintime = self.chargemintime_org
+        self.aw.qmc.fixmaxtime = self.fixmaxtime_org
+        self.aw.qmc.locktimex = self.locktimex_org
+        self.aw.qmc.autotimex = self.autotimex_org
+        self.aw.qmc.autotimexMode = self.autotimexMode_org
+        self.aw.qmc.autodeltaxET = self.autodeltaxET_org
+        self.aw.qmc.autodeltaxBT = self.autodeltaxBT_org
+        self.aw.qmc.loadaxisfromprofile = self.loadaxisfromprofile_org
+        # redraw and close dialog
+        self.aw.qmc.redraw(recomputeAllDeltas=False)
+        self.close()
+
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self,_):
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue('AxisPosition',self.frameGeometry().topLeft())
-#        self.aw.closeEventSettings()
-        super().close()
 
     @pyqtSlot(bool)
     def reset(self,_):
