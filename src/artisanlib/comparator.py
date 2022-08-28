@@ -834,7 +834,6 @@ class roastCompareDlg(ArtisanDialog):
         self.cb.flagChanged.connect(self.flagChanged)
 
         settings1Layout = QHBoxLayout()
-        settings1Layout.addSpacing(10)
         settings1Layout.addWidget(self.modeComboBox)
         settings1Layout.addStretch()
         settings1Layout.addSpacing(10)

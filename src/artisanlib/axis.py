@@ -167,6 +167,7 @@ class WindowsDlg(ArtisanDialog):
         self.autotimexFlag.stateChanged.connect(self.autoTimexFlagChanged)
         self.autotimexFlag.setToolTip(QApplication.translate('Tooltip', 'Automatically set time axis min and max from profile CHARGE/DROP events'))
         self.autoButton = QPushButton(QApplication.translate('Button','Calc'))
+        self.autoButton.setToolTip(QApplication.translate('Tooltip', 'Calc time axis using current auto time axis settings'))
         self.autoButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.autoButton.clicked.connect(self.autoAxis)
         # autotimexMode
@@ -176,7 +177,7 @@ class WindowsDlg(ArtisanDialog):
             self.autoButton.setEnabled(False)
         if self.aw.qmc.flagon:
             self.autoButton.setEnabled(False)
-        self.autotimexModeCombobox.setToolTip(QApplication.translate('Tooltip', 'Distance of major tick labels'))
+        self.autotimexModeCombobox.setToolTip(QApplication.translate('Tooltip', 'Coverage of auto time axis mode'))
         autotimeModes =   [
                       QApplication.translate('ComboBox', 'Roast'),
                       QApplication.translate('ComboBox', 'BBP+Roast'),
