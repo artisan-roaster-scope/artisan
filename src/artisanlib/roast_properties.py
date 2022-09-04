@@ -4332,7 +4332,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def copyDataTabletoClipboard(self,_=False):
-        self.aw.copy_cells_to_clipboard(self.datatable,adjustment=5)
+        self.aw.copy_cells_to_clipboard(self.datatable,adjustment=1)
         self.aw.sendmessage(QApplication.translate('Message','Data table copied to clipboard'))
 
     @pyqtSlot(bool)

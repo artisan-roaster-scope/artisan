@@ -20288,7 +20288,7 @@ class ApplicationWindow(QMainWindow):
                             clipboard += entry
                             if c != (ncols-1):
                                 clipboard += '\t'
-                    clipboard = clipboard[:-1] + '\n'
+                    clipboard = clipboard + '\n'
             # copy to the system clipboard
             sys_clip = QApplication.clipboard()
             sys_clip.setText(clipboard)
