@@ -44,6 +44,7 @@ Machine                         | Driver | Remarks
 [BC Roasters](/machines/bc/) | CP210x | on some older machines FTDI, on others CH34x
 [Coffeed](/machines/coffed/) | CH34x
 [Coffee Tech](/machines/coffeetech/) | FTDI
+[Coffee Machines Sale](/machines/cms/) | CH34x
 [Dätgen](/machines/datgen/) | CH34x
 [Dongyi](/machines/dongyi/) | CP210x | FTDI on some older machines
 [Easyster](/machines/easyster/) | FTDI

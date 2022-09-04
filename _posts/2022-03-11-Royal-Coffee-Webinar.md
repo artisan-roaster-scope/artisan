@@ -7,7 +7,7 @@ title: "Royal Coffee"
 excerpt: "Webinar: Navigating Artisan"
 author: Dave Baxter
 date: 2022-03-11
-last_modified_at: 2022-02-25
+last_modified_at: 2022-07-10
 categories:
   - event
   - webinar
@@ -22,7 +22,9 @@ Join Dave to learn the best ways to use Artisan to improve your workflow and imp
 
 Roasting experience with Artisan is recommended but not required.
 
-**UPDATE: a recording of this session is now available on [YouTube](https://www.youtube.com/watch?v=tJKRJrEPeEQ){:target="_blank"}**
+**UPDATE: a recording of this session is now available**
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/tJKRJrEPeEQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
 > <a href="https://events.royalcoffee.com/navigating_artisan" target="_blank">Getting the Most From Your Curves</a> (Royal Coffee)   

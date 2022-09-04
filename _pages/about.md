@@ -112,7 +112,7 @@ Artisan supports the following 64bit operating systems:
 * Windows 10 (x64) and newer
 * Linux glibc 2.31
 
-There are also legacy builds for Windows 8 (x64) and macOS 10.13 as well as experimental builds for the Raspberry Pi platform.
+There are also legacy builds for Windows 8 (x64) and macOS 10.13 as well as experimental builds for the Raspberry Pi platform (32bit only).
 
 ## Notable Features
 

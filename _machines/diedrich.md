@@ -2,7 +2,7 @@
 layout: single
 permalink: /machines/diedrich/
 title: "Diedrich"
-excerpt: "4 & 6 Sensor Data Logging"
+excerpt: "DR, 4 & 6 Sensor Data Logging"
 header:
   overlay_image: /assets/images/diedrich.jpg
   image: /assets/images/diedrich1.jpg
@@ -24,6 +24,12 @@ sidebar:
   - all of the 4 Sensor Data Logging Package
   - logging of fuel percentage (Power 0-100%)
   - logging of air dampener (Roast Air)
+* __DR Series:__
+  - logging of bean temperature (BT)
+  - logging of exhaust temperature (ET)
+  - logging of inlet temperature
+  - logging of burner power (0-100%)
+  - logging of air fan speed (0-100%)
 
 **Watch out!**
 The datalogging on Diedrich maschines is build around [Phidgets](https://www.phidgets.com/){:target="_blank"}. Ensure you have the latest Phidgets driver v22 for your platform (e.g. [Windows](https://www.phidgets.com/docs/OS_-_Windows){:target="_blank"}, [macOS](https://www.phidgets.com/docs/OS_-_macOS){:target="_blank"} or [Linux](https://www.phidgets.com/docs/OS_-_Linux){:target="_blank"}) installed.
