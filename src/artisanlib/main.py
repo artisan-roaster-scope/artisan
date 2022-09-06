@@ -16188,7 +16188,13 @@ class tgraphcanvas(FigureCanvas):
                         deltaX = stringfromseconds(event.xdata - self.baseX)
                         deltaY = str(aw.float2float(event.ydata - self.baseY,1))
                         RoR = str(aw.float2float(60 * (event.ydata - self.baseY) / (event.xdata - self.baseX),1))
-                        message = f'delta Time= {deltaX},    delta Temp= {deltaY} {aw.qmc.mode},    RoR= {RoR} {aw.qmc.mode}/min'
+                        deltaRoR = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,event.ydata))[1]))[1]
+                                    - self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,self.baseY))[1]))[1])
+                        #RoRoR is always in C/min/min
+                        if aw.qmc.mode == 'F':
+                            deltaRoR = RoRfromFtoC(deltaRoR)
+                        RoRoR = str(aw.float2float(60 * (deltaRoR)/(event.xdata - self.baseX),1))
+                        message = f'delta Time= {deltaX},    delta Temp= {deltaY} {aw.qmc.mode},    RoR= {RoR} {aw.qmc.mode}/min,    RoRoR= {RoRoR} C/min/min' 
                         aw.sendmessage(message)
                         self.base_messagevisible = True
                     elif self.base_messagevisible:

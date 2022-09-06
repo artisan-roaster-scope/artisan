@@ -360,7 +360,7 @@ Section Uninstall
   !insertmacro Rmdir_Wildcard "$INSTDIR\prettytable*.egg-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\pycparser*.dist-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\pyinstaller*.dist-info" ${__LINE__}
-  !insertmacro Rmdir_Wildcard "$INSTDIR\python_snap7-1.2.dist-info" ${__LINE__}
+  !insertmacro Rmdir_Wildcard "$INSTDIR\python_snap7*.dist-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\setuptools*.dist-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\wheel*.dist-info" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\zope.event*.dist-info" ${__LINE__}
