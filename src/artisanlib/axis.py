@@ -588,16 +588,24 @@ class WindowsDlg(ArtisanDialog):
 
     @pyqtSlot(int)
     def autoDeltaxFlagChanged(self,_):
+        self.aw.qmc.autodeltaxET = self.autodeltaxETFlag.isChecked()
+        self.aw.qmc.autodeltaxBT = self.autodeltaxBTFlag.isChecked()
         if not self.aw.qmc.flagon and (self.autodeltaxETFlag or self.autodeltaxBTFlag):
-            self.autoDeltaAxis()
+            if bool(self.aw.comparator):
+                self.aw.comparator.redraw()
+            else:
+                self.autoDeltaAxis()
 
     @pyqtSlot(int)
     def autoTimexFlagChanged(self,n):
         if n:
+            self.aw.qmc.autotimex = True
             self.locktimexFlag.setChecked(False)
             self.enableAutoControls()
             self.enableXAxisControls()
-            if not self.aw.qmc.flagon :
+            if bool(self.aw.comparator):
+                self.aw.comparator.redraw()
+            elif not self.aw.qmc.flagon:
                 self.autoAxis()
         else:
             self.disableAutoControls()
@@ -687,13 +695,13 @@ class WindowsDlg(ArtisanDialog):
         if changed:
             self.aw.qmc.redraw(recomputeAllDeltas=False)
 
-    def changexrotation(self):
-        self.aw.qmc.xrotation = self.xrotationSpinBox.value()
-        self.xrotationSpinBox.setDisabled(True)
-        self.aw.qmc.xaxistosm(redraw=False)
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-        self.xrotationSpinBox.setDisabled(False)
-        self.xrotationSpinBox.setFocus()
+#    def changexrotation(self):
+#        self.aw.qmc.xrotation = self.xrotationSpinBox.value()
+#        self.xrotationSpinBox.setDisabled(True)
+#        self.aw.qmc.xaxistosm(redraw=False)
+#        self.aw.qmc.redraw(recomputeAllDeltas=False)
+#        self.xrotationSpinBox.setDisabled(False)
+#        self.xrotationSpinBox.setFocus()
 
     @pyqtSlot(int)
     def changegridalpha(self,_):
@@ -729,13 +737,19 @@ class WindowsDlg(ArtisanDialog):
     @pyqtSlot(int)
     def changelegendloc(self,_):
         self.aw.qmc.legendloc = self.legendComboBox.currentIndex()
-        self.aw.qmc.legend = None
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
+        if bool(self.aw.comparator):
+            self.aw.comparator.legend = None
+            self.aw.comparator.redraw()
+        else:
+            self.aw.qmc.legend = None
+            self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(int)
     def changeAutoTimexMode(self,_):
         self.aw.qmc.autotimexMode = self.autotimexModeCombobox.currentIndex()
-        if not self.aw.qmc.flagon:
+        if bool(self.aw.comparator):
+            self.aw.comparator.modeComboBox.setCurrentIndex(self.aw.qmc.autotimexMode)
+        elif not self.aw.qmc.flagon:
             self.autoAxis()
 
     @pyqtSlot(int)
@@ -931,4 +945,7 @@ class WindowsDlg(ArtisanDialog):
             self.zlimitEdit.setText(str(self.aw.qmc.zlimit_C_default))
             self.zlimitEdit_min.setText(str(self.aw.qmc.zlimit_min_C_default))
             self.zgridSpinBox.setValue(self.aw.qmc.zgrid_C_default)
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
+        if bool(self.aw.comparator):
+            self.aw.comparator.redraw()
+        else:
+            self.aw.qmc.redraw(recomputeAllDeltas=False)
