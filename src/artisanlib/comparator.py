@@ -1170,8 +1170,7 @@ class roastCompareDlg(ArtisanDialog):
 
     def redraw(self):
         self.clearCanvas()
-        if self.profiles:
-            self.drawAlignmentLine()
+        self.drawAlignmentLine()
         self.recompute()
         for rp in self.profiles:
             rp.draw()
@@ -1332,7 +1331,9 @@ class roastCompareDlg(ArtisanDialog):
             # update chart
             self.updateDeltaLimits()
             self.autoTimeLimits()
+            self.realign()
             self.repaint()
+            self.aw.qpc.update_phases(self.getPhasesData())
         elif i == 2: # title header clicked
             selected = self.profileTable.selectedRanges()
             if selected and len(selected) > 0:
@@ -1356,6 +1357,7 @@ class roastCompareDlg(ArtisanDialog):
         self.profiles[i].setVisible(bool(state))
         self.updateDeltaLimits()
         self.autoTimeLimits()
+        self.realign()
         self.repaint()
         self.aw.qpc.update_phases(self.getPhasesData())
 
@@ -1545,7 +1547,10 @@ class roastCompareDlg(ArtisanDialog):
                 return
             if self.l_align is not None:
                 self.l_align.set_xdata(refTime)
-                self.l_align.set_visible(True)
+                if any([p.visible for p in profiles]):
+                    self.l_align.set_visible(True)
+                else:
+                    self.l_align.set_visible(False)
             for p in profiles[1:]:
                 if (self.aw.qmc.compareAlignEvent == 0 and p.timeindex[0] != -1):
                     eventTime = p.timex[p.timeindex[self.aw.qmc.compareAlignEvent]]
@@ -1593,6 +1598,10 @@ class roastCompareDlg(ArtisanDialog):
             self.autoTimeLimits()
             self.updateProfileTableItems()
             self.updateDeltaLimits()
+        else: # no profile loaded
+            if self.l_align is not None:
+                # we hide the alignment line
+                self.l_align.set_visible(False)
 
     ### ADD/DELETE table items
 

@@ -134,7 +134,7 @@ parity=N
 port=502
 stopbits=1
 timeout=0.5
-type=4
+type=3
 optimizer=true
 fetch_max_blocks=false
 

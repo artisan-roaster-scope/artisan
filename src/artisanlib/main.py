@@ -229,6 +229,7 @@ from artisanlib.util import (appFrozen, stringp, uchr, decodeLocal, encodeLocal,
         debugLogLevelActive, setDebugLogLevel, abbrevString, createGradient, natsort, toGrey, toDim)
 
 from artisanlib.qtsingleapplication import QtSingleApplication
+from artisanlib.filters import LiveMedian
 
 
 from Phidget22.VoltageRange import VoltageRange
@@ -972,7 +973,7 @@ class tgraphcanvas(FigureCanvas):
         'filterDropOut_replaceRoR_period', 'filterDropOut_spikeRoR_period', 'filterDropOut_tmin_C_default', 'filterDropOut_tmax_C_default',
         'filterDropOut_tmin_F_default', 'filterDropOut_tmax_F_default', 'filterDropOut_spikeRoR_dRoR_limit_C_default', 'filterDropOut_spikeRoR_dRoR_limit_F_default',
         'filterDropOuts', 'filterDropOut_tmin', 'filterDropOut_tmax', 'filterDropOut_spikeRoR_dRoR_limit', 'minmaxLimits',
-        'dropSpikes', 'dropDuplicates', 'dropDuplicatesLimit', 'interpolatemax', 'swapETBT', 'wheelflag', 'wheelnames', 'segmentlengths', 'segmentsalpha',
+        'dropSpikes', 'dropDuplicates', 'dropDuplicatesLimit', 'liveMedianRoRfilter', 'interpolatemax', 'swapETBT', 'wheelflag', 'wheelnames', 'segmentlengths', 'segmentsalpha',
         'wheellabelparent', 'wheelcolor', 'wradii', 'startangle', 'projection', 'wheeltextsize', 'wheelcolorpattern', 'wheeledge',
         'wheellinewidth', 'wheellinecolor', 'wheeltextcolor', 'wheelconnections', 'wheelx', 'wheelz', 'wheellocationx', 'wheellocationz',
         'wheelaspect', 'samplingSemaphore', 'profileDataSemaphore', 'messagesemaphore', 'errorsemaphore', 'serialsemaphore', 'seriallogsemaphore',
@@ -2004,7 +2005,7 @@ class tgraphcanvas(FigureCanvas):
 
         #variables to configure the 8 default buttons
         # button = 0:CHARGE, 1:DRY_END, 2:FC_START, 3:FC_END, 4:SC_START, 5:SC_END, 6:DROP, 7:COOL_END;
-        self.buttonvisibility = [True,True,True,True,True,False,True,True]
+        self.buttonvisibility = [True,True,True,True,True,False,True,False]
         self.buttonactions = [0]*8
         self.buttonactionstrings = ['']*8
         #variables to configure the 0: ON, 1: OFF, 2: SAMPLE, 3:RESET, 4:START
@@ -2501,6 +2502,8 @@ class tgraphcanvas(FigureCanvas):
         self.dropSpikes = False
         self.dropDuplicates = False
         self.dropDuplicatesLimit = 0.3
+
+        self.liveMedianRoRfilter = LiveMedian(5) # the offline filter uses a window length of 5, but does not introduce any delay. This is a compromize
 
         self.interpolatemax = 3 # maximal number of dropped readings (-1) that will be interpolated
 
@@ -4295,6 +4298,11 @@ class tgraphcanvas(FigureCanvas):
                                 _log.exception(e)
 
                         # unfiltereddelta1/2 contains the RoRs respecting the delta_span, but without any delta smoothing AND delta mathformulas applied
+                        # we apply a minimal live median spike filter minimizing the delay by choosing a window smaller than in the offline medfilt
+                        if aw.qmc.filterDropOuts:
+                            aw.qmc.rateofchange1 = aw.qmc.liveMedianRoRfilter(aw.qmc.rateofchange1)
+                            aw.qmc.rateofchange2 = aw.qmc.liveMedianRoRfilter(aw.qmc.rateofchange2)
+
                         sample_unfiltereddelta1.append(aw.qmc.rateofchange1)
                         sample_unfiltereddelta2.append(aw.qmc.rateofchange2)
 
@@ -7112,6 +7120,7 @@ class tgraphcanvas(FigureCanvas):
         #   this processEvents() seems not to be needed any longer!?
         return True
 
+    # https://gist.github.com/bhawkins/3535131
     @staticmethod
     def medfilt(x, k):
         """Apply a length-k median filter to a 1D array x.
@@ -7198,7 +7207,7 @@ class tgraphcanvas(FigureCanvas):
         # 2. filter spikes
         if aw.qmc.filterDropOuts:
             try:
-                b = self.medfilt(b,5)  # k=3 seems not to catch all spikes in all cases; k must be odd!
+                b = self.medfilt(b,5)  # k=3 seems not to catch all spikes in all cases; k=5 and k=7 seems to be ok; 13 might be the maximum; k must be odd!
 # scipyernative which performs equal, but produces larger artefacts at the borders and for intermediate NaN values for k>3
 #                from scipy.signal import medfilt as scipy_medfilt
 #                b = scipy_medfilt(b,3)
@@ -15013,10 +15022,10 @@ class tgraphcanvas(FigureCanvas):
         #init start vars        #CH, DE,      FCs,      FCe,       SCs,         SCe,         Drop,      COOL
         self.designertimeinit = [0,(4*60),(9*60),(11*60),(12*60),(12.5*60),(13*60),(17*60)]
         if self.mode == 'C':
-            self.designertemp1init = [290.,290.,290.,290.,280.,270.,260.,150.]   #CHARGE,DE,FCs,FCe,SCs,SCe,DROP,COOL
+            self.designertemp1init = [230.,230.,230.,230.,225.,220.,215.,150.]   #CHARGE,DE,FCs,FCe,SCs,SCe,DROP,COOL
             self.designertemp2init = [210.,150.,198.,207.,212.,213.,215.,150.]   #CHARGE,DE,FCs,FCe,SCs,SCe,DROP,COOL
         elif self.mode == 'F':
-            self.designertemp1init = [554.,554.,554.,554.,536.,518.,500.,302.]
+            self.designertemp1init = [446.,446.,446.,446.,437.,428.,419.,302.]
             self.designertemp2init = [410.,300.,388.,404.,413.,415.5,419.,302.]
 
         #check x limits
@@ -15037,19 +15046,19 @@ class tgraphcanvas(FigureCanvas):
         # add TP
         if self.mode == 'C':
             self.timex.insert(1,1.5*60)
-            self.temp1.insert(1,290)
+            self.temp1.insert(1,230)
             self.temp2.insert(1,110)
             # add one intermediate point between DRY and FCs
             self.timex.insert(3,6*60)
-            self.temp1.insert(3,290)
+            self.temp1.insert(3,230)
             self.temp2.insert(3,174)
         elif self.mode == 'F':
             self.timex.insert(1,1.5*60)
-            self.temp1.insert(1,554)
+            self.temp1.insert(1,446)
             self.temp2.insert(1,230)
             # add one intermediate point between DRY and FCs
             self.timex.insert(3,6*60)
-            self.temp1.insert(3,554)
+            self.temp1.insert(3,446)
             self.temp2.insert(3,345)
         for x in range(len(self.timeindex)):
             if self.timeindex[x] >= 2:
@@ -16194,7 +16203,7 @@ class tgraphcanvas(FigureCanvas):
                         if aw.qmc.mode == 'F':
                             deltaRoR = RoRfromFtoC(deltaRoR)
                         RoRoR = str(aw.float2float(60 * (deltaRoR)/(event.xdata - self.baseX),1))
-                        message = f'delta Time= {deltaX},    delta Temp= {deltaY} {aw.qmc.mode},    RoR= {RoR} {aw.qmc.mode}/min,    RoRoR= {RoRoR} C/min/min' 
+                        message = f'delta Time= {deltaX},    delta Temp= {deltaY} {aw.qmc.mode},    RoR= {RoR} {aw.qmc.mode}/min,    RoRoR= {RoRoR} C/min/min'
                         aw.sendmessage(message)
                         self.base_messagevisible = True
                     elif self.base_messagevisible:
@@ -20223,7 +20232,7 @@ class ApplicationWindow(QMainWindow):
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################
 
     # if recurse is True (default) and no selection exists, all is selected before calling the copy function again
-    def copy_cells_to_clipboard(self,table_widget, adjustment=0,recurse=True):  # adjustment bitwise 0:None, 1: add leading tab to header, 2: add leading tab to first data row, 4: remove extra cell at the end of header
+    def copy_cells_to_clipboard(self,table_widget,adjustment=0,recurse=True):  # adjustment bitwise 0:None, 1: add leading tab to header, 2: add leading tab to first data row, 4: remove extra cell at the end of header
         if len(table_widget.selectionModel().selectedIndexes()) > 0:
             # sort select indexes into rows and columns
             previous = table_widget.selectionModel().selectedIndexes()[0]
@@ -21353,6 +21362,10 @@ class ApplicationWindow(QMainWindow):
                         steps = int(round(steps/10))*10
                     elif steps > 10:
                         steps = int(round(steps/5))*5
+                    elif steps > 5:
+                        steps = 5
+                    else:
+                        steps = int(round(steps/2))*2
                     auto_grid = max(2,steps)
                     aw.qmc.zgrid = auto_grid
         except Exception as e: # pylint: disable=broad-except
@@ -36581,7 +36594,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def viewplatform(self,_=False):
-        from artisanlib.platform import platformDlg
+        from artisanlib.platformdlg import platformDlg
         platformDLG = platformDlg(self,self)
         platformDLG.setModal(False)
         platformDLG.show()
