@@ -23499,19 +23499,40 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('writeWord'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple):
                                         if len(cmds) == 3 and not isinstance(cmds[0],list):
-                                            # cmd has format "write(s,r,v)"
+                                            # cmd has format "writeWord(s,r,v)"
                                             aw.modbus.writeWord(*cmds)
                                             followupCmd = 0.08
                                         else:
-                                        # cmd has format "write([s,r,v],..,[s,r,v])"
+                                        # cmd has format "writeWord([s,r,v],..,[s,r,v])"
                                             for cx in cmds:
                                                 if followupCmd:
                                                     libtime.sleep(followupCmd) # respect the MODBUS timing (a MODBUS command might have preceded)
                                                 aw.modbus.writeWord(*cx)
                                                 followupCmd = 0.08
                                     else:
-                                        # cmd has format "write([s,r,v])"
+                                        # cmd has format "write(Word[s,r,v])"
                                         aw.modbus.writeWord(*cmds)
+                                        followupCmd = 0.08
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            elif cs.startswith('writeLong'): # writing directly 32bit integers in two consecutive registers
+                                try:
+                                    cmds = eval(cs[len('writeLong'):]) # pylint: disable=eval-used
+                                    if isinstance(cmds,tuple):
+                                        if len(cmds) == 3 and not isinstance(cmds[0],list):
+                                            # cmd has format "writeLong(s,r,v)"
+                                            aw.modbus.writeLong(*cmds)
+                                            followupCmd = 0.08
+                                        else:
+                                        # cmd has format "writeLong([s,r,v],..,[s,r,v])"
+                                            for cx in cmds:
+                                                if followupCmd:
+                                                    libtime.sleep(followupCmd) # respect the MODBUS timing (a MODBUS command might have preceded)
+                                                aw.modbus.writeLong(*cx)
+                                                followupCmd = 0.08
+                                    else:
+                                        # cmd has format "writeLong([s,r,v])"
+                                        aw.modbus.writeLong(*cmds)
                                         followupCmd = 0.08
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)

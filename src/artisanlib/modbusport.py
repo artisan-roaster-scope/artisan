@@ -658,6 +658,31 @@ class modbusport():
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
 
+    # function 16 (Write Multiple Holding Registers)
+    # value=int or float
+    # writes a 32bit integer (2-registers)
+    def writeLong(self,slave,register,value):
+        _log.debug('writeLong(%d,%d,%s)', slave, register, value)
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
+            builder.add_32bit_int(int(value))
+            payload = builder.build()
+            self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
+            time.sleep(.03)
+        except Exception as ex: # pylint: disable=broad-except
+            _log.info('writeLong(%d,%d,%s) failed', slave, register, value)
+            _log.exception(ex)
+#            self.disconnect()
+            _, _, exc_tb = sys.exc_info()
+            if self.aw.qmc.flagon:
+                self.aw.qmc.adderror((QApplication.translate('Error Message','Modbus Error:') + ' writeLong() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
     def readFloat(self,slave,register,code=3,force=False):
