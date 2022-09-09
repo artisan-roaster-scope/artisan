@@ -35,7 +35,6 @@ except Exception: # pylint: disable=broad-except
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, QLayout, # @UnusedImport @Reimport  @UnresolvedImport
         QSpinBox) # @UnusedImport @Reimport  @UnresolvedImport
 
-
 class WindowsDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super().__init__(parent, aw)
@@ -562,11 +561,18 @@ class WindowsDlg(ArtisanDialog):
     def zlimitChanged(self):
         try:
             self.aw.qmc.autodeltaxET = False
-            self.autodeltaxETFlag.setChecked(self.aw.qmc.autodeltaxET)
             self.aw.qmc.autodeltaxBT = False
+            self.autodeltaxETFlag.blockSignals(True)
+            self.autodeltaxBTFlag.blockSignals(True)
+            self.autodeltaxETFlag.setChecked(self.aw.qmc.autodeltaxET)
             self.autodeltaxBTFlag.setChecked(self.aw.qmc.autodeltaxBT)
+            self.autodeltaxETFlag.blockSignals(False)
+            self.autodeltaxBTFlag.blockSignals(False)
             self.aw.qmc.zlimit = int(self.zlimitEdit.text().strip())
-            self.aw.qmc.redraw(recomputeAllDeltas=False)
+            if bool(self.aw.comparator):
+                self.aw.comparator.redraw()
+            else:
+                self.aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception: # pylint: disable=broad-except
             self.zlimitEdit.setText(str(self.aw.qmc.zlimit))
 
@@ -593,6 +599,7 @@ class WindowsDlg(ArtisanDialog):
         if not self.aw.qmc.flagon and (self.autodeltaxETFlag or self.autodeltaxBTFlag):
             if bool(self.aw.comparator):
                 self.aw.comparator.redraw()
+                self.zlimitEdit.setText(str(self.aw.qmc.zlimit))
             else:
                 self.autoDeltaAxis()
 

@@ -1478,7 +1478,9 @@ class roastCompareDlg(ArtisanDialog):
                         (self.cb.itemCheckState(3) == Qt.CheckState.Checked and self.cb.itemCheckState(2) != Qt.CheckState.Checked and self.aw.qmc.autodeltaxET) : # DeltaBT
                         dmax = max(dmax,rp.max_DeltaBT)
             if dmax > 0:
+                dmax = int(dmax) + 1
                 self.aw.qmc.delta_ax.set_ylim(top=dmax) # we only autoadjust the upper limit
+                self.aw.qmc.zlimit = int(round(dmax))
 
     def recompute(self):
         for rp in self.profiles:
