@@ -11,6 +11,7 @@ author_profile: true
 
 * [Artisan - Basic Setup and Tuning Guide (GoogleDocs)](https://docs.google.com/document/d/1eGtztr56t3GFYafTaMvQUDU3YQXK5nOFNcECM-q_WQ8/edit) by Joel Spandel
 * [Controlling a Hottop Roaster with Artisan: The Basics v6 (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2ZGxsTU4tbmtVUmM/edit?usp=sharing) by Barrie Fairley
+* [Roasting with the PID using BT as input – Fuji PXF](https://www.bigloose.com/v11/index.php/home/archive/artisan-roasting-with-the-pid-using-bt-as-input-fuji-pxf) by Nico
 * Arduino/TC4
   -  [Arduino aArtisan/TC4 Driver Installation (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SlRQa1ozNnZ4Uk0/edit?usp=sharing) by John Hannon
   -  [Arduino TC4 Emulator](https://github.com/FilePhil/TC4-Emulator) by FilePhil, an example how to send data to Artisan using the TC4 protocol
