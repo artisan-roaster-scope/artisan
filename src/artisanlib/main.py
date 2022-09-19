@@ -27275,7 +27275,7 @@ class ApplicationWindow(QMainWindow):
                 self.loadbackground(filename)
                 self.qmc.background = not self.qmc.hideBgafterprofileload
                 self.autoAdjustAxis()
-                self.qmc.timealign(redraw=True)
+                self.qmc.timealign(redraw=True, recompute=True)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
                 self.deleteBackground() # delete a loaded background if any
