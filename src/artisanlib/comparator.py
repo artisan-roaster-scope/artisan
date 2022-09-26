@@ -1421,6 +1421,7 @@ class roastCompareDlg(ArtisanDialog):
             self.aw.qmc.compareAlignEvent = i
             self.realign()
             self.repaint()
+            self.aw.qpc.update_phases(self.getPhasesData())
 
     @pyqtSlot(int)
     def changeEventsidx(self,i):
@@ -1720,7 +1721,7 @@ class roastCompareDlg(ArtisanDialog):
                 p3 = total - fcs if fcs != 0 else 0
                 p2 = total - p1 - p3 if p1 != 0 and p3 != 0 else 0
                 c = QColor.fromRgbF(*p.color)
-                data.append((p.label, total, (p1, p2, p3), p.active, c.name()))
+                data.append((p.label, total, (p1, p2, p3), p.active, p.aligned, c.name()))
         return data
 
     def getProfilesVisualOrder(self):
