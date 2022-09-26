@@ -35,8 +35,7 @@ else
     ln -s /usr/lib/libusb-1.0.so.0
 fi
 
-pyinstaller -D -n artisan -y -c \
-	    --log-level=INFO artisan-linux.spec
+pyinstaller -y --log-level=INFO artisan-linux.spec
 
 mv dist/artisan dist/artisan.d
 mv dist/artisan.d/* dist
