@@ -228,7 +228,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             spinBox.setRange(0,99)
             spinBox.setSingleStep(5)
             spinBox.setSuffix(' %')
-            spinBox.setValue(self.aw.ser.ArduinoFILT[i])
+            spinBox.setValue(int(self.aw.ser.ArduinoFILT[i]))
             self.FILTspinBoxes.append(spinBox)
         ####################################################
 
@@ -1074,7 +1074,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.elevationSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.elevationSpinBox.setRange(0,3000)
         self.elevationSpinBox.setSingleStep(1)
-        self.elevationSpinBox.setValue(self.aw.qmc.elevation)
+        self.elevationSpinBox.setValue(int(self.aw.qmc.elevation))
         self.elevationSpinBox.setSuffix(' ' + QApplication.translate('Label','MASL'))
         temperatureDeviceLabel = QLabel(QApplication.translate('Label','Temperature'))
         humidityDeviceLabel = QLabel(QApplication.translate('Label','Humidity'))
@@ -1476,13 +1476,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         Fill1SpinBox.setSingleStep(1)
                         Fill1SpinBox.setRange(0,100)
                         Fill1SpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
-                        Fill1SpinBox.setValue(self.aw.extraFill1[i])
+                        Fill1SpinBox.setValue(int(self.aw.extraFill1[i]))
                         Fill1SpinBox.editingFinished.connect(self.updateFill1)
                         Fill2SpinBox =  QSpinBox()
                         Fill2SpinBox.setSingleStep(1)
                         Fill2SpinBox.setRange(0,100)
                         Fill2SpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
-                        Fill2SpinBox.setValue(self.aw.extraFill2[i])
+                        Fill2SpinBox.setValue(int(self.aw.extraFill2[i]))
                         Fill2SpinBox.editingFinished.connect(self.updateFill2)
                         #add widgets to the table
                         self.devicetable.setCellWidget(i,0,typeComboBox)

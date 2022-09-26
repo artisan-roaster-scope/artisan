@@ -26683,7 +26683,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.fig.canvas.draw()
                 return
             if currentevent > lenevents:
-                self.eNumberSpinBox.setValue(lenevents)
+                self.eNumberSpinBox.setValue(int(lenevents))
                 return
             self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
             if aw.qmc.timeindex[0] > -1:

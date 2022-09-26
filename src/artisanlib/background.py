@@ -110,7 +110,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.speedSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.speedSpinBox.setRange(1,90)
         self.speedSpinBox.setSingleStep(5)
-        self.speedSpinBox.setValue(self.aw.qmc.backgroundmovespeed)
+        self.speedSpinBox.setValue(int(self.aw.qmc.backgroundmovespeed))
 
         curvenames = [''] # first entry is the empty one, no extra curve displayed
         for i in range(min(len(self.aw.qmc.extraname1B),len(self.aw.qmc.extraname2B),len(self.aw.qmc.extratimexB))):
@@ -213,7 +213,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.etimeunit.setEnabled(self.aw.qmc.backgroundReproduce)
         self.etimeSpinBox = QSpinBox()
         self.etimeSpinBox.setRange(1,60)
-        self.etimeSpinBox.setValue(self.aw.qmc.detectBackgroundEventTime)
+        self.etimeSpinBox.setValue(int(self.aw.qmc.detectBackgroundEventTime))
         self.etimeSpinBox.valueChanged.connect(self.setreproduce)
         self.etimeSpinBox.setEnabled(self.aw.qmc.backgroundReproduce)
         self.clearBgbeforeprofileload = QCheckBox(QApplication.translate('CheckBox','Clear the background before loading a new profile'))

@@ -338,13 +338,13 @@ class phasesGraphDlg(ArtisanDialog):
         self.reject()
 
     def getphases(self):
-        self.startdry.setValue(self.aw.qmc.phases[0])
+        self.startdry.setValue(int(round(self.aw.qmc.phases[0])))
         self.startdry.repaint()
-        self.enddry.setValue(self.aw.qmc.phases[1])
+        self.enddry.setValue(int(round(self.aw.qmc.phases[1])))
         self.enddry.repaint()
-        self.endmid.setValue(self.aw.qmc.phases[2])
+        self.endmid.setValue(int(round(self.aw.qmc.phases[2])))
         self.endmid.repaint()
-        self.endfinish.setValue(self.aw.qmc.phases[3])
+        self.endfinish.setValue(int(round(self.aw.qmc.phases[3])))
         self.endfinish.repaint()
 
     @pyqtSlot(bool)

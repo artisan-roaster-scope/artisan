@@ -249,7 +249,7 @@ class WindowsDlg(ArtisanDialog):
         self.ygridSpinBox.setToolTip(QApplication.translate('Tooltip', 'Distance of major tick labels'))
         self.ygridSpinBox.setRange(0,500)
         self.ygridSpinBox.setSingleStep(5)
-        self.ygridSpinBox.setValue(self.aw.qmc.ygrid)
+        self.ygridSpinBox.setValue(int(self.aw.qmc.ygrid))
         self.ygridSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.ygridSpinBox.editingFinished.connect(self.changeygrid)
         self.ygridSpinBox.setMaximumWidth(60)
@@ -259,7 +259,7 @@ class WindowsDlg(ArtisanDialog):
         self.zgridSpinBox.setToolTip(QApplication.translate('Tooltip', 'Distance of major tick labels'))
         self.zgridSpinBox.setRange(0,100)
         self.zgridSpinBox.setSingleStep(1)
-        self.zgridSpinBox.setValue(self.aw.qmc.zgrid)
+        self.zgridSpinBox.setValue(int(self.aw.qmc.zgrid))
         self.zgridSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.zgridSpinBox.editingFinished.connect(self.changezgrid)
         self.zgridSpinBox.setMaximumWidth(60)
@@ -295,7 +295,7 @@ class WindowsDlg(ArtisanDialog):
         gridthicknesslabel = QLabel(QApplication.translate('Label', 'Width'))
         self.gridwidthSpinBox = QSpinBox()
         self.gridwidthSpinBox.setRange(1,5)
-        self.gridwidthSpinBox.setValue(self.aw.qmc.gridthickness)
+        self.gridwidthSpinBox.setValue(int(self.aw.qmc.gridthickness))
         self.gridwidthSpinBox.valueChanged.connect(self.changegridwidth)
         self.gridwidthSpinBox.setMaximumWidth(40)
         self.gridwidthSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
@@ -693,7 +693,7 @@ class WindowsDlg(ArtisanDialog):
             else:
                 steps = int(round(steps/2))*2
             auto_grid = max(2,steps)
-            self.zgridSpinBox.setValue(auto_grid)
+            self.zgridSpinBox.setValue(int(auto_grid))
             if auto_grid != self.aw.qmc.zgrid:
                 self.aw.qmc.zgrid = auto_grid
                 changed = True
@@ -937,21 +937,21 @@ class WindowsDlg(ArtisanDialog):
         except Exception: # pylint: disable=broad-except
             self.xaxislencombobox.setCurrentIndex(2)
         if self.aw.qmc.mode == 'F':
-            self.ygridSpinBox.setValue(self.aw.qmc.ygrid_F_default)
+            self.ygridSpinBox.setValue(int(self.aw.qmc.ygrid_F_default))
             self.aw.qmc.ygrid = self.aw.qmc.ygrid_F_default
             self.ylimitEdit.setText(str(self.aw.qmc.ylimit_F_default))
             self.ylimitEdit_min.setText(str(self.aw.qmc.ylimit_min_F_default))
             self.zlimitEdit.setText(str(self.aw.qmc.zlimit_F_default))
             self.zlimitEdit_min.setText(str(self.aw.qmc.zlimit_min_F_default))
-            self.zgridSpinBox.setValue(self.aw.qmc.zgrid_F_default)
+            self.zgridSpinBox.setValue(int(self.aw.qmc.zgrid_F_default))
         else:
-            self.ygridSpinBox.setValue(self.aw.qmc.ygrid_C_default)
+            self.ygridSpinBox.setValue(int(self.aw.qmc.ygrid_C_default))
             self.aw.qmc.ygrid = self.aw.qmc.ygrid_C_default
             self.ylimitEdit.setText(str(self.aw.qmc.ylimit_C_default))
             self.ylimitEdit_min.setText(str(self.aw.qmc.ylimit_min_C_default))
             self.zlimitEdit.setText(str(self.aw.qmc.zlimit_C_default))
             self.zlimitEdit_min.setText(str(self.aw.qmc.zlimit_min_C_default))
-            self.zgridSpinBox.setValue(self.aw.qmc.zgrid_C_default)
+            self.zgridSpinBox.setValue(int(self.aw.qmc.zgrid_C_default))
         if bool(self.aw.comparator):
             self.aw.comparator.redraw()
         else:

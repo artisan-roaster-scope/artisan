@@ -166,7 +166,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.overlapEdit.setRange(0,100)    #(min,max)
         self.overlapEdit.setMinimumWidth(80)
         self.overlapEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.overlapEdit.setValue(self.aw.qmc.overlappct)
+        self.overlapEdit.setValue(int(self.aw.qmc.overlappct))
         self.overlapEdit.setSuffix(' %')
 
         helpcurveDialogButton = QDialogButtonBox()
@@ -214,7 +214,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.eventslabelscharsSpinner.setSingleStep(1)
         self.eventslabelscharsSpinner.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.eventslabelscharsSpinner.setRange(1,20)
-        self.eventslabelscharsSpinner.setValue(self.aw.qmc.eventslabelschars)
+        self.eventslabelscharsSpinner.setValue(int(self.aw.qmc.eventslabelschars))
 
         if self.aw.qmc.eventsGraphflag not in [2,3,4]:
             self.eventsclampflag.setEnabled(False)
@@ -458,7 +458,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.chargeTimerSpinner.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.chargeTimerSpinner.setRange(0,60)
         self.chargeTimerSpinner.setSuffix('s')
-        self.chargeTimerSpinner.setValue(self.aw.qmc.chargeTimerPeriod)
+        self.chargeTimerSpinner.setValue(int(self.aw.qmc.chargeTimerPeriod))
         self.autoDrop = QCheckBox(QApplication.translate('CheckBox','Auto DROP'))
         self.autoDrop.setChecked(self.aw.qmc.autoDropFlag)
         self.autoDrop.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -489,7 +489,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.nbuttonsSpinBox.setMaximumWidth(100)
         self.nbuttonsSpinBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.nbuttonsSpinBox.setRange(2,30)
-        self.nbuttonsSpinBox.setValue(self.aw.buttonlistmaxlen)
+        self.nbuttonsSpinBox.setValue(int(self.aw.buttonlistmaxlen))
         self.nbuttonsSpinBox.valueChanged.connect(self.setbuttonlistmaxlen)
         nbuttonsSizeLabel = QLabel(QApplication.translate('Label','Button size'))
         self.nbuttonsSizeBox = MyQComboBox()
@@ -704,35 +704,35 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E1_min = QSpinBox()
         self.E1_min.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E1_min.setRange(0,self.aw.eventsMaxValue)
-        self.E1_min.setValue(self.aw.eventslidermin[0])
+        self.E1_min.setValue(int(self.aw.eventslidermin[0]))
         self.E2_min = QSpinBox()
         self.E2_min.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E2_min.setRange(0,self.aw.eventsMaxValue)
-        self.E2_min.setValue(self.aw.eventslidermin[1])
+        self.E2_min.setValue(int(self.aw.eventslidermin[1]))
         self.E3_min = QSpinBox()
         self.E3_min.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E3_min.setRange(0,self.aw.eventsMaxValue)
-        self.E3_min.setValue(self.aw.eventslidermin[2])
+        self.E3_min.setValue(int(self.aw.eventslidermin[2]))
         self.E4_min = QSpinBox()
         self.E4_min.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E4_min.setRange(0,self.aw.eventsMaxValue)
-        self.E4_min.setValue(self.aw.eventslidermin[3])
+        self.E4_min.setValue(int(self.aw.eventslidermin[3]))
         self.E1_max = QSpinBox()
         self.E1_max.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E1_max.setRange(0,self.aw.eventsMaxValue)
-        self.E1_max.setValue(self.aw.eventslidermax[0])
+        self.E1_max.setValue(int(self.aw.eventslidermax[0]))
         self.E2_max = QSpinBox()
         self.E2_max.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E2_max.setRange(0,self.aw.eventsMaxValue)
-        self.E2_max.setValue(self.aw.eventslidermax[1])
+        self.E2_max.setValue(int(self.aw.eventslidermax[1]))
         self.E3_max = QSpinBox()
         self.E3_max.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E3_max.setRange(0,self.aw.eventsMaxValue)
-        self.E3_max.setValue(self.aw.eventslidermax[2])
+        self.E3_max.setValue(int(self.aw.eventslidermax[2]))
         self.E4_max = QSpinBox()
         self.E4_max.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E4_max.setRange(0,self.aw.eventsMaxValue)
-        self.E4_max.setValue(self.aw.eventslidermax[3])
+        self.E4_max.setValue(int(self.aw.eventslidermax[3]))
         self.E1_calc = QToolButton()
         self.E1_calc.setText('...')
         self.E1_calc.setToolTip(QApplication.translate('Form Caption', 'Slider Calculator'))
@@ -1744,15 +1744,15 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E3factor.setValue(self.aw.eventsliderfactors[2])
         self.E4factor.setValue(self.aw.eventsliderfactors[3])
         # set slider min
-        self.E1_min.setValue(self.aw.eventslidermin[0])
-        self.E2_min.setValue(self.aw.eventslidermin[1])
-        self.E3_min.setValue(self.aw.eventslidermin[2])
-        self.E4_min.setValue(self.aw.eventslidermin[3])
+        self.E1_min.setValue(int(self.aw.eventslidermin[0]))
+        self.E2_min.setValue(int(self.aw.eventslidermin[1]))
+        self.E3_min.setValue(int(self.aw.eventslidermin[2]))
+        self.E4_min.setValue(int(self.aw.eventslidermin[3]))
         # set slider max
-        self.E1_max.setValue(self.aw.eventslidermax[0])
-        self.E2_max.setValue(self.aw.eventslidermax[1])
-        self.E3_max.setValue(self.aw.eventslidermax[2])
-        self.E4_max.setValue(self.aw.eventslidermax[3])
+        self.E1_max.setValue(int(self.aw.eventslidermax[0]))
+        self.E2_max.setValue(int(self.aw.eventslidermax[1]))
+        self.E3_max.setValue(int(self.aw.eventslidermax[2]))
+        self.E4_max.setValue(int(self.aw.eventslidermax[3]))
         # set slider Bernoulli
         self.E1slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[0]))
         self.E2slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[1]))
@@ -2044,7 +2044,7 @@ class EventsDlg(ArtisanResizeablDialog):
         if 0 <= pindex < 10:
             answer = self.localSetbuttonsfrom(pindex)
             if answer:
-                self.nbuttonsSpinBox.setValue(self.aw.buttonlistmaxlen)
+                self.nbuttonsSpinBox.setValue(int(self.aw.buttonlistmaxlen))
                 self.transferpalettecurrentLabelEdit.setText(self.aw.buttonpalette_label)
                 self.updatePalettePopup()
                 self.updateSliderTab()
@@ -2065,7 +2065,7 @@ class EventsDlg(ArtisanResizeablDialog):
     def colorizebuttons(self,pattern=0):
         if self.changingcolorflag:
             n = self.colorSpinBox.value()
-            self.colorSpinBox.setValue(n-1)
+            self.colorSpinBox.setValue(int(n-1))
             return
         self.changingcolorflag = True
 
@@ -2182,7 +2182,7 @@ class EventsDlg(ArtisanResizeablDialog):
             # save the current columnWidth to reset them afte table creation
             self.aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())]
 
-        self.nbuttonsSpinBox.setValue(self.aw.buttonlistmaxlen)
+        self.nbuttonsSpinBox.setValue(int(self.aw.buttonlistmaxlen))
         nbuttons = len(self.extraeventstypes)
 
         # self.eventbuttontable.clear() # this crashes Ubuntu 16.04

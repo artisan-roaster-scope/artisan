@@ -98,7 +98,7 @@ class StatisticsDlg(ArtisanDialog):
         self.baseedit = QSpinBox()
         self.baseedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.baseedit.setRange(0,999)
-        self.baseedit.setValue(self.aw.qmc.AUCbase)
+        self.baseedit.setValue(int(round(self.aw.qmc.AUCbase)))
         if self.aw.qmc.mode == 'F':
             self.baseedit.setSuffix(' F')
         else:
@@ -111,7 +111,7 @@ class StatisticsDlg(ArtisanDialog):
         self.targetedit = QSpinBox()
         self.targetedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.targetedit.setRange(0,9999)
-        self.targetedit.setValue(self.aw.qmc.AUCtarget)
+        self.targetedit.setValue(int(round(self.aw.qmc.AUCtarget)))
         self.targetFlag = QCheckBox(QApplication.translate('CheckBox','Background'))
         self.targetedit.setEnabled(not self.aw.qmc.AUCtargetFlag)
         self.targetFlag.setChecked(self.aw.qmc.AUCtargetFlag)
@@ -129,7 +129,7 @@ class StatisticsDlg(ArtisanDialog):
         self.statsmaxchrperlineedit = QSpinBox()
         self.statsmaxchrperlineedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.statsmaxchrperlineedit.setRange(1,120)
-        self.statsmaxchrperlineedit.setValue(self.aw.qmc.statsmaxchrperline)
+        self.statsmaxchrperlineedit.setValue(int(round(self.aw.qmc.statsmaxchrperline)))
         self.statsmaxchrperlineedit.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         statsmaxchrperlineHorizontal = QHBoxLayout()
         statsmaxchrperlineHorizontal.addWidget(statsmaxchrperlinelabel)

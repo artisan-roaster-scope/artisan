@@ -130,7 +130,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.popupTimoutSpinBox.setSingleStep(1)
         self.popupTimoutSpinBox.setRange(0,120)
         self.popupTimoutSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.popupTimoutSpinBox.setValue(self.aw.qmc.alarm_popup_timout)
+        self.popupTimoutSpinBox.setValue(int(self.aw.qmc.alarm_popup_timout))
         popupTimeoutLabel = QLabel(QApplication.translate('Label', 'Pop Up Timeout'))
 
         alarmLabelLabel = QLabel(QApplication.translate('Label', 'Label'))

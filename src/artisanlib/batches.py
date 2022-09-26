@@ -63,7 +63,7 @@ class batchDlg(ArtisanDialog):
             self.neverOverwriteCheckbox.setChecked(False)
 
         if self.aw.qmc.batchcounter > -1:
-            self.counterSpinBox.setValue(self.aw.qmc.batchcounter)
+            self.counterSpinBox.setValue(int(round(self.aw.qmc.batchcounter)))
             self.counterSpinBox.setEnabled(True)
             self.prefixEdit.setEnabled(True)
             self.neverOverwriteCheckbox.setEnabled(True)

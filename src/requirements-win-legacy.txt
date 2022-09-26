@@ -14,7 +14,7 @@ pyinstaller-versionfile==2.0.0
 #
 gevent==21.12.0 #21.8.0 # 20.9.0 # 1.5.0 is not compatible with Python 3.8
 gevent-websocket==0.10.1
-numpy==1.23.2 #1.23.1
+numpy==1.23.3 #1.23.2
 scipy==1.9.1 #1.9.0 # depends on numpy thus we have to put it after numpy
 matplotlib==3.5.3 # 3.5.2 # 3.4.1 requires pyinstaller > 4.2 # currently pyinstaller up to 4.0 is not compatible with MPL 3.3.x
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
@@ -22,6 +22,6 @@ colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
 PyQt5==5.15.7 #5.15.6
 PyQtWebEngine==5.15.6 #5.15.5
 openpyxl==3.0.10 #3.0.9
-keyring==23.6.0 #23.5.0 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
+keyring==23.9.3 #23.6.0 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
 lxml==4.9.1 #4.7.1
-prettytable==3.3.0 #3.2.0 # >1.0.0 fail to be packed by py2app, but a monkey patch in main.py helps
+prettytable==3.4.1 #3.3.0 # >1.0.0 fail to be packed by py2app, but a monkey patch in main.py helps

@@ -124,7 +124,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidCycle.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidCycle.setRange(0,99999)
         self.pidCycle.setSingleStep(100)
-        self.pidCycle.setValue(self.aw.pidcontrol.pidCycle)
+        self.pidCycle.setValue(int(self.aw.pidcontrol.pidCycle))
         self.pidCycle.setSuffix(' ms')
         pidCycleLabel = QLabel(QApplication.translate('Label','Cycle'))
 
@@ -217,14 +217,14 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSV.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSV.setRange(0,999)
         self.pidSV.setSingleStep(10)
-        self.pidSV.setValue(self.aw.pidcontrol.svValue)
+        self.pidSV.setValue(int(self.aw.pidcontrol.svValue))
         pidSVLabel = QLabel(QApplication.translate('Label','SV'))
 
         self.pidSVLookahead = QSpinBox()
         self.pidSVLookahead.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVLookahead.setRange(0,999)
         self.pidSVLookahead.setSingleStep(1)
-        self.pidSVLookahead.setValue(self.aw.pidcontrol.svLookahead)
+        self.pidSVLookahead.setValue(int(round(self.aw.pidcontrol.svLookahead)))
         self.pidSVLookahead.setSuffix(' s')
         pidSVLookaheadLabel = QLabel(QApplication.translate('Label','Lookahead'))
 
@@ -232,7 +232,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidDutySteps.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidDutySteps.setRange(1,10)
         self.pidDutySteps.setSingleStep(1)
-        self.pidDutySteps.setValue(self.aw.pidcontrol.dutySteps)
+        self.pidDutySteps.setValue(int(self.aw.pidcontrol.dutySteps))
         self.pidDutySteps.setSuffix(' %')
         pidDutyStepsLabel = QLabel(QApplication.translate('Label','Steps'))
 
@@ -261,7 +261,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSVSliderMin.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVSliderMin.setRange(0,999)
         self.pidSVSliderMin.setSingleStep(10)
-        self.pidSVSliderMin.setValue(self.aw.pidcontrol.svSliderMin)
+        self.pidSVSliderMin.setValue(int(self.aw.pidcontrol.svSliderMin))
         pidSVSliderMinLabel = QLabel(QApplication.translate('Label','Min'))
         self.pidSVSliderMin.valueChanged.connect(self.sliderMinValueChangedSlot)
 
@@ -269,7 +269,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSVSliderMax.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVSliderMax.setRange(0,999)
         self.pidSVSliderMax.setSingleStep(10)
-        self.pidSVSliderMax.setValue(self.aw.pidcontrol.svSliderMax)
+        self.pidSVSliderMax.setValue(int(self.aw.pidcontrol.svSliderMax))
         pidSVSliderMaxLabel = QLabel(QApplication.translate('Label','Max'))
         self.pidSVSliderMax.valueChanged.connect(self.sliderMaxValueChangedSlot)
 
@@ -309,7 +309,7 @@ class PID_DlgControl(ArtisanDialog):
         self.dutyMin.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.dutyMin.setRange(-100,100)
         self.dutyMin.setSingleStep(10)
-        self.dutyMin.setValue(self.aw.pidcontrol.dutyMin)
+        self.dutyMin.setValue(int(self.aw.pidcontrol.dutyMin))
         self.dutyMin.setSuffix(' %')
         dutyMinLabel = QLabel(QApplication.translate('Label','Min'))
 
@@ -317,7 +317,7 @@ class PID_DlgControl(ArtisanDialog):
         self.dutyMax.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.dutyMax.setRange(-100,100)
         self.dutyMax.setSingleStep(10)
-        self.dutyMax.setValue(self.aw.pidcontrol.dutyMax)
+        self.dutyMax.setValue(int(self.aw.pidcontrol.dutyMax))
         self.dutyMax.setSuffix(' %')
         dutyMaxLabel = QLabel(QApplication.translate('Label','Max'))
 
@@ -755,7 +755,7 @@ class PID_DlgControl(ArtisanDialog):
         self.RSnTab_LabelWidgets[n].setText(self.aw.pidcontrol.RS_svLabels[n])
     def setRSnSVvalues(self,n):
         for i in range(self.aw.pidcontrol.svLen):
-            self.RSnTab_SVWidgets[n][i].setValue(self.aw.pidcontrol.RS_svValues[n][i])
+            self.RSnTab_SVWidgets[n][i].setValue(int(round(self.aw.pidcontrol.RS_svValues[n][i])))
     def setRSnSVramps(self,n):
         for i in range(self.aw.pidcontrol.svLen):
             self.RSnTab_RampWidgets[n][i].setTime(self.aw.time2QTime(self.aw.pidcontrol.RS_svRamps[n][i]))
@@ -852,7 +852,7 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             self.labelEdit.setText(self.aw.pidcontrol.svLabel)
             for i in range(self.aw.pidcontrol.svLen):
-                self.SVWidgets[i].setValue(self.aw.pidcontrol.svValues[i])
+                self.SVWidgets[i].setValue(int(round(self.aw.pidcontrol.svValues[i])))
                 self.RampWidgets[i].setTime(self.aw.time2QTime(self.aw.pidcontrol.svRamps[i]))
                 self.SoakWidgets[i].setTime(self.aw.time2QTime(self.aw.pidcontrol.svSoaks[i]))
                 self.ActionWidgets[i].setCurrentIndex(self.aw.pidcontrol.svActions[i] + 1)
@@ -1309,7 +1309,7 @@ class PXRpidDlgControl(PXpidDlgControl):
         self.pidSVLookahead.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVLookahead.setRange(0,999)
         self.pidSVLookahead.setSingleStep(1)
-        self.pidSVLookahead.setValue(self.aw.fujipid.lookahead)
+        self.pidSVLookahead.setValue(int(round(self.aw.fujipid.lookahead)))
         self.pidSVLookahead.setSuffix(' s')
         self.pidSVLookahead.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pidSVLookahead.valueChanged.connect(self.changeLookAhead)
@@ -2095,7 +2095,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.pidSVLookahead.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVLookahead.setRange(0,999)
         self.pidSVLookahead.setSingleStep(1)
-        self.pidSVLookahead.setValue(self.aw.fujipid.lookahead)
+        self.pidSVLookahead.setValue(int(round(self.aw.fujipid.lookahead)))
         self.pidSVLookahead.setSuffix(' s')
         self.pidSVLookahead.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pidSVLookahead.valueChanged.connect(self.changeLookAhead)
@@ -2188,14 +2188,14 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.pidSVSliderMin.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVSliderMin.setRange(0,999)
         self.pidSVSliderMin.setSingleStep(10)
-        self.pidSVSliderMin.setValue(self.aw.pidcontrol.svSliderMin)
+        self.pidSVSliderMin.setValue(int(self.aw.pidcontrol.svSliderMin))
         self.pidSVSliderMin.valueChanged.connect(self.sliderMinValueChangedSlot)
         pidSVSliderMinLabel = QLabel(QApplication.translate('Label','SV min'))
         self.pidSVSliderMax = QSpinBox()
         self.pidSVSliderMax.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVSliderMax.setRange(0,999)
         self.pidSVSliderMax.setSingleStep(10)
-        self.pidSVSliderMax.setValue(self.aw.pidcontrol.svSliderMax)
+        self.pidSVSliderMax.setValue(int(self.aw.pidcontrol.svSliderMax))
         self.pidSVSliderMax.valueChanged.connect(self.sliderMaxValueChangedSlot)
         pidSVSliderMaxLabel = QLabel(QApplication.translate('Label','SV max'))
         if self.aw.qmc.mode == 'F':
