@@ -4,7 +4,7 @@
 ::
 :: script comandline option LEGACY used to flag a legacy build
 :: when running locally these paths need to be set here
-::   normally they are set in appveyor.yml
+::   normally the paths are set in appveyor.yml
 ::
 setlocal enabledelayedexpansion
 if /i "%APPVEYOR%" NEQ "True" (
@@ -83,10 +83,14 @@ echo ***** Finished installing pyinstaller v%PYINSTALLER_VER%
 echo curl vc_redist.x64.exe
 curl -L -O %VC_REDIST%
 
-echo curl snap7
-curl -k -L -O https://netcologne.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
-7z x snap7-full-1.4.2.7z
-copy snap7-full-1.4.2\build\bin\win64\snap7.dll c:\windows
+::echo curl snap7
+::curl -k -L -O https://netcologne.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
+::7z x snap7-full-1.4.2.7z
+::copy snap7-full-1.4.2\build\bin\win64\snap7.dll c:\windows
+::
+:: copy the snap7 binary
+::
+copy %PYTHON_PATH%\Lib\site-packages\snap7\lib\snap7.dll C:\Windows
 
 echo curl libusb-win32
 curl -k -L -O https://netcologne.dl.sourceforge.net/project/libusb-win32/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip

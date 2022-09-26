@@ -133,11 +133,13 @@ for:
 
   environment:
     ARTISAN_OS: osx
-    PYTHON: ~/venv3.10
-    language: generic
-    HOMEBREW_NO_INSTALL_CLEANUP: 1
-    HOMEBREW_NO_ANALYTICS: 1
+    PYTHON_V: 3.10
+    PYTHONPATH: /usr/local/lib/python${PYTHON_V}
     MACOSX_DEPLOYMENT_TARGET: 10.15
+    #PYTHON: ~/venv3.10
+    #language: generic
+    #HOMEBREW_NO_INSTALL_CLEANUP: 1
+    #HOMEBREW_NO_ANALYTICS: 1
 
   install:
     - echo "MacOS Install"
@@ -176,7 +178,9 @@ for:
 
   environment:
     ARTISAN_OS: linux
-    PYTHON: $HOME/venv3.10.2
+    PYTHON_V: 3.10
+    PYTHON_PATH: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
+    #PYTHON: $HOME/venv3.10.2
     #PYTHON: $HOME/venv3.9.10
     # NOTE: there is an issue with Python 3.10.0 and pyinstaller fixed in Python 3.10.1 (not yet available on appveyor)
     # see pyinstaller Issue #6301

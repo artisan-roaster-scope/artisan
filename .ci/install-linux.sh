@@ -13,8 +13,12 @@ pip install --upgrade pip
 pip install -r src/requirements.txt
 pip install -r src/requirements-${ARTISAN_OS}.txt
 
+# copy the snap7 binary installed by pip
+sudo cp -f ${PYTHON_PATH}/snap7/lib/libsnap7.so /usr/lib
+
 .ci/install-libusb.sh
 # don't install the Phidget driver as it would overwrite the user installed one
 # the Phidget Python libs are installed via pid from requirements.txt
 #.ci/install-phidgets.sh
-.ci/install-snap7.sh
+#snap7 installed via pip
+#.ci/install-snap7.sh

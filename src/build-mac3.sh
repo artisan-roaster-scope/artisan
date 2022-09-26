@@ -12,10 +12,13 @@ if [ ! -z $APPVEYOR ]; then
 #    export PYTHON=/Users/appveyor/venv3.9 # venv3.9 => venv3.9.6
 #    export PYTHONBIN=$PYTHON/bin
 #    export PYTHONPATH=$PYTHON/lib/python${PYTHON_V}
-    export PYTHON_V=3.10
-    export PYTHON=/usr/local/opt/python@3.10
+#    export PYTHON_V=3.10
+#    export PYTHON=/usr/local/opt/python@3.10
+#    export PYTHONBIN=$PYTHON/bin
+#    export PYTHONPATH=/usr/local/lib/python${PYTHON_V}
+    export PYTHON=/usr/local/opt/python@${PYTHON_V}
     export PYTHONBIN=$PYTHON/bin
-    export PYTHONPATH=/usr/local/lib/python${PYTHON_V}
+    #PYTHONPATH set in appveyor.yml
 
 # for PyQt5:
 #    export PYLUPDATE=$PYTHONBIN/pylupdate5
@@ -31,8 +34,8 @@ if [ ! -z $APPVEYOR ]; then
     export PYRCC=pyrcc6
     export PYLUPDATE=./pylupdate6pro
 
-    export MACOSX_DEPLOYMENT_TARGET=10.15
-#    export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
+#    export MACOSX_DEPLOYMENT_TARGET=10.15  #now set in appveyor.yml
+#    export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH  #unused?
 else
     # standard local builds
     echo "NOTICE: Standard build"

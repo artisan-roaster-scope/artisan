@@ -32,7 +32,7 @@ set -e # reduced logging
 #brew install python@3.10
 #brew unlink python@3.9
 #brew link --force python@3.10
-export PATH="/usr/local/opt/python@3.10/bin:$PATH"
+export PATH="/usr/local/opt/python@${PYTHON_V}/bin:$PATH"
 
 hash -r
 which python3
@@ -54,8 +54,10 @@ python3 -m pip install --upgrade pip
 # thus we force the compilation from source
 sudo -H python3 -m pip install --no-binary lxml lxml==4.9.1 #4.7.1
 sudo -H python3 -m pip install -r src/requirements.txt
-# replaced sudo -H python3 -m pip install -r src/requirements-${TRAVIS_OS_NAME}.txt
 sudo -H python3 -m pip install -r src/requirements-${ARTISAN_OS}.txt
+
+# copy the snap7 binary installed by pip
+cp -f ${PYTHONPATH}/site-packages/snap7/lib/libsnap7.dylib /usr/local/lib
 
 # use a custom py2app v0.23 with apptemplate main-x86_64 build for
 # target 10.13 using MacOSX10.15.sdk build on macOS 10.15 to add dark-mode support to builds
@@ -73,4 +75,4 @@ sudo rm -rf /usr/local/opt/python@3.10/lib/python3.9/site-packages/matplotlib/mp
 sudo rm -rf /usr/local/opt/python@3.10/Frameworks/Python.framework/Versions/3.10/lib/python3.9/site-packages/matplotlib/mpl-data/sample_data
 
 #.ci/install-phidgets.sh # now installed via pip
-.ci/install-snap7.sh
+#.ci/install-snap7.sh
