@@ -248,18 +248,8 @@ class RoastProfile():
                 self.metadata['roastdate'] = QDateTime.fromSecsSinceEpoch(profile['roastepoch'])
             except Exception: # pylint: disable=broad-except
                 pass
-        if 'roastbatchnr' in profile and profile['roastbatchnr'] != 0 and 'roastbatchpos' in profile and profile['roastbatchpos'] != 0:
-            if self.aw.locale_str == 'en':
-                if profile['roastbatchpos'] in [1,21,31,41]:
-                    self.metadata['roastoftheday'] = f'{profile["roastbatchpos"]}st Roast of the Day'
-                elif profile['roastbatchpos'] in [2,22,32,42]:
-                    self.metadata['roastoftheday'] = f'{profile["roastbatchpos"]}nd Roast of the Day'
-                elif profile['roastbatchpos'] in [3,23,33,43]:
-                    self.metadata['roastoftheday'] = f'{profile["roastbatchpos"]}rd Roast of the Day'
-                elif profile['roastbatchpos'] > 3:
-                    self.metadata['roastoftheday'] = f'{profile["roastbatchpos"]}th Roast of the Day'
-            else:
-                self.metadata['roastoftheday'] = f'{aw.qmc.roastbatchpos} {QApplication.translate("AddlInfo", "Roast of the Day")}'
+        if 'roastbatchpos' in profile:
+            self.metadata['roastoftheday'] = f'{self.aw.qmc.roastOfTheDay(profile["roastbatchpos"])}'
         if 'beans' in profile:
             self.metadata['beans'] = decodeLocal(profile['beans'])
         if 'weight' in profile and profile['weight'][0] != 0.0:
