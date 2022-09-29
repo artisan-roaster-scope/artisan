@@ -16,7 +16,7 @@ sidebar:
 * __Features:__
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
   - logging of burner temperature, burner level (0-100%), drum speed (0-100%) and air flow (0-100%)
-  - some machines (at least the newer automatic models with Mitsubishi FX5 PLC) also allow the control of the burner level, drum speed and air flow using Artisan sliders and/or button
+  - some machines (at least the newer automatic models with Mitsubishi FX5 PLC) also allow the control of the burner level, drum speed and air flow using Artisan sliders and/or buttons
 
 <figure>
 <center>

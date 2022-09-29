@@ -44,6 +44,8 @@ machines:
         url: /machines/carmomaq/
       - title: "Coffeed"
         url: /machines/coffed/
+      - title: "Coffee Machines Sale"
+        url: /machines/cms/
       - title: "Coffee Tech"
         url: /machines/coffeetech/
       - title: "Coffeetool"
