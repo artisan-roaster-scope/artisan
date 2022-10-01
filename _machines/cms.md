@@ -15,7 +15,7 @@ sidebar:
 * __Connection:__ MODBUS RTU via USB
 * __Features:__
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
-  - logging of burner temperature, burner level (0-100%), drum speed (20-50Hz) and air flow (20-50Hz)
+  - logging of burner level (0-100%), drum speed (20-50Hz) and air flow (20-50Hz)
   - control of the burner level, drum speed and air flow using Artisan sliders and/or buttons
 
 <figure>
