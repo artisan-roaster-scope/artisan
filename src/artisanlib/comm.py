@@ -327,10 +327,10 @@ class serialport():
         self.EXTECH755PrevTemp = -1
         #select PID type that controls the roaster.
         # Reads/Controls ET
-        self.controlETpid = [0,1]        # index0: type of pid: 0 = FujiPXG, 1 = FujiPXR3, 2 = DTA, 3 = not used, 4 = PXF
-#                                        # index1: RS485 unitID: Can be changed in device menu.
+        self.controlETpid = [0,1]        # index 0: type of pid: 0 = FujiPXG, 1 = FujiPXR3, 2 = DTA, 3 = not used, 4 = PXF
+#                                        # index 1: RS485 unitID: Can be changed in device menu.
         # Reads BT
-        self.readBTpid = [1,2]           # index 0: type: FujiPXG, 1 = FujiPXR3, 2 = None, 3 = DTA, 4 = PXF
+        self.readBTpid = [1,2]           # index 0: type of pid: 0 = FujiPXG, 1 = FujiPXR3, 2 = None, 3 = DTA, 4 = PXF
 #                                        # index 1: RS485 unitID. Can be changed in device menu.
         # Reuse Modbus-meter port
         self.useModbusPort = False

@@ -1483,7 +1483,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             propGrid.addLayout(outButtonLayout,1,9)
 
 
-            if self.aw.scale.device == 'acaia':
+            if self.aw.scale.device == 'acaia' and not (platform.system() == 'Windows' and math.floor(toFloat(platform.release())) < 10):
+                # QtBluetooth is not well supported under Windows versions before Windows 10
                 try:
 #                    with suppress_stdout_stderr():
                     # if selected scale is the Acaia, start the BLE interface

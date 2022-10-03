@@ -2505,7 +2505,7 @@ class tgraphcanvas(FigureCanvas):
         self.dropDuplicates = False
         self.dropDuplicatesLimit = 0.3
 
-        self.liveMedianRoRfilter = LiveMedian(5) # the offline filter uses a window length of 5, but does not introduce any delay. This is a compromize
+        self.liveMedianRoRfilter = LiveMedian(5) # the offline filter uses a window length of 5, introducing some delay, compared to the medfilt() in offline mode which does not introduce any delay
 
         self.interpolatemax = 3 # maximal number of dropped readings (-1) that will be interpolated
 
@@ -20641,8 +20641,7 @@ class ApplicationWindow(QMainWindow):
         if action:
             label = (action.text() if action.data()[1] == '' else f'{action.data()[1]} {action.text()}')
             label = label.replace('&&','&') # we reduce those && again to & that were introduced to have the & rendered in the menu entry
-            string = QApplication.translate('Message', 'Configure for {0}?<br><br>Your current settings will be overwritten!<br><br>'+
-                    'It is advisable to save your current settings beforehand via menu Help >> Save Settings.').format(label)
+            string = QApplication.translate('Message', 'Configure for {0}?<br><br>Your current settings will be overwritten!<br><br>It is advisable to save your current settings beforehand via menu Help >> Save Settings.').format(label)
             reply = QMessageBox.question(aw,QApplication.translate('Message', 'Adjust Settings'),string,
                 QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
             if reply == QMessageBox.StandardButton.Cancel:
@@ -35793,7 +35792,7 @@ class ApplicationWindow(QMainWindow):
         control_alt_modifier = modifiers == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier) # both
         outputOptions = ('text', 'full')
         if control_alt_modifier:
-            outputOptions = ('tabular', 'abbrev')            
+            outputOptions = ('tabular', 'abbrev')
         if control_modifier:
             outputOptions = ('text', 'abrev')
         elif alt_modifier:
@@ -35939,14 +35938,14 @@ class ApplicationWindow(QMainWindow):
             #build a list of all events
             eventlist = []
             #indexes
-            i_esec = 0  #the list will later be sorted on this value 
-            i_etime = 1 
-            i_ettemp = 2 
-            i_bttemp = 3 
-            i_etype = 4 
-            i_estring = 5 
-            i_evalue = 6 
-            i_esliderunit = 7 
+            i_esec = 0  #the list will later be sorted on this value
+            i_etime = 1
+            i_ettemp = 2
+            i_bttemp = 3
+            i_etype = 4
+            i_estring = 5
+            i_evalue = 6
+            i_esliderunit = 7
 
             #add special events to the event list
             nevents = len(aw.qmc.specialevents)
@@ -35954,11 +35953,11 @@ class ApplicationWindow(QMainWindow):
             #get time of FCs, if there is no FCs set the time to -1
             if aw.qmc.timeindex[2]:
                 fcstime = aw.qmc.timex[aw.qmc.timeindex[2]] - aw.qmc.timex[aw.qmc.timeindex[0]]
-            else: 
+            else:
                 fcstime = -1
-            #skip special events not enabled for display, 
+            #skip special events not enabled for display,
             #calculate special event values at the time of CHARGE,
-            #and skip special events before CHARGE and after DROP 
+            #and skip special events before CHARGE and after DROP
             eventsatcharge = {0:None, 1:None, 2:None, 3:None}
             for i in range(nevents):
                 #skip the event if the event type is not enabled for display in the events configuration disalog
@@ -36042,7 +36041,7 @@ class ApplicationWindow(QMainWindow):
             import prettytable
             tbl = prettytable.PrettyTable()
 
-            #format the event list to create the special events data 
+            #format the event list to create the special events data
             for i in range(len(eventlist)):
                 etime = stringtoseconds(eventlist[i][i_etime])
                 #show the event @time if it happened after CHARGE and before show_time_limit seconds
