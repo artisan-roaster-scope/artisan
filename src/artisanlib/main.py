@@ -9989,7 +9989,8 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             loc = self.legend._loc # pylint: disable=protected-access
                         try:
-                            leg = self.ax.legend(self.handles,self.labels,loc=loc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
+                            # ncol keyword argument to legend renamed to ncols in MPL 3.6
+                            leg = self.ax.legend(self.handles,self.labels,loc=loc,ncol=ncol,ncols=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
                         except Exception: # pylint: disable=broad-except
                             pass
                         try:
