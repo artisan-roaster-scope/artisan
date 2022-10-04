@@ -9989,34 +9989,38 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             loc = self.legend._loc # pylint: disable=protected-access
                         try:
-                            # ncol keyword argument to legend renamed to ncols in MPL 3.6
-                            leg = self.ax.legend(self.handles,self.labels,loc=loc,ncol=ncol,ncols=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
+                            try:
+                                leg = self.ax.legend(self.handles,self.labels,loc=loc,ncols=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
+                            except:
+                                # ncol keyword argument to legend renamed to ncols in MPL 3.6, thus for older MPL versions we need to still use ncol
+                                leg = self.ax.legend(self.handles,self.labels,loc=loc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
+                            try:
+                                leg.set_in_layout(False) # remove legend from tight_layout calculation
+                            except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
+                                pass
+                            self.legend = leg
+                            self.legend_lines = leg.get_lines()
+                            for h in leg.legendHandles:
+                                h.set_picker(False) # we disable the click to hide on the handles feature
+                                #h.set_picker(aw.draggable_text_box_picker) # as setting this picker results in non-termination
+                            for l in leg.texts:
+                                #l.set_picker(5)
+                                l.set_picker(aw.draggable_text_box_picker)
+                            try:
+                                leg.set_draggable(state=True,use_blit=True)  #,update='bbox')
+                                leg.set_picker(aw.draggable_text_box_picker)
+                            except Exception: # pylint: disable=broad-except # not available in mpl<3.x
+                                leg.draggable(state=True) # for mpl 2.x
+                            frame = leg.get_frame()
+                            frame.set_facecolor(self.palette['legendbg'])
+                            frame.set_alpha(self.alpha['legendbg'])
+                            frame.set_edgecolor(self.palette['legendborder'])
+                            frame.set_linewidth(0.5)
+                            for line,text in zip(leg.get_lines(), leg.get_texts()):
+                                text.set_color(line.get_color())
                         except Exception: # pylint: disable=broad-except
                             pass
-                        try:
-                            leg.set_in_layout(False) # remove legend from tight_layout calculation
-                        except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
-                            pass
-                        self.legend = leg
-                        self.legend_lines = leg.get_lines()
-                        for h in leg.legendHandles:
-                            h.set_picker(False) # we disable the click to hide on the handles feature
-                            #h.set_picker(aw.draggable_text_box_picker) # as setting this picker results in non-termination
-                        for l in leg.texts:
-                            #l.set_picker(5)
-                            l.set_picker(aw.draggable_text_box_picker)
-                        try:
-                            leg.set_draggable(state=True,use_blit=True)  #,update='bbox')
-                            leg.set_picker(aw.draggable_text_box_picker)
-                        except Exception: # pylint: disable=broad-except # not available in mpl<3.x
-                            leg.draggable(state=True) # for mpl 2.x
-                        frame = leg.get_frame()
-                        frame.set_facecolor(self.palette['legendbg'])
-                        frame.set_alpha(self.alpha['legendbg'])
-                        frame.set_edgecolor(self.palette['legendborder'])
-                        frame.set_linewidth(0.5)
-                        for line,text in zip(leg.get_lines(), leg.get_texts()):
-                            text.set_color(line.get_color())
+
                         if aw.qmc.patheffects:
                             rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground=self.palette['background'])]
                     else:
