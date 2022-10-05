@@ -312,6 +312,7 @@ class WindowsDlg(ArtisanDialog):
         self.dialogbuttons.rejected.connect(self.restoreState)
 
         resetButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
+        resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         resetButton.clicked.connect(self.reset)
         self.setButtonTranslations(resetButton,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
         resetButton.setToolTip(QApplication.translate('Tooltip', 'Reset axis settings to their defaults'))
