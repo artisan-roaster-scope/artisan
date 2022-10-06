@@ -17185,7 +17185,7 @@ class ApplicationWindow(QMainWindow):
         self.processingKeyEvent = False
 
         self.quickEventShortCut = None
-        # this is None if inactive, or holds a tuple (n,s) with n a number {1,..,4} indicating the custom event number
+        # this is None if inactive, or holds a tuple (n,s) with n a number {-1,..,4} indicating the custom event number (0-3), 4 for SV, or -1 for custom event buttons to be addressed
         # and s a string of length 0 (no digit yet), length 1 (if first digit is typed) or 2 (both digits are typed) indicating the value (00-99)
 
         # html2pdf() state:
@@ -26133,8 +26133,13 @@ class ApplicationWindow(QMainWindow):
                         self.quickEventShortCut = (4,'')
                         aw.sendmessage('SV')
                 elif k == 66:  #letter b hides/shows extra rows of event buttons
-                    if not app.artisanviewerMode and not self.qmc.designerflag and not self.qmc.wheelflag:
-                        self.toggleextraeventrows()
+                    if (alt_modifier and platf != 'Windows') or (control_shift_modifier and platf == 'Windows'):
+                        # activate custom event button
+                        self.quickEventShortCut = (-1,'')
+                        aw.sendmessage(f"{QApplication.translate('Label','Event button')}")
+                    else:
+                        if not app.artisanviewerMode and not self.qmc.designerflag and not self.qmc.wheelflag:
+                            self.toggleextraeventrows()
                 elif k == 77:  #letter m hides/shows standard buttons row
                     if aw.qmc.flagstart:
                         self.standardButtonsVisibility()
@@ -26146,11 +26151,26 @@ class ApplicationWindow(QMainWindow):
                             # quick custom event entry
                             eventNr = self.quickEventShortCut[0]
                             eventValueStr = self.quickEventShortCut[1] + str(button.index(k))
-                            if eventNr == 4:
+                            if eventNr == -1:
+                                aw.sendmessage(f"{QApplication.translate('Label','Event button')} {eventValueStr}")
+                            elif eventNr == 4:
                                 aw.sendmessage('SV %s'%(eventValueStr))
                             else:
                                 aw.sendmessage('%s %s'%(aw.qmc.etypes[eventNr],eventValueStr))
-                            if eventNr == 4: # SV
+                            if eventNr == -1: # Custom Event Button
+                                if len(eventValueStr) == 2:
+                                    buttonnumber = int(eventValueStr)-1
+                                    if buttonnumber < len(self.extraeventstypes):
+                                        self.recordextraevent(buttonnumber,parallel=False,updateButtons=False)
+                                    else:
+                                        try:
+                                            aw.sendmessage(QApplication.translate('Message',f'Button {int(eventValueStr)} not defined'))
+                                        except Exception: # pylint: disable=broad-except
+                                            pass
+                                else:
+                                    # keep on looking for digits
+                                    self.quickEventShortCut = (eventNr,eventValueStr)
+                            elif eventNr == 4: # SV
                                 if len(eventValueStr) == 3:
                                     # three digits entered, set the SV
                                     self.quickEventShortCut = None

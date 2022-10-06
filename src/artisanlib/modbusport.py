@@ -879,11 +879,12 @@ class modbusport():
             _log.info('peekSingleRegister(%d,%d,%d) failed', slave, register, code)
             _log.exception(ex)
             res = None
-        if self.invalidResult(res,1):
+        if not self.invalidResult(res,1):
             if code in [1,2]:
                 if res is not None and res.bits[0]:
                     return 1
                 return 0
+            _log.info('RES %s',res)
             decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
             r = decoder.decode_16bit_uint()
             _log.debug('  res.registers => %s', res.registers)
