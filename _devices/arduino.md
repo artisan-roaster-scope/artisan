@@ -16,6 +16,13 @@ Artisan implements the [serial protocol](https://github.com/greencardigan/TC4-sh
 * [aArtisan firmware v3.10](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan/tags/REL-310) from 1.7.2015 by Jim (baudrate: 115200)
 * [aArtisanQ PID](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan_PID/branches/aArtisanQ_PID_6) 6 firmware by Brad ([configuration notes](https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan_PID/tags/REL-aArtisanQ_PID_6_2_3/aArtisanQ_PID/Configuration%20Options.pdf), baudrate: 115200)
 
+The following device types are available
+
+* ```ArduinoTC4```: temperature channels 1/2
+* ```ArduinoTC4_34```: temperature channels 3/4
+* ```ArduinoTC4_56```: heater / fan duty %
+* ```ArduinoTC4_78``` (PID firmware only): PID SV / internal temperature
+
 **Watch out!** Older TC4 firmware versions operated at the lower 19200 baudrate.
 {: .notice--primary}
 
