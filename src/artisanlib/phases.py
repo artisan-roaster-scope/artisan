@@ -114,6 +114,7 @@ class phasesGraphDlg(ArtisanDialog):
         self.dialogbuttons.accepted.connect(self.updatephases)
         self.dialogbuttons.rejected.connect(self.cancel)
         setDefaultButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
+        setDefaultButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         setDefaultButton.clicked.connect(self.setdefault)
         self.setButtonTranslations(setDefaultButton,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
 

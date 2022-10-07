@@ -566,7 +566,8 @@ class graphColorDlg(ArtisanDialog):
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.accept)
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
-        self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
+        resetButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
+        resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults).clicked.connect(self.recolor1)
         self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults),'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
 
