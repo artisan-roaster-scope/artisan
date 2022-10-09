@@ -3469,7 +3469,8 @@ class tgraphcanvas(FigureCanvas):
                     # Mark starting point of click-and-drag with a marker
                     self.base_horizontalcrossline, = self.ax.plot(self.baseX,self.baseY,'r+', markersize=20)
                     self.base_verticalcrossline, = self.ax.plot(self.baseX,self.baseY,'wo', markersize = 2)
-            elif event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag and not aw.ntb.mode == 'pan/zoom':# and not self.flagon:
+            elif event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag and not aw.ntb.mode in ['pan/zoom', 'zoom rect']:# and not self.flagon:
+                # popup not available if pan/zoom or zoom rect is active as it interacts
                 timex = self.time2index(event.xdata)
                 if timex > 0:
                     menu = QMenu(aw) # if we bind this to self, we inherit the background-color: transparent from self.fig
@@ -6854,6 +6855,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.roastbatchprefix = aw.qmc.batchprefix
 
             aw.sendmessage(QApplication.translate('Message','Scope has been reset'))
+            aw.AUClcd.setNumDigits(3)
             aw.buttonFCs.setDisabled(False)
             aw.buttonFCe.setDisabled(False)
             aw.buttonSCs.setDisabled(False)
@@ -15254,6 +15256,7 @@ class tgraphcanvas(FigureCanvas):
 
 
             self.releaseMouse()
+            aw.ntb.release_zoom(event) # reset the zoom rectangles
             self.mousepress = False
             self.setCursor(Qt.CursorShape.OpenHandCursor)
 
@@ -19240,7 +19243,7 @@ class ApplicationWindow(QMainWindow):
         self.AUClcd = QLCDNumber()
         self.AUClcd.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.AUClcd.customContextMenuRequested.connect(self.AUClcdClicked)
-        self.AUClcd.display('---')
+        self.AUClcd.display('--')
         self.AUClcdFrame = self.makePhasesLCDbox(self.AUClabel,self.AUClcd)
 #        self.AUClcdFrame.setFrameStyle(QFrame.Shadow.Plain)
         self.AUClcd.setNumDigits(3)
@@ -22452,14 +22455,19 @@ class ApplicationWindow(QMainWindow):
                 (aw.qmc.AUCbegin == 1 and aw.qmc.TPalarmtimeindex) or
                 (aw.qmc.AUCbegin == 2 and self.qmc.timeindex[1] > 0) or
                 (aw.qmc.AUCbegin == 3 and self.qmc.timeindex[2] > 0)):
-                if aw.qmc.AUCLCDmode == 0:
+                if aw.qmc.AUCLCDmode == 0: # AUC abs value
                     v = int(round(aw.qmc.AUCvalue))
-                    if v > 999:
-                        auc_value_str = '---'
+                    if v > 9999:
+                        auc_value_str = '--'
+                        self.AUClcd.setNumDigits(3)
                     else:
                         auc_value_str = str(v)
+                        if v > 999:
+                            self.AUClcd.setNumDigits(4)
+                        else:
+                            self.AUClcd.setNumDigits(3)
                     auc_style = 'QLCDNumber { color: black; }'
-                elif aw.qmc.AUCLCDmode == 1:
+                elif aw.qmc.AUCLCDmode == 1: # AUC delta to target/background
                     if aw.qmc.AUCtargetFlag and aw.qmc.backgroundprofile is not None and aw.qmc.AUCbackground > 0:
                         # background AUC as target
                         target = aw.qmc.AUCbackground
@@ -22475,20 +22483,31 @@ class ApplicationWindow(QMainWindow):
                         auc_style = 'QLCDNumber { color: red; }'
                         self.AUClabel.setText('<small><b>' + QApplication.translate('Label', 'AUC') + '&laquo;</b></small>')
                     v = abs(int(round(d)))
-                    if v > 999:
-                        auc_value_str = '---'
+                    if v > 9999:
+                        auc_value_str = '--'
                         auc_style = 'QLCDNumber { color: black; }'
+                        self.AUClcd.setNumDigits(3)
                     else:
                         auc_value_str = str(v)
-                elif aw.qmc.timeindex[2] > 0:
+                        if v > 999:
+                            self.AUClcd.setNumDigits(4)
+                        else:
+                            self.AUClcd.setNumDigits(3)
+                elif aw.qmc.timeindex[2] > 0: # AUC since FCs
                     v = int(round(aw.qmc.AUCsinceFCs))
-                    if v > 999:
-                        auc_value_str = '---'
+                    if v > 9999:
+                        auc_value_str = '--'
+                        self.AUClcd.setNumDigits(3)
                     else:
                         auc_value_str = str(v)
+                        if v > 999:
+                            self.AUClcd.setNumDigits(4)
+                        else:
+                            self.AUClcd.setNumDigits(3)
                     auc_style = 'QLCDNumber { color: black; }'
                 else:
-                    auc_value_str = '---'
+                    self.AUClcd.setNumDigits(3)
+                    auc_value_str = '--'
                     auc_style = 'QLCDNumber { color: black; }'
             self.AUClcd.display(auc_value_str)
             self.AUClcd.setStyleSheet(auc_style)
