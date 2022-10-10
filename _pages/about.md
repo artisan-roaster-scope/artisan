@@ -142,15 +142,13 @@ __Marko Luther__ –– maintainer
 
 __Dave Baxter__ –– design wizard & genius
 
-__Benoit Clennett-Sirois__ –– SOLID style guru
-
 __Michael Herbert__ –– documentation & fundraising
-
-__Rui Paulo__ –– Aillio master & CI
 
 __Brett Pound__ –– support
 
 __Frans Goddijn__ –– support
+
+__Rui Paulo__ –– Aillio master & CI
 
 We are always looking for people that support us here and there. Especially, people that help us to localize the UI of Artisan to more languages and to complete the existing translations are very welcome!
 
