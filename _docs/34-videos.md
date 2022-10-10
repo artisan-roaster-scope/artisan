@@ -7,7 +7,11 @@ toc: false
 author: Michael Herbert
 author_profile: true
 gallery:
-  - url: https://www.youtube.com/watch?v=tJKRJrEPeEQ&t
+  - url: https://www.youtube.com/watch?v=QRAzYkmGYVw
+    image_path: /assets/images/gsg/video-axis-system.jpg
+    alt: "Axis System"
+    title: "2022-9 Axis System"
+  - url: https://www.youtube.com/watch?v=tJKRJrEPeEQ
     image_path: /assets/images/gsg/video-RoyalCoffe-GettingMostFromYourCruves.jpg
     alt: "Royal Coffee - Getting the Most From your Curves"
     title: "2022-3 Royal Coffee - Getting the Most From your Curves"
