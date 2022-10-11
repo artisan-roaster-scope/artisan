@@ -131,7 +131,7 @@ gallery:
     
 ---
 
-Also check out the [Artisan channel on](https://www.youtube.com/channel/UCEp-DH_Y7sBR3-X3FWomgog) YouTube!
+Also check out the [Artisan channel](https://www.youtube.com/channel/UCEp-DH_Y7sBR3-X3FWomgog) on YouTube!
 
 {% include gallery id="gallery" %} 
 
