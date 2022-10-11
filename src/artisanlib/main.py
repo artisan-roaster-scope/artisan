@@ -11716,7 +11716,7 @@ class tgraphcanvas(FigureCanvas):
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
-            if recording and self.flagKeepON:
+            if recording and self.flagKeepON and len(self.timex) > 10:
                 self.OnMonitor()
 
         except Exception as ex: # pylint: disable=broad-except
