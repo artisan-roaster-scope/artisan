@@ -2,6 +2,73 @@ Detailed Release History
 ========================
 
 ----
+v2.8.0 (October XX, 2022)
+------------------
+
+* NEW FEATURES
+  - adds support for [Besca](https://bescaroasters.com/) BEE v2 (2022 model), [Besca](https://bescaroasters.com/) BSC full-automatic, [Titanium Roasters](https://www.titaniumroasters.coffee/) and [Coffee Machines Sale](https://cmsale.com/) roasting machines
+  - adds support for [San Franciscan](https://www.sanfranroaster.com/) 2022 Eurotherm variant and [Diedrich DR](https://www.diedrichroasters.com/)
+  - adds support for the [Plugin Roast 2.0 module](https://www.pluginroast.com.br/)
+  - adds back support for [Typhoon roasters](https://typhoon.coffee/) ([Issue #959](../../../issues/959))
+  - adds energy defaults for [Probat](https://www.probat.com/) P01E
+  - adds Comparator phases widget ([Issue #947](../../../issues/947))
+  - adds auto time axis modes (Roast, BBP+Roast, BBP) toggle as popup in Axis and Comparator dialogs and via shortcut key G
+  - adds Loring CSV importer ([Issue #902](../../../issues/902))
+  - adds individual control on the event types participating in playback aid and event playback
+  - adds mm:ss time formats for special events annotations ([Issue #864](../../../issues/964))
+  - adds additional keyboard shortcuts documentation under `Help >> Keyboard Shortcuts`
+  - adds MODBUS IP timeout and retry parameters ([Issue #892](../../../issues/892))
+  - adds MODBUS Serial delay and retry parameters
+  - adds Modbus Command "writeLong" to send a 32bit integer to the connected MODBUS device
+  - adds shortcut COMMAND/CTRL +/- to inc/dec graph resolution
+  - adds minimal median filter to RoR computation during roasting if Smooth Spikes is enabled
+  - adds RoRoR to mouse cross
+  - adds file not found message to Artisan Command loadBackground
+  - adds OPTION+B [Mac] / CTRL-SHIFT+B [Win] keyboard shortcut followed by two digits to fire corresponding custom event button action
+* CHANGES
+  - autoDROP on OFF only if CHARGE is set before
+  - ArtisanViewer logs to separate file
+  - ArtisanViewer submits changes to artisan.plus
+  - send roast templates temperature, pressure, humidity along every roast record to artisan.plus
+  - support unicode characters in filenames ([Issue #869](../../../issues/869))
+  - CONTROL button rendered in red if PID is active
+  - sets default batch size from nominal batch size
+  - do not send the SV on PID start if in Ramp/Soak mode ([Issue #910](../../../issues/910))
+  - updated WCRC cup profile scheme
+  - remember last batch size even if "Delete roast properties on RESET" is ticked and initialize it by the machines nominal batch size as set on setup
+  - hides axis spines and labels along axis ticks if axis step width is set to 0 (or the empty entry)
+  - settings in the axis dialog are applied immediately
+  - reduced curve smoothing and limits its settings to the range of 0-5 ([Issue #907](../../../issues/907))
+  - hides COOL END button by default
+  - Português do Brasil translation updates supported by the people behind the [Plugin Roast module](https://www.pluginroast.com.br/)
+  - updated Chinese Traditional translations (by Yeh Cavix)
+  - updated Vietnamese translations
+  - updates Qt/PyQt to v6.4.0 and Matplotlib to v3.6.1
+  - display 4 digits AUC ([Issue #977](../../../issues/977))
+* FIXES
+  - fixes regression in 2.6.0 where symbolic formulas were not processed on software PID input ([Issue #847](../../../issues/847))
+  - fixes regression in 2.6.0 where the integrate Yoctopuce driver could not be loaded on Windows (non-legacy build) ([Issue #873](../../../issues/873))
+  - fixes regression in 2.6.0 where connections to Acaia scales on Windows 10 could fail
+  - fixes regression in 2.6.0 where support for Japanese was broken
+  - fixes LCD order if LCD / DeltaLCD swap is set differently in settings on settings load
+  - fixes conversion of temperature difference in F to C for det/dbt (```CM_ETD/CM_BTD```)
+  - fixes pdf filename cut-off on saving ([Issue #898](../../../issues/898))
+  - fixes autoDROP lack of precision ([Issue #859](../../../issues/859))
+  - fixes issue with Chinese characters in Analyzer results annotation boxes ([Issue #869](../../../issues/869))
+  - fixes event picks in Comparator to respect visibility, selection and z-order
+  - fixes copy roast data table
+  - adds verification of MODBUS/S7 result length and improved handling of MODBUS/S7 communication errors ([Issue #883](../../../issues/883) and [Issue #912](../../../issues/912))
+  - fixes TE-VA18B decoding ([Issue #882](../../../issues/882))
+  - prevents a potential deadlock on RampSoak processing
+  - updates playback mode indicator (color of background profile name as subtitle in the upper right corner) on Artisan Command playback mode
+  - avoids sending -1 error temperatures to the artisan.plus platform
+  - avoids unproductive event quantification while OFF
+  - don't replay background events after background profile DROP
+  - ensures that relative event buttons work correctly after PID control is turned off
+  - fixes a rounding issue of a RoR smoothing parameter that could lead to a small x-axis offset between background curve and recorded curve (Issue #907)
+  - correctly re-aligns background profile after producing a ranking report
+
+----
 v2.6.0 (March 11, 2022)
 ------------------
 
