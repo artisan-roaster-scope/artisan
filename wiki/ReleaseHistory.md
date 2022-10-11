@@ -6,16 +6,16 @@ v2.8.0 (October XX, 2022)
 ------------------
 
 * NEW FEATURES
+  - adds Comparator phases widget ([Issue #479](../../../issues/479))
+  - adds auto time axis modes (Roast, BBP+Roast, BBP) toggle as popup in Axis and Comparator dialogs and via shortcut key G
   - adds support for [Besca](https://bescaroasters.com/) BEE v2 (2022 model), [Besca](https://bescaroasters.com/) BSC full-automatic, [Titanium Roasters](https://www.titaniumroasters.coffee/) and [Coffee Machines Sale](https://cmsale.com/) roasting machines
   - adds support for [San Franciscan](https://www.sanfranroaster.com/) 2022 Eurotherm variant and [Diedrich DR](https://www.diedrichroasters.com/)
   - adds support for the [Plugin Roast 2.0 module](https://www.pluginroast.com.br/)
   - adds back support for [Typhoon roasters](https://typhoon.coffee/) ([Issue #959](../../../issues/959))
   - adds energy defaults for [Probat](https://www.probat.com/) P01E
-  - adds Comparator phases widget ([Issue #947](../../../issues/947))
-  - adds auto time axis modes (Roast, BBP+Roast, BBP) toggle as popup in Axis and Comparator dialogs and via shortcut key G
   - adds Loring CSV importer ([Issue #902](../../../issues/902))
   - adds individual control on the event types participating in playback aid and event playback
-  - adds mm:ss time formats for special events annotations ([Issue #864](../../../issues/964))
+  - adds mm:ss time formats for special events annotations ([Issue #864](../../../issues/864))
   - adds additional keyboard shortcuts documentation under `Help >> Keyboard Shortcuts`
   - adds MODBUS IP timeout and retry parameters ([Issue #892](../../../issues/892))
   - adds MODBUS Serial delay and retry parameters
@@ -38,7 +38,7 @@ v2.8.0 (October XX, 2022)
   - remember last batch size even if "Delete roast properties on RESET" is ticked and initialize it by the machines nominal batch size as set on setup
   - hides axis spines and labels along axis ticks if axis step width is set to 0 (or the empty entry)
   - settings in the axis dialog are applied immediately
-  - reduced curve smoothing and limits its settings to the range of 0-5 ([Issue #907](../../../issues/907))
+  - reduced curve smoothing and limits its range to 0-5 ([Issue #907](../../../issues/907))
   - hides COOL END button by default
   - Português do Brasil translation updates supported by the people behind the [Plugin Roast module](https://www.pluginroast.com.br/)
   - updated Chinese Traditional translations (by Yeh Cavix)
@@ -65,7 +65,7 @@ v2.8.0 (October XX, 2022)
   - avoids unproductive event quantification while OFF
   - don't replay background events after background profile DROP
   - ensures that relative event buttons work correctly after PID control is turned off
-  - fixes a rounding issue of a RoR smoothing parameter that could lead to a small x-axis offset between background curve and recorded curve (Issue #907)
+  - fixes a rounding issue of a RoR smoothing parameter that could lead to a small x-axis offset between background curve and recorded curve ([Issue #907](../../../issues/907))
   - correctly re-aligns background profile after producing a ranking report
 
 ----
