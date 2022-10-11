@@ -104,8 +104,8 @@ def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,wordorde
 class modbusport():
     """ this class handles the communications with all the modbus devices"""
 
-    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
-        'timeout', 'IP_timeout', 'IP_retries', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
+    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_extra_read_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
+        'timeout', 'IP_timeout', 'IP_retries', 'serial_readRetries', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
         'channels', 'inputSlaves', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
         'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'reset_socket', 'activeRegisters', 'readingsCache', 'SVmultiplier', 'PIDmultiplier',
         'byteorderLittle', 'wordorderLittle', 'master', 'COMsemaphore', 'host', 'port', 'type', 'lastReadResult', 'commError' ]
@@ -114,6 +114,7 @@ class modbusport():
         self.aw = aw
 
         self.modbus_serial_read_delay = 0.035 # in seconds
+        self.modbus_serial_extra_read_delay = 0.0 # in seconds (user configurable)
         self.modbus_serial_write_delay = 0.080 # in seconds
 
         self.maxCount = 125 # the maximum number of registers that can be fetched in one request according to the MODBUS spec
@@ -125,6 +126,7 @@ class modbusport():
         self.parity= 'N'
         self.stopbits = 1
         self.timeout = 0.4 # serial MODBUS timeout
+        self.serial_readRetries = 0 # user configurable, defaults to 0
         self.IP_timeout = 0.4 # UDP/TCP MODBUS timeout in seconds
         self.IP_retries = 1 # UDP/TCP MODBUS retries (max 2)
         self.PID_slave_ID = 0
@@ -196,7 +198,7 @@ class modbusport():
             if self.type in [3,4]: # delay between writes only on serial connections
                 pass
             else:
-                time.sleep(self.modbus_serial_read_delay)
+                time.sleep(self.modbus_serial_read_delay + self.modbus_serial_extra_read_delay)
 
     @staticmethod
     def address2register(addr, code=3):
@@ -243,7 +245,7 @@ class modbusport():
                         retry_on_invalid=False,
                         reset_socket=self.reset_socket,
                         timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
-                    self.readRetries = 0
+                    self.readRetries = self.serial_readRetries
                 elif self.type == 2: # Serial Binary
                     from pymodbus.client.sync import ModbusSerialClient # @Reimport
                     self.master = ModbusSerialClient(
@@ -257,7 +259,7 @@ class modbusport():
                         retry_on_invalid=False,
                         reset_socket=self.reset_socket,
                         timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
-                    self.readRetries = 0
+                    self.readRetries = self.serial_readRetries
                 elif self.type == 3: # TCP
                     from pymodbus.client.sync import ModbusTcpClient
                     try:
@@ -309,7 +311,7 @@ class modbusport():
                         strict=False, # settings this to False disables the inter char timeout restriction
                         timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
 #                    self.master.inter_char_timeout = 0.05
-                    self.readRetries = 0
+                    self.readRetries = self.serial_readRetries
                 self.master.connect()
                 _log.debug('connect(): connected')
                 self.updateActiveRegisters()
@@ -364,19 +366,19 @@ class modbusport():
 
     @staticmethod
     def invalidResult(res,count):
-        failure = res is None or res.isError() or res.registers is None or len(res.registers) != count
-        if failure:
+        if res is None:
+            _log.info('invalidResult(%d) => None', count)
             return True
-        else:
-            if res is None:
-                _log.info('invalidResult(%d) => None', count)
-            elif res.isError():
-                _log.info('invalidResult(%d) => Error', count)
-            elif res.registers is None :
-                _log.info('invalidResult(%d) => res.registers is None', count)
-            elif len(res.registers) != count:
-                _log.info('invalidResult(%d) => len(res.registers)=%d', count, len(res.registers))
-            return False
+        elif res.isError():
+            _log.info('invalidResult(%d) => Error', count)
+            return True
+        elif res.registers is None:
+            _log.info('invalidResult(%d) => res.registers is None', count)
+            return True
+        elif len(res.registers) != count:
+            _log.info('invalidResult(%d) => len(res.registers)=%d', count, len(res.registers))
+            return True
+        return False
 
     def readActiveRegisters(self):
         if not self.optimizer:
@@ -424,6 +426,7 @@ class modbusport():
                                     if retry > 0:
                                         retry = retry - 1
                                         time.sleep(0.020)
+                                        _log.debug('retry')
                                     else:
                                         res = None
                                         raise Exception('Exception response')
@@ -717,7 +720,8 @@ class modbusport():
                 if self.invalidResult(res,2):
                     if retry > 0:
                         retry = retry - 1
-                        #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
+                        #time.sleep(0.020)  # no retry delay as timeout time should already be large enough
+                        _log.debug('retry')
                     else:
                         raise Exception('Exception response')
                 else:
@@ -806,6 +810,7 @@ class modbusport():
                     if retry > 0:
                         retry = retry - 1
                         #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
+                        _log.debug('retry')
                     else:
                         raise Exception('Exception response')
                 else:
@@ -941,6 +946,7 @@ class modbusport():
                     if retry > 0:
                         retry = retry - 1
                         #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
+                        _log.debug('retry')
                     else:
                         raise Exception(f'readSingleRegister({slave},{register},{code},{force},{signed}) failed')
                 else:
@@ -1044,6 +1050,7 @@ class modbusport():
                     if retry > 0:
                         retry = retry - 1
                         #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
+                        _log.debug('retry')
                     else:
                         raise Exception('Exception response')
                 else:
@@ -1142,6 +1149,7 @@ class modbusport():
                     if retry > 0:
                         retry = retry - 1
                         # time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
+                        _log.debug('retry')
                     else:
                         raise Exception('Exception response')
                 else:

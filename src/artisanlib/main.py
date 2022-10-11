@@ -3473,6 +3473,7 @@ class tgraphcanvas(FigureCanvas):
                 # popup not available if pan/zoom or zoom rect is active as it interacts
                 timex = self.time2index(event.xdata)
                 if timex > 0:
+                    # reset the zoom rectangles
                     menu = QMenu(aw) # if we bind this to self, we inherit the background-color: transparent from self.fig
 #                    menu.setStyleSheet("QMenu::item {background-color: palette(window); selection-color: palette(window); selection-background-color: darkBlue;}")
                     # populate menu
@@ -15256,8 +15257,11 @@ class tgraphcanvas(FigureCanvas):
 
 
             self.releaseMouse()
-            aw.ntb.release_zoom(event) # reset the zoom rectangles
             self.mousepress = False
+            # reset the zoom rectangles
+            aw.ntb.release_pan(event)
+            aw.ntb.release_zoom(event)
+            # set cursor
             self.setCursor(Qt.CursorShape.OpenHandCursor)
 
             self.currentx = event.xdata
@@ -17776,9 +17780,9 @@ class ApplicationWindow(QMainWindow):
         self.htmlAction.setShortcut('Ctrl+R')
         self.roastReportMenu.addAction(self.htmlAction)
 
-        self.roastCliptextReportAction = QAction(QApplication.translate('Menu', 'Text to Clipboard...'), self)
-        self.roastCliptextReportAction.triggered.connect(self.cliptextRoastReport)
-        self.roastReportMenu.addAction(self.roastCliptextReportAction)
+#        self.roastCliptextReportAction = QAction(QApplication.translate('Menu', 'Text to Clipboard...'), self)
+#        self.roastCliptextReportAction.triggered.connect(self.cliptextRoastReport)
+#        self.roastReportMenu.addAction(self.roastCliptextReportAction)
 
         self.productionMenu = self.reportMenu.addMenu(QApplication.translate('Menu', 'Batches'))
 
@@ -31296,6 +31300,10 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.parity = s2a(toString(settings.value('parity',self.modbus.parity)))
             if settings.contains('timeout'):
                 self.modbus.timeout = aw.float2float(toFloat(settings.value('timeout',self.modbus.timeout)))
+            if settings.contains('modbus_serial_extra_read_delay'):
+                self.modbus.modbus_serial_extra_read_delay = toFloat(settings.value('modbus_serial_extra_read_delay',self.modbus.modbus_serial_extra_read_delay))
+            if settings.contains('serial_readRetries'):
+                self.modbus.serial_readRetries = toInt(settings.value('serial_readRetries',self.modbus.serial_readRetries))
             if settings.contains('IP_timeout'):
                 self.modbus.IP_timeout = aw.float2float(toFloat(settings.value('IP_timeout',self.modbus.IP_timeout)))
             if settings.contains('IP_retries'):
@@ -33037,6 +33045,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue('stopbits',self.modbus.stopbits)
             settings.setValue('parity',self.modbus.parity)
             settings.setValue('timeout',self.modbus.timeout)
+            settings.setValue('modbus_serial_extra_read_delay',self.modbus.modbus_serial_extra_read_delay)
+            settings.setValue('serial_readRetries',self.modbus.serial_readRetries)
             settings.setValue('IP_timeout',self.modbus.IP_timeout)
             settings.setValue('IP_retries',self.modbus.IP_retries)
             settings.setValue('PID_slave_ID',self.modbus.PID_slave_ID)
@@ -37004,7 +37014,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def helpAbout(self,_=False):
-        coredevelopers = '<br>Rafael Cobo, Marko Luther, Dave Baxter &amp; Rui Paulo'
+        coredevelopers = '<br>Rafael Cobo, Marko Luther, &amp; Dave Baxter'
         contribs = ['<br>' + uchr(199) + 'etin Barut, Marcio Carnerio, Bradley Collins, ',
                     'Sebastien Delgrande, Kalle Deligeorgakis, Jim Gall, ',
                     'Frans Goddijn, Rich Helms, Kyle Iseminger, Ingo, ',
@@ -37171,7 +37181,15 @@ class ApplicationWindow(QMainWindow):
             self.modbus.stopbits = int(str(dialog.modbus_stopbitsComboBox.currentText()))
             self.modbus.parity = str(dialog.modbus_parityComboBox.currentText())
             self.modbus.timeout = aw.float2float(toFloat(str(dialog.modbus_timeoutEdit.text())))
-            self.modbus.IP_timeout = aw.float2float(toFloat(str(dialog.modbus_IP_timeoutEdit.text())))
+            try:
+                self.modbus.modbus_serial_extra_read_delay = toInt(dialog.modbus_Serial_delayEdit.text()) / 1000
+            except Exception: # pylint: disable=broad-except
+                pass
+            self.modbus.serial_readRetries = dialog.modbus_Serial_retriesComboBox.currentIndex()
+            try:
+                self.modbus.IP_timeout = aw.float2float(toFloat(str(dialog.modbus_IP_timeoutEdit.text())))
+            except Exception: # pylint: disable=broad-except
+                pass
             self.modbus.IP_retries = dialog.modbus_IP_retriesComboBox.currentIndex()
             self.modbus.PID_slave_ID = int(str(dialog.modbus_PIDslave_Edit.text()))
             self.modbus.PID_SV_register = int(str(dialog.modbus_SVregister_Edit.text()))

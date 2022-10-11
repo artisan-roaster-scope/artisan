@@ -730,6 +730,33 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_pid.setContentsMargins(0,10,0,0)
         modbus_pidgroup.setContentsMargins(0,20,0,3)
 
+
+        modbus_Serial_delaylabel = QLabel(QApplication.translate('Label', 'Delay'))
+        modbus_Serial_delaylabel.setToolTip(QApplication.translate('Tooltip', 'Extra delay in Milliseconds between MODBUS Serial commands'))
+        self.modbus_Serial_delayEdit = QLineEdit(str(int(self.aw.modbus.modbus_serial_extra_read_delay*1000)))
+        self.modbus_Serial_delayEdit.setValidator(self.aw.createCLocaleDoubleValidator(0,99,0,self.modbus_Serial_delayEdit))
+        self.modbus_Serial_delayEdit.setFixedWidth(50)
+        self.modbus_Serial_delayEdit.setToolTip(QApplication.translate('Tooltip', 'Extra delay in Milliseconds between MODBUS Serial commands'))
+        modbus_Serial_retries = QLabel(QApplication.translate('Label', 'Retries'))
+        self.modbus_Serial_retriesComboBox = QComboBox()
+#        modbus_Serial_retries.setBuddy(self.modbus_Serial_retriesComboBox)
+        self.modbus_Serial_retriesComboBox.addItems([str(n) for n in range(3)])
+        self.modbus_Serial_retriesComboBox.setCurrentIndex(self.aw.modbus.serial_readRetries)
+
+        modbus_Serial_grid = QGridLayout()
+        modbus_Serial_grid.addWidget(modbus_Serial_delaylabel,0,0,Qt.AlignmentFlag.AlignRight)
+        modbus_Serial_grid.addWidget(self.modbus_Serial_delayEdit,0,1,Qt.AlignmentFlag.AlignRight)
+        modbus_Serial_grid.addWidget(modbus_Serial_retries,1,0,Qt.AlignmentFlag.AlignRight)
+        modbus_Serial_grid.addWidget(self.modbus_Serial_retriesComboBox,1,1,Qt.AlignmentFlag.AlignRight)
+
+        modbus_Serial_layout = QVBoxLayout()
+        modbus_Serial_layout.addLayout(modbus_Serial_grid)
+        modbus_Serial_layout.addStretch()
+
+        modbus_Serialgroup = QGroupBox(QApplication.translate('GroupBox', 'Serial'))
+        modbus_Serialgroup.setLayout(modbus_Serial_layout)
+
+
         modbus_IP_timeoutlabel = QLabel(QApplication.translate('Label', 'Timeout'))
         modbus_IP_timeoutlabel.setToolTip(QApplication.translate('Tooltip', 'IP timeout in seconds, not larger than half of the sampling interval'))
         self.modbus_IP_timeoutEdit = QLineEdit(str(self.aw.modbus.IP_timeout))
@@ -757,6 +784,7 @@ class comportDlg(ArtisanResizeablDialog):
 
         modbus_PID_IP = QHBoxLayout()
         modbus_PID_IP.addWidget(modbus_pidgroup)
+        modbus_PID_IP.addWidget(modbus_Serialgroup)
         modbus_PID_IP.addWidget(modbus_IPgroup)
 
         scanButton = QPushButton(QApplication.translate('Button','Scan'))
