@@ -7,12 +7,16 @@ toc: false
 author: Michael Herbert
 author_profile: true
 gallery:
+  - url: https://www.youtube.com/watch?v=8ivsccu9e_Y
+    image_path: /assets/images/gsg/video-RoyalCoffee-GettingMostFromArtisansTools.jpg
+    alt: "Royal Coffee - Getting the Most from Artisan's Tools"
+    title: "2022-10 Royal Coffee - Getting the Most from Artisan's Tools"
   - url: https://www.youtube.com/watch?v=QRAzYkmGYVw
     image_path: /assets/images/gsg/video-axis-system.jpg
     alt: "Axis System"
     title: "2022-9 Axis System"
   - url: https://www.youtube.com/watch?v=tJKRJrEPeEQ
-    image_path: /assets/images/gsg/video-RoyalCoffe-GettingMostFromYourCruves.jpg
+    image_path: /assets/images/gsg/video-RoyalCoffee-GettingMostFromYourCurves.jpg
     alt: "Royal Coffee - Getting the Most From your Curves"
     title: "2022-3 Royal Coffee - Getting the Most From your Curves"
   - url: https://www.youtube.com/watch?v=c8Ev_pwWzPs

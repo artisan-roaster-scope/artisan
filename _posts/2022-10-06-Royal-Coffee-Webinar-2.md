@@ -23,6 +23,9 @@ Dave Baxter will cover how these tools work, how to apply them and provide tips 
 
 Roasting experience with Artisan is recommended but not required.
 
+**UPDATE: a recording of this session is now available**
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/8ivsccu9e_Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 > <a href="https://events.royalcoffee.com/getting-the-most-from-artisans-tools" target="_blank">Getting the Most From Artisan's Tools</a> (Royal Coffee)   
 > Friday, Oct 06 \| 1-2 pm PST   
