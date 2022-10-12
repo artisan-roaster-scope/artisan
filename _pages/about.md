@@ -52,7 +52,7 @@ gallery:
     alt: "acaia"
     title: "acaia"
   - url: https://cmsale.com/
-    image_path: /assets/images/cms-logo.jpeg
+    image_path: /assets/images/cms-logo.jpg
     alt: "Coffee Maschines Sale"
     title: "Coffee Maschines Sale"
 ---
