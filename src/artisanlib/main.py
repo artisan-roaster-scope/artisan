@@ -226,7 +226,7 @@ from artisanlib.util import (appFrozen, stringp, uchr, decodeLocal, encodeLocal,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toBool, toStringList, toMap, removeAll, application_name, application_viewer_name, application_organization_name,
         application_organization_domain, getDataDirectory, getAppPath, getResourcePath, getDirectory, debugLogLevelToggle,
-        debugLogLevelActive, setDebugLogLevel, abbrevString, createGradient, natsort, toGrey, toDim, scaleFloat2String)
+        debugLogLevelActive, setDebugLogLevel, abbrevString, createGradient, natsort, toGrey, toDim)
 
 from artisanlib.qtsingleapplication import QtSingleApplication
 from artisanlib.filters import LiveMedian
