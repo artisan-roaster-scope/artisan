@@ -312,6 +312,7 @@ Section Uninstall
   Delete "$INSTDIR\base_library.zip"
 
   RMDir /r "$INSTDIR\certifi"
+  RMDir /r "$INSTDIR\contourpy"
   RMDir /r "$INSTDIR\gevent"
   RMDir /r "$INSTDIR\greenlet"
   RMDir /r "$INSTDIR\Icons"
