@@ -3459,7 +3459,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.backgroundprofile is not None:
                         # toggle background if right top corner above canvas where the subtitle is clicked
                         self.background = not self.background
-                        aw.autoAdjustAxis()
+                        aw.autoAdjustAxis(background=True)
                         self.redraw(recomputeAllDeltas=True)
                         return
 
@@ -8593,10 +8593,15 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         stemp3B = self.stemp2BX[n3]
                                 if not self.backgroundShowFullflag:
-                                    stemp3B = numpy.concatenate((
-                                        numpy.full(bcharge_idx, numpy.nan, dtype=numpy.double),
-                                        stemp3B[bcharge_idx:bdrop_idx+1],
-                                        numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
+                                    if not self.autotimex or self.autotimexMode == 0:
+                                        stemp3B = numpy.concatenate((
+                                            numpy.full(bcharge_idx, numpy.nan, dtype=numpy.double),
+                                            stemp3B[bcharge_idx:bdrop_idx+1],
+                                            numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
+                                    else:
+                                        stemp3B = numpy.concatenate((
+                                            stemp3B[0:bdrop_idx+1],
+                                            numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
                                 try:
                                     if self.l_back3 is not None:
                                         self.l_back3.remove()
@@ -8638,10 +8643,15 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         stemp4B = self.stemp2BX[n4]
                                 if not self.backgroundShowFullflag:
-                                    stemp4B = numpy.concatenate((
-                                        numpy.full(bcharge_idx, numpy.nan, dtype=numpy.double),
-                                        stemp4B[bcharge_idx:bdrop_idx+1],
-                                        numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
+                                    if not self.autotimex or self.autotimexMode == 0:
+                                        stemp4B = numpy.concatenate((
+                                            numpy.full(bcharge_idx, numpy.nan, dtype=numpy.double),
+                                            stemp4B[bcharge_idx:bdrop_idx+1],
+                                            numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
+                                    else:
+                                        stemp4B = numpy.concatenate((
+                                            stemp4B[0:bdrop_idx+1],
+                                            numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
                                 try:
                                     if self.l_back4 is not None:
                                         self.l_back4.remove()
@@ -8660,11 +8670,16 @@ class tgraphcanvas(FigureCanvas):
                             if self.backgroundShowFullflag:
                                 temp_etb = self.stemp1B
                             else:
-                                # only draw background curve from CHARGE to DROP
-                                temp_etb = numpy.concatenate((
-                                    numpy.full(bcharge_idx, numpy.nan, dtype=numpy.double),
-                                    self.stemp1B[bcharge_idx:bdrop_idx+1],
-                                    numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
+                                if not self.autotimex or self.autotimexMode == 0:
+                                    # only draw background curve from CHARGE to DROP
+                                    temp_etb = numpy.concatenate((
+                                        numpy.full(bcharge_idx, numpy.nan, dtype=numpy.double),
+                                        self.stemp1B[bcharge_idx:bdrop_idx+1],
+                                        numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
+                                else:
+                                    temp_etb = numpy.concatenate((
+                                        self.stemp1B[0:bdrop_idx+1],
+                                        numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
                         else:
                             temp_etb = numpy.full(len(self.timeB), numpy.nan, dtype=numpy.double)
                         try:
@@ -8682,11 +8697,17 @@ class tgraphcanvas(FigureCanvas):
                             if self.backgroundShowFullflag:
                                 temp_btb = self.stemp2B
                             else:
-                                # only draw background curve from CHARGE to DROP
-                                temp_btb = numpy.concatenate((
-                                    numpy.full(bcharge_idx, numpy.nan, dtype=numpy.double),
-                                    self.stemp2B[bcharge_idx:bdrop_idx+1],
-                                    numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
+                                if not self.autotimex or self.autotimexMode == 0:
+                                    # only draw background curve from CHARGE to DROP
+                                    temp_btb = numpy.concatenate((
+                                        numpy.full(bcharge_idx, numpy.nan, dtype=numpy.double),
+                                        self.stemp2B[bcharge_idx:bdrop_idx+1],
+                                        numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
+                                else:
+                                    temp_btb = numpy.concatenate((
+                                        self.stemp2B[0:bdrop_idx+1],
+                                        numpy.full(len(self.timeB)-bdrop_idx-1, numpy.nan, dtype=numpy.double)))
+
                         else:
                             temp_btb = numpy.full(len(self.timeB), numpy.nan, dtype=numpy.double)
                         try:
@@ -8756,7 +8777,7 @@ class tgraphcanvas(FigureCanvas):
                             for p in range(len(self.backgroundEvents)):
                                 if self.eventsGraphflag not in [2,4] or self.backgroundEtypes[p] > 3:
                                     event_idx = self.backgroundEvents[p]
-                                    if not self.backgroundShowFullflag and event_idx < bcharge_idx or event_idx > bdrop_idx:
+                                    if not self.backgroundShowFullflag and (((not self.autotimex or self.autotimexMode == 0) and event_idx < bcharge_idx) or event_idx > bdrop_idx):
                                         continue
                                     if self.backgroundEtypes[p] < 4:
                                         st1 = f'{self.Betypesf(self.backgroundEtypes[p])[0]}{self.eventsvaluesShort(self.backgroundEvalues[p])}'
@@ -8800,7 +8821,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.overlapList = []
                                 for i in range(len(self.backgroundEvents)):
                                     event_idx = self.backgroundEvents[i]
-                                    if (not self.backgroundShowFullflag and (event_idx < bcharge_idx or event_idx > bdrop_idx)):
+                                    if (not self.backgroundShowFullflag and (((not self.autotimex or self.autotimexMode == 0) and event_idx < bcharge_idx) or event_idx > bdrop_idx)):
                                         continue
                                     pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
                                     if self.backgroundEtypes[i] == 0 and aw.qmc.showEtypes[0]:
@@ -9019,7 +9040,7 @@ class tgraphcanvas(FigureCanvas):
                                     Bevalues = [self.E1backgroundvalues[:],self.E2backgroundvalues[:],self.E3backgroundvalues[:],self.E4backgroundvalues[:]]
                                 for i in range(len(self.backgroundEvents)):
                                     event_idx = self.backgroundEvents[i]
-                                    if not self.backgroundShowFullflag and (event_idx < bcharge_idx or event_idx > bdrop_idx):
+                                    if not self.backgroundShowFullflag and (((not self.autotimex or self.autotimexMode == 0) and event_idx < bcharge_idx) or event_idx > bdrop_idx):
                                         continue
                                     if self.backgroundEtypes[i] == 4 or self.eventsGraphflag in [0,3,4]:
                                         if self.backgroundEtypes[i] < 4 and (not aw.qmc.renderEventsDescr or len(self.backgroundEStrings[i].strip()) == 0):
@@ -9198,7 +9219,9 @@ class tgraphcanvas(FigureCanvas):
                             for i in range(Nevents):
                                 try:
                                     tx = self.timex[self.specialevents[i]]
-                                    if self.foregroundShowFullflag or ((self.timeindex[0] > -1 and tx >= self.timex[self.timeindex[0]]) and (self.timeindex[6] > 0 and tx <= self.timex[self.timeindex[6]]) or (self.autotimexMode != 0 and (self.timeindex[6] > 0 and tx >= self.timex[self.timeindex[6]]))):
+                                    event_idx = int(self.specialevents[i])
+
+                                    if self.flagstart or self.foregroundShowFullflag or (event_idx >= charge_idx and event_idx <= drop_idx) or (self.autotimex and self.autotimexMode != 0 and event_idx < charge_idx):
                                         if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
                                             netypes[0].append(tx)
                                         elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
@@ -9227,7 +9250,7 @@ class tgraphcanvas(FigureCanvas):
                                 elif aw.qmc.showEtypes[self.specialeventstype[i]]:
                                     event_idx = int(self.specialevents[i])
                                     try:
-                                        if not self.flagstart and not self.foregroundShowFullflag and (event_idx < charge_idx or (self.autotimexMode != 0 and event_idx > drop_idx)):
+                                        if not(self.flagstart or self.foregroundShowFullflag or (event_idx >= charge_idx and event_idx <= drop_idx) or (self.autotimex and self.autotimexMode != 0 and event_idx < charge_idx)):
                                             continue
 
                                         firstletter = self.etypes[self.specialeventstype[i]][0]
@@ -9297,7 +9320,7 @@ class tgraphcanvas(FigureCanvas):
                                 try:
                                     tx = self.timex[self.specialevents[i]]
                                     if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
-                                        if ((not self.foregroundShowFullflag and self.autotimexMode == 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
+                                        if ((not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
                                             (not self.foregroundShowFullflag and self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
                                             if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
                                                 E1_CHARGE = pos # remember event value at CHARGE
@@ -9338,7 +9361,7 @@ class tgraphcanvas(FigureCanvas):
                                             aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                     elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
                                         tx = self.timex[self.specialevents[i]]
-                                        if ((not self.foregroundShowFullflag and self.autotimexMode == 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
+                                        if ((not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
                                             (not self.foregroundShowFullflag and self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
                                             if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
                                                 E2_CHARGE = pos # remember event value at CHARGE
@@ -9380,7 +9403,7 @@ class tgraphcanvas(FigureCanvas):
                                             aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                     elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
                                         tx = self.timex[self.specialevents[i]]
-                                        if ((not self.foregroundShowFullflag and self.autotimexMode == 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
+                                        if ((not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
                                             (not self.foregroundShowFullflag and self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
                                             if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
                                                 E3_CHARGE = pos # remember event value at CHARGE
@@ -9421,7 +9444,7 @@ class tgraphcanvas(FigureCanvas):
                                             aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                                     elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
                                         tx = self.timex[self.specialevents[i]]
-                                        if ((not self.foregroundShowFullflag and self.autotimexMode == 0 and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
+                                        if ((not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]) or
                                             (not self.foregroundShowFullflag and self.timeindex[6] > 0 and tx > self.timex[self.timeindex[6]])):
                                             if (self.timeindex[0] > -1 and tx < self.timex[self.timeindex[0]]):
                                                 E4_CHARGE = pos # remember event value at CHARGE
@@ -9467,7 +9490,7 @@ class tgraphcanvas(FigureCanvas):
                                 pos = max(0,int(round((self.specialeventsvalue[E1_last]-1)*10)))
                                 if not self.clampEvents: # in clamp mode we render also event values higher than 100:
                                     pos = (pos*event_pos_factor)+event_pos_offset
-                                if self.foregroundShowFullflag and self.autotimexMode != 0 and (self.timeindex[7] > 0 and
+                                if self.foregroundShowFullflag and self.autotimex and self.autotimexMode != 0 and (self.timeindex[7] > 0 and
                                         aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E1_last]]):   #if cool exists and last event was earlier
                                     self.E1timex.append(self.timex[self.timeindex[7]]) #time of cool
                                     self.E1values.append(pos) #repeat last event value
@@ -9499,7 +9522,7 @@ class tgraphcanvas(FigureCanvas):
                                 pos = max(0,int(round((self.specialeventsvalue[E2_last]-1)*10)))
                                 if not self.clampEvents: # in clamp mode we render also event values higher than 100:
                                     pos = (pos*event_pos_factor)+event_pos_offset
-                                if self.foregroundShowFullflag and self.autotimexMode != 0 and (self.timeindex[7] > 0 and
+                                if self.foregroundShowFullflag and self.autotimex and self.autotimexMode != 0 and (self.timeindex[7] > 0 and
                                         aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E2_last]]):   #if cool exists and last event was earlier
                                     self.E2timex.append(self.timex[self.timeindex[7]]) #time of cool
                                     self.E2values.append(pos) #repeat last event value
@@ -9531,7 +9554,7 @@ class tgraphcanvas(FigureCanvas):
                                 pos = max(0,int(round((self.specialeventsvalue[E3_last]-1)*10)))
                                 if not self.clampEvents: # in clamp mode we render also event values higher than 100:
                                     pos = (pos*event_pos_factor)+event_pos_offset
-                                if self.foregroundShowFullflag and self.autotimexMode != 0 and (self.timeindex[7] > 0 and
+                                if self.foregroundShowFullflag and self.autotimex and self.autotimexMode != 0 and (self.timeindex[7] > 0 and
                                         aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E3_last]]):   #if cool exists and last event was earlier
                                     self.E3timex.append(self.timex[self.timeindex[7]]) #time of cool
                                     self.E3values.append(pos) #repeat last event value
@@ -9563,7 +9586,7 @@ class tgraphcanvas(FigureCanvas):
                                 pos = max(0,int(round((self.specialeventsvalue[E4_last]-1)*10)))
                                 if not self.clampEvents: # in clamp mode we render also event values higher than 100:
                                     pos = (pos*event_pos_factor)+event_pos_offset
-                                if self.foregroundShowFullflag and self.autotimexMode != 0 and (self.timeindex[7] > 0 and
+                                if self.foregroundShowFullflag and self.autotimex and self.autotimexMode != 0 and (self.timeindex[7] > 0 and
                                         aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E4_last]]):   #if cool exists and last event was earlier
                                     self.E4timex.append(self.timex[self.timeindex[7]]) #time of cool
                                     self.E4values.append(pos) #repeat last event value
@@ -9640,7 +9663,7 @@ class tgraphcanvas(FigureCanvas):
                                             else:
                                                 temp = self.stemp2[event_idx]
 
-                                        if not self.flagstart and not self.foregroundShowFullflag and ((self.autotimexMode == 0 and event_idx < charge_idx) or event_idx > drop_idx):
+                                        if not self.flagstart and not self.foregroundShowFullflag and (((not self.autotimex or self.autotimexMode == 0) and event_idx < charge_idx) or event_idx > drop_idx):
                                             continue
 
                                         # combo events
@@ -9790,12 +9813,12 @@ class tgraphcanvas(FigureCanvas):
                                     trans = self.delta_ax.transData
                                 else:
                                     trans = self.ax.transData
-                                if not self.flagstart and not self.foregroundShowFullflag and self.autotimexMode == 0 and len(self.extrastemp1[i]) > 0:
+                                if not self.flagstart and not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and len(self.extrastemp1[i]) > 0:
                                     visible_extratemp1 = numpy.concatenate((
                                         numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
                                         self.extrastemp1[i][charge_idx:drop_idx+1],
                                         numpy.full(len(self.extratimex[i])-drop_idx-1, numpy.nan, dtype=numpy.double)))
-                                elif not self.flagstart and not self.foregroundShowFullflag and self.autotimexMode != 0 and len(self.extrastemp1[i]) > 0:
+                                elif not self.flagstart and not self.foregroundShowFullflag and self.autotimex and self.autotimexMode != 0 and len(self.extrastemp1[i]) > 0:
                                     visible_extratemp1 = numpy.concatenate((
                                         self.extrastemp1[i][0:drop_idx+1],
                                         numpy.full(len(self.extratimex[i])-drop_idx-1, numpy.nan, dtype=numpy.double)))
@@ -9822,12 +9845,12 @@ class tgraphcanvas(FigureCanvas):
                                     trans = self.delta_ax.transData
                                 else:
                                     trans = self.ax.transData
-                                if not self.flagstart and not self.foregroundShowFullflag and self.autotimexMode == 0 and len(self.extrastemp2[i]) > 0:
+                                if not self.flagstart and not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and len(self.extrastemp2[i]) > 0:
                                     visible_extratemp2 = numpy.concatenate((
                                         numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
                                         self.extrastemp2[i][charge_idx:drop_idx+1],
                                         numpy.full(len(self.extratimex[i])-drop_idx-1, numpy.nan, dtype=numpy.double)))
-                                elif not self.flagstart and not self.foregroundShowFullflag and self.autotimexMode != 0 and len(self.extrastemp2[i]) > 0:
+                                elif not self.flagstart and not self.foregroundShowFullflag and self.autotimex and self.autotimexMode != 0 and len(self.extrastemp2[i]) > 0:
                                     visible_extratemp2 = numpy.concatenate((
                                         self.extrastemp2[i][0:drop_idx+1],
                                         numpy.full(len(self.extratimex[i])-drop_idx-1, numpy.nan, dtype=numpy.double)))
@@ -9845,7 +9868,7 @@ class tgraphcanvas(FigureCanvas):
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                     ##### ET,BT curves
-                    if not self.flagstart and not self.foregroundShowFullflag and self.autotimexMode == 0:
+                    if not self.flagstart and not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0):
                         visible_et = numpy.concatenate((
                                         numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
                                         self.stemp1[charge_idx:drop_idx+1],
@@ -9854,7 +9877,7 @@ class tgraphcanvas(FigureCanvas):
                                         numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
                                         self.stemp2[charge_idx:drop_idx+1],
                                         numpy.full(len(self.timex)-drop_idx-1, numpy.nan, dtype=numpy.double)))
-                    elif not self.flagstart and not self.foregroundShowFullflag and self.autotimexMode != 0:
+                    elif not self.flagstart and not self.foregroundShowFullflag and self.autotimex and self.autotimexMode != 0:
                         visible_et = numpy.concatenate((
                                         self.stemp1[0:drop_idx+1],
                                         numpy.full(len(self.timex)-drop_idx-1, numpy.nan, dtype=numpy.double)))
@@ -10654,7 +10677,7 @@ class tgraphcanvas(FigureCanvas):
 
                 # position the stats summary relative to the right hand edge of the graph
                 # when in BBP mode the graph will end at CHARGE, so we must look for the CHARGE annotation instead of DROP.
-                if aw.qmc.autotimexMode != 2:
+                if not aw.qmc.autotimex or aw.qmc.autotimexMode != 2:
                     event_label = QApplication.translate('Scope Annotation','DROP {0}').replace(' {0}','')
                 else:
                     event_label = QApplication.translate('Scope Annotation','CHARGE')
@@ -33292,7 +33315,10 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.beginGroup('Axis')
             settings.setValue('loadAxisFromProfile',self.qmc.loadaxisfromprofile)
-            settings.setValue('xmin',self.qmc.startofx)
+            xmin = self.qmc.startofx
+            if self.qmc.timeindex[0] != -1:
+                xmin -= self.qmc.timex[self.qmc.timeindex[0]]
+            settings.setValue('xmin',xmin)
             settings.setValue('xmax',self.qmc.endofx)
             settings.setValue('ymax',self.qmc.ylimit)
             settings.setValue('ymin',self.qmc.ylimit_min)
