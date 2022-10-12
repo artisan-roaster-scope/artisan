@@ -11,7 +11,7 @@ sidebar:
   nav: "machines"
 ---
 
-<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Producer:__ [KapoK Roasters](http://kapokcoffee.com/){:target="_blank"}, Taiwan
 * __Machines:__ K500, K1.0, K5.0

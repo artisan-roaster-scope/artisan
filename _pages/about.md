@@ -27,10 +27,6 @@ gallery:
     image_path: /assets/images/yoctopuce-logo.png
     alt: "Yoctopuce"
     title: "Yoctopuce"
-  - url: https://www.sweetmarias.com/
-    image_path: /assets/images/sweet-marias-logo.jpeg
-    alt: "Sweet Maria's"
-    title: "Sweet Maria's"
   - url: http://www.buckeyecoffee.com/
     image_path: /assets/images/bc-logo.jpg
     alt: "Buckeye Coffee"
@@ -39,10 +35,6 @@ gallery:
     image_path: /assets/images/roastmax_logo.jpg
     alt: "Roastmax"
     title: "Roastmax"
-  - url: https://www.ip-cc.com/
-    image_path: /assets/images/IP-CC-logo.jpg
-    alt: "IP-CC"
-    title: "IP-CC"
   - url: https://www.bescaroasters.com/
     image_path: /assets/images/besca-logo.jpg
     alt: "Besca Roasters"
@@ -55,6 +47,17 @@ gallery:
     image_path: /assets/images/coffed-logo-light.png
     alt: "Coffed"
     title: "Coffed"
+  - url: https://acaia.co/
+    image_path: /assets/images/acaia-logo.jpeg
+    alt: "acaia"
+    title: "acaia"
+  - url: https://cmsale.com/
+    image_path: /assets/images/cms-logo.jpeg
+    alt: "Coffee Maschines Sale"
+    title: "Coffee Maschines Sale"
+---
+
+<!--
   - url: https://www.ingnapoli.com/
     image_path: /assets/images/tostabar-logo.png
     alt: "Tostabar"
@@ -67,13 +70,14 @@ gallery:
     image_path: /assets/images/kapok-logo.png
     alt: "KapoK"
     title: "KapoK"
-  - url: https://acaia.co/
-    image_path: /assets/images/acaia-logo.jpeg
-    alt: "acaia"
-    title: "acaia"
----
-
-<!--
+  - url: https://www.ip-cc.com/
+    image_path: /assets/images/IP-CC-logo.jpg
+    alt: "IP-CC"
+    title: "IP-CC"
+  - url: https://www.sweetmarias.com/
+    image_path: /assets/images/sweet-marias-logo.jpeg
+    alt: "Sweet Maria's"
+    title: "Sweet Maria's"
   - url: http://www.twinoroasters.com/
     image_path: /assets/images/twino-logo.png
     alt: "Twino"

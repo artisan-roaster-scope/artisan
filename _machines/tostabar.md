@@ -11,7 +11,7 @@ sidebar:
   nav: "machines"
 ---
 
-<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Producer:__ [Ing. Napoli & C.](https://www.ingnapoli.com/){:target="_blank"}, Italy
 * __Machines:__ Genius K1 and Genius K3

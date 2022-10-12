@@ -11,7 +11,7 @@ sidebar:
   nav: "machines"
 ---
 
-<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Distributor:__ [Showroom Coffee](https://showroomcoffee.com/category/roasting-supplies/){:target="_blank"}, USA
 
