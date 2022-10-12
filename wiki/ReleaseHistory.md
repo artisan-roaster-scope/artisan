@@ -8,11 +8,11 @@ v2.8.0 (October XX, 2022)
 * NEW FEATURES
   - adds Comparator phases widget ([Issue #479](../../../issues/479))
   - adds auto time axis modes (Roast, BBP+Roast, BBP) toggle as popup in Axis and Comparator dialogs and via shortcut key G
-  - adds support for [Besca](https://bescaroasters.com/) BEE v2 (2022 model), [Besca](https://bescaroasters.com/) BSC full-automatic, [Titanium Roasters](https://www.titaniumroasters.coffee/) and [Coffee Machines Sale](https://cmsale.com/) roasting machines
-  - adds support for [San Franciscan](https://www.sanfranroaster.com/) 2022 Eurotherm variant and [Diedrich DR](https://www.diedrichroasters.com/)
+  - adds support for [Besca](https://artisan-scope.org/machines/besca/) BEE v2 (2022 model), [Besca](https://artisan-scope.org/machines/besca/) BSC full-automatic, [Titanium Roasters](https://artisan-scope.org/machines/titanium/) and [Coffee Machines Sale](https://artisan-scope.org/machines/cms/) roasting machines
+  - adds support for [San Franciscan](https://artisan-scope.org/machines/sf/) 2022 Eurotherm variant and [Diedrich DR](https://artisan-scope.org/machines/diedrich/)
   - adds support for the [Plugin Roast 2.0 module](https://www.pluginroast.com.br/)
-  - adds back support for [Typhoon roasters](https://typhoon.coffee/) ([Issue #959](../../../issues/959))
-  - adds energy defaults for [Probat](https://www.probat.com/) P01E
+  - adds back support for [Typhoon roasters](https://artisan-scope.org/machines/typhoon/) ([Issue #959](../../../issues/959))
+  - adds energy defaults for [Probat](https://artisan-scope.org/machines/probat/) P01E
   - adds Loring CSV importer ([Issue #902](../../../issues/902))
   - adds individual control on the event types participating in playback aid and event playback
   - adds mm:ss time formats for special events annotations ([Issue #864](../../../issues/864))
