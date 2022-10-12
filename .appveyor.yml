@@ -61,6 +61,11 @@ for:
   build_script:
     - cmd: echo Windows Legacy Build
     - cmd: cd src
+        
+    #update the copyright year used by pyinstaller to set exe propertis for Windows
+    - ps: $YEAR=(Get-Date).year
+    - ps: gc version-metadata.yml | %{ $_ -replace "yyyy", "$YEAR" } | out-file newfile -encoding ascii
+    - ps: move -force newfile version-metadata.yml
 
     # update the __revision__ field with the left seven of the GIT commit hash
     - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
@@ -106,6 +111,11 @@ for:
     - cmd: echo Windows Build
     - cmd: cd src
 
+    #update the copyright year used by pyinstaller to set exe propertis for Windows
+    - ps: $YEAR=(Get-Date).year
+    - ps: gc version-metadata.yml | %{ $_ -replace "yyyy", "$YEAR" } | out-file newfile -encoding ascii
+    - ps: move -force newfile version-metadata.yml
+
     # update the __revision__ field with the left seven of the GIT commit hash
     - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
     - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '0'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
@@ -136,10 +146,6 @@ for:
     PYTHON_V: 3.10
     PYTHONPATH: /usr/local/lib/python${PYTHON_V}
     MACOSX_DEPLOYMENT_TARGET: 10.15
-    #PYTHON: ~/venv3.10
-    #language: generic
-    #HOMEBREW_NO_INSTALL_CLEANUP: 1
-    #HOMEBREW_NO_ANALYTICS: 1
 
   install:
     - echo "MacOS Install"
@@ -180,10 +186,6 @@ for:
     ARTISAN_OS: linux
     PYTHON_V: 3.10
     PYTHON_PATH: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
-    #PYTHON: $HOME/venv3.10.2
-    #PYTHON: $HOME/venv3.9.10
-    # NOTE: there is an issue with Python 3.10.0 and pyinstaller fixed in Python 3.10.1 (not yet available on appveyor)
-    # see pyinstaller Issue #6301
 
   install:
     - echo "Linux Install"
@@ -199,8 +201,8 @@ for:
     - chmod +x src/*.sh
     - .ci/script-${ARTISAN_OS}.sh
 
-  test_script:
-    - QT_QPA_PLATFORM=offscreen python -m unittest discover -s src
+#  test_script:
+#    - QT_QPA_PLATFORM=offscreen python -m unittest discover -s src
 
 #  artifacts:
 #    - path: 'src/artisan-*.deb'
