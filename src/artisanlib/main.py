@@ -259,7 +259,7 @@ class Artisan(QtSingleApplication):
 
         if multiprocessing.current_process().name == 'MainProcess' and self.isRunning():
             self.artisanviewerMode = True
-            if not platf=='Windows' and self.isRunningViewer(): sys.exit(0) # there is already one ArtisanViewer running, we terminate
+            if self.isRunningViewer(): sys.exit(0) # there is already one ArtisanViewer running, we terminate
         else:
             self.artisanviewerMode = False
         self.messageReceived.connect(self.receiveMessage)
