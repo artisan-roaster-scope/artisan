@@ -11783,8 +11783,8 @@ class tgraphcanvas(FigureCanvas):
 
             # calc final values
             if pressure is not None:
-                if temp is None:
-                    t = 23 # we just assume 23C room temperature if no ambient temperature is given
+                if temp is None or t<-20 or t>40:
+                    t = 23 # we just assume 23C room temperature if no ambient temperature is given or ambient temperature is out of range
                 else:
                     t = temp
                 pressure = self.barometricPressure(pressure,t,self.elevation)

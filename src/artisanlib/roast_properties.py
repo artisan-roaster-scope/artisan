@@ -1127,13 +1127,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         color_label = QLabel('<b>' + QApplication.translate('Label', 'Color') + '</b>')
         whole_color_label = QLabel('<b>' + QApplication.translate('Label', 'Whole') + '</b>')
         self.whole_color_edit = QLineEdit(str(self.aw.qmc.whole_color))
-        self.whole_color_edit.setValidator(QIntValidator(0, 1000, self.whole_color_edit))
+        self.whole_color_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 2, self.whole_color_edit))
         self.whole_color_edit.setMinimumWidth(70)
         self.whole_color_edit.setMaximumWidth(70)
         self.whole_color_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         ground_color_label = QLabel('<b>' + QApplication.translate('Label', 'Ground') + '</b>')
         self.ground_color_edit = QLineEdit(str(self.aw.qmc.ground_color))
-        self.ground_color_edit.setValidator(QIntValidator(0, 1000, self.ground_color_edit))
+        self.ground_color_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 2, self.whole_color_edit))
         self.ground_color_edit.setMinimumWidth(70)
         self.ground_color_edit.setMaximumWidth(70)
         self.ground_color_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -2600,8 +2600,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                     volumeOut = float(self.aw.comma2dot(str(self.volumeoutedit.text())))
                     densityRoasted = float(self.aw.comma2dot(str(self.bean_density_out_edit.text())))
                     moistureRoasted = float(self.aw.comma2dot(self.moisture_roasted_edit.text()))
-                    wholeColor = int(self.whole_color_edit.text())
-                    groundColor = int(self.ground_color_edit.text())
+                    wholeColor = int(round(float(self.whole_color_edit.text())))
+                    groundColor = int(round(float(self.ground_color_edit.text())))
 
                 rr = self.aw.createRecentRoast(
                     title,
@@ -4995,11 +4995,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.divots_flag = self.divots.isChecked()
         #update color
         try:
-            self.aw.qmc.whole_color = int(str(self.whole_color_edit.text()))
+            self.aw.qmc.whole_color = int(round(float(str(self.whole_color_edit.text()))))
         except Exception: # pylint: disable=broad-except
             self.aw.qmc.whole_color = 0
         try:
-            self.aw.qmc.ground_color = int(str(self.ground_color_edit.text()))
+            self.aw.qmc.ground_color = int(round(float(str(self.ground_color_edit.text()))))
         except Exception: # pylint: disable=broad-except
             self.aw.qmc.ground_color = 0
         self.aw.qmc.color_system_idx = self.colorSystemComboBox.currentIndex()
