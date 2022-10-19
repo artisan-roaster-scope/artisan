@@ -1360,12 +1360,13 @@ class roastCompareDlg(ArtisanDialog):
     @pyqtSlot(int)
     def visibilityChanged(self,state):
         i = self.aw.findWidgetsRow(self.profileTable,self.sender(),1)
-        self.profiles[i].setVisible(bool(state))
-        self.updateDeltaLimits()
-        self.autoTimeLimits()
-        self.realign()
-        self.repaint()
-        self.aw.qpc.update_phases(self.getPhasesData())
+        if i is not None:
+            self.profiles[i].setVisible(bool(state))
+            self.updateDeltaLimits()
+            self.autoTimeLimits()
+            self.realign()
+            self.repaint()
+            self.aw.qpc.update_phases(self.getPhasesData())
 
     @pyqtSlot(int,bool)
     def flagChanged(self,i,b):

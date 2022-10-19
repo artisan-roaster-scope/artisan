@@ -3889,48 +3889,49 @@ class PXG4pidDlgControl(PXpidDlgControl):
     @pyqtSlot(bool)
     def setsegment(self,_):
         i = self.aw.findWidgetsRow(self.segmenttable,self.sender(),3)
-        idn = i+1
-        svedit =  self.segmenttable.cellWidget(i,0)
-        rampedit = self.segmenttable.cellWidget(i,1)
-        soakedit = self.segmenttable.cellWidget(i,2)
-        sv = float(self.aw.comma2dot(str(svedit.text())))
-        ramp = stringtoseconds(str(rampedit.text()))
-        soak = stringtoseconds(str(soakedit.text()))
-        svkey = 'segment' + str(idn) + 'sv'
-        rampkey = 'segment' + str(idn) + 'ramp'
-        soakkey = 'segment' + str(idn) + 'soak'
-        if self.aw.ser.controlETpid[0] == 0: # PXG
-            reg_dict = self.aw.fujipid.PXG4
-        else: # PXF
-            reg_dict = self.aw.fujipid.PXF
-        if self.aw.ser.useModbusPort:
-            reg = self.aw.modbus.address2register(reg_dict[svkey][1],6)
-            self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,int(sv*10))
-            libtime.sleep(0.1) #important time between writings
-            reg = self.aw.modbus.address2register(reg_dict[rampkey][1],6)
-            self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,ramp)
-            libtime.sleep(0.1) #important time between writings
-            reg = self.aw.modbus.address2register(reg_dict[soakkey][1],6)
-            self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,soak)
-            r1 = r2 = r3 = '        '
-        else:
-            svcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict[svkey][1],int(sv*10))
-            r1 = self.aw.ser.sendFUJIcommand(svcommand,8)
-            libtime.sleep(0.1) #important time between writings
-            rampcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict[rampkey][1],ramp)
-            r2 = self.aw.ser.sendFUJIcommand(rampcommand,8)
-            libtime.sleep(0.1) #important time between writings
-            soakcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict[soakkey][1],soak)
-            r3 = self.aw.ser.sendFUJIcommand(soakcommand,8)
-        #check if OK
-        if len(r1) == 8 and len(r2) == 8 and len(r3) == 8:
-            self.aw.fujipid.PXG4[svkey][0] = sv
-            self.aw.fujipid.PXG4[rampkey][0] = ramp
-            self.aw.fujipid.PXG4[soakkey][0] = soak
-            self.paintlabels()
-            self.status.showMessage(QApplication.translate('StatusBar','Ramp/Soak successfully written',None),5000)
-        else:
-            self.aw.qmc.adderror(QApplication.translate('Error Message','Segment values could not be written into PID',None))
+        if i != None:
+            idn = i+1
+            svedit =  self.segmenttable.cellWidget(i,0)
+            rampedit = self.segmenttable.cellWidget(i,1)
+            soakedit = self.segmenttable.cellWidget(i,2)
+            sv = float(self.aw.comma2dot(str(svedit.text())))
+            ramp = stringtoseconds(str(rampedit.text()))
+            soak = stringtoseconds(str(soakedit.text()))
+            svkey = 'segment' + str(idn) + 'sv'
+            rampkey = 'segment' + str(idn) + 'ramp'
+            soakkey = 'segment' + str(idn) + 'soak'
+            if self.aw.ser.controlETpid[0] == 0: # PXG
+                reg_dict = self.aw.fujipid.PXG4
+            else: # PXF
+                reg_dict = self.aw.fujipid.PXF
+            if self.aw.ser.useModbusPort:
+                reg = self.aw.modbus.address2register(reg_dict[svkey][1],6)
+                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,int(sv*10))
+                libtime.sleep(0.1) #important time between writings
+                reg = self.aw.modbus.address2register(reg_dict[rampkey][1],6)
+                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,ramp)
+                libtime.sleep(0.1) #important time between writings
+                reg = self.aw.modbus.address2register(reg_dict[soakkey][1],6)
+                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,soak)
+                r1 = r2 = r3 = '        '
+            else:
+                svcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict[svkey][1],int(sv*10))
+                r1 = self.aw.ser.sendFUJIcommand(svcommand,8)
+                libtime.sleep(0.1) #important time between writings
+                rampcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict[rampkey][1],ramp)
+                r2 = self.aw.ser.sendFUJIcommand(rampcommand,8)
+                libtime.sleep(0.1) #important time between writings
+                soakcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict[soakkey][1],soak)
+                r3 = self.aw.ser.sendFUJIcommand(soakcommand,8)
+            #check if OK
+            if len(r1) == 8 and len(r2) == 8 and len(r3) == 8:
+                self.aw.fujipid.PXG4[svkey][0] = sv
+                self.aw.fujipid.PXG4[rampkey][0] = ramp
+                self.aw.fujipid.PXG4[soakkey][0] = soak
+                self.paintlabels()
+                self.status.showMessage(QApplication.translate('StatusBar','Ramp/Soak successfully written',None),5000)
+            else:
+                self.aw.qmc.adderror(QApplication.translate('Error Message','Segment values could not be written into PID',None))
 
 
 ############################################################################

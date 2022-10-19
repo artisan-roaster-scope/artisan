@@ -198,47 +198,50 @@ class CustomBlendDialog(ArtisanDialog):
     @pyqtSlot()
     def ratioChanged(self):
         i = self.aw.findWidgetsRow(self.ui.tableWidget,self.sender(), 0)
-        ratioLineEdit = self.ui.tableWidget.cellWidget(i,0)
-        ratio = float(ratioLineEdit.text()) / 100
-        self.blend.components[i].ratio = ratio
-        # if there are exactly two components, we calculate the ratio of the second component to 1
-        if len(self.blend.components) == 2:
-            self.blend.components[(i+1) % 2].ratio = 1 - ratio
-        self.updateComponentTable()
+        if i != None:
+            ratioLineEdit = self.ui.tableWidget.cellWidget(i,0)
+            ratio = float(ratioLineEdit.text()) / 100
+            self.blend.components[i].ratio = ratio
+            # if there are exactly two components, we calculate the ratio of the second component to 1
+            if len(self.blend.components) == 2:
+                self.blend.components[(i+1) % 2].ratio = 1 - ratio
+            self.updateComponentTable()
 
     @pyqtSlot()
     def weightChanged(self):
         i = self.aw.findWidgetsRow(self.ui.tableWidget,self.sender(), 1)
-        weightLineEdit = self.ui.tableWidget.cellWidget(i,1)
-        weight = float(self.aw.comma2dot(weightLineEdit.text()))
-        inw = '%g' % self.aw.float2floatWeightVolume(weight)
-        weightLineEdit.setText(inw)
-        if self.initialTotalWeight == 0:
-            # we update the total weight
-            self.inWeight = sum(float(self.ui.tableWidget.cellWidget(j,1).text()) for j in range(self.ui.tableWidget.rowCount()))
-            inw = '%g' % self.aw.float2floatWeightVolume(self.inWeight)
-            self.ui.lineEdit_weight.setText(inw)
-        # we update the ratio
-        ratio = weight / self.inWeight
-        self.blend.components[i].ratio = ratio
-        # if there are exactly two components, we calculate the ratio of the second component to 1
-        if len(self.blend.components) == 2:
-            self.blend.components[(i+1) % 2].ratio = 1 - ratio
-        elif self.initialTotalWeight == 0:
-            # we calculate the ratio of all other components from their individual weight too
-            for j in range(self.ui.tableWidget.rowCount()):
-                if j != i: # for component i we already calculated the ratio
-                    weight = float(self.ui.tableWidget.cellWidget(j,1).text())
-                    ratio = weight / self.inWeight
-                    self.blend.components[j].ratio = ratio
-        self.updateComponentTable()
+        if i is not None:
+            weightLineEdit = self.ui.tableWidget.cellWidget(i,1)
+            weight = float(self.aw.comma2dot(weightLineEdit.text()))
+            inw = '%g' % self.aw.float2floatWeightVolume(weight)
+            weightLineEdit.setText(inw)
+            if self.initialTotalWeight == 0:
+                # we update the total weight
+                self.inWeight = sum(float(self.ui.tableWidget.cellWidget(j,1).text()) for j in range(self.ui.tableWidget.rowCount()))
+                inw = '%g' % self.aw.float2floatWeightVolume(self.inWeight)
+                self.ui.lineEdit_weight.setText(inw)
+            # we update the ratio
+            ratio = weight / self.inWeight
+            self.blend.components[i].ratio = ratio
+            # if there are exactly two components, we calculate the ratio of the second component to 1
+            if len(self.blend.components) == 2:
+                self.blend.components[(i+1) % 2].ratio = 1 - ratio
+            elif self.initialTotalWeight == 0:
+                # we calculate the ratio of all other components from their individual weight too
+                for j in range(self.ui.tableWidget.rowCount()):
+                    if j != i: # for component i we already calculated the ratio
+                        weight = float(self.ui.tableWidget.cellWidget(j,1).text())
+                        ratio = weight / self.inWeight
+                        self.blend.components[j].ratio = ratio
+            self.updateComponentTable()
 
     @pyqtSlot(int)
     def componentCoffeeChanged(self,_):
         i = self.aw.findWidgetsRow(self.ui.tableWidget,self.sender(), 2)
-        coffeecombobox = self.ui.tableWidget.cellWidget(i,2)
-        hr_id = self.coffees[coffeecombobox.currentText()]
-        self.blend.components[i].coffee = hr_id
+        if i != None:
+            coffeecombobox = self.ui.tableWidget.cellWidget(i,2)
+            hr_id = self.coffees[coffeecombobox.currentText()]
+            self.blend.components[i].coffee = hr_id
 
     ###
 
@@ -254,9 +257,10 @@ class CustomBlendDialog(ArtisanDialog):
     @pyqtSlot(bool)
     def deleteComponent(self,_):
         i = self.aw.findWidgetsRow(self.ui.tableWidget,self.sender(), 3)
-        self.blend.components = self.blend.components[:i] + self.blend.components[i+1:]
-        self.updateAddButton()
-        self.updateComponentTable()
+        if i != None:
+            self.blend.components = self.blend.components[:i] + self.blend.components[i+1:]
+            self.updateAddButton()
+            self.updateComponentTable()
 
     def saveSettings(self):
         settings = QSettings()
@@ -322,8 +326,8 @@ class CustomBlendDialog(ArtisanDialog):
                 ratioedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 1, ratioedit))  # the max limit has to be high enough otherwise the connected signals are not send!
                 if not ratio_correct:
                     ratioedit.setStyleSheet('QLineEdit { color: #CC0F50; }')
-                ratioedit.editingFinished.connect(self.ratioChanged)
                 self.ui.tableWidget.setCellWidget(i,0,ratioedit)
+                ratioedit.editingFinished.connect(self.ratioChanged)
 
                 #weight
                 component_weight = c.ratio * self.inWeight
@@ -332,8 +336,8 @@ class CustomBlendDialog(ArtisanDialog):
                 weightedit.setMinimumWidth(70)
                 weightedit.setMaximumWidth(70)
                 weightedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, weightedit))  # the max limit has to be high enough otherwise the connected signals are not send!
-                weightedit.editingFinished.connect(self.weightChanged)
                 self.ui.tableWidget.setCellWidget(i,1,weightedit)
+                weightedit.editingFinished.connect(self.weightChanged)
 
                 #beans
                 beansComboBox = MyQComboBox()

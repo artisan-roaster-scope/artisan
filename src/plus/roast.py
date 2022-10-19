@@ -419,6 +419,8 @@ sync_record_zero_supressed_attributes: List[str] = [  #for Python >= 3.9 can rep
     'CO2_batch',
 ]
 
+# the following data items are suppressed from the roast record if they hold the empty string
+# to avoid sending just tags with empty strings:
 sync_record_empty_string_supressed_attributes: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
     'label',
     'batch_prefix',
