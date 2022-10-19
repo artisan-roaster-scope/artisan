@@ -5979,7 +5979,7 @@ class tgraphcanvas(FigureCanvas):
             delta_main_events = ['dCHARGE','dDRY','dFCs','dFCe','dSCs','dSCe','dDROP', 'dCOOL']
             try:
                 for i,v in enumerate(delta_main_events):
-                    if (i == 0 and self.timeindex[i] > -1) or (self.timeindex[i] > 0):
+                    if len(sample_timex)>0 and (i == 0 and self.timeindex[i] > -1) or (self.timeindex[i] > 0) and len(sample_timex)>self.timeindex[i]:
                         # we return the time after the event in seconds
                         mathdictionary[v] = sample_timex[-1] - sample_timex[self.timeindex[i]]
                     else:
