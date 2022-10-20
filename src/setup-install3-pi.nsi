@@ -332,6 +332,7 @@ Section Uninstall
   RMDir /r "$INSTDIR\pytz"
   RMDir /r "$INSTDIR\pywin32_system32"
   RMDir /r "$INSTDIR\scipy"
+  RMDir /r "$INSTDIR\scipy.libs"
   RMDir /r "$INSTDIR\tcl"
   RMDir /r "$INSTDIR\tcl8"
   RMDir /r "$INSTDIR\Themes"
