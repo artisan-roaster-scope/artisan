@@ -48,7 +48,7 @@ get_notifications_semaphore = QSemaphore(
 
 # if notifications > 0 the new notifications are retrieved and forwarded to the user
 # should only be called from the GUI thread
-def updateNotifications(notifications: int, machines: List[str]):  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
+def updateNotifications(notifications: int, machines):  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
     _log.debug('updateNotifications(%s,%s)',notifications,machines)
     try:
         if config.app_window:

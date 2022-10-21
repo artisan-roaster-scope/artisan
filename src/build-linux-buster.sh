@@ -40,8 +40,7 @@ do
 done
 
 
-pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream \
-	    --log-level=INFO artisan-linux.spec
+pyinstaller -y --log-level=INFO artisan-linux.spec
 
 mv dist/artisan dist/artisan.d
 mv dist/artisan.d/* dist

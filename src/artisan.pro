@@ -42,7 +42,7 @@ SOURCES = \
     artisanlib/phases.py \
     artisanlib/pid_control.py \
     artisanlib/pid_dialogs.py \
-    artisanlib/platform.py \
+    artisanlib/platformdlg.py \
     artisanlib/ports.py \
     artisanlib/roast_properties.py \
     artisanlib/rubasse.py \

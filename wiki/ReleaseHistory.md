@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v2.8.0 (October XX, 2022)
+v2.8.0 (October 21, 2022)
 ------------------
 
 * NEW FEATURES
@@ -28,8 +28,8 @@ v2.8.0 (October XX, 2022)
 * CHANGES
   - autoDROP on OFF only if CHARGE is set before
   - ArtisanViewer logs to separate file
-  - ArtisanViewer submits changes to artisan.plus
-  - send roast templates temperature, pressure, humidity along every roast record to artisan.plus
+  - ArtisanViewer submits changes to [artisan.plus](https://artisan.plus)
+  - send roast templates temperature, pressure, humidity along every roast record to [artisan.plus](https://artisan.plus)
   - support unicode characters in filenames ([Issue #869](../../../issues/869))
   - CONTROL button rendered in red if PID is active
   - sets default batch size from nominal batch size
@@ -61,7 +61,7 @@ v2.8.0 (October XX, 2022)
   - fixes TE-VA18B decoding ([Issue #882](../../../issues/882))
   - prevents a potential deadlock on RampSoak processing
   - updates playback mode indicator (color of background profile name as subtitle in the upper right corner) on Artisan Command playback mode
-  - avoids sending -1 error temperatures to the artisan.plus platform
+  - avoids sending -1 error temperatures to the [artisan.plus platform](https://artisan.plus)
   - avoids unproductive event quantification while OFF
   - don't replay background events after background profile DROP
   - ensures that relative event buttons work correctly after PID control is turned off
