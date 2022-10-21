@@ -28,7 +28,7 @@ except Exception: # pylint: disable=broad-except
     from PyQt5.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
 
 try:
-    from typing import Final, List  #for Python >= 3.9: can remove 'List' since type hints can use the generic 'list'
+    from typing import Final  #for Python >= 3.9: can remove 'List' since type hints can use the generic 'list'
 except ImportError:
     # for Python 3.7:
     from typing_extensions import Final
