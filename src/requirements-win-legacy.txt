@@ -1,13 +1,16 @@
+# packages for legacy Windows platform
+#
+######
+# the following commented package versions are read by appveyor.
+#
+# pyinstaller==5.4.1  #built during the appveyor ci process
+# libusb==1.2.6.0     #downloaded during the appveyor ci process
+#
 ######
 # platform specifics
 #
 pywin32==304 #303
 pyinstaller-versionfile==2.0.0
-#
-# pyinstaller now installed from our own build
-#pyinstaller==4.0 # 3.5 works # v3.6 and v4.0 on Windows breaks on some machines, v3.5 has a security issue but only in --onefile mode
-# NOTE: pyinstaller 3.5 is NOT compatible with Python3.8
-# pyinstaller 3.6 issue: https://github.com/pyinstaller/pyinstaller/issues/4213
 #
 ######
 # packages that differ per platform:

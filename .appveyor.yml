@@ -1,13 +1,13 @@
-# Generic build number, later set to commit hash by init
-version: '{build}'
-
-# Do not build on tags (GitHub only)
-skip_tags: true
-clone_depth: 1
-
-# Include "nodeploy" in the commit message to prevent deployment to github
+###################################################################
+# Appveyor CI configuration to build Artisan install packages  
+#     for Windows, Windows legacy, macOS, and Linux
+################################################################### 
+# Include "skip ci" in the commit message to prevent this build process from running
 
 environment:
+  # Set the Python version for windows, macos and linux here. Does not affect windows_legacy.
+  PYTHON_V: 3.10
+
   matrix:
   - job_name: windows_legacy
     appveyor_build_worker_image: Visual Studio 2019
@@ -17,24 +17,25 @@ environment:
     appveyor_build_worker_image: macos
   - job_name: linux
     appveyor_build_worker_image: Ubuntu2004
-#  - job_name: rpi
-#    appveyor_build_worker_image: Ubuntu1604
 
-matrix:
-  allow_failures:
-    - job_name: rpi
 
+# Generic build number, later set to commit hash by init
+version: '{build}'
+
+# Do not build on tags
+skip_tags: true
+clone_depth: 1
+  
 init:
-  # Set "build version number" shown in appveyor build status to the commit hash, the build number keeps it unique
+  # Sets the commit hash to "build version number" shown in appveyor build status, the build number keeps it unique
   - ps: Update-AppveyorBuild -Version "$($env:APPVEYOR_REPO_COMMIT.substring(0,7)) ($env:APPVEYOR_BUILD_NUMBER)"
-  - ps: if($Env:inhibit_deploy -eq 'true'){Write-Host "**** Deploy Inhibited ****"}
-
+  
 branches:
   only:
     - master
 
 stack:
-  python 3.10 # if nothing else is specified per platform, this indicates the Python version to be used
+  python ${PYTHON_V}
 
 for:
 -
@@ -47,22 +48,28 @@ for:
     PYTHON_PATH: "C:\\Python38-x64"
     QT_PATH: "c:\\qt\\5.15\\msvc2019_64"
     PYUIC: "pyuic5.exe"
-    PYINSTALLER_VER: "5.4.1"
     BUILD_PYINSTALLER: "True"
     ARTISAN_LEGACY: "True"
     VC_REDIST: "https://aka.ms/vs/16/release/vc_redist.x64.exe"
-    UPLOADTOOL_BODY: "WARNING: pre-release builds may not work. Use at your own risk."
 
   install:
     - cmd: echo Windows Legacy Install
+
+    # pull library versions from requirments file
+    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements-win-legacy.txt 'pyinstaller==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value} 
+    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements-win-legacy.txt 'libusb==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value} 
+
+    # update path env var
     - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
+
+    # run the install script
     - cmd: .ci\install-win.bat LEGACY
 
   build_script:
     - cmd: echo Windows Legacy Build
     - cmd: cd src
         
-    #update the copyright year used by pyinstaller to set exe propertis for Windows
+    #update the copyright year used by pyinstaller to set exe properties for Windows
     - ps: $YEAR=(Get-Date).year
     - ps: gc version-metadata.yml | %{ $_ -replace "yyyy", "$YEAR" } | out-file newfile -encoding ascii
     - ps: move -force newfile version-metadata.yml
@@ -72,7 +79,7 @@ for:
     - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '0'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
     - ps: move -force newfile artisanlib/__init__.py
 
-    # run the install script
+    # run the build script
     - cmd: build-win3-pi.bat LEGACY
 
 #  test_script:
@@ -82,9 +89,7 @@ for:
 #    - path: 'src\artisan-*.zip'
 
   deploy_script:
-    - cmd: curl -L -O https://github.com/roasterdave/uploadtool/raw/master/upload.sh
-    - cmd: bash upload.sh artisan-*.zip
-
+    - cmd: bash ../.ci/upload.sh artisan-*.zip
 
 -
   matrix:
@@ -93,25 +98,34 @@ for:
     fast_finish: false
 
   environment:
-    PYTHON_PATH: "C:\\Python310-x64"
     QT_PATH: "C:\\qt\\6.2\\msvc2019_64"
     PYUIC: "pyuic6.exe"
-    PYINSTALLER_VER: "5.4.1"
     BUILD_PYINSTALLER: "True"
     ARTISAN_LEGACY: "False"
     VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"
-    UPLOADTOOL_BODY: "WARNING: pre-release builds may not work. Use at your own risk."
 
   install:
     - cmd: echo Windows Install
+
+    # derive the python path from the version number
+    - ps: $env:PYTHON_PATH = "C:\\Python$($env:PYTHON_V -replace '\.','')-x64"
+    - ps: Write-Host $env:PYTHON_PATH
+
+    # pull library versions from requirments file
+    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements-win.txt 'pyinstaller==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value} 
+    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements-win.txt 'libusb==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value} 
+
+    # update path env var
     - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
+
+    # run the install script
     - cmd: .ci\install-win.bat
 
   build_script:
     - cmd: echo Windows Build
     - cmd: cd src
 
-    #update the copyright year used by pyinstaller to set exe propertis for Windows
+    #update the copyright year used by pyinstaller to set exe properties for Windows
     - ps: $YEAR=(Get-Date).year
     - ps: gc version-metadata.yml | %{ $_ -replace "yyyy", "$YEAR" } | out-file newfile -encoding ascii
     - ps: move -force newfile version-metadata.yml
@@ -121,7 +135,7 @@ for:
     - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '0'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
     - ps: move -force newfile artisanlib/__init__.py
 
-    # run the install script
+    # run the build script
     - cmd: build-win3-pi.bat
 
 #  test_script:
@@ -131,8 +145,7 @@ for:
 #    - path: 'src\artisan-*.zip'
 
   deploy_script:
-    - cmd: curl -L -O https://github.com/roasterdave/uploadtool/raw/master/upload.sh
-    - cmd: bash upload.sh artisan-*.zip
+    - cmd: bash ../.ci/upload.sh artisan-*.zip
 
 
 -
@@ -143,24 +156,28 @@ for:
 
   environment:
     ARTISAN_OS: osx
-    PYTHON_V: 3.10
     PYTHONPATH: /usr/local/lib/python${PYTHON_V}
     MACOSX_DEPLOYMENT_TARGET: 10.15
 
   install:
     - echo "MacOS Install"
     - chmod +x .ci/*.sh
+
     # update the __revision__ field with the left seven of the GIT commit hash
     - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
     - sed -i'' -e "s/__revision__ = '0'/__revision__ = '$GIT_VERSION'/" src/artisanlib/__init__.py
+
     # run the install script
-    - .ci/install-${ARTISAN_OS}.sh
+    - .ci/install-osx.sh
 
   build_script:
     - echo "MacOS Build"
     - chmod +x src/*.sh
     - chmod +x src/pylupdate6pro
-    - .ci/script-${ARTISAN_OS}.sh
+        
+    # run the build script
+    - cd src
+    - ./build-mac3.sh
 
 # unit test fails as it runs on Py3.9 while the build installs under brew isntalled Py3.10 (see build-mac3.py)
 #  test_script:
@@ -170,11 +187,9 @@ for:
 #    - path: 'src/artisan-*.dmg'
 
   deploy_script:
-    - cd src
-    - curl -L -O https://github.com/roasterdave/uploadtool/raw/master/upload.sh
-    - export UPLOADTOOL_BODY="WARNING pre-release builds may not work. Use at your own risk."
-    - export UPLOADTOOL_ISPRERELEASE=true
-    - bash upload.sh artisan-*.dmg
+#    - cd src
+    - ../.ci/upload.sh artisan-*.dmg
+
 
 -
   matrix:
@@ -184,22 +199,28 @@ for:
 
   environment:
     ARTISAN_OS: linux
-    PYTHON_V: 3.10
+#    PYTHON_V: ${PYTHON_VER}  #3.10
     PYTHON_PATH: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
 
   install:
     - echo "Linux Install"
     - chmod +x .ci/*.sh
+
     # update the __revision__ field with the left seven of the GIT commit hash
     - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
     - sed -i'' -e "s/__revision__ = '0'/__revision__ = '$GIT_VERSION'/" src/artisanlib/__init__.py
+
     # run the install script
-    - .ci/install-${ARTISAN_OS}.sh
+    - .ci/install-linux.sh
 
   build_script:
     - echo "Linux Build"
     - chmod +x src/*.sh
-    - .ci/script-${ARTISAN_OS}.sh
+    - cd src
+
+    # run the build scripts
+    - ./build-linux.sh
+    - ./build-linux-pkg.sh
 
 #  test_script:
 #    - QT_QPA_PLATFORM=offscreen python -m unittest discover -s src
@@ -207,44 +228,10 @@ for:
 #  artifacts:
 #    - path: 'src/artisan-*.deb'
 #    - path: 'src/artisan-*.rpm'
+#    - path: 'src/artisan-*.AppImage'
 
   deploy_script:
-    - cd src
-    - curl -L -O https://github.com/roasterdave/uploadtool/raw/master/upload.sh
-    - export UPLOADTOOL_BODY="WARNING pre-release builds may not work. Use at your own risk."
-    - export UPLOADTOOL_ISPRERELEASE=true
-    - bash upload.sh artisan-*.deb
-    - bash upload.sh artisan-*.rpm
-    - bash upload.sh artisan-*.AppImage
+    - ../.ci/upload.sh artisan-*.deb
+    - ../.ci/upload.sh artisan-*.rpm
+    - ../.ci/upload.sh artisan-*.AppImage
 
--
-  matrix:
-    only:
-      - job_name: rpi
-    fast_finish: false
-
-  environment:
-    ARTISAN_OS: rpi
-    PYTHON: $HOME/venv3.9
-
-  install:
-    - echo "RPI Install"
-    - chmod +x ./.ci/*.sh
-    - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
-    - sed -i'' -e "s/__revision__ = '0'/__revision__ = '$GIT_VERSION'/" src/artisanlib/__init__.py
-    - .ci/install-${ARTISAN_OS}.sh
-
-  build_script:
-    - echo "RPI Build"
-    - chmod +x src/*.sh
-    - .ci/script-${ARTISAN_OS}.sh
-
-#  artifacts:
-#    - path: 'src/artisan-*.deb'
-
-  deploy_script:
-    - cd src
-    - curl -L -O https://github.com/roasterdave/uploadtool/raw/master/upload.sh
-    - export UPLOADTOOL_BODY="WARNING pre-release builds may not work. Use at your own risk."
-    - export UPLOADTOOL_ISPRERELEASE=true
-    - bash upload.sh artisan-*.deb

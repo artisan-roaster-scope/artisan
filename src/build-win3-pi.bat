@@ -1,23 +1,26 @@
 @echo off
 :: on entry to this script the current path must be the src folder
+::
+:: script comandline option LEGACY used to flag a legacy build
+::
 
-::
-:: comandline option LEGACY used to flag a legacy build
-:: when running locally these paths need to be set here
-::   normally they are set in appveyor.yml
-::
+:: ----------------------------------------------------------------------
+:: normally these paths are set in appveyor.yml
+:: when running locally these paths must be set here 
+:: CAUTION: the paths in this section are not gurantted to be to date!! 
+:: ----------------------------------------------------------------------
 setlocal enabledelayedexpansion
 if /i "%APPVEYOR%" NEQ "True" (
     if /i "%~1" == "LEGACY" (
+        set ARTISAN_SPEC=win-legacy
         set PYTHON_PATH=c:\Python38-64
         set ARTISAN_LEGACY=True
-        set ARTISAN_SPEC=win-legacy
         set PYUIC=pyuic5.exe
         set QT_PATH=c:\qt\5.15\msvc2019_64
     ) else (
+        set ARTISAN_SPEC=win
         set PYTHON_PATH=c:\Python310-64
         set ARTISAN_LEGACY=False
-        set ARTISAN_SPEC=win
         set PYUIC=pyuic6.exe
         set QT_PATH=c:\qt\6.2\msvc2019_64
     )
@@ -29,6 +32,7 @@ if /i "%APPVEYOR%" NEQ "True" (
         set ARTISAN_SPEC=win-legacy
     )
 )
+:: ----------------------------------------------------------------------
 
 ::
 :: convert .ui files to .py files

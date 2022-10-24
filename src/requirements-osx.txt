@@ -25,4 +25,4 @@ PyQt6-WebEngine==6.4.0 #6.3.1
 openpyxl==3.0.10 #3.0.9
 keyring==23.6.0 #23.5.0 # builds using 19.3.0 and 20.0.0 fail with py2app/pyinstaller, 21.21 seems to have fixed this
 prettytable==3.4.1 #3.3.0 # >1.0.0 fail to be packed, but a main.py monkey patch helps
-# lxml==4.9.1 # 4.6.4 # installed from source in .ci/install-osx.sh to make notarization happy
+lxml==4.9.1 # 4.6.4 
