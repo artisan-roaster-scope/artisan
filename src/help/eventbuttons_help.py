@@ -141,6 +141,7 @@ def content():
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','alarmset(<as>)'),QApplication.translate('HelpDlg','activates the alarmset with the given number or label')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','moveBackground(<direction>,<int>)'),QApplication.translate('HelpDlg','moves the background profile the indicated number of steps towards <direction>, with <direction> one of up, down, left, right')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','keyboard(<bool>)'),QApplication.translate('HelpDlg','enables/disables keyboard mode')])
+    tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','keepON(<bool>)'),QApplication.translate('HelpDlg','enables/disables the Keep ON flag')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','showCurve(<name>,<bool>)'),QApplication.translate('HelpDlg','shows/hides the curve indicated by <name> which is one of { ET, BT, DeltaET, DeltaBT, BackgroundET, BackgroundBT}')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','showExtraCurve(<extra_device>,<curve>,<bool>)'),QApplication.translate('HelpDlg','shows/hides the <curve> (one of {T1,T2}) of the zero-based <extra_device> number')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','showEvents(<event_type>, <bool>)'),QApplication.translate('HelpDlg','shows/hides the events of <event_type> in [1,..,5]')])

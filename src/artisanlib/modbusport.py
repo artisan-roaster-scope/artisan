@@ -233,7 +233,7 @@ class modbusport():
             try:
                 # as in the following the port is None, no port is opened on creation of the (py)serial object
                 if self.type == 1: # Serial ASCII
-                    from pymodbus.client.sync import ModbusSerialClient
+                    from pymodbus.client import ModbusSerialClient
                     self.master = ModbusSerialClient(
                         method='ascii',
                         port=self.comport,
@@ -244,10 +244,11 @@ class modbusport():
                         retry_on_empty=False,
                         retry_on_invalid=False,
                         reset_socket=self.reset_socket,
-                        timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
+                        # timeout is in seconds (int) and defaults to 3
+                        timeout=int(round(max(1, min((self.aw.qmc.delay/2000), self.timeout))))) # the timeout should not be larger than half of the sampling interval
                     self.readRetries = self.serial_readRetries
                 elif self.type == 2: # Serial Binary
-                    from pymodbus.client.sync import ModbusSerialClient # @Reimport
+                    from pymodbus.client import ModbusSerialClient # @Reimport
                     self.master = ModbusSerialClient(
                         method='binary',
                         port=self.comport,
@@ -258,10 +259,11 @@ class modbusport():
                         retry_on_empty=False,
                         retry_on_invalid=False,
                         reset_socket=self.reset_socket,
-                        timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
+                        # timeout is in seconds (int) and defaults to 3
+                        timeout=int(round(max(1, min((self.aw.qmc.delay/2000), self.timeout))))) # the timeout should not be larger than half of the sampling interval
                     self.readRetries = self.serial_readRetries
                 elif self.type == 3: # TCP
-                    from pymodbus.client.sync import ModbusTcpClient
+                    from pymodbus.client import ModbusTcpClient
                     try:
                         self.master = ModbusTcpClient(
                                 host=self.host,
@@ -270,7 +272,8 @@ class modbusport():
                                 retry_on_invalid=False, # only supported for serial clients in v2.5.2
                                 reset_socket=self.reset_socket,
                                 retries=self.IP_retries,
-                                timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
+                                # timeout is in seconds (int) and defaults to 3
+                                timeout=int(round(max(1, min((self.aw.qmc.delay/2000), self.IP_timeout)))) # the timeout should not be larger than half of the sampling interval
                                 )
                         self.readRetries = 1
                     except Exception: # pylint: disable=broad-except
@@ -279,7 +282,7 @@ class modbusport():
                                 port=self.port,
                                 )
                 elif self.type == 4: # UDP
-                    from pymodbus.client.sync import ModbusUdpClient
+                    from pymodbus.client import ModbusUdpClient
                     try:
                         self.master = ModbusUdpClient(
                             host=self.host,
@@ -288,7 +291,8 @@ class modbusport():
                             retry_on_invalid=False, # only supported for serial clients in v2.5.2
                             reset_socket=self.reset_socket,
                             retries=self.IP_retries,
-                            timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
+                            # timeout is in seconds (int) and defaults to 3
+                            timeout=int(round(max(1,min((self.aw.qmc.delay/2000), self.IP_timeout)))) # the timeout should not be larger than half of the sampling interval
                             )
                         self.readRetries = 1
                     except Exception: # pylint: disable=broad-except # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
@@ -297,7 +301,7 @@ class modbusport():
                             port=self.port,
                             )
                 else: # Serial RTU
-                    from pymodbus.client.sync import ModbusSerialClient # @Reimport
+                    from pymodbus.client import ModbusSerialClient # @Reimport
                     self.master = ModbusSerialClient(
                         method='rtu',
                         port=self.comport,
@@ -309,7 +313,7 @@ class modbusport():
                         retry_on_invalid=False, # by default False
                         reset_socket=self.reset_socket,
                         strict=False, # settings this to False disables the inter char timeout restriction
-                        timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
+                        timeout=int(round(max(1, min((self.aw.qmc.delay/2000), self.timeout))))) # the timeout should not be larger than half of the sampling interval
 #                    self.master.inter_char_timeout = 0.05
                     self.readRetries = self.serial_readRetries
                 self.master.connect()
@@ -319,6 +323,8 @@ class modbusport():
                 time.sleep(.5) # avoid possible hickups on startup
                 if self.isConnected() != None:
                     self.aw.sendmessage(QApplication.translate('Message', 'Connected via MODBUS'))
+                else:
+                    _log.debug('connect(): connect failed')
             except Exception as ex: # pylint: disable=broad-except
                 _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
@@ -366,11 +372,15 @@ class modbusport():
 
     @staticmethod
     def invalidResult(res,count):
+        from pymodbus.pdu import ExceptionResponse
         if res is None:
             _log.info('invalidResult(%d) => None', count)
             return True
         elif res.isError():
-            _log.info('invalidResult(%d) => Error', count)
+            _log.info('invalidResult(%d) => pymodbus error', count)
+            return True
+        elif isinstance(res, ExceptionResponse):
+            _log.info('invalidResult(%d) => received exception from device', count)
             return True
         elif res.registers is None:
             _log.info('invalidResult(%d) => res.registers is None', count)
@@ -415,9 +425,9 @@ class modbusport():
                                 try:
                                     # we cache only MODBUS function 3 and 4 (not 1 and 2!)
                                     if code == 3:
-                                        res = self.master.read_holding_registers(register,count,unit=slave)
+                                        res = self.master.read_holding_registers(register,count,slave=slave)
                                     elif code == 4:
-                                        res = self.master.read_input_registers(register,count,unit=slave)
+                                        res = self.master.read_input_registers(register,count,slave=slave)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.info('readActive(%d,%d,%d,%d)', slave, code, register, count)
                                     _log.exception(e)
@@ -488,7 +498,7 @@ class modbusport():
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            self.master.write_coils(int(register),list(values),unit=int(slave))
+            self.master.write_coils(int(register),list(values),slave=int(slave))
             time.sleep(.3) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeCoils(%d,%d,%s)', slave, register, values)
@@ -510,7 +520,7 @@ class modbusport():
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            self.master.write_coil(int(register),value,unit=int(slave))
+            self.master.write_coil(int(register),value,slave=int(slave))
             time.sleep(.3) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeCoil(%d,%d,%s) failed', slave, register, value)
@@ -544,7 +554,7 @@ class modbusport():
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            self.master.write_register(int(register),int(round(value)),unit=int(slave))
+            self.master.write_register(int(register),int(round(value)),slave=int(slave))
             time.sleep(.03) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeSingleRegister(%d,%d,%s) failed', slave, register, value)
@@ -569,7 +579,7 @@ class modbusport():
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            self.master.mask_write_register(int(register),int(and_mask),int(or_mask),unit=int(slave))
+            self.master.mask_write_register(int(register),int(and_mask),int(or_mask),slave=int(slave))
             time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('maskWriteRegister(%d,%d,%s,%s) failed', slave, register, and_mask, or_mask)
@@ -599,7 +609,7 @@ class modbusport():
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            self.master.write_registers(int(register),values,unit=int(slave))
+            self.master.write_registers(int(register),values,slave=int(slave))
             time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeRegisters(%d,%d,%s) failed', slave, register, values)
@@ -624,7 +634,7 @@ class modbusport():
             builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
             builder.add_32bit_float(float(value))
             payload = builder.build()
-            self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
+            self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True)
             time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeWord(%d,%d,%s) failed', slave, register, value)
@@ -648,7 +658,7 @@ class modbusport():
             r = convert_to_bcd(int(value))
             builder.add_16bit_uint(r)
             payload = builder.build() # .tolist()
-            self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
+            self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True)
             time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeBCD(%d,%d,%s) failed', slave, register, value)
@@ -673,7 +683,7 @@ class modbusport():
             builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
             builder.add_32bit_int(int(value))
             payload = builder.build()
-            self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
+            self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True)
             time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeLong(%d,%d,%s) failed', slave, register, value)
@@ -714,9 +724,9 @@ class modbusport():
             self.connect()
             while True:
                 if code==3:
-                    res = self.master.read_holding_registers(int(register),2,unit=int(slave))
+                    res = self.master.read_holding_registers(int(register),2,slave=int(slave))
                 else:
-                    res = self.master.read_input_registers(int(register),2,unit=int(slave))
+                    res = self.master.read_input_registers(int(register),2,slave=int(slave))
                 if self.invalidResult(res,2):
                     if retry > 0:
                         retry = retry - 1
@@ -803,9 +813,9 @@ class modbusport():
             self.connect()
             while True:
                 if code==3:
-                    res = self.master.read_holding_registers(int(register),2,unit=int(slave))
+                    res = self.master.read_holding_registers(int(register),2,slave=int(slave))
                 else:
-                    res = self.master.read_input_registers(int(register),2,unit=int(slave))
+                    res = self.master.read_input_registers(int(register),2,slave=int(slave))
                 if self.invalidResult(res,2):
                     if retry > 0:
                         retry = retry - 1
@@ -873,13 +883,13 @@ class modbusport():
             return None
         try:
             if code==1:
-                res = self.master.read_coils(int(register),1,unit=int(slave))
+                res = self.master.read_coils(int(register),1,slave=int(slave))
             elif code==2:
-                res = self.master.read_discrete_inputs(int(register),1,unit=int(slave))
+                res = self.master.read_discrete_inputs(int(register),1,slave=int(slave))
             elif code==4:
-                res = self.master.read_input_registers(int(register),1,unit=int(slave))
+                res = self.master.read_input_registers(int(register),1,slave=int(slave))
             else: # code==3
-                res = self.master.read_holding_registers(int(register),1,unit=int(slave))
+                res = self.master.read_holding_registers(int(register),1,slave=int(slave))
         except Exception as ex: # pylint: disable=broad-except
             _log.info('peekSingleRegister(%d,%d,%d) failed', slave, register, code)
             _log.exception(ex)
@@ -932,13 +942,13 @@ class modbusport():
             while True:
                 try:
                     if code==1:
-                        res = self.master.read_coils(int(register),1,unit=int(slave))
+                        res = self.master.read_coils(int(register),1,slave=int(slave))
                     elif code==2:
-                        res = self.master.read_discrete_inputs(int(register),1,unit=int(slave))
+                        res = self.master.read_discrete_inputs(int(register),1,slave=int(slave))
                     elif code==4:
-                        res = self.master.read_input_registers(int(register),1,unit=int(slave))
+                        res = self.master.read_input_registers(int(register),1,slave=int(slave))
                     else: # code==3
-                        res = self.master.read_holding_registers(int(register),1,unit=int(slave))
+                        res = self.master.read_holding_registers(int(register),1,slave=int(slave))
                 except Exception as ex: # pylint: disable=broad-except
                     _log.exception(ex)
                     res = None
@@ -1043,9 +1053,9 @@ class modbusport():
             self.connect()
             while True:
                 if code==3:
-                    res = self.master.read_holding_registers(int(register),2,unit=int(slave))
+                    res = self.master.read_holding_registers(int(register),2,slave=int(slave))
                 else:
-                    res = self.master.read_input_registers(int(register),2,unit=int(slave))
+                    res = self.master.read_input_registers(int(register),2,slave=int(slave))
                 if self.invalidResult(res,2):
                     if retry > 0:
                         retry = retry - 1
@@ -1140,9 +1150,9 @@ class modbusport():
             while True:
                 try:
                     if code==3:
-                        res = self.master.read_holding_registers(int(register),1,unit=int(slave))
+                        res = self.master.read_holding_registers(int(register),1,slave=int(slave))
                     else:
-                        res = self.master.read_input_registers(int(register),1,unit=int(slave))
+                        res = self.master.read_input_registers(int(register),1,slave=int(slave))
                 except Exception: # pylint: disable=broad-except
                     res = None
                 if self.invalidResult(res,1):
