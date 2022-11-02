@@ -23079,6 +23079,8 @@ class ApplicationWindow(QMainWindow):
 # required for the default tracking sliders
     @pyqtSlot(int)
     def updateSlider1LCD(self,v):
+        if aw.eventslidercoarse[0]:
+            v = int(round(v / 10.))*10
         self.updateSliderLCD(0,v)
         if self.eventslidermoved[0]:
             # if slider was moved by a keyboard action, we have to explicitly update the value and send the signals
@@ -23088,6 +23090,8 @@ class ApplicationWindow(QMainWindow):
             self.eventslidermoved[0] = 0
     @pyqtSlot(int)
     def updateSlider2LCD(self,v):
+        if aw.eventslidercoarse[1]:
+            v = int(round(v / 10.))*10
         self.updateSliderLCD(1,v)
         if self.eventslidermoved[1]:
             # if slider was moved by a keyboard action, we have to explicitly update the value and send the signals
@@ -23097,6 +23101,8 @@ class ApplicationWindow(QMainWindow):
             self.eventslidermoved[1] = 0
     @pyqtSlot(int)
     def updateSlider3LCD(self,v):
+        if aw.eventslidercoarse[2]:
+            v = int(round(v / 10.))*10
         self.updateSliderLCD(2,v)
         if self.eventslidermoved[2]:
             # if slider was moved by a keyboard action, we have to explicitly update the value and send the signals
@@ -23106,6 +23112,8 @@ class ApplicationWindow(QMainWindow):
             self.eventslidermoved[2] = 0
     @pyqtSlot(int)
     def updateSlider4LCD(self,v):
+        if aw.eventslidercoarse[3]:
+            v = int(round(v / 10.))*10
         self.updateSliderLCD(3,v)
         if self.eventslidermoved[3]:
             # if slider was moved by a keyboard action, we have to explicitly update the value and send the signals
@@ -23182,7 +23190,7 @@ class ApplicationWindow(QMainWindow):
                 if aw.eventslidercoarse[0]:
                     sv1 = int(round(sv1 / 10.))*10
                 self.eventslidervalues[0] = sv1
-                if updateLCD:
+                if updateLCD or (aw.eventslidercoarse[0] and sv1 != self.slider1.value()):
                     self.moveslider(0,sv1,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
         elif n == 1:
@@ -23192,7 +23200,7 @@ class ApplicationWindow(QMainWindow):
                 if aw.eventslidercoarse[1]:
                     sv2 = int(round(sv2 / 10.))*10
                 self.eventslidervalues[1] = sv2
-                if updateLCD:
+                if updateLCD or (aw.eventslidercoarse[1] and sv2 != self.slider2.value()):
                     self.moveslider(1,sv2,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
         elif n == 2:
@@ -23202,7 +23210,7 @@ class ApplicationWindow(QMainWindow):
                 if aw.eventslidercoarse[2]:
                     sv3 = int(round(sv3 / 10.))*10
                 self.eventslidervalues[2] = sv3
-                if updateLCD:
+                if updateLCD or (aw.eventslidercoarse[2] and sv3 != self.slider3.value()):
                     self.moveslider(2,sv3,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
         elif n == 3:
@@ -23212,7 +23220,7 @@ class ApplicationWindow(QMainWindow):
                 if aw.eventslidercoarse[3]:
                     sv4 = int(round(sv4 / 10.))*10
                 self.eventslidervalues[3] = sv4
-                if updateLCD:
+                if updateLCD or (aw.eventslidercoarse[3] and sv4 != self.slider4.value()):
                     self.moveslider(3,sv4,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
         return False

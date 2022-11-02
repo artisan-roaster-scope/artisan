@@ -30,4 +30,4 @@ loggers:
     propagate: no
 root:
   level: ERROR
-  handlers: [console]
+  handlers: [file]
