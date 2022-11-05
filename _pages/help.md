@@ -19,6 +19,19 @@ If you need support please check the [documentation](#documentation) or ask the 
 * [Artisan app](https://github.com/artisan-roaster-scope/artisan/releases/latest){:target="_blank"}
    - Tooltips (hover over elements)
    - Help pages (click the help buttons in dialogs like devices, ports, events, alarms, ..)
+
+      - [alarms](https://htmlpreview.github.io/?https://github.com/artisan-roaster-scope/artisan/blob/master/doc/help_dialogs/Output_html/alarms_help.html){:target="_blank"}
+      - [autosave](https://htmlpreview.github.io/?https://github.com/artisan-roaster-scope/artisan/blob/master/doc/help_dialogs/Output_html/autosave_help.html){:target="_blank"}
+      - [energy](https://htmlpreview.github.io/?https://github.com/artisan-roaster-scope/artisan/blob/master/doc/help_dialogs/Output_html/energy_help.html){:target="_blank"}
+      - [event annotations](https://htmlpreview.github.io/?https://github.com/artisan-roaster-scope/artisan/blob/master/doc/help_dialogs/Output_html/eventannotations_help.html){:target="_blank"}
+      - [event buttons](https://htmlpreview.github.io/?https://github.com/artisan-roaster-scope/artisan/blob/master/doc/help_dialogs/Output_html/eventbuttons_help.html){:target="_blank"}
+      - [event sliders](https://htmlpreview.github.io/?https://github.com/artisan-roaster-scope/artisan/blob/master/doc/help_dialogs/Output_html/eventsliders_help.html){:target="_blank"}
+      - [keyboard shortcuts](https://htmlpreview.github.io/?https://github.com/artisan-roaster-scope/artisan/blob/master/doc/help_dialogs/Output_html/keyboardshortcuts_help.html){:target="_blank"}
+      - [MODBUS](https://htmlpreview.github.io/?https://github.com/artisan-roaster-scope/artisan/blob/master/doc/help_dialogs/Output_html/modbus_help.html){:target="_blank"}
+      - [programs](https://htmlpreview.github.io/?https://github.com/artisan-roaster-scope/artisan/blob/master/doc/help_dialogs/Output_html/programs_help.html){:target="_blank"}
+      - [S7](https://htmlpreview.github.io/?https://github.com/artisan-roaster-scope/artisan/blob/master/doc/help_dialogs/Output_html/s7_help.html){:target="_blank"}
+      - [symbolic formulas](https://htmlpreview.github.io/?https://github.com/artisan-roaster-scope/artisan/blob/master/doc/help_dialogs/Output_html/symbolic_help.html){:target="_blank"}
+      - [transposer](https://htmlpreview.github.io/?https://github.com/artisan-roaster-scope/artisan/blob/master/doc/help_dialogs/Output_html/transposer_help.html){:target="_blank"}
    - Keyboard shortcuts page (menu `Help` >> `Keyboard Shortcuts`)
 * [Quick-Start Guide](/docs/quick-start-guide/)
 * [Artisan Blog](https://artisan-roasterscope.blogspot.com/){:target="_blank"}
