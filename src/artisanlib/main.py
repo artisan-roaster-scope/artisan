@@ -26595,7 +26595,7 @@ class ApplicationWindow(QMainWindow):
             fields = [
                 ('batch_long', self.qmc.roastbatchprefix + str(bnr) + ' (' + str(self.qmc.roastbatchpos) + ')'),
                 ('batchprefix',self.qmc.roastbatchprefix),
-                ('batchcounter',str(bnr) if bnr!=0 else '**'),
+                ('batchcounter',str(bnr)),
                 ('batchposition',str(self.qmc.roastbatchpos)),
                 ('batch', self.qmc.roastbatchprefix + str(bnr)),
                 ('title',self.qmc.title),
@@ -34974,6 +34974,9 @@ class ApplicationWindow(QMainWindow):
             # get profile filenames
             files = self.reportFiles()
             if files and len(files) > 0:
+                prev_foreground_profile_path = aw.curFile
+                prev_backgroundpath = aw.qmc.backgroundpath
+                prev_background = aw.qmc.background
                 cont = aw.qmc.reset(soundOn=False)
                 if cont:
                     profiles = [self.deserialize(f) for f in files]
@@ -35025,7 +35028,6 @@ class ApplicationWindow(QMainWindow):
                     color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
                     # collect data
 #                    c = 1
-                    foreground_profile_path = aw.curFile  # @UndefinedVariable
                     min_start_time = max_end_time = 0
                     first_profile = True
                     first_profile_event_time = 0
@@ -35489,10 +35491,11 @@ class ApplicationWindow(QMainWindow):
 
                     try:
                         # redraw original graph
-                        if foreground_profile_path:
-                            aw.loadFile(foreground_profile_path)
-                        if aw.qmc.backgroundpath:
-                            aw.loadbackground(aw.qmc.backgroundpath)
+                        if prev_foreground_profile_path:
+                            aw.loadFile(prev_foreground_profile_path)
+                        if prev_backgroundpath:
+                            aw.loadbackground(prev_backgroundpath)
+                            aw.qmc.background = prev_background
                         self.qmc.timealign()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
