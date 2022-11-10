@@ -26,7 +26,7 @@ except ImportError:
     # for Python 3.7:
     from typing_extensions import Final
 
-from artisanlib.util import deltaLabelUTF8
+from artisanlib.util import deltaLabelUTF8, setDeviceDebugLogLevel
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox
 
@@ -1963,6 +1963,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def okEvent(self):
         try:
             self.aw.qmc.device_logging = self.deviceLoggingFlag.isChecked()
+            try:
+                setDeviceDebugLogLevel(self.aw.qmc.device_logging)
+            except Exception: # pylint: disable=broad-except
+                pass
 
             #save any extra devices here
             self.savedevicetable(redraw=False)

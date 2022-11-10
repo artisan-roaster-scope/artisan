@@ -226,7 +226,7 @@ from artisanlib.util import (appFrozen, stringp, uchr, decodeLocal, encodeLocal,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toBool, toStringList, toMap, removeAll, application_name, application_viewer_name, application_organization_name,
         application_organization_domain, getDataDirectory, getAppPath, getResourcePath, getDirectory, debugLogLevelToggle,
-        debugLogLevelActive, setDebugLogLevel, abbrevString, createGradient, natsort, toGrey, toDim)
+        debugLogLevelActive, setDebugLogLevel, abbrevString, createGradient, natsort, toGrey, toDim, setDeviceDebugLogLevel)
 
 from artisanlib.qtsingleapplication import QtSingleApplication
 from artisanlib.filters import LiveMedian
@@ -1245,7 +1245,8 @@ class tgraphcanvas(FigureCanvas):
         #DEVICES
         self.device = 18                                    # default device selected to None (18). Calls appropriate function
 
-        self.device_logging = False # turn on/off device logging
+        self.device_logging = False # turn on/off device debug logging (MODBUS, ..) # Note that MODBUS log messages are written to the main artisan log file
+        # Phidget messages are logged to the artisan device log
         self.device_log_file_name = 'artisan_device'
         self.device_log_file = getDirectory(self.device_log_file_name,'.log')
 
@@ -11683,12 +11684,14 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventactionx(self.extrabuttonactions[0],self.extrabuttonactionstrings[0])
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+            _log.info('ON MONITOR')
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate('Error Message', 'Exception:') + ' OnMonitor() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def OffMonitor(self):
+        _log.info('OFF MONITOR')
         try:
             # first activate "Stopping Mode" to ensure that sample() is not resetting the timer now (independent of the flagstart state)
 
@@ -12184,13 +12187,14 @@ class tgraphcanvas(FigureCanvas):
                 QTimer.singleShot(self.chargeTimerPeriod*1000, self.fireChargeTimer)
 
 
-
+            _log.info('START RECORDING')
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' OffMonitor() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' OnRecorder() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def OffRecorder(self, autosave=True):
+        _log.info('STOP RECORDING')
         try:
             # mark DROP if not yet set, at least 7min roast time and CHARGE is set and either autoDROP is active or DROP button is hidden
             if self.timeindex[6] == 0 and aw.qmc.timeindex[0] != -1 and (self.autoDropFlag or not self.buttonvisibility[6]):
@@ -19876,21 +19880,24 @@ class ApplicationWindow(QMainWindow):
         )
         try:
             for log_file_name in ['artisan.log', 'artisanViewer.log']:
-                with open(os.path.join(getDataDirectory(),log_file_name), 'rb') as attachment:
-                    # Add file as application/octet-stream
-                    # Email client can usually download this automatically
-                    # as attachment
-                    part = MIMEBase('application', 'octet-stream')
-                    part.set_payload(attachment.read())
-                # Encode file in ASCII characters to send by email
-                encoders.encode_base64(part)
-                # Add header as key/value pair to attachment part
-                part.add_header(
-                    'Content-Disposition',
-                    f'attachment; filename= {log_file_name}',
-                )
-                # Add attachment to message and convert message to string
-                message.attach(part)
+                try:
+                    with open(os.path.join(getDataDirectory(),log_file_name), 'rb') as attachment:
+                        # Add file as application/octet-stream
+                        # Email client can usually download this automatically
+                        # as attachment
+                        part = MIMEBase('application', 'octet-stream')
+                        part.set_payload(attachment.read())
+                    # Encode file in ASCII characters to send by email
+                    encoders.encode_base64(part)
+                    # Add header as key/value pair to attachment part
+                    part.add_header(
+                        'Content-Disposition',
+                        f'attachment; filename= {log_file_name}',
+                    )
+                    # Add attachment to message and convert message to string
+                    message.attach(part)
+                except FileNotFoundError:
+                    _log.debug('log file %s not found', log_file_name)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         try:
@@ -19911,6 +19918,8 @@ class ApplicationWindow(QMainWindow):
             )
             # Add attachment to message and convert message to string
             message.attach(part2)
+        except FileNotFoundError:
+            _log.debug('log file %s not found', self.qmc.device_log_file)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         # Save message to file tmp file
@@ -30932,8 +30941,12 @@ class ApplicationWindow(QMainWindow):
 
             #restore device
             settings.beginGroup('Device')
-            if settings.contains('device_logging'):
+            if filename is None and settings.contains('device_logging'):
                 self.qmc.device_logging = bool(toBool(settings.value('device_logging',self.qmc.device_logging)))
+                try:
+                    setDeviceDebugLogLevel(self.aw.qmc.device_logging)
+                except Exception: # pylint: disable=broad-except
+                    pass
             if settings.contains('id'):
                 self.qmc.device = toInt(settings.value('id',self.qmc.device))
             # Phidget configurations
@@ -35097,8 +35110,9 @@ class ApplicationWindow(QMainWindow):
                                 BT_AUC += self.calcAUC(rtbt,p['timex'],p['temp2'],i)
                             BT_AUC = int(round(BT_AUC/60.))
                             rd['AUC'] = BT_AUC
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
+                        except Exception: # pylint: disable=broad-except
+                            # 'TP_index' might not be in computedProfile and then we fail here
+                            pass
                         # --
                         if 'AUC' in rd:
                             AUC += rd['AUC']
@@ -36831,7 +36845,7 @@ class ApplicationWindow(QMainWindow):
             phidgetlibversion = PhidgetDriver.getLibraryVersion()
             otherlibs += ', ' + phidgetlibversion
         except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+            _log.debug(e)
         try:
             from Phidget22 import __version__ as phidget_lib_version # @UnresolvedImport
             otherlibs += f' ({phidget_lib_version})'
@@ -37260,6 +37274,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def loadSettings_triggered(self,_=False):
+        _log.info('menu load settings')
         self.loadSettings()
 
     def loadSettings(self,fn=None,remember=True,reset=True,machine=False,theme=False,reload=True):
@@ -37352,6 +37367,7 @@ class ApplicationWindow(QMainWindow):
         if action:
             fname = toString(action.data())
             if os.path.isfile(fname):
+                _log.info('menu load recent settings: %s',fname)
                 self.loadSettings(fn=fname)
             else:
                 settings = QSettings()

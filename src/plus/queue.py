@@ -254,7 +254,7 @@ def start():
         # auto_commit=False
 
 
-    _log.info('start()')
+    _log.debug('start()')
     _log.debug('-> qsize: %s', queue.qsize())
     if worker_thread is None:
         worker = Worker()
@@ -265,14 +265,17 @@ def start():
         worker.replySignal.connect(util.updateLimits)
         #app.aboutToQuit.connect(end)
         worker.startSignal.emit()
+        _log.debug('queue started')
     else:
         worker.resume()
+        _log.debug('queue resumed')
 
 
 # the queue worker thread cannot really be stopped, but we can pause it
 def stop():
     if worker is not None:
         worker.pause()
+        _log.debug('queue stopped')
 
 
 # check if a full roast record (one with date) with roast_id is in the queue
@@ -317,7 +320,7 @@ def is_full_roast_record(r: Dict[str, Any]) -> bool:  #for Python >= 3.9 can rep
 #   an update only the roast_id
 def addRoast(roast_record=None):
     try:
-        _log.info('addRoast()')
+        _log.debug('addRoast()')
         if config.app_window.plus_readonly:
             _log.info(
                 '-> roast not queued as users'
@@ -365,6 +368,8 @@ def addRoast(roast_record=None):
                     # sql queue does not feature a timeout
                 )
                 _log.debug('-> roast queued up')
+                if 'roast_id' in r:
+                    _log.info('roast queued: %s', r['roast_id'])
                 _log.debug('-> qsize: %s', queue.qsize())
             else:
                 _log.debug(

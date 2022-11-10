@@ -102,7 +102,7 @@ class Worker(QObject):
     # requests stock data from server and fills the stock cache
     def fetch(self) -> bool:
         global stock  # pylint: disable=global-statement
-        _log.info('fetch()')
+        _log.debug('fetch()')
         try:
             # fetch from server
             d = connection.getData(config.stock_url)
@@ -167,14 +167,14 @@ def save() -> None:
 
 # try to load stock from cache if empty
 def init() -> None:
-    _log.info('init()')
+    _log.debug('init()')
     if stock is None:
         load()
 
 # load stock data from local file cache
 def load() -> None:
     global stock  # pylint: disable=global-statement
-    _log.info('load()')
+    _log.debug('load()')
     try:
         stock_semaphore.acquire(1)
         with open(stock_cache_path, encoding='utf-8') as f:

@@ -402,6 +402,18 @@ def createRGBGradient(rgb, tint_factor=0.3, shade_factor=0.3):
         lighter_rgb = darker_rgb = '#000000'
     return lighter_rgb,darker_rgb
 
+# Networking
+
+# returns True if the given ip:port can be connected to
+def isOpen(ip: str, port: int) -> bool:
+    import socket
+    timeout = 0.3 # timeout in seconds
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(timeout)
+            return s.connect_ex((ip, port)) == 0
+    except Exception as e: # pylint: disable=broad-except
+        _log.info(e)
 
 # Logging
 
@@ -415,14 +427,24 @@ def debugLogLevelActive() -> bool:
     except Exception: # pylint: disable=broad-except
         return False
 
+def setDeviceDebugLogLevel(state: bool) -> None:
+    if state:
+        # debug logging on
+        setFileLogLevels(logging.DEBUG, ['pymodbus'])
+        _log.info('device debug logging ON')
+    else:
+        # debug logging off
+        setFileLogLevels(logging.INFO, ['pymodbus'])
+        _log.info('device debug logging OFF')
+
 def setDebugLogLevel(state: bool) -> None:
     if state:
         # debug logging on
-        setFileLogLevels(logging.DEBUG)
+        setFileLogLevels(logging.DEBUG, ['artisanlib', 'plus'])
         _log.info('debug logging ON')
     else:
         # debug logging off
-        setFileLogLevels(logging.INFO)
+        setFileLogLevels(logging.INFO, ['artisanlib', 'plus'])
         _log.info('debug logging OFF')
 
 def setFileLogLevel(logger, level) -> None:
@@ -431,10 +453,11 @@ def setFileLogLevel(logger, level) -> None:
         if handler.get_name() == 'file':
             handler.setLevel(level)
 
-def setFileLogLevels(level) -> None:
+def setFileLogLevels(level, logger_names) -> None:
     loggers = getLoggers()
     for logger in loggers:
-        setFileLogLevel(logger, level)
+        if logger.name in logger_names:
+            setFileLogLevel(logger, level)
 
 # returns True if new log level of loggers is DEBUG, False otherwise
 def debugLogLevelToggle() -> bool:

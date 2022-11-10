@@ -96,7 +96,7 @@ def setToken(token: str, nickname: str = None) -> None:
 
 
 def clearCredentials(remove_from_keychain: bool = True) -> None:
-    _log.info('clearCredentials()')
+    _log.debug('clearCredentials()')
     # remove credentials from keychain
     try:
         if (
@@ -162,7 +162,7 @@ def setKeyring() -> None:
 # returns True on successful authentication
 # NOTE: authentify might be called from outside the GUI thread
 def authentify() -> bool:
-    _log.info('authentify()')
+    _log.debug('authentify()')
     import requests # @Reimport
     try:
         if (
@@ -311,12 +311,12 @@ def authentify() -> bool:
             return False
         return False
     except requests.exceptions.RequestException as e:
-        _log.exception(e)
-        raise (e)
+        _log.info(e)
+        raise(e)
     except Exception as e:  # ylint: disable=broad-except
         _log.exception(e)
         clearCredentials()
-        raise (e)
+        raise(e)
 
 
 def getHeaders(
@@ -364,7 +364,7 @@ def sendData(
     compress: bool = config.compress_posts,
 ) -> Any:
     # don't log POST data as it might contain credentials!
-    _log.info('sendData(%s,_data_,%s,%s)', url, verb, authorized)
+    _log.debug('sendData(%s,_data_,%s,%s)', url, verb, authorized)
     jsondata = json.dumps(data).encode('utf8')
     _log.debug('-> size %s', len(jsondata))
     headers, postdata = getHeadersAndData(authorized, compress, jsondata)
@@ -414,7 +414,7 @@ def sendData(
 
 
 def getData(url: str, authorized: bool = True, params=None) -> Any:
-    _log.info('getData(%s,%s,%s)', url, authorized, params)
+    _log.debug('getData(%s,%s,%s)', url, authorized, params)
     headers = getHeaders(authorized)
     params = params or {}
     #    _log.debug("-> request headers %s",headers)

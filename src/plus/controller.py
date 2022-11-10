@@ -81,7 +81,7 @@ def start(app_window):
 # toggles between connected and disconnected modes. If connected and
 # not is_synced() send current data to server
 def toggle(app_window):
-    _log.info('toggle()')
+    _log.debug('toggle()')
     config.app_window = app_window
     if config.app_window.plus_account is None:  # @UndefinedVariable
         connect()
@@ -119,7 +119,7 @@ def toggle(app_window):
 # NOTE: authentify might be called from outside the GUI thread (interactive must be False in this case!)
 def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
     if not is_connected():
-        _log.info(
+        _log.debug(
             'connect(%s,%s)', clear_on_failure, interactive
         )
         try:
@@ -272,7 +272,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                         )  # @UndefinedVariable
         except Exception as e:  # pylint: disable=broad-except
             if interactive:
-                _log.exception(e)
+                _log.debug(e)
             if clear_on_failure:
                 connection.clearCredentials()
                 if interactive:
@@ -322,7 +322,7 @@ def disconnect(
     interactive: bool = False,
     keepON: bool = True
 ) -> None:
-    _log.info(
+    _log.debug(
         'disconnect(%s,%s,%s,%s)',
         remove_credentials,
         stop_queue,
@@ -359,6 +359,7 @@ def disconnect(
                 )
             if stop_queue:
                 queue.stop()  # stop the outbox queue
+            _log.info('artisan.plus disconnected')
         finally:
             if connect_semaphore.available() < 1:
                 connect_semaphore.release(1)
@@ -367,10 +368,10 @@ def disconnect(
 
 def reconnected() -> None:
     if not is_connected():
-        _log.info('reconnected()')
         try:
             connect_semaphore.acquire(1)
             config.connected = True
+            _log.info('artisan.plus reconnected')
         finally:
             if connect_semaphore.available() < 1:
                 connect_semaphore.release(1)
@@ -386,7 +387,7 @@ def reconnected() -> None:
 # to be added to the saved file
 def updateSyncRecordHashAndSync() -> None:
     try:
-        _log.info('updateSyncRecordHashAndSync()')
+        _log.debug('updateSyncRecordHashAndSync()')
         if is_on():
             roast_record = roast.getRoast()
             sync_record, sync_record_hash = roast.getSyncRecord(roast_record)

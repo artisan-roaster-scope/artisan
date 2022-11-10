@@ -450,7 +450,7 @@ sync_record_attributes: List[str] = (  #for Python >= 3.9 can replace 'List' wit
 # if applied, r is assumed to contain the complete roast data as returned
 # by roast.getRoast()
 def getSyncRecord(r: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], str]:  #for Python >= 3.9 can replace 'Dict' and 'Tuple' with the generic type hints 'dict' and 'tuple'
-    _log.info('getSyncRecord()')
+    _log.debug('getSyncRecord()')
     m = hashlib.sha256()
     d: dict[str, Any] = {}
     try:

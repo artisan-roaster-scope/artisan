@@ -33,7 +33,7 @@ except Exception: # pylint: disable=broad-except
     from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 
-from artisanlib.util import stringp
+from artisanlib.util import stringp, debugLogLevelActive
 
 
 _log: Final = logging.getLogger(__name__)
@@ -227,8 +227,7 @@ class modbusport():
     def connect(self):
 #        if self.master and not self.master.socket:
 #            self.master = None
-        if self.master is None:
-            _log.debug('connect()')
+        if self.master is None or not self.master.socket:
             self.commError = False
             try:
                 # as in the following the port is None, no port is opened on creation of the (py)serial object
@@ -244,8 +243,8 @@ class modbusport():
                         retry_on_empty=False,
                         retry_on_invalid=False,
                         reset_socket=self.reset_socket,
-                        # timeout is in seconds (int) and defaults to 3
-                        timeout=int(round(max(1, min((self.aw.qmc.delay/2000), self.timeout))))) # the timeout should not be larger than half of the sampling interval
+                        # timeout is in seconds and defaults to 3
+                        timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
                     self.readRetries = self.serial_readRetries
                 elif self.type == 2: # Serial Binary
                     from pymodbus.client import ModbusSerialClient # @Reimport
@@ -259,8 +258,8 @@ class modbusport():
                         retry_on_empty=False,
                         retry_on_invalid=False,
                         reset_socket=self.reset_socket,
-                        # timeout is in seconds (int) and defaults to 3
-                        timeout=int(round(max(1, min((self.aw.qmc.delay/2000), self.timeout))))) # the timeout should not be larger than half of the sampling interval
+                        # timeout is in seconds and defaults to 3
+                        timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
                     self.readRetries = self.serial_readRetries
                 elif self.type == 3: # TCP
                     from pymodbus.client import ModbusTcpClient
@@ -273,7 +272,7 @@ class modbusport():
                                 reset_socket=self.reset_socket,
                                 retries=self.IP_retries,
                                 # timeout is in seconds (int) and defaults to 3
-                                timeout=int(round(max(1, min((self.aw.qmc.delay/2000), self.IP_timeout)))) # the timeout should not be larger than half of the sampling interval
+                                timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
                                 )
                         self.readRetries = 1
                     except Exception: # pylint: disable=broad-except
@@ -292,7 +291,7 @@ class modbusport():
                             reset_socket=self.reset_socket,
                             retries=self.IP_retries,
                             # timeout is in seconds (int) and defaults to 3
-                            timeout=int(round(max(1,min((self.aw.qmc.delay/2000), self.IP_timeout)))) # the timeout should not be larger than half of the sampling interval
+                            timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
                             )
                         self.readRetries = 1
                     except Exception: # pylint: disable=broad-except # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
@@ -313,18 +312,18 @@ class modbusport():
                         retry_on_invalid=False, # by default False
                         reset_socket=self.reset_socket,
                         strict=False, # settings this to False disables the inter char timeout restriction
-                        timeout=int(round(max(1, min((self.aw.qmc.delay/2000), self.timeout))))) # the timeout should not be larger than half of the sampling interval
+                        timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
 #                    self.master.inter_char_timeout = 0.05
                     self.readRetries = self.serial_readRetries
+                _log.debug('connect(): connecting')
                 self.master.connect()
-                _log.debug('connect(): connected')
-                self.updateActiveRegisters()
-                self.clearReadingsCache()
-                time.sleep(.5) # avoid possible hickups on startup
-                if self.isConnected() != None:
+                if self.isConnected():
+                    self.updateActiveRegisters()
+                    self.clearReadingsCache()
+                    time.sleep(.5) # avoid possible hickups on startup
                     self.aw.sendmessage(QApplication.translate('Message', 'Connected via MODBUS'))
                 else:
-                    _log.debug('connect(): connect failed')
+                    _log.debug('connect(): failed to connect')
             except Exception as ex: # pylint: disable=broad-except
                 _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
@@ -398,83 +397,84 @@ class modbusport():
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            self.clearReadingsCache()
-            for code in self.activeRegisters:
-                for slave in self.activeRegisters[code]:
-                    registers = sorted(self.activeRegisters[code][slave])
-                    if self.fetch_max_blocks:
-                        sequences = [[registers[0],registers[-1]]]
-                    else:
-                        # split in successive sequences
-                        gaps = [[s, er] for s, er in zip(registers, registers[1:]) if s+1 < er]
-                        edges = iter(registers[:1] + sum(gaps, []) + registers[-1:])
-                        sequences = list(zip(edges, edges)) # list of pairs of the form (start-register,end-register)
-                    just_send = False
-                    for seq in sequences:
-                        retry = self.readRetries
-                        register = seq[0]
-                        count = seq[1]-seq[0] + 1
-                        if 0 < count <= self.maxCount:
-                            res = None
-                            if just_send:
-                                self.sleepBetween() # we start with a sleep, as it could be that just a send command happened before the semaphore was caught
-                            just_send = True
-                            tx = time.time()
-                            while True:
-                                _log.debug('readActive(%d,%d,%d,%d)', slave, code, register, count)
-                                try:
-                                    # we cache only MODBUS function 3 and 4 (not 1 and 2!)
-                                    if code == 3:
-                                        res = self.master.read_holding_registers(register,count,slave=slave)
-                                    elif code == 4:
-                                        res = self.master.read_input_registers(register,count,slave=slave)
-                                except Exception as e: # pylint: disable=broad-except
-                                    _log.info('readActive(%d,%d,%d,%d)', slave, code, register, count)
-                                    _log.exception(e)
-                                    res = None
-                                if self.invalidResult(res,count):
-                                    if retry > 0:
-                                        retry = retry - 1
-                                        time.sleep(0.020)
-                                        _log.debug('retry')
-                                    else:
+            if self.isConnected():
+                self.clearReadingsCache()
+                for code in self.activeRegisters:
+                    for slave in self.activeRegisters[code]:
+                        registers = sorted(self.activeRegisters[code][slave])
+                        if self.fetch_max_blocks:
+                            sequences = [[registers[0],registers[-1]]]
+                        else:
+                            # split in successive sequences
+                            gaps = [[s, er] for s, er in zip(registers, registers[1:]) if s+1 < er]
+                            edges = iter(registers[:1] + sum(gaps, []) + registers[-1:])
+                            sequences = list(zip(edges, edges)) # list of pairs of the form (start-register,end-register)
+                        just_send = False
+                        for seq in sequences:
+                            retry = self.readRetries
+                            register = seq[0]
+                            count = seq[1]-seq[0] + 1
+                            if 0 < count <= self.maxCount:
+                                res = None
+                                if just_send:
+                                    self.sleepBetween() # we start with a sleep, as it could be that just a send command happened before the semaphore was caught
+                                just_send = True
+                                tx = time.time()
+                                while True:
+                                    _log.debug('readActive(%d,%d,%d,%d)', slave, code, register, count)
+                                    try:
+                                        # we cache only MODBUS function 3 and 4 (not 1 and 2!)
+                                        if code == 3:
+                                            res = self.master.read_holding_registers(register,count,slave=slave)
+                                        elif code == 4:
+                                            res = self.master.read_input_registers(register,count,slave=slave)
+                                    except Exception as e: # pylint: disable=broad-except
+                                        _log.info('readActive(%d,%d,%d,%d)', slave, code, register, count)
+                                        _log.debug(e)
                                         res = None
-                                        raise Exception('Exception response')
-                                else:
-                                    break
+                                    if self.invalidResult(res,count):
+                                        if retry > 0:
+                                            retry = retry - 1
+                                            time.sleep(0.020)
+                                            _log.debug('retry')
+                                        else:
+                                            res = None
+                                            raise Exception('Exception response')
+                                    else:
+                                        break
 
-                            #note: logged chars should be unicode not binary
-                            if self.aw.seriallogflag:
-                                if self.type < 3: # serial MODBUS
-                                    ser_str = 'MODBUS readActiveRegisters : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx# = {}'.format(
-                                        self.formatMS(tx,time.time()),
-                                        self.comport,
-                                        self.baudrate,
-                                        self.bytesize,
-                                        self.parity,
-                                        self.stopbits,
-                                        self.timeout,
-                                        slave,
-                                        register,
-                                        code,
-                                        len(res.registers))
-                                else: # IP MODBUS
-                                    ser_str = 'MODBUS readActiveRegisters : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx# = {}'.format(
-                                        self.formatMS(tx,time.time()),
-                                        self.host,
-                                        self.port,
-                                        slave,
-                                        register,
-                                        code,
-                                        len(res.registers))
-                                _log.debug(ser_str)
-                                self.aw.addserial(ser_str)
+                                #note: logged chars should be unicode not binary
+                                if self.aw.seriallogflag:
+                                    if self.type < 3: # serial MODBUS
+                                        ser_str = 'MODBUS readActiveRegisters : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx# = {}'.format(
+                                            self.formatMS(tx,time.time()),
+                                            self.comport,
+                                            self.baudrate,
+                                            self.bytesize,
+                                            self.parity,
+                                            self.stopbits,
+                                            self.timeout,
+                                            slave,
+                                            register,
+                                            code,
+                                            len(res.registers))
+                                    else: # IP MODBUS
+                                        ser_str = 'MODBUS readActiveRegisters : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx# = {}'.format(
+                                            self.formatMS(tx,time.time()),
+                                            self.host,
+                                            self.port,
+                                            slave,
+                                            register,
+                                            code,
+                                            len(res.registers))
+                                    _log.debug(ser_str)
+                                    self.aw.addserial(ser_str)
 
-                            if res is not None:
-                                if self.commError: # we clear the previous error and send a message
-                                    self.commError = False
-                                    self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-                                self.cacheReadings(code,slave,register,res.registers)
+                                if res is not None:
+                                    if self.commError: # we clear the previous error and send a message
+                                        self.commError = False
+                                        self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                                    self.cacheReadings(code,slave,register,res.registers)
 
         except Exception as ex: # pylint: disable=broad-except
             _log.debug(ex)
@@ -502,7 +502,7 @@ class modbusport():
             time.sleep(.3) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeCoils(%d,%d,%s)', slave, register, values)
-            _log.exception(ex)
+            _log.debug(ex)
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -524,7 +524,7 @@ class modbusport():
             time.sleep(.3) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeCoil(%d,%d,%s) failed', slave, register, value)
-            _log.exception(ex)
+            _log.debug(ex)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
@@ -558,7 +558,7 @@ class modbusport():
             time.sleep(.03) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeSingleRegister(%d,%d,%s) failed', slave, register, value)
-            _log.exception(ex)
+            _log.debug(ex)
 #            _logger.debug("writeSingleRegister exception: %s" % str(ex))
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -583,7 +583,8 @@ class modbusport():
             time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('maskWriteRegister(%d,%d,%s,%s) failed', slave, register, and_mask, or_mask)
-            _log.exception(ex)
+            if debugLogLevelActive():
+                _log.debug(ex)
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
@@ -613,7 +614,7 @@ class modbusport():
             time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeRegisters(%d,%d,%s) failed', slave, register, values)
-            _log.exception(ex)
+            _log.debug(ex)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
@@ -638,7 +639,7 @@ class modbusport():
             time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeWord(%d,%d,%s) failed', slave, register, value)
-            _log.exception(ex)
+            _log.debug(ex)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
@@ -662,7 +663,7 @@ class modbusport():
             time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeBCD(%d,%d,%s) failed', slave, register, value)
-            _log.exception(ex)
+            _log.debug(ex)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
@@ -687,7 +688,7 @@ class modbusport():
             time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeLong(%d,%d,%s) failed', slave, register, value)
-            _log.exception(ex)
+            _log.debug(ex)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
@@ -722,29 +723,32 @@ class modbusport():
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
-            while True:
-                if code==3:
-                    res = self.master.read_holding_registers(int(register),2,slave=int(slave))
-                else:
-                    res = self.master.read_input_registers(int(register),2,slave=int(slave))
-                if self.invalidResult(res,2):
-                    if retry > 0:
-                        retry = retry - 1
-                        #time.sleep(0.020)  # no retry delay as timeout time should already be large enough
-                        _log.debug('retry')
+            if self.isConnected():
+                while True:
+                    if code==3:
+                        res = self.master.read_holding_registers(int(register),2,slave=int(slave))
                     else:
-                        raise Exception('Exception response')
-                else:
-                    break
-            decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-            r = decoder.decode_32bit_float()
-            if self.commError: # we clear the previous error and send a message
-                self.commError = False
-                self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-            return r
+                        res = self.master.read_input_registers(int(register),2,slave=int(slave))
+                    if self.invalidResult(res,2):
+                        if retry > 0:
+                            retry = retry - 1
+                            #time.sleep(0.020)  # no retry delay as timeout time should already be large enough
+                            _log.debug('retry')
+                        else:
+                            raise Exception('Exception response')
+                    else:
+                        break
+                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
+                r = decoder.decode_32bit_float()
+                if self.commError: # we clear the previous error and send a message
+                    self.commError = False
+                    self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                return r
+            else:
+                return None
         except Exception as ex: # pylint: disable=broad-except
             _log.info('readFloat(%d,%d,%d,%s) failed', slave, register, code, force)
-            _log.exception(ex)
+            _log.debug(ex)
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
@@ -811,30 +815,33 @@ class modbusport():
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
-            while True:
-                if code==3:
-                    res = self.master.read_holding_registers(int(register),2,slave=int(slave))
-                else:
-                    res = self.master.read_input_registers(int(register),2,slave=int(slave))
-                if self.invalidResult(res,2):
-                    if retry > 0:
-                        retry = retry - 1
-                        #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
-                        _log.debug('retry')
+            if self.isConnected():
+                while True:
+                    if code==3:
+                        res = self.master.read_holding_registers(int(register),2,slave=int(slave))
                     else:
-                        raise Exception('Exception response')
-                else:
-                    break
-            decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-            r = decoder.decode_32bit_uint()
-            if self.commError: # we clear the previous error and send a message
-                self.commError = False
-                self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-            time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
-            return convert_from_bcd(r)
+                        res = self.master.read_input_registers(int(register),2,slave=int(slave))
+                    if self.invalidResult(res,2):
+                        if retry > 0:
+                            retry = retry - 1
+                            #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
+                            _log.debug('retry')
+                        else:
+                            raise Exception('Exception response')
+                    else:
+                        break
+                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
+                r = decoder.decode_32bit_uint()
+                if self.commError: # we clear the previous error and send a message
+                    self.commError = False
+                    self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
+                return convert_from_bcd(r)
+            else:
+                return None
         except Exception as ex: # pylint: disable=broad-except
             _log.info('readBCD(%d,%d,%d,%s) failed', slave, register, code, force)
-            _log.exception(ex)
+            _log.debug(ex)
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
@@ -892,7 +899,7 @@ class modbusport():
                 res = self.master.read_holding_registers(int(register),1,slave=int(slave))
         except Exception as ex: # pylint: disable=broad-except
             _log.info('peekSingleRegister(%d,%d,%d) failed', slave, register, code)
-            _log.exception(ex)
+            _log.debug(ex)
             res = None
         if not self.invalidResult(res,1):
             if code in [1,2]:
@@ -939,49 +946,52 @@ class modbusport():
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
-            while True:
-                try:
-                    if code==1:
-                        res = self.master.read_coils(int(register),1,slave=int(slave))
-                    elif code==2:
-                        res = self.master.read_discrete_inputs(int(register),1,slave=int(slave))
-                    elif code==4:
-                        res = self.master.read_input_registers(int(register),1,slave=int(slave))
-                    else: # code==3
-                        res = self.master.read_holding_registers(int(register),1,slave=int(slave))
-                except Exception as ex: # pylint: disable=broad-except
-                    _log.exception(ex)
-                    res = None
-                if self.invalidResult(res,1):
-                    if retry > 0:
-                        retry = retry - 1
-                        #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
-                        _log.debug('retry')
+            if self.isConnected():
+                while True:
+                    try:
+                        if code==1:
+                            res = self.master.read_coils(int(register),1,slave=int(slave))
+                        elif code==2:
+                            res = self.master.read_discrete_inputs(int(register),1,slave=int(slave))
+                        elif code==4:
+                            res = self.master.read_input_registers(int(register),1,slave=int(slave))
+                        else: # code==3
+                            res = self.master.read_holding_registers(int(register),1,slave=int(slave))
+                    except Exception as ex: # pylint: disable=broad-except
+                        _log.debug(ex)
+                        res = None
+                    if self.invalidResult(res,1):
+                        if retry > 0:
+                            retry = retry - 1
+                            #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
+                            _log.debug('retry')
+                        else:
+                            raise Exception(f'readSingleRegister({slave},{register},{code},{force},{signed}) failed')
                     else:
-                        raise Exception(f'readSingleRegister({slave},{register},{code},{force},{signed}) failed')
+                        break
+                if code in [1,2]:
+                    if res is not None and res.bits[0]:
+                        r = 1
+                    else:
+                        r = 0
+                    if self.commError: # we clear the previous error and send a message
+                        self.commError = False
+                        self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                    return r
+                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
+                if signed:
+                    r = decoder.decode_16bit_int()
                 else:
-                    break
-            if code in [1,2]:
-                if res is not None and res.bits[0]:
-                    r = 1
-                else:
-                    r = 0
+                    r = decoder.decode_16bit_uint()
                 if self.commError: # we clear the previous error and send a message
                     self.commError = False
                     self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
                 return r
-            decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-            if signed:
-                r = decoder.decode_16bit_int()
             else:
-                r = decoder.decode_16bit_uint()
-            if self.commError: # we clear the previous error and send a message
-                self.commError = False
-                self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-            return r
+                return None
         except Exception as ex: # pylint: disable=broad-except
             _log.info('readSingleRegister(%d,%d,%d,%s) failed', slave, register, code, force)
-            _log.exception(ex)
+            _log.debug(ex)
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -1051,32 +1061,35 @@ class modbusport():
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
-            while True:
-                if code==3:
-                    res = self.master.read_holding_registers(int(register),2,slave=int(slave))
-                else:
-                    res = self.master.read_input_registers(int(register),2,slave=int(slave))
-                if self.invalidResult(res,2):
-                    if retry > 0:
-                        retry = retry - 1
-                        #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
-                        _log.debug('retry')
+            if self.isConnected():
+                while True:
+                    if code==3:
+                        res = self.master.read_holding_registers(int(register),2,slave=int(slave))
                     else:
-                        raise Exception('Exception response')
+                        res = self.master.read_input_registers(int(register),2,slave=int(slave))
+                    if self.invalidResult(res,2):
+                        if retry > 0:
+                            retry = retry - 1
+                            #time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
+                            _log.debug('retry')
+                        else:
+                            raise Exception('Exception response')
+                    else:
+                        break
+                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
+                if signed:
+                    r = decoder.decode_32bit_int()
                 else:
-                    break
-            decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-            if signed:
-                r = decoder.decode_32bit_int()
+                    r = decoder.decode_32bit_uint()
+                if self.commError: # we clear the previous error and send a message
+                    self.commError = False
+                    self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                return r
             else:
-                r = decoder.decode_32bit_uint()
-            if self.commError: # we clear the previous error and send a message
-                self.commError = False
-                self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-            return r
+                return None
         except Exception as ex: # pylint: disable=broad-except
             _log.info('readInt32(%d,%d,%d,%s) failed', slave, register, code, force)
-            _log.exception(ex)
+            _log.debug(ex)
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
@@ -1147,31 +1160,36 @@ class modbusport():
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
-            while True:
-                try:
-                    if code==3:
-                        res = self.master.read_holding_registers(int(register),1,slave=int(slave))
+            if self.isConnected():
+                while True:
+                    try:
+                        if code==3:
+                            res = self.master.read_holding_registers(int(register),1,slave=int(slave))
+                        else:
+                            res = self.master.read_input_registers(int(register),1,slave=int(slave))
+                    except Exception: # pylint: disable=broad-except
+                        res = None
+                    if self.invalidResult(res,1):
+                        if retry > 0:
+                            retry = retry - 1
+                            # time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
+                            _log.debug('retry')
+                        else:
+                            raise Exception('Exception response')
                     else:
-                        res = self.master.read_input_registers(int(register),1,slave=int(slave))
-                except Exception: # pylint: disable=broad-except
-                    res = None
-                if self.invalidResult(res,1):
-                    if retry > 0:
-                        retry = retry - 1
-                        # time.sleep(0.020)  # no retry delay as timeout time should already be larger enough
-                        _log.debug('retry')
-                    else:
-                        raise Exception('Exception response')
-                else:
-                    break
-            decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-            r = decoder.decode_16bit_uint()
-            if self.commError: # we clear the previous error and send a message
-                self.commError = False
-                self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-            time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
-            return convert_from_bcd(r)
-        except Exception: # pylint: disable=broad-except
+                        break
+                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
+                r = decoder.decode_16bit_uint()
+                if self.commError: # we clear the previous error and send a message
+                    self.commError = False
+                    self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
+                return convert_from_bcd(r)
+            else:
+                return None
+        except Exception as ex: # pylint: disable=broad-except
+            _log.info('readBCDint(%d,%d,%d,%s) failed', slave, register, code, force)
+            _log.debug(ex)
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)

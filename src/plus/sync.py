@@ -787,7 +787,7 @@ def fetchServerUpdate(uuid: str, file=None):
 
 # this function might be called from a thread (eg. via QTimer)
 def getUpdate(uuid: str, file=None):
-    _log.info('getUpdate(%s,%s)', uuid, file)
+    _log.debug('getUpdate(%s,%s)', uuid, file)
     if uuid is not None:
         aw = config.app_window
         if aw.editgraphdialog is None and controller.is_connected():
@@ -806,7 +806,7 @@ def getUpdate(uuid: str, file=None):
 
 def sync():
     try:
-        _log.info('sync()')
+        _log.debug('sync()')
         aw = config.app_window
         rr = roast.getRoast()
         computed_sync_record, computed_sync_record_hash = roast.getSyncRecord(
