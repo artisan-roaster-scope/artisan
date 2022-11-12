@@ -84,6 +84,7 @@ echo NSIS makensis.exe file date %NSIS_DATE%
 ::
 :: run NSIS to build the install .exe file
 %NSIS_EXE% /DPRODUCT_VERSION=%ARTISAN_VERSION%.%ARTISAN_BUILD% /DLEGACY=%ARTISAN_LEGACY% setup-install3-pi.nsi
+if ERRORLEVEL 1 (exit /b 1)
 
 ::
 :: package the zip file
@@ -91,5 +92,15 @@ echo NSIS makensis.exe file date %NSIS_DATE%
 if /i "%APPVEYOR%" == "True" (
     copy ..\LICENSE LICENSE.txt
     7z a artisan-%ARTISAN_SPEC%-%ARTISAN_VERSION%.zip Setup*.exe LICENSE.txt README.txt
-    del LICENSE.txt
+)
+
+::
+:: check the approximate size of the zip file  
+::
+set file=artisan-%ARTISAN_SPEC%-%ARTISAN_VERSION%.zip
+set expectedbytesize=170000000
+for %%A in (%file%) do set size=%%~zA
+if %size% LSS %expectedbytesize% (
+    echo ***Zip file is smaller than expected
+    exit /b 1
 )
