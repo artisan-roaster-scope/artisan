@@ -2506,6 +2506,8 @@ class tgraphcanvas(FigureCanvas):
         self.dropDuplicates = False
         self.dropDuplicatesLimit = 0.3
 
+        self.liveMedianETfilter = LiveMedian(3)
+        self.liveMedianBTfilter = LiveMedian(3)
         self.liveMedianRoRfilter = LiveMedian(5) # the offline filter uses a window length of 5, introducing some delay, compared to the medfilt() in offline mode which does not introduce any delay
 
         self.interpolatemax = 3 # maximal number of dropped readings (-1) that will be interpolated
@@ -3835,7 +3837,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             wrong_reading = 0
             #########################
-            # a) detect duplicates: remove a reading if it is equal to the previous or if that is -1 to the one before
+            # a) detect duplicates: remove a reading if it is equal to the previous or if that is -1 to the one before that
             if aw.qmc.dropDuplicates and ((len(tempx)>1 and tempx[-1] == -1 and abs(temp - tempx[-2]) <= aw.qmc.dropDuplicatesLimit) or (len(tempx)>0 and abs(temp - tempx[-1]) <= aw.qmc.dropDuplicatesLimit)):
                 wrong_reading = 2 # replace by previous reading not by -1
             #########################
@@ -4206,6 +4208,12 @@ class tgraphcanvas(FigureCanvas):
                         st2 = self.decay_average(sample_ctimex2,sample_ctemp2,dw2)
                     else:
                         st2 = -1
+
+                    # we apply a minimal live median spike filter minimizing the delay by choosing a window smaller than in the offline medfilt
+                    if aw.qmc.filterDropOuts and not self.delay > 2000:
+                        st1 = aw.qmc.liveMedianETfilter(st1)
+                        st2 = aw.qmc.liveMedianBTfilter(st2)
+
                     # register smoothed values
                     sample_tstemp1.append(st1)
                     sample_tstemp2.append(st2)
@@ -4304,7 +4312,7 @@ class tgraphcanvas(FigureCanvas):
 
                         # unfiltereddelta1/2 contains the RoRs respecting the delta_span, but without any delta smoothing AND delta mathformulas applied
                         # we apply a minimal live median spike filter minimizing the delay by choosing a window smaller than in the offline medfilt
-                        if aw.qmc.filterDropOuts:
+                        if aw.qmc.filterDropOuts and not self.delay > 2000:
                             aw.qmc.rateofchange1 = aw.qmc.liveMedianRoRfilter(aw.qmc.rateofchange1)
                             aw.qmc.rateofchange2 = aw.qmc.liveMedianRoRfilter(aw.qmc.rateofchange2)
 
@@ -17183,6 +17191,8 @@ class ApplicationWindow(QMainWindow):
     updateSubscriptionSignal = pyqtSignal(str)
     updateLimitsSignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int
     updatePlaybackIndicatorSignal = pyqtSignal()
+    pidOnSignal = pyqtSignal()
+    pidOffSignal = pyqtSignal()
 
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
@@ -19685,6 +19695,8 @@ class ApplicationWindow(QMainWindow):
         self.updateSubscriptionSignal.connect(self.updateSubscription)
         self.updateLimitsSignal.connect(self.updateLimits)
         self.updatePlaybackIndicatorSignal.connect(self.updatePlaybackIndicator)
+        self.pidOnSignal.connect(self.pidcontrol.pidOn)
+        self.pidOffSignal.connect(self.pidcontrol.pidOff)
 
         self.notificationManager = None
         if not app.artisanviewerMode:
@@ -23471,6 +23483,8 @@ class ApplicationWindow(QMainWindow):
 #            self.qmc.updateBackground()
 #            self.qmc.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
+    # NOTE: this may runs in a separate EventActionThread and not in the GUI thread thus actions modifying the GUI might need to use signals to
+    # ensure that they run in the GUI thread to avoid hard crashes (see pidON/pidOFF)
     def eventaction_internal(self,action,cmd):
         if action:
             try:
@@ -24419,7 +24433,7 @@ class ApplicationWindow(QMainWindow):
                                         aw.fujipid.setONOFFstandby(1)
                                         aw.sendmessage(QApplication.translate('Message','PID set to OFF'))
                                 else:
-                                    aw.pidcontrol.pidOff()
+                                    self.pidOffSignal.emit()
                             elif cs == 'PIDon':
                                 if aw.qmc.device == 0: # Fuji
                                     standby = aw.fujipid.getONOFFstandby()
@@ -24427,7 +24441,7 @@ class ApplicationWindow(QMainWindow):
                                         aw.fujipid.setONOFFstandby(0)
                                         aw.sendmessage(QApplication.translate('Message','PID set to ON'))
                                 else:
-                                    aw.pidcontrol.pidOn()
+                                    self.pidOnSignal.emit()
                             elif cs == 'PIDtoggle':
                                 if aw.qmc.device == 0: # Fuji
                                     standby = aw.fujipid.getONOFFstandby()

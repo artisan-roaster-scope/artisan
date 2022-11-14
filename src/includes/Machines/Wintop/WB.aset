@@ -2,6 +2,8 @@
 Delay=3000
 Oversampling=true
 roastertype_setup=Wintop WB
+dropDuplicates=true
+dropDuplicatesLimit=0.1
 
 [Device]
 controlETpid=4, 2

@@ -4,6 +4,8 @@ Oversampling=false
 ETcurve=false
 ETlcd=false
 roastertype_setup=VNT PID
+dropDuplicates=true
+dropDuplicatesLimit=0.1
 
 [Device]
 id=29

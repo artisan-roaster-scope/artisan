@@ -2,6 +2,8 @@
 Delay=2000
 Oversampling=false
 roastertype_setup=Dongyi DY
+dropDuplicates=true
+dropDuplicatesLimit=0.1
 
 [Device]
 id=29

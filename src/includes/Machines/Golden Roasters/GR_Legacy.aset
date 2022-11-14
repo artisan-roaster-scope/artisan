@@ -1,6 +1,8 @@
 [General]
 Delay=2000
 roastertype_setup=GR Legacy
+dropDuplicates=true
+dropDuplicatesLimit=0.1
 
 [Device]
 id=29
