@@ -1,6 +1,6 @@
 [General]
 Delay=1000
-ExtraEventSamplingDelay=20000
+ExtraEventSamplingDelay=10000
 Oversampling=false
 roastertype_setup=Probat Sample
 

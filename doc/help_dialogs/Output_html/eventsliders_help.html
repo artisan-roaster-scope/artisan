@@ -89,6 +89,36 @@
         </tr>
         <tr>
             <td>&#160;</td>
+            <td>readSigned(slaveId,register)</td>
+            <td>reads 1 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as signed integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>readBCD(slaveID,register)</td>
+            <td>reads 1 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as BCD. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>read32(slaveID,register)</td>
+            <td>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as unsigned integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>read32Signed(slaveID,register)</td>
+            <td>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as signed integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>read32BCD(slaveID,register)</td>
+            <td>reads 2 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as BCD. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>readFloat(slaveID,register)</td>
+            <td>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as float. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
             <td>write(slaveId,register,value) or write([slaveId,register,value],..,[slaveId,register,value])</td>
             <td>write register: MODBUS function 6 (int) or function 16 (float)</td>
         </tr>

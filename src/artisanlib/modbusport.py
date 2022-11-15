@@ -159,6 +159,7 @@ class modbusport():
         self.fetch_max_blocks = False # if set, the optimizer fetches only one sequence per area from the minimum to the maximum register ignoring gaps
         self.fail_on_cache_miss = True # if False and request cannot be resolved from optimizer cache while optimizer is active,
             # send individual reading request; if set to True, never send individual data requests while optimizer is on
+            # NOTE: if TRUE read requests with force=False (default) will fail
 
         self.reset_socket = False # reset socket connection on error (True by default in pymodbus>v2.5.2, False by default in pymodbus v2.3)
 
@@ -710,8 +711,8 @@ class modbusport():
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            if self.optimizer:
-                if not force and code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave] \
+            if self.optimizer and not force:
+                if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave] \
                     and register+1 in self.readingsCache[code][slave]:
                     # cache hit
                     res = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
@@ -802,8 +803,8 @@ class modbusport():
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            if self.optimizer:
-                if not force and code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave] \
+            if self.optimizer and not force:
+                if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave] \
                     and register+1 in self.readingsCache[code][slave]:
                     # cache hit
                     res = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
@@ -931,8 +932,8 @@ class modbusport():
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            if self.optimizer:
-                if not force and code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave]:
+            if self.optimizer and not force:
+                if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave]:
                     # cache hit
                     res = self.readingsCache[code][slave][register]
                     decoder = getBinaryPayloadDecoderFromRegisters([res], self.byteorderLittle, self.wordorderLittle)
@@ -1045,8 +1046,8 @@ class modbusport():
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            if self.optimizer:
-                if not force and code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave] \
+            if self.optimizer and not force:
+                if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave] \
                     and register+1 in self.readingsCache[code][slave]:
                     # cache hit
                     res = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
@@ -1148,8 +1149,8 @@ class modbusport():
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            if self.optimizer:
-                if not force and code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave]:
+            if self.optimizer and not force:
+                if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave]:
                     # cache hit
                     res = self.readingsCache[code][slave][register]
                     decoder = getBinaryPayloadDecoderFromRegisters([res], self.byteorderLittle, self.wordorderLittle)
