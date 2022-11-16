@@ -3,13 +3,13 @@
 ######
 # the following commented package versions are read by appveyor.
 #
-# pyinstaller==5.4.1  #built during the appveyor ci process
+# pyinstaller==5.6.2 #5.4.1  #built during the appveyor ci process
 # libusb==1.2.6.0     #downloaded during the appveyor ci process
 #
 ######
 # platform specifics
 #
-pywin32==304 #303
+pywin32==305 #304
 pyinstaller-versionfile==2.0.0
 #
 ######
@@ -25,6 +25,6 @@ colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
 PyQt5==5.15.7 #5.15.6
 PyQtWebEngine==5.15.6 #5.15.5
 openpyxl==3.0.10 #3.0.9
-keyring==23.9.3 #23.6.0 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
+keyring==23.11.0 #23.9.3 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
 lxml==4.9.1 #4.7.1
-prettytable==3.4.1 #3.3.0 # >1.0.0 fail to be packed by py2app, but a monkey patch in main.py helps
+prettytable==3.5.0 #3.4.1 # >1.0.0 fail to be packed by py2app, but a monkey patch in main.py helps

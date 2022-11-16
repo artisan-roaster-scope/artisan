@@ -10,6 +10,7 @@
 # platform specifics
 #
 distro==1.7.0 #1.6.0
+# and SecretStorage (see below)
 #
 ######
 # packages that differ per platform:
@@ -25,11 +26,11 @@ openpyxl==3.0.10 #3.0.9
 #PyQt 5.15.2 is preinstalled
 #PyQtWebEngine==5.15.5 # not available for 32bit platforms
 # what about
-pyinstaller==5.4.1 #4.9
+pyinstaller==5.6.2 #5.4.1 #4.9
 cffi==1.15.0
 cryptography==3.4.8
-keyring==23.9.3 #23.6.0 # versions beyond 23.0.1 require importlib_metadata >=v3.6 (RPi buster comes with v2.0)
-SecretStorage==3.3.1 # 3.3.0
+keyring==23.11.0 #23.9.3 # versions beyond 23.0.1 require importlib_metadata >=v3.6 (RPi buster comes with v2.0)
+SecretStorage==3.3.3 #3.3.1
 lxml==4.9.1 #4.7.1
 prettytable==0.7.2 # >1.0.0 fail to be packed and the monkey patch in main.py does not help here due the old python version
 #
