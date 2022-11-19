@@ -21,6 +21,7 @@ a = Analysis(['artisan.py'],
              hiddenimports=['scipy.spatial.transform._rotation_groups',
                             'scipy._lib.messagestream', 
                             'scipy.special.cython_special',
+                            'matplotlib.backends.backend_pdf',
                             'matplotlib.backends.backend_svg',
                             'pkg_resources.py2_warn'
                             ],
