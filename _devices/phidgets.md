@@ -15,6 +15,10 @@ Artisan supports a large number of Phidgets that gather temperature and other da
 
 All Phidgets can be connected either directly via USB or remotely via network connection by using a [Phidgets SBC](http://www.phidgets.com/products.php?category=21&product_id=1073_0){:target="_blank"} as gateway or a [wireless VINT HUB](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=1143){:target="_blank"} like the HUB5000. Most Phidgets don't need any additional power supply.
 
+
+> **Watch out!**  
+> Setting up Artisan for wireless access to Phidgets see below under [5. Remote Access](#remote-access).
+
 There are Phidgets that feature a direct USB connection as well as the more recent [VINT Phidgets](https://www.phidgets.com/docs/What_is_VINT%3F){:target="_blank"}* that are connected via a [VINT USB hub](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"} to the USB port. Some are electrically isolated and thus more resistant against electrical noise.
 
 Any number of Phidgets, of one type or mixed types, can be used in combination with any of the other supported devices.
@@ -279,3 +283,28 @@ with
 
 
 See [Artisan v1.6.1](https://artisan-roasterscope.blogspot.com/2019/03/artisan-v161.html){:target="_blank"} under "RC Servos" for details.
+
+
+## <a name="remote-access"></a>5. Remote Access
+
+All Phidgets can be accessed either directly via USB or remotely via network connection. The device making its connected Phidgets accessible via remote access can be either a wireless VINT hub like the [Phidget HUB5000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=1143){:target="_blank"}, a [Phidget SBC](https://www.phidgets.com/?tier=1&catid=1&pcid=0) or another computer running the Phidget driver. In the last case, one needs to activate the Network Server in the Phidget Control Panel running on the computer with the Phidgets physically connected to make those available for remote access. 
+
+<figure>
+    <a href="/assets/images/PhidgetNetworkServer.png"><img src="/assets/images/PhidgetNetworkServer.png"></a>
+    <figcaption>Phidget Control Panel</figcaption>
+</figure>
+
+The first tab of the Phidget Control Panel lists all Phidgets accessible by the computer running it. It shows local Phidgets directly connected via USB/VINT as well as Phidgets accessible via the network indicating also the serving entity.
+
+<figure>
+    <a href="/assets/images/RemotePhidgets.png"><img src="/assets/images/RemotePhidgets.png"></a>
+    <figcaption>Accessible Phidgets</figcaption>
+</figure>
+
+By default Artisan is only accessing local Phidgets. Ticking the the flag in the Network section of the Phidget tab (menu ```Config >> Device```, 4th tab) makes networked Phidgets accessible to Artisan as well. In most cases there is no need to enter the name of the server under Host as the mDNS/ZeroConf protocoll will allow to find Phidget servers automatically. In rare cases one needs to enter the servers name like ```hub5000.local``` or its IP address in the example above in the ```Host``` field. If the ```Remote Only``` flag is ticked too, local Phidgets are ignored.
+
+
+<figure>
+    <a href="/assets/images/PhidgetsTab.png"><img src="/assets/images/PhidgetsTab.png"></a>
+    <figcaption>Phidgets Tab</figcaption>
+</figure>
