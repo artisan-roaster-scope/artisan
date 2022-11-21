@@ -295,14 +295,14 @@ All Phidgets can be accessed either directly via USB or remotely via network con
     <figcaption>Phidget Control Panel</figcaption>
 </figure>
 
-The first tab of the Phidget Control Panel lists all Phidgets accessible by the computer running it. It shows local Phidgets directly connected via USB/VINT as well as Phidgets accessible via the network indicating also the serving entity.
+The first tab of the Phidget Control Panel lists all Phidgets accessible by the computer running it. It shows local Phidgets directly connected via USB/VINT as well as Phidgets accessible via the network indicating also the serving entity. Note that only published network servers without password protection are listed.
 
 <figure>
     <a href="/assets/images/RemotePhidgets.png"><img src="/assets/images/RemotePhidgets.png"></a>
     <figcaption>Accessible Phidgets</figcaption>
 </figure>
 
-By default Artisan is only accessing local Phidgets. Ticking the flag in the Network section of the Phidget tab (menu ```Config >> Device```, 4th tab) makes networked Phidgets accessible to Artisan as well. In most cases there is no need to enter the name of the server under Host as the mDNS/ZeroConf protocol will find Phidget servers automatically. In rare cases one needs to enter the remote server name like ```hub5000.local``` or its IP address in the ```Host``` field. If the ```Remote Only``` flag is ticked too, local Phidgets are ignored.
+By default Artisan is only accessing local Phidgets. Ticking the flag in the Network section of the Phidget tab (menu ```Config >> Device```, 4th tab) makes networked Phidgets accessible to Artisan as well. In most cases there is no need to enter the name of the server under Host as the mDNS/ZeroConf protocol will find Phidget servers automatically. In rare cases (e.g. if you set a password on your Phidget Network Servder) one needs to enter the remote server name like ```hub5000.local``` or its IP address in the ```Host``` field and its password (if set) into the ```Password```field. If the ```Remote Only``` flag is ticked too, local Phidgets are ignored.
 
 
 <figure>
