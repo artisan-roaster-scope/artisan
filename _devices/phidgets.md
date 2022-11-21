@@ -18,6 +18,7 @@ All Phidgets can be connected either directly via USB or remotely via network co
 
 > **Watch out!**  
 > Setting up Artisan for wireless access to Phidgets see below under [5. Remote Access](#remote-access).
+{: .notice--primary}
 
 There are Phidgets that feature a direct USB connection as well as the more recent [VINT Phidgets](https://www.phidgets.com/docs/What_is_VINT%3F){:target="_blank"}* that are connected via a [VINT USB hub](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"} to the USB port. Some are electrically isolated and thus more resistant against electrical noise.
 
@@ -301,7 +302,7 @@ The first tab of the Phidget Control Panel lists all Phidgets accessible by the 
     <figcaption>Accessible Phidgets</figcaption>
 </figure>
 
-By default Artisan is only accessing local Phidgets. Ticking the the flag in the Network section of the Phidget tab (menu ```Config >> Device```, 4th tab) makes networked Phidgets accessible to Artisan as well. In most cases there is no need to enter the name of the server under Host as the mDNS/ZeroConf protocoll will allow to find Phidget servers automatically. In rare cases one needs to enter the servers name like ```hub5000.local``` or its IP address in the example above in the ```Host``` field. If the ```Remote Only``` flag is ticked too, local Phidgets are ignored.
+By default Artisan is only accessing local Phidgets. Ticking the flag in the Network section of the Phidget tab (menu ```Config >> Device```, 4th tab) makes networked Phidgets accessible to Artisan as well. In most cases there is no need to enter the name of the server under Host as the mDNS/ZeroConf protocol will find Phidget servers automatically. In rare cases one needs to enter the remote server name like ```hub5000.local``` or its IP address in the ```Host``` field. If the ```Remote Only``` flag is ticked too, local Phidgets are ignored.
 
 
 <figure>
