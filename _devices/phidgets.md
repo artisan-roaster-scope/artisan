@@ -295,7 +295,7 @@ All Phidgets can be accessed either directly via USB or remotely via network con
     <figcaption>Phidget Control Panel</figcaption>
 </figure>
 
-The first tab of the Phidget Control Panel lists all Phidgets accessible by the computer running it. It shows local Phidgets directly connected via USB/VINT as well as Phidgets accessible via the network indicating also the serving entity. Note that only published network servers without password protection are listed.
+The first tab of the Phidget Control Panel lists all Phidgets accessible by the computer running it. It shows local Phidgets directly connected via USB/VINT as well as Phidgets accessible via the network indicating also the serving entity. Note that only enabled and published network servers without password protection are listed.
 
 <figure>
     <a href="/assets/images/RemotePhidgets.png"><img src="/assets/images/RemotePhidgets.png"></a>
