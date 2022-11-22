@@ -53,5 +53,3 @@ sudo -H python -m pip install --root-user-action=ignore -r src/requirements-${AR
 
 # copy the snap7 binary installed by pip
 cp -f ${PYTHONSITEPKGS}/snap7/lib/libsnap7.dylib /usr/local/lib
-
-

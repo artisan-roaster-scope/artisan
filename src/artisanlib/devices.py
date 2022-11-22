@@ -928,10 +928,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.phidgetBoxRemoteFlag.setChecked(self.aw.qmc.phidgetRemoteFlag)
         phidgetServerIdLabel = QLabel(QApplication.translate('Label','Host'))
         self.phidgetServerId = QLineEdit(self.aw.qmc.phidgetServerID)
+        self.phidgetServerId.textChanged.connect(self.phidgetHostChanged)
         self.phidgetServerId.setMinimumWidth(200)
         phidgetPasswordLabel = QLabel(QApplication.translate('Label','Password'))
         self.phidgetPassword = QLineEdit(self.aw.qmc.phidgetPassword)
         self.phidgetPassword.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
+        self.phidgetPassword.setEnabled(self.aw.qmc.phidgetServerID != '')
         self.phidgetPassword.setMinimumWidth(100)
         phidgetPortLabel = QLabel(QApplication.translate('Label','Port'))
         self.phidgetPort = QLineEdit(str(self.aw.qmc.phidgetPort))
@@ -1280,6 +1282,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if settings.contains('DeviceAssignmentGeometry'):
             self.restoreGeometry(settings.value('DeviceAssignmentGeometry'))
         self.TabWidget.setCurrentIndex(activeTab)
+
+
+    @pyqtSlot(str)
+    def phidgetHostChanged(self,str):
+        self.phidgetPassword.setEnabled(str != '')
 
     @pyqtSlot(int)
     def changeOutprogramFlag(self,_):
