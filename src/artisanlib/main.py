@@ -4029,13 +4029,13 @@ class tgraphcanvas(FigureCanvas):
                                 extratx = aw.qmc.RTextratx[i]
                                 extrat1 = aw.qmc.RTextratemp1[i]
                                 extrat2 = aw.qmc.RTextratemp2[i]
-                                if len(aw.qmc.extramathexpression1) > i and aw.qmc.extramathexpression1[i] is not None and len(aw.qmc.extramathexpression1[i]):
+                                if len(aw.qmc.extramathexpression1) > i and aw.qmc.extramathexpression1[i] is not None and len(aw.qmc.extramathexpression1[i].strip()):
                                     try:
                                         extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],aw.qmc.RTextratx[i],RTsname='Y'+str(2*i+3),RTsval=aw.qmc.RTextratemp1[i])
                                         aw.qmc.RTextratemp1[i] = extrat1
                                     except Exception as e: # pylint: disable=broad-except
                                         _log.exception(e)
-                                if len(aw.qmc.extramathexpression2) > i and aw.qmc.extramathexpression2[i] is not None and len(aw.qmc.extramathexpression2[i]):
+                                if len(aw.qmc.extramathexpression2) > i and aw.qmc.extramathexpression2[i] is not None and len(aw.qmc.extramathexpression2[i].strip()):
                                     try:
                                         extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname='Y'+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
                                         aw.qmc.RTextratemp2[i] = extrat2
@@ -4121,13 +4121,13 @@ class tgraphcanvas(FigureCanvas):
 
                     ####### all values retrieved
 
-                    if aw.qmc.ETfunction is not None and len(aw.qmc.ETfunction):
+                    if aw.qmc.ETfunction is not None and len(aw.qmc.ETfunction.strip()):
                         try:
                             t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,tx,RTsname='Y1',RTsval=t1)
                             aw.qmc.RTtemp1 = t1
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
-                    if aw.qmc.BTfunction is not None and len(aw.qmc.BTfunction):
+                    if aw.qmc.BTfunction is not None and len(aw.qmc.BTfunction.strip()):
                         try:
                             t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,tx,RTsname='Y2',RTsval=t2)
                             aw.qmc.RTtemp2 = t2
@@ -4212,8 +4212,10 @@ class tgraphcanvas(FigureCanvas):
 
                     # we apply a minimal live median spike filter minimizing the delay by choosing a window smaller than in the offline medfilt
                     if aw.qmc.filterDropOuts and not self.delay > 2000:
-                        st1 = aw.qmc.liveMedianETfilter(st1)
-                        st2 = aw.qmc.liveMedianBTfilter(st2)
+                        if st1 is not None and st1 != -1:
+                            st1 = aw.qmc.liveMedianETfilter(st1)
+                        if st1 is not None and st2 != -1:
+                            st2 = aw.qmc.liveMedianBTfilter(st2)
 
                     # register smoothed values
                     sample_tstemp1.append(st1)
@@ -4300,12 +4302,12 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.unfiltereddelta2_pure.append(aw.qmc.rateofchange2)
 
                         # apply the math formula before the delta smoothing
-                        if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction):
+                        if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction.strip()):
                             try:
                                 aw.qmc.rateofchange1 = aw.qmc.eval_math_expression(aw.qmc.DeltaETfunction,tx,RTsname='R1',RTsval=aw.qmc.rateofchange1)
                             except Exception as e: # pylint: disable=broad-except
                                 _log.exception(e)
-                        if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
+                        if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction.strip()):
                             try:
                                 aw.qmc.rateofchange2 = aw.qmc.eval_math_expression(aw.qmc.DeltaBTfunction,tx,RTsname='R2',RTsval=aw.qmc.rateofchange2)
                             except Exception as e: # pylint: disable=broad-except
@@ -4313,9 +4315,11 @@ class tgraphcanvas(FigureCanvas):
 
                         # unfiltereddelta1/2 contains the RoRs respecting the delta_span, but without any delta smoothing AND delta mathformulas applied
                         # we apply a minimal live median spike filter minimizing the delay by choosing a window smaller than in the offline medfilt
-                        if aw.qmc.filterDropOuts and not self.delay > 2000:
-                            aw.qmc.rateofchange1 = aw.qmc.liveMedianRoRfilter(aw.qmc.rateofchange1)
-                            aw.qmc.rateofchange2 = aw.qmc.liveMedianRoRfilter(aw.qmc.rateofchange2)
+                        if aw.qmc.filterDropOuts and self.delay <= 2000:
+                            if aw.qmc.rateofchange1 is not None and aw.qmc.rateofchange1 != -1:
+                                aw.qmc.rateofchange1 = aw.qmc.liveMedianRoRfilter(aw.qmc.rateofchange1)
+                            if aw.qmc.rateofchange2 is not None and aw.qmc.rateofchange2 != -1:
+                                aw.qmc.rateofchange2 = aw.qmc.liveMedianRoRfilter(aw.qmc.rateofchange2)
 
                         sample_unfiltereddelta1.append(aw.qmc.rateofchange1)
                         sample_unfiltereddelta2.append(aw.qmc.rateofchange2)
@@ -4387,7 +4391,7 @@ class tgraphcanvas(FigureCanvas):
                                 o = 0.5
                             else:
                                 o = 0.5 * 1.8
-                            b = aw.BTbreak(length_of_qmc_timex - 1,o)
+                            b = aw.BTbreak(length_of_qmc_timex - 1,o) # call BTbreak with last index
                             if b > 0:
                                 # we found a BT break at the current index minus b
                                 aw.qmc.autoChargeIdx = length_of_qmc_timex - b
@@ -6906,6 +6910,10 @@ class tgraphcanvas(FigureCanvas):
             self.plus_sync_record_hash = None
             self.plus_file_last_modified = None
 
+            # initialize recording version to be stored to new profiles recorded
+            self.recording_version = str(__version__)
+            self.recording_build = str(__build__)
+
             # if we are in KeepON mode, the reset triggered by ON should respect the roastpropertiesflag ("Delete Properties on Reset")
             if self.roastpropertiesflag and (self.flagKeepON or not keepProperties):
                 self.title = QApplication.translate('Scope Title', 'Roaster Scope')
@@ -6982,9 +6990,15 @@ class tgraphcanvas(FigureCanvas):
             self.ystep_up = 0
 
             # reset keyboard mode
-            aw.keyboardmoveindex = 0 # points to the last activated button in keyboardButtonList; we start with the CHARGE button            aw.resetKeyboardButtonMarks()
+            aw.keyboardmoveindex = 0 # points to the last activated button in keyboardButtonList; we start with the CHARGE button
+            aw.resetKeyboardButtonMarks()
 
             aw.setTimerColor('timer')
+
+            try:
+                aw.ntb.update() # reset the MPL navigation history
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
 
             #roast flags
             self.heavyFC_flag = False
@@ -7987,7 +8001,7 @@ class tgraphcanvas(FigureCanvas):
     # if updatebackground is True, the profileDataSemaphore is caught and updatebackground() is called
     @pyqtSlot(str,bool)
     def setProfileTitle(self,title,updatebackground=False):
-        if ((self.flagon and not aw.curFile) or self.flagstart) and self.batchcounter != -1:
+        if ((self.flagon and not aw.curFile) or self.flagstart):
             bprefix = self.batchprefix
             bnr = self.batchcounter + 1
         else:
@@ -7995,6 +8009,8 @@ class tgraphcanvas(FigureCanvas):
             bnr = self.roastbatchnr
         if bnr != 0 and title != '':
             title = f'{bprefix}{str(bnr)} {title}'
+        elif bnr == 0 and title != '' and bprefix != '':
+            title = f'{bprefix} {title}'
 
         if self.graphfont in [1,9]: # if selected font is Humor or Dijkstra we translate the unicode title into pure ascii
             title = self.__to_ascii(title)
@@ -12097,8 +12113,15 @@ class tgraphcanvas(FigureCanvas):
                 pass
             self.OffMonitor()
 
-    def fireChargeTimer(self):
-        self.autoChargeIdx = max(1,len(self.timex))
+    def fireChargeTimer(self): #profileDataSemaphore
+        #### lock shared resources #####
+        try:
+            self.profileDataSemaphore.acquire(1)
+            self.autoChargeIdx = max(1,len(self.timex))
+        finally:
+            if self.profileDataSemaphore.available() < 1:
+                self.profileDataSemaphore.release(1)
+
 
     def OnRecorder(self):
         try:
@@ -12227,6 +12250,10 @@ class tgraphcanvas(FigureCanvas):
             if len(self.timex) > 2:
                 self.fileDirtySignal.emit()
                 aw.autoAdjustAxis() # automatic adjust axis after roast if auto axis is enabled
+                try:
+                    aw.ntb.update() # reset the MPL navigation history
+                except Exception as e: # pylint: disable=broad-except
+                    _log.error(e)
             try:
                 if aw.clusterEventsFlag:
                     aw.clusterEvents()
@@ -17184,6 +17211,7 @@ class ApplicationWindow(QMainWindow):
     setbuttonsfromSignal = pyqtSignal(int)
     loadBackgroundSignal = pyqtSignal(str)
     clearBackgroundSignal = pyqtSignal()
+    setTareSignal = pyqtSignal(int)
     adjustSVSignal = pyqtSignal(int)
     updateSerialLogSignal = pyqtSignal()
     fireslideractionSignal = pyqtSignal(int)
@@ -17249,7 +17277,7 @@ class ApplicationWindow(QMainWindow):
         'extraeventsvisibility', 'fileSaveAction', 'fileSaveAsAction', 'keyboardButtonStyles', 'language_menu_actions', 'loadThemeAction', 'main_button_min_width_str',
         'minieventleft', 'minieventright', 'nLCDS', 'notificationManager', 'notificationsflag', 'ntb', 'pdf_page_layout', 'pdf_rendering', 'productionPDFAction',
         'rankingPDFAction', 'roastReportMenu', 'roastReportPDFAction', 'saveAsThemeAction', 'sliderGrpBox1x', 'sliderGrpBox2x', 'sliderGrpBox3x', 'sliderGrpBox4x',
-        'small_button_min_width_str', 'standard_button_min_width_px', 'tiny_button_min_width_str' ]
+        'small_button_min_width_str', 'standard_button_min_width_px', 'tiny_button_min_width_str', 'recording_version', 'recording_build' ]
 
 
 
@@ -19675,6 +19703,8 @@ class ApplicationWindow(QMainWindow):
             QMessageBox.information(aw,QApplication.translate('Message','One time message about ArtisanViewer'),string)
             settings.setValue('Mode',self.qmc.mode)  #prevent this popup in case a second instance is started before this first one is closed.
 
+        self.recording_version = str(__version__) # saved to and loaded from profiles, indicating the Artisan version that created this profile, will be set to __version__ on RESET
+        self.recording_build = str(__build__) # saved to and loaded from profiles, indicating the Artisan build that created this profile, will be set to __build__ on RESET
 
         # we connect the signals
         self.singleShotPhidgetsPulseOFF.connect(self.processSingleShotPhidgetsPulse)
@@ -19688,6 +19718,7 @@ class ApplicationWindow(QMainWindow):
         self.setbuttonsfromSignal.connect(self.setbuttonsfrom)
         self.loadBackgroundSignal.connect(self.loadbackgroundRedraw)
         self.clearBackgroundSignal.connect(self.clearbackgroundRedraw)
+        self.setTareSignal.connect(self.setTare)
         self.adjustSVSignal.connect(self.adjustPIDsv)
         self.updateSerialLogSignal.connect(self.updateSerialLog)
         self.fireslideractionSignal.connect(self.fireslideraction)
@@ -20219,6 +20250,7 @@ class ApplicationWindow(QMainWindow):
             pass
 
     # set the tare values per channel (0: ET, 1:BT, 2:E1c0, 3:E1c1, 4:E1c0, 5:E1c1,...)
+    @pyqtSlot(int)
     def setTare(self,n):
         if self.qmc.flagon: # we set the tare value
             if n == 0:
@@ -24477,7 +24509,7 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     cmds = eval(cs[len('tare'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,int):
-                                        aw.setTare(cmds-1)
+                                        self.setTareSignal.emit()
                                         self.sendmessage(f'Artisan Command: {cs}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -26809,6 +26841,8 @@ class ApplicationWindow(QMainWindow):
                     prefix = self.qmc.autosaveprefix
                 elif aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0:
                     prefix += aw.qmc.batchprefix + str(aw.qmc.roastbatchnr)
+                elif aw.qmc.batchprefix != '':
+                    prefix += aw.qmc.batchprefix
                 filename = self.generateFilename(prefix=prefix)
                 filename_path = os.path.join(self.qmc.autosavepath,filename)
                 oldDir = str(QDir.current())
@@ -27217,6 +27251,58 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.hideBgafterprofileload:
                     aw.qmc.background = False
                     aw.autoAdjustAxis()
+
+
+
+#                #####
+#                ##### START of autoCHARGE/autoDROP debug
+#                ##
+#                ## uncomment this section to run BTbreak() to re-calc CHARGE and DROP for debugging
+#                ##
+#                _log.info("PRINT #########")
+#                _log.info("PRINT autoCHARGE/autoDROP debug")
+#                chargetime = 0
+#                if self.qmc.timeindex[0] > -1:
+#                    chargetime = self.qmc.timex[self.qmc.timeindex[0]]
+#                    _log.info("PRINT CHARGE Idx: %s (%s@%s)",self.qmc.timeindex[0],stringfromseconds(self.qmc.timex[self.qmc.timeindex[0]]-chargetime),self.qmc.temp2[self.qmc.timeindex[0]])
+#                if aw.qmc.timeindex[6]:
+#                    _log.info("PRINT DROP Idx: %s (%s@%s)",self.qmc.timeindex[6],stringfromseconds(self.qmc.timex[self.qmc.timeindex[6]]-chargetime),self.qmc.temp2[self.qmc.timeindex[6]])
+#                if aw.qmc.mode == 'C':
+#                    o = 0.5
+#                else:
+#                    o = 0.5 * 1.8
+#                if aw.qmc.mode == 'C':
+#                    oo = 0.2
+#                else:
+#                    oo = 0.2 * 1.8
+#                autoChargeIdx = 0
+#                autoDropIdx = 0
+#                for i in range(len(self.qmc.temp2)):
+#                    if i>=5 and self.qmc.temp2 is not None and self.qmc.temp2 != -1:
+#                        # autoCharge:
+#                        if not autoChargeIdx and (self.qmc.mode == 'C' and self.qmc.temp2[i] > 77) or (self.qmc.mode == 'F' and self.qmc.temp2[-1] > 170):
+#                            b = self.BTbreak(i,o)
+#                            if b > 0:
+#                                autoChargeIdx = i - b + 1
+#                                _log.info("PRINT autoChargeIdx: %s (%s@%s)",autoChargeIdx,stringfromseconds(self.qmc.timex[autoChargeIdx]-chargetime),self.qmc.temp2[autoChargeIdx])
+#                                # add event marker
+#                                self.qmc.specialevents.append(autoChargeIdx)
+#                                self.qmc.specialeventstype.append(4)
+#                                self.qmc.specialeventsStrings.append("CHARGE")
+#                                self.qmc.specialeventsvalue.append(0)
+#                        if autoChargeIdx and not autoDropIdx and ((self.qmc.timex[i] - chargetime) > 420) and  ((self.qmc.mode == 'C' and self.qmc.temp2[i] > 160) or (self.qmc.mode == 'F' and self.qmc.temp2[i] > 320)):
+#                            b = self.BTbreak(i,oo)
+#                            if b > 0:
+#                                autoDropIdx = i - b + 1
+#                                _log.info("PRINT autoDropIdx: %s (%s@%s)",autoDropIdx,stringfromseconds(self.qmc.timex[autoDropIdx]-chargetime),self.qmc.temp2[autoDropIdx])
+#                                # add event marker
+#                                self.qmc.specialevents.append(autoDropIdx)
+#                                self.qmc.specialeventstype.append(4)
+#                                self.qmc.specialeventsStrings.append("DROP")
+#                                self.qmc.specialeventsvalue.append(0)
+#                ##### END of autoCHARGE/autoDROP debug
+
+
                 #Plot everything
                 self.qmc.redraw()
                 self.updatePhasesLCDs()
@@ -29326,6 +29412,11 @@ class ApplicationWindow(QMainWindow):
 
             self.updateExtraLCDvisibility()
 
+            if 'recording_version' in profile:
+                self.recording_version = profile['recording_version']
+            if 'recording_build' in profile:
+                self.recording_build = profile['recording_build']
+
 # if auto-adjusted is ticked phases will automatically adjust to the set values in the profile
 # we better not load the phases from the profile not to change the user defined phases settings
 #            if "phases" in profile:
@@ -30223,6 +30314,8 @@ class ApplicationWindow(QMainWindow):
     def getProfile(self):
         try:
             profile = {}
+            profile['recording_version'] = self.recording_version
+            profile['recording_build'] = self.recording_build
             profile['version'] = str(__version__)
             profile['revision'] = str(__revision__)
             profile['build'] = str(__build__)
@@ -30465,8 +30558,10 @@ class ApplicationWindow(QMainWindow):
             if not filename:
                 path = QDir()
                 path.setPath(self.getDefaultPath())
-                if aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0 and self.qmc.autosaveprefix == '':
+                if aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0:
                     prefix = aw.qmc.batchprefix + str(aw.qmc.roastbatchnr)
+                elif aw.qmc.roastbatchprefix != '':
+                    prefix = aw.qmc.roastbatchprefix
                 else:
                     prefix = self.qmc.autosaveprefix
                 fname = path.absoluteFilePath(self.generateFilename(prefix=prefix))
@@ -36568,8 +36663,8 @@ class ApplicationWindow(QMainWindow):
         return index
 
     @staticmethod
-    def checkTop(offset, p0, p1, p2, p3, p4, p5):
-#        print("->",p0,p1,p2,p3,p4,p5)
+    def checkTop(offset, p0, p1, p2, p3, p4, p5, twice=False):
+#        _log.info('PRINT checkTop(%s,%s,%s,%s,%s,%s,%s,%s)',offset,p0,p1,p2,p3,p4,p5,twice)
         d1 = p0 - p1
         d2 = p1 - p2
         #--
@@ -36579,24 +36674,34 @@ class ApplicationWindow(QMainWindow):
         dpost = (d3 + d4) / 2.0
         if aw.qmc.mode == 'C':
             f = 2.5
+            d = -0.67 #-0.55 # minimum temperature delta of the two legs after the event to prevent too early recognition based on noise
+            maxdpre = 6.4 # limit the difference between pre and post to catch the case where temp before the event rises strong
         else:
             f = 2.8 * 1.8
-#        print("checkTop",d3 < .0,d4 < .0,abs(dpost),(offset + (f * abs(dpre))))
-        return bool(d3 < .0 and d4 < .0 and (abs(dpost) > (offset + (f * abs(dpre)))))
-
+            d = -1.2 #-0,99 # minimum temperature delta of the two legs after the event to prevent too early recognition based on noise
+            maxdpre = 11.52
+        if twice:
+            d = d*2
+#        _log.info('PRINT checkTop => %s, %s, %s, %s', d3, d4, abs(dpost), (offset + (f * abs(dpre))))
+#        return bool(d3 < .0 and d4 < .0 and (abs(dpost) > (offset + (f * abs(dpre))))) # v2.8
+        # improved variant requesting for a certain minimum delta between the reading of interest and the next two post event legs:
+        return bool(d3 < d and d4 < d and (abs(dpost) > min(maxdpre, offset + (f * abs(dpre))) ))
 
     # returns True if a BT break at i-2 is detected
+    # i the index of the last reading to be considered to proof that i-2 (or i-4) is the index of the BT break
     # idea:
     # . average delta before i-2 is not negative
     # . average delta after i-2 is negative and twice as high (absolute) as the one before
     def BTbreak(self,i,offset):
-#        print("BTbreak",i,offset,self.qmc.temp2[i])
+#        _log.info('PRINT BTbreak(%s,%s) => %s',i,offset,self.qmc.temp2[i])
         res = 0
         if len(self.qmc.timex)>5 and i < len(self.qmc.timex):
             if self.checkTop(offset,self.qmc.temp2[i-5],self.qmc.temp2[i-4],self.qmc.temp2[i-3],self.qmc.temp2[i-2],self.qmc.temp2[i-1],self.qmc.temp2[i]):
+#                _log.info('PRINT BTbreak tight success')
                 res = 3
-            elif len(self.qmc.timex)>10 and self.checkTop(offset,self.qmc.temp2[i-10],self.qmc.temp2[i-8],self.qmc.temp2[i-6],self.qmc.temp2[i-4],self.qmc.temp2[i-2],self.qmc.temp2[i]):
-                res = 6
+            elif len(self.qmc.timex)>10 and self.checkTop(offset,self.qmc.temp2[i-10],self.qmc.temp2[i-8],self.qmc.temp2[i-6],self.qmc.temp2[i-4],self.qmc.temp2[i-2],self.qmc.temp2[i],twice=True):
+                res = 5
+#                _log.info('PRINT BTbreak loose success')
         return res
 
     # this can be used to find the CHARGE index as well as the DROP index by using
@@ -36690,7 +36795,11 @@ class ApplicationWindow(QMainWindow):
     def thisAUC(self,idx,timex,temp,mode):
         if aw.qmc.AUCbaseFlag:
             # we take the base temperature from the BT at st
-            tbase = temp[idx]
+            if len(temp)>idx and temp[idx] is not None and temp[idx]!=-1:
+                tbase = temp[idx]
+            else:
+                # no proper base temperature available, return AUC=0
+                return 0
         else:
             tbase = aw.qmc.AUCbase
         tbase = convertTemp(tbase,mode,'C')
@@ -36719,7 +36828,7 @@ class ApplicationWindow(QMainWindow):
     # result is in C*seconds
     @staticmethod
     def calcAUC(base, timex, temp, i=-1, temp2=None):
-        if len(timex) > 1 and len(temp) > 1 and (i == -1 or (0 < i < min(len(timex),len(temp)))):
+        if len(timex) > 1 and len(temp) > 1 and (i == -1 or (0 < i < min(len(timex),len(temp)))) and temp[i] is not None and temp[i] != -1 and temp[i-1] is not None and temp[i-1] != -1:
             # at least two readings available
             dt = (timex[i] - timex[i-1])
             t1 = convertTemp(temp[i],aw.qmc.mode,'C')

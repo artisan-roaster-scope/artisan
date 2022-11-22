@@ -1285,8 +1285,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
 
     @pyqtSlot(str)
-    def phidgetHostChanged(self,str):
-        self.phidgetPassword.setEnabled(str != '')
+    def phidgetHostChanged(self,s):
+        self.phidgetPassword.setEnabled(s != '')
 
     @pyqtSlot(int)
     def changeOutprogramFlag(self,_):

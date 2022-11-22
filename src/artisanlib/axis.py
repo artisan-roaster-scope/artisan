@@ -867,6 +867,10 @@ class WindowsDlg(ArtisanDialog):
         if not self.aw.qmc.flagon:
             self.aw.autoAdjustAxis(background=(bool(self.aw.qmc.backgroundpath) and not len(self.aw.qmc.timex) > 3)) # align background if no foreground
         self.aw.qmc.redraw(recomputeAllDeltas=False)
+        try:
+            self.aw.ntb.update() # reset the MPL navigation history
+        except Exception: # pylint: disable=broad-except
+            pass
         string = QApplication.translate('Message','xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})').format(str(self.ylimitEdit_min.text()),str(self.ylimitEdit.text()),str(self.xlimitEdit_min.text()),str(self.xlimitEdit.text()),str(self.zlimitEdit_min.text()),str(self.zlimitEdit.text()))
         self.aw.sendmessage(string)
         self.close()
