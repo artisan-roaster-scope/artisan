@@ -72,8 +72,6 @@ if /i "%BUILD_PYINSTALLER%"=="True" (
     echo ***** Running WAF
     %PYTHON_PATH%\python.exe ./waf all --target-arch=64bit
     cd ..
-    ::setup install is deprecated
-    ::%PYTHON_PATH%\python.exe setup.py -q install
     echo ***** Building Wheel
     %PYTHON_PATH%\python.exe setup.py -q bdist_wheel
     if not exist dist\\pyinstaller-%PYINSTALLER_VER%-py3-none-any.whl (exit /b 102)
@@ -109,7 +107,7 @@ if not exist vc_redist.x64.exe (exit /b 104)
 copy %PYTHON_PATH%\Lib\site-packages\snap7\lib\snap7.dll C:\Windows
 
 ::
-:: download and copy the libusb-win32 dll. NOTE-the version number for appveypr builds is set in the requirements-win*.txt file.
+:: download and copy the libusb-win32 dll. NOTE-the version number for libusb is set in the requirements-win*.txt file.
 ::
 echo curl libusb-win32
 curl -k -L -O https://netcologne.dl.sourceforge.net/project/libusb-win32/libusb-win32-releases/%LIBUSB_VER%/libusb-win32-bin-%LIBUSB_VER%.zip

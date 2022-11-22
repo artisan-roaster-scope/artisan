@@ -20,7 +20,7 @@ do
     fi
 done
 
-# Confirm existance of a toolans set chatool
+# Confirm existance of a tool
 if command -v sha256sum >/dev/null 2>&1 ; then
     shatool="sha256sum"
 elif command -v shasum >/dev/null 2>&1 ; then

@@ -102,7 +102,7 @@ for:
     PYUIC: "pyuic6.exe"
     BUILD_PYINSTALLER: "True"
     ARTISAN_LEGACY: "False"
-    VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+    VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"  #redistributable for VS 2015-2022
 
   install:
     - cmd: echo Windows Install
@@ -155,9 +155,13 @@ for:
     fast_finish: false
 
   environment:
-    ARTISAN_OS: osx
-    PYTHONPATH: /usr/local/lib/python${PYTHON_V}
+    ARTISAN_OS: macos
     MACOSX_DEPLOYMENT_TARGET: 10.15
+    PYTHONSITEPKGS: /Users/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
+    QT_PATH: ${PYTHONSITEPKGS}/PyQt6/Qt6
+    PYUIC: pyuic6
+    PYRCC: pyrcc6
+    PYLUPDATE: ./pylupdate6pro  #the dot slash is necessary
 
   install:
     - echo "MacOS Install"
@@ -168,7 +172,7 @@ for:
     - sed -i'' -e "s/__revision__ = '0'/__revision__ = '$GIT_VERSION'/" src/artisanlib/__init__.py
 
     # run the install script
-    - .ci/install-osx.sh
+    - .ci/install-macos.sh
 
   build_script:
     - echo "MacOS Build"
@@ -177,7 +181,7 @@ for:
         
     # run the build script
     - cd src
-    - ./build-mac3.sh
+    - ./build-macos3.sh
 
 # unit test fails as it runs on Py3.9 while the build installs under brew isntalled Py3.10 (see build-mac3.py)
 #  test_script:
@@ -187,7 +191,6 @@ for:
 #    - path: 'src/artisan-*.dmg'
 
   deploy_script:
-#    - cd src
     - ../.ci/upload.sh artisan-*.dmg
 
 
@@ -199,12 +202,15 @@ for:
 
   environment:
     ARTISAN_OS: linux
-#    PYTHON_V: ${PYTHON_VER}  #3.10
     PYTHON_PATH: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
+    QT_PATH: $PYTHON_PATH/PyQt6/Qt6
 
   install:
     - echo "Linux Install"
     - chmod +x .ci/*.sh
+
+    # pull library versions from requirments file
+    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements-linux.txt 'libusb==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value} 
 
     # update the __revision__ field with the left seven of the GIT commit hash
     - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
@@ -234,4 +240,3 @@ for:
     - ../.ci/upload.sh artisan-*.deb
     - ../.ci/upload.sh artisan-*.rpm
     - ../.ci/upload.sh artisan-*.AppImage
-
