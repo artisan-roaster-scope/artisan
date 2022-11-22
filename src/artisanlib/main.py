@@ -6911,8 +6911,8 @@ class tgraphcanvas(FigureCanvas):
             self.plus_file_last_modified = None
 
             # initialize recording version to be stored to new profiles recorded
-            self.recording_version = str(__version__)
-            self.recording_build = str(__build__)
+            aw.recording_version = str(__version__)
+            aw.recording_build = str(__build__)
 
             # if we are in KeepON mode, the reset triggered by ON should respect the roastpropertiesflag ("Delete Properties on Reset")
             if self.roastpropertiesflag and (self.flagKeepON or not keepProperties):
