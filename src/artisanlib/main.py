@@ -6912,6 +6912,7 @@ class tgraphcanvas(FigureCanvas):
 
             # initialize recording version to be stored to new profiles recorded
             aw.recording_version = str(__version__)
+            aw.recording_revision = str(__revision__)
             aw.recording_build = str(__build__)
 
             # if we are in KeepON mode, the reset triggered by ON should respect the roastpropertiesflag ("Delete Properties on Reset")
@@ -17277,7 +17278,7 @@ class ApplicationWindow(QMainWindow):
         'extraeventsvisibility', 'fileSaveAction', 'fileSaveAsAction', 'keyboardButtonStyles', 'language_menu_actions', 'loadThemeAction', 'main_button_min_width_str',
         'minieventleft', 'minieventright', 'nLCDS', 'notificationManager', 'notificationsflag', 'ntb', 'pdf_page_layout', 'pdf_rendering', 'productionPDFAction',
         'rankingPDFAction', 'roastReportMenu', 'roastReportPDFAction', 'saveAsThemeAction', 'sliderGrpBox1x', 'sliderGrpBox2x', 'sliderGrpBox3x', 'sliderGrpBox4x',
-        'small_button_min_width_str', 'standard_button_min_width_px', 'tiny_button_min_width_str', 'recording_version', 'recording_build' ]
+        'small_button_min_width_str', 'standard_button_min_width_px', 'tiny_button_min_width_str', 'recording_version', 'recording_revision', 'recording_build' ]
 
 
 
@@ -19704,6 +19705,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue('Mode',self.qmc.mode)  #prevent this popup in case a second instance is started before this first one is closed.
 
         self.recording_version = str(__version__) # saved to and loaded from profiles, indicating the Artisan version that created this profile, will be set to __version__ on RESET
+        self.recording_revision = str(__revision__) # saved to and loaded from profiles, indicating the Artisan revision that created this profile, will be set to __revision__ on RESET
         self.recording_build = str(__build__) # saved to and loaded from profiles, indicating the Artisan build that created this profile, will be set to __build__ on RESET
 
         # we connect the signals
@@ -29414,8 +29416,16 @@ class ApplicationWindow(QMainWindow):
 
             if 'recording_version' in profile:
                 self.recording_version = profile['recording_version']
+            else:
+                self.recording_version = 'unknown'
+            if 'recording_revision' in profile:
+                self.recording_revision = profile['recording_revision']
+            else:
+                self.recording_revision = 'unknown'
             if 'recording_build' in profile:
                 self.recording_build = profile['recording_build']
+            else:
+                self.recording_build = 'unknown'
 
 # if auto-adjusted is ticked phases will automatically adjust to the set values in the profile
 # we better not load the phases from the profile not to change the user defined phases settings
@@ -30315,6 +30325,7 @@ class ApplicationWindow(QMainWindow):
         try:
             profile = {}
             profile['recording_version'] = self.recording_version
+            profile['recording_revision'] = self.recording_revision
             profile['recording_build'] = self.recording_build
             profile['version'] = str(__version__)
             profile['revision'] = str(__revision__)
@@ -36682,10 +36693,10 @@ class ApplicationWindow(QMainWindow):
             maxdpre = 11.52
         if twice:
             d = d*2
-#        _log.info('PRINT checkTop => %s, %s, %s, %s', d3, d4, abs(dpost), (offset + (f * abs(dpre))))
+#        _log.info('PRINT checkTop => %s, %s, %s, %s => %s | %s | %s', d3, d4, abs(dpost), (offset + (f * abs(dpre))), dpre, dpost, -dpre - dpost)
 #        return bool(d3 < .0 and d4 < .0 and (abs(dpost) > (offset + (f * abs(dpre))))) # v2.8
         # improved variant requesting for a certain minimum delta between the reading of interest and the next two post event legs:
-        return bool(d3 < d and d4 < d and (abs(dpost) > min(maxdpre, offset + (f * abs(dpre))) ))
+        return bool(d3 < d and d4 < d and ((abs(dpost) > min(maxdpre, offset + (f * abs(dpre)))) or (dpost < 0 and dpre < 0 and (-dpre - dpost) > 1.4)))
 
     # returns True if a BT break at i-2 is detected
     # i the index of the last reading to be considered to proof that i-2 (or i-4) is the index of the BT break
