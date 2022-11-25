@@ -142,11 +142,11 @@ There are also legacy builds for Windows 8 (x64) and macOS 10.13 as well as expe
 
 __Rafael Cobo__ –– brain behind the project
 
-__Marko Luther__ –– maintainer
+__[Marko Luther](/authors/luther/)__ –– maintainer
 
-__Dave Baxter__ –– design wizard & genius
+__[Dave Baxter](/authors/baxter/)__ –– design wizard & genius
 
-__Michael Herbert__ –– documentation & fundraising
+__[Michael Herbert](/authors/herbert/)__ –– documentation & fundraising
 
 __Brett Pound__ –– support
 
