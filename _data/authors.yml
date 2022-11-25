@@ -10,6 +10,9 @@ Marko Luther:
     - label: "Facebook"
       icon: "fab fa-fw fa-facebook-square"
       url: "https://www.facebook.com/marko.luther/"
+    - label: "Mastodon"
+      icon: "fab fa-fw fa-mastodon"
+      url: "https://masto.ai/@marko"
 
 Michael Herbert:
   name     : "Michael Herbert"

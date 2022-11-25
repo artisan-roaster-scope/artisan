@@ -11,7 +11,7 @@
 # https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/#installing-the-theme
 
 # theme                  : "minimal-mistakes-jekyll"
-remote_theme             : "mmistakes/minimal-mistakes@4.23.0"
+remote_theme             : "mmistakes/minimal-mistakes@4.24.0"
 minimal_mistakes_skin    : "default" # "default" "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
 # Site Settings
@@ -92,7 +92,6 @@ social:
   type                   : # Person or Organization (defaults to Person)
   name                   : # If the user or organization name differs from the site's name
   links: # An array of links to social media profiles
-    - "https://twitter.com/mluther"
     - "https://facebook.com/marko.luther"
 
 # Analytics
@@ -132,21 +131,24 @@ author:
 # Site Footer
 footer:
   links:
-    - label: "Twitter"
-      icon: "fab fa-fw fa-twitter-square"
-      url: https://twitter.com/artisanscope
     - label: "Facebook"
       icon: "fab fa-fw fa-facebook-square"
       url: "https://www.facebook.com/ArtisanScope"
-    - label: "Instagram"
-      icon: "fab fa-fw fa-instagram"
-      url: "https://www.instagram.com/artisanscope/"
     - label: "YouTube"
       icon: "fab fa-fw fa-youtube"
       url: "https://www.youtube.com/channel/UCEp-DH_Y7sBR3-X3FWomgog"
+    - label: "Instagram"
+      icon: "fab fa-fw fa-instagram"
+      url: "https://www.instagram.com/artisanscope/"
     - label: "Linked.in"
       icon: "fab fa-fw fa-linkedin"
       url: "https://www.linkedin.com/company/artisan-plus"
+#    - label: "Twitter"
+#      icon: "fab fa-fw fa-twitter-square"
+#      url: https://twitter.com/artisanscope
+    - label: "Mastodon"
+      icon: "fab fa-fw fa-mastodon"
+      url: https://masto.ai/@artisan
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/artisan-roaster-scope/artisan"
