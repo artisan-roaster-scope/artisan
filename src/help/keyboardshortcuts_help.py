@@ -10,9 +10,9 @@ def content():
     helpstr = ''  #@UnusedVariable
     newline = '\n'  #@UnusedVariable
     strlist.append('<head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body>')
-    strlist.append('<b>')
+    strlist.append("<b>")
     strlist.append(QApplication.translate('HelpDlg','KEYBOARD SHORTCUTS'))
-    strlist.append('</b>')
+    strlist.append("</b>")
     tbl_KeyboardShortcuts = prettytable.PrettyTable()
     tbl_KeyboardShortcuts.field_names = [QApplication.translate('HelpDlg','Keys'),QApplication.translate('HelpDlg','Description')]
     tbl_KeyboardShortcuts.add_row([QApplication.translate('HelpDlg','ENTER'),QApplication.translate('HelpDlg','Turns ON/OFF Keyboard Shortcuts')])
@@ -47,10 +47,10 @@ def content():
     tbl_KeyboardShortcuts.add_row([QApplication.translate('HelpDlg','V +  <value>'),QApplication.translate('HelpDlg','Quick PID SV Entry.  Value is a three digit number.  For values less than 100 must be entered with a leading zero, e.g. &#39;v075&#39;.')])
     tbl_KeyboardShortcuts.add_row([QApplication.translate('HelpDlg','OPTION+B + <value> [Mac]\nCTRL+SHIFT+B + <value> [Win]'),QApplication.translate('HelpDlg','Fire custom event button action. Value is a two digit number indicating the button number.')])
     tbl_KeyboardShortcuts.add_row([QApplication.translate('HelpDlg','F\nCTRL+SHIFT+F [Win]'),QApplication.translate('HelpDlg','Full Screen Mode')])
-    strlist.append(tbl_KeyboardShortcuts.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
-    strlist.append('<br/><br/><b>')
+    strlist.append(tbl_KeyboardShortcuts.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
+    strlist.append("<br/><br/><b>")
     strlist.append(QApplication.translate('HelpDlg','ADDITIONAL SHORTCUTS'))
-    strlist.append('</b>')
+    strlist.append("</b>")
     tbl_AddlShortcuts = prettytable.PrettyTable()
     tbl_AddlShortcuts.field_names = [QApplication.translate('HelpDlg','Key/mouse stroke(s)'),QApplication.translate('HelpDlg','Where'),QApplication.translate('HelpDlg','Action'),QApplication.translate('HelpDlg','Additional Information')]
     tbl_AddlShortcuts.add_row([QApplication.translate('HelpDlg','Double click on Roast Title'),QApplication.translate('HelpDlg','Graph'),QApplication.translate('HelpDlg','Open the roast in artisan.plus'),QApplication.translate('HelpDlg','Requires an artisan.plus account')])
@@ -82,10 +82,11 @@ def content():
     tbl_AddlShortcuts.add_row([QApplication.translate('HelpDlg','OPTION click  &#39;+&#39;  button [Mac]\nALT click  &#39;+&#39;  button [Win]'),QApplication.translate('HelpDlg','Roast Properties Roast tab'),QApplication.translate('HelpDlg','Adds Weight Roasted, Volume Roasted, Moisture Roasted, ColorWhole, and Color Ground to the recent roast'),'&#160;'])
     tbl_AddlShortcuts.add_row([QApplication.translate('HelpDlg','OPTION File>> New>> <recent-roast> [Mac]\nALT File>> New>> <recent-roast> [Win]'),QApplication.translate('HelpDlg','Roast Properties Roast tab'),QApplication.translate('HelpDlg','Sets roast properties to <recent-roast> without starting a new roast'),'&#160;'])
     tbl_AddlShortcuts.add_row([QApplication.translate('HelpDlg','OPTION click &#39;Copy Table&#39; Button [Mac]\nALT click &#39;Copy Table&#39; Button [Win]'),QApplication.translate('HelpDlg','Various'),QApplication.translate('HelpDlg','For various tables this copies the table in tabular form'),'&#160;'])
-    strlist.append(tbl_AddlShortcuts.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
-    strlist.append('<br/><br/><b>')
+    tbl_AddlShortcuts.add_row([QApplication.translate('HelpDlg','Click on Home Icon\nWhile recording only'),QApplication.translate('HelpDlg','Navigation Toolbar'),QApplication.translate('HelpDlg','Toggle Zoom Follow (automatic panning)'),QApplication.translate('HelpDlg','Zoom action while recording sets Follow ON')])
+    strlist.append(tbl_AddlShortcuts.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
+    strlist.append("<br/><br/><b>")
     strlist.append(QApplication.translate('HelpDlg','MENU SHORTCUTS'))
-    strlist.append('</b>')
+    strlist.append("</b>")
     tbl_MenuShortcuts = prettytable.PrettyTable()
     tbl_MenuShortcuts.field_names = [QApplication.translate('HelpDlg','Keys'),QApplication.translate('HelpDlg','Menu'),QApplication.translate('HelpDlg','Action')]
     tbl_MenuShortcuts.add_row([QApplication.translate('HelpDlg','⌘+O [Mac]\nCTRL+O [Win]'),QApplication.translate('HelpDlg','File'),QApplication.translate('HelpDlg','Open')])
@@ -107,8 +108,8 @@ def content():
     tbl_MenuShortcuts.add_row([QApplication.translate('HelpDlg','⌘+L [Mac]\nCTRL+L [Win]'),QApplication.translate('HelpDlg','View'),QApplication.translate('HelpDlg','Show/Hide Large Main LCDs')])
     tbl_MenuShortcuts.add_row([QApplication.translate('HelpDlg','⌘+F [Mac]\nCTRL+SHIFT+F [Win]'),QApplication.translate('HelpDlg','View'),QApplication.translate('HelpDlg','Toggle Full Screen Mode \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 \u00A0\u00A0\u00A0\u00A0\u00A0 ')])
     tbl_MenuShortcuts.add_row([QApplication.translate('HelpDlg','F1'),QApplication.translate('HelpDlg','Help'),QApplication.translate('HelpDlg','Open QuickStart Guide in the system browser')])
-    strlist.append(tbl_MenuShortcuts.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
-    strlist.append('</body>')
-    helpstr = ''.join(strlist)
-    helpstr = re.sub(r'&amp;', r'&',helpstr)
+    strlist.append(tbl_MenuShortcuts.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
+    strlist.append("</body>")
+    helpstr = "".join(strlist)
+    helpstr = re.sub(r"&amp;", r"&",helpstr)
     return helpstr
