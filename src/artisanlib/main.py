@@ -11719,7 +11719,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventactionx(self.extrabuttonactions[0],self.extrabuttonactionstrings[0])
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
-            _log.info('ON MONITOR')
+            _log.info('ON MONITOR (sampling @%ss)', aw.float2float(self.delay/1000))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
