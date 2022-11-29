@@ -18,3 +18,4 @@ websocket-client==1.4.2 #1.4.1 # ATTENTION: API changed for all on_ methods that
 PyYAML==6.0 # 5.4.1
 darkdetect==0.7.1 #0.6.0 # detect if dark mode is active
 # darkdetect 0.4.0 and 0.5.0 fail in signed macOS builds as relative paths are not allowed in hardened runtimes PR#15
+psutil==5.9.4

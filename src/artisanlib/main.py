@@ -62,6 +62,8 @@ import io
 import functools
 import dateutil.parser
 from bisect import bisect_right
+import psutil
+from psutil._common import bytes2human
 
 # links CTR-C signals to the system default (ignore)
 import signal
@@ -7146,6 +7148,13 @@ class tgraphcanvas(FigureCanvas):
             aw.autoAdjustAxis(background=not keepProperties) # if reset() triggered by ON, we ignore background on adjusting the axis and adjust according to RESET min/max
             self.redraw(True,sampling=sampling,smooth=aw.qmc.optimalSmoothing) # we need to re-smooth with standard smoothing if ON and optimal-smoothing is ticked
 
+        # write memory stats to the log
+        try:
+            vm = psutil.virtual_memory()
+            _log.info('memory used %s, %s (%s%%) available', bytes2human(psutil.Process().memory_full_info().uss),bytes2human(vm[1]),int(round(100-vm[2])))
+        except Exception: # pylint: disable=broad-except
+            pass
+
         #QApplication.processEvents() # this one seems to be needed for a proper redraw in fullscreen mode on OS X if a profile was loaded and NEW is pressed
         #   this processEvents() seems not to be needed any longer!?
         return True
@@ -12218,7 +12227,6 @@ class tgraphcanvas(FigureCanvas):
                 if self.chargeTimerPeriod > 0:
                     aw.setTimerColor('slowcoolingtimer')
                 QTimer.singleShot(self.chargeTimerPeriod*1000, self.fireChargeTimer)
-
 
             _log.info('START RECORDING')
         except Exception as ex: # pylint: disable=broad-except
@@ -27282,7 +27290,7 @@ class ApplicationWindow(QMainWindow):
 #                for i in range(len(self.qmc.temp2)):
 #                    if i>=5 and self.qmc.temp2 is not None and self.qmc.temp2 != -1:
 #                        # autoCharge:
-#                        if not autoChargeIdx and (self.qmc.mode == 'C' and self.qmc.temp2[i] > 77) or (self.qmc.mode == 'F' and self.qmc.temp2[-1] > 170):
+#                        if not autoChargeIdx and ((self.qmc.mode == 'C' and self.qmc.temp2[i] > 77) or (self.qmc.mode == 'F' and self.qmc.temp2[-1] > 170)):
 #                            b = self.BTbreak(i,o)
 #                            if b > 0:
 #                                autoChargeIdx = i - b + 1
@@ -27292,7 +27300,7 @@ class ApplicationWindow(QMainWindow):
 #                                self.qmc.specialeventstype.append(4)
 #                                self.qmc.specialeventsStrings.append("CHARGE")
 #                                self.qmc.specialeventsvalue.append(0)
-#                        if autoChargeIdx and not autoDropIdx and ((self.qmc.timex[i] - chargetime) > 420) and  ((self.qmc.mode == 'C' and self.qmc.temp2[i] > 160) or (self.qmc.mode == 'F' and self.qmc.temp2[i] > 320)):
+#                        if autoChargeIdx and not autoDropIdx and ((self.qmc.timex[i] - chargetime) > 420) and ((self.qmc.mode == 'C' and self.qmc.temp2[i] > 160) or (self.qmc.mode == 'F' and self.qmc.temp2[i] > 320)):
 #                            b = self.BTbreak(i,oo)
 #                            if b > 0:
 #                                autoDropIdx = i - b + 1
@@ -36692,7 +36700,7 @@ class ApplicationWindow(QMainWindow):
             d = -1.2 #-0,99 # minimum temperature delta of the two legs after the event to prevent too early recognition based on noise
             maxdpre = 11.52
         if twice:
-            d = d*2
+            d = d*1.5
 #        _log.info('PRINT checkTop => %s, %s, %s, %s => %s | %s | %s', d3, d4, abs(dpost), (offset + (f * abs(dpre))), dpre, dpost, -dpre - dpost)
 #        return bool(d3 < .0 and d4 < .0 and (abs(dpost) > (offset + (f * abs(dpre))))) # v2.8
         # improved variant requesting for a certain minimum delta between the reading of interest and the next two post event legs:
