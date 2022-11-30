@@ -5915,6 +5915,37 @@ class tgraphcanvas(FigureCanvas):
             return readings[shiftedindex], evalsign
         return -1, evalsign
 
+    # Computes the shifted value and and sign of the background data (readings), based on the index interpreted w.r.t. foreground time
+    # takes array with readings, the current index, the sign of the shift as character and the shift value
+    # timex is the time array of the foreground and timeb is that of the background
+    # the index is computed w.r.t. the foreground and then mapped to the corresponding index in the given background readings w.r.t. its time array timeb
+    # result is clipped w.r.t. foreground data thus data beyond foreground cannot be accessed in the background
+    # returns val, evalsign
+    @staticmethod
+    def shiftValueEvalsignBackground(timex,timeb,readings,index,sign,shiftval):
+        if sign == '-': #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
+            evalsign = '0'      # "-" becomes digit "0" for python eval compatibility
+            shiftedindex = index - shiftval
+        elif sign == '+': #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
+            evalsign = '1'      #digit 1 = "+"
+            shiftedindex = index + shiftval
+        if len(timex) > 0 and len(timeb)>0:
+            if shiftedindex < 0:
+                return -1, evalsign
+            if shiftedindex >= len(timex):
+                if len(timex)>2:
+                    # we extend the time beyond the foreground
+                    tx = timex[-1] + (1+shiftedindex-len(timex))*(timex[-1] - timex[-2])
+                else:
+                    tx = timex[-1]
+            else:
+                tx = timex[shiftedindex]
+            if timeb[0] <= tx <= timeb[-1]:
+                idx = tgraphcanvas.timearray2index(timeb, tx)
+                if -1 < idx < len(readings):
+                    return readings[idx], evalsign
+        return -1, evalsign
+
     # mathexpression = formula; t = a number to evaluate(usually time);
     # equeditnumber option = plotter edit window number; RTsname = option RealTime var name; RTsval = RealTime var val
     # The given mathexpression has to be a non-empty string!
@@ -6192,7 +6223,7 @@ class tgraphcanvas(FigureCanvas):
                                 seconddigitstr = ''
                                 if mathexpression[i+k+1].isdigit():
                                     nint = int(mathexpression[i+k+1])              #Rnumber int
-                                    #check for TIMESHIFT 0-9 (one digit). Example: "R1[-2]"
+                                    #check for TIMESHIFT 0-9 (one digit). Example: "R1[-2]" or RB1[-2]
                                     if i+k+5 < len(mathexpression) and mathexpression[i+k+2] == '[':
                                         Yshiftval = int(mathexpression[i+k+4])
                                         sign = mathexpression[i+k+3]
@@ -6213,16 +6244,24 @@ class tgraphcanvas(FigureCanvas):
                                                 readings = sample_delta2
                                             else:
                                                 readings = self.delta2B
-                                        val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
+                                        if k == 0:
+                                            val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
+                                        else:
+                                            #if sampling
+                                            if RTsname is not None and RTsname != '':
+                                                idx = index + 1
+                                            else:
+                                                idx = index
+                                            val, evalsign = self.shiftValueEvalsignBackground(sample_timex, self.timeB,readings,idx,sign,Yshiftval)
 
                                         #add expression and values found
                                         evaltimeexpression = ''.join((c,mathexpression[i+k+1],evalsign*2,mathexpression[i+k+4],seconddigitstr,evalsign))
                                         timeshiftexpressions.append(evaltimeexpression)
                                         timeshiftexpressionsvalues.append(val)
                                         #convert "R2[+9]" to Rnumber compatible for python eval() to add to dictionary
-                                        #METHOD USED: replace all non digits chars with sign value.
-                                        #Example1 "R2[-7]" = "R20070"   Example2 "R2[+9]" = "R21191"
-                                        mathexpression = evaltimeexpression.join((mathexpression[:i+k],mathexpression[i+k+6:]))
+                                        #METHOD USED: replace all non digits chars with numbers value.
+                                        #Example1 "R2[-7]" = "R20070"   Example2 "R2[+9]" = "R21191" Example3 "RB2[-1]" = "RB23313
+                                        mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+k+6:]))
 
                                     #direct index access: e.g. "R2{CHARGE}" or "R2{12}"
                                     elif i+k+5 < len(mathexpression) and mathexpression[i+k+2] == '{' and mathexpression.find('}',i+k+3) > -1:
@@ -6259,12 +6298,55 @@ class tgraphcanvas(FigureCanvas):
                                             if k == 0:
                                                 mathdictionary['R1'] = sample_delta1[index]
                                             else:
-                                                mathdictionary['RB1'] = self.delta1B[index]
+                                                #if sampling
+                                                if RTsname is not None and RTsname != '':
+                                                    idx = index + 1
+                                                else:
+                                                    idx = index
+                                                # the index is resolved relative to the time of the foreground profile if available
+                                                if not len(sample_timex):
+                                                    mathdictionary['RB1'] = self.delta1B[idx]
+                                                else:
+                                                    if RTsname is not None and RTsname != '':
+                                                        if len(sample_timex)>2:
+                                                            sample_interval = sample_timex[-1] - sample_timex[-2]
+                                                            tx = sample_timex[index] + sample_interval
+                                                        else:
+                                                            tx = sample_timex[index]
+                                                    else:
+                                                        tx = sample_timex[index]
+                                                    idx = tgraphcanvas.timearray2index(self.timeB, tx)
+                                                    if -1 < idx < len(self.delta1B):
+                                                        res = self.delta1B[idx]
+                                                    else:
+                                                        res = -1
+                                                    mathdictionary['RB1'] = res
                                         elif mathexpression[i+k+1] == '2':
                                             if k == 0:
                                                 mathdictionary['R2'] = sample_delta2[index]
                                             else:
-                                                mathdictionary['RB2'] = self.delta2B[index]
+                                                if RTsname is not None and RTsname != '':
+                                                    idx = index + 1
+                                                else:
+                                                    idx = index
+                                                # the index is resolved relative to the time of the foreground profile if available
+                                                if not len(sample_timex):
+                                                    mathdictionary['RB2'] = self.delta2B[idx]
+                                                else:
+                                                    if RTsname is not None and RTsname != '':
+                                                        if len(sample_timex)>2:
+                                                            sample_interval = sample_timex[-1] - sample_timex[-2]
+                                                            tx = sample_timex[index] + sample_interval
+                                                        else:
+                                                            tx = sample_timex[index]
+                                                    else:
+                                                        tx = sample_timex[index]
+                                                    idx = tgraphcanvas.timearray2index(self.timeB, tx)
+                                                    if -1 < idx < len(self.delta2B):
+                                                        res = self.delta2B[idx]
+                                                    else:
+                                                        res = -1
+                                                    mathdictionary['RB2'] = res
                         except Exception: # pylint: disable=broad-except
                             # if deltas of backgrounds are not visible the data is not calculated and thus this fails with an exception
                             pass
@@ -6385,8 +6467,10 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         if nint == 1: #ETbackground
                                             readings = self.temp1B
+                                            readings_time = self.timeB
                                         elif nint == 2: #BTbackground
                                             readings = self.temp2B
+                                            readings_time = self.timeB
                                         #B3, B4, B5, ...
                                         elif nint > 2:
                                             idx3 = aw.qmc.xtcurveidx - 1
@@ -6395,7 +6479,15 @@ class tgraphcanvas(FigureCanvas):
                                                 readings = self.temp1BX[n3]
                                             else:
                                                 readings = self.temp2BX[n3]
-                                        val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
+                                            readings_time = self.extratimexB[n3]
+#                                        # variant operating directly on the background curve via the given index
+#                                        val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
+                                        # variant operating on the background curve with the given index interpreted as time relative to the foreground curve:
+                                        if RTsname is not None and RTsname != '':
+                                            idx = index + 1
+                                        else:
+                                            idx = index
+                                        val, evalsign = self.shiftValueEvalsignBackground(sample_timex, readings_time, readings,idx,sign,Yshiftval)
                                     evaltimeexpression = ''.join(('B',mathexpression[i+1],evalsign*2,mathexpression[i+4],seconddigitstr,evalsign))
                                     timeshiftexpressions.append(evaltimeexpression)
                                     timeshiftexpressionsvalues.append(val)
@@ -6439,16 +6531,33 @@ class tgraphcanvas(FigureCanvas):
                                         mathdictionary[f'B{mathexpression[i+1]}'] = 0
                                     else:
                                         if nint == 1:
-                                            val = self.temp1B[bindex]
+                                            readings = self.temp1B
                                         elif nint == 2:
-                                            val = self.temp2B[bindex]
+                                            readings = self.temp2B
                                         else:
                                             idx3 = aw.qmc.xtcurveidx - 1
                                             n3 = idx3//2
                                             if aw.qmc.xtcurveidx%2:
-                                                val = self.temp1BX[n3][bindex]
+                                                readings = self.temp1BX[n3]
                                             else:
-                                                val = self.temp2BX[n3][bindex]
+                                                readings = self.temp2BX[n3]
+                                        if len(sample_timex):
+                                            if RTsname is not None and RTsname != '':
+                                                if len(sample_timex)>2:
+                                                    sample_interval = sample_timex[-1] - sample_timex[-2]
+                                                    tx = sample_timex[index] + sample_interval
+                                                else:
+                                                    tx = sample_timex[index]
+                                            else:
+                                                tx = sample_timex[index]
+                                            # the index is resolved relative to the time of the foreground profile if available
+                                            idx = tgraphcanvas.timearray2index(self.timeB, tx)
+                                            if -1 < idx < len(readings):
+                                                val = readings[idx]
+                                            else:
+                                                val = -1
+                                        else:
+                                            val = readings[bindex]
 
                                         mathdictionary[f'B{mathexpression[i+1]}'] = val
 
