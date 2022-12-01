@@ -684,17 +684,21 @@ class tphasescanvas(FigureCanvas):
         self.ax.grid(False)
         self.ax.set_xlim(0,100 + 2*self.m + 2*self.g)
 
+    # a similar function is define in aw:ApplicationWindow
     def setdpi(self,dpi,moveWindow=True):
-        if aw and self.fig:
-            dpi = (dpi + self.dpi_offset) * aw.devicePixelRatio()
-            self.fig.set_dpi(dpi)
-            if moveWindow:
-                with warnings.catch_warnings():
-                    warnings.simplefilter('ignore')
-                    self.fig.canvas.draw()
-                    self.fig.canvas.update()
-                FigureCanvas.updateGeometry(self)  #@UndefinedVariable
-            aw.scroll.setMaximumHeight(self.sizeHint().height())
+        if aw and self.fig and dpi >= 40:
+            try:
+                dpi = (dpi + self.dpi_offset) * aw.devicePixelRatio()
+                self.fig.set_dpi(dpi)
+                if moveWindow:
+                    with warnings.catch_warnings():
+                        warnings.simplefilter('ignore')
+                        self.fig.canvas.draw()
+                        self.fig.canvas.update()
+                    FigureCanvas.updateGeometry(self)  #@UndefinedVariable
+                aw.scroll.setMaximumHeight(self.sizeHint().height())
+            except Exception as e:  # pylint: disable=broad-except
+                _log.exception(e)
 
     # data is expected to be a None or a list of tuples of the form
     #   (label, total_time, (phase1_time, phase2_time, phase3_time), active, color)
@@ -17547,7 +17551,9 @@ class ApplicationWindow(QMainWindow):
         settings = QSettings()
         if settings.contains('dpi') and (not settings.contains('resetqsettings') or toInt(settings.value('resetqsettings',self.resetqsettings)) == 0):
             try:
-                self.dpi = toInt(settings.value('dpi',self.dpi))
+                dpi = toInt(settings.value('dpi',self.dpi))
+                if dpi >= 40:
+                    self.dpi = dpi
             except Exception: # pylint: disable=broad-except
                 pass
 
@@ -23559,23 +23565,26 @@ class ApplicationWindow(QMainWindow):
         super().resizeEvent(event)
 
     def setdpi(self,dpi,moveWindow=True):
-        if aw:
-            aw.dpi = dpi
-            # on mpl >= v2 we assume hidpi support and consider the pixel ratio
-            self.qmc.fig.set_dpi(dpi*aw.devicePixelRatio())
-            #move widget to update display
-            if moveWindow:
-                with warnings.catch_warnings():
-                    warnings.simplefilter('ignore')
-                    aw.qmc.fig.canvas.draw()
-                    aw.qmc.fig.canvas.update()
-                aw.qmc.adjustSize()
-                FigureCanvas.updateGeometry(aw.qmc)  #@UndefinedVariable
-                QApplication.processEvents()
-                if aw.qmc.statssummary:
-                    aw.qmc.redraw(recomputeAllDeltas=False)
-            if aw.qpc:
-                aw.qpc.setdpi(dpi,moveWindow)
+        if aw and dpi >= 40:
+            try:
+                aw.dpi = dpi
+                # on mpl >= v2 we assume hidpi support and consider the pixel ratio
+                self.qmc.fig.set_dpi(dpi*aw.devicePixelRatio())
+                #move widget to update display
+                if moveWindow:
+                    with warnings.catch_warnings():
+                        warnings.simplefilter('ignore')
+                        aw.qmc.fig.canvas.draw()
+                        aw.qmc.fig.canvas.update()
+                    aw.qmc.adjustSize()
+                    FigureCanvas.updateGeometry(aw.qmc)  #@UndefinedVariable
+                    QApplication.processEvents()
+                    if aw.qmc.statssummary:
+                        aw.qmc.redraw(recomputeAllDeltas=False)
+                if aw.qpc:
+                    aw.qpc.setdpi(dpi,moveWindow)
+            except Exception as e:  # pylint: disable=broad-except
+                _log.exception(e)
 
     def enableSaveActions(self):
         if aw:
