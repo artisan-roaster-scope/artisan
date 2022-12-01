@@ -17549,7 +17549,7 @@ class ApplicationWindow(QMainWindow):
         #mpl.rcParams['toolbar'] is None # this does not work to remove the default toolbar
 
         settings = QSettings()
-        if settings.contains('dpi') and (not settings.contains('resetqsettings') or toInt(settings.value('resetqsettings',self.resetqsettings)) == 0):
+        if settings.contains('dpi') and (not settings.contains('resetqsettings') or toInt(settings.value('resetqsettings',self.resetqsettings)) == 0) and Qt.KeyboardModifier.AltModifier not in QApplication.queryKeyboardModifiers():
             try:
                 dpi = toInt(settings.value('dpi',self.dpi))
                 if dpi >= 40:
@@ -19559,7 +19559,7 @@ class ApplicationWindow(QMainWindow):
         self.splitter.setFrameShape(QFrame.Shape.NoFrame)
         #self.splitter.handle(0).setVisible(False)
         settings = QSettings()
-        if settings.contains('MainSplitter'):
+        if settings.contains('MainSplitter') and Qt.KeyboardModifier.AltModifier not in QApplication.queryKeyboardModifiers():
             self.splitter.restoreState(settings.value('MainSplitter'))
 
         self.splitter.setHandleWidth(7)
@@ -31169,7 +31169,7 @@ class ApplicationWindow(QMainWindow):
                 settings = QSettings()
             if settings.contains('resetqsettings'):
                 self.resetqsettings = toInt(settings.value('resetqsettings',self.resetqsettings))
-                if self.resetqsettings:
+                if self.resetqsettings or (filename is None and Qt.KeyboardModifier.AltModifier in QApplication.queryKeyboardModifiers()):
                     self.resetqsettings = 0
                     if 'canvas' in aw.qmc.palette:
                         aw.updateCanvasColors(checkColors=False)
@@ -40277,6 +40277,7 @@ def main():
         QApplication.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
     else:
         QApplication.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+
     aw.settingsLoad(redraw=False) # redraw is triggered later in the startup process again
     aw.restoreExtraDeviceSettingsBackup() # load settings backup if it exists (like on RESET)
 
