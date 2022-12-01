@@ -34188,7 +34188,8 @@ class ApplicationWindow(QMainWindow):
                 if unsaved_changes:
                     # in case we have unsaved changes and the user decided to discard those, we first reset to have the correct settings (like axis limits) saved
                     self.qmc.reset(redraw=False,soundOn=False,sampling=False,keepProperties=False,fireResetAction=False)
-                self.closeEventSettings()
+                if Qt.KeyboardModifier.AltModifier not in QApplication.queryKeyboardModifiers():
+                    self.closeEventSettings()
                 gc.collect()
                 QApplication.exit()
                 return True

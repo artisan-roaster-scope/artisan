@@ -328,6 +328,7 @@ Section Uninstall
   RMDir /r "$INSTDIR\numpy"
   RMDir /r "$INSTDIR\openpyxl"
   RMDir /r "$INSTDIR\PIL"
+  RMDir /r "$INSTDIR\psutil"
   RMDir /r "$INSTDIR\pyinstaller"
   RMDir /r "$INSTDIR\pytz"
   RMDir /r "$INSTDIR\pywin32_system32"
