@@ -822,6 +822,9 @@ class EventsDlg(ArtisanResizeablDialog):
         helpsliderbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.setButtonTranslations(helpsliderbutton,'Help',QApplication.translate('Button','Help'))
         helpsliderbutton.clicked.connect(self.showSliderHelp)
+        self.sliderKeyboardControlflag = QCheckBox(QApplication.translate('CheckBox','Keyboard Control'))
+        self.sliderKeyboardControlflag.setToolTip(QApplication.translate('Tooltip', 'Move slider under focus using the up/down cursor keys'))
+        self.sliderKeyboardControlflag.setChecked(self.aw.eventsliderKeyboardControl)
         ## tab4
         qeventtitlelabel = QLabel(QApplication.translate('Label','Event'))
         qeventtitlelabel.setFont(titlefont)
@@ -1380,7 +1383,10 @@ class EventsDlg(ArtisanResizeablDialog):
 
         SliderHelpHBox = QHBoxLayout()
         SliderHelpHBox.addStretch()
+        SliderHelpHBox.addStretch()
         SliderHelpHBox.addWidget(helpsliderDialogButton)
+        SliderHelpHBox.addStretch()
+        SliderHelpHBox.addWidget(self.sliderKeyboardControlflag)
         C5VBox = QVBoxLayout()
         C5VBox.addLayout(tab5Layout)
         C5VBox.addStretch()
@@ -2879,6 +2885,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.autoChargeFlagstored = self.aw.qmc.autoChargeFlag
         self.autoDropFlagstored = self.aw.qmc.autoDropFlag
         self.markTPFlagstored = self.aw.qmc.markTPflag
+        self.eventsliderKeyboardControlstored = self.aw.eventsliderKeyboardControl
         # buttons
         self.extraeventslabels = self.aw.extraeventslabels[:]
         self.extraeventsdescriptions = self.aw.extraeventsdescriptions[:]
@@ -2940,6 +2947,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.qmc.chargeTimerPeriod = self.chargeTimerPeriodstored
         self.aw.qmc.autoChargeFlag = self.autoChargeFlagstored
         self.aw.qmc.autoDropFlag = self.autoDropFlagstored
+        self.aw.eventsliderKeyboardControl = self.eventsliderKeyboardControlstored
         self.aw.qmc.markTPflag = self.markTPFlagstored
         # buttons saved only if ok is pressed, so no restore needed
         self.aw.buttonlistmaxlen = self.buttonlistmaxlen
@@ -3075,6 +3083,13 @@ class EventsDlg(ArtisanResizeablDialog):
                 self.aw.qmc.autoChargeFlag = self.autoCharge.isChecked()
                 self.aw.qmc.autoDropFlag = self.autoDrop.isChecked()
                 self.aw.qmc.markTPflag = self.markTP.isChecked()
+                # keyboard control flag
+                self.aw.eventsliderKeyboardControl = self.sliderKeyboardControlflag.isChecked()
+                if self.aw.eventsliderKeyboardControl != self.eventsliderKeyboardControlstored and self.aw.sliderFrame.isVisible():
+                    if self.aw.eventsliderKeyboardControl:
+                        self.aw.setSliderFocusPolicy(Qt.FocusPolicy.StrongFocus)
+                    else:
+                        self.aw.setSliderFocusPolicy(Qt.FocusPolicy.NoFocus)
                 #save quantifiers
                 self.aw.updateSlidersProperties() # set visibility and event names on slider widgets
 # we don't do that anymore!

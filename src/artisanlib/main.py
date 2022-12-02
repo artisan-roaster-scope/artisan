@@ -927,7 +927,7 @@ class tgraphcanvas(FigureCanvas):
         'on_timex', 'on_temp1', 'on_temp2', 'on_ctimex1', 'on_ctimex2', 'on_ctemp1', 'on_ctemp2','on_tstemp1', 'on_tstemp2', 'on_unfiltereddelta1',
         'on_unfiltereddelta2', 'on_delta1', 'on_delta2', 'on_extratemp1', 'on_extratemp2', 'on_extratimex', 'on_extractimex1', 'on_extractemp1', 'on_extractimex2', 'on_extractemp2',
         'timeindex', 'ETfunction', 'BTfunction', 'DeltaETfunction', 'DeltaBTfunction', 'safesaveflag', 'pid', 'background', 'backgroundprofile', 'backgroundprofile_moved_x', 'backgroundprofile_moved_y', 'backgroundDetails',
-        'backgroundeventsflag', 'backgroundpath', 'backgroundUUID', 'backgroundUUID', 'backgroundShowFullflag', 'titleB', 'roastbatchnrB', 'roastbatchprefixB',
+        'backgroundeventsflag', 'backgroundpath', 'backgroundUUID', 'backgroundUUID', 'backgroundShowFullflag', 'backgroundKeyboardControlFlag', 'titleB', 'roastbatchnrB', 'roastbatchprefixB',
         'roastbatchposB', 'temp1B', 'temp2B', 'temp1BX', 'temp2BX', 'timeB', 'temp1Bdelta', 'temp2Bdelta',
         'stemp1B', 'stemp2B', 'stemp1BX', 'stemp2BX', 'extraname1B', 'extraname2B', 'extratimexB', 'xtcurveidx', 'ytcurveidx', 'delta1B', 'delta2B', 'timeindexB',
         'TP_time_B_loaded', 'backgroundEvents', 'backgroundEtypes', 'backgroundEvalues', 'backgroundEStrings', 'backgroundalpha', 'backgroundmetcolor',
@@ -1856,6 +1856,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundUUID = None
         self.backgroundmovespeed = 30
         self.backgroundShowFullflag = False
+        self.backgroundKeyboardControlFlag = True
         self.titleB = ''
         self.roastbatchnrB = 0
         self.roastbatchprefixB = ''
@@ -17359,7 +17360,7 @@ class ApplicationWindow(QMainWindow):
         'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
         'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
-        'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventslideractions', 'eventslidercommands', 'eventslideroffsets',
+        'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventsliderKeyboardControl', 'eventslideractions', 'eventslidercommands', 'eventslideroffsets',
         'eventsliderfactors', 'eventslidermin', 'eventsMaxValue', 'eventslidermax', 'eventslidersflags', 'eventsliderBernoulli', 'eventslidercoarse',
         'eventslidertemp', 'eventsliderunits', 'eventslidermoved', 'SVslidermoved', 'eventquantifieractive', 'eventquantifiersource', 'eventquantifierSV',
         'eventquantifiermin', 'eventquantifiermax', 'eventquantifiercoarse', 'eventquantifieraction', 'clusterEventsFlag', 'eventquantifierlinspaces',
@@ -17671,6 +17672,7 @@ class ApplicationWindow(QMainWindow):
         #event sliders
         self.eventslidervalues = [0,0,0,0]
         self.eventslidervisibilities = [0,0,0,0]
+        self.eventsliderKeyboardControl = True # if false sliders cannot be moved using up/down keys
         self.eventslideractions = [0,0,0,0] # 0: None, 1: Serial Command, 2: Modbus Command, 3: DTA Command, 4: Call Program, 5: Hottop Heater, 6: Hottop Fan
         self.eventslidercommands = ['','','','']
         self.eventslideroffsets = [0,0,0,0]
@@ -19631,7 +19633,7 @@ class ApplicationWindow(QMainWindow):
         self.slider1.sliderReleased.connect(self.slider1released)
         # needed for both tracking variants:
         self.slider1.actionTriggered.connect(self.slider1actionTriggered)
-        self.slider1.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus
+        self.slider1.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus NoFocus
 
         self.slider2 = self.slider()
         self.sliderLCD2 = self.sliderLCD()
@@ -22533,22 +22535,22 @@ class ApplicationWindow(QMainWindow):
     # set slider focus to Qt.FocusPolicy.StrongFocus to allow keyboard control and
     # Qt.FocusPolicy.NoFocus to deactivate it
     def setSliderFocusPolicy(self,focus):
-        if bool(aw.eventslidervisibilities[0]):
+        if self.eventsliderKeyboardControl and bool(aw.eventslidervisibilities[0]):
             self.slider1.setFocusPolicy(focus)
         else:
             self.slider1.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.slider1.clearFocus()
-        if bool(aw.eventslidervisibilities[1]):
+        if self.eventsliderKeyboardControl and bool(aw.eventslidervisibilities[1]):
             self.slider2.setFocusPolicy(focus)
         else:
             self.slider2.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.slider2.clearFocus()
-        if bool(aw.eventslidervisibilities[2]):
+        if self.eventsliderKeyboardControl and bool(aw.eventslidervisibilities[2]):
             self.slider3.setFocusPolicy(focus)
         else:
             self.slider3.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.slider3.clearFocus()
-        if bool(aw.eventslidervisibilities[3]):
+        if self.eventsliderKeyboardControl and bool(aw.eventslidervisibilities[3]):
             self.slider4.setFocusPolicy(focus)
         else:
             self.slider4.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -26387,24 +26389,24 @@ class ApplicationWindow(QMainWindow):
                 elif k == 16777234:               #MOVES CURRENT BUTTON LEFT
                     if self.keyboardmoveflag:
                         self.moveKbutton('left')
-                    elif aw.qmc.background:
+                    elif aw.qmc.background and aw.qmc.backgroundKeyboardControlFlag:
                         aw.qmc.movebackground('left',aw.qmc.backgroundmovespeed)
                         self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
                         aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
                 elif k == 16777236:               #MOVES CURRENT BUTTON RIGHT
                     if self.keyboardmoveflag:
                         self.moveKbutton('right')
-                    elif aw.qmc.background:
+                    elif aw.qmc.background and aw.qmc.backgroundKeyboardControlFlag:
                         aw.qmc.movebackground('right',aw.qmc.backgroundmovespeed)
                         self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
                         aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
                 elif k == 16777235:               #UP
-                    if aw.qmc.background:
+                    if aw.qmc.background and aw.qmc.backgroundKeyboardControlFlag:
                         aw.qmc.movebackground('up',aw.qmc.backgroundmovespeed)
                         self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
                         aw.qmc.redraw(recomputeAllDeltas=False,sampling=aw.qmc.flagon)
                 elif k == 16777237:               #DOWN
-                    if aw.qmc.background:
+                    if aw.qmc.background and aw.qmc.backgroundKeyboardControlFlag:
                         aw.qmc.movebackground('down',aw.qmc.backgroundmovespeed)
                         self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
                         aw.qmc.redraw(recomputeAllDeltas=False,sampling=aw.qmc.flagon)
@@ -32528,6 +32530,8 @@ class ApplicationWindow(QMainWindow):
                 self.eventslidercommands = list(map(str,list(toStringList(settings.value('slidercommands',self.eventslidercommands)))))
                 self.eventslideroffsets = [toFloat(x) for x in toList(settings.value('slideroffsets',self.eventslideroffsets))]
                 self.eventsliderfactors = [toFloat(x) for x in toList(settings.value('sliderfactors',self.eventsliderfactors))]
+            if settings.contains('eventsliderKeyboardControl'):
+                aw.eventsliderKeyboardControl = bool(toBool(settings.value('eventsliderKeyboardControl',aw.eventsliderKeyboardControl)))
             if settings.contains('slidermin'):
                 self.eventslidermin = [toInt(x) for x in toList(settings.value('slidermin',self.eventslidermin))]
                 self.eventslidermax = [toInt(x) for x in toList(settings.value('slidermax',self.eventslidermax))]
@@ -32593,6 +32597,8 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.backgroundBTcurve = bool(toBool(settings.value('BTBflag',aw.qmc.backgroundBTcurve)))
             if settings.contains('backgroundShowFullflag'):
                 aw.qmc.backgroundShowFullflag = bool(toBool(settings.value('backgroundShowFullflag',aw.qmc.backgroundShowFullflag)))
+            if settings.contains('backgroundKeyboardControlFlag'):
+                aw.qmc.backgroundKeyboardControlFlag = bool(toBool(settings.value('backgroundKeyboardControlFlag',aw.qmc.backgroundKeyboardControlFlag)))
             if settings.contains('clearBgbeforeprofileload'):
                 aw.qmc.clearBgbeforeprofileload = bool(toBool(settings.value('clearBgbeforeprofileload',aw.qmc.clearBgbeforeprofileload)))
             if settings.contains('hideBgafterprofileload'):
@@ -33907,6 +33913,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue('ETBflag',aw.qmc.backgroundETcurve)
             settings.setValue('BTBflag',aw.qmc.backgroundBTcurve)
             settings.setValue('backgroundShowFullflag',aw.qmc.backgroundShowFullflag)
+            settings.setValue('backgroundKeyboardControlFlag',aw.qmc.backgroundKeyboardControlFlag)
             settings.setValue('clearBgbeforeprofileload',aw.qmc.clearBgbeforeprofileload)
             settings.setValue('hideBgafterprofileload',aw.qmc.hideBgafterprofileload)
             settings.endGroup()
@@ -33971,6 +33978,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.beginGroup('Sliders')
             settings.setValue('slidervisibilities',self.eventslidervisibilities)
+            settings.setValue('eventsliderKeyboardControl',self.eventsliderKeyboardControl)
             settings.setValue('slideractions',self.eventslideractions)
             settings.setValue('slidercommands',self.eventslidercommands)
             settings.setValue('slideroffsets',self.eventslideroffsets)
@@ -34188,7 +34196,7 @@ class ApplicationWindow(QMainWindow):
                 if unsaved_changes:
                     # in case we have unsaved changes and the user decided to discard those, we first reset to have the correct settings (like axis limits) saved
                     self.qmc.reset(redraw=False,soundOn=False,sampling=False,keepProperties=False,fireResetAction=False)
-                if Qt.KeyboardModifier.AltModifier not in QApplication.queryKeyboardModifiers():
+                if QApplication.queryKeyboardModifiers() != Qt.KeyboardModifier.AltModifier:
                     self.closeEventSettings()
                 gc.collect()
                 QApplication.exit()
