@@ -978,7 +978,9 @@ class tgraphcanvas(FigureCanvas):
         'l_eventtype4annos', 'l_annotations', 'l_background_annotations', 'l_annotations_dict', 'l_annotations_pos_dict', 'l_event_flags_dict',
         'l_event_flags_pos_dict', 'ai', 'timeclock', 'threadserver', 'designerflag', 'designerconnections', 'mousepress', 'indexpoint',
         'workingline', 'eventtimecopy', 'specialeventsStringscopy', 'specialeventsvaluecopy', 'specialeventstypecopy', 'currentx', 'currenty',
-        'designertimeinit', 'BTsplinedegree', 'ETsplinedegree', 'reproducedesigner', 'designertemp1init', 'designertemp2init',
+        'designertimeinit', 'BTsplinedegree', 'ETsplinedegree', 'reproducedesigner', 'designertemp1init', 'designertemp2init', 'ax_background_designer', 'designer_timez', 'time_step_size',
+        '_designer_orange_mark', '_designer_orange_mark_shown', '_designer_blue_mark', '_designer_blue_mark_shown', 'l_temp1_markers', 'l_temp2_markers',
+        'l_stat1', 'l_stat2', 'l_stat3', 'l_div1', 'l_div2', 'l_div3', 'l_div4',
         'filterDropOut_replaceRoR_period', 'filterDropOut_spikeRoR_period', 'filterDropOut_tmin_C_default', 'filterDropOut_tmax_C_default',
         'filterDropOut_tmin_F_default', 'filterDropOut_tmax_F_default', 'filterDropOut_spikeRoR_dRoR_limit_C_default', 'filterDropOut_spikeRoR_dRoR_limit_F_default',
         'filterDropOuts', 'filterDropOut_tmin', 'filterDropOut_tmax', 'filterDropOut_spikeRoR_dRoR_limit', 'minmaxLimits',
@@ -2471,7 +2473,7 @@ class tgraphcanvas(FigureCanvas):
         ##########################     Designer variables       #################################
         self.designerflag = False
         self.designerconnections = [None,None,None,None]   #mouse event ids
-        self.mousepress = None
+        self.mousepress = False
         self.indexpoint = 0
         self.workingline = 2  #selects ET or BT
         self.eventtimecopy = []
@@ -2486,6 +2488,23 @@ class tgraphcanvas(FigureCanvas):
         self.reproducedesigner = 0      #flag to add events to help reproduce (replay) the profile: 0 = none; 1 = sv; 2 = ramp
         self.designertemp1init = []
         self.designertemp2init = []
+        self.ax_background_designer = None # canvas background in designer mode for bitblitting
+        self.designer_timez = None
+        self.time_step_size = 2 # only every 2sec a point to increase speed of redrawing
+        # designer artist line caches
+        self._designer_orange_mark = None
+        self._designer_orange_mark_shown = False
+        self._designer_blue_mark = None
+        self._designer_blue_mark_shown = False
+        self.l_temp1_markers = None
+        self.l_temp2_markers = None
+        self.l_stat1 = None
+        self.l_stat2 = None
+        self.l_stat3 = None
+        self.l_div1 = None
+        self.l_div2 = None
+        self.l_div3 = None
+        self.l_div4 = None
 
         ###########################         filterDropOut variables     ################################
 
@@ -2886,6 +2905,14 @@ class tgraphcanvas(FigureCanvas):
         else:
             while len(self.ax.lines) > 0:
                 self.ax.lines[0].remove()
+
+    def ax_annotations_clear(self):
+        for l in self.l_annotations + self.l_background_annotations:
+            if l:
+                try:
+                    l.remove()
+                except Exception: # pylint: disable=broad-except
+                    pass
 
     # set current burner settings as defaults
     def setEnergyLoadDefaults(self):
@@ -7193,11 +7220,12 @@ class tgraphcanvas(FigureCanvas):
             self.autoDryIdx = 0
             self.autoFCsIdx = 0
 
-            self.l_annotations = [] # initiate the event annotations
-            # we initialize the annotation position dict of the foreground profile
-            self.deleteAnnoPositions(foreground=True, background=False)
-            self.l_event_flags_dict = {} # initiate the event id to temp/time annotation dict for flags
-            self.l_background_annotations = [] # initiate the background event annotations
+            if redraw: # only if redraw follows we remove the cached artists
+                self.l_annotations = [] # initiate the event annotations
+                # we initialize the annotation position dict of the foreground profile
+                self.deleteAnnoPositions(foreground=True, background=False)
+                self.l_event_flags_dict = {} # initiate the event id to temp/time annotation dict for flags
+                self.l_background_annotations = [] # initiate the background event annotations
 
             if not sampling:
                 aw.hideDefaultButtons()
@@ -8345,7 +8373,7 @@ class tgraphcanvas(FigureCanvas):
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
     def redraw(self, recomputeAllDeltas=True, smooth=True, sampling=False, takelock=True, forceRenewAxis=False):
         if aw.qmc.designerflag:
-            aw.qmc.redrawdesigner()
+            aw.qmc.redrawdesigner(force=True)
         elif bool(aw.comparator):
             aw.comparator.redraw()
             aw.qpc.redraw_phases()
@@ -10305,14 +10333,6 @@ class tgraphcanvas(FigureCanvas):
                     self.l_AUCguide = self.ax.axvline(0,visible=False,color = self.palette['aucguide'],
                                                 label=aw.arabicReshape(QApplication.translate('Label', 'AUCguide')),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
-
-                # if designer ON
-                if self.designerflag:
-#                    if self.background:
-#                        self.ax.lines = self.ax.lines[2:] # this might be wrong as the background can also have deltas, 3rd curve and 4x event artists!!
-                    if len(self.timex):
-                        self.xaxistosm()
-                        self.redrawdesigner()
 
                 if aw.qmc.patheffects:
                     rcParams['path.effects'] = []
@@ -15223,8 +15243,8 @@ class tgraphcanvas(FigureCanvas):
             #
             self.reset(redraw=False,soundOn=False)
             self.connect_designer()
-            self.designerinit()
             aw.disableEditMenus(designer=True)
+            self.designerinit()
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -15262,7 +15282,7 @@ class tgraphcanvas(FigureCanvas):
                 self.temp2 = obj['temp2']
                 self.timeindex = obj['timeindex']
                 self.xaxistosm(redraw=False)
-                self.redrawdesigner()
+                self.redrawdesigner(force=True)
                 aw.sendmessage(QApplication.translate('Message','Points loaded'))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -15280,11 +15300,6 @@ class tgraphcanvas(FigureCanvas):
         elif self.mode == 'F':
             self.designertemp1init = [446.,446.,446.,446.,437.,428.,419.,302.]
             self.designertemp2init = [410.,300.,388.,404.,413.,415.5,419.,302.]
-
-        #check x limits
-        #if self.endofx < 960:
-        #    self.endofx = 960
-        #    self.redraw()
 
         idx = 0
         self.timex,self.temp1,self.temp2 = [],[],[]
@@ -15321,7 +15336,11 @@ class tgraphcanvas(FigureCanvas):
 
         if not self.locktimex:
             self.xaxistosm(redraw=False)
-        self.redrawdesigner()
+
+        # import UnivariateSpline needed to draw the curve in designer
+        from scipy.interpolate import UnivariateSpline # @UnusedImport # pylint: disable=import-error
+        global UnivariateSpline
+        self.redrawdesigner(force=True)
 
     #loads main points from a profile so that they can be edited
     def initfromprofile(self):
@@ -15376,57 +15395,146 @@ class tgraphcanvas(FigureCanvas):
 
         if not self.locktimex:
             self.xaxistosm(redraw=False)
-        self.redrawdesigner()                                   #redraw the designer screen
+        self.redrawdesigner(force=True)                                   #redraw the designer screen
         return True
 
     #redraws designer
-    def redrawdesigner(self):
+    def redrawdesigner(self,force=False): #if force is set the bitblit cache is ignored and a full redraw is triggered
+        from scipy.interpolate import UnivariateSpline
         if aw.qmc.designerflag:
-            #pylint: disable=E0611
-            #reset (clear) plot
-            self.ax_lines_clear()
-            # remove logo image while in Designer
-            if self.ai is not None:
-                try:
-                    self.ai.remove()
-                except Exception: # pylint: disable=broad-except
-                    pass
 
-            fontprop_medium = aw.mpl_fontproperties.copy()
-            fontprop_medium.set_size('medium')
-            self.set_xlabel(aw.arabicReshape(QApplication.translate('Label', 'Designer')))
+            if not self.locktimex and self.timex[-1] > self.endofx:
+                self.endofx = self.timex[-1] + 120
+                self.xaxistosm()
+                self.ax_background_designer = None
 
-            #draw background
-            if self.background:
-                self.ax.plot(self.timeB, self.stemp1B,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
-                                                sketch_params=None,path_effects=[],
-                                                linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
-                                                alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate('Label', 'BackgroundET')))
-                self.ax.plot(self.timeB, self.stemp2B,markersize=self.BTbackmarkersize,marker=self.BTbackmarker,
-                                                linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
-                                                sketch_params=None,path_effects=[],
-                                                alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate('Label', 'BackgroundBT')))
+            if self.ax_background_designer is None or force:
+                # we first initialize the background canvas and the bitblit cache
+                self.designer_timez = numpy.arange(self.timex[0],self.timex[-1],self.time_step_size)
+
+                #pylint: disable=E0611
+                #reset (clear) plot
+                self.ax_lines_clear()
+                self.ax_annotations_clear() # remove background profiles annotations
+
+                # remove logo image while in Designer
+                if self.ai is not None:
+                    try:
+                        self.ai.remove()
+                    except Exception: # pylint: disable=broad-except
+                        pass
+                fontprop_medium = aw.mpl_fontproperties.copy()
+                fontprop_medium.set_size('medium')
+                self.set_xlabel(aw.arabicReshape(QApplication.translate('Label', 'Designer')))
+
+                if not self.locktimex and self.timex[-1] > self.endofx:
+                    self.endofx = self.timex[-1] + 120
+                    self.xaxistosm()
+
+                # init artists
+                rcParams['path.sketch'] = (0,0,0)
+
+
+                #draw background
+                if self.background:
+                    if self.backgroundShowFullflag:
+                        btime = self.timeB
+                        b1temp = self.stemp1B
+                        b2temp = self.stemp2B
+                    else:
+                        bcharge_idx = 0
+                        if self.timeindexB[0] > -1:
+                            bcharge_idx = self.timeindexB[0]
+                        bdrop_idx = len(self.timeB)-1
+                        if self.timeindexB[6] > 0:
+                            bdrop_idx = self.timeindexB[6]
+                        btime = self.timeB[bcharge_idx:bdrop_idx]
+                        b1temp = self.stemp1B[bcharge_idx:bdrop_idx]
+                        b2temp = self.stemp2B[bcharge_idx:bdrop_idx]
+
+                    self.ax.plot(btime,b1temp,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
+                                                    sketch_params=None,path_effects=[],
+                                                    linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
+                                                    alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate('Label', 'BackgroundET')))
+                    self.ax.plot(btime,b2temp,markersize=self.BTbackmarkersize,marker=self.BTbackmarker,
+                                                    linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
+                                                    sketch_params=None,path_effects=[],
+                                                    alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate('Label', 'BackgroundBT')))
+
+                self.l_stat1, = self.ax.plot([],[],color = self.palette['rect1'],alpha=.5,linewidth=5)
+                self.l_stat2, = self.ax.plot([],[],color = self.palette['rect2'],alpha=.5,linewidth=5)
+                self.l_stat3, = self.ax.plot([],[],color = self.palette['rect3'],alpha=.5,linewidth=5)
+
+                self.l_div1, = self.ax.plot([],[],color = self.palette['grid'],alpha=.3,linewidth=3,linestyle='--')
+                self.l_div2, = self.ax.plot([],[],color = self.palette['grid'],alpha=.3,linewidth=3,linestyle='--')
+                self.l_div3, = self.ax.plot([],[],color = self.palette['grid'],alpha=.3,linewidth=3,linestyle='--')
+                self.l_div4, = self.ax.plot([],[],color = self.palette['grid'],alpha=.3,linewidth=3,linestyle='--')
+
+                if (self.DeltaBTflag or self.DeltaETflag) and self.delta_ax is not None:
+                    trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
+
+                self.l_delta1, = self.ax.plot([],[],transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
+                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette['background'])],
+                    linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette['deltaet'],
+                    label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate('Label', 'ET')))
+                self.l_delta2, = self.ax.plot([],[],transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
+                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette['background'])],
+                    linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette['deltabt'],
+                    label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate('Label', 'BT')))
+
+                self.l_temp1, = self.ax.plot([], [],markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,
+                    linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette['et'],
+                        label=QApplication.translate('Label', 'ET'))
+                self.l_temp2, = self.ax.plot([], [], markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,
+                    linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette['bt'],
+                        label=QApplication.translate('Label', 'BT'))
+
+                self.l_temp1_markers, = self.ax.plot([],[],color = self.palette['et'],marker = 'o',picker=10,linestyle='',markersize=8)
+                self.l_temp2_markers, = self.ax.plot([],[],color = self.palette['bt'],marker = 'o',picker=10,linestyle='',markersize=8)
+
+                self._designer_orange_mark, = self.ax.plot([],[],color = 'orange',marker = 'o',alpha = .3,markersize=30)
+                self._designer_blue_mark, = self.ax.plot([],[],color = 'blue',marker = 'o',alpha = .3,markersize=30)
+
+                #plot
+                with warnings.catch_warnings():
+                    warnings.simplefilter('ignore')
+                    self.fig.canvas.draw() # NOTE: this needs to be done NOW and not via draw_idle() at any time later, to avoid ghost lines
+
+                # initialize bitblit background
+                self.ax_background_designer = self.fig.canvas.copy_from_bbox(aw.qmc.ax.get_figure().bbox)
+
+
+
+            # restore background
+            self.fig.canvas.restore_region(self.ax_background_designer)
+
 
             #create statistics bar
             #calculate the positions for the statistics elements
             ydist = self.ylimit - self.ylimit_min
             statisticsheight = self.ylimit - (0.13 * ydist)
+            stats_ys = [statisticsheight,statisticsheight]
 
             #add statistics bar
-            self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[1]]],[statisticsheight,statisticsheight],color = self.palette['rect1'],alpha=.5,linewidth=5)
-            self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[2]]],[statisticsheight,statisticsheight],color = self.palette['rect2'],alpha=.5,linewidth=5)
-            self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[6]]],[statisticsheight,statisticsheight],color = self.palette['rect3'],alpha=.5,linewidth=5)
+
+            self.l_stat1.set_data([self.timex[self.timeindex[0]],self.timex[self.timeindex[1]]],stats_ys)
+            self.ax.draw_artist(self.l_stat1)
+            self.l_stat2.set_data([self.timex[self.timeindex[1]],self.timex[self.timeindex[2]]],stats_ys)
+            self.ax.draw_artist(self.l_stat2)
+            self.l_stat3.set_data([self.timex[self.timeindex[2]],self.timex[self.timeindex[6]]],stats_ys)
+            self.ax.draw_artist(self.l_stat3)
 
             #add phase division lines
-            ylist = [self.ylimit,0]
-            self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[0]]],ylist,color = self.palette['grid'],alpha=.3,linewidth=3,linestyle='--')
-            self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[1]]],ylist,color = self.palette['grid'],alpha=.3,linewidth=3,linestyle='--')
-            self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[2]]],ylist,color = self.palette['grid'],alpha=.3,linewidth=3,linestyle='--')
-            self.ax.plot([self.timex[self.timeindex[6]],self.timex[self.timeindex[6]]],ylist,color = self.palette['grid'],alpha=.3,linewidth=3,linestyle='--')
 
-            if not self.locktimex and self.timex[-1] > self.endofx:
-                self.endofx = self.timex[-1] + 120
-                self.xaxistosm()
+            ylist = [self.ylimit,0]
+            self.l_div1.set_data([self.timex[self.timeindex[0]],self.timex[self.timeindex[0]]],ylist)
+            self.ax.draw_artist(self.l_div1)
+            self.l_div2.set_data([self.timex[self.timeindex[1]],self.timex[self.timeindex[1]]],ylist)
+            self.ax.draw_artist(self.l_div2)
+            self.l_div3.set_data([self.timex[self.timeindex[2]],self.timex[self.timeindex[2]]],ylist)
+            self.ax.draw_artist(self.l_div3)
+            self.l_div4.set_data([self.timex[self.timeindex[6]],self.timex[self.timeindex[6]]],ylist)
+            self.ax.draw_artist(self.l_div4)
 
             if self.BTsplinedegree >= len(self.timex):  #max 5 or less. Cannot biger than points
                 self.BTsplinedegree = len(self.timex)-1
@@ -15434,13 +15542,11 @@ class tgraphcanvas(FigureCanvas):
             if self.ETsplinedegree >= len(self.timex):  #max 5 or less. Cannot biger than points
                 self.ETsplinedegree = len(self.timex)-1
 
-            timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
             try:
-                from scipy.interpolate import UnivariateSpline
-                func = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
-                btvals = func(timez).tolist()
-                func2 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
-                etvals = func2(timez).tolist()
+                func2 = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
+                btvals = func2(self.designer_timez)
+                func1 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
+                etvals = func1(self.designer_timez)
             except Exception: # pylint: disable=broad-except
                 aw.qmc.adderror(QApplication.translate('Error Message', 'Exception: redrawdesigner() Roast events may be out of order. Restting Designer.'))
                 self.reset_designer()
@@ -15448,47 +15554,41 @@ class tgraphcanvas(FigureCanvas):
 
             #convert all time values to temperature
 
-            rcParams['path.sketch'] = (0,0,0)
-
-            if (self.DeltaBTflag or self.DeltaETflag) and self.delta_ax is not None:
-                trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
-            if self.DeltaBTflag:
-                funcDelta = func.derivative()
-                deltabtvals = [x*60 for x in funcDelta(timez).tolist()]
-                self.ax.plot(timez,deltabtvals,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette['background'])],
-                    linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette['deltabt'],
-                    label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate('Label', 'BT')))
+            if self.DeltaBTflag and self.l_delta2:
+                funcDelta2 = func2.derivative()
+                deltabtvals = funcDelta2(self.designer_timez) * 60
+                self.l_delta2.set_data(self.designer_timez,deltabtvals)
+                self.ax.draw_artist(self.l_delta2)
 
             if self.DeltaETflag:
-                funcDelta2 = func2.derivative()
-                deltaetvals = [x*60 for x in funcDelta2(timez).tolist()]
-                self.ax.plot(timez,deltaetvals,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette['background'])],
-                    linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette['deltaet'],
-                    label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate('Label', 'ET')))
+                funcDelta1 = func1.derivative()
+                deltaetvals = funcDelta1(self.designer_timez) * 60
+                self.l_delta1.set_data(self.designer_timez,deltaetvals)
+                self.ax.draw_artist(self.l_delta1)
 
             #add curves
-            if self.ETcurve:
-                self.ax.plot(timez, etvals,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,
-                    linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette['et'],
-                        label=QApplication.translate('Label', 'ET'))
-            if self.BTcurve:
-                self.ax.plot(timez, btvals, markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,
-                    linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette['bt'],
-                        label=QApplication.translate('Label', 'BT'))
+            if self.ETcurve and self.l_temp1:
+                self.l_temp1.set_data(self.designer_timez, etvals)
+                self.ax.draw_artist(self.l_temp1)
+            if self.BTcurve and self.l_temp2:
+                self.l_temp2.set_data(self.designer_timez, btvals)
+                self.ax.draw_artist(self.l_temp2)
 
             #add markers (big circles) '0'
-            if self.ETcurve:
-                self.ax.plot(self.timex,self.temp1,color = self.palette['et'],marker = 'o',picker=10,linestyle='',markersize=8)
-            if self.BTcurve:
-                self.ax.plot(self.timex,self.temp2,color = self.palette['bt'],marker = 'o',picker=10,linestyle='',markersize=8)     #picker = 10 means 10 points tolerance
+            if self.ETcurve and self.l_temp1_markers:
+                self.l_temp1_markers.set_data(self.timex,self.temp1)
+                self.ax.draw_artist(self.l_temp1_markers)
+            if self.BTcurve and self.l_temp2_markers:
+                self.l_temp2_markers.set_data(self.timex,self.temp2)
+                self.ax.draw_artist(self.l_temp2_markers)
 
+            if self._designer_orange_mark_shown:
+                self.ax.draw_artist(self._designer_orange_mark)
+            if self._designer_blue_mark_shown:
+                self.ax.draw_artist(self._designer_blue_mark)
 
-            #plot
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore')
-                self.fig.canvas.draw()
+            self.fig.canvas.blit(self.ax.get_figure().bbox)
+            self.fig.canvas.flush_events()
 
     #CONTEXT MENU  = Right click
     def on_press(self,event):
@@ -15503,7 +15603,7 @@ class tgraphcanvas(FigureCanvas):
             aw.ntb.release_pan(event)
             aw.ntb.release_zoom(event)
             # set cursor
-            self.setCursor(Qt.CursorShape.OpenHandCursor)
+            self.setCursor(Qt.CursorShape.PointingHandCursor)
 
             self.currentx = event.xdata
             self.currenty = event.ydata
@@ -15576,6 +15676,51 @@ class tgraphcanvas(FigureCanvas):
     def on_release(self,_):
         self.mousepress = False
         self.setCursor(Qt.CursorShape.OpenHandCursor)
+        self.redrawdesigner(force=True)
+
+    def phases_to_messageline(self):
+        totaltime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
+        dryphasetime = self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]
+        midphasetime = self.timex[self.timeindex[2]] - self.timex[self.timeindex[1]]
+        finishphasetime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]]
+
+        if totaltime:
+            dryphaseP = int(round(dryphasetime*100./totaltime))
+            midphaseP = int(round(midphasetime*100./totaltime))
+            finishphaseP = int(round(finishphasetime*100./totaltime))
+        else:
+            return
+
+        midramp = self.temp2[self.timeindex[2]] - self.temp2[self.timeindex[1]]
+        finishramp = self.temp2[self.timeindex[6]] - self.temp2[self.timeindex[2]]
+
+        min_bt,time_min_bt = self.findTPdes()
+        dryrampTP = self.temp2[self.timeindex[1]] - min_bt
+        dryphasetimeTP = self.timex[self.timeindex[1]] - time_min_bt
+
+        if dryphasetimeTP:
+            dryroc = f' {((dryrampTP/dryphasetimeTP)*60.):.1f} {aw.qmc.mode}/min'
+        else:
+            dryroc = f' 0 {aw.qmc.mode}/min'
+
+        if midphasetime:
+            midroc = f' {((midramp/midphasetime)*60.):.1f} {aw.qmc.mode}/min'
+        else:
+            midroc = '/min' f' 0 {aw.qmc.mode}/min'
+
+        if finishphasetime:
+            finishroc = f' {((finishramp/finishphasetime)*60.):.1f} {aw.qmc.mode}/min'
+        else:
+            finishroc = f'/min' f' 0 {aw.qmc.mode}/min'
+
+        margin = '&nbsp;&nbsp;&nbsp;'
+        text_color_rect1 = 'white' if aw.QColorBrightness(QColor(self.palette['rect1'])) < 128 else 'black'
+        string1 = f" <font color = \"{text_color_rect1}\" style=\"BACKGROUND-COLOR: {self.palette['rect1']}\">{margin}{stringfromseconds(dryphasetime)}{margin}{dryphaseP}%{margin}{dryroc}{margin}</font>"
+        text_color_rect2 = 'white' if aw.QColorBrightness(QColor(self.palette['rect2'])) < 128 else 'black'
+        string2 = f" <font color = \"{text_color_rect2}\" style=\"BACKGROUND-COLOR: {self.palette['rect2']}\">{margin} {stringfromseconds(midphasetime)} {margin} {midphaseP}% {margin} {midroc} {margin}</font>"
+        text_color_rect3 = 'white' if aw.QColorBrightness(QColor(self.palette['rect3'])) < 128 else 'black'
+        string3 = f" <font color = \"{text_color_rect3}\" style=\"BACKGROUND-COLOR: {self.palette['rect3']}\">{margin} {stringfromseconds(finishphasetime)} {margin} {finishphaseP}% {margin} {finishroc} {margin}</font>"
+        aw.sendmessage(f'{string1}{string2}{string3}',append=False)
 
     #handler for moving point
     def on_motion(self,event):
@@ -15592,6 +15737,11 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     self.temp2[self.indexpoint] = ydata
 
+                if self._designer_orange_mark_shown:
+                    self._designer_orange_mark.set_data([event.xdata], [ydata])
+                elif self._designer_blue_mark_shown:
+                    self._designer_blue_mark.set_data([event.xdata], [ydata])
+
                 #check point going over point
                 #check to the left
                 if self.indexpoint > 0:
@@ -15606,28 +15756,47 @@ class tgraphcanvas(FigureCanvas):
 
                 #check for possible CHARGE time moving
                 if self.indexpoint == self.timeindex[0]:
+                    self.designer_timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
                     self.xaxistosm(redraw=False)
+
+                #check for possible DROP/COOL time moving
+                if (self.timeindex[7] and self.indexpoint == self.timeindex[7]) or (not self.timeindex[7] and self.indexpoint == self.timeindex[6]):
+                    self.designer_timez = numpy.arange(self.timex[0],self.timex[-1],self.time_step_size)
 
                 #redraw
                 self.redrawdesigner()
+
+                if self.indexpoint in self.timeindex:
+                    #report phases to messageline on moving event points
+                    self.phases_to_messageline()
+                else:
+                    #report time of the additional point in blue
+                    timez = stringfromseconds(self.timex[self.indexpoint] - self.timex[self.timeindex[0]])
+                    aw.sendmessage(timez,style="background-color:'lightblue';",append=False)
                 return
 
+            orange_hit = False
+            blue_hit = False
             if type(event.xdata):                       #outside graph type is None
                 for i in range(len(self.timex)):
                     if abs(event.xdata - self.timex[i]) < 7.:
                         if i in self.timeindex:
                             if abs(self.temp2[i] - ydata) < 10:
-                                self.ax.plot(self.timex[i],self.temp2[i],color = 'orange',marker = 'o',alpha = .3,markersize=30)
-                                with warnings.catch_warnings():
-                                    warnings.simplefilter('ignore')
-                                    self.fig.canvas.draw()
-                                QTimer.singleShot(600, self.redrawdesigner)
+                                orange_hit = True
+                                if not self._designer_orange_mark_shown:
+                                    self._designer_orange_mark_shown = True
+                                    self._designer_orange_mark.set_data(self.timex[i],self.temp2[i])
+                                    self.ax.draw_artist(self._designer_orange_mark)
+                                    self.fig.canvas.blit(self.ax.get_figure().bbox)
+                                    self.fig.canvas.flush_events()
                             elif abs(self.temp1[i] - ydata) < 10:
-                                self.ax.plot(self.timex[i],self.temp1[i],color = 'orange',marker = 'o',alpha = .3,markersize=30)
-                                with warnings.catch_warnings():
-                                    warnings.simplefilter('ignore')
-                                    self.fig.canvas.draw()
-                                QTimer.singleShot(600, self.redrawdesigner)
+                                orange_hit = True
+                                if not self._designer_orange_mark_shown:
+                                    self._designer_orange_mark_shown = True
+                                    self._designer_orange_mark.set_data(self.timex[i],self.temp1[i])
+                                    self.ax.draw_artist(self._designer_orange_mark)
+                                    self.fig.canvas.blit(self.ax.get_figure().bbox)
+                                    self.fig.canvas.flush_events()
                             index = self.timeindex.index(i)
                             if index == 0:
                                 timez = stringfromseconds(0)
@@ -15655,63 +15824,44 @@ class tgraphcanvas(FigureCanvas):
                                 aw.sendmessage(QApplication.translate('Message', '[ COOL ]') + ' ' + timez, style="background-color:'#6FB5D1';",append=False)
                             break
                         if abs(self.temp2[i] - ydata) < 10:
-                            self.ax.plot(self.timex[i],self.temp2[i],color = 'blue',marker = 'o',alpha = .3,markersize=30)
-                            with warnings.catch_warnings():
-                                warnings.simplefilter('ignore')
-                                self.fig.canvas.draw()
-                            QTimer.singleShot(600, self.redrawdesigner)
+                            blue_hit = True
+                            if not self._designer_blue_mark_shown:
+                                self._designer_blue_mark_shown = True
+                                self._designer_blue_mark.set_data(self.timex[i],self.temp2[i])
+                                self.ax.draw_artist(self._designer_blue_mark)
+                                self.fig.canvas.blit(self.ax.get_figure().bbox)
+                                self.fig.canvas.flush_events()
                         elif abs(self.temp1[i] - ydata) < 10:
-                            self.ax.plot(self.timex[i],self.temp1[i],color = 'blue',marker = 'o',alpha = .3,markersize=30)
-                            with warnings.catch_warnings():
-                                warnings.simplefilter('ignore')
-                                self.fig.canvas.draw()
-                            QTimer.singleShot(600, self.redrawdesigner)
+                            blue_hit = True
+                            if not self._designer_blue_mark_shown:
+                                self._designer_blue_mark_shown = True
+                                self._designer_blue_mark.set_data(self.timex[i],self.temp1[i])
+                                self.ax.draw_artist(self._designer_blue_mark)
+                                self.fig.canvas.blit(self.ax.get_figure().bbox)
+                                self.fig.canvas.flush_events()
                         timez = stringfromseconds(self.timex[i] - self.timex[self.timeindex[0]])
                         aw.sendmessage(timez,style="background-color:'lightblue';",append=False)
                         break
-                    totaltime = aw.float2float(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
-                    dryphasetime = aw.float2float(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
-                    midphasetime = aw.float2float(self.timex[self.timeindex[2]] - self.timex[self.timeindex[1]])
-                    finishphasetime = aw.float2float(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
+                draw_idle = False
+                if not orange_hit and self._designer_orange_mark_shown:
+                    # clear mark
+                    self._designer_orange_mark_shown = False
+                    self._designer_orange_mark.set_data([], [])
+                    draw_idle = True
+                if not blue_hit and self._designer_blue_mark_shown:
+                    # clear mark
+                    self._designer_blue_mark_shown = False
+                    self._designer_blue_mark.set_data([], [])
+                    draw_idle = True
+                if draw_idle:
+                    self.redrawdesigner(force=True)
 
-                    if totaltime:
-                        dryphaseP = int(round(dryphasetime*100./totaltime))
-                        midphaseP = int(round(midphasetime*100./totaltime))
-                        finishphaseP = int(round(finishphasetime*100./totaltime))
-                    else:
-                        return
+                if orange_hit or blue_hit:
+                    self.setCursor(Qt.CursorShape.OpenHandCursor)
+                else:
+                    self.setCursor(Qt.CursorShape.PointingHandCursor) # Qt.CursorShape.PointingHandCursor or Qt.CursorShape.ArrowCursor
+                    self.phases_to_messageline()
 
-                    #dryramp = self.temp2[self.timeindex[1]] - self.temp2[self.timeindex[0]] # ML: unused
-                    midramp = self.temp2[self.timeindex[2]] - self.temp2[self.timeindex[1]]
-                    finishramp = self.temp2[self.timeindex[6]] - self.temp2[self.timeindex[2]]
-
-                    min_bt,time_min_bt = self.findTPdes()
-                    dryrampTP = self.temp2[self.timeindex[1]] - min_bt
-                    dryphasetimeTP = self.timex[self.timeindex[1]] - time_min_bt
-
-                    if dryphasetimeTP:
-                        dryroc = (' %.1f ' + aw.qmc.mode + '/min')%((dryrampTP/dryphasetimeTP)*60.)
-                    else:
-                        dryroc = ' 0 ' + aw.qmc.mode + '/min'
-
-                    if midphasetime:
-                        midroc = (' %.1f ' + aw.qmc.mode + '/min')%((midramp/midphasetime)*60.)
-                    else:
-                        midroc = ' 0 ' + aw.qmc.mode + '/min'
-
-                    if finishphasetime:
-                        finishroc = (' %.1f ' + aw.qmc.mode + '/min')%((finishramp/finishphasetime)*60.)
-                    else:
-                        finishroc = 0
-
-                    margin = '&nbsp;&nbsp;&nbsp;'
-                    string1 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s</font>"%(self.palette['rect1'],
-                              margin,stringfromseconds(dryphasetime),margin, dryphaseP, margin,dryroc,margin)
-                    string2 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s</font>"%(self.palette['rect2'],
-                              margin,stringfromseconds(midphasetime),margin,midphaseP,margin,midroc,margin)
-                    string3 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s</font>"%(self.palette['rect3'],
-                              margin,stringfromseconds(finishphasetime),margin,finishphaseP,margin,finishroc,margin)
-                    aw.sendmessage(string1+string2+string3,append=False)
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -15783,7 +15933,7 @@ class tgraphcanvas(FigureCanvas):
                 self.timex.append(self.currentx)
                 #no need to update time index
 
-                self.redrawdesigner()
+                self.redrawdesigner(force=True)
                 return # 0
 
             if self.currentx < self.timex[0]:         #if point is below min timex (all the way to the left)
@@ -15806,7 +15956,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.timeindex[u]:
                         self.timeindex[u] += 1
 
-                self.redrawdesigner()
+                self.redrawdesigner(force=True)
                 return # len(self.timex)-1   #return index received from Designer Dialog Config to assign index to timeindex)
 
             #mid range
@@ -15831,7 +15981,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.timeindex[x] >= i:
                         self.timeindex[x] += 1
 
-            self.redrawdesigner()
+            self.redrawdesigner(force=True)
             return # i
 
         except Exception as e: # pylint: disable=broad-except
@@ -15871,13 +16021,32 @@ class tgraphcanvas(FigureCanvas):
                 if self.timeindex[x] > index: #decrease time index by one when above the index taken out
                     self.timeindex[x] = max(0,self.timeindex[x] - 1)
 
-            self.redrawdesigner()
+            self.redrawdesigner(force=True)
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' removepoint() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
+
+    def clear_designer(self):
+        # removes all generated artists and cleans the bitblit cache
+        self.ax_background_designer = None
+        self.ax_lines_clear()
+        # clear references
+        self._designer_orange_mark = None
+        self._designer_orange_mark_shown = False
+        self._designer_blue_mark = None
+        self._designer_blue_mark_shown = False
+        self.l_temp1_markers = None
+        self.l_temp2_markers = None
+        self.l_stat1 = None
+        self.l_stat2 = None
+        self.l_stat3 = None
+        self.l_div1 = None
+        self.l_div2 = None
+        self.l_div3 = None
+        self.l_div4 = None
 
 
     #converts from a designer profile to a normal profile
@@ -15965,7 +16134,7 @@ class tgraphcanvas(FigureCanvas):
         if not self.designerflag:
             self.designerflag = True
             aw.designerAction.setChecked(True)
-            self.setCursor(Qt.CursorShape.OpenHandCursor)
+            self.setCursor(Qt.CursorShape.PointingHandCursor)
             self.mousepress = None
             #create mouse events. Note: keeping the ids inside a list helps protect against extrange python behaviour.
             self.designerconnections = [None,None,None,None]
@@ -26189,14 +26358,18 @@ class ApplicationWindow(QMainWindow):
                 aw.minieventsflags[0] = 1
 
     def toggleForegroundShowfullFlag(self):
-        self.qmc.foregroundShowFullflag = not self.qmc.foregroundShowFullflag
-        self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
-        self.qmc.redraw(recomputeAllDeltas=False)
+        if not self.qmc.designerflag:
+            self.qmc.foregroundShowFullflag = not self.qmc.foregroundShowFullflag
+            self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
+            self.qmc.redraw(recomputeAllDeltas=False)
 
     def toggleBackroundShowfullFlag(self):
         self.qmc.backgroundShowFullflag = not self.qmc.backgroundShowFullflag
-        self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
-        self.qmc.redraw(recomputeAllDeltas=False)
+        if self.qmc.designerflag:
+            self.qmc.redrawdesigner(force=True)
+        else:
+            self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
+            self.qmc.redraw(recomputeAllDeltas=False)
 
     def updatePlaybackIndicator(self):
         if self.qmc.l_subtitle is not None:
@@ -26265,7 +26438,7 @@ class ApplicationWindow(QMainWindow):
                 elif k == 79:                       #O (toggle background showfull flag)
                     self.toggleBackroundShowfullFlag()
                 elif k == 72:                       #H  (load / delete background profile
-                    if not self.qmc.designerflag and not bool(aw.comparator):
+                    if not bool(aw.comparator):
                         # allow SHIFT-H for all platforms (ALT-H additionally for non-Windows platforms)
                         if ((alt_modifier or shift_modifier) and platf != 'Windows') or (control_shift_modifier or control_alt_modifier and platf == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
                             self.deleteBackground()
@@ -35573,12 +35746,7 @@ class ApplicationWindow(QMainWindow):
 
                             # remove annotations, lines and other artists from background profile
                             try:
-                                for l in aw.qmc.l_annotations + aw.qmc.l_background_annotations:
-                                    if l:
-                                        try:
-                                            l.remove()
-                                        except Exception: # pylint: disable=broad-except
-                                            pass
+                                self.qmc.ax_annotations_clear()
                                 for l in [
                                         aw.qmc.l_back1,
                                         aw.qmc.l_back2,
@@ -38134,6 +38302,7 @@ class ApplicationWindow(QMainWindow):
 
     def stopdesigner(self):
         aw.enableEditMenus()
+        self.qmc.clear_designer()
         self.qmc.convert_designer()
         self.updateReadingsLCDsVisibility()
         self.updateSlidersVisibility()
