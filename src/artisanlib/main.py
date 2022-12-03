@@ -15339,7 +15339,7 @@ class tgraphcanvas(FigureCanvas):
 
         # import UnivariateSpline needed to draw the curve in designer
         from scipy.interpolate import UnivariateSpline # @UnusedImport # pylint: disable=import-error
-        global UnivariateSpline
+        global UnivariateSpline # pylint: disable=global-statement
         self.redrawdesigner(force=True)
 
     #loads main points from a profile so that they can be edited
