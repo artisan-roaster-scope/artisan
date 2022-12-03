@@ -15489,8 +15489,8 @@ class tgraphcanvas(FigureCanvas):
                     linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette['bt'],
                         label=QApplication.translate('Label', 'BT'))
 
-                self.l_temp1_markers, = self.ax.plot([],[],color = self.palette['et'],marker = 'o',picker=10,linestyle='',markersize=8)
-                self.l_temp2_markers, = self.ax.plot([],[],color = self.palette['bt'],marker = 'o',picker=10,linestyle='',markersize=8)
+                self.l_temp1_markers, = self.ax.plot([],[],color = self.palette['et'],marker = 'o',picker=True, pickradius=10,linestyle='',markersize=8)
+                self.l_temp2_markers, = self.ax.plot([],[],color = self.palette['bt'],marker = 'o',picker=True, pickradius=10,linestyle='',markersize=8)
 
                 self._designer_orange_mark, = self.ax.plot([],[],color = 'orange',marker = 'o',alpha = .3,markersize=30)
                 self._designer_blue_mark, = self.ax.plot([],[],color = 'blue',marker = 'o',alpha = .3,markersize=30)
@@ -16499,7 +16499,7 @@ class tgraphcanvas(FigureCanvas):
                     radii.append(Wradii[z])
 
                 bar.append(self.ax2.bar(theta, radii, width=segmentwidth, bottom=lbottom[z],edgecolor=self.wheellinecolor,
-                                        linewidth=self.wheellinewidth,picker=3))
+                                        linewidth=self.wheellinewidth,picker=True,pickerradius=3))
                 count = 0
                 #set color, alpha, and text
                 for _,bar[z] in zip(radii, bar[z]):
