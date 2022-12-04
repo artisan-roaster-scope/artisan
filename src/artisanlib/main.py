@@ -15781,7 +15781,7 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(len(self.timex)):
                     if abs(event.xdata - self.timex[i]) < 7.:
                         if i in self.timeindex:
-                            if abs(self.temp2[i] - ydata) < 10:
+                            if self.BTcurve and abs(self.temp2[i] - ydata) < 10:
                                 orange_hit = True
                                 if not self._designer_orange_mark_shown:
                                     self._designer_orange_mark_shown = True
@@ -15789,7 +15789,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.ax.draw_artist(self._designer_orange_mark)
                                     self.fig.canvas.blit(self.ax.get_figure().bbox)
                                     self.fig.canvas.flush_events()
-                            elif abs(self.temp1[i] - ydata) < 10:
+                            elif self.ETcurve and abs(self.temp1[i] - ydata) < 10:
                                 orange_hit = True
                                 if not self._designer_orange_mark_shown:
                                     self._designer_orange_mark_shown = True
@@ -15823,7 +15823,7 @@ class tgraphcanvas(FigureCanvas):
                                 timez = stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]])
                                 aw.sendmessage(QApplication.translate('Message', '[ COOL ]') + ' ' + timez, style="background-color:'#6FB5D1';",append=False)
                             break
-                        if abs(self.temp2[i] - ydata) < 10:
+                        if self.BTcurve and abs(self.temp2[i] - ydata) < 10:
                             blue_hit = True
                             if not self._designer_blue_mark_shown:
                                 self._designer_blue_mark_shown = True
@@ -15831,7 +15831,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.ax.draw_artist(self._designer_blue_mark)
                                 self.fig.canvas.blit(self.ax.get_figure().bbox)
                                 self.fig.canvas.flush_events()
-                        elif abs(self.temp1[i] - ydata) < 10:
+                        elif self.ETcurve and abs(self.temp1[i] - ydata) < 10:
                             blue_hit = True
                             if not self._designer_blue_mark_shown:
                                 self._designer_blue_mark_shown = True
