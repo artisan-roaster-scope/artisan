@@ -1205,7 +1205,7 @@ class tgraphcanvas(FigureCanvas):
         # default delay between readings in milliseconds
         self.default_delay: Final = 2000 # default 2s
         self.delay = self.default_delay
-        self.min_delay = 250 # 500 # 1000
+        self.min_delay = 250 #500 # 1000 # Note that a 0.25s min delay puts a lot of performance pressure on the app
 
         # extra event sampling interval in milliseconds. If 0, then extra sampling commands are sent "in sync" with the standard sampling commands
         self.extra_event_sampling_delay = 0 # sync, 0.5s, 1.0s, 1.5s,.., 5s => 0, 500, 1000, 1500, ..
@@ -3545,7 +3545,7 @@ class tgraphcanvas(FigureCanvas):
                                 if self.timeindex[i] and self.timeindex[i] != -1:
                                     idx_after = self.timeindex[i]
                             if ((not idx_before) or timex > idx_before) and ((not idx_after) or timex < idx_after):
-                                if not self.flagstart or (k[1] == 0) or (k[1] != 0 and self.timeindex[k[1]] != 0): # only add menu item during recording if already a value is set (via a button)
+                                if not self.flagstart or (k[1] == 0) or (k[1] != 0 and self.timeindex[k[1]] != 0): # only add menu item during recording if already a value is set (via a button); but for CHARGE
                                     ac = QAction(menu)
                                     ac.key = (k[1],timex)
                                     ac.setText(' ' + k[0])
@@ -3590,7 +3590,7 @@ class tgraphcanvas(FigureCanvas):
                 except Exception: # pylint: disable=broad-except
                     pass
                 # realign to background
-                if self.flagon:
+                if self.flagstart:
                     try:
                         if self.locktimex:
                             self.startofx = self.locktimex_start + self.timex[self.timeindex[0]]
@@ -3598,6 +3598,10 @@ class tgraphcanvas(FigureCanvas):
                             self.startofx = self.chargemintime + self.timex[self.timeindex[0]] # we set the min x-axis limit to the CHARGE Min time
                     except Exception: # pylint: disable=broad-except
                         pass
+                    if not aw.buttonCHARGE.isFlat():
+                        aw.buttonCHARGE.setFlat(True)
+                        aw.buttonCHARGE.stopAnimation()
+                        aw.onMarkMoveToNext(aw.buttonCHARGE)
                 else:
                     # we keep xaxis limit the same but adjust to updated timeindex[0] mark
                     if timeindex_before > -1:
@@ -3629,8 +3633,18 @@ class tgraphcanvas(FigureCanvas):
                         plus.queue.addRoast()
                     except Exception: # pylint: disable=broad-except
                         pass
-                if not self.flagon:
+                if not self.flagstart:
                     aw.autoAdjustAxis(deltas=False)
+#                elif firstDROP: # not needed as DROP cannot be occur in popup
+#                    aw.buttonDROP.setFlat(True)
+#                    aw.buttonCHARGE.setFlat(True)
+#                    aw.buttonCHARGE.stopAnimation()
+#                    aw.buttonDRY.setFlat(True)
+#                    aw.buttonFCs.setFlat(True)
+#                    aw.buttonFCe.setFlat(True)
+#                    aw.buttonSCs.setFlat(True)
+#                    aw.buttonSCe.setFlat(True)
+
 
             # update phases
             elif action.key[0] == 1 and self.phasesbuttonflag: # DRY
@@ -3975,8 +3989,10 @@ class tgraphcanvas(FigureCanvas):
     # NOTE: sample_processing is processed in the GUI thread NOT the sample thread!
     def sample_processing(self, local_flagstart, temp1_readings, temp2_readings, timex_readings):
         ##### (try to) lock resources  #########
-        gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,200) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
-#        gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+        if self.delay < 500:
+            gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,10) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+        else:
+            gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,200) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
         if gotlock:
             try:
                 # duplicate system state flag flagstart locally and only refer to this copy within this function to make it behaving uniquely (either append or overwrite mode)
@@ -4261,15 +4277,26 @@ class tgraphcanvas(FigureCanvas):
                         if aw.qmc.BTcurve:
                             aw.qmc.l_temp2.set_data(sample_ctimex2, sample_ctemp2)
 
-                    if (aw.qmc.Controlbuttonflag and aw.pidcontrol.pidActive and \
+                    #NOTE: the following is no longer restricted to aw.pidcontrol.pidActive==True
+                    # as now the software PID is also update while the PID is off (if configured).
+                    if (aw.qmc.Controlbuttonflag and \
                             not aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
                         if aw.pidcontrol.pidSource == 1:
                             aw.qmc.pid.update(st2) # smoothed BT
-                        else:
+                        elif aw.pidcontrol.pidSource == 2:
                             aw.qmc.pid.update(st1) # smoothed ET
+                        else:
+                            # pidsource = 3 => extra device 1, channel 1 => sample_extratemp1[0]
+                            # pidsource = 4 => extra device 1, channel 2 => sample_extratemp2[0]
+                            # pidsource = 5 => extra device 2, channel 3 => sample_extratemp1[1]
+                            #...
+                            ps = aw.pidcontrol.pidSource - 3
+                            if ps % 2 == 0 and len(sample_extratemp1)>(ps // 2) and len(sample_extratemp1[ps // 2])>0:
+                                aw.qmc.pid.update(sample_extratemp1[ps // 2][-1])
+                            elif len(sample_extratemp1)>(ps // 2) and len(sample_extratemp2[ps // 2])>0:
+                                aw.qmc.pid.update(sample_extratemp2[ps // 2][-1])
 
                     #we need a minimum of two readings to calculate rate of change
-#                    if local_flagstart and length_of_qmc_timex > 1:
                     if length_of_qmc_timex > 1:
                         # compute T1 RoR
                         if t1_final == -1 or len(sample_ctimex1)<2:  # we repeat the last RoR if underlying temperature dropped

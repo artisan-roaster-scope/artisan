@@ -2616,7 +2616,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.qmc.device = 107
                     message = QApplication.translate('Message','Device set to {0}').format(meter)
                 ##########################
-                elif meter == 'Yocto 4-20ma Rx':
+                elif meter == 'Yocto 4-20mA Rx':
                     self.aw.qmc.device = 108
                     message = QApplication.translate('Message','Device set to {0}').format(meter)
                 ##########################

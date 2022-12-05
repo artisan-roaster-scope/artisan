@@ -94,13 +94,28 @@ class PID_DlgControl(ArtisanDialog):
             self.pidSource.addItems(pidSourceItems)
             self.pidSource.setCurrentIndex(self.aw.pidcontrol.pidSource - 1)
         else:
+            # internal software PID
             # Hottop or MODBUS or others (self.qmc.device in [53,29])
-            pidSourceItems = ['BT','ET']
+#            pidSourceItems = ['BT','ET']
+#            self.pidSource.addItems(pidSourceItems)
+#            if self.aw.pidcontrol.pidSource == 1:
+#                self.pidSource.setCurrentIndex(0)
+#            else:
+#                self.pidSource.setCurrentIndex(1)
+            pidSourceItems = []
+            # NOTE: ET/BT inverted as pidSource=1 => BT and pidSource=2 => ET !!
+            pidSourceItems.append(QApplication.translate('ComboBox','ET'))
+            pidSourceItems.append(QApplication.translate('ComboBox','BT'))
+            for i in range(len(self.aw.qmc.extradevices)):
+                pidSourceItems.append(str(i) + 'xT1: ' + self.aw.qmc.extraname1[i])
+                pidSourceItems.append(str(i) + 'xT2: ' + self.aw.qmc.extraname2[i])
             self.pidSource.addItems(pidSourceItems)
             if self.aw.pidcontrol.pidSource == 1:
+                self.pidSource.setCurrentIndex(1)
+            elif self.aw.pidcontrol.pidSource == 2:
                 self.pidSource.setCurrentIndex(0)
             else:
-                self.pidSource.setCurrentIndex(1)
+                self.pidSource.setCurrentIndex(self.aw.pidcontrol.pidSource-1)
 
         pidSourceLabel = QLabel(QApplication.translate('Label','Source'))
 
@@ -903,7 +918,13 @@ class PID_DlgControl(ArtisanDialog):
         kp = self.pidKp.value() # 5.00
         ki = self.pidKi.value() # 0.15
         kd = self.pidKd.value() # 0.00
-        source = self.pidSource.currentIndex() + 1 # 1-4, def 1
+        pidSourceIdx = self.pidSource.currentIndex()
+        if pidSourceIdx == 0:
+            source = 2 # BT
+        elif pidSourceIdx == 1:
+            source = 1 # ET
+        else:
+            source = self.pidSource.currentIndex() + 1 # 3, 4, ... (extra device curves)
         cycle = self.pidCycle.value() # def 1000 in ms
         pOnE = bool(self.pOnE.isChecked())
         self.aw.pidcontrol.confPID(kp,ki,kd,source,cycle,pOnE)
@@ -922,7 +943,13 @@ class PID_DlgControl(ArtisanDialog):
         ki = self.pidKi.value() # 0.15
         kd = self.pidKd.value() # 0.00
 
-        source = self.pidSource.currentIndex() + 1 # 1-4, def 1
+        pidSourceIdx = self.pidSource.currentIndex()
+        if pidSourceIdx == 0:
+            source = 2 # BT
+        elif pidSourceIdx == 1:
+            source = 1 # ET
+        else:
+            source = self.pidSource.currentIndex() + 1 # 3, 4, ... (extra device curves)
         if not (self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
             self.aw.pidcontrol.pidPositiveTarget = self.positiveControlCombo.currentIndex()
             self.aw.pidcontrol.pidNegativeTarget = self.negativeControlCombo.currentIndex()

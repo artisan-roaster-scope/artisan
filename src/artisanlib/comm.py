@@ -25,6 +25,7 @@ import shlex
 import threading
 import platform
 import logging
+from typing import Optional
 try:
     from typing import Final
 except ImportError:
@@ -458,7 +459,7 @@ class serialport():
                                    self.BEHMOR_78,            #105
                                    self.PHIDGET_HUB0000_0,    #106
                                    self.PHIDGET_HUB0000_D_0,  #107
-                                   self.YOCTO_generic,        #108 # Yocto-4-20mA-Rx
+                                   self.Yocto_4_20mA_Rx,      #108
                                    self.MODBUS_78,            #109
                                    self.S7_910,               #110
                                    self.WS,     # self.probat_sample,        #111
@@ -470,9 +471,9 @@ class serialport():
                                    self.HB_AT,                #117
                                    self.WS_78,  # self.probat_sample_inlet_ambient, # 118
                                    self.WS_910,  # self.probat_sample_cooling # 119
-                                   self.YOCTO_generic,        #120 # Yocto-0-10V-Rx
-                                   self.YOCTO_generic,        #121 # Yocto-milliVolt-Rx
-                                   self.YOCTO_generic,        #122 # Yocto-Serial
+                                   self.Yocto_0_10V_Rx,       #120
+                                   self.Yocto_milliVolt_Rx,   #121
+                                   self.Yocto_Serial,         #122
                                    self.PHIDGET_VCP1000,      #123 Phidget VCP1000
                                    self.PHIDGET_VCP1001,      #124 Phidget VCP1001
                                    self.PHIDGET_VCP1002,      #125 Phidget VCP1002
@@ -1405,10 +1406,35 @@ class serialport():
         v2,v1 = self.YOCTOtemperatures(0)
         return tx,v1,v2
 
-    def YOCTO_generic(self):
+    def Yocto_4_20mA_Rx(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
-        v2,v1 = self.YOCTOtemperatures(4)
+        v2,v1 = self.YOCTOtemperatures(4,'Yocto-4-20mA-Rx')
         return tx,v1,v2
+
+    def Yocto_0_10V_Rx(self):
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.YOCTOtemperatures(4,'Yocto-0-10V-Rx')
+        return tx,v1,v2
+
+    def Yocto_milliVolt_Rx(self):
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.YOCTOtemperatures(4,'Yocto-milliVolt-Rx')
+        return tx,v1,v2
+
+    def Yocto_Serial(self):
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.YOCTOtemperatures(4,'Yocto-Serial')
+        return tx,v1,v2
+
+#    def YOCTO_generic12(self):
+#        tx = self.aw.qmc.timeclock.elapsedMilli()
+#        v2,v1 = self.YOCTOtemperatures(5)
+#        return tx,v1,v2
+#
+#    def YOCTO_generic23(self):
+#        tx = self.aw.qmc.timeclock.elapsedMilli()
+#        v2,v1 = self.YOCTOtemperatures(6)
+#        return tx,v1,v2
 
     def YOCTO_pt100(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
@@ -5201,7 +5227,8 @@ class serialport():
     #   mode=3 => Yocto-Meteo
     #   mode=4 => Yocto-4-20mA-Rx (works also for the Yocto-0-10V-Rx, the Yocto-milliVolt-Rx and the Yocto-Serial)
     # that is not in the list of already connected ones
-    def getNextYOCTOsensorOfType(self,mode,connected_yoctos,YOCTOsensor):
+    # if productName is given, the results are filtered by productName (has to be set with mode=4 to discriminate)
+    def getNextYOCTOsensorOfType(self,mode,connected_yoctos,YOCTOsensor, productNameFilter:Optional[str]=None):
         if mode == 4:
             from yoctopuce.yocto_genericsensor import YGenericSensor
         else:
@@ -5212,13 +5239,10 @@ class serialport():
                 ((mode == 0 and productName == 'Yocto-Thermocouple') or (mode == 1 and productName == 'Yocto-PT100') or \
                  (mode == 2 and productName == 'Yocto-Temperature-IR') or \
                  (mode == 3 and productName.startswith('Yocto-Meteo')) or \
-                 (mode == 4 and productName.startswith('Yocto-4-20mA-Rx')) or \
-                 (mode == 4 and productName.startswith('Yocto-0-10V-Rx')) or \
-                 (mode == 4 and productName.startswith('Yocto-milliVolt-Rx')) or \
-                 (mode == 4 and productName.startswith('Yocto-Serial'))):
+                 (mode == 4 and productName is not None and productName.startswith(productNameFilter))):
                 return YOCTOsensor
             if mode == 4:
-                return self.getNextYOCTOsensorOfType(mode,connected_yoctos,YGenericSensor.nextGenericSensor(YOCTOsensor))
+                return self.getNextYOCTOsensorOfType(mode,connected_yoctos,YGenericSensor.nextGenericSensor(YOCTOsensor),productNameFilter)
             return self.getNextYOCTOsensorOfType(mode,connected_yoctos,YTemperature.nextTemperature(YOCTOsensor))
         return None
 
@@ -5249,9 +5273,11 @@ class serialport():
             if self.YOCTOsemaphores[channel].available() < 1:
                 self.YOCTOsemaphores[channel].release(1)
 
-    # mode = 0 for 2x thermocouple model; mode = 1 for 1x PT100 type probe; mode = 2 for IR sensor; mode = 4 for the Yocto-4-20mA-Rx
-    #   (as well as the Yocto-0-10V-Rx, Yocto-milliVolt-Rx and Yocto-Serial)
-    def YOCTOtemperatures(self,mode=0):
+    # mode = 0 for 2x thermocouple model; mode = 1 for 1x PT100 type probe; mode = 2 for IR sensor; mode = 4 for supported Yocto-Generics,
+    # mode = 5 for unsupported Yocto-Generics channel 1+2, mode = 6 for unsupported Yocto-Generics channel 3+4 (unsupported match any Yocto device thus could conflict with other "named" Yocot modules)
+    #   (like Yocto-4-20mA-Rx, Yocto-0-10V-Rx, Yocto-milliVolt-Rx and Yocto-Serial)
+    # productNameFilter if given is used to filter Yocto-Generic modules by product name
+    def YOCTOtemperatures(self,mode=0, productNameFilter=None):
         try:
             if not self.YOCTOsensor:
                 self.YOCTOimportLIB()
@@ -5272,7 +5298,7 @@ class serialport():
 
                     # search for the next one of the required type, but not yet connected
                     if mode == 4:
-                        self.YOCTOsensor = self.getNextYOCTOsensorOfType(mode,connected_yoctos,YGenericSensor.FirstGenericSensor())
+                        self.YOCTOsensor = self.getNextYOCTOsensorOfType(mode,connected_yoctos,YGenericSensor.FirstGenericSensor(),productNameFilter)
                     else:
                         self.YOCTOsensor = self.getNextYOCTOsensorOfType(mode,connected_yoctos,YTemperature.FirstTemperature())
 
@@ -5358,8 +5384,12 @@ class serialport():
                     elif mode == 4 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YGenericSensor.FindGenericSensor(serial + '.genericSensor1')
+                        _log.info('PRINT self.YOCTOchan1.describe() %s',self.YOCTOchan1.describe())
                         self.YOCTOchan2 = YGenericSensor.FindGenericSensor(serial + '.genericSensor2')
-                        self.aw.sendmessage(QApplication.translate('Message','Yocto 4-20mA-Rx attached'))
+                        if productNameFilter is not None:
+                            self.aw.sendmessage(QApplication.translate('Message',f'{productNameFilter} attached'))
+                        else:
+                            self.aw.sendmessage(QApplication.translate('Message','Yocto sensor attached'))
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                     if self.YOCTOthread is not None:

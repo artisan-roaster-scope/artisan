@@ -1145,7 +1145,7 @@ class PIDcontrol():
         self.pOnE = True # True for Proposional on Error mode, False for Proposional on Measurement Mode
         # pidSource
         #   either the TC4 input channel from [1,..,4] if self.qmc.device == 19 (Arduino/TC4)
-        #   in all other cases (HOTTOP, MODBUS,..), 1 is interpreted as BT and 2 as ET
+        #   in all other cases (HOTTOP, MODBUS,..), 1 is interpreted as BT and 2 as ET, 3 as 0xT1, 4 as 0xT2, 5 as 1xT1, ...
         self.pidSource = 1
         self.pidCycle = 1000
         # the positive target should increase with positive PID duty
