@@ -146,7 +146,7 @@ Please consult the [Yocto-Servo User's guide](https://www.yoctopuce.com/EN/produ
 
 *(support for this module is available in Artisan v2.8.2 and later)*
 
-The Yocto-Watt is a digital watt-meter allowing you to monitor the power consumption of electrical devices. It measures voltage, current, power, and performs power integration on an electric connection.
+The Yocto-Watt is a digital watt-meter allows to monitor the power consumption of electrical devices. It measures voltage, current, power, and performs power integration on an electric connection.
 
 The Yocto-Watt is supported by Artisan with the following device types.
 
