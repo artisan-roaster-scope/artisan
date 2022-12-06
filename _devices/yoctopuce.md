@@ -166,6 +166,10 @@ The Yocto-Watt is supported by Artisan with the following device types.
   - channel 1: reports the AC current (`current1`)
   - channel 2: reports the DC current (`current2`)
 
+**Watch out!** 
+`Yocto Energy` will bind to the first Yocto-Watt device only. All other device types support multiple Yocto-Watt devices.
+{: .notice--primary}
+
 <a name="Yocto-Sensor"></a>
 ## Yocto Sensor
 
