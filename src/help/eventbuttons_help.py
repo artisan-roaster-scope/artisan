@@ -80,6 +80,7 @@ def content():
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','off(c[,sn])'),QApplication.translate('HelpDlg','YOCTOPUCE Relay Output: turn channel c of the relay module off')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','flip(c[,sn])'),QApplication.translate('HelpDlg','YOCTOPUCE Relay Output: toggle the state of channel c')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','pip(c,delay,duration[,sn])'),QApplication.translate('HelpDlg','YOCTOPUCE Relay Output: pulse the channel c on after a delay of delay milliseconds for the duration of duration milliseconds')])
+    tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','powerReset([sn])'),QApplication.translate('HelpDlg','YOCTOPUCE resets the power counter of the Yocto-Watt module')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','slider(c,v)'),QApplication.translate('HelpDlg','move slider c to value v')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','button(i,c,b[,sn])'),QApplication.translate('HelpDlg','switches channel c off (b=0) and on (b=1) and sets button i to pressed or normal depending on the value b')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','sleep(<float>)'),QApplication.translate('HelpDlg','sleep: add a delay of <float> seconds')])

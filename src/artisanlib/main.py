@@ -1524,7 +1524,12 @@ class tgraphcanvas(FigureCanvas):
                        'Phidget VCP1002',           #125
                        'ARC BT/ET',                 #126
                        '+ARC MET/IT',               #127
-                       '+ARC AT'                    #128
+                       '+ARC AT',                   #128
+                       'Yocto Power',               #129
+                       'Yocto Energy',              #130
+                       'Yocto Voltage',             #131
+                       'Yocto Current',             #132
+                       'Yocto Sensor'               #133
                        ]
 
         # ADD DEVICE:
@@ -1566,10 +1571,15 @@ class tgraphcanvas(FigureCanvas):
             99, # Aillio Bullet R1 IBTS/BT
             100, # Yocto IR
             108, # Yocto 4-20mA Rx
-            111,  # WebSocket
+            111, # WebSocket
             120, # Yocto-0-10V-Rx
             121, # Yocto-milliVolt-Rx
-            122  # Yocto-Serial
+            122, # Yocto-Serial
+            129, # Yocto Power
+            130, # Yocto Energy
+            131, # Yocto Voltage
+            132, # Yocto Current
+            133  # Yocto Sensor
         ]
 
         # ADD DEVICE:
@@ -1612,7 +1622,12 @@ class tgraphcanvas(FigureCanvas):
             122, # Yocto-Serial
             123, # Phidget VCP1000
             124, # Phidget VCP1001
-            125  # Phidget VCP1002
+            125, # Phidget VCP1002
+            129, # Yocto Power
+            130, # Yocto Energy
+            131, # Yocto Voltage
+            132, # Yocto Current
+            133  # Yocto Sensor
         ]
 
         #extra devices
@@ -4534,7 +4549,6 @@ class tgraphcanvas(FigureCanvas):
                     #output ET, BT, ETB, BTB to output program
                     if aw.ser.externaloutprogramFlag:
                         try:
-                            from subprocess import call as subprocesscall# @Reimport
                             if aw.qmc.background:
                                 if aw.qmc.timeindex[0] != -1:
                                     j = aw.qmc.backgroundtime2index(tx - sample_timex[aw.qmc.timeindex[0]])
@@ -4545,11 +4559,13 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 ETB = -1
                                 BTB = -1
-                            subprocesscall([aw.ser.externaloutprogram,
-                                f'{sample_temp1[-1]:.1f}',
-                                f'{sample_temp2[-1]:.1f}',
-                                f'{ETB:.1f}',
-                                f'{BTB:.1f}'])
+#                            from subprocess import call as subprocesscall# @Reimport
+#                            subprocesscall([aw.ser.externaloutprogram,
+#                                f'{sample_temp1[-1]:.1f}',
+#                                f'{sample_temp2[-1]:.1f}',
+#                                f'{ETB:.1f}',
+#                                f'{BTB:.1f}'])
+                            aw.call_prog_with_args(f'{aw.ser.externaloutprogram} {sample_temp1[-1]:.1f} {sample_temp2[-1]:.1f} {ETB:.1f} {BTB:.1f}')
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
 
@@ -24225,6 +24241,7 @@ class ApplicationWindow(QMainWindow):
                     ##  off(c[,sn])  : turn channel c of the relay module off
                     ##  flip(c[,sn]) : toggle the state of channel c
                     ##  pip(c,delay,duration[,sn]) : pulse the channel c on after a delay of delay milliseconds for the duration of duration milliseconds
+                    ##  powerReset([,sn]) : reset the power meter of the Yocto Watt
                     #
                     # OTHERS
                     ##  slider(c,v)   : move slider c to value v
@@ -24356,11 +24373,16 @@ class ApplicationWindow(QMainWindow):
                                 aw.ser.yoctoRELflip(int(cs_a[1]),None)
                             elif cs_a[0] == 'flip' and cs_len == 3:
                                 aw.ser.yoctoRELflip(int(cs_a[1]),cs_a[2])
-                            # pulse(c,delay,duration[,sn])
+                            # pip(c,delay,duration[,sn])
                             elif cs_a[0] == 'pip' and cs_len == 4:
                                 aw.ser.yoctoRELpulse(int(cs_a[1]),int(cs_a[2]),int(cs_a[3]),None)
                             elif cs_a[0] == 'pip' and cs_len == 5:
                                 aw.ser.yoctoRELpulse(int(cs_a[1]),int(cs_a[2]),int(cs_a[3]),cs_a[4])
+                            #  powerReset([,sn]) : reset the power meter of the Yocto Watt
+                            elif cs_a[0] == 'powerReset' and cs_len == 1:
+                                aw.ser.yoctoPowerReset(None)
+                            elif cs_a[0] == 'powerReset' and cs_len == 2:
+                                aw.ser.yoctoPowerReset(cs_a[1])
                             else:
                                 #print("no match for command [%s], continue" % (cs_a[0]))
                                 _log.info('IO Command <%s> not recognized', cs_a[0])
