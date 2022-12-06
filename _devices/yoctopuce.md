@@ -9,7 +9,7 @@ header:
   teaser: assets/images/yoctopuce-logo-plain.png
 ---
 
-Artisan supports by now many Yoctopuce devices. Most prominently the Yocto Thermocouple and the Yocto PT100. Both connect directly via USB and do not need the installation of any additional driver. 
+Artisan supports most Yoctopuce modules. Most prominently the Yocto Thermocouple and the Yocto PT100. Both connect directly via USB and do not need the installation of any additional driver. 
 
 Artisan can access Yoctopuce devices connected to a [VirtualHub](https://www.yoctopuce.com/EN/virtualhub.php) from remote via a network connection, via the [YoctoHub-Ethernet](https://www.yoctopuce.com/EN/products/extensions-and-networking/yoctohub-ethernet), a [YoctoHub-Wireless](https://www.yoctopuce.com/EN/products/extensions-and-networking/yoctohub-wireless-n) hub or any other [Yoctopuce networking extension](http://www.yoctopuce.com/EN/products/category/extensions-and-networking). Just enter the IP address of the virtual hub under menu `Config >> Device, Yoctopuce tab`. 
 
@@ -50,7 +50,7 @@ The miliVolt-Rx module lets you measure by USB very small voltages (down to a fe
 
 ## [Yoctopuce 0-10V-Rx](https://www.yoctopuce.com/EN/products/usb-electrical-sensors/yocto-0-10v-rx)
 
-The Yocto-0-10V-Rx module lets you read via USB the instant value returned by any industrial sensor following the 0-10V standard.q Artisan usess the Yoctopuce GenericSensor API to fetch data from this device.
+The Yocto-0-10V-Rx module lets you read via USB the instant value returned by any industrial sensor following the 0-10V standard. Artisan usess the Yoctopuce GenericSensor API to fetch data from this device.
 
 
 ## [Yoctopuce 0-10V-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-0-10v-tx)
@@ -141,4 +141,30 @@ The optional `sn` parameter specifies either the modules serial number or its lo
 
 Please consult the [Yocto-Servo User's guide](https://www.yoctopuce.com/EN/products/yocto-servo/doc/SERVORC1.usermanual.html) for further information on this API.
 
+<a name="Yocto-Watt"></a>
+## [Yocto-Watt](https://www.yoctopuce.com/EN/products/usb-electrical-sensors/yocto-watt)
 
+The Yocto-Watt is a digital watt-meter allowing you to monitor the power consumption of electrical devices. It measures voltage, current, power, and performs power integration on an electric connection.
+
+The Yocto-Watt is supported by Artisan with the following device types.
+
+- `Yocto Power`:
+  - channel 1: reports the current power consumption (`currentValue`)
+  - channel 2: reports the integrated power consumption over time (`meter`). Note that this counter is reset at each start of the device or via tha Artisan Command `powerReset([,sn])`.
+
+- `Yocto Energy`:
+  - channel 1: reports the delivered energy (`deliveredEnergyMeter`), maintained by integrating the power consumption over time when positive only. Note that this counter is reset at each start of the device or via tha Artisan Command `powerReset(,sn])`.
+  - channel 2: reports the received energy (`receivedEnergyMeter `), maintained by integrating the power consumption over time when negative only. Note that this counter is reset at each start of the device or via tha Artisan Command `powerReset([,sn])`.
+
+- `Yocto Voltage`:
+  - channel 1: reports the DC voltage (`voltage1`)
+  - channel 2: reports the AC voltage (`voltage2`)
+
+- `Yocto Current`:
+  - channel 1: reports the AC current (`current1`)
+  - channel 2: reports the DC current (`current2`)
+
+<a name="Yocto-Sensor"></a>
+## Yocto Sensor
+
+This device type is generic sensor input device which binds its two channels to any Yoctopuce sensor interface (`YSensor`) not yet allocated.
