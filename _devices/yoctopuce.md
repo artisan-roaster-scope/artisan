@@ -152,11 +152,11 @@ The Yocto-Watt is supported by Artisan with the following device types.
 
 - `Yocto Power`:
   - channel 1: reports the current power consumption (`currentValue`)
-  - channel 2: reports the integrated power consumption over time (`meter`). Note that this counter is reset at each start of the device or via tha Artisan Command `powerReset([,sn])`.
+  - channel 2: reports the integrated power consumption over time (`meter`). Note that this counter is reset at each start of the device or via tha Artisan IO command `powerReset([,sn])`.
 
 - `Yocto Energy`:
-  - channel 1: reports the delivered energy (`deliveredEnergyMeter`), maintained by integrating the power consumption over time when positive only. Note that this counter is reset at each start of the device or via tha Artisan Command `powerReset(,sn])`.
-  - channel 2: reports the received energy (`receivedEnergyMeter `), maintained by integrating the power consumption over time when negative only. Note that this counter is reset at each start of the device or via tha Artisan Command `powerReset([,sn])`.
+  - channel 1: reports the delivered energy (`deliveredEnergyMeter`), maintained by integrating the power consumption over time when positive only. Note that this counter is reset at each start of the device or via tha Artisan IO command `powerReset(,sn])`.
+  - channel 2: reports the received energy (`receivedEnergyMeter `), maintained by integrating the power consumption over time when negative only. Note that this counter is reset at each start of the device or via tha Artisan IO command `powerReset([,sn])`.
 
 - `Yocto Voltage`:
   - channel 1: reports the DC voltage (`voltage1`)
