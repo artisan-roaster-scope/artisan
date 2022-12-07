@@ -2485,12 +2485,8 @@ class CurvesDlg(ArtisanDialog):
         if self.aw.largeDeltaLCDs_dialog is not None:
             self.aw.largeDeltaLCDs_dialog.reLayout()
 
-        self.aw.notificationsflag = self.notifications.isChecked()
-        if self.aw.notificationManager:
-            if self.aw.notificationsflag:
-                self.aw.notificationManager.showNotifications()
-            else:
-                self.aw.notificationManager.hideNotifications()
+        notifications_enabled = self.notifications.isChecked()
+        self.aw.notificationsSetEnabledSignal.emit(notifications_enabled)
 
         self.aw.qmc.RoRlimitFlag = self.rorFilter.isChecked()
         self.aw.qmc.RoRlimitm = int(self.rorminLimit.value())

@@ -17557,6 +17557,7 @@ class ApplicationWindow(QMainWindow):
     updatePlaybackIndicatorSignal = pyqtSignal()
     pidOnSignal = pyqtSignal()
     pidOffSignal = pyqtSignal()
+    notificationsSetEnabledSignal = pyqtSignal(bool)
 
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
@@ -17826,7 +17827,7 @@ class ApplicationWindow(QMainWindow):
 
         self.soundflag = 0
 
-        self.notificationsflag = True # enable/disable notifications
+        self.notificationsflag = True # show/hide and enable/disable notifications
 
         # recent roasts, an ordered list (first-in, first-out) of dictionaries holding partial roast-properties and a link to the background profile if any
         self.recentRoasts = []
@@ -20068,6 +20069,7 @@ class ApplicationWindow(QMainWindow):
         self.updatePlaybackIndicatorSignal.connect(self.updatePlaybackIndicator)
         self.pidOnSignal.connect(self.pidcontrol.pidOn)
         self.pidOffSignal.connect(self.pidcontrol.pidOff)
+        self.notificationsSetEnabledSignal.connect(self.notificationsSetEnabled)
 
         self.notificationManager = None
         if not app.artisanviewerMode:
@@ -24999,10 +25001,10 @@ class ApplicationWindow(QMainWindow):
                                     if aw.notificationManager:
                                         value = cs[len('notifications('):-1]
                                         if value.lower() in ('yes', 'true', 't', '1'):
-                                            aw.notificationManager.enableNotifications()
+                                            aw.notificationsSetEnabledSignal.emit(True)
                                             aw.sendmessage(QApplication.translate('Message','Notifications on'))
                                         else:
-                                            aw.notificationManager.disableNotifications()
+                                            aw.notificationsSetEnabledSignal.emit(False)
                                             aw.sendmessage(QApplication.translate('Message','Notifications off'))
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -31351,6 +31353,18 @@ class ApplicationWindow(QMainWindow):
     def fileImportRoastLogger(self,_=False):
         self.fileImport(QApplication.translate('Message', 'Import RoastLogger'),self.importRoastLogger,True)
 
+    @pyqtSlot(bool)
+    def notificationsSetEnabled(self,enabled:bool):
+        self.notificationsflag = enabled
+        if self.notificationManager:
+            if self.notificationsflag:
+                self.notificationManager.showNotifications()
+                self.notificationManager.enableNotifications()
+            else:
+                self.notificationManager.disableNotifications()
+                self.notificationManager.hideNotifications()
+        _log.info('notifications: %s',self.notificationsflag)
+
     #loads the settings at the start of application. See the oppposite closeEventSettings()
     def settingsLoad(self, filename=None, theme=False, machine=False, redraw=True):
         res = False
@@ -32398,12 +32412,9 @@ class ApplicationWindow(QMainWindow):
                             self.notificationManager.addNotificationItem(n)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-                self.notificationsflag = toBool(settings.value('notificationsflag',self.notificationsflag))
-                if self.notificationManager:
-                    if self.notificationsflag:
-                        self.notificationManager.showNotifications()
-                    else:
-                        self.notificationManager.hideNotifications()
+                notifications_enabled = toBool(settings.value('notificationsflag',self.notificationsflag))
+                self.notificationsSetEnabledSignal.emit(notifications_enabled)
+
                 settings.endGroup()
 
             #loads max-min temp limits of graph

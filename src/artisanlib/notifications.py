@@ -341,5 +341,9 @@ class NotificationManager(QObject):
                 else:
                     # we delay the presentation of this new notification one time
                     QTimer.singleShot(self.notification_timeout, lambda : self.setNotification(n))
+            elif not self.notifications_available:
+                _log.debug('notifications not available')
+            elif not self.notifications_enabled:
+                _log.debug('notifications disabled')
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
