@@ -5485,17 +5485,17 @@ class serialport():
                         if productNameFilter is not None:
                             self.aw.sendmessage(QApplication.translate('Message',f'{productNameFilter} attached'))
                         else:
-                            self.aw.sendmessage(QApplication.translate('Message','Yocto sensor attached'))
+                            self.aw.sendmessage(QApplication.translate('Message','Yocto Sensor attached'))
                     elif mode == 5 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YPower.FindPower(serial + '.power')
                         self.YOCTOchan2 = None
-                        self.aw.sendmessage(QApplication.translate('Message','Yocto Watt Power sensor attached'))
+                        self.aw.sendmessage(QApplication.translate('Message','Yocto Watt Power attached'))
                     elif mode == 6 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YPower.FindPower(serial + '.power')
                         self.YOCTOchan2 = None
-                        self.aw.sendmessage(QApplication.translate('Message','Yocto Watt Energy sensor attached'))
+                        self.aw.sendmessage(QApplication.translate('Message','Yocto Watt Energy attached'))
                     elif mode == 7 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YVoltage.FindVoltage(serial + '.voltage1')
@@ -5506,7 +5506,7 @@ class serialport():
                             self.YOCTOchan2.set_resolution(yocto_res)
                         except Exception: # pylint: disable=broad-except
                             pass
-                        self.aw.sendmessage(QApplication.translate('Message','Yocto Watt Voltage sensor attached'))
+                        self.aw.sendmessage(QApplication.translate('Message','Yocto Watt Voltage attached'))
                     elif mode == 8 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YCurrent.FindCurrent(serial + '.current1')
@@ -5517,7 +5517,7 @@ class serialport():
                             self.YOCTOchan2.set_resolution(yocto_res)
                         except Exception: # pylint: disable=broad-except
                             pass
-                        self.aw.sendmessage(QApplication.translate('Message','Yocto Watt Current sensor attached'))
+                        self.aw.sendmessage(QApplication.translate('Message','Yocto Watt Current attached'))
                     elif mode == 9 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = self.YOCTOsensor

@@ -4296,7 +4296,7 @@ class tgraphcanvas(FigureCanvas):
                     # as now the software PID is also update while the PID is off (if configured).
                     if (aw.qmc.Controlbuttonflag and \
                             not aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
-                        if aw.pidcontrol.pidSource == 1:
+                        if aw.pidcontrol.pidSource in [0,1]:
                             aw.qmc.pid.update(st2) # smoothed BT
                         elif aw.pidcontrol.pidSource == 2:
                             aw.qmc.pid.update(st1) # smoothed ET
@@ -8093,6 +8093,9 @@ class tgraphcanvas(FigureCanvas):
 
     @staticmethod
     def bisection(array, value):
+        '''Given an ``array`` , and given a ``value`` , returns an index j such that ``value`` is between array[j]
+        and array[j+1]. ``array`` must be monotonic increasing. j=-1 or j=len(array) is returned
+        to indicate that ``value`` is out of range below and above respectively.'''
         #Algorithm presumes 'array' is monotonic increasing.  This is not guaranteed for profiles so there
         #may be results that are not strictly correct.
         n = len(array)
@@ -8122,7 +8125,8 @@ class tgraphcanvas(FigureCanvas):
             TP_Index = aw.findTP()
             if aw.qmc.AUCbaseFlag:
                 _,_,_,idx = aw.ts()
-                idx = TP_Index + self.bisection(self.stemp2[TP_Index:self.timeindex[6]],aw.qmc.stemp2[idx])
+                # ML: next line seems not to alter the idx in any way and is just not needed
+#                idx = TP_Index + self.bisection(self.stemp2[TP_Index:self.timeindex[6]],aw.qmc.stemp2[idx])
             else:
                 idx = TP_Index + self.bisection(self.stemp2[TP_Index:self.timeindex[6]],aw.qmc.AUCbase)
             rtbt = aw.qmc.stemp2[idx]
@@ -8801,18 +8805,16 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         trans = self.ax.transData
                                     if smooth:
-                                        stemp3B = self.smooth_list(tx,fill_gaps(self.temp1BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
-                                    else:
-                                        stemp3B = self.stemp1BX[n3]
+                                        self.stemp1BX[n3] = self.smooth_list(tx,fill_gaps(self.temp1BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                    stemp3B = self.stemp1BX[n3]
                                 else:
                                     if aw.qmc.temp2Bdelta[n3]:
                                         trans = self.delta_ax.transData
                                     else:
                                         trans = self.ax.transData
                                     if smooth:
-                                        stemp3B = self.smooth_list(tx,fill_gaps(self.temp2BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
-                                    else:
-                                        stemp3B = self.stemp2BX[n3]
+                                        self.stemp2BX[n3] = self.smooth_list(tx,fill_gaps(self.temp2BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                    stemp3B = self.stemp2BX[n3]
                                 if not self.backgroundShowFullflag:
                                     if not self.autotimex or self.autotimexMode == 0:
                                         stemp3B = numpy.concatenate((
@@ -8851,18 +8853,16 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         trans = self.ax.transData
                                     if smooth:
-                                        stemp4B = self.smooth_list(tx,fill_gaps(self.temp1BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
-                                    else:
-                                        stemp4B = self.stemp1BX[n4]
+                                        self.stemp1BX[n4] = self.smooth_list(tx,fill_gaps(self.temp1BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                    stemp4B = self.stemp1BX[n4]
                                 else:
                                     if aw.qmc.temp2Bdelta[n4]:
                                         trans = self.delta_ax.transData
                                     else:
                                         trans = self.ax.transData
                                     if smooth:
-                                        stemp4B = self.smooth_list(tx,fill_gaps(self.temp2BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
-                                    else:
-                                        stemp4B = self.stemp2BX[n4]
+                                        self.stemp2BX[n4] = self.smooth_list(tx,fill_gaps(self.temp2BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                    stemp4B = self.stemp2BX[n4]
                                 if not self.backgroundShowFullflag:
                                     if not self.autotimex or self.autotimexMode == 0:
                                         stemp4B = numpy.concatenate((
@@ -14742,6 +14742,8 @@ class tgraphcanvas(FigureCanvas):
                     self.stemp2B[i] += step
                 for i in range(len(self.extratimexB)):
                     for j in range(len(self.extratimexB[i])):
+                        self.temp1BX[i][j] += step
+                        self.temp2BX[i][j] += step
                         self.stemp1BX[i][j] += step
                         self.stemp2BX[i][j] += step
                 self.backgroundprofile_moved_y += step
@@ -14774,6 +14776,8 @@ class tgraphcanvas(FigureCanvas):
 
                 for i in range(len(self.extratimexB)):
                     for j in range(len(self.extratimexB[i])):
+                        self.temp1BX[i][j] -= step
+                        self.temp2BX[i][j] -= step
                         self.stemp1BX[i][j] -= step
                         self.stemp2BX[i][j] -= step
                 self.backgroundprofile_moved_y -= step
@@ -15160,6 +15164,35 @@ class tgraphcanvas(FigureCanvas):
         else:
             offset = 0
         return self.timetemparray2temp(self.timeB,self.stemp1B,seconds + offset)
+
+    # returns the background temperature of extra curve n
+    # with n=0 => extra device 1, curve 1; n=1 => extra device 1, curve 2; n=2 => extra device 2, curve 1,....
+    # if the selected extra curve does not exists, the error value -1 is returned
+    # if smoothed is True, the value of the corresponding smoothed extra line is returned
+    def backgroundXTat(self, n, seconds, relative=False, smoothed=False):
+        if self.timeindexB[0] > -1 and relative:
+            offset = self.timeB[self.timeindexB[0]]
+        else:
+            offset = 0
+        if n % 2 == 0:
+            # even
+            if smoothed:
+                tempBX = self.stemp1BX
+            else:
+                tempBX = self.temp1BX
+        else:
+            # odd
+            if smoothed:
+                tempBX = self.stemp2BX
+            else:
+                tempBX = self.temp2BX
+        c = n // 2
+        if len(tempBX)>c:
+            temp = tempBX[c]
+        else:
+            # no such extra device curve
+            return -1
+        return self.timetemparray2temp(self.timeB,temp,seconds + offset)
 
     def backgroundDBTat(self,seconds, relative=False):
         if self.timeindexB[0] > -1 and relative:
@@ -16542,7 +16575,7 @@ class tgraphcanvas(FigureCanvas):
                     radii.append(Wradii[z])
 
                 bar.append(self.ax2.bar(theta, radii, width=segmentwidth, bottom=lbottom[z],edgecolor=self.wheellinecolor,
-                                        linewidth=self.wheellinewidth,picker=True,pickerradius=3))
+                                        linewidth=self.wheellinewidth,picker=3))
                 count = 0
                 #set color, alpha, and text
                 for _,bar[z] in zip(radii, bar[z]):
@@ -25137,7 +25170,7 @@ class ApplicationWindow(QMainWindow):
                             # pidSource(<n>) with <n> 0: BT, 1: ET (Artisan internal software PID); <n> in {0,..,3} (Arduino PID)
                             elif cs.startswith('pidSource(') and cs.endswith(')'):
                                 try:
-                                    source = int(cs[len('pidSource('):-1])
+                                    source = int(cs[len('pidSource('):-1]) + 1 # internally pidSource counts from 1
                                     if self.qmc.device not in (0, 26):
                                         kp = aw.pidcontrol.pidKp
                                         ki = aw.pidcontrol.pidKi

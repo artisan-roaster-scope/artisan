@@ -110,12 +110,14 @@ class PID_DlgControl(ArtisanDialog):
                 pidSourceItems.append(str(i) + 'xT1: ' + self.aw.qmc.extraname1[i])
                 pidSourceItems.append(str(i) + 'xT2: ' + self.aw.qmc.extraname2[i])
             self.pidSource.addItems(pidSourceItems)
-            if self.aw.pidcontrol.pidSource == 1:
+            if self.aw.pidcontrol.pidSource in [0,1]:
                 self.pidSource.setCurrentIndex(1)
             elif self.aw.pidcontrol.pidSource == 2:
                 self.pidSource.setCurrentIndex(0)
-            else:
+            elif self.aw.pidcontrol.pidSource-1 < len(pidSourceItems):
                 self.pidSource.setCurrentIndex(self.aw.pidcontrol.pidSource-1)
+            else:
+                self.pidSource.setCurrentIndex(1)
 
         pidSourceLabel = QLabel(QApplication.translate('Label','Source'))
 
