@@ -15,7 +15,7 @@ py-cpuinfo==8.0.0 # used for proper CPU arch detection running under Rosetta2
 #
 #gevent==21.12.0 # not supported on macOS 10.13
 #gevent-websocket==0.10.1 # not supported on macOS 10.13
-numpy==1.23.4 #1.23.3 # last version with binaries for macOS 10.13 on Python 3.10
+numpy==1.23.5 #1.23.4 # last version with binaries for macOS 10.13 on Python 3.10
 scipy==1.9.3 #1.9.2  # depends on numpy thus we have to put it after numpy
 matplotlib==3.6.2 #3.5.3
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy

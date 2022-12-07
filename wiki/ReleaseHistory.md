@@ -2,6 +2,46 @@ Detailed Release History
 ========================
 
 ----
+v2.8.2 (December XX, 2022)
+------------------
+
+* NEW FEATURES
+  - adds support for the [Yocto Watt module](https://artisan-scope.org/devices/yoctopuce/#Yocto-Watt) ([Discussion #955]((../../../discussions/955))) and for [generic Yoctopuce sensors](https://artisan-scope.org/devices/yoctopuce/#Yocto-Sensor)
+  - adds Artisan Command `keepON(<bool>)`
+  - adds MODBUS Commands `readBCD`, `read32`, `read32Signed`, `read32BCD`, and `readFloat`
+  - adds extra device channels as PID sources to the Artisan internal software PID (Discussion #998)
+  - adds flags to activated/deactivate background shifting via cursor keys and slider control via up/down keys ([Discussion #1026](../../../discussions/864))
+  - adds factory reset by pressing ALT/OPTION modifier on startup and skips saving app settings if ALT/OPTION is held on application exit
+  - save generating Artisan version/revision/build numbers to .alog profiles
+* CHANGES
+  - better designer
+  - corrects and improves autoCHARGE/autoDROP
+  - improved MODBUS error handling and reconnect
+  - interprets index access of symbolic variables RB1, RB2, B1, B2,.. w.r.t. foreground time respecting background alignment ([Issue #996](../../../issues/996))
+  - keep updating software pid loop running while PID is OFF if software PID is configured
+  - improved performance on 0.25sec sampling rate
+  - test availability of given S7 port before trying to connect to avoid hangs
+  - allow to use the batch prefix with deactivated batch counter supporting manual batch numbers in any format
+  - updates keep-alive ping frequency on Probat setups
+  - disables Phidget server password field if no host is given and thus mDNS/ZeroConf server discovery is active
+  - coarse sliders move only with step size 10
+  - restore profiles in graph after web ranking report
+  - direct root logging to artisan log file
+  - MODBUS lib internal debug messages are logged if debug logging mode is active and device logging is enabled (logging flag in device dialog)
+  - synchronizes Curves >> UI tabs notification flag and Artisan Command notifications
+  - upgrade to pymodbus v3, Qt/PyQt 6.4.1, matplotlib 3.6.2
+* FIXES
+  - fixes symbolic variable RB1/RB2 index access ([Issue #996](../../../issues/996))
+  - fixes S7 and MODBUS read commands which may fail due to cache misses breaking control on some machines like Probatone ([Issue #1002](../../../issues/1002))
+  - fixes crash on pidOn/pidOff Artisan Commands ([Issue #1005](../../../issues/1005))
+  - fixes saveGraph as PDF regression on Windows ([Issue #1011](../../../issues/1011))
+  - fixes prevent low DPI settings that could trigger a crash on redrawing the canvas (Issue #1024)
+  - fixes event step line extension to CHARGE in case event snap, 100%-step and showFull were disabled and implemented the mechanism also for the background profile
+  - fixes the navigation history on reset and on changing axis settings
+  - fixes Yocto-4-20mA-Rx device input
+  - fixes Artisan Command `pidSource(<int>)`
+
+----
 v2.8.0 (October 21, 2022)
 ------------------
 

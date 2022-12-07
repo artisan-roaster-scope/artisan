@@ -17,7 +17,7 @@ pyinstaller-versionfile==2.0.0
 #
 gevent==22.10.2 #22.10.1 #21.12.0 # 1.5.0 is not compatible with Python 3.8
 gevent-websocket==0.10.1
-numpy==1.23.4 #1.23.3
+numpy==1.23.5 #1.23.4
 scipy==1.9.3 #1.9.2 # depends on numpy thus we have to put it after numpy
 matplotlib==3.6.2 #3.5.3 # 3.4.1 requires pyinstaller > 4.2 # currently pyinstaller up to 4.0 is not compatible with MPL 3.3.x
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
