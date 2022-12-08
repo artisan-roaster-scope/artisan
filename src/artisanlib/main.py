@@ -252,6 +252,9 @@ platf = str(platform.system())
 appGuid = '9068bd2fa8e54945a6be1f1a0a589e92'
 viewerAppGuid = '9068bd2fa8e54945a6be1f1a0a589e93'
 
+aw = None # assigned to the single instance of ApplicationWindow on creation
+artisanviewerFirstStart = False
+
 class Artisan(QtSingleApplication):
     def __init__(self, args):
         super().__init__(appGuid,viewerAppGuid,args)
@@ -4004,11 +4007,13 @@ class tgraphcanvas(FigureCanvas):
     # NOTE: sample_processing is processed in the GUI thread NOT the sample thread!
     def sample_processing(self, local_flagstart, temp1_readings, temp2_readings, timex_readings):
         ##### (try to) lock resources  #########
+        wait_period = 200  # we try to catch a lock within the next 200ms
         if self.delay < 500:
-            gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,10) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+            wait_period = 10 # on tight sampling rate we only wait 10ms
+        gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1, wait_period) # we try to catch the lock, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+        if not gotlock:
+            _log.info('sample_processing(): failed to get profileDataSemaphore lock')
         else:
-            gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,200) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
-        if gotlock:
             try:
                 # duplicate system state flag flagstart locally and only refer to this copy within this function to make it behaving uniquely (either append or overwrite mode)
 
@@ -8339,6 +8344,8 @@ class tgraphcanvas(FigureCanvas):
             finally:
                 if aw.qmc.profileDataSemaphore.available() < 1:
                     aw.qmc.profileDataSemaphore.release(1)
+        else:
+            _log.info('lazyredraw(): failed to get profileDataSemaphore lock')
 
     def smoothETBT(self,smooth,recomputeAllDeltas,sampling,decay_smoothing_p):
         try:
@@ -16690,7 +16697,9 @@ class tgraphcanvas(FigureCanvas):
     def drawcross(self,event):
         # do not interleave with redraw()
         gotlock = aw.qmc.profileDataSemaphore.tryAcquire(1,0)
-        if gotlock:
+        if not gotlock:
+            _log.info('drawcross(): failed to get profileDataSemaphore lock')
+        else:
             try:
                 if event.inaxes == self.ax:
                     x = event.xdata
@@ -17387,7 +17396,9 @@ class SampleThread(QThread):
     # fetch the raw samples from the main and all extra devices once per interval
     def sample(self):
         gotlock = aw.qmc.samplingSemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
-        if gotlock:
+        if not gotlock:
+            _log.info('sample(): failed to get samplingSemaphore lock')
+        else:
             try:
                 temp1_readings = []
                 temp2_readings = []
@@ -17432,8 +17443,7 @@ class SampleThread(QThread):
                 if aw.qmc.samplingSemaphore.available() < 1:
                     aw.qmc.samplingSemaphore.release(1)
                 self.sample_processingSignal.emit(local_flagstart, temp1_readings, temp2_readings, timex_readings)
-        else:
-            _log.debug('sample() timeout')
+
 
     # libtime.sleep is accurate only up to 0-5ms
     # using a hyprid approach using sleep() and busy-wait based on the time.perf_counter()
@@ -17559,8 +17569,6 @@ class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-met
 #################### MAIN APPLICATION WINDOW ###########################################
 ########################################################################################
 
-aw = None # assigned to the single instance of ApplicationWindow on creation
-artisanviewerFirstStart = False
 
 # NOTE: to have pylint to verify proper __slot__ definitions one has to remove the super class QMainWindow here temporarily
 #   as this does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
