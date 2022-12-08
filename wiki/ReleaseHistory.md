@@ -10,7 +10,7 @@ v2.8.2 (December XX, 2022)
   - adds Artisan Command `keepON(<bool>)`
   - adds MODBUS Commands `readBCD`, `read32`, `read32Signed`, `read32BCD`, and `readFloat`
   - adds extra device channels as PID sources to the Artisan internal software PID (Discussion #998)
-  - adds flags to activated/deactivate background shifting via cursor keys and slider control via up/down keys ([Discussion #1026](../../../discussions/864))
+  - adds flags to activated/deactivate background shifting via cursor keys and slider control via up/down keys ([Discussion #1026](../../../discussions/1026))
   - adds factory reset by pressing ALT/OPTION modifier on startup and skips saving app settings if ALT/OPTION is held on application exit
   - save generating Artisan version/revision/build numbers to .alog profiles
 * CHANGES
