@@ -22810,6 +22810,11 @@ class ApplicationWindow(QMainWindow):
         else:
             self.slider4.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.slider4.clearFocus()
+        if self.eventsliderKeyboardControl and bool(aw.pidcontrol.svSlider):
+            self.sliderSV.setFocusPolicy(focus)
+        else:
+            self.sliderSV.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.sliderSV.clearFocus()
 
     def setFonts(self, redraw=True):
         # try to select the right font for matplotlib according to the given locale and platform
