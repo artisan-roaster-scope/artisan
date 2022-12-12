@@ -1,12 +1,12 @@
 ###################################################################
-# Appveyor CI configuration to build Artisan install packages  
+# Appveyor CI configuration to build Artisan install packages
 #     for Windows, Windows legacy, macOS, and Linux
-################################################################### 
+###################################################################
 # Include "skip ci" in the commit message to prevent this build process from running
 
 environment:
   # Set the Python version for windows, macos and linux here. Does not affect windows_legacy.
-  PYTHON_V: 3.10
+  PYTHON_V: 3.11
 
   matrix:
   - job_name: windows_legacy
@@ -25,11 +25,11 @@ version: '{build}'
 # Do not build on tags
 skip_tags: true
 clone_depth: 1
-  
+
 init:
   # Sets the commit hash to "build version number" shown in appveyor build status, the build number keeps it unique
   - ps: Update-AppveyorBuild -Version "$($env:APPVEYOR_REPO_COMMIT.substring(0,7)) ($env:APPVEYOR_BUILD_NUMBER)"
-  
+
 branches:
   only:
     - master
@@ -56,8 +56,8 @@ for:
     - cmd: echo Windows Legacy Install
 
     # pull library versions from requirments file
-    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements-win-legacy.txt 'pyinstaller==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value} 
-    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements-win-legacy.txt 'libusb==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value} 
+    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements-win-legacy.txt 'pyinstaller==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value}
+    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements-win-legacy.txt 'libusb==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value}
 
     # update path env var
     - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
@@ -68,7 +68,7 @@ for:
   build_script:
     - cmd: echo Windows Legacy Build
     - cmd: cd src
-        
+
     #update the copyright year used by pyinstaller to set exe properties for Windows
     - ps: $YEAR=(Get-Date).year
     - ps: gc version-metadata.yml | %{ $_ -replace "yyyy", "$YEAR" } | out-file newfile -encoding ascii
@@ -112,8 +112,8 @@ for:
     - ps: Write-Host $env:PYTHON_PATH
 
     # pull library versions from requirments file
-    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements-win.txt 'pyinstaller==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value} 
-    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements-win.txt 'libusb==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value} 
+    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements-win.txt 'pyinstaller==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value}
+    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements-win.txt 'libusb==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value}
 
     # update path env var
     - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
@@ -178,12 +178,12 @@ for:
     - echo "MacOS Build"
     - chmod +x src/*.sh
     - chmod +x src/pylupdate6pro
-        
+
     # run the build script
     - cd src
     - ./build-macos3.sh
 
-# unit test fails as it runs on Py3.9 while the build installs under brew isntalled Py3.10 (see build-mac3.py)
+# unit test fails as it runs on Py3.9 while the build installs under brew installed Py3.10 (see build-mac3.py)
 #  test_script:
 #    - python -m unittest discover -s src
 
@@ -210,7 +210,7 @@ for:
     - chmod +x .ci/*.sh
 
     # pull library versions from requirments file
-    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements-linux.txt 'libusb==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value} 
+    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements-linux.txt 'libusb==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value}
 
     # update the __revision__ field with the left seven of the GIT commit hash
     - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
