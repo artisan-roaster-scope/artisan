@@ -301,7 +301,7 @@ except:
     pass
 
 
-for python_version in ['python3.8', 'python3.9', 'python3.10']:
+for python_version in ['python3.8', 'python3.9', 'python3.10', 'python3.11']:
     rootdir = f'./Artisan.app/Contents/Resources/lib/{python_version}'
 
     if os.path.isdir(f'{rootdir}/PyQt6'):
