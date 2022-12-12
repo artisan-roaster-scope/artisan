@@ -6,7 +6,9 @@ v2.8.2 (December XX, 2022)
 ------------------
 
 * NEW FEATURES
+  - adds [Santoker Q Series and R Series](https://artisan-scope.org/machines/santoker/) support
   - adds support for the [Yocto Watt module](https://artisan-scope.org/devices/yoctopuce/#Yocto-Watt) ([Discussion #955]((../../../discussions/955)) and for [generic Yoctopuce sensors](https://artisan-scope.org/devices/yoctopuce/#Yocto-Sensor)
+  - adds [Phidget DAQ1500](https://artisan-scope.org/devices/phidgets/#DAQ1500) support
   - adds Artisan Command `keepON(<bool>)`
   - adds MODBUS Commands `readBCD`, `read32`, `read32Signed`, `read32BCD`, and `readFloat`
   - adds extra device channels as PID sources to the Artisan internal software PID (Discussion #998)
@@ -28,8 +30,8 @@ v2.8.2 (December XX, 2022)
   - restore profiles in graph after web ranking report
   - direct root logging to artisan log file
   - MODBUS lib internal debug messages are logged if debug logging mode is active and device logging is enabled (logging flag in device dialog)
-  - synchronizes Curves >> UI tabs notification flag and Artisan Command notifications
-  - upgrade to pymodbus v3, Qt/PyQt 6.4.1, matplotlib 3.6.2
+  - synchronizes `Curves >> UI` tabs notification flag and Artisan Command notifications
+  - upgrade to Python 3.11, pymodbus v3, Qt/PyQt 6.4.1, matplotlib 3.6.2
 * FIXES
   - fixes symbolic variable RB1/RB2 index access ([Issue #996](../../../issues/996))
   - fixes S7 and MODBUS read commands which may fail due to cache misses breaking control on some machines like Probatone ([Issue #1002](../../../issues/1002))
@@ -40,6 +42,9 @@ v2.8.2 (December XX, 2022)
   - fixes the navigation history on reset and on changing axis settings
   - fixes Yocto-4-20mA-Rx device input
   - fixes Artisan Command `pidSource(<int>)`
+  - fixes Phidget 1046 configuration
+*  REMOVALS
+  - drops builds for RPi Buster
 
 ----
 v2.8.0 (October 21, 2022)
