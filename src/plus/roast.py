@@ -23,11 +23,7 @@
 
 from plus import config, util
 from typing import Any, Optional, Dict, List, Tuple  #for Python >= 3.9: can remove 'List', 'Dict' and 'Tuple' since type hints can use the generic 'list', 'dict' and 'tuple'
-try:
-    from typing import Final
-except ImportError:
-    # for Python 3.7:
-    from typing_extensions import Final
+from typing import Final
 import hashlib
 import logging
 

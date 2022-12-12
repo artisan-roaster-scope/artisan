@@ -91,6 +91,7 @@ def content():
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','slider(c,v)'),QApplication.translate('HelpDlg','move slider c to value v')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','button(i,c,b[,sn])'),QApplication.translate('HelpDlg','switches channel c off (b=0) and on (b=1) and sets button i to pressed or normal depending on the value b')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','sleep(<float>)'),QApplication.translate('HelpDlg','sleep: add a delay of <float> seconds')])
+    tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','santoker(<target>,<value>)'),QApplication.translate('HelpDlg','sends integer <value> to <target> register specified by as byte in hex notation like “fa” via the Santoker Network protocol')])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','S7 Command'),QApplication.translate('HelpDlg','_'),QApplication.translate('HelpDlg','variable holding the last value read via S7')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','sleep(<float>)'),QApplication.translate('HelpDlg','sleep: add a delay of <float> seconds')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','button(<bool>)'),QApplication.translate('HelpDlg','sets calling button to “pressed” if argument evaluates to 1 or True')])

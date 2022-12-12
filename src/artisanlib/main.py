@@ -71,12 +71,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 import logging.config
 from yaml import safe_load as yaml_load
-from typing import Optional, List  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
-try:
-    from typing import Final
-except ImportError:
-    # for Python 3.7:
-    from typing_extensions import Final
+from typing import Final, Optional, List  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 
 from functools import reduce as freduce
 
@@ -219,7 +214,6 @@ try:
         import win_inet_pton # @UnresolvedImport @UnusedImport # pylint: disable=import-error,unused-import
 except Exception: # pylint: disable=broad-except
     pass
-
 
 
 import artisanlib.arabic_reshaper
@@ -1321,7 +1315,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1200_2_dataRate = 250
 
         self.phidget1046_async = [False]*4
-        self.phidget1046_gain = [1]*4 # defaults to no gain (values are 0-based)
+        self.phidget1046_gain = [2]*4 # defaults to gain 8 (values are 1-based index into gainValues) # 0 is not value
         self.phidget1046_gainValues: Final = ['1', '8','16','32','64','128'] # 1 for no gain
         self.phidget1046_formula: Final = [1]*4 # 0: 1K Ohm Wheatstone Bridge, 1: 1K Ohm Voltage Divider, 2: raw
         self.phidget1046_formulaValues: Final = ['WS', 'Div','raw']
@@ -1532,7 +1526,11 @@ class tgraphcanvas(FigureCanvas):
                        'Yocto Energy',              #130
                        'Yocto Voltage',             #131
                        'Yocto Current',             #132
-                       'Yocto Sensor'               #133
+                       'Yocto Sensor',              #133
+                       'Santoker BT/ET',            #134
+                       '+Santoker Power/Fan',       #135
+                       '+Santoker Drum',            #136
+                       'Phidget DAQ1500'            #137
                        ]
 
         # ADD DEVICE:
@@ -1559,7 +1557,8 @@ class tgraphcanvas(FigureCanvas):
             107, # Phidget HUB IO Digital 0
             123, # Phidget VCP1000
             124, # Phidget VCP1001
-            125  # Phidget VCP1002
+            125, # Phidget VCP1002
+            137  # Phidget DAQ1500
         ]
 
         # ADD DEVICE:
@@ -1582,7 +1581,8 @@ class tgraphcanvas(FigureCanvas):
             130, # Yocto Energy
             131, # Yocto Voltage
             132, # Yocto Current
-            133  # Yocto Sensor
+            133, # Yocto Sensor
+            134  # Santoker BT/ET
         ]
 
         # ADD DEVICE:
@@ -1630,7 +1630,10 @@ class tgraphcanvas(FigureCanvas):
             130, # Yocto Energy
             131, # Yocto Voltage
             132, # Yocto Current
-            133  # Yocto Sensor
+            133, # Yocto Sensor
+            135, # Santoker Power/Fan
+            136, # Santoker Drum
+            137  # Phidget DAQ1500
         ]
 
         #extra devices
@@ -3828,7 +3831,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.modbus.inputDivs[1] == 0 and
                     aw.modbus.inputModes[1] == '' and
                     no_math_formula_defined)
-            if self.extradevices[n] == 33: # MODBUS_34
+            elif self.extradevices[n] == 33: # MODBUS_34
                 if c == 0:
                     return ((aw.modbus.inputFloatsAsInt[2] or aw.modbus.inputBCDsAsInt[2] or not aw.modbus.inputFloats[2]) and
                         aw.modbus.inputDivs[2] == 0 and
@@ -3838,7 +3841,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.modbus.inputDivs[3] == 0 and
                     aw.modbus.inputModes[3] == '' and
                     no_math_formula_defined)
-            if self.extradevices[n] == 55: # MODBUS_56
+            elif self.extradevices[n] == 55: # MODBUS_56
                 if c == 0:
                     return ((aw.modbus.inputFloatsAsInt[4] or aw.modbus.inputBCDsAsInt[4] or not aw.modbus.inputFloats[4]) and
                         aw.modbus.inputDivs[4] == 0 and
@@ -3848,7 +3851,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.modbus.inputDivs[5] == 0 and
                     aw.modbus.inputModes[5] == '' and
                     no_math_formula_defined)
-            if self.extradevices[n] == 109: # MODBUS_78
+            elif self.extradevices[n] == 109: # MODBUS_78
                 if c == 0:
                     return ((aw.modbus.inputFloatsAsInt[6] or aw.modbus.inputBCDsAsInt[6] or not aw.modbus.inputFloats[6]) and
                         aw.modbus.inputDivs[6] == 0 and
@@ -3858,16 +3861,20 @@ class tgraphcanvas(FigureCanvas):
                     aw.modbus.inputDivs[7] == 0 and
                     aw.modbus.inputModes[7] == '' and
                     no_math_formula_defined)
-            if self.extradevices[n] == 70: # S7
+            elif self.extradevices[n] == 70: # S7
                 return aw.s7.type[0+c] != 1 and aw.s7.mode[0+c] == 0 and (aw.s7.div[0+c] == 0 or aw.s7.type[0+c] == 2) and no_math_formula_defined
-            if self.extradevices[n] == 80: # S7_34
+            elif self.extradevices[n] == 80: # S7_34
                 return aw.s7.type[2+c] != 1 and aw.s7.mode[2+c] == 0 and (aw.s7.div[2+c] == 0 or aw.s7.type[2+c] == 2) and no_math_formula_defined
-            if self.extradevices[n] == 81: # S7_56
+            elif self.extradevices[n] == 81: # S7_56
                 return aw.s7.type[4+c] != 1 and aw.s7.mode[4+c] == 0 and (aw.s7.div[4+c] == 0 or aw.s7.type[4+c] == 2) and no_math_formula_defined
-            if self.extradevices[n] == 82: # S7_78
+            elif self.extradevices[n] == 82: # S7_78
                 return aw.s7.type[6+c] != 1 and aw.s7.mode[6+c] == 0 and (aw.s7.div[6+c] == 0 or aw.s7.type[6+c] == 2) and no_math_formula_defined
-            if self.extradevices[n] == 110: # S7_910
+            elif self.extradevices[n] == 110: # S7_910
                 return aw.s7.type[8+c] != 1 and aw.s7.mode[8+c] == 0 and (aw.s7.div[8+c] == 0 or aw.s7.type[8+c] == 2) and no_math_formula_defined
+            elif self.extradevices[n] in [54,90,91,135,136]: # Hottop Heater/Fan, Slider 12, Slider 34, Santoker Power / Fan
+                return True
+            elif self.extradevices[n] == 136 and c == 0: # Santoker Drum
+                return True
             return False
         return False
 
@@ -11849,9 +11856,19 @@ class tgraphcanvas(FigureCanvas):
                 self.OffMonitor()
                 return
 
-            if not bool(aw.simulator) and aw.qmc.device == 53:
-                from artisanlib.hottop import startHottop
-                startHottop(0.6,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
+            if not bool(aw.simulator):
+                if aw.qmc.device == 53:
+                    # connect HOTTOP
+                    from artisanlib.hottop import startHottop
+                    startHottop(0.6,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
+                elif aw.qmc.device == 134:
+                    # connect Santoker
+                    from artisanlib.santoker import SantokerNetwork
+                    aw.santoker = SantokerNetwork()
+                    aw.santoker.setLogging(self.device_logging)
+                    aw.santoker.start(aw.santokerHost, aw.santokerPort,
+                        connected_handler=lambda : aw.sendmessageSignal.emit(QApplication.translate('Message', 'Santoker connected'),True,None),
+                        disconnected_handler=lambda : aw.sendmessageSignal.emit(QApplication.translate('Message', 'Santoker disconnected'),True,None))
 
             aw.initializedMonitoringExtraDeviceStructures()
 
@@ -11933,6 +11950,14 @@ class tgraphcanvas(FigureCanvas):
             aw.pidcontrol.pidOff()
 #            if aw.qmc.device == 53:
 #                aw.HottopControlOff()
+
+            # disconnect Santoker
+            if not bool(aw.simulator) and aw.qmc.device == 134:
+                # disconnect Santoker
+                if aw.santoker is not None:
+                    aw.santoker.stop()
+                    aw.santoker = None
+
             # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
             if self.device == 0 and aw.fujipid.followBackground:
                 if aw.fujipid.sv and aw.fujipid.sv > 0:
@@ -17435,7 +17460,6 @@ class SampleThread(QThread):
 
 #                    _log.debug("sample(): ET/BT time => %.4f", etbt_time)
 #                    _log.debug("sample(): total time => %.4f", total_time)
-
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             finally:
@@ -17599,6 +17623,7 @@ class ApplicationWindow(QMainWindow):
     pidOnSignal = pyqtSignal()
     pidOffSignal = pyqtSignal()
     notificationsSetEnabledSignal = pyqtSignal(bool)
+    santokerSendMessageSignal = pyqtSignal(bytes,int)
 
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
@@ -17611,7 +17636,7 @@ class ApplicationWindow(QMainWindow):
         'userprofilepath', 'printer', 'main_widget', 'defaultdpi', 'dpi', 'qmc', 'HottopControlActive', 'AsyncSamplingAction', 'wheeldialog',
         'simulator', 'simulatorpath', 'comparator', 'stack', 'eventsbuttonflag', 'minieventsflags', 'seriallogflag',
         'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'ws', 'scale', 'color', 'extraser', 'extracomport', 'extrabaudrate',
-        'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
+        'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'santokerHost', 'santokerPort', 'santoker', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
         'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
         'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventsliderKeyboardControl', 'eventslideractions', 'eventslidercommands', 'eventslideroffsets',
@@ -17859,6 +17884,11 @@ class ApplicationWindow(QMainWindow):
         self.extraser = []
         #extra comm port settings
         self.extracomport,self.extrabaudrate,self.extrabytesize,self.extraparity,self.extrastopbits,self.extratimeout = [],[],[],[],[],[]
+
+        # Santoker Network
+        self.santokerHost = '10.10.100.254'
+        self.santokerPort = 20001
+        self.santoker = None # holds the Santoker instance created on connect; reset to None on disconnect
 
         # create a ET control objects
         self.fujipid = FujiPID(self)
@@ -20111,6 +20141,7 @@ class ApplicationWindow(QMainWindow):
         self.pidOnSignal.connect(self.pidcontrol.pidOn)
         self.pidOffSignal.connect(self.pidcontrol.pidOff)
         self.notificationsSetEnabledSignal.connect(self.notificationsSetEnabled)
+        self.santokerSendMessageSignal.connect(self.santokerSendMessage)
 
         self.notificationManager = None
         if not app.artisanviewerMode:
@@ -24295,6 +24326,7 @@ class ApplicationWindow(QMainWindow):
                     ##  slider(c,v)   : move slider c to value v
                     ##  button(i,c,b[,sn]) : switches channel c off (b=0) and on (b=1) and sets button i to pressed or normal depending on the value b
                     ##  sleep(s) : sleep for s seconds, s a float
+                    ##  santoker(<target>,<value> : the byte <target> indicates where <value> of type integer should be written to
                     #
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
@@ -24404,6 +24436,23 @@ class ApplicationWindow(QMainWindow):
                                         libtime.sleep(t)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+
+                            ##  santoker(<target>,<value> : the hex string or integer <target> indicates where <value> of type integer should be written to
+                            elif cs_a[0] == 'santoker' and cs_len == 3:
+                                if aw.santoker is not None:
+                                    try:
+                                        v = int(round(float(eval(cs_a[2]))))  # pylint: disable=eval-used
+                                        try:
+                                            # interpret target as integer
+                                            b = int(cs_a[1])
+                                            aw.santokerSendMessageSignal.emit(b.to_bytes(1, 'big'), v)
+                                        except Exception: # pylint: disable=broad-except
+                                            # interpret target as hex string
+                                            b = bytes.fromhex(cs_a[1])
+                                            if len(b)>0:
+                                                aw.santokerSendMessageSignal.emit(b[0:1], v)
+                                    except Exception: # pylint: disable=broad-except
+                                        _log.exception(e)
 
                             # Yoctopuce Relay Command Actions
                             # on(c[,sn])
@@ -29455,6 +29504,7 @@ class ApplicationWindow(QMainWindow):
         settings.setValue('extraDelta2',self.extraDelta2)
         settings.setValue('extraFill1',self.extraFill1)
         settings.setValue('extraFill2',self.extraFill2)
+        settings.setValue('devicetablecolumnwidths',self.qmc.devicetablecolumnwidths)
 
     def setExtraDeviceCurveStyles(self, settings):
         settings.setValue('extralinestyles1',self.qmc.extralinestyles1)
@@ -29538,6 +29588,8 @@ class ApplicationWindow(QMainWindow):
             self.extraFill1 = [toInt(x) for x in toList(settings.value('extraFill1',self.extraFill1))]
         if settings.contains('extraFill2'):
             self.extraFill2 = [toInt(x) for x in toList(settings.value('extraFill2',self.extraFill2))]
+        if settings.contains('devicetablecolumnwidths'):
+            self.qmc.devicetablecolumnwidths = [toInt(x) for x in toList(settings.value('devicetablecolumnwidths',self.qmc.devicetablecolumnwidths))]
 
     def getExtraDeviceCurveStyles(self, settings):
         self.qmc.extralinestyles1 = list(map(str,list(toStringList(settings.value('extralinestyles1',self.qmc.extralinestyles1)))))
@@ -31411,6 +31463,12 @@ class ApplicationWindow(QMainWindow):
                 self.notificationManager.hideNotifications()
         _log.info('notifications: %s',self.notificationsflag)
 
+
+    @pyqtSlot(bytes,int)
+    def santokerSendMessage(self,target:bytes,value:int):
+        if self.santoker is not None:
+            self.santoker.send_msg(target,value)
+
     #loads the settings at the start of application. See the oppposite closeEventSettings()
     def settingsLoad(self, filename=None, theme=False, machine=False, redraw=True):
         res = False
@@ -31518,7 +31576,7 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.mode == 'C' and old_mode == 'F':
                 self.qmc.celsiusMode()
 
-            if filename is None and settings.contains('DebugLogLevel'):
+            if settings.contains('DebugLogLevel'):
                 try:
                     setDebugLogLevel(bool(toBool(settings.value('DebugLogLevel',False))))
                 except Exception: # pylint: disable=broad-except
@@ -31526,7 +31584,7 @@ class ApplicationWindow(QMainWindow):
 
             #restore device
             settings.beginGroup('Device')
-            if filename is None and settings.contains('device_logging'):
+            if settings.contains('device_logging'):
                 self.qmc.device_logging = bool(toBool(settings.value('device_logging',self.qmc.device_logging)))
                 try:
                     setDeviceDebugLogLevel(self.aw.qmc.device_logging)
@@ -31606,6 +31664,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ambient_humidity_device = toInt(settings.value('ambient_humidity_device',self.qmc.ambient_humidity_device))
                 self.qmc.ambient_pressure_device = toInt(settings.value('ambient_pressure_device',self.qmc.ambient_pressure_device))
                 self.qmc.elevation = toInt(settings.value('elevation',self.qmc.elevation))
+            self.santokerHost = toString(settings.value('santokerHost',self.santokerHost))
+            self.santokerPort = toInt(settings.value('santokerPort',self.santokerPort))
             # activate CONTROL BUTTON
             aw.showControlButton()
             if settings.contains('controlETpid'):
@@ -32665,13 +32725,9 @@ class ApplicationWindow(QMainWindow):
                 settings.beginGroup('ExtraDev')
                 if settings.contains('extradevices'):
                     self.getExtraDeviceSettings(settings)
-                if settings.contains('devicetablecolumnwidths'):
-                    self.qmc.devicetablecolumnwidths = [toInt(x) for x in toList(settings.value('devicetablecolumnwidths',self.qmc.devicetablecolumnwidths))]
                 settings.endGroup()
-
                 # ensure that extra list length are of the size of the extradevices:
                 self.ensureCorrectExtraDeviceListLenght()
-
                 self.updateExtradeviceSettings()
 
             #restore curve styles
@@ -33554,6 +33610,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue('ambient_humidity_device',self.qmc.ambient_humidity_device)
             settings.setValue('ambient_pressure_device',self.qmc.ambient_pressure_device)
             settings.setValue('elevation',self.qmc.elevation)
+            settings.setValue('santokerHost',self.santokerHost)
+            settings.setValue('santokerPort',self.santokerPort)
             settings.endGroup()
             settings.setValue('fmt_data_RoR',self.qmc.fmt_data_RoR)
             settings.setValue('fmt_data_ON',self.qmc.fmt_data_ON)
@@ -34179,7 +34237,6 @@ class ApplicationWindow(QMainWindow):
             settings.setValue('ETBdeltamarker',self.qmc.ETBdeltamarker)
             settings.setValue('ETBdeltamarkersize',self.qmc.ETBdeltamarkersize)
             self.setExtraDeviceCurveStyles(settings)
-            settings.setValue('devicetablecolumnwidths',self.qmc.devicetablecolumnwidths)
             settings.endGroup()
             #background settings
             settings.beginGroup('background')
@@ -34408,9 +34465,16 @@ class ApplicationWindow(QMainWindow):
             if not (platf == 'Darwin' and self.qmc.locale_str == 'en'):
                 self.fullscreenAction.setChecked(False)
             self.showNormal()
-        if aw.qmc.device == 53:
-            from artisanlib.hottop import stopHottop
-            stopHottop()
+        if not bool(aw.simulator):
+            if aw.qmc.device == 53:
+                # disconnect HOTTOP
+                from artisanlib.hottop import stopHottop
+                stopHottop()
+            elif aw.qmc.device == 134:
+                # disconnect Santoker
+                if aw.santoker is not None:
+                    aw.santoker.stop()
+                    aw.santoker = None
         if self.qmc.flagon:
             self.qmc.ToggleMonitor()
         if self.WebLCDs:

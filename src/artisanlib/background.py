@@ -37,11 +37,8 @@ except Exception:  # pylint: disable=broad-except
 
 
 import logging
-try:
-    from typing import Final
-except ImportError:
-    # for Python 3.7:
-    from typing_extensions import Final
+from typing import Final
+
 _log: Final = logging.getLogger(__name__)
 
 class backgroundDlg(ArtisanResizeablDialog):

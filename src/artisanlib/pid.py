@@ -20,11 +20,7 @@
 import time
 import numpy
 import logging
-try:
-    from typing import Final
-except ImportError:
-    # for Python 3.7:
-    from typing_extensions import Final
+from typing import Final
 
 try:
     #ylint: disable-next = E, W, R, C

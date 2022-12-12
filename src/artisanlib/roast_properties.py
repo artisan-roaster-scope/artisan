@@ -19,11 +19,7 @@ import sys
 import math
 import platform
 import logging
-try:
-    from typing import Final
-except ImportError:
-    # for Python 3.7:
-    from typing_extensions import Final
+from typing import Final
 
 # import artisan.plus modules
 import plus.config  # @UnusedImport

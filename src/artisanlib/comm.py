@@ -25,12 +25,7 @@ import shlex
 import threading
 import platform
 import logging
-from typing import Optional
-try:
-    from typing import Final
-except ImportError:
-    # for Python 3.7:
-    from typing_extensions import Final
+from typing import Optional, Final
 
 from artisanlib.util import cmd2str, RoRfromCtoF, fromCtoF, fromFtoC, hex2int, str2cmd, toFloat
 
@@ -349,7 +344,7 @@ class serialport():
         # device 1 (with index 1 below) is Omega HH806
         # device 2 (with index 2 below) is omega HH506
         # etc
-        # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
+        # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:" in the code (main.py, comm.py, devices.py)
         # - add to self.devicefunctionlist
         self.devicefunctionlist = [self.fujitemperature,    #0
                                    self.HH806AU,            #1
@@ -484,7 +479,11 @@ class serialport():
                                    self.Yocto_Energy,         #130
                                    self.Yocto_Voltage,        #131
                                    self.Yocto_Current,        #132
-                                   self.Yocto_Sensor          #133
+                                   self.Yocto_Sensor,         #133
+                                   self.Santoker_BTET,        #134
+                                   self.Santoker_PF,          #135
+                                   self.Santoker_D,           #136
+                                   self.PHIDGET_DAQ1500       #137
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = 'test.py'
@@ -868,6 +867,11 @@ class serialport():
     def PHIDGET1046_34(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.PHIDGET1046temperature(1)
+        return tx,t1,t2
+
+    def PHIDGET_DAQ1500(self):
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t2,t1 = self.PHIDGET1046temperature(0,device_type=1)
         return tx,t1,t2
 
     def PHIDGET1051(self):
@@ -1465,6 +1469,33 @@ class serialport():
         tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.YOCTOtemperatures(2)
         return tx,v2,v1
+
+    def Santoker_BTET(self):
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.santoker is not None:
+            t1 = self.aw.santoker.getBT()
+            t2 = self.aw.santoker.getET()
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, ET (chan2), BT (chan1)
+
+    def Santoker_PF(self):
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.santoker is not None:
+            t1 = self.aw.santoker.getPower()
+            t2 = self.aw.santoker.getAir()
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, Air (chan2), Power (chan1)
+
+    def Santoker_D(self):
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.santoker is not None:
+            t1 = -1
+            t2 = self.aw.santoker.getDrum()
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, -1 (chan2), Drum (chan1)
 
     def TEVA18B(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
@@ -3470,12 +3501,12 @@ class serialport():
                     _log.exception(e)
                 # set voltage ratio change trigger to 0 (fire every DataInterval)
                 try:
-                    self.PhidgetBridgeSensor[idx].setVoltageChangeTrigger(0)
+                    self.PhidgetBridgeSensor[idx].setVoltageRatioChangeTrigger(0)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                 # enable channel
                 try:
-                    self.PhidgetBridgeSensor[idx].setBridgeEnabled(channel, True)
+                    self.PhidgetBridgeSensor[idx].setBridgeEnabled(True)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                 if self.aw.qmc.phidget1046_async[channel]:
@@ -3494,7 +3525,10 @@ class serialport():
                 channel = self.PhidgetBridgeSensor[idx].getChannel()
                 self.aw.qmc.phidgetManager.reserveSerialPort(serial,port,channel,'PhidgetVoltageRatioInput',deviceType,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
                 if channel == 0:
-                    self.aw.sendmessage(QApplication.translate('Message','Phidget Bridge 4-input attached'))
+                    if deviceType == DeviceID.PHIDID_1046:
+                        self.aw.sendmessage(QApplication.translate('Message','Phidget 1046 attached'))
+                    else:
+                        self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1500 attached'))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
@@ -3505,23 +3539,30 @@ class serialport():
                 channel = self.PhidgetBridgeSensor[idx].getChannel()
                 self.aw.qmc.phidgetManager.releaseSerialPort(serial,port,channel,'PhidgetVoltageRatioInput',deviceType,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
                 if channel == 0:
-                    self.aw.sendmessage(QApplication.translate('Message','Phidget Bridge 4-input detached'))
+                    if deviceType == DeviceID.PHIDID_1046:
+                        self.aw.sendmessage(QApplication.translate('Message','Phidget 1046 detached'))
+                    else:
+                        self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1500 detached'))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4
-    def PHIDGET1046temperature(self,mode=0,retry=True):
+    # device_type = 0 for Phidget 1046, device_type = 1 for Phidget DAQ1500
+    def PHIDGET1046temperature(self,mode=0,retry=True,device_type=0):
+        deviceType = DeviceID.PHIDID_1046
+        if device_type == 1:
+            deviceType = DeviceID.PHIDID_DAQ1500
         try:
             if not self.PhidgetBridgeSensor and self.aw.qmc.phidgetManager is not None:
                 ser = None
                 port = None
                 if mode == 0:
                     # we scan for available main device
-                    ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageRatioInput',DeviceID.PHIDID_1046,0,
+                    ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageRatioInput',deviceType,0,
                         remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
                 # in all other cases, we check for existing serial/port pairs from attaching the main channels 1+2 of the device
                 elif mode == 1:
-                    ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageRatioInput',DeviceID.PHIDID_1046,2,
+                    ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageRatioInput',deviceType,2,
                         remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
                 if ser:
                     self.PhidgetBridgeSensor = [VoltageRatioInput(),VoltageRatioInput()]
@@ -3537,8 +3578,8 @@ class serialport():
                             if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
                                 self.PhidgetBridgeSensor[i].setIsRemote(True)
                                 self.PhidgetBridgeSensor[i].setIsLocal(False)
-                            self.PhidgetBridgeSensor[i].setOnAttachHandler(lambda _,x=i:self.phidget1046attached(ser,port,DeviceID.PHIDID_1046,x))
-                            self.PhidgetBridgeSensor[i].setOnDetachHandler(lambda _,x=i:self.phidget1046detached(ser,port,DeviceID.PHIDID_1046,x))
+                            self.PhidgetBridgeSensor[i].setOnAttachHandler(lambda _,x=i:self.phidget1046attached(ser,port,deviceType,x))
+                            self.PhidgetBridgeSensor[i].setOnDetachHandler(lambda _,x=i:self.phidget1046detached(ser,port,deviceType,x))
                             libtime.sleep(.1)
                             try:
                                 self.PhidgetBridgeSensor[i].open() #.openWaitForAttachment(timeout)

@@ -16,11 +16,7 @@
 # Marko Luther, 2018
 
 import logging
-try:
-    from typing import Final
-except ImportError:
-    # for Python 3.7:
-    from typing_extensions import Final
+from typing import Final
 
 from Phidget22.Devices.Manager import Manager
 from Phidget22.DeviceID import DeviceID

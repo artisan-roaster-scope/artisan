@@ -32,11 +32,7 @@ from pathlib import Path
 from artisanlib.util import getDirectory
 from plus import config
 from typing import Optional
-try:
-    from typing import Final
-except ImportError:
-    # for Python 3.7:
-    from typing_extensions import Final
+from typing import Final
 import os
 import logging
 

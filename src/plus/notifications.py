@@ -27,11 +27,7 @@ except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
 
-try:
-    from typing import Final  #for Python >= 3.9: can remove 'List' since type hints can use the generic 'list'
-except ImportError:
-    # for Python 3.7:
-    from typing_extensions import Final
+from typing import Final
 
 import logging
 

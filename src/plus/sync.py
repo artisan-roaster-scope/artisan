@@ -36,11 +36,7 @@ from plus import config, util, connection, controller, roast
 import os
 import time
 import logging
-try:
-    from typing import Final
-except ImportError:
-    # for Python 3.7:
-    from typing_extensions import Final
+from typing import Final
 
 
 _log: Final = logging.getLogger(__name__)

@@ -9,11 +9,7 @@ from requests_file import FileAdapter  # @UnresolvedImport
 import re
 from lxml import html
 import logging
-try:
-    from typing import Final
-except ImportError:
-    # for Python 3.7:
-    from typing_extensions import Final
+from typing import Final
 
 try:
     #ylint: disable = E, W, R, C

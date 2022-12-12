@@ -32,11 +32,7 @@ from artisanlib.util import decodeLocal
 from pathlib import Path
 from plus import config
 from typing import Optional, List  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
-try:
-    from typing import Final
-except ImportError:
-    # for Python 3.7:
-    from typing_extensions import Final
+from typing import Final
 import datetime
 import dateutil.parser
 import logging

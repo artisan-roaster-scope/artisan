@@ -84,6 +84,7 @@ def content():
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','slider(c,v)'),QApplication.translate('HelpDlg','move slider c to value v')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','button(i,c,b[,sn])'),QApplication.translate('HelpDlg','switches channel c off (b=0) and on (b=1) and sets button i to pressed or normal depending on the value b')])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','sleep(<float>)'),QApplication.translate('HelpDlg','sleep: add a delay of <float> seconds')])
+    tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','santoker(<target>,<value>)'),QApplication.translate('HelpDlg','sends integer <value> to <target> register specified by as byte in hex notation like “fa” via the Santoker Network protocol')])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Hottop Heater'),'&#160;',QApplication.translate('HelpDlg','sets heater to value')])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Hottop Fan'),'&#160;',QApplication.translate('HelpDlg','sets fan to value')])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Hottop Command'),QApplication.translate('HelpDlg','motor(n),solenoid(n),stirrer(n),heater(h),fan(f) '),QApplication.translate('HelpDlg','with n={0 ,1},h={0,..100},f={0,..10}')])

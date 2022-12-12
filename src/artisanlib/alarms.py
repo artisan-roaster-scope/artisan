@@ -18,11 +18,7 @@
 import os
 import sys
 import logging
-try:
-    from typing import Final
-except ImportError:
-    # for Python 3.7:
-    from typing_extensions import Final
+from typing import Final
 
 
 from artisanlib.util import deltaLabelUTF8
