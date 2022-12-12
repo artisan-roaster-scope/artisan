@@ -66,6 +66,14 @@ All of these devices support J, K, E and T type thermocouples. The type of therm
 **Watch out!** The TMP1200 supports 2-, 3- and 4-wire PT100 and PT1000 RTDs to be connected directly. The type of RTD used has to be configured on the Artisan side (menu `Config >> Device, Phidgets tab`)
 {: .notice--primary}
 
+#### 2-Channel
+
+<a name="DAQ1500"></a>
+* [Phidget DAQ1500](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=957){:target="_blank"} (VINT)
+
+**Watch out!** The Phidget DAQ1500 requires either a [Voltage Divider](http://www.phidgets.com/docs/3175_User_Guide#Using_a_Voltage_Divider){:target="_blank"} or a [Wheatstone Bridge](http://www.phidgets.com/docs/3175_User_Guide#Using_a_Wheatstone_Bridge){:target="_blank"} to connect a RTD. The applied wiring has to be configured within Artisan (menu `Config >> Device, Phidgets tab`)
+{: .notice--primary}
+
 #### 4-Channel
 
 * [Phidget 1046](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=35){:target="_blank"} (USB)
