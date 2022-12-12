@@ -6,7 +6,7 @@ v2.8.2 (December XX, 2022)
 ------------------
 
 * NEW FEATURES
-  - adds [Santoker Q Series and R Series](https://artisan-scope.org/machines/santoker/) support
+  - adds [Santoker Q Series and R Series](https://artisan-scope.org/machines/santoker/) support ([Discussion #1019](../../../discussions/1019))
   - adds support for the [Yocto Watt module](https://artisan-scope.org/devices/yoctopuce/#Yocto-Watt) ([Discussion #955](../../../discussions/955)) and for [generic Yoctopuce sensors](https://artisan-scope.org/devices/yoctopuce/#Yocto-Sensor)
   - adds [Phidget DAQ1500](https://artisan-scope.org/devices/phidgets/#DAQ1500) support
   - adds Artisan Command `keepON(<bool>)`
