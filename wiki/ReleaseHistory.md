@@ -43,8 +43,9 @@ v2.8.2 (December XX, 2022)
   - fixes Yocto-4-20mA-Rx device input
   - fixes Artisan Command `pidSource(<int>)`
   - fixes Phidget 1046 configuration
-*  REMOVALS
-  - drops builds for RPi Buster
+* REMOVALS
+   - drops builds for RPi Buster
+
 
 ----
 v2.8.0 (October 21, 2022)
