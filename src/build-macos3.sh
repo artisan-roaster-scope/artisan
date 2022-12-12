@@ -10,14 +10,14 @@ if [ ! -z $APPVEYOR ]; then
 else
     # standard local builds
     echo "NOTICE: Standard build"
-    export PYTHON_V=3.10
+    export PYTHON_V=3.11
     export PYTHON=/Library/Frameworks/Python.framework/Versions/${PYTHON_V}
     export PYTHONBIN=$PYTHON/bin
     export PYTHONPATH=$PYTHON/lib/python${PYTHON_V}
 
 # for PyQt6:
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt6/Qt6
-    export QT_SRC_PATH=~/Qt6.4/6.4.0/macos
+    export QT_SRC_PATH=~/Qt6.4/6.4.1/macos
     export PYUIC=pyuic6
     export PYRCC=pyrcc6
     export PYLUPDATE=./pylupdate6pro
