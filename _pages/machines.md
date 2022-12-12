@@ -17,7 +17,7 @@ Artisan provides one-click configurations for more than 60 roaster brands repres
 
 {: .notice--info}
 **Control!**
-Machine control (incl. heater, air flow, drum speed, ...) via buttons and sliders allowing for automation is currently supported by machines of [Aillio](/machines/aillio), [Besca](/machines/besca), [Caparaó](/machines/caparao), [Carmomaq](/machines/carmomaq), [Coffed](/machines/coffed), [Coffee Machines Sale](/machines/cms), [Coffee Tech](/machines/coffeetech), [Coffeetool](/machines/coffeetool), [Giesen](/machines/giesen), [Hottop](/machines/hottop), [IP-CC](/machines/ip-cc), [Kirsch & Mausser](/machines/kirsch), [Kuban](/machines/kuban), [NOR](/machines/nor), [Nordic](/machines/nordic), [Probat](/machines/probat), [Prometheus](/machines/prometheus/), [San Franciscan](/machines/sf) and [Twino/Ozstar](/machines/twino-ozstar).
+Machine control (incl. heater, air flow, drum speed, ...) via buttons and sliders allowing for automation is currently supported by machines of [Aillio](/machines/aillio), [Besca](/machines/besca), [Caparaó](/machines/caparao), [Carmomaq](/machines/carmomaq), [Coffed](/machines/coffed), [Coffee Machines Sale](/machines/cms), [Coffee Tech](/machines/coffeetech), [Coffeetool](/machines/coffeetool), [Giesen](/machines/giesen), [Hottop](/machines/hottop), [IP-CC](/machines/ip-cc), [Kirsch & Mausser](/machines/kirsch), [Kuban](/machines/kuban), [NOR](/machines/nor), [Nordic](/machines/nordic), [Probat](/machines/probat), [Prometheus](/machines/prometheus/), [San Franciscan](/machines/sf), [Santoker](/machines/santoker) and [Twino/Ozstar](/machines/twino-ozstar).
 {: .notice--info}
 
 <!--
