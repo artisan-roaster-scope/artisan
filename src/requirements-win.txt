@@ -24,7 +24,9 @@ wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
 PyQt6==6.4.0 #6.3.1
 PyQt6-WebEngine==6.4.0 #6.3.1
+PyQt6-Qt6==6.4.0  #revert from 6.4.1 installed by PyQt6 to mitigate Qt scaling changes
 openpyxl==3.0.10 #3.0.9
 keyring==23.11.0 #23.9.3 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
-lxml==4.9.1 #4.7.1
+#temporary downgrade for Python 3.11 lxml==4.9.1 #4.7.1
+.ci/lxml-4.9.0-cp311-cp311-win_amd64.whl
 prettytable==3.5.0 #3.4.1 # >1.0.0 fail to be packed by py2app, but a monkey patch in main.py helps

@@ -100,7 +100,7 @@ for:
   environment:
     QT_PATH: "C:\\qt\\6.2\\msvc2019_64"
     PYUIC: "pyuic6.exe"
-    BUILD_PYINSTALLER: "True"
+    BUILD_PYINSTALLER: "False"
     ARTISAN_LEGACY: "False"
     VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"  #redistributable for VS 2015-2022
 
