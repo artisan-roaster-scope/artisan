@@ -32891,18 +32891,32 @@ class ApplicationWindow(QMainWindow):
             #restore quantifier
             settings.beginGroup('Quantifiers')
             if settings.contains('quantifieractive'):
-                self.eventquantifieractive = [toInt(x) for x in toList(settings.value('quantifieractive',self.eventquantifieractive))]
-                self.eventquantifiersource = [toInt(x) for x in toList(settings.value('quantifiersource',self.eventquantifiersource))]
-                self.eventquantifiermin = [toInt(x) for x in toList(settings.value('quantifiermin',self.eventquantifiermin))]
-                self.eventquantifiermax = [toInt(x) for x in toList(settings.value('quantifiermax',self.eventquantifiermax))]
+                activequantifiers = [toInt(x) for x in toList(settings.value('quantifieractive',self.eventquantifieractive))]
+                if len(activequantifiers) == 4:
+                    self.eventquantifieractive = activequantifiers
+                quantifiersource = [toInt(x) for x in toList(settings.value('quantifiersource',self.eventquantifiersource))]
+                if len(quantifiersource) == 4:
+                    self.eventquantifiersource = quantifiersource
+                quantifiersmin =[toInt(x) for x in toList(settings.value('quantifiermin',self.eventquantifiermin))]
+                if len(quantifiersmin) == 4:
+                    self.eventquantifiermin = quantifiersmin
+                quantifiersmax =[toInt(x) for x in toList(settings.value('quantifiermax',self.eventquantifiermax))]
+                if len(quantifiersmax) == 4:
+                    self.eventquantifiermax = quantifiersmax
                 if settings.contains('quantifiercoarse'):
-                    self.eventquantifiercoarse = [toInt(x) for x in toList(settings.value('quantifiercoarse',self.eventquantifiercoarse))]
+                    eventquantifiercoarse = [toInt(x) for x in toList(settings.value('quantifiercoarse',self.eventquantifiercoarse))]
+                    if len(eventquantifiercoarse) == 4:
+                        self.eventquantifiercoarse = eventquantifiercoarse
                     if settings.contains('clusterEventsFlag'):
                         self.clusterEventsFlag = bool(toBool(settings.value('clusterEventsFlag',aw.clusterEventsFlag)))
                 if settings.contains('eventquantifieraction'):
-                    self.eventquantifieraction = [toInt(x) for x in toList(settings.value('eventquantifieraction',self.eventquantifieraction))]
+                    eventquantifieraction = [toInt(x) for x in toList(settings.value('eventquantifieraction',self.eventquantifieraction))]
+                    if len(eventquantifieraction) == 4:
+                        self.eventquantifieraction = eventquantifieraction
                 if settings.contains('eventquantifierSV'):
-                    self.eventquantifierSV = [toInt(x) for x in toList(settings.value('eventquantifierSV',self.eventquantifierSV))]
+                    eventquantifierSV = [toInt(x) for x in toList(settings.value('eventquantifierSV',self.eventquantifierSV))]
+                    if len(eventquantifierSV) == 4:
+                        self.eventquantifierSV = eventquantifierSV
             settings.endGroup()
             settings.beginGroup('Batch')
             if settings.contains('batchcounter'):
