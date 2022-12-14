@@ -288,6 +288,13 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                         True,
                         None,
                     )
+                if (config.app_window.plus_account is not None and queue.queue is None):
+                    # connect failed (most likely due to network issues)
+                    # we anyhow initialize the queue if not yet done to get roasts queued up
+                    try:
+                        queue.start()  # start the outbox queue to initialize it
+                    except Exception as ex:  # pylint: disable=broad-except
+                        _log.exception(ex)
                 config.connected = False
         finally:
             if connect_semaphore.available() < 1:

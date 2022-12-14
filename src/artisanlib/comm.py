@@ -1473,8 +1473,8 @@ class serialport():
     def Santoker_BTET(self):
         tx = self.aw.qmc.timeclock.elapsedMilli()
         if self.aw.santoker is not None:
-            t1 = self.aw.santoker.getBT()
-            t2 = self.aw.santoker.getET()
+            t1 = self.aw.santoker.getET()
+            t2 = self.aw.santoker.getBT()
         else:
             t1 = t2 = -1
         return tx,t1,t2 # time, ET (chan2), BT (chan1)

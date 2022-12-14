@@ -212,11 +212,11 @@ class modbusport():
         try:
             if self.master is not None:
                 self.master.close()
+                self.aw.sendmessage(QApplication.translate('Message', 'MODBUS disconnected'))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         self.master = None
         self.clearReadingsCache()
-        self.aw.sendmessage(QApplication.translate('Message', 'MODBUS disconnected'))
 
     def disconnectOnError(self):
         # we only disconnect on error if mechanism is active, we are no longer connected or there is a IO commError, and we are on serial MODBUS (IP MODBUS reconnects automtically)

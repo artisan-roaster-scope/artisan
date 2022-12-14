@@ -51,7 +51,7 @@ notifications_url: Final = api_base_url + '/notifications'
 
 # Connection configurations
 
-#verify_ssl       = False
+#verify_ssl = False
 verify_ssl: Final = True
 connect_timeout: Final = 2  # in seconds
 read_timeout: Final = 4  # in seconds
@@ -77,6 +77,8 @@ queue_start_delay: Final = 5  # startup time of queue in seconds
 queue_task_delay: Final = 0.7
 queue_retries: Final = 2  # number of retries (should be >=0)
 queue_retry_delay: Final = 30  # time between retries in seconds
+queue_discard_after: Final = 3*24*60*60 # period in seconds after 'modified_at'..
+  # .. until a queued item is removed from the queue; if queue_discard_after is 0 items are never discarded
 # queque_put_timeout indicates the number of seconds to wait on putting
 # a new item into the queue (unused for now)
 queue_put_timeout: Final = 0.5

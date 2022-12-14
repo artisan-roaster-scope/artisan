@@ -7275,12 +7275,11 @@ class tgraphcanvas(FigureCanvas):
             self.autoDryIdx = 0
             self.autoFCsIdx = 0
 
-            if redraw: # only if redraw follows we remove the cached artists
-                self.l_annotations = [] # initiate the event annotations
-                # we initialize the annotation position dict of the foreground profile
-                self.deleteAnnoPositions(foreground=True, background=False)
-                self.l_event_flags_dict = {} # initiate the event id to temp/time annotation dict for flags
-                self.l_background_annotations = [] # initiate the background event annotations
+            self.l_annotations = [] # initiate the event annotations
+            # we initialize the annotation position dict of the foreground profile
+            self.deleteAnnoPositions(foreground=True, background=False)
+            self.l_event_flags_dict = {} # initiate the event id to temp/time annotation dict for flags
+            self.l_background_annotations = [] # initiate the background event annotations
 
             if not sampling:
                 aw.hideDefaultButtons()
@@ -8220,7 +8219,7 @@ class tgraphcanvas(FigureCanvas):
             bnr = self.roastbatchnr
         if bnr != 0 and title != '':
             title = f'{bprefix}{str(bnr)} {title}'
-        elif bnr == 0 and title != '' and bprefix != '':
+        elif bnr == 0 and title != '' and title != aw.qmc.title != QApplication.translate('Scope Title', 'Roaster Scope') and bprefix != '':
             title = f'{bprefix} {title}'
 
         if self.graphfont in [1,9]: # if selected font is Humor or Dijkstra we translate the unicode title into pure ascii
@@ -11868,8 +11867,12 @@ class tgraphcanvas(FigureCanvas):
                     aw.santoker.setLogging(self.device_logging)
                     aw.santoker.start(aw.santokerHost, aw.santokerPort,
                         connected_handler=lambda : aw.sendmessageSignal.emit(QApplication.translate('Message', 'Santoker connected'),True,None),
-                        disconnected_handler=lambda : aw.sendmessageSignal.emit(QApplication.translate('Message', 'Santoker disconnected'),True,None))
-
+                        disconnected_handler=lambda : aw.sendmessageSignal.emit(QApplication.translate('Message', 'Santoker disconnected'),True,None),
+                        charge_handler=lambda : (aw.marChargeSignal.emit() if (aw.qmc.timeindex[0] == -1) else None),
+                        dry_handler=lambda : (aw.markDRYSignal.emit() if (aw.qmc.timeindex[2] == 0) else None),
+                        fcs_handler=lambda : (aw.markFCsSignal.emit() if (aw.qmc.timeindex[1] == 0) else None),
+                        scs_handler=lambda : (aw.markSCsSignal.emit() if (aw.qmc.timeindex[4] == 0) else None),
+                        drop_handler=lambda : (aw.markDropSignal.emit() if (aw.qmc.timeindex[6] == 0) else None))
             aw.initializedMonitoringExtraDeviceStructures()
 
             #reset alarms
@@ -12617,6 +12620,12 @@ class tgraphcanvas(FigureCanvas):
                         except Exception: # pylint: disable=broad-except
                             pass
 
+                        try:
+                            # adjust endofx back to resetmaxtime (it might have been extended if "Expand" is ticked beyond the resetmaxtime at START)
+                            if not self.locktimex and not self.fixmaxtime and self.endofx != self.resetmaxtime:
+                                self.endofx = self.resetmaxtime
+                        except Exception: # pylint: disable=broad-except
+                            pass
                         self.xaxistosm(redraw=False) # need to fix uneven x-axis labels like -0:13
 
                         if self.BTcurve:
@@ -15511,9 +15520,12 @@ class tgraphcanvas(FigureCanvas):
         from scipy.interpolate import UnivariateSpline
         if aw.qmc.designerflag:
 
-            if not self.locktimex and self.timex[-1] > self.endofx:
+            if not self.locktimex and self.timex[-1] != self.endofx:
                 self.endofx = self.timex[-1] + 120
-                self.xaxistosm()
+                self.xaxistosm(redraw=False)
+                self.ax_background_designer = None
+            elif self.timex[0] != self.startofx:
+                self.xaxistosm(redraw=False)
                 self.ax_background_designer = None
 
             if self.ax_background_designer is None or force:
@@ -24437,20 +24449,15 @@ class ApplicationWindow(QMainWindow):
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
 
-                            ##  santoker(<target>,<value> : the hex string or integer <target> indicates where <value> of type integer should be written to
+                            ##  santoker(<target>,<value> : the hex string indicates where <value> of type integer should be written to
                             elif cs_a[0] == 'santoker' and cs_len == 3:
                                 if aw.santoker is not None:
                                     try:
                                         v = int(round(float(eval(cs_a[2]))))  # pylint: disable=eval-used
-                                        try:
-                                            # interpret target as integer
-                                            b = int(cs_a[1])
-                                            aw.santokerSendMessageSignal.emit(b.to_bytes(1, 'big'), v)
-                                        except Exception: # pylint: disable=broad-except
-                                            # interpret target as hex string
-                                            b = bytes.fromhex(cs_a[1])
-                                            if len(b)>0:
-                                                aw.santokerSendMessageSignal.emit(b[0:1], v)
+                                        # interpret target as hex string
+                                        b = bytes.fromhex(cs_a[1])
+                                        if len(b)>0:
+                                            aw.santokerSendMessageSignal.emit(b[0:1], v)
                                     except Exception: # pylint: disable=broad-except
                                         _log.exception(e)
 
@@ -26706,14 +26713,14 @@ class ApplicationWindow(QMainWindow):
                             aw.showControls()
                         self.releaseminieditor()
                 elif k == 16777234:               #MOVES CURRENT BUTTON LEFT
-                    if self.keyboardmoveflag:
+                    if self.keyboardmoveflag and self.qmc.flagstart:
                         self.moveKbutton('left')
                     elif aw.qmc.background and aw.qmc.backgroundKeyboardControlFlag:
                         aw.qmc.movebackground('left',aw.qmc.backgroundmovespeed)
                         self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
                         aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
                 elif k == 16777236:               #MOVES CURRENT BUTTON RIGHT
-                    if self.keyboardmoveflag:
+                    if self.keyboardmoveflag and self.qmc.flagstart:
                         self.moveKbutton('right')
                     elif aw.qmc.background and aw.qmc.backgroundKeyboardControlFlag:
                         aw.qmc.movebackground('right',aw.qmc.backgroundmovespeed)
@@ -34546,6 +34553,7 @@ class ApplicationWindow(QMainWindow):
         try:
             unsaved_changes = bool(self.qmc.safesaveflag == True)
             if self.qmc.checkSaved(): # if not canceled
+                _log.info('QUIT')
                 flagKeepON = aw.qmc.flagKeepON
                 self.qmc.flagKeepON = False # temporarily turn keepOn off
                 self.stopActivities()

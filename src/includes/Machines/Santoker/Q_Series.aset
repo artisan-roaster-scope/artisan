@@ -8,6 +8,9 @@ id=134
 santokerHost=10.10.100.254
 santokerPort=20001
 
+[events]
+markTP=false
+
 [ExtraComm]
 extrabaudrate=19200, 19200
 extrabytesize=8, 8
@@ -24,8 +27,8 @@ extraDelta1=false, false, false, false, false, false, false, false, false, false
 extraDelta2=false, false, false, false, false, false, false, false, false, false
 extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-extraLCDvisibility1=true, false, false, false, false, false, false, false, false, false
-extraLCDvisibility2=true, false, false, false, false, false, false, false, false, false
+extraLCDvisibility1=false, false, false, false, false, false, false, false, false, false
+extraLCDvisibility2=false, false, false, false, false, false, false, false, false, false
 extradevicecolor1=#910113, #49b160
 extradevicecolor2=#4895ce, #800080
 extradevices=135, 136
@@ -64,7 +67,7 @@ eventslidersflags=0, 1, 1
 eventslidertemp=0, 0, 0, 0
 eventsliderunits=, , , 
 slideractions=11, 11, 0, 11
-slidercommands="santoker(ca,{})", "santoker(fa,{})", , "santoker(c0,{})"
+slidercommands="santoker(ca,{})", "santoker(c0,{})", , "santoker(fa,{})"
 sliderfactors=1, 1, 1, 1
 slidermax=100, 100, 100, 100
 slidermin=0, 0, 0, 0

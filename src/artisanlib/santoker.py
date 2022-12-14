@@ -99,7 +99,12 @@ class SantokerNetwork():
 
     # message decoder
 
-    def register_reading(self, target:bytes, value:int) -> None:
+    def register_reading(self, target:bytes, value:int,
+                charge_handler:Optional[Callable[[], None]] = None,
+                dry_handler:Optional[Callable[[], None]] = None,
+                fcs_handler:Optional[Callable[[], None]] = None,
+                scs_handler:Optional[Callable[[], None]] = None,
+                drop_handler:Optional[Callable[[], None]] = None) -> None:
         if self._logging:
             _log.info('register_reading(%s,%s)',target,value)
         if target == self.BT:
@@ -114,20 +119,55 @@ class SantokerNetwork():
             self._drum = value
         #
         elif target == self.CHARGE:
-            self._CHARGE = bool(value)
+            b = bool(value)
+            if b and b != self._CHARGE and charge_handler is not None:
+                try:
+                    charge_handler()
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+            self._CHARGE = b
         elif target == self.DRY:
-            self._DRY = bool(value)
+            b = bool(value)
+            if b and b != self._DRY and dry_handler is not None:
+                try:
+                    dry_handler()
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+            self._DRY = b
         elif target == self.FCs:
-            self._FCs = bool(value)
+            b = bool(value)
+            if b and b != self._FCs and fcs_handler is not None:
+                try:
+                    fcs_handler()
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+            self._FCs = b
         elif target == self.SCs:
-            self._SCs = bool(value)
+            b = bool(value)
+            if b and b != self._SCs and scs_handler is not None:
+                try:
+                    scs_handler()
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+            self._SCs = b
         elif target == self.DROP:
-            self._DROP = bool(value)
+            b = bool(value)
+            if b and b != self._DROP and drop_handler is not None:
+                try:
+                    drop_handler()
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+            self._DROP = b
         else:
             _log.debug('unknown data target %s', target)
 
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
-    async def read_msg(self, stream: asyncio.StreamReader) -> None:
+    async def read_msg(self, stream: asyncio.StreamReader,
+                charge_handler:Optional[Callable[[], None]] = None,
+                dry_handler:Optional[Callable[[], None]] = None,
+                fcs_handler:Optional[Callable[[], None]] = None,
+                scs_handler:Optional[Callable[[], None]] = None,
+                drop_handler:Optional[Callable[[], None]] = None) -> None:
         # look for the first header byte
         await stream.readuntil(self.HEADER[0:1])
         # check for the second header byte (wifi)
@@ -156,16 +196,23 @@ class SantokerNetwork():
             _log.debug('unexpected TAIL: %s', tail)
             return
         # full message decoded
-        self.register_reading(target, value)
+        self.register_reading(target, value, charge_handler, dry_handler,
+                        fcs_handler, scs_handler, drop_handler)
 
 
     # asyncio loop
 
-    async def handle_reads(self, reader: asyncio.StreamReader) -> None:
+    async def handle_reads(self, reader: asyncio.StreamReader,
+                charge_handler:Optional[Callable[[], None]] = None,
+                dry_handler:Optional[Callable[[], None]] = None,
+                fcs_handler:Optional[Callable[[], None]] = None,
+                scs_handler:Optional[Callable[[], None]] = None,
+                drop_handler:Optional[Callable[[], None]] = None) -> None:
         try:
             with suppress(asyncio.CancelledError):
                 while not reader.at_eof():
-                    await self.read_msg(reader)
+                    await self.read_msg(reader, charge_handler, dry_handler,
+                                fcs_handler, scs_handler, drop_handler)
         except Exception as e: # pylint: disable=broad-except
             _log.error(e)
 
@@ -189,7 +236,14 @@ class SantokerNetwork():
             with suppress(asyncio.CancelledError, ConnectionResetError):
                 await writer.drain()
 
-    async def connect(self, host:str, port:int, connected_handler:Optional[Callable[[], None]] = None, disconnected_handler:Optional[Callable[[], None]] = None) -> None:
+    async def connect(self, host:str, port:int,
+            connected_handler:Optional[Callable[[], None]] = None,
+                disconnected_handler:Optional[Callable[[], None]] = None,
+                charge_handler:Optional[Callable[[], None]] = None,
+                dry_handler:Optional[Callable[[], None]] = None,
+                fcs_handler:Optional[Callable[[], None]] = None,
+                scs_handler:Optional[Callable[[], None]] = None,
+                drop_handler:Optional[Callable[[], None]] = None) -> None:
         while True:
             try:
                 _log.debug('connecting to %s:%s ...',host,port)
@@ -197,19 +251,20 @@ class SantokerNetwork():
                 # Wait for 1 seconds, then raise TimeoutError
                 reader, writer = await asyncio.wait_for(connect, timeout=2)
                 _log.debug('connected')
-                if connected_handler:
+                if connected_handler is not None:
                     try:
                         connected_handler()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                 self._write_queue = asyncio.Queue()
-                read_handler = asyncio.create_task(self.handle_reads(reader))
+                read_handler = asyncio.create_task(self.handle_reads(reader, charge_handler,
+                                    dry_handler, fcs_handler, scs_handler, drop_handler))
                 write_handler = asyncio.create_task(self.handle_writes(writer, self._write_queue))
                 await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
                 writer.close()
                 _log.debug('disconnected')
                 self.resetReadings()
-                if disconnected_handler:
+                if disconnected_handler is not None:
                     try:
                         disconnected_handler()
                     except Exception as e: # pylint: disable=broad-except
@@ -257,14 +312,21 @@ class SantokerNetwork():
 
     def start(self, host:str = '10.10.100.254', port:int = 20001,
                 connected_handler:Optional[Callable[[], None]] = None,
-                disconnected_handler:Optional[Callable[[], None]] = None) -> None:
+                disconnected_handler:Optional[Callable[[], None]] = None,
+                charge_handler:Optional[Callable[[], None]] = None,
+                dry_handler:Optional[Callable[[], None]] = None,
+                fcs_handler:Optional[Callable[[], None]] = None,
+                scs_handler:Optional[Callable[[], None]] = None,
+                drop_handler:Optional[Callable[[], None]] = None) -> None:
         try:
             _log.debug('start sampling')
             self._loop = asyncio.new_event_loop()
             self._thread = Thread(target=self.start_background_loop, args=(self._loop,), daemon=True)
             self._thread.start()
             # run sample task in async loop
-            asyncio.run_coroutine_threadsafe(self.connect(host, port, connected_handler, disconnected_handler), self._loop)
+            asyncio.run_coroutine_threadsafe(self.connect(host, port,
+                connected_handler, disconnected_handler,
+                charge_handler, dry_handler, fcs_handler, scs_handler, drop_handler), self._loop)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
 
