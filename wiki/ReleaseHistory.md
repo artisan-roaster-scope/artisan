@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v2.8.2 (December XX, 2022)
+v2.8.2 (December 21, 2022)
 ------------------
 
 * NEW FEATURES
@@ -43,6 +43,7 @@ v2.8.2 (December XX, 2022)
   - fixes Yocto-4-20mA-Rx device input
   - fixes Artisan Command `pidSource(<int>)`
   - fixes Phidget 1046 configuration
+  - fixes regression which blocked background left/right shifts if keyboard moves was active
 * REMOVALS
    - drops builds for RPi Buster
 
