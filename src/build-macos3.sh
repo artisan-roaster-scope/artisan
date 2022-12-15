@@ -17,7 +17,7 @@ else
 
 # for PyQt6:
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt6/Qt6
-    export QT_SRC_PATH=~/Qt6.4/6.4.1/macos
+    export QT_SRC_PATH=~/Qt/6.4.1/macos
     export PYUIC=pyuic6
     export PYRCC=pyrcc6
     export PYLUPDATE=./pylupdate6pro

@@ -1,3 +1,9 @@
+artisan (2.8.2-0) precise; urgency=low
+  * new upstream release
+  * changes since 2.8.0:
+   - bug fixes and performance enhancements
+ --  <marko.luther@gmx.net>  Wed, 21 Dec 2022 19:32:14 +0200
+
 artisan (2.8.0-0) precise; urgency=low
   * new upstream release
   * changes since 2.6.0:
