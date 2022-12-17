@@ -1,6 +1,5 @@
 [General]
 Delay=1000
-Oversampling=false
 roastertype_setup=Santoker Q Series
 
 [Device]
