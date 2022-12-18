@@ -128,6 +128,8 @@ machines:
         url: /machines/sf/
       - title: "Sedona"
         url: /machines/sedona/
+      - title: "Sivetz"
+        url: /machines/sivetz/
       - title: "Tesla"
         url: /machines/tesla/
       - title: "Titanium"

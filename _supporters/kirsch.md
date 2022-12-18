@@ -2,7 +2,7 @@
 layout: single
 permalink: /machines/kirsch/
 title: "Kirsch & Mausser"
-excerpt: ""
+excerpt: "UG & G Series"
 header:
   overlay_image: /assets/images/kirsch2.jpg
   image: /assets/images/kirsch.jpg

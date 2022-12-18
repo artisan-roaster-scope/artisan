@@ -55,6 +55,11 @@ gallery:
     image_path: /assets/images/cms-logo.jpg
     alt: "Coffee Maschines Sale"
     title: "Coffee Maschines Sale"
+  - url: https://www.sivetz.com/
+    image_path: /assets/images/sivetz-logo.png
+    alt: "Sivetz"
+    title: "Sivetz"
+    
 ---
 
 <!--
