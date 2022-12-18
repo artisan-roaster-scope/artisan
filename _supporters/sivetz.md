@@ -4,7 +4,7 @@ permalink: /machines/sivetz/
 title: "Sivetz"
 excerpt: "SRM Series"
 header:
-  overlay_image: /assets/images/sivetz2.png
+  overlay_image: /assets/images/sivetz2.jpg
   image: /assets/images/sivetz.png
   teaser: assets/images/sivetz.png
 sidebar:
