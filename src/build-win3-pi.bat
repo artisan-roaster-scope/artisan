@@ -7,7 +7,7 @@
 :: ----------------------------------------------------------------------
 :: normally these paths are set in appveyor.yml
 :: when running locally these paths must be set here 
-:: CAUTION: the paths in this section are not gurantted to be to date!! 
+:: CAUTION: the paths in this section are not gurantted to be up to date!! 
 :: ----------------------------------------------------------------------
 setlocal enabledelayedexpansion
 if /i "%APPVEYOR%" NEQ "True" (
@@ -19,10 +19,10 @@ if /i "%APPVEYOR%" NEQ "True" (
         set QT_PATH=c:\qt\5.15\msvc2019_64
     ) else (
         set ARTISAN_SPEC=win
-        set PYTHON_PATH=c:\Python310-64
+        set PYTHON_PATH=c:\Python311-64
         set ARTISAN_LEGACY=False
         set PYUIC=pyuic6.exe
-        set QT_PATH=c:\qt\6.2\msvc2019_64
+        set QT_PATH=c:\qt\6.4\msvc2022_64
     )
     set PATH=!PYTHON_PATH!;!PYTHON_PATH!\Scripts;!PATH!
 ) else (

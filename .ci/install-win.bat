@@ -7,7 +7,7 @@
 :: ----------------------------------------------------------------------
 :: normally these paths are set in appveyor.yml
 :: when running locally these paths must be set here 
-:: CAUTION: the paths in this section are not gurantted to be to date!! 
+:: CAUTION: the paths in this section are not gurantted to be up to date!! 
 :: ----------------------------------------------------------------------
 setlocal enabledelayedexpansion
 if /i "%APPVEYOR%" NEQ "True" (
@@ -15,15 +15,15 @@ if /i "%APPVEYOR%" NEQ "True" (
         set ARTISAN_SPEC=win-legacy
         set PYTHON_PATH=c:\Python38-64
         set QT_PATH=c:\qt\5.15\msvc2019_64
-        set PYINSTALLER_VER=5.5
+        set PYINSTALLER_VER=5.7
         set LIBUSB_VER=1.2.6.0
         set BUILD_PYINSTALLER=False
         set VC_REDIST=https://aka.ms/vs/16/release/vc_redist.x64.exe
     ) else (
         set ARTISAN_SPEC=win
-        set PYTHON_PATH=c:\Python310-64
-        set QT_PATH=c:\qt\6.2\msvc2019_64
-        set PYINSTALLER_VER=5.5
+        set PYTHON_PATH=c:\Python311-64
+        set QT_PATH=c:\qt\6.4\msvc2022_64
+        set PYINSTALLER_VER=5.7
         set LIBUSB_VER=1.2.6.0
         set BUILD_PYINSTALLER=True
         set VC_REDIST=https://aka.ms/vs/17/release/vc_redist.x64.exe
