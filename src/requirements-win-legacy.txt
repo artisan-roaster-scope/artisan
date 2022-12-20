@@ -26,5 +26,5 @@ PyQt5==5.15.7 #5.15.6
 PyQtWebEngine==5.15.6 #5.15.5
 openpyxl==3.0.10 #3.0.9
 keyring==23.11.0 #23.9.3 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
-lxml==4.9.1 #4.7.1
+lxml==4.9.2 #4.7.1
 prettytable==3.5.0 #3.4.1 # >1.0.0 fail to be packed by py2app, but a monkey patch in main.py helps
