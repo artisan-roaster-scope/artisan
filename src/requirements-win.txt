@@ -3,14 +3,14 @@
 ######
 # the following commented package versions are read by appveyor.
 #
-# pyinstaller==5.7.0 #5.6.2  #built during the appveyor ci process
+# pyinstaller==5.6.2 #5.7.0 #5.6.2  #built during the appveyor ci process
 # libusb==1.2.6.0     #downloaded during the appveyor ci process
 #
 ######
 # platform specifics
 #
 pywin32==305 #304
-pyinstaller-versionfile==2.1.1 #2.0.0
+pyinstaller-versionfile==2.0.0 #2.1.1 #2.0.0
 #
 ######
 # packages that differ per platform:
