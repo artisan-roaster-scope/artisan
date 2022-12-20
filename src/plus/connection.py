@@ -114,7 +114,7 @@ def clearCredentials(remove_from_keychain: bool = True) -> None:
                     config.app_name, config.app_window.plus_account
                 )  # @UndefinedVariable
             except Exception as e:  # pylint: disable=broad-except
-                _log.exception(e)
+                _log.error(e)
     except Exception: # pylint: disable=broad-except
         # config.app_window might be still unbound
         pass
@@ -257,7 +257,7 @@ def authentify() -> bool:
                             _log.exception(e)
 
 
-                    # note, here we have to convert the dateUtil string locally here, instead of accessing aw.plus_paidUntil which might not yet set via the signal processing above
+                    # note, here we have to convert the dateUtil string locally , instead of accessing aw.plus_paidUntil which might not yet have been set via the signal processing above
                     try:
                         if paidUntil != '' and (
                             dateutil.parser.parse(paidUntil).date()

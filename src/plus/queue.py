@@ -324,59 +324,62 @@ def is_full_roast_record(r: Dict[str, Any]) -> bool:  #for Python >= 3.9 can rep
 def addRoast(roast_record=None):
     try:
         _log.debug('addRoast()')
-        if config.app_window.plus_readonly:
-            _log.info(
-                '-> roast not queued as users'
-                 ' account access is readonly'
-            )
-        elif queue is None:
-            _log.info(
-                '-> roast not queued as queue'
-                 ' is not running'
-            )
+        if config.app_window is None:
+            _log.info('config.app_window is None')
         else:
-            if roast_record is None:
-                r = roast.getRoast()
-            else:
-                r = roast_record
-            # if modification date is not set yet, we add the current time as
-            # modified_at timestamp as float EPOCH with millisecond
-            if 'modified_at' not in r:
-                r['modified_at'] = util.epoch2ISO8601(time.time())
-            _log.debug('-> roast: %s', r)
-            # check if all required data is available before queueing this up
-            if (
-                'roast_id' in r
-                and r['roast_id']
-                and (
-                    roast_record is not None
-                    or ('date' in r and r['date'] and 'amount' in r)
+            if config.app_window.plus_readonly:
+                _log.info(
+                    '-> roast not queued as users'
+                     ' account access is readonly'
                 )
-            ):  # amount can be 0 but has to be present
-                # put in upload queue
-                _log.debug('-> put in queue')
-                config.app_window.sendmessage(
-                    QApplication.translate(
-                        'Plus',
-                        'Queuing roast for upload to artisan.plus'
+            elif queue is None:
+                _log.info(
+                    '-> roast not queued as queue'
+                     ' is not running'
+                )
+            else:
+                if roast_record is None:
+                    r = roast.getRoast()
+                else:
+                    r = roast_record
+                # if modification date is not set yet, we add the current time as
+                # modified_at timestamp as float EPOCH with millisecond
+                if 'modified_at' not in r:
+                    r['modified_at'] = util.epoch2ISO8601(time.time())
+                _log.debug('-> roast: %s', r)
+                # check if all required data is available before queueing this up
+                if (
+                    'roast_id' in r
+                    and r['roast_id']
+                    and (
+                        roast_record is not None
+                        or ('date' in r and r['date'] and 'amount' in r)
                     )
-                )  # @UndefinedVariable
-                if roast_record is not None:
-                    # on updates only changed attributes w.r.t. the current
-                    # cached sync record are uploaded
-                    r = sync.diffCachedSyncRecord(r)
-                queue.put(
-                    {'url': config.roast_url, 'data': r, 'verb': 'POST'},
-                    # timeout=config.queue_put_timeout
-                    # sql queue does not feature a timeout
-                )
-                _log.debug('-> roast queued up')
-                if 'roast_id' in r:
-                    _log.info('roast queued: %s', r['roast_id'])
-                _log.debug('-> qsize: %s', queue.qsize())
-            else:
-                _log.debug(
-                    '-> roast not queued as mandatory info missing'
-                )
+                ):  # amount can be 0 but has to be present
+                    # put in upload queue
+                    _log.debug('-> put in queue')
+                    config.app_window.sendmessage(
+                        QApplication.translate(
+                            'Plus',
+                            'Queuing roast for upload to artisan.plus'
+                        )
+                    )  # @UndefinedVariable
+                    if roast_record is not None:
+                        # on updates only changed attributes w.r.t. the current
+                        # cached sync record are uploaded
+                        r = sync.diffCachedSyncRecord(r)
+                    queue.put(
+                        {'url': config.roast_url, 'data': r, 'verb': 'POST'},
+                        # timeout=config.queue_put_timeout
+                        # sql queue does not feature a timeout
+                    )
+                    _log.debug('-> roast queued up')
+                    if 'roast_id' in r:
+                        _log.info('roast queued: %s', r['roast_id'])
+                    _log.debug('-> qsize: %s', queue.qsize())
+                else:
+                    _log.debug(
+                        '-> roast not queued as mandatory info missing'
+                    )
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)

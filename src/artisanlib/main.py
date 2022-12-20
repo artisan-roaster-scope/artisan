@@ -37690,11 +37690,26 @@ class ApplicationWindow(QMainWindow):
             self.modbus.PID_ON_action = s2a(toString(dialog.modbus_pid_on.text()))
 
             for i in range(aw.modbus.channels):
-                self.modbus.inputSlaves[i] = int(str(dialog.modbus_inputSlaveEdits[i].text()))
-                self.modbus.inputRegisters[i] = int(str(dialog.modbus_inputRegisterEdits[i].text()))
-                self.modbus.inputCodes[i] = int(str(dialog.modbus_inputCodes[i].currentText()))
-                self.modbus.inputDivs[i] = dialog.modbus_inputDivs[i].currentIndex()
-                self.modbus.inputModes[i] = str(dialog.modbus_inputModes[i].currentText())
+                try:
+                    self.modbus.inputSlaves[i] = int(str(dialog.modbus_inputSlaveEdits[i].text()))
+                except Exception: # pylint: disable=broad-except
+                    self.modbus.inputSlaves[i] = 0
+                try:
+                    self.modbus.inputRegisters[i] = int(str(dialog.modbus_inputRegisterEdits[i].text()))
+                except Exception: # pylint: disable=broad-except
+                    self.modbus.inputRegisters[i] = 0
+                try:
+                    self.modbus.inputCodes[i] = int(str(dialog.modbus_inputCodes[i].currentText()))
+                except Exception: # pylint: disable=broad-except
+                    self.modbus.inputCodes[i] = 3
+                try:
+                    self.modbus.inputDivs[i] = dialog.modbus_inputDivs[i].currentIndex()
+                except Exception: # pylint: disable=broad-except
+                    self.modbus.inputDivs[i] = 0
+                try:
+                    self.modbus.inputModes[i] = str(dialog.modbus_inputModes[i].currentText())
+                except Exception: # pylint: disable=broad-except
+                    self.modbus.inputModes[i] = 'C'
                 if dialog.modbus_inputDecodes[i].currentIndex() == 4:
                     self.modbus.inputBCDsAsInt[i] = True
                     self.modbus.inputFloatsAsInt[i] = False
