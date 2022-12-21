@@ -95,9 +95,10 @@ parity=O
 port=502
 reset_socket=false
 stopbits=1
-timeout=0.4
+timeout=0.5
 type=0
 wordorderLittle=true
+modbus_serial_extra_read_delay=0.03
 
 [ExtraComm]
 extrabaudrate=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\x96\0)
