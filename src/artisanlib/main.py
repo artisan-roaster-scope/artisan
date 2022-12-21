@@ -31026,9 +31026,9 @@ class ApplicationWindow(QMainWindow):
             if not filename:
                 path = QDir()
                 path.setPath(self.getDefaultPath())
-                if aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0:
+                if aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0 and self.qmc.autosaveprefix == '':
                     prefix = aw.qmc.batchprefix + str(aw.qmc.roastbatchnr)
-                elif aw.qmc.roastbatchprefix != '':
+                elif aw.qmc.roastbatchprefix != '' and self.qmc.autosaveprefix == '':
                     prefix = aw.qmc.roastbatchprefix
                 else:
                     prefix = self.qmc.autosaveprefix
