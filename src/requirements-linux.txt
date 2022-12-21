@@ -26,7 +26,7 @@ openpyxl==3.0.10 #3.0.9
 pyinstaller==5.7.0 #5.6.2 # binary build with pyinstaller 4.8 fails on setuptools==60.7.0/60.7.1
 #jeepney==0.4
 #cryptography==2.6.1
-keyring==23.11.0 #23.9.3  # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
+keyring==23.13.1 #23.9.3  # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
 SecretStorage==3.3.3 #3.3.1
 lxml==4.9.1 #4.7.1
 prettytable==3.5.0 #3.4.1 # >1.0.0 fail to be packed by py2app, but a monkey patch in main.py helps

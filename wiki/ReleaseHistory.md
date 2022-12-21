@@ -45,6 +45,7 @@ v2.8.2 (December 21, 2022)
   - fixes Artisan Command `pidSource(<int>)`
   - fixes Phidget 1046 configuration
   - fixes regression which blocked background left/right shifts if keyboard moves was active
+  - fixes regression which crashed the Fuji PXR PID dialog ([Issue #1054](../../../issues/1054))
 * REMOVALS
    - drops builds for RPi Buster
 
