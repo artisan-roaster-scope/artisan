@@ -15520,14 +15520,6 @@ class tgraphcanvas(FigureCanvas):
         from scipy.interpolate import UnivariateSpline
         if aw.qmc.designerflag:
 
-            if not self.locktimex and self.timex[-1] != self.endofx:
-                self.endofx = self.timex[-1] + 120
-                self.xaxistosm(redraw=False)
-                self.ax_background_designer = None
-            elif self.timex[0] != self.startofx:
-                self.xaxistosm(redraw=False)
-                self.ax_background_designer = None
-
             if self.ax_background_designer is None or force:
                 # we first initialize the background canvas and the bitblit cache
                 self.designer_timez = numpy.arange(self.timex[0],self.timex[-1],self.time_step_size)
@@ -37504,7 +37496,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def helpAbout(self,_=False):
-        coredevelopers = '<br>Rafael Cobo, Marko Luther, &amp; Dave Baxter'
+        coredevelopers = '<br>Rafael Cobo, Marko Luther &amp; Dave Baxter'
         contribs = ['<br>' + uchr(199) + 'etin Barut, Marcio Carnerio, Bradley Collins, ',
                     'Sebastien Delgrande, Kalle Deligeorgakis, Jim Gall, ',
                     'Frans Goddijn, Rich Helms, Kyle Iseminger, Ingo, ',

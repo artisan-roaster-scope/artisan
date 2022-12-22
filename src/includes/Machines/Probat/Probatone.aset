@@ -159,6 +159,7 @@ slidermax=100, 100, 100, 100
 slidermin=0, 0, 0, 0
 slideroffsets=0, 0, 0, 0
 slidervisibilities=0, 0, 0, 1
+eventsliderunits=, , , %
 
 [background]
 BTBflag=true
