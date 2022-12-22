@@ -917,7 +917,8 @@ class modbusport():
             _log.info('peekSingleRegister(%d,%d,%d) failed', slave, register, code)
             _log.debug(ex)
             res = None
-        if not self.invalidResult(res,1):
+        error, _ = self.invalidResult(res,1)
+        if not error:
             if code in [1,2]:
                 if res is not None and res.bits[0]:
                     return 1
