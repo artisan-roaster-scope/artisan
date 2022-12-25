@@ -20646,11 +20646,17 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot('QPoint')
     def setTareET(self,_):
-        self.setTare(0)
+        if not aw.qmc.swaplcds:
+            self.setTare(0)
+        else:
+            self.setTare(1)
 
     @pyqtSlot('QPoint')
     def setTareBT(self,_):
-        self.setTare(1)
+        if not aw.qmc.swaplcds:
+            self.setTare(1)
+        else:
+            self.setTare(0)
 
     @pyqtSlot('QPoint')
     def setTare_slot(self,_):
@@ -24953,7 +24959,7 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     cmds = eval(cs[len('tare'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,int):
-                                        self.setTareSignal.emit()
+                                        self.setTareSignal.emit(cmds-1)
                                         self.sendmessage(f'Artisan Command: {cs}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
