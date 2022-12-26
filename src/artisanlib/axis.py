@@ -561,19 +561,21 @@ class WindowsDlg(ArtisanDialog):
     @pyqtSlot()
     def zlimitChanged(self):
         try:
-            self.aw.qmc.autodeltaxET = False
-            self.aw.qmc.autodeltaxBT = False
-            self.autodeltaxETFlag.blockSignals(True)
-            self.autodeltaxBTFlag.blockSignals(True)
-            self.autodeltaxETFlag.setChecked(self.aw.qmc.autodeltaxET)
-            self.autodeltaxBTFlag.setChecked(self.aw.qmc.autodeltaxBT)
-            self.autodeltaxETFlag.blockSignals(False)
-            self.autodeltaxBTFlag.blockSignals(False)
-            self.aw.qmc.zlimit = int(self.zlimitEdit.text().strip())
-            if bool(self.aw.comparator):
-                self.aw.comparator.redraw()
-            else:
-                self.aw.qmc.redraw(recomputeAllDeltas=False)
+            new_value = int(self.zlimitEdit.text().strip())
+            if self.aw.qmc.zlimit != new_value:
+                self.aw.qmc.autodeltaxET = False
+                self.aw.qmc.autodeltaxBT = False
+                self.autodeltaxETFlag.blockSignals(True)
+                self.autodeltaxBTFlag.blockSignals(True)
+                self.autodeltaxETFlag.setChecked(self.aw.qmc.autodeltaxET)
+                self.autodeltaxBTFlag.setChecked(self.aw.qmc.autodeltaxBT)
+                self.autodeltaxETFlag.blockSignals(False)
+                self.autodeltaxBTFlag.blockSignals(False)
+                self.aw.qmc.zlimit = new_value
+                if bool(self.aw.comparator):
+                    self.aw.comparator.redraw()
+                else:
+                    self.aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception: # pylint: disable=broad-except
             self.zlimitEdit.setText(str(self.aw.qmc.zlimit))
 

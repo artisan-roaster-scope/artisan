@@ -15344,7 +15344,7 @@ class tgraphcanvas(FigureCanvas):
                 if res:
                     self.connect_designer()
                     aw.disableEditMenus(designer=True)
-                    self.redraw(True)
+                    self.redraw()
                 else:
                     aw.designerAction.setChecked(False)
             elif reply == QMessageBox.StandardButton.Cancel:
@@ -15454,9 +15454,13 @@ class tgraphcanvas(FigureCanvas):
         if not self.locktimex:
             self.xaxistosm(redraw=False)
 
-        # import UnivariateSpline needed to draw the curve in designer
-        from scipy.interpolate import UnivariateSpline # @UnusedImport # pylint: disable=import-error
-        global UnivariateSpline # pylint: disable=global-statement
+#        # import UnivariateSpline needed to draw the curve in designer
+#        from scipy.interpolate import UnivariateSpline # @UnusedImport # pylint: disable=import-error
+#        global UnivariateSpline # pylint: disable=global-statement
+        # init designer timez
+        self.designer_timez = numpy.arange(self.timex[0],self.timex[-1],self.time_step_size)
+        # set initial RoR z-axis limits
+        self.setDesignerDeltaAxisLimits(self.DeltaETflag, self.DeltaBTflag)
         self.redrawdesigner(force=True)
 
     #loads main points from a profile so that they can be edited
@@ -15509,11 +15513,73 @@ class tgraphcanvas(FigureCanvas):
             self.currentx = lptime
             self.currenty = lptemp2
             self.addpoint(manual=False)
+            # reset cursor coordinates
+            self.currentx = 0
+            self.currenty = 0
 
         if not self.locktimex:
             self.xaxistosm(redraw=False)
+#        # import UnivariateSpline needed to draw the curve in designer
+#        from scipy.interpolate import UnivariateSpline # @UnusedImport # pylint: disable=import-error
+#        global UnivariateSpline # pylint: disable=global-statement
+        # init designer timez
+        self.designer_timez = numpy.arange(self.timex[0],self.timex[-1],self.time_step_size)
+        # set initial RoR z-axis limits
+        self.setDesignerDeltaAxisLimits(self.DeltaETflag, self.DeltaBTflag)
         self.redrawdesigner(force=True)                                   #redraw the designer screen
         return True
+
+
+    def setDesignerDeltaAxisLimits(self, setET:bool, setBT:bool):
+        if setET or setBT:
+            from scipy.interpolate import UnivariateSpline
+            delta1_max = 0
+            delta2_max = 0
+            # we have first to calculate the delta data
+            # returns the max ET/BT RoR between CHARGE and DROP
+            if setET:
+                func1 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
+                funcDelta1 = func1.derivative()
+                delta1_max = max(funcDelta1(self.designer_timez) * 60)
+            if setBT:
+                func2 = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
+                funcDelta2 = func2.derivative()
+                delta2_max = max(funcDelta2(self.designer_timez) * 60)
+            dmax = max(delta1_max, delta2_max)
+            # we only adjust the upper limit automatically
+            zlimit_org = aw.qmc.zlimit
+            if dmax > aw.qmc.zlimit_min:
+                self.zlimit = int(dmax) + 1
+            else:
+                self.zlimit = self.zlimit_min + 1
+            if zlimit_org != self.zlimit:
+                self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
+            if self.zgrid != 0:
+                d = self.zlimit - self.zlimit_min
+                steps = int(round(d/5))
+                if steps > 50:
+                    steps = int(round(steps/10))*10
+                elif steps > 10:
+                    steps = int(round(steps/5))*5
+                elif steps > 5:
+                    steps = 5
+                else:
+                    steps = int(round(steps/2))*2
+                auto_grid = max(2,steps)
+                if auto_grid != self.zgrid:
+                    self.zgrid = auto_grid
+                    if self.zgrid > 0:
+                        self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
+                        self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                        for i in self.delta_ax.get_yticklines():
+                            i.set_markersize(10)
+                        for i in self.delta_ax.yaxis.get_minorticklines():
+                            i.set_markersize(5)
+                        for label in self.delta_ax.get_yticklabels() :
+                            label.set_fontsize('small')
+                        if not self.LCDdecimalplaces:
+                            self.delta_ax.minorticks_off()
+
 
     #redraws designer
     def redrawdesigner(self,force=False): #if force is set the bitblit cache is ignored and a full redraw is triggered
@@ -15538,6 +15604,9 @@ class tgraphcanvas(FigureCanvas):
                 fontprop_medium = aw.mpl_fontproperties.copy()
                 fontprop_medium.set_size('medium')
                 self.set_xlabel(aw.arabicReshape(QApplication.translate('Label', 'Designer')))
+
+                # update z-axis limits if autoDelta is enabled
+                self.setDesignerDeltaAxisLimits(self.DeltaETflag and self.autodeltaxET, self.DeltaBTflag and self.autodeltaxBT)
 
                 if not self.locktimex and self.timex[-1] > self.endofx:
                     self.endofx = self.timex[-1] + 120
@@ -38499,11 +38568,11 @@ class ApplicationWindow(QMainWindow):
             self.startdesigner()
 
     def startdesigner(self):
-        self.qmc.designer()
         self.hideLCDs(False)
         self.hideSliders(False)
         self.hide_minieventline(False)
         self.hideExtraButtons()
+        self.qmc.designer()
 
     def stopdesigner(self):
         aw.enableEditMenus()
