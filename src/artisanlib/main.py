@@ -222,7 +222,8 @@ from artisanlib.util import (appFrozen, stringp, uchr, decodeLocal, encodeLocal,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toBool, toStringList, toMap, removeAll, application_name, application_viewer_name, application_organization_name,
         application_organization_domain, getDataDirectory, getAppPath, getResourcePath, getDirectory, debugLogLevelToggle,
-        debugLogLevelActive, setDebugLogLevel, abbrevString, createGradient, natsort, toGrey, toDim, setDeviceDebugLogLevel)
+        debugLogLevelActive, setDebugLogLevel, abbrevString, createGradient, natsort, toGrey, toDim, setDeviceDebugLogLevel,
+        scaleFloat2String)
 
 from artisanlib.qtsingleapplication import QtSingleApplication
 from artisanlib.filters import LiveMedian
@@ -1228,7 +1229,7 @@ class tgraphcanvas(FigureCanvas):
         # NOTE: stat. flavors not used anymore. The code has been removed.
         #       statisticsflags[5] area is not used anymore
         self.statisticsflags = [1,1,0,1,0,0,1]
-        self.statisticsmode = 1 # one of 0: standard computed values, 1: roast properties
+        self.statisticsmode = 1 # one of 0: standard computed values, 1: roast properties, 2: total energy/CO2 data, 3: just roast energy/CO2 data
 
         # Area Under Curve (AUC)
         self.AUCbegin = 1 # counting begins after 0: CHARGE, 1: TP (default), 2: DE, 3: FCs
@@ -3496,7 +3497,7 @@ class tgraphcanvas(FigureCanvas):
     def onclick(self,event):
         try:
             if not self.designerflag and not self.wheelflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == 3:
-                aw.qmc.statisticsmode = (aw.qmc.statisticsmode + 1)%2
+                aw.qmc.statisticsmode = (aw.qmc.statisticsmode + 1)%4
                 aw.qmc.writecharacteristics()
                 aw.qmc.fig.canvas.draw_idle()
                 return
@@ -14143,7 +14144,7 @@ class tgraphcanvas(FigureCanvas):
                         if FCperiod is not None:
                             strline = strline + '   ' + QApplication.translate('Label', 'FC') + '=%smin' % FCperiod
                     self.set_xlabel(strline)
-                else:
+                elif aw.qmc.statisticsmode == 1:
                     sep = '   '
                     msg = aw.qmc.roastdate.date().toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))
                     tm = aw.qmc.roastdate.time().toString()[:-3]
@@ -14165,6 +14166,82 @@ class tgraphcanvas(FigureCanvas):
                     elif aw.qmc.ground_color:
                         msg += sep + '#' + str(aw.qmc.ground_color)
                     self.set_xlabel(msg)
+                elif aw.qmc.statisticsmode == 2:
+                    # total energy/CO2
+                    energy_label = QApplication.translate('GroupBox','Energy')
+                    CO2_label = QApplication.translate('GroupBox','CO2').replace('CO2','CO₂')
+                    energy_unit = self.energyunits[self.energyresultunit_setup]
+                    energymetrics,_ = self.calcEnergyuse()
+                    KWH_per_green = energymetrics['KWH_batch_per_green_kg']
+                    CO2_per_green = energymetrics['CO2_batch_per_green_kg']
+
+                    # energy per kg
+                    if KWH_per_green > 0:
+                        if KWH_per_green < 1:
+                            scaled_energy_kwh = scaleFloat2String(KWH_per_green*1000.) + ' Wh/kg'
+                        else:
+                            scaled_energy_kwh = scaleFloat2String(KWH_per_green) + ' kWh/kg'
+                        energyPerKgCoffeeLabel = f'  ({scaled_energy_kwh})'
+                    # no weight is available
+                    else:
+                        energyPerKgCoffeeLabel = ''
+
+                    # CO2 per kg
+                    if CO2_per_green > 0:
+                        if CO2_per_green < 1000:
+                            scaled_co2_kg = scaleFloat2String(CO2_per_green) + 'g/kh'
+                        else:
+                            scaled_co2_kg = scaleFloat2String(CO2_per_green/1000.) + 'kg/kh'
+                        CO2perKgCoffeeLabel = f'  ({scaled_co2_kg})'
+                    # no weight is available
+                    else:
+                        CO2perKgCoffeeLabel = ''
+
+                    total_energy = scaleFloat2String(self.convertHeat(energymetrics['BTU_batch'],0,self.energyresultunit_setup))
+                    scaled_co2_batch = str(scaleFloat2String(energymetrics['CO2_batch']))+'g' if energymetrics['CO2_batch']<1000 else str(scaleFloat2String(energymetrics['CO2_batch']/1000.)) +'kg'
+
+
+                    msg = f'{energy_label}: {total_energy}{energy_unit}{energyPerKgCoffeeLabel}   {CO2_label}: {scaled_co2_batch}{CO2perKgCoffeeLabel}'
+                    self.set_xlabel(msg)
+                elif aw.qmc.statisticsmode == 3:
+                    # just roast energy/CO2
+                    energy_label = QApplication.translate('GroupBox','Energy')
+                    CO2_label = QApplication.translate('GroupBox','CO2').replace('CO2','CO₂')
+                    energy_unit = self.energyunits[self.energyresultunit_setup]
+                    roast_label = QApplication.translate('Label','Roast')
+                    energymetrics,_ = self.calcEnergyuse()
+                    KWH_per_green_roast = energymetrics['KWH_roast_per_green_kg']
+                    CO2_per_green_roast = energymetrics['CO2_roast_per_green_kg']
+
+                    # energy per kg
+                    if KWH_per_green_roast > 0:
+                        if KWH_per_green_roast < 1:
+                            scaled_energy_kwh = scaleFloat2String(KWH_per_green_roast*1000.) + ' Wh/kg'
+                        else:
+                            scaled_energy_kwh = scaleFloat2String(KWH_per_green_roast) + ' kWh/kg'
+                        energyPerKgCoffeeLabel = f'  ({scaled_energy_kwh})'
+                    # no weight is available
+                    else:
+                        energyPerKgCoffeeLabel = ''
+
+                    # CO2 per kg
+                    if CO2_per_green_roast > 0:
+                        if CO2_per_green_roast < 1000:
+                            scaled_co2_kg = scaleFloat2String(CO2_per_green_roast) + 'g/kh'
+                        else:
+                            scaled_co2_kg = scaleFloat2String(CO2_per_green_roast/1000.) + 'kg/kh'
+                        CO2perKgCoffeeLabel = f'  ({scaled_co2_kg})'
+                    # no weight is available
+                    else:
+                        CO2perKgCoffeeLabel = ''
+
+                    total_energy = scaleFloat2String(self.convertHeat(energymetrics['BTU_roast'],0,self.energyresultunit_setup))
+                    scaled_co2_batch = str(scaleFloat2String(energymetrics['CO2_roast']))+'g' if energymetrics['CO2_roast']<1000 else str(scaleFloat2String(energymetrics['CO2_roast']/1000.)) +'kg'
+
+                    msg = f'{roast_label} {energy_label}: {total_energy}{energy_unit}{energyPerKgCoffeeLabel}   {roast_label} {CO2_label}: {scaled_co2_batch}{CO2perKgCoffeeLabel}'
+                    self.set_xlabel(msg)
+                else:
+                    self.set_xlabel('')
             else:
                 if aw.qmc.flagstart or self.xgrid == 0:
                     self.set_xlabel('')
