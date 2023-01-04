@@ -609,6 +609,7 @@ class RoastsComboBox(QComboBox):
         self.updateMenu()
         self.editTextChanged.connect(self.textEdited)
         self.setEditable(True)
+        self.completer().setCaseSensitivity(Qt.CaseSensitivity.CaseSensitive)
 #        self.setMouseTracking(False)
 
     @pyqtSlot('QString')
