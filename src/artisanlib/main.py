@@ -267,6 +267,7 @@ class Artisan(QtSingleApplication):
 
     @pyqtSlot('QWidget*','QWidget*')
     def appRaised(self,oldFocusWidget,newFocusWidget):
+        _log.debug('appRaised')
         try:
             if aw is not None and not sip.isdeleted(aw): # sip not supported on older PyQt versions (eg. RPi)
                 if oldFocusWidget is None and newFocusWidget is not None and aw is not None and aw.centralWidget() == newFocusWidget and self.sentToBackground is not None:
@@ -14169,7 +14170,10 @@ class tgraphcanvas(FigureCanvas):
                 elif aw.qmc.statisticsmode == 2:
                     # total energy/CO2
                     energy_label = QApplication.translate('GroupBox','Energy')
-                    CO2_label = QApplication.translate('GroupBox','CO2').replace('CO2','CO₂')
+                    CO2_label = QApplication.translate('GroupBox','CO2')
+                    if not (platf == 'Windows' and int(platform.release()) < 10):
+                         # no subscript for legacy Windows
+                        CO2_label = CO2_label.replace('CO2','CO₂')
                     energy_unit = self.energyunits[self.energyresultunit_setup]
                     energymetrics,_ = self.calcEnergyuse()
                     KWH_per_green = energymetrics['KWH_batch_per_green_kg']
@@ -14206,7 +14210,10 @@ class tgraphcanvas(FigureCanvas):
                 elif aw.qmc.statisticsmode == 3:
                     # just roast energy/CO2
                     energy_label = QApplication.translate('GroupBox','Energy')
-                    CO2_label = QApplication.translate('GroupBox','CO2').replace('CO2','CO₂')
+                    CO2_label = QApplication.translate('GroupBox','CO2')
+                    if not (platf == 'Windows' and int(platform.release()) < 10):
+                         # no subscript for legacy Windows
+                        CO2_label = CO2_label.replace('CO2','CO₂')
                     energy_unit = self.energyunits[self.energyresultunit_setup]
                     roast_label = QApplication.translate('Label','Roast')
                     energymetrics,_ = self.calcEnergyuse()

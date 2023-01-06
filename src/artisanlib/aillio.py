@@ -123,7 +123,7 @@ class AillioR1:
         if self.usbhandle is None:
             raise OSError('not found or no permission')
         self.__dbg('device found!')
-        if not system().startswith('Windows'):
+        if not system().startswith('Windows') and not system() == 'Darwin':
             if self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE):
                 try:
                     self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE)
