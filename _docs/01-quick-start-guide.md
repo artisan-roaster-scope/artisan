@@ -36,7 +36,7 @@ The [artisan.plus service](https://artisan.plus/en/) features support for
 
 ### Learn what Artisan can do and Your First Roast 
 
-**Best Practices - Learn to save your settings.  Before each roasting session, without any profile loaded, load your saved settings.  Why?  When you load another profile it could change some settings like your special event labels.**  
+**Best Practices - Learn to save your settings.**   Also after installing a new version do two things; read the release notes so you can spot anything relevant to your roasting, and look over the shortcuts as new ones are often being added.  
 
 1.	Skim the pages of this Quick Start Guide, learn what Artisan RoasterScope can do, and then go back and read the pages of interest in detail. For each roast, an Artisan "profile" will be created and can be saved in various formats and can be exported for sharing under File>Save Graph (be sure to review these).  For most of the topics below, you will find a page in this Quick Start Guide, and some are linked.  
 2.	`Config` >> `Temperature`  
