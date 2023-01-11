@@ -14,7 +14,7 @@ author_profile: true
 If you read through the topics on the left you will have a very good idea of how Artisan works.  This Quick-Start-Guide is not intended to answer all technical questions.
 {: .notice--primary}
 
-Artisan Quick-Start Guide is maintained by *Michael Herbert of [CarefreeBuzzBuzz](https://www.carefreebuzzbuzz.com/){:target="_blank"}*. If you have suggestions for improving the content of the Quick-Start-Guide or technical questions, please use the [Artisan discussion forum](https://github.com/artisan-roaster-scope/artisan/discussions) (GitHub registration required).  When clicking links in this Quick-Start-Guide, we suggest you open links in a new window.  You can also find a great deal of more advanced information at the [Artisan Blog](https://artisan-roasterscope.blogspot.com/).  Use the search bar in the upper left, 
+Artisan Quick-Start Guide is maintained by *Michael Herbert of [CarefreeBuzzBuzz](https://www.carefreebuzzbuzz.com/){:target="_blank"}*. If you have suggestions for improving the content of the Quick-Start-Guide or technical questions, please use the [Artisan discussion forum](https://github.com/artisan-roaster-scope/artisan/discussions) (GitHub registration required).  When clicking links in this Quick-Start-Guide, we suggest you open links in a new window.  You can also find a great deal of more advanced information at the [Artisan Blog](https://artisan-roasterscope.blogspot.com/).  Use the search bar in the upper left.
 
 
 
@@ -75,6 +75,8 @@ Go to `Help` >> `Shortcuts` to see how to enable them and see what keyboard shor
 19.	More personalization  
 Go to `Config` >> [Colors](https://artisan-scope.org/docs/colors/) and `Config` >> [Themes](https://artisan-scope.org/docs/themes/) to explore the options.  Note that some of the graph configurations are accessed with the last icon in the set on the left on the Roast graph (the one with jagged up arrow).  `Config` >> `Curves`, UI, pick a font and background image, IF you wish to personalize your use
 20.	READY FOR YOUR FIRST ROAST
+
+After you have completed some roasting, please watch the video [Getting the Most from Artisan's Tools](https://www.youtube.com/watch?v=8ivsccu9e_Y&t=3094s) to learn more about how to improve your roasting.  
 
 The main controls look like this:
 ![View Controls](/assets/images/gsg/view menu controls.png)
