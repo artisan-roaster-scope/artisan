@@ -76,7 +76,7 @@ Go to `Help` >> `Shortcuts` to see how to enable them and see what keyboard shor
 Go to `Config` >> [Colors](https://artisan-scope.org/docs/colors/) and `Config` >> [Themes](https://artisan-scope.org/docs/themes/) to explore the options.  Note that some of the graph configurations are accessed with the last icon in the set on the left on the Roast graph (the one with jagged up arrow).  `Config` >> `Curves`, UI, pick a font and background image, IF you wish to personalize your use
 20.	READY FOR YOUR FIRST ROAST
 
-After you have completed some roasting, please watch the video [Getting the Most from Artisan's Tools](https://www.youtube.com/watch?v=8ivsccu9e_Y&t=3094s) to learn more about how to improve your roasting.  
+After you have completed some roasting, please watch the video [Getting the Most from Artisan's Tools](https://www.youtube.com/watch?v=8ivsccu9e_Y&t=3094s){:target="_blank"} to learn more about how to improve your roasting.  
 
 The main controls look like this:
 ![View Controls](/assets/images/gsg/view menu controls.png)
