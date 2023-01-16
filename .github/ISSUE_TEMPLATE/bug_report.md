@@ -26,7 +26,6 @@ If applicable, add screenshots to help explain your problem.
 **Setup (please complete the following information):**
  - Artisan Version [e.g. v2.4.4]:
  - Artisan Build (number in brackets shown in the about box) [e.g. 97e6dec]:
- - Version [e.g. 22]:
  - Platform (Mac/Windows/Linux + OS version) [e.g. macOS 10.15.3]:
  - Connected devices or roasting machine [e.g. Probatone 5]:
 

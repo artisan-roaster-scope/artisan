@@ -182,6 +182,7 @@ if mpl_version[0] > 2 and mpl_version[1] > 2:
         from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatioF # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error,no-name-in-module
     from matplotlib.backend_bases import _Mode as MPL_Mode  # @UnresolvedImport
 
+from matplotlib.backends.backend_pdf import FigureCanvasPdf
 
 # on OS X / PyQt5 one needs to
 #   export DYLD_FRAMEWORK_PATH=~/Qt5.5.0/5.5/clang_64/lib/
@@ -3236,7 +3237,13 @@ class tgraphcanvas(FigureCanvas):
                 if self.title_text is not None and self.title_artist is not None and self.title_width is not None:
                     try:
                         prev_title_text = self.title_artist.get_text()
-                        if ax_width_for_title <= self.title_width:
+                        render = None
+                        try:
+                            render = self.fig.canvas.get_renderer()
+                        except Exception as e: # pylint: disable=broad-except
+                            # FigureCanvasPdf does not feature a renderer and thus the abbreviation mechanism does not work for PDF export
+                            pass
+                        if render is not None and ax_width_for_title <= self.title_width:
                             chars = max(3,int(ax_width_for_title / (self.title_width / len(self.title_text))) - 2)
                             self.title_artist.set_text(f'{self.title_text[:chars].strip()}...')
                         else:
