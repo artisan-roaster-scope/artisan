@@ -123,24 +123,26 @@ class AillioR1:
         if self.usbhandle is None:
             raise OSError('not found or no permission')
         self.__dbg('device found!')
-        if not system().startswith('Windows') and not system() == 'Darwin':
+        if not system().startswith('Windows'):
             if self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE):
                 try:
                     self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE)
-                except Exception as e:
-                    self.usbhandle = None
-                    raise OSError('unable to detach kernel driver') from e
+                except Exception: # pylint: disable=broad-except
+                    pass
+                    # detach fails on libusb 1.0.26 and newer on macOS >v12 if not running under sudo and seems not to be needed on those configurations
+#                    self.usbhandle = None
+#                    raise OSError('unable to detach kernel driver') from e
         try:
             config = self.usbhandle.get_active_configuration()
             if config.bConfigurationValue != self.AILLIO_CONFIGURATION:
                 self.usbhandle.set_configuration(configuration=self.AILLIO_CONFIGURATION)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             self.usbhandle = None
             raise OSError('unable to configure') from e
 
         try:
             usb.util.claim_interface(self.usbhandle, self.AILLIO_INTERFACE)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             self.usbhandle = None
             raise OSError('unable to claim interface') from e
         self.__sendcmd(self.AILLIO_CMD_INFO1)

@@ -387,6 +387,10 @@ try:
     subprocess.check_call('rm -rf ./Artisan.app/Contents/Resources/lib/python3.10/matplotlib/mpl-data/sample_data',shell = True)
 except:
     pass
+try:
+    subprocess.check_call('rm -rf ./Artisan.app/Contents/Resources/lib/python3.11/matplotlib/mpl-data/sample_data',shell = True)
+except:
+    pass
 
 print('*** Removing unused files ***')
 for root, dirs, files in os.walk('.'):

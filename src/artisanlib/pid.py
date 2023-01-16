@@ -84,7 +84,7 @@ class PID():
         # throw away superfluous values
         self.previous_outputs = self.previous_outputs[-self.output_smoothing_factor:]
         # compute smoothed output
-        if len(self.previous_outputs) < self.output_smoothing_factor or self.output_smoothing_factor == 0:
+        if self.output_smoothing_factor == 0 or len(self.previous_outputs) < self.output_smoothing_factor:
             res = output # no smoothing yet
         else:
             res = numpy.average(self.previous_outputs,weights=self.output_decay_weights)
@@ -137,6 +137,9 @@ class PID():
     # update control value (the pid loop is running even if PID is inactive, just the control function is only called if active)
     def update(self, i):
         try:
+            if i == -1:
+                # reject error values
+                return
             self.pidSemaphore.acquire(1)
             i = self._smooth_input(i)
             now = time.time()

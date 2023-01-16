@@ -267,11 +267,11 @@ class Artisan(QtSingleApplication):
 
     @pyqtSlot('QWidget*','QWidget*')
     def appRaised(self,oldFocusWidget,newFocusWidget):
-        _log.debug('appRaised')
         try:
             if aw is not None and not sip.isdeleted(aw): # sip not supported on older PyQt versions (eg. RPi)
                 if oldFocusWidget is None and newFocusWidget is not None and aw is not None and aw.centralWidget() == newFocusWidget and self.sentToBackground is not None:
                     #focus gained
+                    _log.debug('focus gained')
                     try:
                         if aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None and \
                                 libtime.time() - self.sentToBackground > self.plus_sync_cache_expiration:
@@ -4549,7 +4549,7 @@ class tgraphcanvas(FigureCanvas):
                             # update SV (if needed)
                             if sv is not None and sv != aw.pidcontrol.sv:
                                 sv = max(0,sv) # we don't send SV < 0
-                                aw.pidcontrol.setSV(sv,init=False) # this is called in updategraphics() within the GUI thread to move the sliders
+                                aw.pidcontrol.setSV(sv,init=False)
 
                     # update AUC running value
                     if local_flagstart: # only during recording
@@ -14172,7 +14172,7 @@ class tgraphcanvas(FigureCanvas):
                     energy_label = QApplication.translate('GroupBox','Energy')
                     CO2_label = QApplication.translate('GroupBox','CO2')
                     if not (platf == 'Windows' and int(platform.release()) < 10):
-                         # no subscript for legacy Windows
+                        # no subscript for legacy Windows
                         CO2_label = CO2_label.replace('CO2','CO₂')
                     energy_unit = self.energyunits[self.energyresultunit_setup]
                     energymetrics,_ = self.calcEnergyuse()
@@ -14212,7 +14212,7 @@ class tgraphcanvas(FigureCanvas):
                     energy_label = QApplication.translate('GroupBox','Energy')
                     CO2_label = QApplication.translate('GroupBox','CO2')
                     if not (platf == 'Windows' and int(platform.release()) < 10):
-                         # no subscript for legacy Windows
+                        # no subscript for legacy Windows
                         CO2_label = CO2_label.replace('CO2','CO₂')
                     energy_unit = self.energyunits[self.energyresultunit_setup]
                     roast_label = QApplication.translate('Label','Roast')

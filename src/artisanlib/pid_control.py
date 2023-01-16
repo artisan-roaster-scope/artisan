@@ -1602,7 +1602,7 @@ class PIDcontrol():
     def adjustsv(self,diff):
         if self.sv is None or self.sv<0:
             self.sv = 0
-        self.setSV(self.sv + diff,True)
+        self.setSV(self.sv + diff,move=True)
 
     def activateSVSlider(self,flag):
         if flag:

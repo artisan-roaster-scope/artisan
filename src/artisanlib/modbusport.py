@@ -213,6 +213,7 @@ class modbusport():
             if self.master is not None:
                 self.master.close()
                 self.aw.sendmessage(QApplication.translate('Message', 'MODBUS disconnected'))
+                del self.master
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         self.master = None

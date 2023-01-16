@@ -13,9 +13,9 @@ distro==1.8.0 #1.7.0
 gevent==22.10.2 # 21.12.0 # 1.5.0 is not compatible with Python 3.8
 gevent-websocket==0.10.1
 yoctopuce==1.10.52382 #1.10.52094
-numpy==1.23.5 #1.23.4
-scipy==1.9.3 #1.9.2 # depends on numpy thus we have to put it after numpy
-matplotlib==3.6.2 #3.5.3 # 3.4.1 requires pyinstaller > 4.2 # MPL 3.3.x is not compatible with pyinstaller up to 4.0
+numpy==1.24.1 #1.23.5
+scipy==1.10.0 #1.9.3 # depends on numpy thus we have to put it after numpy
+matplotlib==3.6.3 #3.6.2 # 3.4.1 requires pyinstaller > 4.2 # MPL 3.3.x is not compatible with pyinstaller up to 4.0
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
 #PyQt5==5.15.5 #5.14.2 # 5.15.0 seems not to install on Python 3.7.1
@@ -28,8 +28,8 @@ pyinstaller==5.7.0 #5.6.2 # binary build with pyinstaller 4.8 fails on setuptool
 #cryptography==2.6.1
 keyring==23.13.1 #23.9.3  # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
 SecretStorage==3.3.3 #3.3.1
-lxml==4.9.1 #4.7.1
-prettytable==3.5.0 #3.4.1 # >1.0.0 fail to be packed by py2app, but a monkey patch in main.py helps
+lxml==4.9.2 #4.7.1
+prettytable==3.5.0 #3.5.0 # >1.0.0 fail to be packed by py2app, but a monkey patch in main.py helps
 #
 # NOTES:
 # keyring needs the GnomeKeyring package installed for plus to remember the passwords
