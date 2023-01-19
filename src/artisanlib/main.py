@@ -182,8 +182,6 @@ if mpl_version[0] > 2 and mpl_version[1] > 2:
         from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatioF # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error,no-name-in-module
     from matplotlib.backend_bases import _Mode as MPL_Mode  # @UnresolvedImport
 
-from matplotlib.backends.backend_pdf import FigureCanvasPdf
-
 # on OS X / PyQt5 one needs to
 #   export DYLD_FRAMEWORK_PATH=~/Qt5.5.0/5.5/clang_64/lib/
 # (see Mac OS X specific notes in the PyQt5 documentation)
@@ -238,6 +236,13 @@ try:
 except Exception: # pylint: disable=broad-except
     pass
 
+# platform dependent imports:
+if sys.platform.startswith('darwin'):
+    # control app napping on OS X >= 10.9
+    import appnope  # @UnresolvedImport # pylint: disable=import-error
+    # import module to detect if OS X dark mode is active or not
+    import darkdetect # @UnresolvedImport # pylint: disable=import-error
+
 platf = str(platform.system())
 
 
@@ -252,6 +257,8 @@ aw = None # assigned to the single instance of ApplicationWindow on creation
 artisanviewerFirstStart = False
 
 class Artisan(QtSingleApplication):
+    __slots__ = [ 'sentToBackground', 'plus_sync_cache_expiration', 'artisanviewerMode', 'darkmode' ]
+
     def __init__(self, args):
         super().__init__(appGuid,viewerAppGuid,args)
 
@@ -263,6 +270,12 @@ class Artisan(QtSingleApplication):
             if self.isRunningViewer(): sys.exit(0) # there is already one ArtisanViewer running, we terminate
         else:
             self.artisanviewerMode = False
+
+        self.darkmode:bool = False # holds current darkmode state
+        if sys.platform.startswith('darwin'):
+            # remember darkmode
+            self.darkmode = darkdetect.isDark()
+
         self.messageReceived.connect(self.receiveMessage)
         self.focusChanged.connect(self.appRaised)
 
@@ -565,12 +578,6 @@ if platf == 'Windows':
 #    except Exception as e: # pylint: disable=broad-except
 #        pass
 
-# platform dependent imports:
-if sys.platform.startswith('darwin'):
-    # control app napping on OS X >= 10.9
-    import appnope  # @UnresolvedImport # pylint: disable=import-error
-    # import module to detect if OS X dark mode is active or not
-    import darkdetect # @UnresolvedImport # pylint: disable=import-error
 
 #def __dependencies_for_freezing():
 #    # pylint: disable=import-error,no-name-in-module,unused-import
@@ -3240,7 +3247,7 @@ class tgraphcanvas(FigureCanvas):
                         render = None
                         try:
                             render = self.fig.canvas.get_renderer()
-                        except Exception as e: # pylint: disable=broad-except
+                        except Exception: # pylint: disable=broad-except
                             # FigureCanvasPdf does not feature a renderer and thus the abbreviation mechanism does not work for PDF export
                             pass
                         if render is not None and ax_width_for_title <= self.title_width:
@@ -8315,19 +8322,20 @@ class tgraphcanvas(FigureCanvas):
                     self.l_delta1.remove()
             except Exception: # pylint: disable=broad-except
                 pass
-            self.l_delta1, = self.ax.plot(
-                self.timex[start:end],
-                self.delta1[start:end],
-                transform=trans,
-                markersize=self.ETdeltamarkersize,
-                marker=self.ETdeltamarker,
-                sketch_params=None,
-                path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette['background'])],
-                linewidth=self.ETdeltalinewidth,
-                linestyle=self.ETdeltalinestyle,
-                drawstyle=self.ETdeltadrawstyle,
-                color=self.palette['deltaet'],
-                label=aw.arabicReshape(f'{deltaLabelUTF8}{QApplication.translate("Label", "ET")}'))
+            if start < end and end < len(self.timex):
+                self.l_delta1, = self.ax.plot(
+                    self.timex[start:end],
+                    self.delta1[start:end],
+                    transform=trans,
+                    markersize=self.ETdeltamarkersize,
+                    marker=self.ETdeltamarker,
+                    sketch_params=None,
+                    path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette['background'])],
+                    linewidth=self.ETdeltalinewidth,
+                    linestyle=self.ETdeltalinestyle,
+                    drawstyle=self.ETdeltadrawstyle,
+                    color=self.palette['deltaet'],
+                    label=aw.arabicReshape(f'{deltaLabelUTF8}{QApplication.translate("Label", "ET")}'))
 
     def drawDeltaBT(self,trans,start,end):
         if self.DeltaBTflag:
@@ -8336,19 +8344,20 @@ class tgraphcanvas(FigureCanvas):
                     self.l_delta2.remove()
             except Exception: # pylint: disable=broad-except
                 pass
-            self.l_delta2, = self.ax.plot(
-                self.timex[start:end],
-                self.delta2[start:end],
-                transform=trans,
-                markersize=self.BTdeltamarkersize,
-                marker=self.BTdeltamarker,
-                sketch_params=None,
-                path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette['background'])],
-                linewidth=self.BTdeltalinewidth,
-                linestyle=self.BTdeltalinestyle,
-                drawstyle=self.BTdeltadrawstyle,
-                color=self.palette['deltabt'],
-                label=aw.arabicReshape(f'{deltaLabelUTF8}{QApplication.translate("Label", "BT")}'))
+            if start < end and end < len(self.timex):
+                self.l_delta2, = self.ax.plot(
+                    self.timex[start:end],
+                    self.delta2[start:end],
+                    transform=trans,
+                    markersize=self.BTdeltamarkersize,
+                    marker=self.BTdeltamarker,
+                    sketch_params=None,
+                    path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette['background'])],
+                    linewidth=self.BTdeltalinewidth,
+                    linestyle=self.BTdeltalinestyle,
+                    drawstyle=self.BTdeltadrawstyle,
+                    color=self.palette['deltabt'],
+                    label=aw.arabicReshape(f'{deltaLabelUTF8}{QApplication.translate("Label", "BT")}'))
 
     # if profileDataSemaphore lock cannot be fetched the redraw is not performed
     def lazyredraw(self, recomputeAllDeltas=True, smooth=True,sampling=False):
@@ -10055,12 +10064,13 @@ class tgraphcanvas(FigureCanvas):
                             if ((not self.flagon or self.timeindex[0] > 1) and
                                     len(self.timex) == len(self.delta1) and len(self.timex) == len(self.delta2) and len(self.timex)>charge_idx+2):
                                 # to avoid drawing of RoR artifacts directly after CHARGE we skip the first two samples after CHARGE before starting to draw
+                                # as well as the last two readings before DROP
                                 if aw.qmc.swapdeltalcds:
-                                    self.drawDeltaET(trans,charge_idx+2,drop_idx)
-                                    self.drawDeltaBT(trans,charge_idx+2,drop_idx)
+                                    self.drawDeltaET(trans,charge_idx+2,drop_idx-2)
+                                    self.drawDeltaBT(trans,charge_idx+2,drop_idx-2)
                                 else:
-                                    self.drawDeltaBT(trans,charge_idx+2,drop_idx)
-                                    self.drawDeltaET(trans,charge_idx+2,drop_idx)
+                                    self.drawDeltaBT(trans,charge_idx+2,drop_idx-2)
+                                    self.drawDeltaET(trans,charge_idx+2,drop_idx-2)
                             else:
                                 # instead of drawing we still have to establish the self.ax artists to keep the linecount correct!
                                 self.drawDeltaET(trans,0,0)
@@ -20725,9 +20735,10 @@ class ApplicationWindow(QMainWindow):
         return s
 
     def eventFilter(self, obj, event):
-        if event.type() == QEvent.Type.ApplicationPaletteChange:  # called if the palette changed (switch between dark and light mode on macOS)
+        if event.type() == QEvent.Type.ApplicationPaletteChange and sys.platform.startswith('darwin') and self.app is not None and darkdetect.isDark() != self.app.darkmode:
+            # called if the palette changed (switch between dark and light mode on macOS)
+            self.app.darkmode = darkdetect.isDark()
             self.updateCanvasColors()
-            return True
         return super().eventFilter(obj, event)
 
     # search the given QTable table for a row with the given widget as cellWidget or item in column col or as a sub-widget contained in the layout of a widget in place
@@ -21763,12 +21774,12 @@ class ApplicationWindow(QMainWindow):
                 c3 = c[3]
                 # if one color is the canvas color set to None (transparent), we try to avoid a false warning
                 if str(c1) == 'None' and c[0] == 'Canvas':
-                    if sys.platform.startswith('darwin') and darkdetect.isDark() and appFrozen():
+                    if self.app.darkmode:
                         c1 = 'black'
                     else:
                         c1 = 'white'
                 if str(c3) == 'None' and c[2] == 'Canvas':
-                    if sys.platform.startswith('darwin') and darkdetect.isDark() and appFrozen():
+                    if self.app.darkmode:
                         c3 = 'black'
                     else:
                         c3 = 'white'
@@ -21850,7 +21861,7 @@ class ApplicationWindow(QMainWindow):
             canvas_color = self.qmc.palette['canvas'] = '#F8F8F8'
         try:
             if str(canvas_color) == 'None' and sys.platform.startswith('darwin'):
-                if darkdetect.isDark() and appFrozen():
+                if self.app.darkmode:
                     # in dark mode on macOS, the transparent canvas of the classic Artisan theme leeds to unreadable text, thus we switch to standard gray
                     canvas_color = self.qmc.palette['canvas'] = '#333333' # for light: "#F8F8F8"
                     self.qmc.palette['title'] = '#e6e6e6'
@@ -21888,7 +21899,7 @@ class ApplicationWindow(QMainWindow):
         # whitep = True in darkmode (dark canvas)
         if str(canvas_color) == 'None':
             if sys.platform.startswith('darwin'):
-                whitep = darkdetect.isDark() and appFrozen()
+                whitep = self.app.darkmode
             else:
                 whitep = False
         else:
@@ -36212,7 +36223,7 @@ class ApplicationWindow(QMainWindow):
                         ind = 7            # width of color legend indicator
 
                         # setup the font
-                        if sys.platform.startswith('darwin') and darkdetect.isDark() and appFrozen():
+                        if self.app.darkmode:
                             headerfontcolor = '#B2B2B2'
                         else:
                             headerfontcolor = '#707070'
@@ -36827,7 +36838,7 @@ class ApplicationWindow(QMainWindow):
                 pass
 
             org_patheffects = aw.qmc.patheffects
-            if sys.platform.startswith('darwin') and darkdetect.isDark() and appFrozen():
+            if self.app.darkmode:
                 aw.qmc.patheffects = 0
             self.qmc.redraw(recomputeAllDeltas=False)
 
@@ -36848,7 +36859,7 @@ class ApplicationWindow(QMainWindow):
             flavor_image = path2url(flavor_image)
             flavor_image = flavor_image + '?dummy=' + str(int(libtime.time()))
             #return screen to GRAPH profile mode
-            if sys.platform.startswith('darwin') and darkdetect.isDark() and appFrozen():
+            if self.app.darkmode:
                 aw.qmc.patheffects = org_patheffects
 
             self.qmc.fig.clf() # remove the flavorchart artists

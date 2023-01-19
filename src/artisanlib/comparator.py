@@ -21,13 +21,10 @@ import numpy
 from matplotlib import ticker, transforms
 import matplotlib.patheffects as PathEffects
 from matplotlib import rcParams
-if sys.platform.startswith('darwin'):
-    # import module to detect if OS X dark mode is active or not
-    import darkdetect # @UnresolvedImport # plint: disable=import-error
 import logging
 from typing import Final
 
-from artisanlib.util import deltaLabelUTF8, decodeLocal, stringfromseconds, appFrozen, fromFtoC, fromCtoF, fill_gaps
+from artisanlib.util import deltaLabelUTF8, decodeLocal, stringfromseconds, fromFtoC, fromCtoF, fill_gaps
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
@@ -1507,7 +1504,7 @@ class roastCompareDlg(ArtisanDialog):
             w = self.profileTable.item(i,2)
             if w is not None:
                 if p.aligned:
-                    if sys.platform.startswith('darwin') and darkdetect.isDark() and appFrozen():
+                    if self.aw.app.darkmode:
                         w.setForeground(Qt.GlobalColor.white)
                     else:
                         w.setForeground(Qt.GlobalColor.black)

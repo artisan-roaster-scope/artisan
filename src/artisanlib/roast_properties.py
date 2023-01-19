@@ -30,7 +30,7 @@ import plus.queue
 import plus.blend
 
 #from artisanlib.suppress_errors import suppress_stdout_stderr
-from artisanlib.util import deltaLabelUTF8, appFrozen, stringfromseconds,stringtoseconds, toInt, toFloat, abbrevString, scaleFloat2String
+from artisanlib.util import deltaLabelUTF8, stringfromseconds,stringtoseconds, toInt, toFloat, abbrevString, scaleFloat2String
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
 from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit, MyTableWidgetItemNumber
 
@@ -62,9 +62,6 @@ except Exception: # pylint: disable=broad-except
         from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
     except Exception: # pylint: disable=broad-except
         import sip  # @Reimport @UnresolvedImport @UnusedImport
-
-if sys.platform.startswith('darwin'):
-    import darkdetect # @UnresolvedImport # ylint: disable=import-error
 
 
 ########################################################################################
@@ -930,7 +927,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.titleedit.setSizePolicy(QSizePolicy.Policy.MinimumExpanding,QSizePolicy.Policy.Fixed)
         self.titleedit.activated.connect(self.recentRoastActivated)
         self.titleedit.editTextChanged.connect(self.recentRoastEnabled)
-        if sys.platform.startswith('darwin') and darkdetect.isDark() and appFrozen():
+        if self.aw.app.darkmode:
             if self.aw.qmc.palette['canvas'] is None or self.aw.qmc.palette['canvas'] == 'None':
                 canvas_color = 'white'
             else:
@@ -966,7 +963,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         dateedit = QLineEdit(date)
         dateedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         dateedit.setReadOnly(True)
-        if sys.platform.startswith('darwin') and darkdetect.isDark() and appFrozen():
+        if self.aw.app.darkmode:
             dateedit.setStyleSheet('background-color: #757575; color : white;')
         else:
             dateedit.setStyleSheet('background-color: #eeeeee;')
@@ -988,7 +985,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 batch = self.aw.qmc.roastbatchprefix + str(self.aw.qmc.roastbatchnr) + roastpos
             self.batchedit = QLineEdit(batch)
             self.batchedit.setReadOnly(True)
-            if sys.platform.startswith('darwin') and darkdetect.isDark() and appFrozen():
+            if self.aw.app.darkmode:
                 self.batchedit.setStyleSheet('background-color: #757575; color : white;')
             else:
                 self.batchedit.setStyleSheet('background-color: #eeeeee;')
@@ -1945,7 +1942,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     def updatePlusSelectedLine(self):
         try:
-            if sys.platform.startswith('darwin') and darkdetect.isDark() and appFrozen():
+            if self.aw.app.darkmode:
                 dark_mode_link_color = " style=\"color: #e5e9ec;\""
             else:
                 dark_mode_link_color = ''
@@ -2145,7 +2142,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def markPlusCoffeeFields(self,b):
         # for QTextEdit
         if b:
-            if sys.platform.startswith('darwin') and darkdetect.isDark() and appFrozen():
+            if self.aw.app.darkmode:
                 self.beansedit.setStyleSheet('QTextEdit { background-color: #0D658F; selection-background-color: darkgray; }')
             else:
                 self.beansedit.setStyleSheet('QTextEdit { background-color: #e4f3f8; selection-background-color: darkgray;  }')
@@ -2153,7 +2150,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.beansedit.setStyleSheet('')
         # for QLineEdit
         if b:
-            if sys.platform.startswith('darwin') and darkdetect.isDark() and appFrozen():
+            if self.aw.app.darkmode:
                 qlineedit_marked_style = 'QLineEdit { background-color: #0D658F; selection-background-color: darkgray; }'
             else:
                 qlineedit_marked_style = 'QLineEdit { background-color: #e4f3f8; selection-background-color: #424242; }'
@@ -4507,10 +4504,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.sendmessage(message)
 
     # mark widget w if b holds otherwise unmark it
-    @staticmethod
-    def markWidget(w,b):
+    def markWidget(self,w,b):
         if b:
-            if sys.platform.startswith('darwin') and darkdetect.isDark() and appFrozen():
+            if self.aw.app.darkmode:
                 w.setStyleSheet("""QLineEdit { background-color: #ad0427;  }""")
             else:
                 w.setStyleSheet("""QLineEdit { color: #CC0F50; }""")
@@ -4589,7 +4585,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if enough:
             self.weightinedit.setStyleSheet('')
         else:
-            if sys.platform.startswith('darwin') and darkdetect.isDark() and appFrozen():
+            if self.aw.app.darkmode:
                 self.weightinedit.setStyleSheet("""QLineEdit { background-color: #ad0427;  }""")
             else:
                 if enough_replacement:

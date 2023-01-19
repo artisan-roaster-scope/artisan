@@ -1572,7 +1572,7 @@ class EventsDlg(ArtisanResizeablDialog):
                     for ii in range(len(temp)):
                         t = temp[ii]
                         if t != -1: # -1 is an error value
-                            d = self.aw.digitize(t,linespace,self.aw.eventquantifiercoarse[i],self.aw.eventslidermin[i])
+                            d = self.aw.digitize(t,linespace,self.aw.eventquantifiercoarse[i],i)
                             if d is not None and (ld is None or ld != d):
                                 # take only changes
                                 # and only if significantly different than previous to avoid fluktuation
