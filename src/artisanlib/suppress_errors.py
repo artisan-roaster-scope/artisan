@@ -20,7 +20,7 @@ class suppress_stdout_stderr():
     exited (at least, I think that is why it lets exceptions through).
 
     '''
-    def __init__(self):
+    def __init__(self) -> None:
         # Open a pair of null files
         try:
             self.null_fds = [os.open(os.devnull,os.O_RDWR) for _ in range(2)]
@@ -36,13 +36,13 @@ class suppress_stdout_stderr():
             self.null_fds = []
             self.save_fds = []
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         # Assign the null pointers to stdout and stderr.
         if self.save_fds != []:
             os.dup2(self.null_fds[0],1)
             os.dup2(self.null_fds[1],2)
 
-    def __exit__(self, *_):
+    def __exit__(self, *_) -> None:
         # Re-assign the real stdout/stderr back to (1) and (2)
         try:
             if self.save_fds != []:

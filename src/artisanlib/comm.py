@@ -2851,7 +2851,10 @@ class serialport():
     def configureOneTC(self):
         self.Phidget1045values = []
         self.Phidget1045lastvalue = -1
-        self.PhidgetIRSensor.setThermocoupleType(PHIDGET_THERMOCOUPLE_TYPE(self.aw.qmc.phidget1048_types[0]))
+        try:
+            self.PhidgetIRSensor.setThermocoupleType(PHIDGET_THERMOCOUPLE_TYPE(self.aw.qmc.phidget1048_types[0]))
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
         if self.aw.qmc.phidget1048_async[0]:
             self.PhidgetIRSensor.setTemperatureChangeTrigger(self.aw.qmc.phidget1048_changeTriggers[0])
         else:
@@ -2869,8 +2872,14 @@ class serialport():
     def configureOneRTD(self):
         self.Phidget1045values = []
         self.Phidget1045lastvalue = -1
-        self.PhidgetIRSensor.setRTDType(PHIDGET_RTD_TYPE(self.aw.qmc.phidget1200_formula))
-        self.PhidgetIRSensor.setRTDWireSetup(PHIDGET_RTD_WIRE(self.aw.qmc.phidget1200_wire))
+        try:
+            self.PhidgetIRSensor.setRTDType(PHIDGET_RTD_TYPE(self.aw.qmc.phidget1200_formula))
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+        try:
+            self.PhidgetIRSensor.setRTDWireSetup(PHIDGET_RTD_WIRE(self.aw.qmc.phidget1200_wire))
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
         if self.aw.qmc.phidget1200_async:
             self.PhidgetIRSensor.setTemperatureChangeTrigger(self.aw.qmc.phidget1200_changeTrigger)
             self.PhidgetIRSensor.setOnTemperatureChangeHandler(self.phidget1045TemperatureChanged)
@@ -2886,8 +2895,14 @@ class serialport():
     def configureOneRTD_2(self):
         self.Phidget1045values = []
         self.Phidget1045lastvalue = -1
-        self.PhidgetIRSensor.setRTDType(PHIDGET_RTD_TYPE(self.aw.qmc.phidget1200_2_formula))
-        self.PhidgetIRSensor.setRTDWireSetup(PHIDGET_RTD_WIRE(self.aw.qmc.phidget1200_2_wire))
+        try:
+            self.PhidgetIRSensor.setRTDType(PHIDGET_RTD_TYPE(self.aw.qmc.phidget1200_2_formula))
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+        try:
+            self.PhidgetIRSensor.setRTDWireSetup(PHIDGET_RTD_WIRE(self.aw.qmc.phidget1200_2_wire))
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
         if self.aw.qmc.phidget1200_async:
             self.PhidgetIRSensor.setTemperatureChangeTrigger(self.aw.qmc.phidget1200_2_changeTrigger)
             self.PhidgetIRSensor.setOnTemperatureChangeHandler(self.phidget1045TemperatureChanged)
