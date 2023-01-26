@@ -116,7 +116,7 @@ try:
                              QColorDialog, QFrame, QSplitter, QScrollArea, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
                              QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtGui import (QPageLayout, QAction, QImage, QImageReader, QWindow, # @Reimport @UnresolvedImport @UnusedImport
-                                QKeySequence, # @Reimport @UnresolvedImport @UnusedImport
+                                QKeySequence, QShortcut, # @Reimport @UnresolvedImport @UnusedImport
                                 QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
                                 QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor, QFont) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog) # @Reimport @UnresolvedImport @UnusedImport
@@ -142,7 +142,7 @@ except Exception:
                              QColorDialog, QFrame, QSplitter, QScrollArea, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
                              QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtGui import (QPageLayout, QImage, QImageReader, QWindow,  # @Reimport @UnresolvedImport @UnusedImport
-                                QKeySequence, # @Reimport @UnresolvedImport @UnusedImport
+                                QKeySequence, QShortcut, # @Reimport @UnresolvedImport @UnusedImport
                                 QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
                                 QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor, QFont) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog) # @Reimport @UnresolvedImport @UnusedImport
@@ -1773,10 +1773,10 @@ class tgraphcanvas(FigureCanvas):
 #                                  # 0 : None; 1 : ET, 2 : BT, 3 : 0xT1, 4 : 0xT2,
         self.ambient_temperature_device = 0
         self.ambient_pressure = 0.
-        self.ambient_pressure_sampled = 0. # keeps the measured ambientTemp over a restart
+        self.ambient_pressure_sampled = 0. # keeps the measured ambient_pressure over a restart/reset
         self.ambient_pressure_device = 0
         self.ambient_humidity = 0.
-        self.ambient_humidity_sampled = 0. # keeps the measured ambientTemp over a restart
+        self.ambient_humidity_sampled = 0. # keeps the measured ambient_humidity over a restart/reset
         self.ambient_humidity_device = 0
         self.elevation = 0
 
@@ -20332,6 +20332,16 @@ class ApplicationWindow(QMainWindow):
 
         QTimer.singleShot(0,lambda : _log.info('startup time: %.2f', libtime.process_time() - startup_time))
 
+        self.zoomInShortcut = QShortcut(QKeySequence.StandardKey.ZoomIn, self)
+        self.zoomInShortcut.activated.connect(self.zoomIn)
+        self.zoomOutShortcut = QShortcut(QKeySequence.StandardKey.ZoomOut, self)
+        self.zoomOutShortcut.activated.connect(self.zoomOut)
+
+    def zoomIn(self):
+        self.setdpi(aw.dpi+10)
+
+    def zoomOut(self):
+        self.setdpi(aw.dpi-10)
 
     def scrollingPhases(self, event):
         val = self.scroll.verticalScrollBar().value()
@@ -26730,7 +26740,7 @@ class ApplicationWindow(QMainWindow):
                 #meta_modifier = modifiers == Qt.KeyboardModifier.MetaModifier # Control on macOS, Meta on Windows
                 #uncomment next line to find the integer value of a k
                 #print(k,event.text())
-                #_log.info("PRINT key: %s (%s)",k,k_txt)
+                #_log.info("PRINT key: %s",k)
 
                 numberkeys = [48,49,50,51,52,53,54,55,56,57] # keycodes for number keys 0,1,...,9
 
@@ -26816,20 +26826,24 @@ class ApplicationWindow(QMainWindow):
                             aw.sendmessage(QApplication.translate('Message','PID Mode: Ramp/Soak'))
                         elif  aw.pidcontrol.svMode == 2:
                             aw.sendmessage(QApplication.translate('Message','PID Mode: Background'))
-                elif k_txt == '-': #k == 45:          #- (decrease dpi / decrease SV)
-                    if control_modifier or control_shift_modifier:
-                        aw.setdpi(aw.dpi-10)
-                    else:
+                elif k_txt == '-': #k == 45:          #- (decrease dpi, zoom out / decrease PID lookahead)
+#                    # the following does not work on US keyboards, we use shortcuts instead, see above self.zoomInShortcut()/self.zoomOutShortcut()
+#                    if control_modifier or control_shift_modifier:
+#                        aw.setdpi(aw.dpi-10)
+#                    else:
+                    if not(control_modifier or control_shift_modifier):
                         if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
                             aw.fujipid.lookahead = max(0,aw.fujipid.lookahead-1)
                             aw.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(aw.fujipid.lookahead))
                         elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # MODBUS hardware PID
                             aw.pidcontrol.svLookahead = max(0,aw.pidcontrol.svLookahead-1)
                             aw.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(aw.pidcontrol.svLookahead))
-                elif k_txt == '+': #k == 43:         #+ (increase dpi / increase SV)
-                    if control_modifier or control_shift_modifier:
-                        aw.setdpi(aw.dpi+10)
-                    else:
+                elif k_txt == '+': #k == 43:         #+ (increase dpi, zoom in / increase PID lookahead)
+#                    # the following does not work on US keyboards, we use shortcuts instead, see above self.zoomInShortcut()/self.zoomOutShortcut()
+#                    if control_modifier or control_shift_modifier:
+#                        aw.setdpi(aw.dpi+10)
+#                    else:
+                    if not(control_modifier or control_shift_modifier):
                         if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
                             aw.fujipid.lookahead = aw.fujipid.lookahead+1
                             aw.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(aw.fujipid.lookahead))
