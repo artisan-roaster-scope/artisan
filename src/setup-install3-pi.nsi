@@ -1,3 +1,13 @@
+;
+; .nsi command line options:
+;    /DPRODUCT_VERSION=ww.xx.yy.zz  -explicitly set the product version, default is 0.0.0.0
+;    /DLEGACY=True|False            -True is a build for legacy Windows, default is False
+;    /DSIGN=True|False              -True if the build is part of the process to sign files, default is False 
+;                                    Note: SignArtisan is not a part of the ci process
+;
+; installer command line options
+;    /S                             -silent operation
+
 RequestExecutionLevel admin
 
 !macro APP_ASSOCIATE_URL FILECLASS DESCRIPTION COMMANDTEXT COMMAND
@@ -296,7 +306,7 @@ Function un.onInit
     !insertmacro IsRunning
 
     IfSilent +3
-        MessageBox MB_ICONQUESTION|MB_YESNO|MB_TOPMOST "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +2
+        MessageBox MB_ICONQUESTION|MB_YESNO|MB_TOPMOST "Are you sure you want to remove $(^Name)?" IDYES +2
         Abort
     HideWindow
 
