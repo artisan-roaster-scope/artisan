@@ -112,6 +112,7 @@ def extractProfileIkawaCSV(file,_):
 
             if 'fan set (%)' in item or 'fan set' in item:
                 try:
+                    v = fan
                     if 'fan set (%)' in item:
                         v = float(item['fan set (%)'])
                     elif 'fan set' in item:

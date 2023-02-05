@@ -2025,10 +2025,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
             if self.pidButton.isChecked():
                 #type index[0]: 0 = PXG, 1 = PXR, 2 = DTA
-                if str(self.controlpidtypeComboBox.currentText()) == 'Fuji PXG':
-                    self.aw.ser.controlETpid[0] = 0
-                    str1 = 'Fuji PXG'
-                elif str(self.controlpidtypeComboBox.currentText()) == 'Fuji PXR':
+                #if str(self.controlpidtypeComboBox.currentText()) == 'Fuji PXG':
+                self.aw.ser.controlETpid[0] = 0
+                str1 = 'Fuji PXG'
+                if str(self.controlpidtypeComboBox.currentText()) == 'Fuji PXR':
                     self.aw.ser.controlETpid[0] = 1
                     str1 = 'Fuji PXR'
                 elif str(self.controlpidtypeComboBox.currentText()) == 'Delta DTA':
@@ -2038,10 +2038,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.controlETpid[0] = 4
                     str1 = 'Fuji PXF'
                 self.aw.ser.controlETpid[1] =  int(str(self.controlpidunitidComboBox.currentText()))
-                if str(self.btpidtypeComboBox.currentText()) == 'Fuji PXG':
-                    self.aw.ser.readBTpid[0] = 0
-                    str2 = 'Fuji PXG'
-                elif str(self.btpidtypeComboBox.currentText()) == 'Fuji PXR':
+                #if str(self.btpidtypeComboBox.currentText()) == 'Fuji PXG':
+                self.aw.ser.readBTpid[0] = 0
+                str2 = 'Fuji PXG'
+                if str(self.btpidtypeComboBox.currentText()) == 'Fuji PXR':
                     self.aw.ser.readBTpid[0] = 1
                     str2 = 'Fuji PXR'
                 elif str(self.btpidtypeComboBox.currentText()) == '':

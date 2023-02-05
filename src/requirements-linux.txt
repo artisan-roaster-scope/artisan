@@ -20,7 +20,7 @@ wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
 #PyQt5==5.15.5 #5.14.2 # 5.15.0 seems not to install on Python 3.7.1
 #PyQtWebEngine==5.15.5
-PyQt6==6.4.0 #6.3.1
+PyQt6==6.4.1 #6.4.0
 PyQt6-WebEngine==6.4.0 #6.3.1
 openpyxl==3.0.10 #3.0.9
 pyinstaller==5.7.0 #5.6.2 # binary build with pyinstaller 4.8 fails on setuptools==60.7.0/60.7.1

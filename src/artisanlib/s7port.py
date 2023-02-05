@@ -509,7 +509,7 @@ class s7port():
                                     if retry > 0:
                                         retry = retry - 1
                                     else:
-                                        raise Exception(f'read_area({area},{db_nr},{register},{count})')
+                                        raise Exception(f'read_area({area},{db_nr},{register},{count})') # pylint: disable=broad-exception-raised
                                 else:
                                     break
                             if res is not None:
@@ -549,7 +549,7 @@ class s7port():
                 self.waitToEnsureMinTimeBetweenRequests()
                 ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
                 if len(ba) != 4:
-                    raise Exception(f'read_area({area},{dbnumber},{start},4) returned result of length {len(ba)}')
+                    raise Exception(f'read_area({area},{dbnumber},{start},4) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
                 set_real(ba, 0, float(value))
                 self.waitToEnsureMinTimeBetweenRequests()
                 self.plc.write_area(self.areas[area],dbnumber,start,ba)
@@ -578,7 +578,7 @@ class s7port():
                 self.waitToEnsureMinTimeBetweenRequests()
                 ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
                 if len(ba) != 2:
-                    raise Exception(f'read_area({area},{dbnumber},{start},2) returned result of length {len(ba)}')
+                    raise Exception(f'read_area({area},{dbnumber},{start},2) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
                 set_int(ba, 0, int(round(value)))
                 self.waitToEnsureMinTimeBetweenRequests()
                 self.plc.write_area(self.areas[area],dbnumber,start,ba)
@@ -607,7 +607,7 @@ class s7port():
                 self.waitToEnsureMinTimeBetweenRequests()
                 ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
                 if len(ba) != 2:
-                    raise Exception(f'read_area({area},{dbnumber},{start},2) returned result of length {len(ba)}')
+                    raise Exception(f'read_area({area},{dbnumber},{start},2) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
                 new_val = (int(round(value)) & and_mask) | (or_mask & (and_mask ^ 0xFFFF))
                 set_int(ba, 0, int(new_val))
                 self.waitToEnsureMinTimeBetweenRequests()
@@ -637,7 +637,7 @@ class s7port():
                 self.waitToEnsureMinTimeBetweenRequests()
                 ba = self.plc.read_area(self.areas[area],dbnumber,start,1)
                 if len(ba) != 1:
-                    raise Exception(f'read_area({area},{dbnumber},{start},1) returned result of length {len(ba)}')
+                    raise Exception(f'read_area({area},{dbnumber},{start},1) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
                 set_bool(ba, 0, int(index), bool(value))
                 self.waitToEnsureMinTimeBetweenRequests()
                 self.plc.write_area(self.areas[area],dbnumber,start,ba)
@@ -698,7 +698,7 @@ class s7port():
                         if retry > 0:
                             retry = retry - 1
                         else:
-                            raise Exception('result None')
+                            raise Exception('result None') # pylint: disable=broad-exception-raised
                     else:
                         break
                 if res is None:
@@ -739,7 +739,7 @@ class s7port():
                 self.waitToEnsureMinTimeBetweenRequests()
                 res = self.plc.read_area(self.areas[area],dbnumber,start,4)
                 if len(res) != 4:
-                    raise Exception(f'read_area({area},{dbnumber},{start},4) returned result of length {len(res)}')
+                    raise Exception(f'read_area({area},{dbnumber},{start},4) returned result of length {len(res)}') # pylint: disable=broad-exception-raised
                 return get_real(res,0)
             return None
         except Exception as e: # pylint: disable=broad-except
@@ -786,7 +786,7 @@ class s7port():
                         if retry > 0:
                             retry = retry - 1
                         else:
-                            raise Exception('result None')
+                            raise Exception('result None') # pylint: disable=broad-exception-raised
                     else:
                         break
                 if res is None:
@@ -831,7 +831,7 @@ class s7port():
                 self.waitToEnsureMinTimeBetweenRequests()
                 res = self.plc.read_area(self.areas[area],dbnumber,start,2)
                 if len(res) != 2:
-                    raise Exception(f'read_area({area},{dbnumber},{start},2) returned result of length {len(res)}')
+                    raise Exception(f'read_area({area},{dbnumber},{start},2) returned result of length {len(res)}') # pylint: disable=broad-exception-raised
                 return get_int(res,0)
             return None
         except Exception as e: # pylint: disable=broad-except
@@ -876,7 +876,7 @@ class s7port():
                         if retry > 0:
                             retry = retry - 1
                         else:
-                            raise Exception('result None')
+                            raise Exception('result None') # pylint: disable=broad-exception-raised
                     else:
                         break
                 if res is None:

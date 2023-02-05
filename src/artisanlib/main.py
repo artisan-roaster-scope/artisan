@@ -4210,7 +4210,7 @@ class tgraphcanvas(FigureCanvas):
                                 string = f'{location[0]}= {lengths[0]} {location[1]}= {lengths[1]} {location[2]}= {lengths[2]}'
                                 errormessage = "ERROR: extra devices lengths don't match: %s"%string
                                 errormessage += '\nPlease Reset: Extra devices'
-                            raise Exception(errormessage)
+                            raise Exception(errormessage) # pylint: disable=broad-exception-raised
 
                     ####### all values retrieved
 
@@ -6196,6 +6196,15 @@ class tgraphcanvas(FigureCanvas):
                     mathdictionary['AUCtarget'] = self.AUCbackground
                 else:
                     mathdictionary['AUCtarget'] = self.AUCtarget
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+
+            # add Roast Properties
+            try:
+                # weight-in in g
+                mathdictionary['WEIGHTin'] = int(round(aw.convertWeight(self.weight[0],self.weight_units.index(self.weight[2]),0)))
+                mathdictionary['MOISTUREin'] = self.moisture_greens
+                mathdictionary['TEMPunit'] = (0 if self.mode == 'C' else 1) # 0:C and 1:F
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 

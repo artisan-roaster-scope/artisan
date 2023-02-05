@@ -38,14 +38,14 @@ class suppress_stdout_stderr():
 
     def __enter__(self) -> None:
         # Assign the null pointers to stdout and stderr.
-        if self.save_fds != []:
+        if self.save_fds:
             os.dup2(self.null_fds[0],1)
             os.dup2(self.null_fds[1],2)
 
     def __exit__(self, *_) -> None:
         # Re-assign the real stdout/stderr back to (1) and (2)
         try:
-            if self.save_fds != []:
+            if self.save_fds:
                 os.dup2(self.save_fds[0],1)
                 os.dup2(self.save_fds[1],2)
         except Exception: # pylint: disable=broad-except

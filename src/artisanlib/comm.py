@@ -5820,7 +5820,7 @@ class serialport():
                     libtime.sleep(.1)
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
                     if (not len(result) == 0 and not result.startswith('#')):
-                        raise Exception(QApplication.translate('Error Message','Arduino could not set channels',None))
+                        raise Exception(QApplication.translate('Error Message','Arduino could not set channels',None)) # pylint: disable=broad-exception-raised
 
                     if self.aw.seriallogflag:
                         settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
@@ -5836,7 +5836,7 @@ class serialport():
                         libtime.sleep(.1)
                         result = self.SP.readline().decode('utf-8')[:-2]
                         if (not len(result) == 0 and not result.startswith('#')):
-                            raise Exception(QApplication.translate('Error Message','Arduino could not set temperature unit',None))
+                            raise Exception(QApplication.translate('Error Message','Arduino could not set temperature unit',None)) # pylint: disable=broad-exception-raised
                         #OK. NOW SET FILTER
                         self.SP.reset_input_buffer()
                         self.SP.reset_output_buffer()
@@ -5845,7 +5845,7 @@ class serialport():
                         self.SP.write(str2cmd(command))
                         result = self.SP.readline().decode('utf-8')[:-2]
                         if (not len(result) == 0 and not result.startswith('#')):
-                            raise Exception(QApplication.translate('Error Message','Arduino could not set filters',None))
+                            raise Exception(QApplication.translate('Error Message','Arduino could not set filters',None)) # pylint: disable=broad-exception-raised
                         ### EVERYTHING OK  ###
                         self.ArduinoIsInitialized = 1
                         self.aw.sendmessage(QApplication.translate('Message','TC4 initialized',None))

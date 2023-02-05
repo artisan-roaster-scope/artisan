@@ -19,9 +19,7 @@ scipy==1.10.0 #1.9.3  # depends on numpy thus we have to put it after numpy
 matplotlib==3.6.3 #3.6.2
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
-#PyQt5==5.15.6
-#PyQtWebEngine==5.15.5
-PyQt6==6.4.0
+PyQt6==6.4.1 # 6.4.0
 PyQt6-WebEngine==6.4.0
 openpyxl==3.0.10 #3.0.9
 keyring==23.13.1 #23.6.0 # builds using 19.3.0 and 20.0.0 fail with py2app/pyinstaller, 21.21 seems to have fixed this
