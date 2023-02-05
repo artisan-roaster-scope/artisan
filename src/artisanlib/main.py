@@ -4465,13 +4465,13 @@ class tgraphcanvas(FigureCanvas):
                         ror_end = length_of_qmc_timex
                         if self.timeindex[6] > 0:
                             ror_end = self.timeindex[6]+1
-                        if self.DeltaETflag:
+                        if self.DeltaETflag and self.l_delta1 is not None:
                             if self.timeindex[0] > -1:
                                 ror_start = max(self.timeindex[0],self.timeindex[0]+int(round(self.deltaETfilter/2.)) + max(2,(self.deltaETsamples + 1)))
                                 self.l_delta1.set_data(sample_timex[ror_start:ror_end], sample_delta1[ror_start:ror_end])
                             else:
                                 self.l_delta1.set_data([], [])
-                        if self.DeltaBTflag:
+                        if self.DeltaBTflag and self.l_delta2 is not None:
                             if self.timeindex[0] > -1:
                                 ror_start = max(self.timeindex[0],self.timeindex[0]+int(round(self.deltaBTfilter/2.)) + max(2,(self.deltaBTsamples + 1)))
                                 self.l_delta2.set_data(sample_timex[ror_start:ror_end], sample_delta2[ror_start:ror_end])
@@ -8322,10 +8322,9 @@ class tgraphcanvas(FigureCanvas):
                     self.l_delta1.remove()
             except Exception: # pylint: disable=broad-except
                 pass
-            if start < end and end < len(self.timex):
-                self.l_delta1, = self.ax.plot(
-                    self.timex[start:end],
-                    self.delta1[start:end],
+            self.l_delta1, = self.ax.plot(
+                    [],
+                    [],
                     transform=trans,
                     markersize=self.ETdeltamarkersize,
                     marker=self.ETdeltamarker,
@@ -8336,6 +8335,10 @@ class tgraphcanvas(FigureCanvas):
                     drawstyle=self.ETdeltadrawstyle,
                     color=self.palette['deltaet'],
                     label=aw.arabicReshape(f'{deltaLabelUTF8}{QApplication.translate("Label", "ET")}'))
+            if start < end and end < len(self.timex):
+                self.l_delta1.set_data(self.timex[start:end],self.delta1[start:end])
+            else:
+                self.l_delta1.set_data([],[])
 
     def drawDeltaBT(self,trans,start,end):
         if self.DeltaBTflag:
@@ -8344,10 +8347,9 @@ class tgraphcanvas(FigureCanvas):
                     self.l_delta2.remove()
             except Exception: # pylint: disable=broad-except
                 pass
-            if start < end and end < len(self.timex):
-                self.l_delta2, = self.ax.plot(
-                    self.timex[start:end],
-                    self.delta2[start:end],
+            self.l_delta2, = self.ax.plot(
+                    [],
+                    [],
                     transform=trans,
                     markersize=self.BTdeltamarkersize,
                     marker=self.BTdeltamarker,
@@ -8358,6 +8360,10 @@ class tgraphcanvas(FigureCanvas):
                     drawstyle=self.BTdeltadrawstyle,
                     color=self.palette['deltabt'],
                     label=aw.arabicReshape(f'{deltaLabelUTF8}{QApplication.translate("Label", "BT")}'))
+            if start < end and end < len(self.timex):
+                self.l_delta2.set_data(self.timex[start:end],self.delta2[start:end])
+            else:
+                self.l_delta2.set_data([],[])
 
     # if profileDataSemaphore lock cannot be fetched the redraw is not performed
     def lazyredraw(self, recomputeAllDeltas=True, smooth=True,sampling=False):
@@ -25848,7 +25854,7 @@ class ApplicationWindow(QMainWindow):
                                 (k, _, value) = line.partition('=')
                             # don't copy PYTHONHOME nor PYTHONPATH if it points to the Artisan.app
                             if not ((k in ['PYTHONHOME','PYTHONPATH']) and (('Artisan.app' in value) or 'artisan' in value)):
-                                my_env[k] = value
+                                my_env[k] = value.rstrip('\n')
                         proc.communicate()
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
