@@ -58,9 +58,10 @@ fi
 # translations
 echo "************* 1 **************"
 
-if [ -f "$PYLUPDATE" ]; then
-    $PYLUPDATE artisan.pro
-fi
+# TEMPORARILY DEACTIVATE due to a bug in PyQt6 6.4.1
+#if [ -f "$PYLUPDATE" ]; then
+#    $PYLUPDATE artisan.pro
+#fi
 
 # there is no full Qt installation on Travis, thus don't run  lrelease
 if [ -z $APPVEYOR ]; then
