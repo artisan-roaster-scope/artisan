@@ -5859,6 +5859,8 @@ class serialport():
                 rl = self.SP.readline().decode('utf-8', 'ignore')[:-2]
                 res = rl.rsplit(',')
 
+                if self.aw.seriallogflag:
+                    self.aw.addserial('ArduinoTC4: Tx = ' + str(command) + ' || Rx = ' + str(rl))
 #                _log.debug("command: %s",command)
 #                _log.debug("res: %s",res)
 

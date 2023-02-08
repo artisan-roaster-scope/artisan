@@ -10078,14 +10078,16 @@ class tgraphcanvas(FigureCanvas):
                             # if not recording or if during recording CHARGE was set already
                             if ((not self.flagon or self.timeindex[0] > 1) and
                                     len(self.timex) == len(self.delta1) and len(self.timex) == len(self.delta2) and len(self.timex)>charge_idx+2):
-                                # to avoid drawing of RoR artifacts directly after CHARGE we skip the first two samples after CHARGE before starting to draw
+                                # to avoid drawing of RoR artifacts directly after CHARGE we skip the first few samples after CHARGE before starting to draw
                                 # as well as the last two readings before DROP
+                                skip = max(2,min(20,int(round(5000/self.delay))))
+                                skip2 = max(2,int(round(skip/2)))
                                 if aw.qmc.swapdeltalcds:
-                                    self.drawDeltaET(trans,charge_idx+2,drop_idx-2)
-                                    self.drawDeltaBT(trans,charge_idx+2,drop_idx-2)
+                                    self.drawDeltaET(trans,charge_idx+skip,drop_idx-skip2)
+                                    self.drawDeltaBT(trans,charge_idx+skip,drop_idx-skip2)
                                 else:
-                                    self.drawDeltaBT(trans,charge_idx+2,drop_idx-2)
-                                    self.drawDeltaET(trans,charge_idx+2,drop_idx-2)
+                                    self.drawDeltaBT(trans,charge_idx+skip,drop_idx-skip2)
+                                    self.drawDeltaET(trans,charge_idx+skip,drop_idx-skip2)
                             else:
                                 # instead of drawing we still have to establish the self.ax artists to keep the linecount correct!
                                 self.drawDeltaET(trans,0,0)
