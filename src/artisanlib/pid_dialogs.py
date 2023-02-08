@@ -942,12 +942,15 @@ class PID_DlgControl(ArtisanDialog):
         kd = self.pidKd.value() # 0.00
 
         pidSourceIdx = self.pidSource.currentIndex()
-        if pidSourceIdx == 0:
-            source = 2 # BT
-        elif pidSourceIdx == 1:
-            source = 1 # ET
+        if self.aw.qmc.device == 19:
+            source = self.pidSource.currentIndex()+1 # one of the 4 TC channels, 1,..4
         else:
-            source = self.pidSource.currentIndex() + 1 # 3, 4, ... (extra device curves)
+            if pidSourceIdx == 0:
+                source = 2 # BT
+            elif pidSourceIdx == 1:
+                source = 1 # ET
+            else:
+                source = self.pidSource.currentIndex() + 1 # 3, 4, ... (extra device curves)
         if not (self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
             self.aw.pidcontrol.pidPositiveTarget = self.positiveControlCombo.currentIndex()
             self.aw.pidcontrol.pidNegativeTarget = self.negativeControlCombo.currentIndex()
