@@ -1049,12 +1049,14 @@ class roastCompareDlg(ArtisanDialog):
             direction='inout', # tick_dir # this does not work as ticks are not drawn at all in ON mode with this!?
             labelright=True,
             labelleft=False,
-            labelbottom=False)   # labels along the bottom edge are on
+            labelbottom=False)   # labels along the bottom edge are off
 
         self.aw.qmc.ax.patch.set_visible(True)
 
         delta_axis_label = ('' if self.aw.qmc.zgrid == 0 else self.aw.qmc.mode + self.aw.arabicReshape(QApplication.translate('Label', '/min')))
         self.aw.qmc.delta_ax.set_ylabel(delta_axis_label,color = self.aw.qmc.palette['ylabel'],fontproperties=fontprop_medium)
+
+        self.aw.qmc.delta_ax.yaxis.set_label_position('right')
 
         self.aw.qmc.delta_ax.set_ylim(self.aw.qmc.zlimit_min,self.aw.qmc.zlimit)
         if self.aw.qmc.zgrid > 0:

@@ -176,10 +176,10 @@ except Exception: # pylint: disable=broad-except
     mpl_version = [7,7,7] # a trunk version
 
 if mpl_version[0] > 2 and mpl_version[1] > 2:
-    if mpl_version[1] > 3:
-        from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatio # @UnresolvedImport @UnusedImport
-    else:
-        from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatioF # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error,no-name-in-module
+#    if mpl_version[1] > 3:
+#        from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatio # @UnresolvedImport @UnusedImport
+#    else:
+#        from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatioF # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error,no-name-in-module
     from matplotlib.backend_bases import _Mode as MPL_Mode  # @UnresolvedImport
 
 # on OS X / PyQt5 one needs to
@@ -2373,7 +2373,7 @@ class tgraphcanvas(FigureCanvas):
         self.fixmaxtime = False # if true, do not automatically extend the endofx by 3min if needed because the measurements get out of the x-axis
         self.locktimex = False # if true, do not set time axis min and max from profile on load
         self.autotimex = True # automatically set time axis min and max from profile CHARGE/DROP on load
-        self.autotimexMode = 0 # mode for autotimex with 0: profile (CHARGE/DROP(, 1: BBP+profile (START/DROP), 2: BBP (START/CHARGE)
+        self.autotimexMode = 0 # mode for autotimex with 0: profile (CHARGE/DROP), 1: BBP+profile (START/DROP), 2: BBP (START/CHARGE)
         self.autodeltaxET = False # automatically set the delta axis max to the max(DeltaET)
         self.autodeltaxBT = False # automatically set the delta axis max to the max(DeltaBT)
         self.locktimex_start = self.startofx_default # seconds of x-axis min as locked by locktimex (needs to be interpreted wrt. CHARGE index)
@@ -3534,7 +3534,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.backgroundprofile is not None:
                         # toggle background if right top corner above canvas where the subtitle is clicked
                         self.background = not self.background
-                        aw.autoAdjustAxis(background=True)
+                        aw.autoAdjustAxis(background=self.background)
                         self.redraw(recomputeAllDeltas=True)
                         return
 
@@ -8626,7 +8626,7 @@ class tgraphcanvas(FigureCanvas):
                     if two_ax_mode:
                         #create a second set of axes in the same position as self.ax
                         self.delta_ax.tick_params(\
-                            axis='y',           # changes apply to the x-axis
+                            axis='y',           # changes apply to the y-axis
                             which='both',       # both major and minor ticks are affected
                             left=False,         # ticks along the left edge are off
                             bottom=False,       # ticks along the bottom edge are off
@@ -8634,7 +8634,7 @@ class tgraphcanvas(FigureCanvas):
                             direction='inout', # tick_dir # this does not work as ticks are not drawn at all in ON mode with this!?
                             labelright=True,
                             labelleft=False,
-                            labelbottom=False)   # labels along the bottom edge are on
+                            labelbottom=False)   # labels along the bottom edge are off
 
                         self.ax.patch.set_visible(True)
                         if aw.qmc.flagstart or self.zgrid == 0:
@@ -8645,6 +8645,7 @@ class tgraphcanvas(FigureCanvas):
                                 fontsize='medium',
                                 fontfamily=prop.get_family()
                                 )
+                        self.delta_ax.yaxis.set_label_position('right')
                         try:
                             y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
                         except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
@@ -17313,14 +17314,20 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 pm = self.recolorIcon(pm,QColor('#dfdfdf'))
             else:
                 pm = self.recolorIcon(pm,QColor('#424242'))
+#        if hasattr(pm, 'setDevicePixelRatio'):
+#            if mpl_version[0] > 2 and mpl_version[1] > 2:
+#                if mpl_version[1] > 3:
+#                    _setDevicePixelRatio(pm, _devicePixelRatioF(self)) # pylint: disable=protected-access
+#                else:
+#                    _setDevicePixelRatioF(pm, _devicePixelRatioF(self)) # pylint: disable=protected-access
+#            else:
+#                pm.setDevicePixelRatio(self.canvas._dpi_ratio) # pylint: disable=protected-access
         if hasattr(pm, 'setDevicePixelRatio'):
             if mpl_version[0] > 2 and mpl_version[1] > 2:
-                if mpl_version[1] > 3:
-                    _setDevicePixelRatio(pm, _devicePixelRatioF(self)) # pylint: disable=protected-access
-                else:
-                    _setDevicePixelRatioF(pm, _devicePixelRatioF(self)) # pylint: disable=protected-access
+                pm.setDevicePixelRatio(self.devicePixelRatioF() or 1)
             else:
                 pm.setDevicePixelRatio(self.canvas._dpi_ratio) # pylint: disable=protected-access
+
         return QIcon(pm)
 
     @staticmethod
@@ -22073,35 +22080,35 @@ class ApplicationWindow(QMainWindow):
                 if aw.qmc.flagon and aw.qmc.background:
                     # if we are recording and background profile is loaded and shown
                     background = True
+                # forground limits
+                if len(aw.qmc.timex) > 3:
+                    t_min,t_max = aw.calcAutoAxisForeground()
+                else:
+                    t_min = aw.qmc.chargemintime
+                    t_max = aw.qmc.resetmaxtime
+                if aw.qmc.timeindex[0] != -1:# and len(aw.qmc.timex) > aw.qmc.timeindex[0]
+                    t_max = t_max - aw.qmc.timex[aw.qmc.timeindex[0]]
+                # background limits
                 if background:
-                    t_min,t_max = aw.calcAutoAxisBackground()
-                else:
-                    if len(aw.qmc.timex) > 3:
-                        t_min,t_max = aw.calcAutoAxisForeground()
-                    else:
-                        t_min = aw.qmc.chargemintime
-                        t_max = aw.qmc.resetmaxtime
-                if aw.qmc.background and aw.qmc.autotimexMode != 2:
-                    if background:
-                        t_max_b = t_max
-                    else:
-                        _,t_max_b = aw.calcAutoAxisBackground()
+                    t_min_b,t_max_b = aw.calcAutoAxisBackground()
                     if aw.qmc.timeindexB[0] != -1:
-                        t_max = max(t_max,t_max_b - aw.qmc.timeB[aw.qmc.timeindexB[0]])
-                    else:
-                        t_max = max(t_max,t_max_b)
-
-                if background and aw.qmc.timeindexB[0] != -1:
-                    aw.qmc.startofx = t_min - aw.qmc.timeB[aw.qmc.timeindexB[0]]
+                        t_max_b = t_max_b - aw.qmc.timeB[aw.qmc.timeindexB[0]]
                 else:
-                    aw.qmc.startofx = t_min
+                    t_min_b = t_min
+                    t_max_b = t_max
+                #
+                if aw.qmc.background and aw.qmc.autotimexMode != 2:
+                    if not background:
+                        _,t_max_b = aw.calcAutoAxisBackground()
+                        if aw.qmc.timeindexB[0] != -1:
+                            t_max_b = t_max_b - aw.qmc.timeB[aw.qmc.timeindexB[0]]
+                # calc max extend
+                t_min = min(t_min,t_min_b)
+                t_max = max(t_max,t_max_b)
 
-                if not background and aw.qmc.timeindex[0] != -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
-                    aw.qmc.endofx = t_max - aw.qmc.timex[aw.qmc.timeindex[0]]
-                elif background and aw.qmc.timeindexB[0] != -1 and len(aw.qmc.timeB) > aw.qmc.timeindexB[0]:
-                    aw.qmc.endofx = t_max - aw.qmc.timeB[aw.qmc.timeindexB[0]]
-                else:
-                    aw.qmc.endofx = t_max
+                aw.qmc.startofx = t_min
+                aw.qmc.endofx = t_max
+
             if (aw.qmc.autodeltaxET or aw.qmc.autodeltaxBT) and deltas:
                 # auto delta adjust
                 if background:
