@@ -740,7 +740,7 @@ class roastCompareDlg(ArtisanDialog):
         self.background = background
         self.setWindowTitle(QApplication.translate('Form Caption','Comparator'))
         self.maxentries = 10 # maximum number of profiles to be compared
-        self.basecolors = list(cm.tab10(numpy.linspace(0,1,10)))  # @UndefinedVariable # ylint: disable=maybe-no-member
+        self.basecolors = list(cm.tab10(numpy.linspace(0,1,10)))  # @UndefinedVariable # pylint: disable=maybe-no-member
         self.profiles = []
         self.label_number = 0
         # align line

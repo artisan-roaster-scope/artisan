@@ -39,7 +39,7 @@ class QRImage(qrcode.image.base.BaseImage):
     def process(self):
         pass
 
-    def drawrect_context(self, row, col, active, context):
+    def drawrect_context(self, row: int, col: int, qr: 'QRCode'):
         pass
 
 def QRlabel(url_str):
