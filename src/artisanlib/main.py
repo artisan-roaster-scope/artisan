@@ -3534,7 +3534,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.backgroundprofile is not None:
                         # toggle background if right top corner above canvas where the subtitle is clicked
                         self.background = not self.background
-                        aw.autoAdjustAxis(background=self.background)
+                        aw.autoAdjustAxis(background=self.background and (not len(self.timex) > 3))
                         self.redraw(recomputeAllDeltas=True)
                         return
 
@@ -22080,35 +22080,32 @@ class ApplicationWindow(QMainWindow):
                 if aw.qmc.flagon and aw.qmc.background:
                     # if we are recording and background profile is loaded and shown
                     background = True
-                # forground limits
-                if len(aw.qmc.timex) > 3:
-                    t_min,t_max = aw.calcAutoAxisForeground()
-                else:
-                    t_min = aw.qmc.chargemintime
-                    t_max = aw.qmc.resetmaxtime
-                if aw.qmc.timeindex[0] != -1:# and len(aw.qmc.timex) > aw.qmc.timeindex[0]
-                    t_max = t_max - aw.qmc.timex[aw.qmc.timeindex[0]]
-                # background limits
                 if background:
-                    t_min_b,t_max_b = aw.calcAutoAxisBackground()
-                    if aw.qmc.timeindexB[0] != -1:
-                        t_max_b = t_max_b - aw.qmc.timeB[aw.qmc.timeindexB[0]]
+                    t_min,t_max = aw.calcAutoAxisBackground()
+                    if aw.qmc.timeindexB[0] != -1 and len(aw.qmc.timeB) > aw.qmc.timeindexB[0]:
+                        t_max = t_max - aw.qmc.timeB[aw.qmc.timeindexB[0]]
                 else:
-                    t_min_b = t_min
-                    t_max_b = t_max
-                #
+                    if len(aw.qmc.timex) > 3:
+                        t_min,t_max = aw.calcAutoAxisForeground()
+                        if aw.qmc.timeindex[0] != -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
+                            t_max = t_max - aw.qmc.timex[aw.qmc.timeindex[0]]
+                    else:
+                        t_min = aw.qmc.chargemintime
+                        t_max = aw.qmc.resetmaxtime
                 if aw.qmc.background and aw.qmc.autotimexMode != 2:
-                    if not background:
+                    if background:
+                        t_max_b = t_max
+                    else:
                         _,t_max_b = aw.calcAutoAxisBackground()
-                        if aw.qmc.timeindexB[0] != -1:
+                        if aw.qmc.timeindexB[0] != -1 and len(aw.qmc.timeB) > aw.qmc.timeindexB[0]:
                             t_max_b = t_max_b - aw.qmc.timeB[aw.qmc.timeindexB[0]]
-                # calc max extend
-                t_min = min(t_min,t_min_b)
-                t_max = max(t_max,t_max_b)
+                    t_max = max(t_max,t_max_b)
 
-                aw.qmc.startofx = t_min
+                if background and aw.qmc.timeindexB[0] != -1:
+                    aw.qmc.startofx = t_min - aw.qmc.timeB[aw.qmc.timeindexB[0]]
+                else:
+                    aw.qmc.startofx = t_min
                 aw.qmc.endofx = t_max
-
             if (aw.qmc.autodeltaxET or aw.qmc.autodeltaxBT) and deltas:
                 # auto delta adjust
                 if background:
@@ -40941,6 +40938,7 @@ def main():
                     aw.qmc.background = not aw.qmc.hideBgafterprofileload
                     if not aw.lastLoadedProfile and not(aw.logofilename != '' and aw.logoimgflag):
                         # this extra redraw is not needed if a watermark is loaded as it is triggered by the resize-redraw mechanism
+                        aw.autoAdjustAxis(background=aw.qmc.background and (not len(aw.qmc.timex) > 3))
                         aw.qmc.redraw()
                     else:
                         aw.qmc.timealign(redraw=True,recompute=True)
