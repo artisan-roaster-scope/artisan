@@ -11644,6 +11644,7 @@ class tgraphcanvas(FigureCanvas):
 
     @staticmethod
     def samplingAction():
+        _log.debug('async samplingAction()')
         try:
             ###  lock resources ##
             aw.qmc.profileDataSemaphore.acquire(1)
@@ -11655,7 +11656,8 @@ class tgraphcanvas(FigureCanvas):
 
     def AsyncSamplingActionTrigger(self):
         if aw.AsyncSamplingAction and aw.qmc.extra_event_sampling_delay and aw.qmc.extrabuttonactions[2]:
-            self.samplingAction()
+            if aw.qmc.flagon:
+                self.samplingAction()
             QTimer.singleShot(int(round(aw.qmc.extra_event_sampling_delay)),self.AsyncSamplingActionTrigger)
 
     def StartAsyncSamplingAction(self):
@@ -11975,7 +11977,13 @@ class tgraphcanvas(FigureCanvas):
             recording = self.flagstart
             if recording:
                 self.OffRecorder(autosave=False) # we autosave after the monitor is turned off to get all the data in the generated PDF!
+
+            # trigger event action before disconnecting from devices
+            aw.eventactionx(aw.qmc.extrabuttonactions[1],aw.qmc.extrabuttonactionstrings[1])
+
             self.flagon = False
+            # stop async sampling action before stopping sampling
+            self.StopAsyncSamplingAction()
             # now wait until the current sampling round is done
             while self.flagsampling:
                 libtime.sleep(0.05)
@@ -12048,7 +12056,6 @@ class tgraphcanvas(FigureCanvas):
             aw.update_minieventline_visibility()
             aw.updateExtraButtonsVisibility()
             aw.pidcontrol.activateONOFFeasySV(False)
-            self.StopAsyncSamplingAction()
             aw.enableEditMenus()
 
             aw.autoAdjustAxis()
@@ -12069,7 +12076,6 @@ class tgraphcanvas(FigureCanvas):
                         aw.automaticsave()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-            aw.eventactionx(aw.qmc.extrabuttonactions[1],aw.qmc.extrabuttonactionstrings[1])
 
             # update error dlg
             if aw.error_dlg:
@@ -17631,6 +17637,7 @@ class SampleThread(QThread):
                     ##### send sampling action if any interval is set to "sync" (extra_event_sampling_delay = 0)
                     try:
                         if aw.qmc.extra_event_sampling_delay == 0 and aw.qmc.extrabuttonactions[2]:
+                            _log.debug('sync samplingAction()')
                             aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)

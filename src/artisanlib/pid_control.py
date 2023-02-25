@@ -1479,9 +1479,9 @@ class PIDcontrol():
             # Follow Background mode
             if self.aw.qmc.device == 19 and self.aw.pidcontrol.externalPIDControl(): # in case we run TC4 with the PIDfirmware
                 if int(self.aw.ser.arduinoETChannel) == self.pidSource: # we observe the ET
-                    followCurveNr = 1
-                elif int(self.aw.ser.arduinoBTChannel) == self.pidSource: # we observe the BT
                     followCurveNr = 2
+                elif int(self.aw.ser.arduinoBTChannel) == self.pidSource: # we observe the BT
+                    followCurveNr = 1
                 else:
                     # we do not know which extra background device curve holds the selcted PID source temperatures
                     return None
