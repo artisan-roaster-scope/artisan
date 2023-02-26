@@ -11978,8 +11978,12 @@ class tgraphcanvas(FigureCanvas):
             if recording:
                 self.OffRecorder(autosave=False) # we autosave after the monitor is turned off to get all the data in the generated PDF!
 
-            # trigger event action before disconnecting from devices
-            aw.eventactionx(aw.qmc.extrabuttonactions[1],aw.qmc.extrabuttonactionstrings[1])
+            try:
+                # trigger event action before disconnecting from devices
+                if aw.qmc.extrabuttonactions[1] != 18: # Artisan Commands are executed after the OFFMonitor action is fully executued as they might trigger another buttons
+                    aw.eventactionx(aw.qmc.extrabuttonactions[1],aw.qmc.extrabuttonactionstrings[1])
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 
             self.flagon = False
             # stop async sampling action before stopping sampling
@@ -12086,6 +12090,13 @@ class tgraphcanvas(FigureCanvas):
                     aw.serial_dlg.update()
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
+
+            try:
+                # trigger event action before disconnecting from devices
+                if aw.qmc.extrabuttonactions[1] == 18: # Artisan Commands are executed after the OFFMonitor action is fully executued as they might trigger other buttons
+                    aw.eventactionx(aw.qmc.extrabuttonactions[1],aw.qmc.extrabuttonactionstrings[1])
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 
             if recording and self.flagKeepON and len(self.timex) > 10:
                 self.OnMonitor()
