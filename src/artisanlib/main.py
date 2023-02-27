@@ -11655,19 +11655,31 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.profileDataSemaphore.release(1)
 
     def AsyncSamplingActionTrigger(self):
-        if aw.AsyncSamplingAction and aw.qmc.extra_event_sampling_delay and aw.qmc.extrabuttonactions[2]:
+        if aw.qmc.extra_event_sampling_delay and aw.qmc.extrabuttonactions[2]:
             if aw.qmc.flagon:
                 self.samplingAction()
-            QTimer.singleShot(int(round(aw.qmc.extra_event_sampling_delay)),self.AsyncSamplingActionTrigger)
+            self.StopAsyncSamplingAction()
+            aw.AsyncSamplingTimer = QTimer()
+            aw.AsyncSamplingTimer.timeout.connect(self.AsyncSamplingActionTrigger)
+            aw.AsyncSamplingTimer.setSingleShot(True)
+            aw.AsyncSamplingTimer.start(int(round(aw.qmc.extra_event_sampling_delay)))
 
     def StartAsyncSamplingAction(self):
-        if aw.qmc.flagon and aw.qmc.extra_event_sampling_delay != 0:
-            aw.AsyncSamplingAction = True
+        if aw.AsyncSamplingTimer is None and aw.qmc.flagon and aw.qmc.extra_event_sampling_delay != 0:
             self.AsyncSamplingActionTrigger()
 
     @staticmethod
     def StopAsyncSamplingAction():
-        aw.AsyncSamplingAction = False
+        if aw.AsyncSamplingTimer is not None:
+            aw.AsyncSamplingTimer.stop() # kill the running timer
+            aw.AsyncSamplingTimer.deleteLater()
+            try: # sip not supported on older PyQt versions (RPi!)
+                sip.delete(aw.AsyncSamplingTimer)
+                #print(sip.isdeleted(dialog))
+            except Exception:  # pylint: disable=broad-except
+                pass
+            aw.AsyncSamplingTimer = None
+
 
     # fill the self.extraNoneTempHint1 and self.extraNoneTempHint2 lists
     # indicating which curves should not be temperature converted
@@ -11956,12 +11968,12 @@ class tgraphcanvas(FigureCanvas):
             self.block_update = False # unblock the updating of the bitblit canvas
             aw.updateReadingsLCDsVisibility() # this one triggers the resize and the recreation of the bitblit canvas
             self.threadserver.createSampleThread()
-            if not bool(aw.simulator):
-                self.StartAsyncSamplingAction()
             try:
                 aw.eventactionx(self.extrabuttonactions[0],self.extrabuttonactionstrings[0])
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+            if not bool(aw.simulator):
+                QTimer.singleShot(300,self.StartAsyncSamplingAction)
             _log.info('ON MONITOR (sampling @%ss)', aw.float2float(self.delay/1000))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -11978,6 +11990,10 @@ class tgraphcanvas(FigureCanvas):
             if recording:
                 self.OffRecorder(autosave=False) # we autosave after the monitor is turned off to get all the data in the generated PDF!
 
+            self.flagon = False
+            # stop async sampling action before stopping sampling
+            self.StopAsyncSamplingAction()
+
             try:
                 # trigger event action before disconnecting from devices
                 if aw.qmc.extrabuttonactions[1] != 18: # Artisan Commands are executed after the OFFMonitor action is fully executued as they might trigger another buttons
@@ -11985,9 +12001,6 @@ class tgraphcanvas(FigureCanvas):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
-            self.flagon = False
-            # stop async sampling action before stopping sampling
-            self.StopAsyncSamplingAction()
             # now wait until the current sampling round is done
             while self.flagsampling:
                 libtime.sleep(0.05)
@@ -12099,7 +12112,7 @@ class tgraphcanvas(FigureCanvas):
                 _log.exception(e)
 
             if recording and self.flagKeepON and len(self.timex) > 10:
-                self.OnMonitor()
+                QTimer.singleShot(300,self.OnMonitor)
 
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -17849,7 +17862,7 @@ class ApplicationWindow(QMainWindow):
         'LargePIDLCDsFlag', 'largeExtraLCDs_dialog', 'LargeExtraLCDsFlag', 'largePhasesLCDs_dialog', 'LargePhasesLCDsFlag', 'WebLCDs', 'WebLCDsPort',
         'WebLCDsAlerts', 'EventsDlg_activeTab', 'graphColorDlg_activeTab', 'PID_DlgControl_activeTab', 'CurveDlg_activeTab', 'editGraphDlg_activeTab',
         'backgroundDlg_activeTab', 'DeviceAssignmentDlg_activeTab', 'AlarmDlg_activeTab', 'resetqsettings', 'settingspath', 'wheelpath', 'profilepath',
-        'userprofilepath', 'printer', 'main_widget', 'defaultdpi', 'dpi', 'qmc', 'HottopControlActive', 'AsyncSamplingAction', 'wheeldialog',
+        'userprofilepath', 'printer', 'main_widget', 'defaultdpi', 'dpi', 'qmc', 'HottopControlActive', 'AsyncSamplingTimer', 'wheeldialog',
         'simulator', 'simulatorpath', 'comparator', 'stack', 'eventsbuttonflag', 'minieventsflags', 'seriallogflag',
         'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'ws', 'scale', 'color', 'extraser', 'extracomport', 'extrabaudrate',
         'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'santokerHost', 'santokerPort', 'santoker', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
@@ -18061,8 +18074,8 @@ class ApplicationWindow(QMainWindow):
         #### Hottop Control
         self.HottopControlActive = False
 
-        #### Async Sampling Action
-        self.AsyncSamplingAction = False
+        #### Async Sampling Timer
+        self.AsyncSamplingTimer = None
 
         self.wheeldialog = None
 
@@ -24189,7 +24202,7 @@ class ApplicationWindow(QMainWindow):
                         try:
                             if self.qmc.flagstart and len(self.qmc.timex)>0:
                                 timex = self.qmc.timex[-1]
-                                if self.qmc.timeindex[0] != -1:
+                                if self.qmc.timeindex[0] != -1 and self.qmc.timeindex[0] < len(self.qmc.timex):
                                     timex -= self.qmc.timex[self.qmc.timeindex[0]]
                                 BT_subst = self.qmc.temp2[-1]
                                 ET_subst = self.qmc.temp1[-1]
@@ -24202,7 +24215,7 @@ class ApplicationWindow(QMainWindow):
                                         ETB_subst = etb
                             elif self.qmc.flagon:
                                 timex = self.qmc.on_timex[-1]
-                                if self.qmc.timeindex[0] != -1:
+                                if self.qmc.timeindex[0] != -1 and self.qmc.timeindex[0] < len(self.qmc.on_timex):
                                     timex -= self.qmc.on_timex[self.qmc.timeindex[0]]
                                 BT_subst = self.qmc.on_temp2[-1]
                                 ET_subst = self.qmc.on_temp1[-1]
@@ -27623,7 +27636,7 @@ class ApplicationWindow(QMainWindow):
                 self.eNumberSpinBox.setValue(int(lenevents))
                 return
             self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
-            if aw.qmc.timeindex[0] > -1:
+            if aw.qmc.timeindex[0] > -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
                 timez = stringfromseconds(self.qmc.timex[self.qmc.specialevents[currentevent-1]]-self.qmc.timex[self.qmc.timeindex[0]])
             else:
                 timez = stringfromseconds(self.qmc.timex[self.qmc.specialevents[currentevent-1]])

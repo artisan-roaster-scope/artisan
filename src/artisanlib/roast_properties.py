@@ -5091,8 +5091,9 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         if not self.aw.qmc.flagon:
             self.aw.sendmessage(QApplication.translate('Message','Roast properties updated but profile not saved to disk'))
-        # if recording, dirty and CHARGE and DROP set we send changes to artisan.plus
-        if self.aw.qmc.flagstart and self.aw.qmc.safesaveflag and self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6] > 0:
+        # if recording, dirty and CHARGE and DROP set we send changes to artisan.plus if it is running and we are not in simmulator mode
+        if (self.aw.qmc.flagstart and self.aw.qmc.safesaveflag and self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6] > 0 and
+                self.aw.plus_account is not None and not bool(self.aw.simulator)):
             try:
                 plus.queue.addRoast()
             except Exception as e: # pylint: disable=broad-except
