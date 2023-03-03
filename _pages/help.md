@@ -11,7 +11,7 @@ author: Marko Luther
 author_profile: true
 
 ---
-If you need support please check the [documentation](#documentation) or ask the [community](#Community) for help. We also composed a list of [reoccuring questions with answers (FAQ)](#FAQ) below. In case your problem is more specific and you might need to consult a specialist. Why not [book a video session with Marko](https://shop.artisan.plus/en/consulting/video-conference){:target="_blank"}?
+If you need support please check the [documentation](#documentation) or ask the [community](#Community) for help. We also composed a list of [reoccuring questions with answers (FAQ)](#FAQ) below. In case your problem is more specific and you might need to consult a specialist. Why not [book a video session with Marko](https://shop.artisan.plus/shop/en/consulting/){:target="_blank"}?
 
 <a name="Documentation"></a>
 ## Documentation
