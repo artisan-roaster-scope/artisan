@@ -1,0 +1,21 @@
+I"B<p><img class="tab-image" src="/assets/images/supporter-badge.png" width="150px" /></p>
+
+<ul>
+  <li><strong>Producer:</strong> <a href="https://www.bescaroasters.com" target="_blank">Besca</a>, Turkey</li>
+  <li><strong>Machine:</strong> all Shop and Industrial BSC Roasters as well as the Bee sample roasters</li>
+  <li><strong>Connection:</strong> MODBUS TCP via the network (BSC automatic); MODBUS RTU via USB (BSC manual &amp; Bee)</li>
+  <li><strong>Features:</strong>
+    <ul>
+      <li>logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves</li>
+      <li>slider control of fan speed, burner level and drum speed (only BSC automatic)</li>
+      <li>control buttons to operate the drum, cooler, and mixer (only BSC automatic)</li>
+    </ul>
+  </li>
+</ul>
+
+<p class="notice--primary"><strong>Watch out!</strong> 
+for manual machines produced after 15.09.2019, those with the touch screen, the Artisan machine setup <em>“Besca BSC manual v2”</em> included in Artisan v2.1 and later should be used. For all other manual machines the <em>“Besca BSC manual v1”</em> (or <em>“Besca BSC manual”</em> in Artisan v2.0 and earlier)</p>
+
+<p class="notice--primary"><strong>Watch out!</strong>
+The communication via MODBUS RTU requires to install a <a href="/modbus_serial/">serial driver</a>.</p>
+:ET

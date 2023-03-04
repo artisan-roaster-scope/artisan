@@ -1,0 +1,9 @@
+I"\<p><img class="tab-image" src="/assets/images/supporter-badge.png" width="150px" /></p>
+
+<ul>
+  <li><strong>Producer:</strong> <a href="http://kapokcoffee.com/en/" target="_blank">KapoK Roasters</a>, Taiwan</li>
+  <li><strong>Machines:</strong> K500, K1.0, K5.0</li>
+  <li><strong>Connection:</strong> MODBUS ASCII via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
+  <li><strong>Features:</strong> logging of bean temperature (BT) and environmental temperature (ET).  On machines with a 3rd DTA484 PID logging of the inlet temperature is also supported.</li>
+</ul>
+:ET

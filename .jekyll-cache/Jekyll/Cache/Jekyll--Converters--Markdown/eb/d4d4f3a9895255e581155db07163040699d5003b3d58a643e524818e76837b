@@ -1,0 +1,7 @@
+I"Ç<ul>
+  <li><strong>Producer:</strong> <a href="http://en.gzbideli.com/" target="_blank">Bideli</a>, China</li>
+  <li><strong>Machines:</strong> all models with Fuji PXF PIDs</li>
+  <li><strong>Connection:</strong> MODBUS RTU via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
+  <li><strong>Features:</strong> logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves</li>
+</ul>
+:ET

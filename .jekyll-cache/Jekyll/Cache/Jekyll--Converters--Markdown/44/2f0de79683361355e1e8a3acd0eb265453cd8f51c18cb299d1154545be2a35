@@ -1,0 +1,15 @@
+I"<ul>
+  <li><strong>Producer:</strong> <a href="http://www.toper.com" target="_blank">Toper</a>, Turkey</li>
+  <li><strong>Machines:</strong> the “Toper PLC” setup works via a network connection with machines featuring an Omron PLC (Toper TKM-SX) or the Schneider Modicon PLC (Cafemino). The “Toper USB” setup works with some other Toper roasters that feature an USB connector.</li>
+  <li><strong>Connection:</strong> MODBUS TCP via network or MODBUS RTU via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
+  <li><strong>Features:</strong> logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves</li>
+</ul>
+
+<h3 id="setup">Setup</h3>
+
+<p class="notice--primary">For the “Toperr PLC” setup, the computer running Artisan must be on the same IP network as the Toper roaster which usually is configured to have IP 192.168.137.90. Configure your computer to use a static IP address in the range 192.168.137.x (but with x different from that of the roaster which usually has 90), so for example 192.168.137.91, and set the subnet mask to 255.255.255.0. This can be done on Windows using the Network Sharing Center by adding a TCP/IPv4 Local Area Connection with those properties. On OS X you set your Ethernet port in the Network Control panel to “IPv4: Manually” and fill in the IP and subnet mask accordingly.</p>
+
+<p class="notice--primary"><strong>Watch out!</strong>
+A video tutorial by Stuart Lee Archer of <a href="http://www.pumphreys-coffee.co.uk">Pumphrey’s Coffee</a> on <a href="https://youtu.be/e4nrlxgq04o">Connecting a Toper TKM SX to Artisan Roaster Scope</a>. Enjoy!
+<a href="https://youtu.be/e4nrlxgq04o"><img src="http://img.youtube.com/vi/e4nrlxgq04o/0.jpg" alt="Connecting a Toper TKM SX" /></a></p>
+:ET

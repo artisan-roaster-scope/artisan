@@ -1,0 +1,7 @@
+I"Á<ul>
+  <li><strong>Producer:</strong> <a href="http://hartanzah.com/" target="_blank">HARTANZAH Coffee Roaster</a>, Indonesia</li>
+  <li><strong>Machines:</strong> Machines with Autonics Tk4 PIDs</li>
+  <li><strong>Connection:</strong> MODBUS RTU via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
+  <li><strong>Features:</strong> logging of bean temperature (BT) and environmental temperature (ET).</li>
+</ul>
+:ET

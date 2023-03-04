@@ -12,7 +12,7 @@ author_profile: true
 
 Menu: `Tools` >> `Wheel Graph`
 
-Flavor wheels, like the one available from SCA, have been proposed to aid in the cupping process to come up with somewhat standardised evaluation results.
+Flavor wheels, like the one available from SCA, have been proposed to aid in the cupping process to come up with somewhat standardized evaluation results.
 
 Artisan comes with a general editor for wheel graphs, which are essentially bar graphs in polar coordinates. This editor allows you to design and print your own flavor wheel (menu `Tools` >> `Wheel Graph`). You add layers from inside out by adding wheels in the Wheel Graph Editor table. You specify the elements of a layer by simply specify a comma separated list of names as labels and press the Update labels button. You can further change the radius, the text size and text project as well as the starting angle per layer.
 

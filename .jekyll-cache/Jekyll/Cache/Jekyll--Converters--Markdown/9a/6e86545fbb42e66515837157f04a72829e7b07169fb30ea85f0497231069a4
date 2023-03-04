@@ -1,0 +1,20 @@
+I"<p><img class="tab-image" src="/assets/images/supporter-badge.png" width="150px" /></p>
+
+<ul>
+  <li><strong>Producer:</strong> <a href="http://www.buckeyecoffee.com" target="_blank">Buckeye Coffee Roasters Co. LCC</a>, USA</li>
+  <li><strong>Machines:</strong> all with USB or Bluetooth connection</li>
+  <li><strong>Connection:</strong> MODBUS RTU; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
+  <li><strong>Features:</strong> logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves</li>
+</ul>
+
+<div class="notice--primary">
+  <h4>Watch out!</h4>
+  <br />
+  
+<p>Artsan v1.3.1 and later need a slightly different MODBUS setup (check menu <code class="language-plaintext highlighter-rouge">Config &gt;&gt; Port</code>, 3rd tab <code class="language-plaintext highlighter-rouge">MODBUS</code>) than earlier versions where the state of the little-endian flag <code class="language-plaintext highlighter-rouge">words</code> was insignificant. Now both little-endian flags, <code class="language-plaintext highlighter-rouge">bytes</code> and <code class="language-plaintext highlighter-rouge">words</code>, should not be ticked as in the screenshot below.</p>
+
+<p><img src="../../assets/images/BC_modbus.png" alt="alt text" /></p>
+
+</div>
+
+:ET

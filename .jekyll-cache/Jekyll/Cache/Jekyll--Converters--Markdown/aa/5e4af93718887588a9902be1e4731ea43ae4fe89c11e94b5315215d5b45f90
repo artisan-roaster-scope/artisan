@@ -1,0 +1,23 @@
+I"î<p><img class="tab-image" src="/assets/images/supporter-badge.png" width="150px" /></p>
+
+<ul>
+  <li><strong>Producer:</strong> <a href="https://www.hottopusa.com" target="_blank">Hottop</a>, USA/Taiwan</li>
+  <li><strong>Machine:</strong> KN-8828B-2K+</li>
+  <li><strong>Connection:</strong> vendor specific serial protocol</li>
+  <li><strong>Features:</strong>
+    <ul>
+      <li>logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves</li>
+      <li>slider control of fan and heater</li>
+      <li>button control of motor, door solenoid, and stirrer</li>
+    </ul>
+  </li>
+</ul>
+
+<p class="notice--primary"><strong>Watch out!</strong> Artisan doesnâ€™t monitor unsafe temperatures, so you should never leave the roaster alone.</p>
+
+<p class="notice--primary"><strong>Watch out!</strong>
+The Artisan blog contains a <a href="https://artisan-roasterscope.blogspot.com/2015/05/hottop-kn-8828b-2k.html" target="_blank">detailed post</a> on this setup.</p>
+
+<p class="notice--primary"><strong>Watch out!</strong>
+There is also setup supporting Hottop machines modified with an <a href="http://blog.oilslickcoffee.com/2016/03/15/how-to-install-hottop-htri-control-board/" target="_blank">Arduino/TC4/HTC combination</a>.</p>
+:ET

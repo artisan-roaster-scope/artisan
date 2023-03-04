@@ -1,0 +1,68 @@
+I"�'<h2 id="quick-start-guide">Quick-Start Guide</h2>
+
+<p><strong>If you read through the topics on the left you will have a very good idea of how Artisan works.  This Quick-Start-Guide is not intended to answer all technical questions.</strong>  Artisan Quick-Start Guide is maintained by <em>Michael Herbert of <a href="https://www.carefreebuzzbuzz.com/">CarefreeBuzzBuzz</a>.</em>  If you have suggestions for improving the content of the Quick-Start-Guide or technical questions, please use the <a href="https://github.com/artisan-roaster-scope/artisan/discussions">Artisan discussion forum</a> (GitHub registration required).  When clicking links in this Quick-Start-Guide, we suggest you open links in a new window.  You can also find a great deal of information at the <a href="https://artisan-roasterscope.blogspot.com/">Artisan Blog</a>.</p>
+
+<p>Version 2.0 is a major milestone in the development of the artisan roast logger. It comes not only in a new look and with a new application icon, but also with support for the new <a href="https://artisan.plus/" target="_blank">artisan.plus</a> inventory service described below.</p>
+
+<p>A note on upgrading from v1.x:
+Artisan 2 stores the application settings in a new location. On the initial start up of Artisan 2 the old settings are imported. From that moment on, changes to settings done with Artisan 2 will not be synchronized automatically back to previous versions. However, synchronizing settings via save/load settings (under menu Help) manually works across all versions. PLEASE EXPORT a working SETTINGS FILE and keep it saved to be able to track back in case changes do not work out as expected when upgrading.</p>
+
+<h2 id="artisanplus">Artisan.Plus</h2>
+
+<p>Introduced as part of 2.0, this is an inventory management system which is not covered in the Quick Start Guide.  More information can be found at the Artisan Plus <a href="https://artisan.plus/en/">website</a>. Artisan v2 connects to the inventory management service. This service manages your stock of beans and automatically subtracts batches as you roast them. Beans can be specified to every detail and only essential meta data of roasts is stored online in the cloud. All roast profiles stay local just with you and are not shared with the platform.</p>
+
+<p>Additional popup menus in the Roast Properties dialog (menu Roast » Properties) allow you to choose from your stock and have beans information filled in automatically.</p>
+
+<p>The service features support for</p>
+
+<ul>
+  <li>multiple users, machines and stores</li>
+  <li>blends &amp; certifications</li>
+  <li>charts, tax reports &amp; predictions</li>
+  <li>artisan integration support offline roasting</li>
+</ul>
+
+<h3 id="learn-what-artisan-can-do-and-your-first-roast">Learn what Artisan can do and Your First Roast</h3>
+
+<ol>
+  <li>Skim the pages of this Quick Start Guide, learn what Artisan RoasterScope can do, and then go back and read the pages of interest in detail. For each roast, an Artisan “profile” will be created and can be saved.  For most of the topics below, you will find a page in this Quick Start Guide, and some are linked.</li>
+  <li>Config&gt;Temperature - pick ˚F or ˚C.</li>
+  <li>Config&gt;<a href="https://artisan-scope.org/docs/sampling/">Sampling</a> - leave at 3 for now. After you have done 25-30 roasts and know the program better you can reduce it if your devices support that. Under Curves your Delta Span should be at least twice your sampling rate.  Leave Oversampling unselected/unchecked.</li>
+  <li>Run Config&gt;Machine, or set up your devices, and make sure the LCDs show your temps.  Some of these configurations will change the sampling rate and that’s ok.</li>
+  <li>Config&gt;<a href="https://artisan-scope.org/docs/curves/">Curves</a> - Check the boxes needed on the ROR tab and set the values on the Filters page. Suggest you start with zero for all smoothing and check the Drop Spikes and Smooth Spikes choices. Set Delta Span at twice your sampling rate (3 by default) so 6.  If you find zero smoothing give you too many spikes, slowing increase the numbers.  Once you have an Artisan profile, you can change the numbers and see the results on screen.</li>
+  <li>Config&gt;Events and Config&gt;Alarms - these are the more complex steps and are addressed in the steps below.</li>
+  <li>Config&gt;<a href="https://artisan-scope.org/docs/axes/">Axes</a> - check Auto, and set your range for your Temperature and Delta axes. Starting points could be 0-500 ˚F and 0-40˚F/min, or 0-250˚C and 0-20˚C/min.</li>
+  <li>Config&gt;<a href="https://artisan-scope.org/docs/batches/">Batch</a> - choose a prefix name and turn on the counter.</li>
+  <li>Config&gt;<a href="https://artisan-scope.org/docs/autosave/">Autosave</a>- Check autosave and add to recent. Choose a location and set the path.   If you use cloud storage, you can access your profiles from any device any where.  Choose a file name prefix. Check the Help screen to decide what to include. See the Quick Start Guide for examples.</li>
+  <li>Config&gt;<a href="https://artisan-scope.org/docs/statistics/">Statistics</a> - check all the boxes on the top row.</li>
+  <li>Config&gt;<a href="https://artisan-scope.org/docs/phases/">Phases</a> - For Phases LCD mode, choose time for Drying, Temp for Maillard, and check the box Phases LCD All in the Finishing Line. Other choices are yours - see the QSG.</li>
+  <li>Roast&gt;<a href="https://artisan-scope.org/docs/properties/">Properties</a> - See the QSG, fill in the information and start saving the various roast profiles.</li>
+  <li>Roast&gt;<a href="https://artisan-scope.org/docs/background/">Background</a> - See the QSG on how to load a profile into the background.</li>
+  <li>File&gt;Report and File&gt;Save Graph - learn how to export reports on your roasts and graphs to post. See the QSG.  If you have Shortcuts enabled (hit the Enter key), you can use “;” to take a screenshot.</li>
+  <li>Help&gt;Save Settings - maybe the most important step. Save your settings and make a habit of it before every upgrade and when you change settings.</li>
+  <li>Config&gt;<a href="https://artisan-scope.org/docs/events/">Events</a> and Config&gt;<a href="https://artisan-scope.org/docs/alarms/">Alarms</a> - these are critical, but they also take some work. I put them last so that other important concepts aren’t passed over while you work on this. For this step it’s really critical that you read the QSG in detail. First thing decide if you will use buttons or sliders to record gas changes. Decide which boxes you want to check, including Auto Drop and Auto Charge. I use Auto Drop but not Charge as that helps me focus on the start of the roast. If you use Auto Charge, make sure you hit Start at least 15 seconds before you drop your beans.  I mark TP, MET and I show the Time Guide. For Buttons choosing the Label of the Button and the Description are important. The Description will show your graph, using the Event Annotations - last tab. Make sure you complete the Event Annotations tab so you can see your gas and air changes on your profile. Design Alarms as you need them. I love talking Alarms to remind me of temps and return my air to the starting point. I also use Alarms to mark my initial settings.</li>
+  <li>Tools Menu – once you have roasted a few batches, go back and read the Quick Start Guide pages on the items in the Tools menu: Analyzer, Comparator, Designer, Simulator, Wheel Graph, Transposer and Calculator.</li>
+  <li><a href="https://artisan-scope.org/docs/shortcuts/">Shortcuts</a> – Go to Help&gt;Shortcuts to see how to enable them and see what keyboard shortcuts are available.</li>
+  <li>More personalization – Go to Config&gt;<a href="https://artisan-scope.org/docs/colors/">Colors</a> and Config&gt;<a href="https://artisan-scope.org/docs/themes/">Themes</a> to explore the options.  Note that some of the graph configurations are accessed with the last icon in the set on the left on the Roast graph (the one with jagged up arrow).  Config&gt;Curves, UI, pick a font and background image, IF you wish to personalize your use</li>
+  <li>READY FOR YOUR FIRST ROAST –</li>
+</ol>
+
+<p>The main controls look like this:
+<img src="/assets/images/gsg/view menu controls.png" alt="View Controls" /></p>
+
+<p>Artisan’s standard event buttons are as follows:
+<img src="/assets/images/gsg/standard buttons.png" alt="Artisan buttons" /></p>
+
+<p>In the upper right of your screen, ON starts reading the Devices.  START will begin a roast profile recording  the time and temps.  After you hit START, wait at least 15 seconds, you need to drop your beans into the roaster and hit CHARGE (or use Auto CHARGE) to get a ∆BT graph.  Using the trier, when you determine you are at Dry End, hit the DRY END Button, and do the same for FIRST CRACK START, and DROP.  After the roast completes, hit the off button.  Congratulations on your first roast.  At the end of the roast you hit OFF to stop the recording. When you hit RESET, the current srofile and background profile are removed and Artisan is reset to be ready for a new roast.  You don’t have to RESET after every roast.</p>
+
+<p><strong>NOTE:
+<em>Unplug Your Laptop Before You Roast</em></strong></p>
+
+<p>For some people, unless you have a USB isolator, you need to unplug your computer when using Artisan or you may get feedback loops that may create unwanted spikes in the graph.  If you are using a desktop, you may need an isolator if you are seeing the spikes.</p>
+
+<p>Before or after your first roast, look at the <a href="https://artisan-scope.org/docs/setup/">Setup </a> page to see how to adjust your bean temp readings and your sampling rates.</p>
+
+<p>You can save your graphs under File&gt;Save Graph to various size formats or PDF.  You can aslo convert your data to other formats and export it under the File&gt;Convert and File&gt;Export commands.  You can import another roaster’s file under File&gt;Import.</p>
+
+<p>To review your own files you can use File&gt;Open and search for a file or use the list under File&gt;Open Recent.  When starting a roast you can choose File&gt;New and pick one of the previous Roast Profiles you may have saved.</p>
+:ET

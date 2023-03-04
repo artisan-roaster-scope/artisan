@@ -1,0 +1,22 @@
+I"q<p><img class="tab-image" src="/assets/images/supporter-badge.png" width="150px" /></p>
+
+<ul>
+  <li><strong>Producer:</strong> <a href="http://coffed.pl" target="_blank">Coffed</a>, Poland</li>
+  <li><strong>Machine:</strong> SR3, SR5, SR15, SR25, SR60 (manual, manual delta, and automatic variants)</li>
+  <li><strong>Connection:</strong>
+    <ul>
+      <li>manual variants: MODBUS RTU via USB-2-RS485 interface; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
+      <li>automatic variants: MODBUS TCP via the network</li>
+    </ul>
+  </li>
+  <li><strong>Features:</strong>
+    <ul>
+      <li>logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves</li>
+      <li>control of fan speed, burner level and drum speed (depending on machine capability)</li>
+    </ul>
+  </li>
+</ul>
+
+<p class="notice--primary"><strong>Check out the step-by-step documentation by Coffed!</strong><br />
+<a href="https://coffed.pl/wp-content/uploads/2020/11/Connnect-computer-with-roaster-1.pdf" target="_blank">“How to connect your computer to an automatic Coffed roaster?”</a></p>
+:ET

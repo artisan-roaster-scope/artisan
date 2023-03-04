@@ -1,0 +1,7 @@
+I"ç<ul>
+  <li><strong>Distributor:</strong> <a href="https://sjglobal.id/roaster/" target="_blank">Sudi Jaya Group</a>, Indonesia</li>
+  <li><strong>Machines:</strong> Models with Phidget or Omron PID preinstalled</li>
+  <li><strong>Connection:</strong> Phidget protocol via USB or MODBUS RTU via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
+  <li><strong>Features:</strong> logging of bean temperature (BT) and related rate-of-rise curve</li>
+</ul>
+:ET

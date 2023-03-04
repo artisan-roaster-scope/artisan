@@ -1,0 +1,17 @@
+I"L<h3 id="controls">Controls</h3>
+
+<p>Menu&gt;View&gt;Controls</p>
+
+<p>This toggles on the top line of controls on the right:
+<img src="/assets/images/gsg/view menu controls.png" alt="View Controls" /></p>
+
+<p>These controls need to be visible to operate Artisan.</p>
+
+<p>Menu&gt;View&gt;Readings toggles the standard temperature readings on the right side, on and off.</p>
+
+<p>To toggle the Buttons and Sliders on and off that you configured under <a href="https://artisan-scope.org/docs/events/">Events</a> navigate to:</p>
+
+<p>Menu&gt;View&gt;Buttons</p>
+
+<p>Menu&gt;View&gt;Sliders</p>
+:ET

@@ -1,0 +1,178 @@
+I"�<ul>
+  <li><strong>Producer:</strong> <a href="http://www.giesencoffeeroasters.eu" target="_blank">GIESEN coffee-roasters</a>, The Netherlands</li>
+  <li><strong>Machines:</strong> WPG/WPE/W1/W6/W15/W30/W45/W60 with networked PLC (6/2014 and later)</li>
+  <li><strong>Connection:</strong> Siemens S7 network</li>
+  <li><strong>Features:</strong>
+    <ul>
+      <li>logging of exhaust temperature (ET), bean temperature (BT) and related rate-of-rise curves</li>
+      <li>logging and control of burner level, air flow, air temperature setpoint, drum speed</li>
+      <li>logging of the optional infrared (IR) and/or environmental temperature sensor (Env)</li>
+      <li>operation of actors (intake, flavouring, discharge, cooling, stirrer) on W30 and larger machines via custom buttons (press CMD-2 to switch to this extended button set; CMD-1 switches back to the standard button set)</li>
+    </ul>
+  </li>
+</ul>
+
+<p class="notice--primary"><strong>Watch out!</strong> The WxA coarse setup is for older machines, which allow burner changes only in 10% steps.</p>
+
+<p class="notice--primary"><strong>Watch out!</strong> The WxA+ setups require an unlock code from Giesen and deliver data in higher resolution with decimals.</p>
+
+<h3 id="setup">Setup</h3>
+
+<p>The computer running Artisan must be on the same IP network as the Giesen roaster. Configure your computer to use a static IP address in the range of the roaster (192.168.2.x, 192.168.3.x or 172.30.30.x) but with x different from that of the roaster (see the tables below). Choose 255.255.255.0 as subnet mask.</p>
+
+<h4 id="default-ip-addresses-giesen-roasters-before-22018-without-touch-panel">Default IP Addresses Giesen Roasters before 2/2018 without touch panel:</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>IP-Roaster</th>
+      <th>IP-PC (ex)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>W1</td>
+      <td>192.168.<strong>2</strong>.199</td>
+      <td>192.168.<strong>2</strong>.42</td>
+    </tr>
+    <tr>
+      <td>W6</td>
+      <td>192.168.<strong>2</strong>.199</td>
+      <td>192.168.<strong>2</strong>.42</td>
+    </tr>
+    <tr>
+      <td>W15</td>
+      <td>192.168.<strong>2</strong>.199</td>
+      <td>192.168.<strong>2</strong>.42</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>W30</td>
+      <td>192.168.<strong>3</strong>.199</td>
+      <td>192.168.<strong>3</strong>.42</td>
+    </tr>
+    <tr>
+      <td>W45</td>
+      <td>192.168.<strong>3</strong>.199</td>
+      <td>192.168.<strong>3</strong>.42</td>
+    </tr>
+    <tr>
+      <td>W60</td>
+      <td>192.168.<strong>3</strong>.199</td>
+      <td>192.168.<strong>3</strong>.42</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="default-ip-addresses-giesen-roasters-before-22018-with-touch-panel">Default IP Addresses Giesen Roasters before 2/2018 with touch panel:</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>IP-Roaster</th>
+      <th>IP-PC (ex)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>W1</td>
+      <td>192.168.<strong>2</strong>.180</td>
+      <td>192.168.<strong>2</strong>.42</td>
+    </tr>
+    <tr>
+      <td>W6</td>
+      <td>192.168.<strong>2</strong>.180</td>
+      <td>192.168.<strong>2</strong>.42</td>
+    </tr>
+    <tr>
+      <td>W15</td>
+      <td>192.168.<strong>2</strong>.180</td>
+      <td>192.168.<strong>2</strong>.42</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>W30</td>
+      <td>192.168.<strong>3</strong>.180</td>
+      <td>192.168.<strong>3</strong>.42</td>
+    </tr>
+    <tr>
+      <td>W45</td>
+      <td>192.168.<strong>3</strong>.180</td>
+      <td>192.168.<strong>3</strong>.42</td>
+    </tr>
+    <tr>
+      <td>W60</td>
+      <td>192.168.<strong>3</strong>.180</td>
+      <td>192.168.<strong>3</strong>.42</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="default-ip-addresses-giesen-roasters-after-22018">Default IP Addresses Giesen Roasters after 2/2018:</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>IP-Roaster</th>
+      <th>IP-PC (ex)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>WPG/WPE</td>
+      <td>172.30.30.10</td>
+      <td>172.30.30.42</td>
+    </tr>
+    <tr>
+      <td>W1</td>
+      <td>172.30.30.30</td>
+      <td>172.30.30.42</td>
+    </tr>
+    <tr>
+      <td>W6</td>
+      <td>172.30.30.50</td>
+      <td>172.30.30.42</td>
+    </tr>
+    <tr>
+      <td>W15</td>
+      <td>172.30.30.50</td>
+      <td>172.30.30.42</td>
+    </tr>
+    <tr>
+      <td>W30</td>
+      <td>172.30.30.70</td>
+      <td>172.30.30.42</td>
+    </tr>
+    <tr>
+      <td>W45</td>
+      <td>172.30.30.90</td>
+      <td>172.30.30.42</td>
+    </tr>
+    <tr>
+      <td>W60</td>
+      <td>172.30.30.90</td>
+      <td>172.30.30.42</td>
+    </tr>
+    <tr>
+      <td>W140</td>
+      <td>172.30.30.110</td>
+      <td>172.30.30.42</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>This can be done on Windows using the Network Sharing Center by adding a TCP/IPv4 Local Area Connection with those properties. On macOS you set your ethernet port in the Network Control panel to “IPv4: Manually” and fill in the IP and subnet mask accordingly.</p>
+
+<p class="notice--primary"><strong>Watch out!</strong> Artisan doesn’t monitor unsafe temperatures, so you should never leave the roaster alone.</p>
+:ET

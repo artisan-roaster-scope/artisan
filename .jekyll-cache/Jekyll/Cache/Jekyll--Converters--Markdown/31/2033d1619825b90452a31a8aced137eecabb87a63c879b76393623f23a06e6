@@ -1,0 +1,11 @@
+I"+<p><img class="tab-image" src="/assets/images/supporter-badge.png" width="150px" /></p>
+
+<ul>
+  <li>
+    <p><strong>Distributor:</strong> <a href="http://novustec.co.kr/" target="_blank">Novustec</a>, South Korea</p>
+  </li>
+  <li><strong>Machines:</strong> T2 and T7</li>
+  <li><strong>Connection:</strong> MODBUS ASCII via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
+  <li><strong>Features:</strong> logging of bean temperature and environmental temperature. The T7 provides additionally the airflow.</li>
+</ul>
+:ET

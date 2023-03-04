@@ -1,0 +1,18 @@
+I"7<p><img class="tab-image" src="/assets/images/supporter-badge.png" width="150px" /></p>
+
+<ul>
+  <li><strong>Producer:</strong> <a href="http://www.atilla.com.br/" target="_blank">Atilla Roasters</a>, Brazil</li>
+  <li><strong>Machine:</strong> all Atilla Gold plus roasters with 7” touch display (2/5/10/15/30 kg)</li>
+  <li><strong>Connection:</strong> MODBUS TCP via the network</li>
+  <li><strong>Features:</strong>
+    <ul>
+      <li>logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves</li>
+      <li>gas pressure (mbar), drum speed, and airflow (only Atilla GOLD plus 7’’ II)</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="setup">Setup</h3>
+
+<p class="notice--primary">The computer running Artisan must be on the same IP network as the Atilla roaster which usually is configured to have IP 192.168.0.20. Configure your computer to use a static IP address in the range 192.168.0.x (but with x different from that of the roaster which usually has 15), so for example 192.168.0.15, and set the subnet mask to 255.255.255.0. This can be done on Windows using the Network Sharing Center by adding a TCP/IPv4 Local Area Connection with those properties. On OS X you set your Ethernet port in the Network Control panel to “IPv4: Manually” and fill in the IP and subnet mask accordingly.</p>
+:ET

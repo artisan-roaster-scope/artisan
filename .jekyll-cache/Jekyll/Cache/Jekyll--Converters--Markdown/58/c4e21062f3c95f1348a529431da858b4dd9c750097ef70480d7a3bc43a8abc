@@ -1,0 +1,26 @@
+I"v<p><img class="tab-image" src="/assets/images/supporter-badge.png" width="150px" /></p>
+
+<ul>
+  <li><strong>Producer:</strong> <a href="https://www.diedrichroasters.com/" target="_blank">Diedrich</a>, USA</li>
+  <li><strong>Machines:</strong> All IR- and CR-series machines equipped with the 4 or 6 Sensor Data Logging option</li>
+  <li><strong>Connection:</strong> USB</li>
+  <li><strong>Features 4 Sensor Data Logging Package:</strong>
+    <ul>
+      <li>logging of bean temperature (BT)</li>
+      <li>logging of drum exhaust</li>
+      <li>logging of total exhaust</li>
+      <li>logging of inlet temperature</li>
+    </ul>
+  </li>
+  <li><strong>Features 6 Sensor Data Logging Package:</strong>
+    <ul>
+      <li>all of the 4 Sensor Data Logging Package</li>
+      <li>logging of fuel percentage (Power 0-100%)</li>
+      <li>logging of air dampener (Roast Air)</li>
+    </ul>
+  </li>
+</ul>
+
+<p class="notice--primary"><strong>Watch out!</strong>
+The datalogging on Diedrich maschines is build around <a href="https://www.phidgets.com/" target="_blank">Phidgets</a>. Ensure you have the latest Phidgets driver v22 for your platform (e.g. <a href="https://www.phidgets.com/docs/OS_-_Windows" target="_blank">Windows</a>, <a href="https://www.phidgets.com/docs/OS_-_macOS" target="_blank">macOS</a> or <a href="https://www.phidgets.com/docs/OS_-_Linux" target="_blank">Linux</a>) installed.</p>
+:ET

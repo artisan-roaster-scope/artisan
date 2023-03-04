@@ -24,7 +24,7 @@ So, if the original curve is this:
 
 ![designer 1](/assets/images/gsg/designer 1.png)
 
-And you import it into Artisan by selecting from the top menu, `Tools` >> ´Designer`. Designer warns you that you'll get something different.  Note on importing - The coffee title is imported into the Designer only when `Roast` >> `Properties`, `Delete roast properties on RESET` is unchecked.  Indeed there is a RESET operation when opening the Designer (with or without importing).
+And you import it into Artisan by selecting from the top menu, `Tools` >> `Designer`. Designer warns you that you'll get something different.  Note on importing - The coffee title is imported into the Designer only when `Roast` >> `Properties`, `Delete roast properties on RESET` is unchecked.  Indeed there is a RESET operation when opening the Designer (with or without importing).
 
 ![designer 2](/assets/images/gsg/designer 2.png)
 

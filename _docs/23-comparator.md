@@ -12,7 +12,7 @@ author_profile: true
 
 Menu: `Tools` >> `Comparator`
 
-The Comparator allows the roaster to compare profiles dynamically while Ranking Reports is static. The Comparator can include between batch protocols as well.   The [Ranking Reports](https://artisan-scope.org/docs/ranking-reports/) function has sortable tables with the key data points of the selected roasts, and a chart of all selected profiles. With the Comparator you can add and remove curves in real time, realign based on a different roasting event such as charge or dry end. The Comparator is most useful to compare curves from roasting similar of identical beans from one crop or mulitple crops. It is not great for comparing a natural Ethiopia to a washed Colombia!
+The Comparator allows the roaster to compare profiles dynamically while Ranking Reports is static. The Comparator can include between batch protocols as well.   The [Ranking Reports](https://artisan-scope.org/docs/ranking-reports/) function has sortable tables with the key data points of the selected roasts, and a chart of all selected profiles. With the Comparator you can add and remove curves in real time, realign based on a different roasting event such as charge or dry end. The Comparator is most useful to compare curves from roasting similar of identical beans from one crop or multiple crops. It is not great for comparing a natural Ethiopia to a washed Colombia!
 
 Artisan includes many useful tools to improve your roasts. [Profile Analyzer](https://artisan-scope.org/docs/analyzer/) is great for analyzing one roast. Viewing a profile against a [Background](https://artisan-scope.org/docs/background/) template is good for comparing two roasts. The Comparator is for analysis of multiple roasts of the same bean.
 

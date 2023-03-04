@@ -1,0 +1,7 @@
+I"»<ul>
+  <li><strong>Producer:</strong> <a href="http://wintopmachinery.com/" target="_blank">Wintop</a>, China</li>
+  <li><strong>Machines:</strong> WB, WK, WS series</li>
+  <li><strong>Connection:</strong> serial via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
+  <li><strong>Features:</strong> logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves</li>
+</ul>
+:ET

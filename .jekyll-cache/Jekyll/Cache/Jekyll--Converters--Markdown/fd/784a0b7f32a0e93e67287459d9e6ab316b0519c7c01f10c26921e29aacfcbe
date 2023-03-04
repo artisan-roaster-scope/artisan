@@ -1,0 +1,12 @@
+I"X<p>The Arduino/TC4 (available on <a href="https://www.tindie.com/products/greencardigan/tc4-arduino-shield-v602/">Tindi</a>)is an interesting option for those that do not worry much about handling electronics without a case. The TC4 is a 4-channel temperature probe shield that can be attached to the standard <a href="http://arduino.cc/">Arduino UNO</a> open-hardware device. There is also an integrated product that combines a variant of the UNO with the TC4 in one package, named TC4C, as well as further variants like the <a href="https://coffee.gerstgrasser.net/">TC4+</a>. Furthermore, the HT Roaster Interface was developed as add on to the TC4/TC4C stack to allow the control of the <a href="http://www.hottopusa.com/">Hottop home roaster</a> via serial commands that can be assigned to sliders or buttons in Artisan (see <a href="http://artisan-roasterscope.blogspot.de/2013/02/controlling-hottop.html">this post</a> for details).</p>
+
+<p>Artisan implements the <a href="https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan/trunk/src/aArtisan/commands.txt">serial protocol</a> of the Arduino TC4/TC4C with PID support.</p>
+
+<ul>
+  <li><a href="https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan/tags/REL-310">aArtisan firmware v3.10</a> from 1.7.2015 by Jim (baudrate: 115200)</li>
+  <li><a href="https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan_PID/branches/aArtisanQ_PID_6">aArtisanQ PID</a> 6 firmware by Brad (<a href="https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan_PID/tags/REL-aArtisanQ_PID_6_2_3/aArtisanQ_PID/Configuration%20Options.pdf">configuration notes</a>, baudrate: 115200)</li>
+</ul>
+
+<p class="notice--primary"><strong>Watch out!</strong> Older TC4 firmware versions operated at the lower 19200 baudrate.</p>
+
+:ET

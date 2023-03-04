@@ -1,0 +1,50 @@
+I"�<p>Artisan supports all variants of the MODBUS protocol.</p>
+
+<ul>
+  <li>MODBUS Serial ASCII</li>
+  <li>MODBUS Serial Binary</li>
+  <li>MODBUS Serial RTU</li>
+  <li>MODBUS TCP</li>
+  <li>MODBUS UDP</li>
+</ul>
+
+<p>It can be configured to read registers via functions 1, 2, 3 and 4 for up to 6 data channels. See the posts <a href="https://artisan-roasterscope.blogspot.it/2013/03/modbus-rtu.html">Modbus RTU</a> and <a href="https://artisan-roasterscope.blogspot.it/2013/05/more-modbus.html">More Modbus</a> for configuration details.</p>
+
+<p>Integer divisions by 10 and 100 as well as the decode of float and BCD encodings are supported. Bytes and words are can be big or little endian ordered.</p>
+
+<p>PID mechanism of external devices can be connected via MODBUS to the Artisan PID controls (see the post on <a href="https://artisan-roasterscope.blogspot.it/2016/11/pid-control.html">PID support</a> for details).</p>
+
+<p>Buttons and sliders can send out <code class="language-plaintext highlighter-rouge">MODBUS Command</code>s via functions 5, 6, 15, 16 and 22. The following commands in the action description are supported.</p>
+
+<p>Note that MODBUS Command actions can be sequenced by separating them with semicolons like in <code class="language-plaintext highlighter-rouge">read(0,10); mwrite(0,20,255,0,_)</code></p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">read(slaveId,register)</code>:<br />
+reads <register> from slave <slaveID> using function 3 (Read Multiple Holding Registers). The result is bound to the placeholder `_` and thus can be used in later commands.</slaveID></register></li>
+  <li><code class="language-plaintext highlighter-rouge">writeSingle([slaveId,register,value],..,[slaveId,register,value])</code>:<br />
+write single register via function 6 (int)</li>
+  <li><code class="language-plaintext highlighter-rouge">writeWord([slaveId,register,value],..,[slaveId,register,value])</code>:<br />
+write register via function 16 (float)</li>
+  <li><code class="language-plaintext highlighter-rouge">write([slaveId,register,value],..,[slaveId,register,value])</code>:<br />
+write register via function 6 (int) or function 16 (float)</li>
+  <li><code class="language-plaintext highlighter-rouge">wcoil(slaveId,register,&lt;bool&gt;)</code>:<br />
+write coil via function 5</li>
+  <li><code class="language-plaintext highlighter-rouge">wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;])</code>:<br />
+write coils via function 15</li>
+  <li><code class="language-plaintext highlighter-rouge">mwrite(slaveId,register,andMask,orMask)</code>:<br />
+mask write register via function 22</li>
+  <li><code class="language-plaintext highlighter-rouge">mwrite(slaveId,register,andMask,orMask,value)</code>:<br />
+fake mask write register which evaluates thes masks on the <code class="language-plaintext highlighter-rouge">value</code> and writes the result using function 6. Together with a previous read to set the temporary variable <code class="language-plaintext highlighter-rouge">_</code> this can be used to simulate a mask write register (function 22) if the PLC does not support it directly.</li>
+  <li><code class="language-plaintext highlighter-rouge">writem(slaveId,register,value)</code> and<br />
+<code class="language-plaintext highlighter-rouge">writem(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])</code>:<br />
+write multiple holding registers via function 16</li>
+  <li><code class="language-plaintext highlighter-rouge">writeBCD([s,r,v],..,[s,r,v])</code>:<br />
+write multiple holding registers BCD encoded via function 16</li>
+  <li><code class="language-plaintext highlighter-rouge">sleep(s)</code> :<br />
+delay processing by <code class="language-plaintext highlighter-rouge">s</code> seconds (float)</li>
+  <li><code class="language-plaintext highlighter-rouge">button(&lt;b&gt;)</code> :<br />
+sets the last button pressed to either “pressed” if <code class="language-plaintext highlighter-rouge">b</code> is <code class="language-plaintext highlighter-rouge">1</code> or <code class="language-plaintext highlighter-rouge">True</code>, and “normal”, otherwise</li>
+</ul>
+
+<p>The placeholders <code class="language-plaintext highlighter-rouge">{BT}</code>, <code class="language-plaintext highlighter-rouge">{ET}</code>, <code class="language-plaintext highlighter-rouge">{time}</code> substituted in MODBUS Command actions by the current bean temperature (BT), environmental temperature (ET) or the time in seconds (float).</p>
+:ET

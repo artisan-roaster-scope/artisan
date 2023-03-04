@@ -1,0 +1,20 @@
+I"T<p><img class="tab-image" src="/assets/images/supporter-badge.png" width="150px" /></p>
+
+<ul>
+  <li><strong>Producer:</strong> <a href="https://www.ozstarmakina.com/" target="_blank">Özstar</a>, Turkey</li>
+  <li><strong>Machines:</strong> all Twino/Ozstar machines with networked PLC</li>
+  <li><strong>Connection:</strong> MODBUS TCP via the network</li>
+  <li><strong>Features:</strong>
+    <ul>
+      <li>logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves</li>
+      <li>logging of mixer tank temperature, humidity, gas pressure, gas pressure (burner), feeding weight</li>
+      <li>control of airflow, drum and steerer motor speeds as well as burner power via sliders</li>
+      <li>activation/deactivation of fan, drum, burner, bean feeder, bean filler, stirrer, cooling motor 1 and 2 as well as the release door via buttons</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="setup">Setup</h3>
+
+<p class="notice--primary">The computer running Artisan must be on the same IP network as the Twino/Ozstar roaster which usually is configured to have IP 192.168.2.180.</p>
+:ET

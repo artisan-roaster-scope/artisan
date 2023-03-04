@@ -1,0 +1,10 @@
+I"*<ul>
+  <li><strong>Producer:</strong> <a href="https://hiveroaster.com/" target="_blank">Hive Roaster</a>, USA</li>
+  <li><strong>Machines:</strong> Hive Roaster with Data Dome</li>
+  <li><strong>Connection:</strong> USB</li>
+  <li><strong>Features:</strong> logging of bean temperature (BT) and related rate-of-rise curve</li>
+</ul>
+
+<p class="notice--primary"><strong>Watch out!</strong>
+The datalogging is build on <a href="https://www.phidgets.com/" target="_blank">Phidgets</a>. Ensure you have the latest Phidgets driver v22 for your platform (e.g. <a href="https://www.phidgets.com/docs/OS_-_Windows" target="_blank">Windows</a>, <a href="https://www.phidgets.com/docs/OS_-_macOS" target="_blank">macOS</a> or <a href="https://www.phidgets.com/docs/OS_-_Linux" target="_blank">Linux</a>) installed.</p>
+:ET

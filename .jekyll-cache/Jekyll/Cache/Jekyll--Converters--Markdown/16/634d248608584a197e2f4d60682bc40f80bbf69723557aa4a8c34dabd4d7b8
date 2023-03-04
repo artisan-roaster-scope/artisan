@@ -1,0 +1,130 @@
+I"�!<p>This Phidget setup centers around the VINT Phidget TMP1101 module that provides up to 4 temperature channels.</p>
+
+<h2 id="parts">Parts</h2>
+
+<p>This set is composed from the following 8 parts.</p>
+
+<ul>
+  <li>1x <a href="https://www.phidgets.com/?tier=3&amp;catid=14&amp;pcid=12&amp;prodid=726" target="_blank">TMP1101 4x Thermocouple VINT Module</a></li>
+  <li>1x <a href="https://www.phidgets.com/?tier=3&amp;catid=2&amp;pcid=1&amp;prodid=643" target="_blank">HUB0000 VINT Hub</a></li>
+  <li>2x <a href="https://www.phidgets.com/?tier=3&amp;catid=14&amp;pcid=12&amp;prodid=729" target="_blank">TMP4106 K-Type Probe Thermocouple 11cm, ø3.2mm</a></li>
+  <li>2x <a href="https://www.phidgets.com/?tier=3&amp;catid=14&amp;pcid=12&amp;prodid=634" target="_blank">HDW4101 M12 Mounting Nut for Probes</a></li>
+  <li>1x <a href="https://www.phidgets.com/?tier=3&amp;catid=28&amp;pcid=24&amp;prodid=187" target="_blank">Mini-USB Cable 120cm 24AWG</a></li>
+  <li>1x <a href="https://www.phidgets.com/?tier=3&amp;catid=30&amp;pcid=26&amp;prodid=153" target="_blank">Phidget VINT Cable 10cm</a></li>
+</ul>
+
+<figure class="full">
+    <a href="/assets/images/Phidgets/VINT-TMP1101-2xTC-set-parts.JPG"><img src="/assets/images/Phidgets/VINT-TMP1101-2xTC-set-parts.JPG" /></a>
+    <figcaption>TMP1101 Set – Parts</figcaption>
+</figure>
+
+<h2 id="hardware-setup">Hardware Setup</h2>
+
+<p>The electronic is simple to wire up.</p>
+
+<ol>
+  <li>Connect the thermocouples to the first two inputs on the screw terminal of the TMP1101 module labeled 0 and 1 as in the picture below. The red wire (positive) goes into the numbered screw (0 or 1) and the black wire (negative) to one of the inputs marked with an arrow to ⏚ (ground).</li>
+  <li>Connect the TMP1101 to the VINT Hub using the Phidget cable.</li>
+  <li>Connect the VINT Hub to your computer with a USB cable</li>
+</ol>
+
+<figure class="half">
+    <a href="/assets/images/Phidgets/VINT-TMP1101-2xTC-set-hardware-setup.JPG"><img src="/assets/images/Phidgets/VINT-TMP1101-2xTC-set-hardware-setup.JPG" /></a>
+    <a href="/assets/images/Phidgets/VINT-TMP1101-2xTC-set-connection.JPG"><img src="/assets/images/Phidgets/VINT-TMP1101-2xTC-set-connection.JPG" /></a>
+    <figcaption>TMP1101 Set – Setup</figcaption>
+</figure>
+
+<h3 id="probe-installation">Probe Installation</h3>
+
+<p>The probe connected to the TMP1101 on input 0 should be installed into the lower part of the drum such that it is fully immerged into the bean mass measuring the <em>bean temperature (BT)</em>.</p>
+
+<p>The probe connected to the TMP1101 on input 1 should be installed in the middle of the drum such that it measures the air temperature above the bean mass to report the <em>environmental temperature (ET)</em>.</p>
+
+<p>Both probes should be installed such that most part of their 11cm shield stays inside the drum without touching the drum paddels. To achieve this, the probes can be bended carefully inside the drum, but not at the tip where the sensor element sits.</p>
+
+<h3 id="hardware-test">Hardware Test</h3>
+
+<p>Test your hardware setup and driver installation using the <a href="https://www.phidgets.com/docs/Phidget_Control_Panel" target="_blank">Phidget Control Panel</a> by following the instructions found in the <a href="https://www.phidgets.com/?tier=3&amp;catid=14&amp;pcid=12&amp;prodid=726" target="_blank">user guide of the TMP1101 module</a>.</p>
+
+<h2 id="software-setup">Software Setup</h2>
+
+<h3 id="phidget-driver-installation">Phidget driver Installation</h3>
+
+<p>Download and install the Phidget driver following the instructions for your platform:</p>
+
+<ul>
+  <li><a href="https://www.phidgets.com/docs/OS_-_Windows" target="_blank">Windows</a></li>
+  <li><a href="https://www.phidgets.com/docs/OS_-_OS_X" target="_blank">macOS</a></li>
+  <li><a href="https://www.phidgets.com/docs/OS_-_Linux" target="_blank">Linux</a></li>
+  <li><a href="https://www.phidgets.com/?view=articles&amp;article=GetStartedPhidgetsRaspberry" target="_blank">RPi</a></li>
+</ul>
+
+<h3 id="artisan-installation">Artisan Installation</h3>
+
+<p>Download and install the <a href="https://github.com/artisan-roaster-scope/artisan/releases/latest" target="_blank">latest Artisan version</a>. Choose the correct installer according your operating system:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">artisan-win-XX.XX.XX.zip</code> (Windows)</li>
+  <li><code class="language-plaintext highlighter-rouge">artisan-mac-XX.XX.XX.dmg</code> (macOS)</li>
+  <li><code class="language-plaintext highlighter-rouge">artisan-linux-XX.XX.XX.rpm</code> (Linux Redhat/CentOS)</li>
+  <li><code class="language-plaintext highlighter-rouge">artisan-linux-XX.XX.XX.deb</code> (Linux Debian/Ubuntu)</li>
+  <li><code class="language-plaintext highlighter-rouge">artisan-linux-XX.XX.XX_raspbian-XX.deb</code>(Raspberry Pi)</li>
+</ul>
+
+<p class="notice--primary"><strong>Watch out!</strong> 
+Artisan for macOS is also available via the Homebrew Cask package manager. See the <a href="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/Installation.md" target="_blank">Artisan installation instructions</a> for further details.</p>
+
+<h3 id="artisan-configuration">Artisan Configuration</h3>
+
+<p>Start Artisan and select the menu</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Config &gt;&gt; Machine &gt;&gt; Phidget &gt;&gt; VINT TMP1101 2xTC
+</code></pre></div></div>
+
+<figure class="half">
+    <a href="/assets/images/Phidgets/machine-setup-2xTC.png"><img src="/assets/images/Phidgets/machine-setup-2xTC.png" /></a>
+    <a href="/assets/images/Phidgets/machine-setup-2xTC-confirmation.png"><img src="/assets/images/Phidgets/machine-setup-2xTC-confirmation.png" /></a>
+    <figcaption>TMP1101 Set – Artisan setup</figcaption>
+</figure>
+
+<p>To test the Artisan setup for the TMP1101 set, just press ON and check if the ET and BT LCDs on the right side of the window report the correct readings.</p>
+
+<p class="notice--primary"><strong>Watch out!</strong> 
+Note that the <a href="https://www.phidgets.com/docs/Phidget_Control_Panel" target="_blank">Phidget Control Panel</a> needs to be closed beforehand to allow Artisan to connect to the Phidget hardware as only one app at a time can communicate with the modules.</p>
+
+<h2 id="extensions">Extensions</h2>
+
+<p>The VINT TMP1101 2xTC set can be easily extended.</p>
+
+<h3 id="two-more-tcs">Two more TCs</h3>
+
+<p>The set uses only 2 of the 4 channels available on the TMP1101. One can easily add 2 additional TCs (k-type or j-type) to read for example the temperature of the exhaust air, an approximation of the drum temperature by placing a TC from the outside close to the drum surface or a TC into the air coming from the cooling bin to document fast enough cooling of the beans.</p>
+
+<p>Hardware setup up for two additional TCs is simple. Just screw them into the left-over ports. For the Artisan configuration you add an extra device channel of type <code class="language-plaintext highlighter-rouge">Phidget TMP1101 4xTC 23</code> via menu</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Config &gt;&gt; Device &gt;&gt; Extra Devices (2nd tab)
+</code></pre></div></div>
+
+<figure class="full">
+    <a href="/assets/images/Phidgets/TMP1101-additional-channels.png"><img src="/assets/images/Phidgets/TMP1101-additional-channels.png" /></a>
+    <figcaption>TMP1101 Set – channel 3 and 4 configuration</figcaption>
+</figure>
+
+<p>If your additional TCs are not of type k you need to switch the TC type of those channels in the Phidgets configuration tab via menu</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Config &gt;&gt; Device &gt;&gt; Phidgets (4th tab), TMP1101 section
+</code></pre></div></div>
+
+<figure class="full">
+    <a href="/assets/images/Phidgets/TMP1101-additional-channels-type-conf.png"><img src="/assets/images/Phidgets/TMP1101-additional-channels-type-conf.png" /></a>
+    <figcaption>TMP1101 Set – configure probe type of channel 3 and 4</figcaption>
+</figure>
+
+<h3 id="ambient-modules">Ambient modules</h3>
+
+<p>The <a href="/phidgets/ambient-extension/">ambient modules</a> can be plugged additional into the Phidget HUB0000 to add ambient temperature, humidity, and barometric pressure data automatically to every roast.</p>
+
+<h3 id="further-devices">Further devices</h3>
+
+<p>You can easily plug additional <a href="/devices/phidgets/">VINT modules supported by Artisan</a> into the free ports of the Phidget HUB0000 or add any other <a href="/devices/">device supported by Artisan</a> like a USB Phidget.</p>
+:ET

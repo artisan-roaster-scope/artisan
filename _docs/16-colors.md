@@ -22,7 +22,7 @@ Also new are enhanced dialogs that display the chosen colors within the dialog. 
 
 ![colors dialog lcd](/assets/images/gsg/colors dialog lcd.png)
 
-You can adjust the Opacity of the graph colors, the statistic summary box, and mask when using the Analyze featture.
+You can adjust the Opacity of the graph colors, the statistic summary box, and mask when using the Analyze feature.
 
 ![opacity](/assets/images/gsg/color opacity.png)
 

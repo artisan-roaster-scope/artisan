@@ -1,0 +1,13 @@
+I"à<ul>
+  <li><strong>Producer:</strong> <a href="http://coffeetool.gr" target="_blank">Coffeetool</a>, Greece</li>
+  <li><strong>Machines:</strong> R500/R3/R5/R15 with networked PLC</li>
+  <li><strong>Connection:</strong> MODBUS TCP via the network</li>
+  <li><strong>Features:</strong>
+    <ul>
+      <li>logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves</li>
+      <li>logging of burner temperature, burner level (0-100%), drum speed (0-100%) and air flow (0-100%)</li>
+      <li>some machines (at least the newer automatic models with Mitsubishi FX5 PLC) also allow the control of the burner level, drum speed and air flow using Artisan sliders and/or button</li>
+    </ul>
+  </li>
+</ul>
+:ET

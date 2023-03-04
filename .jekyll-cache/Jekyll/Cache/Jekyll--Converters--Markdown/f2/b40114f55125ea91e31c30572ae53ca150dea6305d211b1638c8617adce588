@@ -1,0 +1,12 @@
+I"”<p><img class="tab-image" src="/assets/images/supporter-badge.png" width="150px" /></p>
+
+<ul>
+  <li><strong>Producer:</strong> <a href="https://www.ingnapoli.com/" target="_blank">Ing. Napoli &amp; C.</a>, Italy</li>
+  <li><strong>Machines:</strong> Genius K1 and Genius K3</li>
+  <li><strong>Connection:</strong> USB</li>
+  <li><strong>Features:</strong> logging of bean and environmental temperatures</li>
+</ul>
+
+<p class="notice--primary"><strong>Watch out!</strong>
+The datalogging on Tostabar maschines is build around <a href="https://www.phidgets.com/" target="_blank">Phidgets</a>. Ensure you have the latest Phidgets driver v22 for your platform (e.g. <a href="https://www.phidgets.com/docs/OS_-_Windows" target="_blank">Windows</a>, <a href="https://www.phidgets.com/docs/OS_-_macOS" target="_blank">macOS</a> or <a href="https://www.phidgets.com/docs/OS_-_Linux" target="_blank">Linux</a>) installed.</p>
+:ET

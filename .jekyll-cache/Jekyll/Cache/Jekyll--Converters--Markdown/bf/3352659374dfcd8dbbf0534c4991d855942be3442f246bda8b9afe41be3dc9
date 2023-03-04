@@ -1,0 +1,105 @@
+I"Q<h2 id="parts">Parts</h2>
+
+<p>This set is composed from the following 10 parts.</p>
+
+<ul>
+  <li>2x <a href="https://www.phidgets.com/?tier=3&amp;catid=14&amp;pcid=12&amp;prodid=968" target="_blank">TMP1200 RTD Phidget VINT Module</a></li>
+  <li>1x <a href="https://www.phidgets.com/?tier=3&amp;catid=2&amp;pcid=1&amp;prodid=643" target="_blank">HUB0000 VINT Hub</a></li>
+  <li>2x <a href="https://www.phidgets.com/?tier=3&amp;catid=14&amp;pcid=12&amp;prodid=1004" target="_blank">TMP4109 PT1000 4-Wire RTD 11cm, ø3.2mm</a></li>
+  <li>2x <a href="https://www.phidgets.com/?tier=3&amp;catid=14&amp;pcid=12&amp;prodid=634" target="_blank">HDW4101 M12 Mounting Nut for Probes</a></li>
+  <li>1x <a href="https://www.phidgets.com/?tier=3&amp;catid=28&amp;pcid=24&amp;prodid=187" target="_blank">Mini-USB Cable 120cm 24AWG</a></li>
+  <li>2x <a href="https://www.phidgets.com/?tier=3&amp;catid=30&amp;pcid=26&amp;prodid=153" target="_blank">VINT Cable 10cm</a></li>
+</ul>
+
+<figure class="full">
+    <a href="/assets/images/Phidgets/VINT-TMP1200-2xRTD-set-parts.JPG"><img src="/assets/images/Phidgets/VINT-TMP1200-2xRTD-set-parts.JPG" /></a>
+    <figcaption>TMP1200 Set – Parts</figcaption>
+</figure>
+
+<h2 id="hardware-setup">Hardware Setup</h2>
+
+<p>The electronic is simple to wire up.</p>
+
+<ol>
+  <li>Connect the RTDs to the TMP1200 modules as in the picture below. The white wire is - (EXC-/RTD-) and the red wires are + (EXC+/RTD+).</li>
+  <li>Connect the TMP1200 modules to the VINT Hub using the Phidget cables.</li>
+  <li>Connect the VINT Hub to your computer with a USB cable</li>
+</ol>
+
+<figure class="third">
+    <a href="/assets/images/Phidgets/VINT-TMP1200-2xRTD-set-hardware-setup.JPG"><img src="/assets/images/Phidgets/VINT-TMP1200-2xRTD-set-hardware-setup.JPG" /></a>
+    <a href="/assets/images/Phidgets/VINT-TMP1200-2xRTD-set-connection1.JPG"><img src="/assets/images/Phidgets/VINT-TMP1200-2xRTD-set-connection1.JPG" /></a>
+    <a href="/assets/images/Phidgets/VINT-TMP1200-2xRTD-set-connection2.JPG"><img src="/assets/images/Phidgets/VINT-TMP1200-2xRTD-set-connection2.JPG" /></a>
+    <figcaption>TMP1200 Set – Setup</figcaption>
+</figure>
+
+<h3 id="probe-installation">Probe Installation</h3>
+
+<p>One probe should be installed into the lower part of the drum such that it is fully immerged into the bean mass measuring the <em>bean temperature (BT)</em>. The other probe should be installed in the middle of the drum such that it measures the air temperature just above the bean mass to report the <em>environmental temperature (ET)</em>.</p>
+
+<p>Both probes should be installed such that most part of their 11cm shield stays inside the drum without touching the drum paddels. To achieve this, the probes can be bended carefully inside the drum, but not at the tip where the sensor element sits.</p>
+
+<p>Each of the TMP1200 modules have to be connected to a port on the HUB0000. The one connected to the BT probe at a lower port number (e.g. port 0) than the one connected to the ET probe (e.g. port 5).</p>
+
+<h3 id="hardware-test">Hardware Test</h3>
+
+<p>Test your hardware setup and driver installation using the <a href="https://www.phidgets.com/docs/Phidget_Control_Panel" target="_blank">Phidget Control Panel</a> by following the instructions found in the <a href="https://www.phidgets.com/?tier=3&amp;catid=14&amp;pcid=12&amp;prodid=968" target="_blank">user guide of the TMP1200 module</a>.</p>
+
+<h2 id="software-setup">Software Setup</h2>
+
+<h3 id="phidget-driver-installation">Phidget driver Installation</h3>
+
+<p>Download and install the Phidget driver following the instructions for your platform:</p>
+
+<ul>
+  <li><a href="https://www.phidgets.com/docs/OS_-_Windows" target="_blank">Windows</a></li>
+  <li><a href="https://www.phidgets.com/docs/OS_-_OS_X" target="_blank">macOS</a></li>
+  <li><a href="https://www.phidgets.com/docs/OS_-_Linux" target="_blank">Linux</a></li>
+  <li><a href="https://www.phidgets.com/?view=articles&amp;article=GetStartedPhidgetsRaspberry" target="_blank">RPi</a></li>
+</ul>
+
+<h3 id="artisan-installation">Artisan Installation</h3>
+
+<p>Download and install the <a href="https://github.com/artisan-roaster-scope/artisan/releases/latest" target="_blank">latest Artisan version</a>. Choose the correct installer according your operating system:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">artisan-win-XX.XX.XX.zip</code> (Windows)</li>
+  <li><code class="language-plaintext highlighter-rouge">artisan-mac-XX.XX.XX.dmg</code> (macOS)</li>
+  <li><code class="language-plaintext highlighter-rouge">artisan-linux-XX.XX.XX.rpm</code> (Linux Redhat/CentOS)</li>
+  <li><code class="language-plaintext highlighter-rouge">artisan-linux-XX.XX.XX.deb</code> (Linux Debian/Ubuntu)</li>
+  <li><code class="language-plaintext highlighter-rouge">artisan-linux-XX.XX.XX_raspbian-XX.deb</code>(Raspberry Pi)</li>
+</ul>
+
+<p class="notice--primary"><strong>Watch out!</strong> 
+Artisan for macOS is also available via the Homebrew Cask package manager. See the <a href="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/Installation.md" target="_blank">Artisan installation instructions</a> for further details.</p>
+
+<h3 id="artisan-configuration">Artisan Configuration</h3>
+
+<p>Start Artisan and select the menu</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Config &gt;&gt; Machine &gt;&gt; Phidget &gt;&gt; VINT TMP1200 2xRTD
+</code></pre></div></div>
+
+<figure class="half">
+    <a href="/assets/images/Phidgets/machine-setup-2xRTD.png"><img src="/assets/images/Phidgets/machine-setup-2xRTD.png" /></a>
+    <a href="/assets/images/Phidgets/machine-setup-2xRTD-confirmation.png"><img src="/assets/images/Phidgets/machine-setup-2xRTD-confirmation.png" /></a>
+    <figcaption>TMP1200 Set – Artisan setup</figcaption>
+</figure>
+
+<p>To test the Artisan setup for the TMP1200 set, just press ON and check if the ET and BT LCDs on the right side of the window report the correct readings.</p>
+
+<p class="notice--primary"><strong>Watch out!</strong> 
+Note that the <a href="https://www.phidgets.com/docs/Phidget_Control_Panel" target="_blank">Phidget Control Panel</a> needs to be closed beforehand to allow Artisan to connect to the Phidget hardware as only one app at a time can communicate with the modules.</p>
+
+<h2 id="extensions">Extensions</h2>
+
+<p>The VINT TMP1200 2xRTD set can be easily extended.</p>
+
+<h3 id="ambient-modules">Ambient modules</h3>
+
+<p>The <a href="/phidgets/ambient-extension/">ambient modules</a> can be plugged additionally into the Phidget HUB0000 to add ambient temperature, humidity, and barometric pressure data automatically to every roast.</p>
+
+<h3 id="further-devices">Further devices</h3>
+
+<p>You can easily plug additional <a href="/devices/phidgets/">VINT modules supported by Artisan</a> into the free ports of the Phidget HUB0000 or add any other <a href="/devices/">device supported by Artisan</a> like a USB Phidget.</p>
+:ET

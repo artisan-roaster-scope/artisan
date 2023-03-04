@@ -11,7 +11,7 @@ author_profile: true
 
 Menu: `Roast` >> `Properties`
 
-Under the Roast Properties, you can input many parameters for your current batch and you can choose a prior roast profile to run in the background.  What you enter here may end up as part of the Summary dialog box which can be printed for your labels.  There is a tab called Setup which contains basic information including the Organzation Name, Operator Name, Machine Model and Size, Heating Method and Drum Speed.  Fill this out first.  
+Under the Roast Properties, you can input many parameters for your current batch and you can choose a prior roast profile to run in the background.  What you enter here may end up as part of the Summary dialog box which can be printed for your labels.  There is a tab called Setup which contains basic information including the Organization Name, Operator Name, Machine Model and Size, Heating Method and Drum Speed.  Fill this out first.  
 
 
 

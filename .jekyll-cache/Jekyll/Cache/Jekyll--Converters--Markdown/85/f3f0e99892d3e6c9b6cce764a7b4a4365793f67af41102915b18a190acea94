@@ -1,0 +1,12 @@
+I"n<ul>
+  <li><strong>Distributor:</strong> <a href="http://millcityroasters.com/" target="_blank">Mill City Roasters</a>, USA/China</li>
+  <li><strong>Machines:</strong> MCR Series</li>
+  <li><strong>Connection:</strong> MODBUS RTU via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
+  <li><strong>Features:</strong> logging of bean temperature (BT), environmental temperature (ET) and exhaust temperatue as well as gas level, drum speed and air flow.</li>
+</ul>
+
+<p class="notice--primary notice--primary"><strong>Watch out!</strong> Mill City Roasters has never supported the Artisan project like many of the manufacturers here.  For that reason, we are unable to offer support for your specific roaster if it differs from the included one-click machine setups.  Please contact <a href="http://millcityroasters.com/">Mill City Roasters</a> for support if you encounter setup issues.</p>
+
+<p class="notice--primary notice--primary"><strong>Watch out!</strong>
+There are two setups, one for machines configured to report temperature data in Celsius and one for those reporting it in Fahrenheit.</p>
+:ET

@@ -13,7 +13,7 @@ author_profile: true
 
 ## Step 0: Verify that your hardware is supported
 
-Verify that your operating system fulfills the requirements listed under supported [Platforms](https://artisan-scope.org/about/#Platforms).
+Verify that your operating system fulfils the requirements listed under supported [Platforms](https://artisan-scope.org/about/#Platforms).
 
 Verify that your roasting machine and the devices you plan to operate with Artisan are among the [Supported Machines](https://artisan-scope.org/machines/index) or [Supported Devices](https://artisan-scope.org/devices/index).
 

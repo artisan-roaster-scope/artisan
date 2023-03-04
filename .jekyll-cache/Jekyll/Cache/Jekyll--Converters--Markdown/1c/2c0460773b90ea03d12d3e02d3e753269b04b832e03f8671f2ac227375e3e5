@@ -1,0 +1,45 @@
+I"�<p><img class="tab-image" src="/assets/images/supporter-badge.png" width="150px" /></p>
+
+<ul>
+  <li><strong>Producer:</strong> <a href="http://www.probat-shoproaster.com/en/home/" target="_blank">Probat</a>, Germany</li>
+  <li><strong>Machines:</strong>
+    <ul>
+      <li>Probatone Series II 5Kg/12Kg/25Kg with software option
+        <ul>
+          <li>small touch display (Wago PLC)</li>
+          <li>7” touch display (Beckhof PLC)</li>
+        </ul>
+      </li>
+      <li>P Series (<a href="https://www.probat.com/en/products/shoproaster/produkte/roasters/sample-roaster/">Sample Roaster</a>, <a href="https://www.probat.com/en/products/shoproaster/produkte/roasters/p-series-probatino/">1kg/5kg/12kg/25kg</a>)</li>
+    </ul>
+  </li>
+  <li><strong>Connection:</strong> MODBUS TCP or WebSocckets via the network</li>
+  <li><strong>Features:</strong>
+    <ul>
+      <li>logging of environmental temperature (ET), bean temperature (BT), air pressure and related rate-of-rise curves</li>
+      <li>control of burner level, drum- and fan speed</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="notes">Notes</h3>
+
+<ul>
+  <li>ET is not available on machines with the small touch screen and an option for the other machines</li>
+  <li>pressure sensor, drum- and fan speed control are options for the machines with 7” touchpad</li>
+  <li>the 7” setup defines 3 configurations that can be switched via the command key plus a number key.
+    <ul>
+      <li>CMD-1: defines only a slider for burner control</li>
+      <li>CMD-2 (default): adds a second slider for drum speed control</li>
+      <li>CMD-3: adds a third slider for fan speed control</li>
+    </ul>
+  </li>
+  <li>the air pressure LCD &amp; Curve are hidden by default, but can be made visible by ticking the Curve2/LCD2 flags of the first extra device entry (menu <code class="language-plaintext highlighter-rouge">Config</code> » <code class="language-plaintext highlighter-rouge">Device</code>, tab <code class="language-plaintext highlighter-rouge">Extra Devices</code>)</li>
+  <li>you might need to update your Probatones firmware to the lastest version via Probat to enjoy all features</li>
+  <li>version v1.6.1 of Artisan add support for the <a href="https://www.probat.com/en/products/shoproaster/produkte/roasters/probatone-series/" target="_blank">Probat Roaster Middleware</a> and allows to read data from all its supported roasting machines</li>
+</ul>
+
+<p class="notice--primary"><strong>Watch out!</strong> Artisan doesn’t monitor unsafe temperatures, so you should never leave the roaster alone.</p>
+
+<p class="notice--primary"><strong>Watch out!</strong> On network problems with a Probatone II with Wago PLC and small touch panel: The small touch panel of the Wago based machines has the fixed IP address 192.168.2.1. Thus on networks running on 192.168.2.x usually the routers IP address is 192.168.2.1 and thus clashes with that internal displays address. Solution: choose an address range for your network different too 192.168.2.x as advised in the roasters manual.</p>
+:ET

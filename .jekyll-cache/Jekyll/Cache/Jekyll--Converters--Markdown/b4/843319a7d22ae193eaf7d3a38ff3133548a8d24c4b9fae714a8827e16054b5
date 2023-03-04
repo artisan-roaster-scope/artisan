@@ -1,0 +1,10 @@
+I"°<ul>
+  <li><strong>Producer:</strong> <a href="https://hb-roaster.com/" target="_blank">HB-Roaster</a>, Germany</li>
+  <li><strong>Machines:</strong> Standard and Model S HB Roaster variants</li>
+  <li><strong>Connection:</strong> USB</li>
+  <li><strong>Features:</strong> logging of environmental temperature (ET), bean temperature (BT), inlet temperature (IT) and drum temperature (DT) as well as ambient temperature</li>
+</ul>
+
+<p class="notice--primary"><strong>Watch out!</strong>
+The communication via USB requires to install the serial driver <a href="https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers">CP210x VCP from Silicon Labs</a>.</p>
+:ET

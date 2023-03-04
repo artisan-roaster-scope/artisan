@@ -16,7 +16,7 @@ Pick and prefix and directory and choose to include a PDF or not.  You might wan
 
 ![autosave](/assets/images/gsg/autosave configuration.png)
 
-The Autosave function has been greatly enhanced.  You now have the option of saving the .alog file and a .pdf or other file formats to separate directories.  Please read the [Artisan Blog story](https://artisan-roasterscope.blogspot.com/2020/05/autosave-file-naming.html) for details. With the new features, you have a great abiltiy to customize the name of your files using various strings which are documented in under Help in the dialog box.  As you enter the strings, the dialog box returns an example of the file save name.  Some examples from the strings are below.  
+The Autosave function has been greatly enhanced.  You now have the option of saving the .alog file and a .pdf or other file formats to separate directories.  Please read the [Artisan Blog story](https://artisan-roasterscope.blogspot.com/2020/05/autosave-file-naming.html) for details. With the new features, you have a great ability to customize the name of your files using various strings which are documented in under Help in the dialog box.  As you enter the strings, the dialog box returns an example of the file save name.  Some examples from the strings are below.  
 
 ![autosave in 2.4](/assets/images/gsg/Autosave Configuration 2.jpg)
 

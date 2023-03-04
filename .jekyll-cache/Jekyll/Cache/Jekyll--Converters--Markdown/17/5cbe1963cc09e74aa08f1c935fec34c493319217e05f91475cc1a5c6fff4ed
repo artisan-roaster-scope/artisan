@@ -1,0 +1,7 @@
+I"<ul>
+  <li><strong>Producer:</strong> <a href="http://www.froco-coffee.com/" target="_blank">Froco Coffee</a>, Indonesia</li>
+  <li><strong>Machines:</strong> FRA Improved and Advanced machines with Omron PIDs</li>
+  <li><strong>Connection:</strong> MODBUS RTU via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
+  <li><strong>Features:</strong> logging of bean temperature (BT), environmental temperature (ET). The A series logs additionally the inlet temperatue (IT).</li>
+</ul>
+:ET

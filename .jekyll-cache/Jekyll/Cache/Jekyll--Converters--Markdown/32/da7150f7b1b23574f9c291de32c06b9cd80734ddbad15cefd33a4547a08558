@@ -1,0 +1,28 @@
+I"�<h3 id="colors-and-color-themes">Colors and Color Themes</h3>
+
+<p>Menu&gt;Config&gt;Colors</p>
+
+<p>Almost every color used in Artisan can now be configured.  All these colors are saved in themes.  If your foreground and background colors are too similar you will get a message to check them out.</p>
+
+<p>Also new are enhanced dialogs that display the chosen colors within the dialog. See the buttons example on the <a href="https://artisan-scope.org/docs/events/">events</a> page.</p>
+
+<p><img src="/assets/images/gsg/colors dialog curves.png" alt="colors dialog curves" /></p>
+
+<p><img src="/assets/images/gsg/colors dialog graph.png" alt="colors dialog graph" /></p>
+
+<p><img src="/assets/images/gsg/colors dialog lcd.png" alt="colors dialog lcd" /></p>
+
+<p>You can adjust the Opacity of the graph colors, the statistic summary box, and mask when using the Analyze featture.</p>
+
+<p><img src="/assets/images/gsg/color opacity.png" alt="opacity" /></p>
+
+<h3 id="background-image-on-your-graph">Background Image on your Graph</h3>
+<p>Artisan v2.1 allows you to show an image in the background of your profiles. This can be any image you choose.  It could be a logo, a picture of your roaster or anything you choose.</p>
+
+<p>To set a background image follow the menu Config&gt;Curves&gt;UI. Click on the “Load” button to choose an image file.  Then set the opacity level from 0 to 10, where 0 it totally transparent and 10 is totally opaque.  The default setting is 2.0.  Choosing “Hide Image During Roasting” will hide the image whenever Artisan is recording.  Use this option if you want to reduce visual clutter in the graph while you are roasting.  See the <a href="https://artisan-roasterscope.blogspot.com/2019/11/background-images.html">Artisan Blog</a> for some tips on using Background Images.</p>
+
+<p><img src="/assets/images/gsg/curves ui.png" alt="curves ui background" /></p>
+
+<p><img src="/assets/images/gsg/background image example.png" alt="background image example" /></p>
+
+:ET

@@ -1,0 +1,28 @@
+I"Ï<p>Phidgets modules offer reliable measuring for roast logging with Artisan. In general Phidgets are plug-and-play, providing high-resolution data at high-speed.</p>
+
+<p>We describe here two basic setups that to our experience perform best. One setup is based on thermocouples (TCs) and a second, low-noise one, based on Resistive Thermal Devices (RTDs). For a technical discussion on the differences see <em><a href="https://artisan-roasterscope.blogspot.com/2019/03/on-idle-noise.html" target="_blank">On Idle Noise</a></em>. An additional set of modules can be added to either of these two setups, providing ambient data (humidity, barometric pressure and room temperature).</p>
+
+<ul>
+  <li><a href="/phidgets/2x-tc-set/">VINT TMP1101 2x TC Set</a></li>
+  <li><a href="/phidgets/2x-rtd-set/">VINT TMP1200 2x RTD Set</a> (low-noise)</li>
+  <li>Extension: <a href="/phidgets/ambient-extension/">VINT Ambient Modules</a></li>
+</ul>
+
+<p>All sets are based on modern <a href="https://www.phidgets.com/docs/What_is_VINT%3F">VINT</a> modules as those provide additional flexibility, increased signal stability and generally consume less power from your USB port, in contrast to the direct-to-USB Phidgets (like the popular Phidget 1048 <em>databridge</em>)</p>
+
+<p>Installation is simple!</p>
+
+<ol>
+  <li>Install the probes into the roasting machine</li>
+  <li>Connect the probes to the Phidget module</li>
+  <li>Connect the Phidget modules and wire them via USB to your PC</li>
+  <li>Install the Phidget driver and Artisan</li>
+  <li>Configure Artisan with one click</li>
+</ol>
+
+<p>Note that the sets use probes with a diameter of Ã¸3.2mm which are considered slow by some. In the post linked above we argue that thinner probes have a worse signal-to-noise ratio, break regularly, and their speed advantage does not matter for the application in coffee roasting.</p>
+
+<p class="notice--primary"><strong>Watch out!</strong> 
+The hardware parts of each set are available from <a href="https://www.phidgets.com/" target="_blank">Phidgets.com</a>, one of their <a href="https://www.phidgets.com/docs/Dealers" target="_blank">resellers</a> or as a compiled ready-to-use package from the <a href="https://shop.artisan.plus/" target="_blank">Artisan shop</a>.</p>
+
+:ET

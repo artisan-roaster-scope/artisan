@@ -1,0 +1,7 @@
+I"<ul>
+  <li><strong>Distributor:</strong> <a href="https://norcofeeroaster.com/" target="_blank">NOR Coffee Roaster</a>, Indonesia</li>
+  <li><strong>Machines:</strong> N1000i, N2000i, N3000i, N5000i, and N3 PRIME machines with Autonics TX4S PIDs or Arduino TC4 module</li>
+  <li><strong>Connection:</strong> MODBUS RTU via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
+  <li><strong>Features:</strong> logging of bean temperature (BT) and environmental temperature (ET)</li>
+</ul>
+:ET
