@@ -67,7 +67,7 @@ def openport(p):
 
 def closeport(p):
     try:
-        if p == None and p.isOpen():
+        if p is None and p.isOpen():
             p.close()
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
@@ -245,7 +245,7 @@ def releaseHottopControl():
 # main_fan : 0-100 (will be converted from the internal int(0-10))
 # solenoid : bool
 def getHottop():
-    if xBT != None and xET != None and xHEATER != None and xMAIN_FAN != None:
+    if xBT is not None and xET is not None and xHEATER is not None and xMAIN_FAN is not None:
         return xBT.value, xET.value, xHEATER.value, xMAIN_FAN.value * 10
     return -1, -1, 0, 0
 
@@ -256,17 +256,17 @@ def getHottop():
 # all parameters are optional and default to None (meanging: don't change value)
 def setHottop(heater=None,fan=None,main_fan=None,solenoid=None,drum_motor=None,cooling_motor=None):
     if xCONTROL and xCONTROL.value:
-        if heater != None:
+        if heater is not None:
             xSET_HEATER.value = int(heater)
-        if fan != None:
+        if fan is not None:
             xSET_FAN.value = int(round(fan / 10.))
-        if main_fan != None:
+        if main_fan is not None:
             xSET_MAIN_FAN.value = int(round(main_fan / 10.))
-        if solenoid != None:
+        if solenoid is not None:
             xSET_SOLENOID.value = int(solenoid)
-        if drum_motor != None:
+        if drum_motor is not None:
             xSET_DRUM_MOTOR.value = int(drum_motor)
-        if cooling_motor != None:
+        if cooling_motor is not None:
             xSET_COOLING_MOTOR.value = int(cooling_motor)
 
 

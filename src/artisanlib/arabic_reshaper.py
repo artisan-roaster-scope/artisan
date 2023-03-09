@@ -218,12 +218,12 @@ class DecomposedWord(): # pylint: disable=too-few-public-methods
                 self.stripped_regular_letters.append(c)
 
     def reconstruct_word(self, reshaped_word):
-        l = list('\x00' * (len(self.stripped_harakat) + len(reshaped_word)))
+        ll = list('\x00' * (len(self.stripped_harakat) + len(reshaped_word)))
         for i in range(len(self.letters_position)):
-            l[self.letters_position[i]] = reshaped_word[i]
+            ll[self.letters_position[i]] = reshaped_word[i]
         for i in range(len(self.harakat_positions)):
-            l[self.harakat_positions[i]] = self.stripped_harakat[i]
-        return ''.join(l)
+            ll[self.harakat_positions[i]] = self.stripped_harakat[i]
+        return ''.join(ll)
 
 def get_reshaped_word(unshaped_word):
     unshaped_word = replace_jalalah(unshaped_word)

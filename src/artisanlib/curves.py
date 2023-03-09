@@ -41,12 +41,12 @@ try:
                                  QTableWidget, QTableWidgetItem, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication, QRegularExpression) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QTableWidget, QTableWidgetItem, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication, QRegularExpression) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QTableWidgetItem, QFrame) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final = logging.getLogger(__name__)
@@ -1647,9 +1647,9 @@ class CurvesDlg(ArtisanDialog):
             error = ''
             for i in range(len(incompatiblevars)):
                 if incompatiblevars[i] in EQU[0]:
-                    error = 'P1: \n-%s\n\n[%s]'%(incompatiblevars[i],EQU[0])
+                    error = f'P1: \n-{incompatiblevars[i]}\n\n[{EQU[0]}]'
                 elif incompatiblevars[i] in EQU[1]:
-                    error = 'P2: \n%-s\n\n[%s]'%(incompatiblevars[i],EQU[1])
+                    error = f'P2: \n-{incompatiblevars[i]}\n\n[{EQU[1]}]'
 
             if error:
                 string = QApplication.translate('Message','Incompatible variables found in %s'%error)
@@ -1687,7 +1687,7 @@ class CurvesDlg(ArtisanDialog):
                 # redraw
                 self.aw.qmc.redraw(recomputeAllDeltas=False)
 
-                self.aw.sendmessage(QApplication.translate('Message','New Extra Device: virtual: y1(x) =[%s]; y2(x)=[%s]'%(EQU[0],EQU[1])))
+                self.aw.sendmessage(QApplication.translate('Message','New Extra Device: virtual: y1(x) =[%s]; y2(x)=[%s]'%(EQU[0],EQU[1]))) # noqa: UP031
 
         self.aw.calcVirtualdevices()
         self.update_equbuttons()
@@ -2027,7 +2027,7 @@ class CurvesDlg(ArtisanDialog):
         return events
 
     def doPolyfit(self):
-        l = min(len(self.aw.qmc.timex),len(self.curves[self.c1ComboBox.currentIndex()]),len(self.curves[self.c2ComboBox.currentIndex()]))
+        ll = min(len(self.aw.qmc.timex),len(self.curves[self.c1ComboBox.currentIndex()]),len(self.curves[self.c2ComboBox.currentIndex()]))
         starttime = stringtoseconds(str(self.startEdit.text()))
         endtime = stringtoseconds(str(self.endEdit.text()))
         if starttime == -1 or endtime == -1:
@@ -2043,7 +2043,7 @@ class CurvesDlg(ArtisanDialog):
         else:
             start = 0
         startindex = self.aw.qmc.time2index(starttime + start)
-        endindex = min(l,self.aw.qmc.time2index(endtime + start))
+        endindex = min(ll,self.aw.qmc.time2index(endtime + start))
         c1 = self.curves[self.c1ComboBox.currentIndex()]
         c2 = self.curves[self.c2ComboBox.currentIndex()]
         z = self.aw.qmc.polyfit(c1,c2,
@@ -2053,7 +2053,7 @@ class CurvesDlg(ArtisanDialog):
             for e in z:
                 if numpy.isnan(e):
                     res = False
-                    return False
+                    break
         if res and z is not None:
             s = self.aw.fit2str(z)
             self.result.setText(s)

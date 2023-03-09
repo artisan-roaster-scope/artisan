@@ -26,11 +26,10 @@ try:
     from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QSemaphore  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib import __version__
-from typing import Any, Optional, Dict  #for Python >= 3.9: can remove 'Dict' since type hints can now use the generic 'dict'
-from typing import Final
+from typing import Any, Optional, Dict, Final  #for Python >= 3.9: can remove 'Dict' since type hints can now use the generic 'dict'
 
 import datetime
 import gzip
@@ -74,11 +73,12 @@ def getNickname() -> Optional[str]:
             token_semaphore.release(1)
 
 
-def setToken(token: str, nickname: str = None) -> None:
+def setToken(token: str, nickname: Optional[str] = None) -> None:
     try:
         token_semaphore.acquire(1)
         config.token = token
         config.nickname = nickname
+        assert config.app_window is not None
         if (
             config.app_window.qmc.operator is None
             or config.app_window.qmc.operator == ''
@@ -121,7 +121,8 @@ def clearCredentials(remove_from_keychain: bool = True) -> None:
     try:
         token_semaphore.acquire(1)
         config.token = None
-        config.app_window.plus_account = None
+        if config.app_window is not None:
+            config.app_window.plus_account = None
         config.passwd = None
         config.nickname = None
         config.account_nr = None
@@ -317,6 +318,7 @@ def authentify() -> bool:
 
 def getHeaders(
     authorized: bool = True, decompress: bool = True) -> Dict[str, str]:  #for Python >= 3.9 can replace 'Dict' with the generic type hint 'dict'
+    assert config.app_window is not None
     os, os_version, os_arch = config.app_window.get_os()  # @UndefinedVariable
     headers = {
         'user-agent': f'Artisan/{__version__} ({os}; {os_version}; {os_arch})'

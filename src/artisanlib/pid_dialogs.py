@@ -34,12 +34,12 @@ try:
         QTimeEdit, QLayout, QSizePolicy, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QIntValidator, QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-        QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QButtonGroup, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QTimeEdit, QLayout, QSizePolicy, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QIntValidator, QRegularExpressionValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QButtonGroup, QDoubleSpinBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QTimeEdit, QLayout, QSizePolicy, QHeaderView) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final = logging.getLogger(__name__)
@@ -3917,7 +3917,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
     @pyqtSlot(bool)
     def setsegment(self,_):
         i = self.aw.findWidgetsRow(self.segmenttable,self.sender(),3)
-        if i != None:
+        if i is not None:
             idn = i+1
             svedit =  self.segmenttable.cellWidget(i,0)
             rampedit = self.segmenttable.cellWidget(i,1)

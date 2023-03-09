@@ -15,18 +15,19 @@
 # AUTHOR
 # Rui Paulo, 2019
 
-import time, random
+import time
+import random
 from struct import unpack
 from multiprocessing import Pipe
 import threading
 from platform import system
-import usb.core
-import usb.util
+import usb.core # type: ignore
+import usb.util # type: ignore
 
 import requests
-from requests_file import FileAdapter  # @UnresolvedImport
+from requests_file import FileAdapter # type: ignore # @UnresolvedImport
 import json
-from lxml import html
+from lxml import html # type: ignore
 
 import logging
 from typing import Final
@@ -36,7 +37,7 @@ try:
     from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:  # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
 
@@ -104,7 +105,7 @@ class AillioR1:
             self.__close()
 
     def __dbg(self, msg):
-        if self.AILLIO_DEBUG and self.simulated != True:
+        if self.AILLIO_DEBUG and not self.simulated:
             try:
                 print('AillioR1: ' + msg)
             except OSError:
@@ -603,12 +604,12 @@ def extractProfileBulletDict(data,aw):
             res['extramarkersizes2'] = [6.0]
             res['extramarkers1'] = [None]
             res['extramarkers2'] = [None]
-            res['extralinewidths1'] = [1.0]
-            res['extralinewidths2'] = [1.0]
-            res['extralinestyles1'] = ['-']
-            res['extralinestyles2'] = ['-']
-            res['extradrawstyles1'] = ['default']
-            res['extradrawstyles2'] = ['default']
+            res['extralinewidths1'] = [aw.qmc.extra_linewidth_default]
+            res['extralinewidths2'] = [aw.qmc.extra_linewidth_default]
+            res['extralinestyles1'] = [aw.qmc.linestyle_default]
+            res['extralinestyles2'] = [aw.qmc.linestyle_default]
+            res['extradrawstyles1'] = [aw.qmc.drawstyle_default]
+            res['extradrawstyles2'] = [aw.qmc.drawstyle_default]
 
         return res
     except Exception as e: # pylint: disable=broad-except
@@ -624,7 +625,7 @@ def extractProfileRoastWorld(url,aw):
     data = data[0].split('gon.profile=')
     data = data[1].split(';')
     res = extractProfileBulletDict(json.loads(data[0]),aw)
-    if not 'beans' in res:
+    if 'beans' not in res:
         try:
             b = tree.xpath("//div[*='Bean']/*/a/text()")
             if b:

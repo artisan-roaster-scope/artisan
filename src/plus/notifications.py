@@ -23,9 +23,9 @@
 try:
     #ylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
+except Exception: # type: ignore # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QSemaphore, QTimer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from typing import Final
 

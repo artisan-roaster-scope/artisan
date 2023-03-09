@@ -27,7 +27,7 @@ try:
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 class wsport():
     def __init__(self,aw):
@@ -204,7 +204,7 @@ class wsport():
             self.aw.addserial('wsport onPong()')
 
     def create(self):
-        import websocket
+        import websocket # type: ignore
         # initialize readings
         self.readings = [-1]*self.channels
         while self.active:
@@ -248,7 +248,7 @@ class wsport():
         return True
 
     def is_connected(self):
-        return self.ws != None and self.ws.sock
+        return self.ws is not None and self.ws.sock
 
     def disconnect(self):
         if self.is_connected():

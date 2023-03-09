@@ -52,16 +52,16 @@ try:
     from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView,  # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QToolButton) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     try:
-        from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
+        from PyQt5 import sip # type: ignore # @Reimport @UnresolvedImport @UnusedImport
     except Exception: # pylint: disable=broad-except
-        import sip  # @Reimport @UnresolvedImport @UnusedImport
+        import sip  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
 
 ########################################################################################
@@ -655,6 +655,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     def __init__(self, parent = None, aw = None, activeTab = 0):
         super().__init__(parent, aw)
+
         self.setModal(True)
 #        self.setWindowModality(Qt.WindowModality.WindowModal)
 #        self.setWindowModality(Qt.WindowModality.ApplicationModal)
@@ -945,10 +946,10 @@ class editGraphDlg(ArtisanResizeablDialog):
                 'QComboBox {font-weight: bold; background-color: ' + backgroundcolor + '; color: ' + color + ';} QComboBox QAbstractItemView {font-weight: normal;}')
         else:
             color = ''
-            if self.aw.qmc.palette['title'] != None and self.aw.qmc.palette['title'] != 'None':
+            if self.aw.qmc.palette['title'] is not None and self.aw.qmc.palette['title'] != 'None':
                 color = ' color: ' + QColor(self.aw.qmc.palette['title']).name() + ';'
             backgroundcolor = ''
-            if self.aw.qmc.palette['canvas'] != None and self.aw.qmc.palette['canvas'] != 'None':
+            if self.aw.qmc.palette['canvas'] is not None and self.aw.qmc.palette['canvas'] != 'None':
                 backgroundcolor = ' background-color: ' + QColor(self.aw.qmc.palette['canvas']).name() + ';'
             self.titleedit.setStyleSheet(
                 'QComboBox {font-weight: bold;' + color + backgroundcolor + '} QComboBox QAbstractItemView {font-weight: normal;}')
@@ -1951,10 +1952,10 @@ class editGraphDlg(ArtisanResizeablDialog):
                 line = f'<a href="{plus.util.coffeeLink(self.plus_coffee_selected)}"{dark_mode_link_color}>{self.plus_coffee_selected_label}</a>'
             elif self.plus_blend_selected_spec and self.plus_blend_selected_spec_labels:
                 # limit to max 4 component links
-                for i,l in sorted(zip(self.plus_blend_selected_spec['ingredients'],self.plus_blend_selected_spec_labels), key=lambda tup:tup[0]['ratio'],reverse = True)[:4]:
+                for i, ll in sorted(zip(self.plus_blend_selected_spec['ingredients'],self.plus_blend_selected_spec_labels), key=lambda tup:tup[0]['ratio'],reverse = True)[:4]:
                     if line:
                         line = line + ', '
-                    c = '<a href="{0}"{2}>{1}</a>'.format(plus.util.coffeeLink(i['coffee']),abbrevString(l,18),dark_mode_link_color)
+                    c = '<a href="{}"{}>{}</a>'.format(plus.util.coffeeLink(i['coffee']),dark_mode_link_color,abbrevString(ll, 18))
                     line = line + str(int(round(i['ratio']*100))) + '% ' + c
             if line and len(line)>0 and self.plus_store_selected is not None and self.plus_store_selected_label is not None:
                 line = line + f'  (<a href="{plus.util.storeLink(self.plus_store_selected)}"{dark_mode_link_color}>{self.plus_store_selected_label}</a>)'
@@ -2191,8 +2192,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         weight_unit_idx = self.unitsComboBox.currentIndex()
         blend_lines = plus.stock.blend2beans(blend,weight_unit_idx,weightIn)
         self.beansedit.clear()
-        for l in blend_lines:
-            self.beansedit.append(l)
+        for ll in blend_lines:
+            self.beansedit.append(ll)
 
     def fillBlendData(self,blend,prev_coffee_label,prev_blend_label):
         try:
@@ -4465,7 +4466,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         specialeventsStrings = []
         specialeventsvalue = []
         for r in range(len(self.aw.qmc.specialevents)):
-            if not (r in rows):
+            if r not in rows:
                 specialevents.append(self.aw.qmc.specialevents[r])
                 specialeventstype.append(self.aw.qmc.specialeventstype[r])
                 specialeventsStrings.append(self.aw.qmc.specialeventsStrings[r])

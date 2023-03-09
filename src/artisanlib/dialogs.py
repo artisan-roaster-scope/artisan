@@ -25,10 +25,10 @@ try:
     from PyQt6.QtGui import QKeySequence, QAction  # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import Qt, QSettings, pyqtSlot  # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit,  # @UnusedImport @Reimport  @UnresolvedImport
-                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit)  # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QKeySequence  # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, QSettings, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QKeySequence # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.widgets import MyQComboBox
 

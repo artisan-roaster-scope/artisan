@@ -42,11 +42,11 @@ try:
         QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl,  # @UnusedImport @Reimport  @UnresolvedImport
-        QCoreApplication, QFileInfo, QDate, QTime, QDateTime) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import (QColor, QDesktopServices) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton,  # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QCoreApplication, QFileInfo, QDate, QTime, QDateTime) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import (QColor, QDesktopServices) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final = logging.getLogger(__name__)
@@ -249,7 +249,7 @@ class RoastProfile():
             w = profile['weight'][0]
             if decodeLocal(profile['weight'][2]) != 'g':
                 w = self.aw.float2float(w,1)
-            self.metadata['weight'] = '%g%s'%(w,decodeLocal(profile['weight'][2]))
+            self.metadata['weight'] = str(w).rstrip('0').rstrip('.') + decodeLocal(profile['weight'][2])
         if 'moisture_greens' in profile and profile['moisture_greens'] != 0.0:
             self.metadata['moisture_greens'] = profile['moisture_greens']
         if 'ambientTemp' in profile:
@@ -443,11 +443,11 @@ class RoastProfile():
     def updateVisibilities(self):
         visibilities = self.curve_visibilities
         profile_visible = self.visible and self.aligned
-        for i,l in enumerate([self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2]):
-            l.set_visible(profile_visible and visibilities[i])
+        for i, ll in enumerate([self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2]):
+            ll.set_visible(profile_visible and visibilities[i])
         #
-        for i,l in enumerate([self.l_events1,self.l_events2,self.l_events3,self.l_events4]):
-            l.set_visible(profile_visible and i+1 == self.event_visibility)
+        for i, ll in enumerate([self.l_events1,self.l_events2,self.l_events3,self.l_events4]):
+            ll.set_visible(profile_visible and i+1 == self.event_visibility)
         #
         self.l_mainEvents1.set_visible(False)
         self.l_mainEvents2.set_visible(False)
@@ -478,12 +478,12 @@ class RoastProfile():
         if self.aw.qmc.swapdeltalcds:
             lines[4] = self.l_delta1
             lines[5] = self.l_delta2
-        for i,l in enumerate(lines):
-            if l is not None:
-                l.set_zorder(self.zorder + self.zorder_offsets[i])
-        for l in [self.l_events1,self.l_events2,self.l_events3,self.l_events4]:
-            if l is not None:
-                l.set_zorder(self.zorder + self.zorder_offsets[6])
+        for i, ll in enumerate(lines):
+            if ll is not None:
+                ll.set_zorder(self.zorder + self.zorder_offsets[i])
+        for ll in [self.l_events1,self.l_events2,self.l_events3,self.l_events4]:
+            if ll is not None:
+                ll.set_zorder(self.zorder + self.zorder_offsets[6])
 
     # swap alpha values based on self.aw.qmc.swaplcds and self.aw.qmc.swapdeltalcds settings
     def updateAlpha(self):
@@ -494,38 +494,38 @@ class RoastProfile():
         if self.aw.qmc.swapdeltalcds:
             alpha[2] = self.alpha[3]
             alpha[3] = self.alpha[2]
-        for l,a in zip(
+        for ll, a in zip(
             [self.l_mainEvents2,self.l_temp2,self.l_mainEvents1,self.l_temp1,self.l_delta2,self.l_delta1,self.l_events1,self.l_events2,self.l_events3,self.l_events4],
             [alpha[0],alpha[0],alpha[1],alpha[1],alpha[2],alpha[3],alpha[4],alpha[4],alpha[4],alpha[4]]):
-            if l is not None:
-                l.set_alpha(a if self.active else a*self.alpha_dim_factor)
+            if ll is not None:
+                ll.set_alpha(a if self.active else a*self.alpha_dim_factor)
 
     def setActive(self,b):
         self.active = b
         self.updateAlpha()
-        for l in [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2,self.l_mainEvents1,self.l_mainEvents2,self.l_events1,self.l_events2,self.l_events3,self.l_events4]:
-            if l is not None:
+        for ll in [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2,self.l_mainEvents1,self.l_mainEvents2,self.l_events1,self.l_events2,self.l_events3,self.l_events4]:
+            if ll is not None:
                 if self.active:
-                    l.set_color(self.color)
+                    ll.set_color(self.color)
                 else:
-                    l.set_color(self.gray)
+                    ll.set_color(self.gray)
 
     def setTimeoffset(self,offset):
         self.timeoffset = offset
         tempTrans = self.getTempTrans()
-        for l in [
+        for ll in [
             # shifting the temperature curves does not work for some curves that hold many points resulting some at the end being not displayed
             # thus we update the xdata explicitly below
             #self.l_temp1,self.l_temp2,
             self.l_mainEvents1,self.l_mainEvents2,self.l_events1,self.l_events2,self.l_events3,self.l_events4]:
-            if l is not None:
-                l.set_transform(tempTrans)
+            if ll is not None:
+                ll.set_transform(tempTrans)
 
         tempTransZero = self.getTempTrans(0)
-        for l in [self.l_temp1,self.l_temp2]:
-            if l is not None:
-                l.set_transform(tempTransZero) # we reset the transformation to avoid a double shift along the timeaxis
-                l.set_xdata([x-offset if x is not None else None for x in self.timex])
+        for ll in [self.l_temp1,self.l_temp2]:
+            if ll is not None:
+                ll.set_transform(tempTransZero) # we reset the transformation to avoid a double shift along the timeaxis
+                ll.set_xdata([x-offset if x is not None else None for x in self.timex])
 
 
         # shifting the delta curves does not work for some curves that hold many points resulting some at the end being not displayed
@@ -535,10 +535,10 @@ class RoastProfile():
 #            if l is not None:
 #                l.set_transform(deltaTrans)
         deltaTransZero = self.getDeltaTrans(offset=0)
-        for l in [self.l_delta1,self.l_delta2]:
-            if l is not None:
-                l.set_transform(deltaTransZero) # we reset the transformation to avoid a double shift along the timeaxis
-                l.set_xdata([x-offset if x is not None else None for x in self.timex])
+        for ll in [self.l_delta1,self.l_delta2]:
+            if ll is not None:
+                ll.set_transform(deltaTransZero) # we reset the transformation to avoid a double shift along the timeaxis
+                ll.set_xdata([x-offset if x is not None else None for x in self.timex])
 
 #        # update RoR clippings
 #        self.l_delta1_clipping.set_transform(self.getDeltaTrans())
@@ -563,10 +563,10 @@ class RoastProfile():
         return transforms.Affine2D().translate(-offset,0) + self.aw.qmc.delta_ax.transData # pylint: disable=invalid-unary-operand-type
 
     def undraw(self):
-        for l in [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2,self.l_mainEvents1,self.l_mainEvents2,
+        for ll in [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2,self.l_mainEvents1,self.l_mainEvents2,
                 self.l_events1,self.l_events2,self.l_events3,self.l_events4]:
             try:
-                l.remove()
+                ll.remove()
             except Exception: # pylint: disable=broad-except
                 pass
         self.l_temp1 = None
@@ -789,7 +789,7 @@ class roastCompareDlg(ArtisanDialog):
         self.alignComboBox = MyQComboBox()
         self.alignComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.alignComboBox.addItems(self.alignnames)
-        if self.aw.qmc.compareRoast == False and self.aw.qmc.compareBBP == True:
+        if not self.aw.qmc.compareRoast and self.aw.qmc.compareBBP:
             self.aw.qmc.compareAlignEvent = 0
             self.alignComboBox.setCurrentIndex(0)
             self.alignComboBox.setEnabled(False)
@@ -1126,9 +1126,9 @@ class roastCompareDlg(ArtisanDialog):
                         lines = [p.l_temp1,p.l_temp2,p.l_delta1,p.l_delta2,p.l_events1,p.l_events2,p.l_events3,p.l_events4]
                     else:
                         lines = [p.l_temp2,p.l_temp1,p.l_delta2,p.l_delta1,p.l_events1,p.l_events2,p.l_events3,p.l_events4]
-                    for l in lines:
-                        if l.get_visible():
-                            handles.append(l)
+                    for ll in lines:
+                        if ll.get_visible():
+                            handles.append(ll)
                             labels.append(p.label)
                             break
             if len(handles) > 0:
@@ -1420,7 +1420,7 @@ class roastCompareDlg(ArtisanDialog):
         selected = [self.aw.findWidgetsRow(self.profileTable,si,2) for si in self.profileTable.selectedItems()]
 #        selected = self.profileTable.getselectedRowsFast() # does return [1],[2],[1],.. on repeated clicks on the row header of the first entry insteadd of [1],[0],[1],..
         for i,p in enumerate(self.profiles):
-            if selected and not i in selected:
+            if selected and i not in selected:
                 p.setActive(False)
             else:
                 p.setActive(True)

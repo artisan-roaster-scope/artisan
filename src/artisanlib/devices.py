@@ -39,12 +39,12 @@ try:
                                  QTableWidget, QMessageBox, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import (QStandardItem, QColor) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QRadioButton, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QTableWidget, QMessageBox, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import (QStandardItem, QColor) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QRadioButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QMessageBox, QHeaderView) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 class DeviceAssignmentDlg(ArtisanResizeablDialog):
@@ -1461,12 +1461,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         color1Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                         color1Button.clicked.connect(self.setextracolor1)
                         textcolor = self.aw.labelBorW(self.aw.qmc.extradevicecolor1[i])
-                        color1Button.setStyleSheet('background-color: %s; color: %s'%(self.aw.qmc.extradevicecolor1[i], textcolor))
+                        color1Button.setStyleSheet(f'background-color: {self.aw.qmc.extradevicecolor1[i]}; color: {textcolor}')
                         color2Button = QPushButton(self.aw.qmc.extradevicecolor2[i])
                         color2Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                         color2Button.clicked.connect(self.setextracolor2)
                         textcolor = self.aw.labelBorW(self.aw.qmc.extradevicecolor2[i])
-                        color2Button.setStyleSheet('background-color: %s; color: %s'%(self.aw.qmc.extradevicecolor2[i], textcolor))
+                        color2Button.setStyleSheet(f'background-color: {self.aw.qmc.extradevicecolor2[i]}; color: {textcolor}')
                         name1edit = QLineEdit(self.aw.qmc.extraname1[i])
                         name2edit = QLineEdit(self.aw.qmc.extraname2[i])
                         mexpr1edit = QLineEdit(self.aw.qmc.extramathexpression1[i])
@@ -1950,10 +1950,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if r is not None:
             self.setextracolor(2,r)
 
-    def setextracolor(self,l,i):
+    def setextracolor(self,ll,i):
         try:
             #line 1
-            if l == 1:
+            if ll == 1:
                 # use native no buttons dialog on Mac OS X, blocks otherwise
                 colorf = self.aw.colordialog(QColor(self.aw.qmc.extradevicecolor1[i]),True,self)
                 if colorf.isValid():
@@ -1961,12 +1961,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.qmc.extradevicecolor1[i] = colorname
                     # set LCD label color
                     self.aw.setLabelColor(self.aw.extraLCDlabel1[i],QColor(colorname))
-                    self.devicetable.cellWidget(i,1).setStyleSheet('background-color: %s; color: %s'%(self.aw.qmc.extradevicecolor1[i], self.aw.labelBorW(self.aw.qmc.extradevicecolor1[i])))
+                    self.devicetable.cellWidget(i,1).setStyleSheet(f'background-color: {self.aw.qmc.extradevicecolor1[i]}; color: { self.aw.labelBorW(self.aw.qmc.extradevicecolor1[i])}')
                     self.devicetable.cellWidget(i,1).setText(colorname)
                     self.aw.checkColors([(self.aw.qmc.extraname1[i], self.aw.qmc.extradevicecolor1[i], QApplication.translate('Label','Background'), self.aw.qmc.palette['background'])])
                     self.aw.checkColors([(self.aw.qmc.extraname1[i], self.aw.qmc.extradevicecolor1[i], QApplication.translate('Label','Legend bkgnd'), self.aw.qmc.palette['background'])])
             #line 2
-            elif l == 2:
+            elif ll == 2:
                 # use native no buttons dialog on Mac OS X, blocks otherwise
                 colorf = self.aw.colordialog(QColor(self.aw.qmc.extradevicecolor2[i]),True,self)
                 if colorf.isValid():
@@ -1974,7 +1974,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.qmc.extradevicecolor2[i] = colorname
                     # set LCD label color
                     self.aw.setLabelColor(self.aw.extraLCDlabel2[i],QColor(colorname))
-                    self.devicetable.cellWidget(i,2).setStyleSheet('background-color: %s; color: %s'%(self.aw.qmc.extradevicecolor2[i], self.aw.labelBorW(self.aw.qmc.extradevicecolor2[i])))
+                    self.devicetable.cellWidget(i,2).setStyleSheet(f'background-color: {self.aw.qmc.extradevicecolor2[i]}; color: {self.aw.labelBorW(self.aw.qmc.extradevicecolor2[i])}')
                     self.devicetable.cellWidget(i,2).setText(colorname)
                     self.aw.checkColors([(self.aw.qmc.extraname2[i], self.aw.qmc.extradevicecolor2[i], QApplication.translate('Label','Background'), self.aw.qmc.palette['background'])])
                     self.aw.checkColors([(self.aw.qmc.extraname2[i], self.aw.qmc.extradevicecolor2[i], QApplication.translate('Label','Legend bkgnd'),self.aw.qmc.palette['background'])])
@@ -3089,7 +3089,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.sendmessage(message)
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
-            if not(self.aw.qmc.device in self.aw.qmc.nonSerialDevices):
+            if self.aw.qmc.device not in self.aw.qmc.nonSerialDevices:
                 self.aw.setcommport()
             self.close()
             self.accept()

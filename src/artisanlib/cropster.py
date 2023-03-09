@@ -3,7 +3,7 @@
 # Cropster XLS Roast Profile importer for Artisan
 
 import time as libtime
-import xlrd
+import xlrd # type: ignore
 import logging
 from typing import Final
 
@@ -13,8 +13,8 @@ try:
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:  # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
 
@@ -23,6 +23,10 @@ _log: Final = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given Cropster XLS file
 def extractProfileCropsterXLS(file,_):
+
+    def takeClosest(num, collection):
+        return min(collection, key=lambda x:abs(x-num))
+
     res = {} # the interpreted data set
 
     book = xlrd.open_workbook(file)
@@ -885,7 +889,6 @@ def extractProfileCropsterXLS(file,_):
             specialeventsvalue = []
             specialeventsStrings = []
             if COMMENTS_sh.ncols >= 4:
-                takeClosest = lambda num,collection:min(collection,key=lambda x:abs(x-num))
                 for r in range(COMMENTS_sh.nrows):
                     if r>0:
                         try:

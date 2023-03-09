@@ -1,9 +1,9 @@
 import prettytable
 import re
 try:
-  from PyQt5.QtWidgets import QApplication
-except Exception:
   from PyQt6.QtWidgets import QApplication
+except Exception:
+  from PyQt5.QtWidgets import QApplication # type: ignore
 
 def content():
     strlist = []

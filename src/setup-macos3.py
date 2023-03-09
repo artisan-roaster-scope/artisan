@@ -5,13 +5,10 @@ Usage:
     python3 setup-mac3.py py2app
 """
 
-import sys
 import os
-import shutil
 import subprocess
 from setuptools import setup
 
-import string
 import plistlib
 
 import artisanlib
@@ -125,7 +122,7 @@ with open('Info.plist', 'r+b') as fp:
     plist['CFBundleVersion'] = 'Artisan ' + VERSION
     try:
         plist['LSMinimumSystemVersion'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
-    except Exception:
+    except Exception: # pylint: disable=broad-except
         plist['LSMinimumSystemVersion'] = '10.15'
     plist['LSMultipleInstancesProhibited'] = 'false'
 #    plist['LSPrefersPPC'] = False # not in use longer
@@ -183,7 +180,7 @@ os.chdir('./dist')
 
 try:
     PYTHONPATH = os.environ['PYTHONPATH'] + r'/'
-except:
+except Exception: # pylint: disable=broad-except
     PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/'
 
 #try:
@@ -199,7 +196,7 @@ except:
 # copy snap7 dylib (we try both directories)
 try:
     subprocess.check_call(r'cp -f /usr/local/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib',shell = True)
-except:
+except Exception: # pylint: disable=broad-except
     subprocess.check_call(r'cp -f /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib',shell = True)
 
 # add localization stubs to make OS X translate the systems menu item and native dialogs
@@ -221,13 +218,13 @@ for lang in ['ar', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id'
 # to get libusb installed
 try:
     subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.26/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
-except:
+except Exception: # pylint: disable=broad-except
     try:
         subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.25/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
-    except Exception:
+    except Exception: # pylint: disable=broad-except
         try:
             subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.24/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 
 
@@ -285,10 +282,10 @@ qt_plugin_files = [
 
 
 # remove unused Qt frameworks libs (not in Qt_modules_frameworks)
-for subdir, dirs, files in os.walk('./Artisan.app/Contents/Frameworks'):
-    for dir in dirs:
-        if dir.startswith('Qt') and dir.endswith('.framework') and dir not in Qt_frameworks:
-            file_path = os.path.join(subdir, dir)
+for subdir, dirs, _files in os.walk('./Artisan.app/Contents/Frameworks'):
+    for di in dirs:
+        if di.startswith('Qt') and di.endswith('.framework') and di not in Qt_frameworks:
+            file_path = os.path.join(subdir, di)
             print(f'rm -rf {file_path}')
             subprocess.check_call(f'rm -rf {file_path}',shell = True)
 
@@ -297,7 +294,7 @@ for subdir, dirs, files in os.walk('./Artisan.app/Contents/Frameworks'):
 # (py2app v0.26.1 copes non-relocated PlugIns to the toplevel)
 try:
     subprocess.check_call('rm -rf ./Artisan.app/Contents/plugins',shell = True)
-except:
+except Exception: # pylint: disable=broad-except
     pass
 
 
@@ -308,7 +305,7 @@ for python_version in ['python3.8', 'python3.9', 'python3.10', 'python3.11']:
         # if PyQt6 exists we remove PyQt5 completely
         try:
             subprocess.check_call(f'rm -rf {rootdir}/PyQt5',shell = True)
-        except:
+        except Exception: # pylint: disable=broad-except
             pass
     # remove Qt artefacts
     for qt_dir in [
@@ -330,11 +327,11 @@ for python_version in ['python3.8', 'python3.9', 'python3.10', 'python3.11']:
         ]:
         try:
             subprocess.check_call(f'rm -rf {rootdir}/{qt_dir}',shell = True)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
     for pyqt_dir in ['PyQt5', 'PyQt6']:
         # remove unused PyQt libs (not in Qt_modules)
-        for subdir, dirs, files in os.walk(f'{rootdir}/{pyqt_dir}'):
+        for subdir, _dirs, files in os.walk(f'{rootdir}/{pyqt_dir}'):
             for file in files:
                 if file.endswith('.pyi'):
                     file_path = os.path.join(subdir, file)
@@ -348,10 +345,10 @@ for python_version in ['python3.8', 'python3.9', 'python3.10', 'python3.11']:
     # remove unused Qt frameworks libs (not in Qt_modules_frameworks)
     for qt_dir in ['PyQt5/Qt5/lib', 'PyQt6/Qt6/lib']:
         qt = f'{rootdir}/{qt_dir}'
-        for root, dirs, _ in os.walk(qt):
-            for dir in dirs:
-                if dir.startswith('Qt') and dir.endswith('.framework') and dir not in Qt_frameworks:
-                    file_path = os.path.join(qt, dir)
+        for _root, dirs, _ in os.walk(qt):
+            for di in dirs:
+                if di.startswith('Qt') and di.endswith('.framework') and di not in Qt_frameworks:
+                    file_path = os.path.join(qt, di)
                     subprocess.check_call(f'rm -rf {file_path}',shell = True)
 
     # remove unused plugins
@@ -363,33 +360,33 @@ for python_version in ['python3.8', 'python3.9', 'python3.10', 'python3.11']:
                 else:
                     for subdir, _, files in os.walk(os.path.join(root,d)):
                         for file in files:
-                            if not (file in qt_plugin_files):
+                            if file not in qt_plugin_files:
                                 file_path = os.path.join(subdir, file)
                                 subprocess.check_call(f'rm -rf {file_path}',shell = True)
 # comment for non-Framework variant
 #        # move plugins directory from Resources/lib/python3.x/PyQtX/QtX/plugins to the root of the app
 #        try:
 #            shutil.move(f"{rootdir}/{qt_dir}", "./Artisan.app/Contents/PlugIns")
-#        except Exception:
+#        except Exception: # pylint: disable=broad-except
 #            pass
 
 
 # remove duplicate mpl_data folder
 try:
     subprocess.check_call('rm -rf ./Artisan.app/Contents/Resources/mpl-data',shell = True)
-except:
+except Exception: # pylint: disable=broad-except
     pass
 try:
     subprocess.check_call('rm -rf ./Artisan.app/Contents/Resources/lib/python3.9/matplotlib/mpl-data/sample_data',shell = True)
-except:
+except Exception: # pylint: disable=broad-except
     pass
 try:
     subprocess.check_call('rm -rf ./Artisan.app/Contents/Resources/lib/python3.10/matplotlib/mpl-data/sample_data',shell = True)
-except:
+except Exception: # pylint: disable=broad-except
     pass
 try:
     subprocess.check_call('rm -rf ./Artisan.app/Contents/Resources/lib/python3.11/matplotlib/mpl-data/sample_data',shell = True)
-except:
+except Exception: # pylint: disable=broad-except
     pass
 
 print('*** Removing unused files ***')
@@ -422,9 +419,9 @@ for root, dirs, files in os.walk('.'):
 #            print('Deleting', file)
 #            os.remove(os.path.join(root,file))
     # remove test files
-    for dir in dirs:
-        if 'tests' in dir:
-            for r,d,f in os.walk(os.path.join(root,dir)):
+    for di in dirs:
+        if 'tests' in di:
+            for r,_d,f in os.walk(os.path.join(root,di)):
                 for fl in f:
 #                    print('Deleting', os.path.join(r,fl))
                     os.remove(os.path.join(r,fl))

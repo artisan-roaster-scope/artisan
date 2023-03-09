@@ -39,8 +39,8 @@ try:
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final = logging.getLogger(__name__)
@@ -866,7 +866,7 @@ class FujiPID():
         n = len(segments)
         #if parts is < 4, make it compatible with Fuji PID (4 segments needed)
         if n < 4:
-            for i in range(4-n):
+            for _ in range(4-n):
                 #last temperature
                 lasttemp = segments[-1].split('::')[1]
                 #create a string with 4 segments ("SETRS" already removed)
@@ -1530,7 +1530,7 @@ class PIDcontrol():
             self.aw.qmc.pid.setDutySteps(dutySteps)
 
 
-    def setSV(self,sv,move=True,init=False):
+    def setSV(self,sv,move:bool = True, init:bool = False):
 #        if not move:
 #            self.aw.sendmessage(QApplication.translate("Message","SV set to %s"%sv))
         if (self.aw.pidcontrol.externalPIDControl() == 1): # MODBUS PID and Control ticked
@@ -1549,7 +1549,7 @@ class PIDcontrol():
             if self.aw.ser.ArduinoIsInitialized:
                 sv = max(0,self.aw.float2float(sv,2))
                 if self.sv != sv: # nothing to do (avoid loops via moveslider!)
-                    if move == True:
+                    if move:
                         self.aw.moveSVslider(sv,setValue=True) # only move the slider
                         self.sv = sv # remember last sv
                     try:

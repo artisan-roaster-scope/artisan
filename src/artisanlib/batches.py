@@ -24,9 +24,9 @@ try:
                                  QDialogButtonBox, QGridLayout, QLineEdit, QSpinBox, QLayout) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import Qt, pyqtSlot, QSettings # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QLabel, QHBoxLayout, QVBoxLayout, QCheckBox, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QDialogButtonBox, QGridLayout, QLineEdit, QSpinBox, QLayout) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, pyqtSlot, QSettings # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QLabel, QHBoxLayout, QVBoxLayout, QCheckBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QDialogButtonBox, QGridLayout, QLineEdit, QSpinBox, QLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 class batchDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):

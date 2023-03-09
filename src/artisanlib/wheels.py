@@ -28,11 +28,11 @@ try:
         QDoubleSpinBox, QGroupBox, QLineEdit, QSpinBox, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QColor # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QLabel, QTableWidget, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QTableWidgetItem, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QDoubleSpinBox, QGroupBox, QLineEdit, QSpinBox, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QColor # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QLabel, QTableWidget, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QTableWidgetItem, QDialogButtonBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QDoubleSpinBox, QGroupBox, QLineEdit, QSpinBox, QHeaderView) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 class WheelDlg(ArtisanDialog):
@@ -322,13 +322,13 @@ class WheelDlg(ArtisanDialog):
             newwidth = z
             oldwidth = self.aw.qmc.segmentlengths[x][u]
             diff = newwidth - oldwidth
-            l = len(self.aw.qmc.segmentlengths[x])
-            for i in range(l):
+            ll = len(self.aw.qmc.segmentlengths[x])
+            for i in range(ll):
                 if i != u:
                     if diff > 0:
-                        self.aw.qmc.segmentlengths[x][i] -= abs(float(diff))/(l-1)
+                        self.aw.qmc.segmentlengths[x][i] -= abs(float(diff))/(ll-1)
                     else:
-                        self.aw.qmc.segmentlengths[x][i] += abs(float(diff))/(l-1)
+                        self.aw.qmc.segmentlengths[x][i] += abs(float(diff))/(ll-1)
             self.aw.qmc.segmentlengths[x][u] = newwidth
             self.aw.qmc.drawWheel()
 
@@ -504,13 +504,13 @@ class WheelDlg(ArtisanDialog):
             newwidth = widthSpinBox.value()
             oldwidth = self.aw.qmc.wradii[x]
             diff = newwidth - oldwidth
-            l = len(self.aw.qmc.wradii)
-            for i in range(l):
+            ll = len(self.aw.qmc.wradii)
+            for i in range(ll):
                 if i != x:
                     if diff > 0:
-                        self.aw.qmc.wradii[i] -= abs(float(diff))/(l-1)
+                        self.aw.qmc.wradii[i] -= abs(float(diff))/(ll-1)
                     else:
-                        self.aw.qmc.wradii[i] += abs(float(diff))/(l-1)
+                        self.aw.qmc.wradii[i] += abs(float(diff))/(ll-1)
             self.aw.qmc.wradii[x] = newwidth
             #Need 100.0% coverage. Correct for numerical floating point rounding errors:
             count = 0.
@@ -608,10 +608,10 @@ class WheelDlg(ArtisanDialog):
         if x is not None:
             #correct raius of other wheels (to use 100% coverage)
             width = self.aw.qmc.wradii[x]
-            l = len(self.aw.qmc.wradii)
-            for i in range(l):
+            ll = len(self.aw.qmc.wradii)
+            for i in range(ll):
                 if i != x:
-                    self.aw.qmc.wradii[i] += float(width)/(l-1)
+                    self.aw.qmc.wradii[i] += float(width)/(ll-1)
             self.aw.qmc.wheelnames.pop(x)
             self.aw.qmc.wradii.pop(x)
             self.aw.qmc.startangle.pop(x)

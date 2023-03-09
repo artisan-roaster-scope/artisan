@@ -26,8 +26,8 @@ try:
     from PyQt6 import QtBluetooth # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5 import QtCore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5 import QtBluetooth # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5 import QtCore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5 import QtBluetooth # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final = logging.getLogger(__name__)
@@ -129,8 +129,10 @@ class BleInterface(QtCore.QObject):
 #--------
 
     @QtCore.pyqtSlot('QByteArray')
-    def dataReceivedProcessing(self,data=QtCore.QByteArray):
+    def dataReceivedProcessing(self,data=None):
 #        _log.debug("data received: %s", data)
+        if data is None:
+            data = QtCore.QByteArray()
         res_w, res_b = self.processData(self.write, data)
         if res_w is not None:
             self.weightChanged.emit(res_w)
@@ -141,8 +143,10 @@ class BleInterface(QtCore.QObject):
         if(self.m_service and self.m_readCharacteristic.isValid()):
             self.m_service.readCharacteristic(self.m_readCharacteristic)
 
-    def write(self,data=bytearray()):
+    def write(self,data=None):
 #        _log.debug("write data: %s", data)
+        if data is None:
+            data = bytearray()
         if (self.m_service and self.m_writeCharacteristic.isValid()):
             if (len(data) > 20):
                 sentBytes = 0

@@ -5,10 +5,10 @@
 import time as libtime
 import dateutil.parser
 import requests
-from requests_file import FileAdapter  # @UnresolvedImport
+from requests_file import FileAdapter # type: ignore # @UnresolvedImport
 import re
 import json
-from lxml import html
+from lxml import html # type: ignore
 import logging
 from typing import Final
 
@@ -17,7 +17,7 @@ try:
     from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
 
@@ -93,15 +93,15 @@ def extractProfileRoastPathHTML(url,_):
                 beans = coffee + '\n' + beans
         if beans != '':
             res['beans'] = beans
-        if not 'title' in res and title != '':
+        if title != '' and 'title' not in res:
             res['title'] = title
 
         data = {}
-        for e in ['btData', 'etData', 'atData', 'eventData', 'rorData', 'noteData', 'fuelData', 'fanData', 'drumData']:
-            d = re.findall(fr"var {e} = JSON\.parse\('(.+?)'\);", page.content.decode('utf-8'), re.S)  # @UndefinedVariable
+        for elem in ['btData', 'etData', 'atData', 'eventData', 'rorData', 'noteData', 'fuelData', 'fanData', 'drumData']:
+            d = re.findall(fr"var {elem} = JSON\.parse\('(.+?)'\);", page.content.decode('utf-8'), re.S)  # @UndefinedVariable
             bt = []
             if d:
-                data[e] = json.loads(d[0])
+                data[elem] = json.loads(d[0])
 
         if 'btData' in data and len(data['btData']) > 0 and 'Timestamp' in data['btData'][0]:
             # BT

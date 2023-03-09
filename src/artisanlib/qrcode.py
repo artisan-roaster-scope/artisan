@@ -1,6 +1,6 @@
 #
 
-import qrcode
+import qrcode # type: ignore
 
 try:
     #ylint: disable = E, W, R, C
@@ -8,8 +8,8 @@ try:
     from PyQt6.QtCore import Qt # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtGui import QImage, QPixmap,QPainter # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtCore import Qt # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QImage, QPixmap,QPainter # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 ##########################################################################
 #####################     QR Image   #####################################
@@ -39,7 +39,7 @@ class QRImage(qrcode.image.base.BaseImage):
     def process(self):
         pass
 
-    def drawrect_context(self, row: int, col: int, qr: 'QRCode'):
+    def drawrect_context(self, row: int, col: int, qr):
         pass
 
 def QRlabel(url_str):

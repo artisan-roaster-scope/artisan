@@ -28,7 +28,7 @@ try:
     from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from pathlib import Path
 from artisanlib.util import getDirectory

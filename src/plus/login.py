@@ -37,7 +37,7 @@ try:
     from PyQt6.QtGui import QKeySequence, QAction # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtWidgets import (
+    from PyQt5.QtWidgets import ( # type: ignore
         QApplication, # @UnusedImport @Reimport  @UnresolvedImport
         QCheckBox, # @UnusedImport @Reimport  @UnresolvedImport
         QGroupBox, # @UnusedImport @Reimport  @UnresolvedImport
@@ -48,8 +48,8 @@ except Exception: # pylint: disable=broad-except
         QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
         QAction, # @UnusedImport @Reimport  @UnresolvedImport
     )
-    from PyQt5.QtCore import Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QKeySequence # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QKeySequence # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 import logging
 from artisanlib.dialogs import ArtisanDialog

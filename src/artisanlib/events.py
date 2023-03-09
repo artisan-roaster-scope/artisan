@@ -37,15 +37,15 @@ try:
     from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import (QColor, QFont, QIntValidator) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QSpinBox, QWidget, QTabWidget, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGridLayout, QGroupBox, QTableWidget, QHeaderView, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import (QColor, QFont, QIntValidator) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QWidget, QTabWidget, QDialogButtonBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGridLayout, QGroupBox, QTableWidget, QHeaderView, QToolButton) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     try:
-        from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
+        from PyQt5 import sip # type: ignore # @Reimport @UnresolvedImport @UnusedImport
     except Exception: # pylint: disable=broad-except
-        import sip  # @Reimport @UnresolvedImport @UnusedImport
+        import sip  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
 
 _log: Final = logging.getLogger(__name__)
@@ -2090,7 +2090,7 @@ class EventsDlg(ArtisanResizeablDialog):
             nrows += 1
         gap = int(-1*(230-50)/ncolumns)
         #Color
-        for i in range(nrows):
+        for _ in range(nrows):
             for f in range(230,50,gap):
                 color = QColor()
                 color.setHsv(step,255,f,255)
@@ -2313,13 +2313,13 @@ class EventsDlg(ArtisanResizeablDialog):
             if et < 4:
                 label = label.replace('\\t',self.aw.qmc.etypes[et])
             self.colorButton.setText(label)
-            self.colorButton.setStyleSheet('background-color: %s; color: %s;'%(self.extraeventbuttoncolor[i],self.extraeventbuttontextcolor[i]))
+            self.colorButton.setStyleSheet(f'background-color: {self.extraeventbuttoncolor[i]}; color: {self.extraeventbuttontextcolor[i]};')
             #Text Color
             self.colorTextButton = QPushButton('Select')
             self.colorTextButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.colorTextButton.clicked.connect(self.setbuttontextcolor)
             self.colorTextButton.setText(label)
-            self.colorTextButton.setStyleSheet('background-color: %s; color: %s;'%(self.extraeventbuttoncolor[i],self.extraeventbuttontextcolor[i]))
+            self.colorTextButton.setStyleSheet(f'background-color: {self.extraeventbuttoncolor[i]}; color: {self.extraeventbuttontextcolor[i]};')
             #Empty Cell
             emptyCell = QLabel('')
             #add widgets to the table
@@ -2558,7 +2558,7 @@ class EventsDlg(ArtisanResizeablDialog):
                 textColor = self.extraeventbuttontextcolor[i]
                 backColor =  self.extraeventbuttoncolor[i]
                 label = self.extraeventslabels[i]
-                style = 'background-color: %s; color: %s;'%(backColor,textColor)
+                style = f'background-color: {backColor}; color: {textColor};'
                 self.eventbuttontable.cellWidget(i,7).setStyleSheet(style)
                 self.eventbuttontable.cellWidget(i,8).setStyleSheet(style)
                 self.aw.checkColors([(QApplication.translate('Label','Event button')+' '+ label, backColor, ' '+QApplication.translate('Label','its text'), textColor)])
@@ -2573,7 +2573,7 @@ class EventsDlg(ArtisanResizeablDialog):
                 textColor = self.extraeventbuttontextcolor[i]
                 backColor =  self.extraeventbuttoncolor[i]
                 label = self.extraeventslabels[i]
-                style = 'background-color: %s; color: %s;'%(backColor,textColor)
+                style = f'background-color: {backColor}; color: {textColor};'
                 self.eventbuttontable.cellWidget(i,7).setStyleSheet(style)
                 self.eventbuttontable.cellWidget(i,8).setStyleSheet(style)
                 self.aw.checkColors([(QApplication.translate('Label','Event button')+' '+ label, backColor, ' '+QApplication.translate('Label','its text'),textColor)])
@@ -3262,7 +3262,7 @@ class SliderCalculator(ArtisanDialog):
 
     @pyqtSlot()
     def accept(self):
-        if self.factorWidget is not None and self.offsetWidget != None:
+        if self.factorWidget is not None and self.offsetWidget is not None:
             factor_text = self.ui.lineEdit_Factor.text()
             offset_text = self.ui.lineEdit_Offset.text()
             if factor_text != '' and offset_text != '':

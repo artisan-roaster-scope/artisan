@@ -22,8 +22,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
-from typing import Final
+from typing import Final, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
 # Constants
 app_name: Final = 'artisan.plus'
@@ -117,7 +119,7 @@ outbox_cache: Final = 'outbox'
 
 # Runtime variables
 
-app_window = None  # handle to the main Artisan application window
+app_window: Optional['ApplicationWindow'] = None  # handle to the main Artisan application window
 #   if set, app_window.plus_login holds the current login account if any and
 #   app_window.updatePlusIcon() is a function that updates the toolbar
 #   plus service connection indicator icon

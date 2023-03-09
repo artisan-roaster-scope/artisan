@@ -5,9 +5,9 @@
 import time as libtime
 import dateutil.parser
 import requests
-from requests_file import FileAdapter  # @UnresolvedImport
+from requests_file import FileAdapter # type: ignore  # @UnresolvedImport
 import re
-from lxml import html
+from lxml import html # type: ignore
 import logging
 from typing import Final
 
@@ -16,7 +16,7 @@ try:
     from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 from artisanlib.util import encodeLocal, stringtoseconds

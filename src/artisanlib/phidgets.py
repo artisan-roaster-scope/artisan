@@ -18,16 +18,16 @@
 import logging
 from typing import Final
 
-from Phidget22.Devices.Manager import Manager
-from Phidget22.DeviceID import DeviceID
-from Phidget22.DeviceClass import DeviceClass
+from Phidget22.Devices.Manager import Manager # type: ignore
+from Phidget22.DeviceID import DeviceID # type: ignore
+from Phidget22.DeviceClass import DeviceClass # type: ignore
 
 try:
     #ylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final = logging.getLogger(__name__)

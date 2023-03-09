@@ -32,10 +32,10 @@ try:
                 QTableWidget, QTableWidgetItem, QGroupBox, QLayout, QHBoxLayout, QVBoxLayout, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import Qt, pyqtSlot, QSettings, QRegularExpression, QDateTime # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QHeaderView, QAbstractItemView, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
-                QTableWidget, QTableWidgetItem, QGroupBox, QLayout, QHBoxLayout, QVBoxLayout, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, pyqtSlot, QSettings, QRegularExpression, QDateTime # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QRegularExpressionValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QHeaderView, QAbstractItemView, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                QTableWidget, QTableWidgetItem, QGroupBox, QLayout, QHBoxLayout, QVBoxLayout, QFrame) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 class MyQRegularExpressionValidator(QRegularExpressionValidator):
     # we fix partial time input like '12' => '12:00', '12:' => '12:00' and '12:0' => '12:00'
@@ -1034,7 +1034,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.time_result_widgets = []
 
         for i in range(4):
-            if len(self.profileTimes) > i and not self.profileTimes[i] is None:
+            if len(self.profileTimes) > i and self.profileTimes[i] is not None:
                 profile_time_str = stringfromseconds(self.profileTimes[i],leadingzero=False)
                 profile_widget = QTableWidgetItem(profile_time_str)
                 profile_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)

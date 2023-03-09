@@ -24,13 +24,13 @@ application_organization_domain: Final = 'artisan-scope.org'
 
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QStandardPaths, QCoreApplication # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QColor  # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QStandardPaths, QCoreApplication # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QColor  # @UnusedImport @Reimport  @UnresolvedImport
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import QStandardPaths, QCoreApplication  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QColor  # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
 
 
 deltaLabelPrefix = '<html>&Delta;&thinsp;</html>' # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
@@ -88,10 +88,10 @@ def cmd2str(c):
 def s2a(s):
     return s.encode('ascii','ignore').decode('ascii')
 
-# returns the prefix of length l of s and adds eclipse
-def abbrevString(s,l):
-    if len(s) > l:
-        return f'{s[:l-1]}...'
+# returns the prefix of length ll of s and adds eclipse
+def abbrevString(s, ll):
+    if len(s) > ll:
+        return f'{s[:ll-1]}...'
     return s
 
 # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
@@ -202,9 +202,9 @@ def toStringList(x):
     return []
 def toMap(x):
     return x
-def removeAll(l,s):
-    for _ in range(l.count(s)):  # @UndefinedVariable
-        l.remove(s)
+def removeAll(ll, s):
+    for _ in range(ll.count(s)):  # @UndefinedVariable
+        ll.remove(s)
 
 # fills in intermediate interpolated values replacing -1 values based on surrounding values
 # [1, 2, 3, -1, -1, -1, 10, 11] => [1, 2, 3, 4.75, 6.5, 8.25, 11]
@@ -212,16 +212,16 @@ def removeAll(l,s):
 # [-1,-1,2] => [2, 2, 2] # a prefix of -1 of max length 'interpolate_max' will be replaced by the first value in l that is not -1
 # INVARIANT: the resulting list has always the same length as l
 # only gaps of length interpolate_max (should be set to the global aw.qmc.interpolatemax), if not None, are interpolated
-def fill_gaps(l, interpolate_max=3):
+def fill_gaps(ll, interpolate_max=3):
     res = []
     last_val = -1
     skip = -1
-    for i,e in enumerate(l):
+    for i,e in enumerate(ll):
         if i >= skip:
             if i == 0 and e == -1 and last_val == -1: # only for the prefix
-                # a prefix of -1 will be replaced by the first value in l that is not -1
+                # a prefix of -1 will be replaced by the first value in ll that is not -1
                 s = -1
-                for ee in l[:5]:
+                for ee in ll[:5]:
                     if ee != -1:
                         s = ee
                         break
@@ -230,18 +230,18 @@ def fill_gaps(l, interpolate_max=3):
             elif e == -1 and last_val != -1:
                 next_val = None
                 next_idx = None # first index of an element beyond i of a value different to -1
-                for j in range(i+1,len(l)):
-                    if l[j] != -1:
-                        next_val = l[j]
+                for j in range(i+1,len(ll)):
+                    if ll[j] != -1:
+                        next_val = ll[j]
                         next_idx = j
                         break
                 if next_val is None or next_idx is None:
                     # no further valid values, we append the tail
-                    res.extend(l[i:])
+                    res.extend(ll[i:])
                     return res
                 if interpolate_max is not None and interpolate_max < (next_idx - i):
                     # gap too big
-                    res.extend(l[i:next_idx])
+                    res.extend(ll[i:next_idx])
                 else:
                     # gap small enough, we interpolate
                     # compute intermediate values
@@ -342,7 +342,7 @@ def getDirectory(
     fn = filename
     if not share:
         app = QCoreApplication.instance()
-        if app.artisanviewerMode:
+        if app.artisanviewerMode: # type: ignore
             fn = filename + '_viewer'
     fp = Path(getDataDirectory(), fn)
     if ext is not None:
@@ -409,6 +409,7 @@ def isOpen(ip: str, port: int) -> bool:
             return s.connect_ex((ip, port)) == 0
     except Exception as e: # pylint: disable=broad-except
         _log.info(e)
+    return False
 
 # Logging
 

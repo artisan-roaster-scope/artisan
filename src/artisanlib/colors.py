@@ -29,11 +29,11 @@ try:
         QLayout, QSpinBox, QTabWidget, QMessageBox) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QColor, QFont, QPalette # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
-        QSizePolicy, QHBoxLayout, QVBoxLayout, QDialogButtonBox, QGridLayout, QGroupBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QLayout, QSpinBox, QTabWidget, QMessageBox) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QColor, QFont, QPalette # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QSizePolicy, QHBoxLayout, QVBoxLayout, QDialogButtonBox, QGridLayout, QGroupBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QLayout, QSpinBox, QTabWidget, QMessageBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 class graphColorDlg(ArtisanDialog):
@@ -606,57 +606,57 @@ class graphColorDlg(ArtisanDialog):
         self.aw.setLCDsBW()
         self.setColorButtons()
 
-    def setLED(self,hue,lcd):
-        if lcd == 1:
-            color = QColor(self.aw.lcdpaletteF['timer'])
-            color.setHsv(hue,255,255,255)
-            self.aw.lcdpaletteF['timer'] = str(color.name())
-            self.aw.setTimerColor('timer')
-            if self.aw.largeLCDs_dialog:
-                self.aw.largeLCDs_dialog.updateStyles()
-        elif lcd == 2:
-            color = QColor(self.aw.lcdpaletteF['et'])
-            color.setHsv(hue,255,255,255)
-            self.aw.lcdpaletteF['et'] = str(color.name())
-            self.aw.lcd2.setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['et'],self.aw.lcdpaletteB['et']))
-            if self.aw.largeLCDs_dialog:
-                self.aw.largeLCDs_dialog.updateStyles()
-        elif lcd == 3:
-            color = QColor(self.aw.lcdpaletteF['bt'])
-            color.setHsv(hue,255,255,255)
-            self.aw.lcdpaletteF['bt'] = str(color.name())
-            self.aw.lcd3.setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['bt'],self.aw.lcdpaletteB['bt']))
-            if self.aw.largeLCDs_dialog:
-                self.aw.largeLCDs_dialog.updateStyles()
-        elif lcd == 4:
-            color = QColor(self.aw.lcdpaletteF['deltaet'])
-            color.setHsv(hue,255,255,255)
-            self.aw.lcdpaletteF['deltaet'] = str(color.name())
-            self.aw.lcd4.setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['deltaet'],self.aw.lcdpaletteB['deltaet']))
-            if self.aw.largeDeltaLCDs_dialog:
-                self.aw.largeDeltaLCDs_dialog.updateStyles()
-        elif lcd == 5:
-            color = QColor(self.aw.lcdpaletteF['deltabt'])
-            color.setHsv(hue,255,255,255)
-            self.aw.lcdpaletteF['deltabt'] = str(color.name())
-            self.aw.lcd5.setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['deltabt'],self.aw.lcdpaletteB['deltabt']))
-            if self.aw.largeDeltaLCDs_dialog:
-                self.aw.largeDeltaLCDs_dialog.updateStyles()
-        elif lcd == 6:
-            color = QColor(self.aw.lcdpaletteF['sv'])
-            color.setHsv(hue,255,255,255)
-            self.aw.lcdpaletteF['sv'] = str(color.name())
-            self.aw.lcd6.setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['sv'],self.aw.lcdpaletteB['sv']))
-            self.aw.lcd7.setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['sv'],self.aw.lcdpaletteB['sv']))
-            for i in range(len(self.aw.qmc.extradevices)):
-                self.aw.extraLCD1[i].setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['sv'],self.aw.lcdpaletteB['sv']))
-                self.aw.extraLCD2[i].setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['sv'],self.aw.lcdpaletteB['sv']))
-            if self.aw.largePIDLCDs_dialog:
-                self.aw.largePIDLCDs_dialog.updateStyles()
-            if self.aw.largeExtraLCDs_dialog:
-                self.aw.largeExtraLCDs_dialog.updateStyles()
-            if self.aw.largePhasesLCDs_dialog:
-                self.aw.largePhasesLCDs_dialog.updateStyles()
+#    def setLED(self,hue,lcd):
+#        if lcd == 1:
+#            color = QColor(self.aw.lcdpaletteF['timer'])
+#            color.setHsv(hue,255,255,255)
+#            self.aw.lcdpaletteF['timer'] = str(color.name())
+#            self.aw.setTimerColor('timer')
+#            if self.aw.largeLCDs_dialog:
+#                self.aw.largeLCDs_dialog.updateStyles()
+#        elif lcd == 2:
+#            color = QColor(self.aw.lcdpaletteF['et'])
+#            color.setHsv(hue,255,255,255)
+#            self.aw.lcdpaletteF['et'] = str(color.name())
+#            self.aw.lcd2.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['et']}; background-color: {self.aw.lcdpaletteB['et']};}}")
+#            if self.aw.largeLCDs_dialog:
+#                self.aw.largeLCDs_dialog.updateStyles()
+#        elif lcd == 3:
+#            color = QColor(self.aw.lcdpaletteF['bt'])
+#            color.setHsv(hue,255,255,255)
+#            self.aw.lcdpaletteF['bt'] = str(color.name())
+#            self.aw.lcd3.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['bt']}; background-color: {self.aw.lcdpaletteB['bt']};}}")
+#            if self.aw.largeLCDs_dialog:
+#                self.aw.largeLCDs_dialog.updateStyles()
+#        elif lcd == 4:
+#            color = QColor(self.aw.lcdpaletteF['deltaet'])
+#            color.setHsv(hue,255,255,255)
+#            self.aw.lcdpaletteF['deltaet'] = str(color.name())
+#            self.aw.lcd4.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['deltaet']}; background-color: {self.aw.lcdpaletteB['deltaet']};}}")
+#            if self.aw.largeDeltaLCDs_dialog:
+#                self.aw.largeDeltaLCDs_dialog.updateStyles()
+#        elif lcd == 5:
+#            color = QColor(self.aw.lcdpaletteF['deltabt'])
+#            color.setHsv(hue,255,255,255)
+#            self.aw.lcdpaletteF['deltabt'] = str(color.name())
+#            self.aw.lcd5.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['deltabt']}; background-color: {self.aw.lcdpaletteB['deltabt']};}}")
+#            if self.aw.largeDeltaLCDs_dialog:
+#                self.aw.largeDeltaLCDs_dialog.updateStyles()
+#        elif lcd == 6:
+#            color = QColor(self.aw.lcdpaletteF['sv'])
+#            color.setHsv(hue,255,255,255)
+#            self.aw.lcdpaletteF['sv'] = str(color.name())
+#            self.aw.lcd6.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['sv']}; background-color: {self.aw.lcdpaletteB['sv']};}}")
+#            self.aw.lcd7.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['sv']}; background-color: {self.aw.lcdpaletteB['sv']};}}")
+#            for i in range(len(self.aw.qmc.extradevices)):
+#                self.aw.extraLCD1[i].setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['sv']}; background-color: {self.aw.lcdpaletteB['sv']};}}")
+#                self.aw.extraLCD2[i].setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['sv']}; background-color: {self.aw.lcdpaletteB['sv']};}}")
+#            if self.aw.largePIDLCDs_dialog:
+#                self.aw.largePIDLCDs_dialog.updateStyles()
+#            if self.aw.largeExtraLCDs_dialog:
+#                self.aw.largeExtraLCDs_dialog.updateStyles()
+#            if self.aw.largePhasesLCDs_dialog:
+#                self.aw.largePhasesLCDs_dialog.updateStyles()
 
     @pyqtSlot(bool)
     def paintlcdsSlot(self,_):
@@ -674,7 +674,7 @@ class graphColorDlg(ArtisanDialog):
                 self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,'et')
             else:
                 self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,'et')
-            self.aw.lcd2.setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['et'],self.aw.lcdpaletteB['et']))
+            self.aw.lcd2.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['et']}; background-color: {self.aw.lcdpaletteB['et']};}}")
             if self.aw.largeLCDs_dialog:
                 self.aw.largeLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd3LEDButton,self.lcd3backButton]:
@@ -682,7 +682,7 @@ class graphColorDlg(ArtisanDialog):
                 self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,'bt')
             else:
                 self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,'bt')
-            self.aw.lcd3.setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['bt'],self.aw.lcdpaletteB['bt']))
+            self.aw.lcd3.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['bt']}; background-color: {self.aw.lcdpaletteB['bt']};}}")
             if self.aw.largeLCDs_dialog:
                 self.aw.largeLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd4LEDButton,self.lcd4backButton]:
@@ -690,7 +690,7 @@ class graphColorDlg(ArtisanDialog):
                 self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,'deltaet')
             else:
                 self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,'deltaet')
-            self.aw.lcd4.setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['deltaet'],self.aw.lcdpaletteB['deltaet']))
+            self.aw.lcd4.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['deltaet']}; background-color: {self.aw.lcdpaletteB['deltaet']};}}")
             if self.aw.largeDeltaLCDs_dialog:
                 self.aw.largeDeltaLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd5LEDButton,self.lcd5backButton]:
@@ -698,7 +698,7 @@ class graphColorDlg(ArtisanDialog):
                 self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,'deltabt')
             else:
                 self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,'deltabt')
-            self.aw.lcd5.setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['deltabt'],self.aw.lcdpaletteB['deltabt']))
+            self.aw.lcd5.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['deltabt']}; background-color: {self.aw.lcdpaletteB['deltabt']};}}")
             if self.aw.largeDeltaLCDs_dialog:
                 self.aw.largeDeltaLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd6LEDButton,self.lcd6backButton]:
@@ -706,11 +706,11 @@ class graphColorDlg(ArtisanDialog):
                 self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,'sv')
             else:
                 self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,'sv')
-            self.aw.lcd6.setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['sv'],self.aw.lcdpaletteB['sv']))
-            self.aw.lcd7.setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['sv'],self.aw.lcdpaletteB['sv']))
+            self.aw.lcd6.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['sv']}; background-color: {self.aw.lcdpaletteB['sv']};}}")
+            self.aw.lcd7.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['sv']}; background-color: {self.aw.lcdpaletteB['sv']};}}")
             for i in range(len(self.aw.qmc.extradevices)):
-                self.aw.extraLCD1[i].setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['sv'],self.aw.lcdpaletteB['sv']))
-                self.aw.extraLCD2[i].setStyleSheet('QLCDNumber { border-radius: 4; color: %s; background-color: %s;}'%(self.aw.lcdpaletteF['sv'],self.aw.lcdpaletteB['sv']))
+                self.aw.extraLCD1[i].setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['sv']}; background-color: {self.aw.lcdpaletteB['sv']};}}")
+                self.aw.extraLCD2[i].setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['sv']}; background-color: {self.aw.lcdpaletteB['sv']};}}")
             if self.aw.largePIDLCDs_dialog:
                 self.aw.largePIDLCDs_dialog.updateStyles()
             if self.aw.largeExtraLCDs_dialog:
@@ -734,7 +734,7 @@ class graphColorDlg(ArtisanDialog):
         self.setColorButtons()
 
     def setColorButtons(self):
-        for l,t in [
+        for ll,tt in [
                 # Curves (background curves handled separately)
                 (self.metButton,'et'),
                 (self.btButton,'bt'),
@@ -769,7 +769,7 @@ class graphColorDlg(ArtisanDialog):
                 (self.analysismaskButton,'analysismask'),
                 (self.statsanalysisbkgndButton,'statsanalysisbkgnd'),
                 ]:
-            self.setColorButton(l,t)
+            self.setColorButton(ll,tt)
 
         # Curves, set background colors and alpha
         self.bgmetButton.setText(self.aw.qmc.backgroundmetcolor)

@@ -20,9 +20,9 @@ try:
     from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import pyqtSignal, QTextStream, Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import pyqtSignal, QTextStream, Qt, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtNetwork import QLocalSocket, QLocalServer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 class QtSingleApplication(QApplication):
@@ -34,7 +34,7 @@ class QtSingleApplication(QApplication):
     def __init__(self, _id,_viewer_id, *argv):
 
         if sys.platform.startswith('darwin') and mp.current_process().name == 'WebLCDs':
-            import AppKit # pylint: disable=import-error
+            import AppKit # type: ignore # pylint: disable=import-error
             info = AppKit.NSBundle.mainBundle().infoDictionary()  # @UndefinedVariable # pylint: disable=maybe-no-member
             info['LSBackgroundOnly'] = '1'
 
@@ -102,7 +102,7 @@ class QtSingleApplication(QApplication):
     def isRunningViewer(self):
         return self._isRunningViewer
 
-    def id(self):
+    def id(self): # noqa: A003
         return self._id
 
     def activationWindow(self):
@@ -149,5 +149,6 @@ class QtSingleApplication(QApplication):
     def _onReadyRead(self):
         while True:
             msg = self._inStream.readLine()
-            if not msg: break
+            if not msg:
+                break
             self.messageReceived.emit(msg)

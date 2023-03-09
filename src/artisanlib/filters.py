@@ -122,8 +122,8 @@ class LiveMedian(LiveFilter):
 
     def init_queue(self):
         self.q = q = deque(self.init_list)
-        self.l = l = list(q)
-        l.sort()
+        self.l = list(q)
+        self.l.sort()
         self.mididx = (len(q) - 1) // 2
         self.initialized = True
         del self.init_list
@@ -137,12 +137,12 @@ class LiveMedian(LiveFilter):
                 return x
             else:
                 self.init_queue()
-        q, l = self.q, self.l
+        q, ll = self.q, self.l
         old_elem = q.popleft()
         q.append(x)
-        del l[bisect_left(l, old_elem)]
-        insort(l, x)
-        return l[self.mididx]
+        del ll[bisect_left(ll, old_elem)]
+        insort(ll, x)
+        return ll[self.mididx]
 
 
 if __name__ == '__main__':
@@ -158,7 +158,7 @@ if __name__ == '__main__':
     yraw = ys + yerr
 
     # define the filters
-    import scipy.signal
+    import scipy.signal # type: ignore
     # define lowpass filter with 2.5 Hz cutoff frequency of order 4
     b, a = scipy.signal.iirfilter(4, Wn=2.5, fs=fs, btype='low', ftype='butter')
     y_scipy_lfilter = scipy.signal.lfilter(b, a, yraw)

@@ -20,18 +20,18 @@ from typing import Optional
 
 try:
     #ylint: disable = E, W, R, C
-    from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
         QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QFontMetrics, QColor, QCursor # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # @UnusedImport @Reimport  @UnresolvedImport
-        QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
-        QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QFontMetrics, QColor, QCursor # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QFontMetrics, QColor, QCursor # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 class MyQComboBox(QComboBox): # pylint: disable=too-few-public-methods
     def __init__(self, *args, **kwargs):
@@ -169,7 +169,8 @@ class MyQLabel(QLabel):
                     fs -= 1
                 else:
                     break
-            if fs < 1: break
+            if fs < 1:
+                break
         #--- update font size ---
         self.setFont(f)
 
@@ -281,8 +282,8 @@ def pushButtonColorStyle(
         font_size:Optional[int]=None):
     color = ('' if color is None else f'color:{color};')
     background = ('' if background is None else f'background-color:{background};')
-    font_size = ('' if font_size is None else f'font-size:{font_size}pt;')
-    return f'{class_name}{selector}{state}{{{color}{background}{font_size}}}'
+    font_size_str = ('' if font_size is None else f'font-size:{font_size}pt;')
+    return f'{class_name}{selector}{state}{{{color}{background}{font_size_str}}}'
 
 class EventPushButton(QPushButton): # pylint: disable=too-few-public-methods
     def __init__(self, background_color, *args, **kwargs):

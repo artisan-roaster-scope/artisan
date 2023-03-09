@@ -26,10 +26,10 @@ try:
         QComboBox, QHBoxLayout, QVBoxLayout) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import pyqtSlot, QSettings, QRegularExpression # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QLabel, QGridLayout, QGroupBox, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import pyqtSlot, QSettings, QRegularExpression # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QRegularExpressionValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QLabel, QGridLayout, QGroupBox, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 class calculatorDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):

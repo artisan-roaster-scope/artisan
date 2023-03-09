@@ -22,9 +22,9 @@ try:
     from PyQt6.QtCore import QTimer, pyqtSlot, QUrl, QObject, QDateTime, QLocale # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtWidgets import QSystemTrayIcon, QApplication, QMenu, QAction # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QIcon, QDesktopServices # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtCore import QTimer, pyqtSlot, QUrl, QObject, QDateTime, QLocale # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QSystemTrayIcon, QApplication, QMenu, QAction # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QIcon, QDesktopServices # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QTimer, pyqtSlot, QUrl, QObject, QDateTime, QLocale # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 import os
 import sys
@@ -83,7 +83,7 @@ class Notification():
         return self._message
 
     @property
-    def type(self):
+    def type(self): # noqa: A003
         return self._type
 
     @property
@@ -91,7 +91,7 @@ class Notification():
         return self._created
 
     @property
-    def id(self):
+    def id(self): # noqa: A003
         return self._id
 
     def formatedTitle(self):
@@ -105,9 +105,9 @@ class Notification():
             day_name = QLocale().standaloneDayName(dt.date().dayOfWeek(), QLocale.FormatType.LongFormat)
             return f'{self._title} ({day_name})'
         # created more than 7 days ago
-        l = QLocale()
+        ll = QLocale()
         dt = QDateTime.fromSecsSinceEpoch(int(round(self._created)))
-        short_date = l.toString(dt.date(), l.dateFormat(QLocale.FormatType.NarrowFormat))
+        short_date = ll.toString(dt.date(), ll.dateFormat(QLocale.FormatType.NarrowFormat))
         return f'{self._title} ({short_date})'
 
 
@@ -255,7 +255,7 @@ class NotificationManager(QObject):
         self.notifications_queue = []
 
     def isNotificationInQueue(self, hr_id):
-        return not id and any(n.id == hr_id for n in self.getNotificationItems())
+        return not id and any(n.id == hr_id for n in self.getNotificationItems()) # type: ignore
 
     def cleanNotificationQueue(self):
         try:
@@ -289,8 +289,9 @@ class NotificationManager(QObject):
     @pyqtSlot(bool)
     def notificationItemSelected(self, _checked:bool = False):
         action = self.sender()
-        n = action.data()
-        self.setNotification(n, addToQueue=False)
+        if hasattr(action, 'data'):
+            n = action.data()
+            self.setNotification(n, addToQueue=False)
 
     # actually presents the given notification to the user
     def showNotification(self, notification: Notification):

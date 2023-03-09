@@ -27,7 +27,7 @@ try:
     from PyQt6.QtWidgets import QApplication, QVBoxLayout, QTextEdit # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtWidgets import QApplication, QVBoxLayout, QTextEdit # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication, QVBoxLayout, QTextEdit # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 class platformDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
@@ -55,7 +55,7 @@ class platformDlg(ArtisanDialog):
             platformdic['Mac'] = str(platform.mac_ver())
         elif system == 'Linux':
             try:
-                import distro  # @UnresolvedImport # pylint: disable=import-error
+                import distro # type: ignore # @UnresolvedImport # pylint: disable=import-error
                 platformdic['Linux'] = str(distro.linux_distribution())
                 platformdic['Libc'] = str(platform.libc_ver())
             except Exception: # pylint: disable=broad-except

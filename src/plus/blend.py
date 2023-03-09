@@ -38,28 +38,28 @@ try:
     from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtWidgets import (
-        QApplication, # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-        QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QToolButton, # @UnusedImport @Reimport  @UnresolvedImport
-        QTableWidget, # @UnusedImport @Reimport  @UnresolvedImport
-        QStyle, # @UnusedImport @Reimport  @UnresolvedImport
-        QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (  # type: ignore
+        QApplication, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QDialogButtonBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QToolButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QTableWidget, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QStyle, # type: ignore#  @UnusedImport @Reimport  @UnresolvedImport
+        QHeaderView, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     )
-    from PyQt5.QtCore import Qt, pyqtSlot, QSize, QSettings # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QIcon # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, pyqtSlot, QSize, QSettings # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QIcon # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
     try:
-        from PyQt5 import sip # @Reimport @UnresolvedImport @UnusedImport
+        from PyQt5 import sip # type: ignore  # @Reimport @UnresolvedImport @UnusedImport
     except Exception: # pylint: disable=broad-except
-        import sip  # @Reimport @UnresolvedImport @UnusedImport
+        import sip  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
 import logging
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 from uic import BlendDialog
-from typing import Final
+from typing import Final, Optional, List
 
 _log: Final = logging.getLogger(__name__)
 
@@ -95,7 +95,7 @@ class Component():
 #######################  Blend  ########################################################
 
 class Blend():
-    def __init__(self, name: str, components: list):
+    def __init__(self, name: str, components: List):
         self._name = name
         self._components = components
 
@@ -120,7 +120,7 @@ class Blend():
     #  - the component ratios of all ingredients sum up to 1,
     #  - there are no duplicates in the list of component coffees, and,
     #  - all component coffees are contained in the list of available_coffees (list of hr_ids as strings), if given
-    def isValid(self, available_coffees: list = None):
+    def isValid(self, available_coffees: Optional[List] = None):
         if self.components is None:
             return False
         component_coffees = [c.coffee for c in self.components]
@@ -194,7 +194,7 @@ class CustomBlendDialog(ArtisanDialog):
     @pyqtSlot()
     def ratioChanged(self):
         i = self.aw.findWidgetsRow(self.ui.tableWidget,self.sender(), 0)
-        if i != None:
+        if i is not None:
             ratioLineEdit = self.ui.tableWidget.cellWidget(i,0)
             ratio = float(ratioLineEdit.text()) / 100
             self.blend.components[i].ratio = ratio
@@ -234,7 +234,7 @@ class CustomBlendDialog(ArtisanDialog):
     @pyqtSlot(int)
     def componentCoffeeChanged(self,_):
         i = self.aw.findWidgetsRow(self.ui.tableWidget,self.sender(), 2)
-        if i != None:
+        if i is not None:
             coffeecombobox = self.ui.tableWidget.cellWidget(i,2)
             hr_id = self.coffees[coffeecombobox.currentText()]
             self.blend.components[i].coffee = hr_id
@@ -253,7 +253,7 @@ class CustomBlendDialog(ArtisanDialog):
     @pyqtSlot(bool)
     def deleteComponent(self,_):
         i = self.aw.findWidgetsRow(self.ui.tableWidget,self.sender(), 3)
-        if i != None:
+        if i is not None:
             self.blend.components = self.blend.components[:i] + self.blend.components[i+1:]
             self.updateAddButton()
             self.updateComponentTable()

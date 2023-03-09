@@ -26,8 +26,8 @@ try:
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import stringp, debugLogLevelActive
 
@@ -205,7 +205,7 @@ class modbusport():
         return addr - 30001
 
     def isConnected(self):
-        return not (self.master is None) and self.master.socket
+        return self.master is not None and self.master.socket
 
     def disconnect(self):
         _log.debug('disconnect()')
@@ -348,7 +348,7 @@ class modbusport():
                 registers = [register]
                 if self.inputFloats[c] or self.inputBCDs[c] or self.inputFloatsAsInt[c]:
                     registers.append(register+1)
-                if not (code in self.activeRegisters):
+                if code not in self.activeRegisters:
                     self.activeRegisters[code] = {}
                 if slave in self.activeRegisters[code]:
                     self.activeRegisters[code][slave].extend(registers)
@@ -361,9 +361,9 @@ class modbusport():
         self.readingsCache = {}
 
     def cacheReadings(self,code,slave,register,results):
-        if not (code in self.readingsCache):
+        if code not in self.readingsCache:
             self.readingsCache[code] = {}
-        if not slave in self.readingsCache[code]:
+        if slave not in self.readingsCache[code]:
             self.readingsCache[code][slave] = {}
         for i,v in enumerate(results):
             self.readingsCache[code][slave][register+i] = v

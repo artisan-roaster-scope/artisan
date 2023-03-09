@@ -27,8 +27,8 @@ try:
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QSemaphore, QTimer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from pathlib import Path
 from artisanlib.util import getDirectory
@@ -595,7 +595,7 @@ def applyServerUpdates(data):
         # to the server on next sync
         updated_record = {}
         for key, value in cached_sync_record.items():
-            if not (key in data):
+            if key not in data:
                 # we explicitly add the implicit null value (0 or "")
                 # for that key
                 if (
@@ -645,6 +645,7 @@ def applyServerUpdates(data):
 # internal function fetching the update from server and then unblock the
 # Properties Dialog and update the plus icon
 def fetchServerUpdate(uuid: str, file=None):
+    assert config.app_window is not None
     aw = config.app_window
     import requests
     try:
@@ -785,6 +786,7 @@ def fetchServerUpdate(uuid: str, file=None):
 def getUpdate(uuid: str, file=None):
     _log.debug('getUpdate(%s,%s)', uuid, file)
     if uuid is not None:
+        assert config.app_window is not None
         aw = config.app_window
         if aw.editgraphdialog is None and controller.is_connected():
             try:

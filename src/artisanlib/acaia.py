@@ -16,7 +16,7 @@
 # Marko Luther, 2019
 
 import logging
-from typing import Final
+from typing import Final, List
 from artisanlib.ble import BLE_CHAR_TYPE
 
 
@@ -92,11 +92,11 @@ class AcaiaBLE():
     NEW_CMD_EVENT_SA = 12
 
     protocolParseStep=E_PRS_CHECKHEADER1
-    protocolParseBuf=[]
+    protocolParseBuf:List[int]=[]
     protocolParseCMD=0
     protocolParseDataIndex = 0
     protocolParseDataLen = 0
-    protocolParseCRC=[]
+    protocolParseCRC:List[int]=[]
 
 
     def __init__(self):

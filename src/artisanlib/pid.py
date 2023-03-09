@@ -27,7 +27,7 @@ try:
     from PyQt6.QtCore import QSemaphore # @Reimport @UnresolvedImport @UnusedImport
 except Exception:  # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt5.QtCore import QSemaphore # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
 _log: Final = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ class PID():
 
     def _smooth_output(self,output):
         # create or update smoothing decay weights
-        if self.output_smoothing_factor != 0 and (self.output_decay_weights == None or len(self.output_decay_weights) != self.output_smoothing_factor): # recompute only on changes
+        if self.output_smoothing_factor != 0 and (self.output_decay_weights is None or len(self.output_decay_weights) != self.output_smoothing_factor): # recompute only on changes
             self.output_decay_weights = numpy.arange(1,self.output_smoothing_factor+1)
         # add new value
         self.previous_outputs.append(output)
@@ -92,7 +92,7 @@ class PID():
 
     def _smooth_input(self,inp):
         # create or update smoothing decay weights
-        if self.input_smoothing_factor != 0 and (self.input_decay_weights == None or len(self.input_decay_weights) != self.input_smoothing_factor): # recompute only on changes
+        if self.input_smoothing_factor != 0 and (self.input_decay_weights is None or len(self.input_decay_weights) != self.input_smoothing_factor): # recompute only on changes
             self.input_decay_weights = numpy.arange(1,self.input_smoothing_factor+1)
         # add new value
         self.previous_inputs.append(inp)
@@ -144,7 +144,7 @@ class PID():
             i = self._smooth_input(i)
             now = time.time()
             err = self.target - i
-            if self.lastError == None or self.lastTime == None:
+            if self.lastError is None or self.lastTime is None:
                 self.lastTime = now
                 self.lastError = err
             else:
@@ -197,7 +197,7 @@ class PID():
                         output = self.outMin
 
                     int_output = min(self.dutyMax,max(self.dutyMin,int(round(output))))
-                    if self.lastOutput == None or self.iterations_since_duty >= self.force_duty or int_output >= self.lastOutput + self.dutySteps or int_output <= self.lastOutput - self.dutySteps:
+                    if self.lastOutput is None or self.iterations_since_duty >= self.force_duty or int_output >= self.lastOutput + self.dutySteps or int_output <= self.lastOutput - self.dutySteps:
                         if self.active:
                             self.control(int_output)
                             self.iterations_since_duty = 0

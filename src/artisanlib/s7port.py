@@ -35,8 +35,8 @@ try:
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final = logging.getLogger(__name__)
@@ -449,7 +449,7 @@ class s7port():
                     registers.append(register+3)
                 elif self.type[c] == 0: # INT
                     registers.append(register+1)
-                if not (area in self.activeRegisters):
+                if area not in self.activeRegisters:
                     self.activeRegisters[area] = {}
                 if db_nr in self.activeRegisters[area]:
                     self.activeRegisters[area][db_nr].extend(registers)
@@ -461,9 +461,9 @@ class s7port():
         self.readingsCache = {}
 
     def cacheReadings(self,area,db_nr,register,results):
-        if not (area in self.readingsCache):
+        if area not in self.readingsCache:
             self.readingsCache[area] = {}
-        if not db_nr in self.readingsCache[area]:
+        if db_nr not in self.readingsCache[area]:
             self.readingsCache[area][db_nr] = {}
         try:
             for i,v in enumerate(results):

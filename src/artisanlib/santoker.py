@@ -269,7 +269,7 @@ class SantokerNetwork():
                         disconnected_handler()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-            except asyncio.TimeoutError as e:
+            except asyncio.TimeoutError:
                 _log.debug('connection timeout')
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)

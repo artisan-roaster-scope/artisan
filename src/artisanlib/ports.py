@@ -36,12 +36,12 @@ try:
                                  QHeaderView)  # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import (Qt, pyqtSlot, QEvent, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QIntValidator # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (Qt, pyqtSlot, QEvent, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QIntValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QHeaderView) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final = logging.getLogger(__name__)
@@ -416,7 +416,7 @@ class PortComboBox(QComboBox):
             import serial.tools.list_ports
             comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
             if platform.system() == 'Darwin':
-                self.ports = [p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync',
+                self.ports = [p for p in comports if (p[0] not in ['/dev/cu.Bluetooth-PDA-Sync',
                     '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem','/dev/cu.Bluetooth-Incoming-Port','/dev/tty.Bluetooth-Incoming-Port'])]
             else:
                 self.ports = list(comports)
@@ -911,7 +911,7 @@ class comportDlg(ArtisanResizeablDialog):
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(etbt_help_label)
         devid = self.aw.qmc.device
-        if not(devid in self.aw.qmc.nonSerialDevices) and not(devid == 0 and self.aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if (devid not in self.aw.qmc.nonSerialDevices) and not(devid == 0 and self.aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             grid = QGridLayout()
             grid.addWidget(comportlabel,0,0,Qt.AlignmentFlag.AlignRight)
             grid.addWidget(self.comportEdit,0,1)
@@ -1763,7 +1763,7 @@ class comportDlg(ArtisanResizeablDialog):
                             devname = devicename
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
-                        if not (devid in self.aw.qmc.nonSerialDevices) and devid != 29 and devicename[0] != '+': # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if (devid not in self.aw.qmc.nonSerialDevices) and devid != 29 and devicename[0] != '+': # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = self.aw.extracomport[i])
                             comportComboBox.activated.connect(self.portComboBoxIndexChanged)
                             comportComboBox.setMinimumContentsLength(15)
@@ -1875,8 +1875,10 @@ class comportDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def accept(self):
         #validate serial parameter against input errors
-        class comportError(Exception): pass
-        class timeoutError(Exception): pass
+        class comportError(Exception):
+            pass
+        class timeoutError(Exception):
+            pass
         comport = str(self.comportEdit.getSelection())
         baudrate = str(self.baudrateComboBox.currentText())
         bytesize = str(self.bytesizeComboBox.currentText())
@@ -1885,7 +1887,7 @@ class comportDlg(ArtisanResizeablDialog):
         timeout = self.aw.comma2dot(str(self.timeoutEdit.text()))
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
-        if not(self.aw.qmc.device in self.aw.qmc.nonSerialDevices) and not(self.aw.qmc.device == 0 and self.aw.ser.useModbusPort): # only if serial conf is not hidden
+        if (self.aw.qmc.device not in self.aw.qmc.nonSerialDevices) and not(self.aw.qmc.device == 0 and self.aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:

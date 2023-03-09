@@ -28,14 +28,14 @@ try:
     )
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import Qt, QEvent, QTimer, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import (
-        QPalette, QFontMetrics, QBrush, QColor, QPixmap, QIcon # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, QEvent, QTimer, pyqtSignal # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import ( # type: ignore
+        QPalette, QFontMetrics, QBrush, QColor, QPixmap, QIcon # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     )
-    from PyQt5.QtWidgets import (
-        QComboBox, QAbstractItemDelegate, QStyledItemDelegate, # @UnusedImport @Reimport  @UnresolvedImport
-        QApplication, QStyle, QStyleOptionComboBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QStyleOptionMenuItem, QStyleOptionViewItem, QStylePainter # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import ( # type: ignore
+        QComboBox, QAbstractItemDelegate, QStyledItemDelegate, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QApplication, QStyle, QStyleOptionComboBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QStyleOptionMenuItem, QStyleOptionViewItem, QStylePainter # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     )
 
 

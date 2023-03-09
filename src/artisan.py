@@ -18,10 +18,10 @@ try:
         #pylint: disable = E, W, R, C
         from PyQt6.QtWidgets import QApplication  # @UnusedImport @Reimport  @UnresolvedImport
         from PyQt6.QtCore import Qt     # @Reimport # @UnusedImport @Reimport  @UnresolvedImport
-    except:
+    except Exception: # pylint: disable=broad-except
         #pylint: disable = E, W, R, C
-        from PyQt5.QtWidgets import QApplication  # @UnusedImport @Reimport  @UnresolvedImport
-        from PyQt5.QtCore import Qt  # @UnusedImport @Reimport  @UnresolvedImport
+        from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        from PyQt5.QtCore import Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     QApplication.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
     QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 #    os.environ["QT_SCALE_FACTOR"] = "1"
@@ -85,7 +85,7 @@ if system() == 'Windows' and hasattr(sys, 'frozen'): # tools/freeze
 if __name__ == '__main__':
 
     # Manage commands that does not need to start the whole application
-    if command_utility.handleCommands() == True:
+    if command_utility.handleCommands():
         freeze_support()
         main.main()
 

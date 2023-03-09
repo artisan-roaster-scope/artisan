@@ -26,7 +26,7 @@ try:
     from PyQt6.QtCore import pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import decodeLocal
 from pathlib import Path
@@ -104,7 +104,7 @@ def extractInfo(res, attr: str, default):
 
 
 def fromFtoC(Ffloat: Optional[float]) -> Optional[float]:
-    if Ffloat in [-1, None] or numpy.isnan(Ffloat):
+    if Ffloat is None or Ffloat == -1 or numpy.isnan(Ffloat):
         return Ffloat
     assert Ffloat is not None
     return (Ffloat - 32.0) * (5.0 / 9.0)
@@ -130,13 +130,14 @@ def tempDiff2C(temp: Optional[float]) -> Optional[float]:
 
 
 def RoRfromFtoC(Ffloat: Optional[float]) -> Optional[float]:
-    if Ffloat in [-1, None] or numpy.isnan(Ffloat):
+    if Ffloat is None or Ffloat == -1 or numpy.isnan(Ffloat):
         return Ffloat
     assert Ffloat is not None
     return Ffloat * (5.0 / 9.0)
 
 
 def RoRtemp2C(temp: Optional[float],mode=None) -> Optional[float]:
+    assert config.app_window is not None
     if (
         temp is not None and (mode == 'F' or (mode is None and config.app_window.qmc.mode == 'F'
     ))):  # @UndefinedVariable
@@ -151,6 +152,7 @@ def RoRtemp2C(temp: Optional[float],mode=None) -> Optional[float]:
 def float2floatMin(fs: Optional[float], n: int = 1) -> Optional[float]:
     if fs is None:
         return None
+    assert config.app_window is not None
     f = config.app_window.float2float(float(fs), n)  # @UndefinedVariable
     i = int(f)
     if f == i:

@@ -35,6 +35,7 @@ def getTemplate(bp: Dict[str, Any],background=False) -> Dict[str, Any]:  #for Py
     _log.debug('getTemplate()')
     d: dict[str, Any] = {}
     try:
+        assert config.app_window is not None
         aw = config.app_window
 
         try:
@@ -251,6 +252,7 @@ def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with th
     d = {}
     try:
         _log.debug('getRoast()')
+        assert config.app_window is not None
         aw = config.app_window
         p = aw.getProfile()
 

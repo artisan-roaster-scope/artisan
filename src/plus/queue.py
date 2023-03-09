@@ -28,13 +28,12 @@ try:
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import QCoreApplication, QObject, QThread, pyqtSlot, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QCoreApplication, QObject, QThread, pyqtSlot, pyqtSignal # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import getDirectory
 from plus import config, util, roast, connection, sync, controller
-from typing import Any, List, Dict  #for Python >= 3.9: can remove 'List' and 'Dict' since type hints can use the generic 'list' and 'dict'
-from typing import Final
+from typing import Any, List, Dict, Final  #for Python >= 3.9: can remove 'List' and 'Dict' since type hints can use the generic 'list' and 'dict'
 import threading
 import time
 import logging
@@ -249,7 +248,7 @@ def start():
 
     if queue is None:
         # we initialize the queue
-        import persistqueue
+        import persistqueue # type: ignore
         queue = persistqueue.SQLiteQueue(
             queue_path, multithreading=True, auto_commit=False
         )
@@ -301,7 +300,7 @@ def full_roast_in_queue(roast_id: str) -> bool:
         return True
     except Exception:  # pylint: disable=broad-except
         # we reached the end of the queue
-        del q
+        del q # noqa: F821
         return False
 
 

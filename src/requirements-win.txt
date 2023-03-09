@@ -17,10 +17,10 @@ pyinstaller-versionfile==2.0.0 #2.1.1 #2.0.0
 #
 gevent==22.10.2 #22.10.1 # 21.12.0 # 1.5.0 is not compatible with Python 3.8
 gevent-websocket==0.10.1
-yoctopuce==1.10.53071 #1.10.52382
+yoctopuce==1.10.53327 #1.10.53071
 numpy==1.24.2 #1.23.5
-scipy==1.10.0 #1.9.3 # depends on numpy thus we have to put it after numpy
-matplotlib==3.7.0 #3.6.3 # 3.4.1 requires pyinstaller > 4.2 # currently pyinstaller up to 4.0 is not compatible with MPL 3.3.x
+scipy==1.10.1 #1.10.0 # depends on numpy thus we have to put it after numpy
+matplotlib==3.7.1 #3.7.0 # 3.4.1 requires pyinstaller > 4.2 # currently pyinstaller up to 4.0 is not compatible with MPL 3.3.x
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
 PyQt6==6.4.2 #6.4.0
