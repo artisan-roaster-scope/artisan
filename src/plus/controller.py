@@ -300,7 +300,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
         finally:
             if connect_semaphore.available() < 1:
                 connect_semaphore.release(1)
-        if config.app_window is not None is not None:
+        if config.app_window is not None:
             config.app_window.updatePlusStatusSignal.emit()  # @UndefinedVariable
         if interactive and is_connected():
             QTimer.singleShot(2500, stock.update)
