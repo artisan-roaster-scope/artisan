@@ -50,7 +50,6 @@ Machine                         | Driver | Remarks
 [Easyster](/machines/easyster/) | FTDI
 [Garanti](/machines/garanti/) | CP210x
 [Golden Roasters](/machines/goldenroasters/) | CH34x
-[HARTANZAH](/machines/hartanzah/) | FTDI
 [Has Garanti](/machines/hasgaranti/) | FTDI
 [HB](/machines/hb/) | CP210x
 [KapoK](/machines/kapok/) | CH34x
@@ -66,4 +65,8 @@ Machine                         | Driver | Remarks
 [Sedona](/machines/sedona/) | CP210x
 [Toper](/machines/toper/) | CP210x | CH34x on some machines
 [Yoshan](/machines/yoshan/) | CP210x
-	
+
+
+<!--
+[HARTANZAH](/machines/hartanzah/) | FTDI
+-->
