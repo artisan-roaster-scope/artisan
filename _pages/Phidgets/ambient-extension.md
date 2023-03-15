@@ -10,6 +10,7 @@ toc: true
 toc_label: "On this page"
 toc_icon: "cog"
 ---
+[Phidget SETS](https://artisan-scope.org/devices/phidget-sets/)
 
 ## Parts
 
