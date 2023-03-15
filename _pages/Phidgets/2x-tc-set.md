@@ -21,7 +21,8 @@ This set is composed from the following 8 parts.
 - 1x [TMP1101 4x Thermocouple VINT Module](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=726){:target="_blank"}
 - 1x [HUB0000 VINT Hub](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"}
 - 2x [TMP4106 K-Type Probe Thermocouple 11cm, ø3.2mm](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=729){:target="_blank"}
-- 2x [HDW4101 M12 Mounting Nut for Probes](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=634){:target="_blank"}
+- 2x [HDW4102 M8 Mounting Nut for Probes](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=1240){:target="_blank"}  
+(2x [HDW4101 M12 Mounting Nuts](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=634){:target="_blank"} up to 15.3.2023)
 - 1x [Mini-USB Cable 120cm 24AWG](https://www.phidgets.com/?tier=3&catid=28&pcid=24&prodid=187){:target="_blank"}
 - 1x [Phidget VINT Cable 10cm](https://www.phidgets.com/?tier=3&catid=30&pcid=26&prodid=153){:target="_blank"}
 
