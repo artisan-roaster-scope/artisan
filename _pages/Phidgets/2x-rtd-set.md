@@ -10,7 +10,7 @@ toc: true
 toc_label: "On this page"
 toc_icon: "cog"
 ---
-<font size="2">[>> Phidget SETS](https://artisan-scope.org/devices/phidget-sets/)</font>
+[<font size="2"> >> Phidget SETS</font>](https://artisan-scope.org/devices/phidget-sets/)
 
 This Phidget setup centers around the VINT Phidget TMP1200 modules which provides 1 temperature channel per module.
 
