@@ -1,4 +1,4 @@
-setuptools==67.6.1 #67.5.0 # v60.7.0 and v60.7.1 break builds on py2app and pyinstaller4.8; with 60.8.1 or newer (tested until 60.9.3) py2app builds fail on start, py2app 0.28 fixes setuptools compatibility but has a typo in the PyQt6 recipe
+setuptools==66.0.0 #pymodbus 3.2 requires <66.0.0; 67.6.1 #67.5.0 # v60.7.0 and v60.7.1 break builds on py2app and pyinstaller4.8; with 60.8.1 or newer (tested until 60.9.3) py2app builds fail on start, py2app 0.28 fixes setuptools compatibility but has a typo in the PyQt6 recipe
 wheel==0.40.0 #0.38.4
 pyserial==3.5
 pymodbus==3.2.2
