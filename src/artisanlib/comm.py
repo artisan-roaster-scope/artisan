@@ -1938,7 +1938,7 @@ class serialport():
                     #return original T1 T2
                     ts1:float
                     if(r[index+11] == 9 or r[index+11] == 65): # 9="\x09" 65="\x41"
-                        ts1 = s1 # pylint: Consider using tuple unpacking for swapping variables consider-swap-variables # tuple unpacking not used here to make pyright happy
+                        ts1 = s1 # pylint: disable=consider-swap-variables # Consider using tuple unpacking for swapping variables consider-swap-variables # tuple unpacking not used here to make pyright happy
                         s1 = s2
                         s2 = ts1
                     elif r[index+11] == 10: # 10="\x0a"
