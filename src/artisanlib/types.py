@@ -183,9 +183,9 @@ class ProfileData(TypedDict, total=False):
     roastbatchprefix: str
     roastbatchpos: int
     roastUUID: str
-    beansize:str
-    beansize_min:int
-    beansize_max:int
+    beansize:str # legacy; float in str mapped to beansize_max
+    beansize_min:str # int saved as str to external profiles (internal variable of type int)
+    beansize_max:str # int saved as str to external profiles (internal variable of type int)
     specialevents: List[int]
     specialeventstype: List[int]
     specialeventsvalue: List[float]

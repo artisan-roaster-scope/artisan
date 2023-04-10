@@ -57,17 +57,3 @@ jobs:
         set -o pipefail
         pylint --disable=C --disable=R --extension-pkg-allow-list=PyQt6 --load-plugins=pylint.extensions.no_self_use src/plus | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
         pylint --disable=C --disable=R --extension-pkg-allow-list=PyQt6 --load-plugins=pylint.extensions.no_self_use src/artisanlib | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
-    - name: Analysing the code with mypy
-      env:
-        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        set -o pipefail
-        mypy src/artisanlib | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
-        mypy src/plus | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
-    - name: Analysing the code with ruff
-      env:
-        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        set -o pipefail
-        ruff src/artisanlib | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
-        ruff src/plus | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check

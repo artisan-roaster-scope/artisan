@@ -1097,7 +1097,7 @@ class tgraphcanvas(FigureCanvas):
         self.moisture_roasted:float = 0.
         self.greens_temp:float = 0.
 
-        self.beansize:float = 0.0
+        self.beansize:float = 0.0 # legacy; now mapped to beansize_max on load
         self.beansize_min:int = 0
         self.beansize_max:int = 0
 

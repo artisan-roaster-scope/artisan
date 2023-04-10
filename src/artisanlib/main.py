@@ -4633,9 +4633,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         if 'beans' in rr and rr['beans'] is not None:
             self.qmc.beans = rr['beans']
         if 'beanSize_min' in rr and rr['beanSize_min'] is not None:
-            self.qmc.beansize_min = rr['beanSize_min']
+            self.qmc.beansize_min = int(rr['beanSize_min'])
         if 'beanSize_max' in rr and rr['beanSize_max'] is not None:
-            self.qmc.beansize_max = rr['beanSize_max']
+            self.qmc.beansize_max = int(rr['beanSize_max'])
         if 'moistureGreen' in rr and rr['moistureGreen'] is not None:
             self.qmc.moisture_greens = rr['moistureGreen']
         if 'moistureRoasted' in rr and rr['moistureRoasted'] is not None:
@@ -13629,11 +13629,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 except Exception: # pylint: disable=broad-except
                     pass
             if 'beansize_min' in profile:
-                self.qmc.beansize_min = int(profile['beansize_min'])
+                self.qmc.beansize_min = int(round(float(profile['beansize_min']))) # compatible with legacy profiles holding beansize_min as floats
             else:
                 self.qmc.beansize_min = 0
             if 'beansize_max' in profile:
-                self.qmc.beansize_max = int(profile['beansize_max'])
+                self.qmc.beansize_max = int(round(float(profile['beansize_max']))) # compatible with legacy profiles holding beansize_max as floats
             else:
                 self.qmc.beansize_max = 0
             if 'heavyFC' in profile:
@@ -14485,9 +14485,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 import uuid
                 self.qmc.roastUUID = uuid.uuid4().hex # generate UUID
             profile['roastUUID'] = self.qmc.roastUUID
-            profile['beansize'] = str(self.qmc.beansize)
-            profile['beansize_min'] = int(self.qmc.beansize_min)
-            profile['beansize_max'] = int(self.qmc.beansize_max)
+#            profile['beansize'] = str(self.qmc.beansize) # legacy; not stored any longer
+            profile['beansize_min'] = str(self.qmc.beansize_min) # int in str (legacy profiles may contain floats in str)
+            profile['beansize_max'] = str(self.qmc.beansize_max) # int in str (legacy profiles may contain floats in str)
             profile['specialevents'] = self.qmc.specialevents
             profile['specialeventstype'] = self.qmc.specialeventstype
             profile['specialeventsvalue'] = self.qmc.specialeventsvalue
@@ -16304,8 +16304,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.machinesetup = toString(settings.value('machinesetup',self.qmc.machinesetup))
 #            self.qmc.density[2] = toFloat(settings.value("densitySampleVolume",self.qmc.density[2])) # fixed to 1l now
 
-            if settings.contains('beansize'):
-                self.qmc.beansize = toFloat(settings.value('beansize',self.qmc.beansize))
+#            if settings.contains('beansize'):
+#                self.qmc.beansize = toFloat(settings.value('beansize',self.qmc.beansize)) # retired
             if settings.contains('beansize_min'):
                 self.qmc.beansize_min = toInt(settings.value('beansize_min',self.qmc.beansize_min))
             if settings.contains('beansize_max'):
@@ -17764,7 +17764,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             settings.beginGroup('RoastProperties')
             settings.setValue('machinesetup',self.qmc.machinesetup)
 #            settings.setValue("densitySampleVolume",self.qmc.density[2]) # fixed to 1l now
-            settings.setValue('beansize',self.qmc.beansize)
+#            settings.setValue('beansize',self.qmc.beansize) # retired
             settings.setValue('beansize_min',self.qmc.beansize_min)
             settings.setValue('beansize_max',self.qmc.beansize_max)
             if filename is None:
