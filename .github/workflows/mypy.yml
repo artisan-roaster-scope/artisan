@@ -18,13 +18,13 @@ on:
           Working directory of where to run mypy command.
           Relative to the root directory.
         required: false
-        default: '.'
+        default: 'src'
       target:
         description: |
           Target file or directory of mypy command.
           Relative to the working directory.
         required: false
-        default: '.'
+        default: 'artisan'
       ### Flags for setup/execute ###
       execute_command:
         description: |
@@ -56,7 +56,7 @@ on:
       level:
         description: 'Report level for reviewdog [info,warning,error]'
         required: false
-        default: 'error'
+        default: 'info'
       reporter:
         description: 'Reporter of reviewdog command [github-pr-check,github-pr-review].'
         required: false

@@ -4127,6 +4127,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         settings.setValue('lastdonationpopup',int(libtime.time()))
         settings.setValue('starts',0)
         settings.sync()
+        if settings.status() != QSettings.Status.NoError:
+            _log.error('Failed to save lastdonationpopup settings')
 
     def donate(self):
         try:
@@ -17160,7 +17162,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             return '','',''
 
 
-    def closeEventSettings(self, filename=None): # pyright: ignore #  Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths (reportGeneralTypeIssues)
+    def closeEventSettings(self, filename=None) -> bool: # pyright: ignore #  Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths (reportGeneralTypeIssues)
         #save window geometry and position. See QSettings documentation.
         #This information is often stored in the system registry on Windows,
         #and in XML preferences files on Mac OS X. On Unix systems, in the absence of a standard,
@@ -18027,10 +18029,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if filename:
                 settings.setValue('timestamp', QDateTime.currentDateTime().toString('yyyy-MM-ddThh:mm:ss'))
 
+            settings.sync()
+            if settings.status() != QSettings.Status.NoError:
+                _log.error('Failed to save settings')
+                QMessageBox.information(self, QApplication.translate('Error Message', 'Error',None),QApplication.translate('Error Message', 'Failed to save settings'))
+                return False
+
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(self, QApplication.translate('Error Message', 'Error',None),QApplication.translate('Error Message', 'Exception:') + ' closeEvent()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
+        return False
 
     def closeEventSettings_theme(self, filename=None):
         try:
@@ -21519,7 +21528,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             #print(sip.isdeleted(dialog))
         except Exception: # pylint: disable=broad-except
             pass
-        self.closeEventSettings() # save all app settings
+        #self.closeEventSettings() # save all app settings
 
     def toggleHottopControl(self):
         if self.HottopControlActive:
@@ -21688,7 +21697,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                             if isinstance(widget, ApplicationWindow):
                                 widget.updateRecentSettingActions()
                         self.sendmessage(QApplication.translate('Message',f'Settings loaded {self.strippedName(filename)}'))
-                    else:
+                    elif not res and remember:
                         # remove file from the recent file list
                         settings = QSettings()
                         files = toStringList(settings.value('recentSettingList'))
@@ -21746,7 +21755,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             fname = toString(action.data())
             if os.path.isfile(fname):
                 _log.info('menu load recent settings: %s',fname)
-                self.loadSettings(fn=fname)
+                self.loadSettings(fn=fname, remember=False)
             else:
                 settings = QSettings()
                 files = toStringList(settings.value('recentSettingList'))
@@ -21769,22 +21778,22 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Save Settings'), path=fname, ext='*.aset')
         if filename:
             self.settingspath = filename
-            self.closeEventSettings(filename)
 
-            self.sendmessage(QApplication.translate('Message','Settings saved'))
-            # update recentSettings menu
-            settings = QSettings()
-            files = toStringList(settings.value('recentSettingList'))
-            try:
-                removeAll(files,filename)
-            except ValueError:
-                pass
-            files.insert(0, filename)
-            del files[self.MaxRecentFiles:]
-            settings.setValue('recentSettingList', files)
-            for widget in QApplication.topLevelWidgets():
-                if isinstance(widget, ApplicationWindow):
-                    widget.updateRecentSettingActions()
+            if self.closeEventSettings(filename):
+                self.sendmessage(QApplication.translate('Message','Settings saved'))
+                # update recentSettings menu
+                settings = QSettings()
+                files = toStringList(settings.value('recentSettingList'))
+                try:
+                    removeAll(files,filename)
+                except ValueError:
+                    pass
+                files.insert(0, filename)
+                del files[self.MaxRecentFiles:]
+                settings.setValue('recentSettingList', files)
+                for widget in QApplication.topLevelWidgets():
+                    if isinstance(widget, ApplicationWindow):
+                        widget.updateRecentSettingActions()
         else:
             self.sendmessage(QApplication.translate('Message','Cancelled'))
 
